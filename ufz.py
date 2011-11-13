@@ -12,22 +12,23 @@
 
     Provided functions (alphabetic)
     ------------------
-    around         round to the passed power of ten.
-    calcvpd        calculates vapour pressure deficit
-    cellarea       calc areas of grid cells in m^2
-    date2dec	   converts arrays with calendar date to decimal date
-    dec2date	   converts arrays with decimal date to calendar date
-    fread          reads in float array from ascii file
-    gap_filling    gap fills eddy flux data (CO2,LE,H-fluxes) 
-    lif            count number of lines in file
+    around         Round to the passed power of ten.
+    calcvpd        Calculates vapour pressure deficit
+    cellarea       Calc areas of grid cells in m^2
+    date2dec	   Converts arrays with calendar date to decimal date
+    dec2date	   Converts arrays with decimal date to calendar date
+    fread          Reads in float array from ascii file
+    gap_filling    Gapfills eddy flux data (CO2, LE, H) 
+    lif            Count number of lines in file
+    mad            Median absolute deviation test
     outlier        Rossner''s extreme standardized deviate outlier test
-    pack           similar to Fortran pack function with mask
-    position       position arrays of subplots to be used with add_axes
-    readnetcdf     reads variables or information from netcdf file
-    semivariogram  calculates semivariogram from spatial data
-    sread          reads in string array from ascii file
-    tsym           Raw unicodes for common sybols
-    unpack         similar to Fortran unpack function with mask
+    pack           Similar to Fortran pack function with mask
+    position       Position arrays of subplots to be used with add_axes
+    readnetcdf     Reads variables or information from netcdf file
+    semivariogram  Calculates semivariogram from spatial data
+    sread          Reads in string array from ascii file
+    tsym           Raw unicodes for common symbols
+    unpack         Similar to Fortran unpack function with mask
 
     
     Provided functions per category
@@ -42,43 +43,44 @@
     -------------------------------
     Array manipulation
     ------------------
-    pack           similar to Fortran pack function with mask
-    unpack         similar to Fortran unpack function with mask
+    pack           Similar to Fortran pack function with mask
+    unpack         Similar to Fortran unpack function with mask
 
     Ascii files
     -----------
-    fread          reads in float array from ascii file
-    lif            count number of lines in file
-    sread          reads in string array from ascii file
+    fread          Reads in float array from ascii file
+    lif            Count number of lines in file
+    sread          Reads in string array from ascii file
 
     Data processing
     ---------------
-    calcvpd        calculates vapour pressure deficit
-    gap_filling    gap fills flux data (CO2,LE,H-fluxes) 
+    calcvpd        Calculates vapour pressure deficit
+    gap_filling    Gapfills flux data (CO2, LE, H)
+    mad            Median absolute deviation test
     outlier        Rossner''s extreme standardized deviate outlier test
-    semivariogram  calculates semivariogram from spatial data
+    semivariogram  Calculates semivariogram from spatial data
 
     Date & Time
     -----------
-    date2dec	   converts arrays with calendar date to decimal date
-    dec2date	   converts arrays with decimal date to calendar date
+    date2dec	   Converts arrays with calendar date to decimal date
+    dec2date	   Converts arrays with decimal date to calendar date
 
     Grids
     -----
-    cellarea       calc areas of grid cells in m^2
+    cellarea       Calc areas of grid cells in m^2
 
     Miscellaneous
     -------------
-    around         round to the passed power of ten.
+    around         Round to the passed power of ten.
 
     Plotting
     --------
-    position       position arrays of subplots to be used with add_axes
-    tsym           Raw unicodes for common sybols
+    position       Position arrays of subplots to be used with add_axes
+    tsym           Raw unicodes for common symbols
 
     Special files
     -------------
-    readnetcdf     reads variables or information from netcdf file
+    readnetcdf     Reads variables or information from netcdf file
         
 
     History
@@ -95,6 +97,7 @@
               TR, May 2011 - calcvpd
               MC, Jun 2011 - /usr/bin/python to /usr/bin/env python
                            - tsym, around
+              MC, Nov 2011 - mad
 """
 # Routines provided
 from around      import *
@@ -106,6 +109,7 @@ from fread       import *
 from gap_filling import *
 from lif         import *
 from outlier     import *
+from mad         import *
 from pack        import *
 from position    import *
 from readnetcdf  import *
@@ -114,8 +118,8 @@ from tsym        import *
 from unpack      import *
 
 # Information
-version = '1.3'
-date = '24.03.2011'
+version = '1.4'
+date = '11.11.2011'
 
 # Main
 if __name__ == '__main__':

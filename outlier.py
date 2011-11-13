@@ -77,13 +77,13 @@ def outlier(y,alpha=0.01,k=-1,quiet=True):
         History
         -------
         Written,  MG, Jul 2010
-        Modified, MC, Mar 2011    - formulation was wrong: after removal of a point, the 
-                                    absolute deviation was not recalculated with the new mean
-                                    it gives exactly the same as the example in the above NIST-webpage
-                                  - calc mean and standard deviation with cummulative formula
-                                    so that there is only three sums of whole array
-                                  - include case with no outliers: returns -1.
-        Modified, MC/MG, Oct 2011 - break loop if new variance < 0 in iteration
+        Modified, MC, Mar 2011 - formulation was wrong: after removal of a point, the 
+                                 absolute deviation was not recalculated with the new mean
+                                 it gives exactly the same as the example in the above NIST-webpage
+                               - calc mean and standard deviation with cummulative formula
+                                 so that there is only three sums of whole array
+                               - include case with no outliers: returns -1.
+               MC/MG, Oct 2011 - break loop if new variance < 0 in iteration
     """
     # check user input
     if ((alpha<=0) or (alpha>1)):

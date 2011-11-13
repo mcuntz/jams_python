@@ -1,0 +1,23 @@
+
+This is the PYTHON library of the
+
+Department Computational Hydrosystems
+Helmholtz Centre for Environmental Research - UFZ
+Permoserstr. 15
+04318 Leipzig
+Germany
+
+The documentation of the library is in the docstring of ufz.py so that one can get help on the
+Python prompt:
+>>> import ufz
+>>> help(ufz)
+
+The individual functions also provide their help as doctrings.
+Getting, for example, help on fread for reading ascii files:
+>>> import ufz
+>>> help(ufz.fread)
+
+The library is maintained with a subversion system at:
+https://svn.ufz.de/chs-svn/PYTHON_chs_lib/
+
+Created June 2009 by Matthias Cuntz
