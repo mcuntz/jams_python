@@ -98,21 +98,29 @@
               MC, Jun 2011 - /usr/bin/python to /usr/bin/env python
                            - tsym, around
               MC, Nov 2011 - mad
+	      MC, Nov 2011 - try netcdf and stats routines
 """
 # Routines provided
+
 from around      import *
 from calcvpd     import *
 from cellarea    import *
-from date2dec    import *
-from dec2date    import *
+try:
+    from readnetcdf  import *
+    from date2dec    import *
+    from dec2date    import *
+    from gap_filling import *
+except ImportError:
+    print "No netcdf support in UFZ library. Disabled functions: readnetcdf, date2dec, dec2date, gap_filling."
 from fread       import *
-from gap_filling import *
 from lif         import *
-from outlier     import *
+try:
+    from outlier     import *
+except ImportError:
+    print "No extra statistics in scipy, i.e. in UFZ library. Disabled functions: outlier."
 from mad         import *
 from pack        import *
 from position    import *
-from readnetcdf  import *
 from sread       import *
 from tsym        import *
 from unpack      import *
