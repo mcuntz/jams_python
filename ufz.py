@@ -13,6 +13,7 @@
     Provided functions (alphabetic)
     ------------------
     around         Round to the passed power of ten.
+    autostring     Format number (array) with given decimal precision.
     calcvpd        Calculates vapour pressure deficit
     cellarea       Calc areas of grid cells in m^2
     date2dec	   Converts arrays with calendar date to decimal date
@@ -72,6 +73,7 @@
     Miscellaneous
     -------------
     around         Round to the passed power of ten.
+    autostring     Format number (array) with given decimal precision.
 
     Plotting
     --------
@@ -99,10 +101,12 @@
                            - tsym, around
               MC, Nov 2011 - mad
 	      MC, Nov 2011 - try netcdf and stats routines
+	      MC, Nov 2011 - autostring
 """
 # Routines provided
 
 from around      import *
+from autostring  import *
 from calcvpd     import *
 from cellarea    import *
 try:
