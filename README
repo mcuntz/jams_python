@@ -20,4 +20,7 @@ Getting, for example, help on fread for reading ascii files:
 The library is maintained with a subversion system at:
 https://svn.ufz.de/chs-svn/PYTHON_chs_lib/
 
+Further information can be found at:
+https://svn.ufz.de/chs-svn/wiki/WikiPython
+
 Created June 2009 by Matthias Cuntz
