@@ -10,7 +10,8 @@ def dec2date(indata, calendar = 'standard', units = False,
              mo = False, dy = False, hr = False, mi = False,
              sc = False, ascii = False, eng = False):
     """
-        PURPOSE:
+        PURPOSE
+        -------
 
         Converts numpy arrays with decimal date into 
         numpy arrays with calendar date. Supported time formats
@@ -31,19 +32,22 @@ def dec2date(indata, calendar = 'standard', units = False,
         
         http://netcdf4-python.googlecode.com        
         
-        DEFINITION:
+        DEFINITION
+        ----------
         
         def dec2date(indata, calendar = 'standard', units = False,
              excelerr = True, fulldate = False, yr = False, 
              mo = False, dy = False, hr = False, mi = False,
              sc = False, ascii = False, eng = False):
                 
-        INPUT:
+        INPUT
+        -----
        
         indata -> Input numpy array with decimal date.
                   Input date must be positive.
        
-        PARAMETERS:
+        PARAMETERS
+        ----------
        
         calendar -> Input date format. Default value is 
                    'standard'.
@@ -83,7 +87,8 @@ def dec2date(indata, calendar = 'standard', units = False,
                            (30 days per month)with its units at 
                            01.01.0001 00:00:00 until now.
        
-        OPTIONAL ARGUMENTS:
+        OPTIONAL ARGUMENTS
+        ------------------
        
         units    -> Time units can be set by user. Input must be a
                      string in the format 'yyyy-mm-dd hh:mm:ss'.
@@ -94,7 +99,8 @@ def dec2date(indata, calendar = 'standard', units = False,
                      For excelerr = False, 1900 is considered as
                      common year.
        
-        OUTPUT:
+        OUTPUT
+        ------
        
         fulldate -> output arrays with year, month, day, hour,
                     minute, second 
@@ -110,7 +116,8 @@ def dec2date(indata, calendar = 'standard', units = False,
                     'yyyy-mm-dd hh:mm:ss'
                     
        
-        EXAMPLE ARRAYS:
+        EXAMPLES
+        --------
 
         #calendar = 'standard'         
         >>> a = np.array([2451549.02101, 2382262.17720, 2316600.93102,\
@@ -211,8 +218,11 @@ def dec2date(indata, calendar = 'standard', units = False,
         #>>> print asciidate        
         #['05.01.2000 12:30:15' '03.07.1000 12:30:15' '02.10.0500 22:20:40'
         # '01.01.0001 00:00:00']
-                          
-        WRITTEN BY AP, JUNE 2010
+
+
+        History
+        -------
+        Written AP, Jun 2010
     """
     
     if (int(nt.__version__[0]) <= 0) and\

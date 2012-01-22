@@ -1,11 +1,8 @@
 #!/usr/bin/env python
 
-import optparse
-import os
 import sys
 import numpy as np
-import pdb
-
+#import pdb
 from ufz import dec2date
 
 ###############################################################
@@ -16,7 +13,8 @@ def gap_filling(tofill,Rg,Tair,vpd,dates,flag_tofill=[],\
         Tair_dev=2.5,vpd_dev=5,t_int = 48,TrueFilling=True):
 
     '''
-        PURPOSE:
+        PURPOSE
+        -------
 
         Fills gaps of flux data derived with Eddy-Covariance (EC) 
         technique according to:
@@ -26,7 +24,8 @@ def gap_filling(tofill,Rg,Tair,vpd,dates,flag_tofill=[],\
         improved algorithm. Global Change Biology,11,9,
         p. 1424-1439.
         
-        INPUT:
+        INPUT
+        -----
         
         tofill     -> input array fluxes 
         Rg         -> input array gloabal radiation in Wm-2
@@ -39,13 +38,15 @@ def gap_filling(tofill,Rg,Tair,vpd,dates,flag_tofill=[],\
         vpd_flag   -> input array: flags of vapour pressure deficit
         dates      -> date in decimal julian days
         
-        PARAMETERS:
+        PARAMETERS
+        ----------
        
         TrueFilling -> True: real filling is performed; just 
                         gaps are filled; gaps are flags_tofill > 0
                        False: every data point is "filled";
         
-        OPTIONAL ARGUMENTS:
+        OPTIONAL ARGUMENTS
+        ------------------
  
         Rg_dev  -> deviation threshold of global radiation (see "*")
         Tair_dev-> deviation threshold of Air Temperature (see "*")
@@ -56,7 +57,8 @@ def gap_filling(tofill,Rg,Tair,vpd,dates,flag_tofill=[],\
         time of gap is taken +- the deviation; in a time window 
         fluxes with these values (condition +- deviation) are averaged.
         
-        OUTPUT:
+        OUTPUT
+        ------
        
         filled -> Output numpy array filled data
         qc_gf -> quality classes of fills 
@@ -65,9 +67,12 @@ def gap_filling(tofill,Rg,Tair,vpd,dates,flag_tofill=[],\
         
         http://numpy.scipy.org/ 
 
-        MODIFIED 09/15/11:
-        loop over single years removed
-        loops now over range of input data
+        History
+        -------
+        Written  TR, 2011
+        Modified TR, Sep 2011 - loop over single years removed
+                              - loops now over range of input data
+        Modified MG, Sep 2011 - include standard deviation output
     '''    
 # --------------------------------------------------------------------
 # sets the quality class of the gap-filling (Reichstein et al. 2005)

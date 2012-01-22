@@ -34,7 +34,7 @@ def tsym(name):
 
         Example
         ----------
-        # \00 in becomes \\x in docstring
+        # \00 becomes \\x in docstring
         >>> tsym('degree')
         u'\\xb0'
         >>> tsym('degreec')

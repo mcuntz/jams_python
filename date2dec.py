@@ -11,7 +11,8 @@ def date2dec(calendar = 'standard', units = False,
              mi = 00, sc = 00, ascii = None, eng = None):
 
     """
-        PURPOSE:
+        PURPOSE
+        -------
 
         Converts numpy arrays with calendar date into 
         numpy arrays with decimal date. Supported calendar
@@ -32,14 +33,16 @@ def date2dec(calendar = 'standard', units = False,
         
         http://netcdf4-python.googlecode.com        
         
-        DEFINITION:
+        DEFINITION
+        ----------
         
         def date2dec(calendar = 'standard', units = False,
              excelerr = True, yr = None, 
              mo = None, dy = None, hr = None, 
              mi = None, sc = None, ascii = None, eng = None):
                 
-        INPUT:
+        INPUT
+        -----
         
         yr       -> input array with year
         mo       -> input array with month
@@ -58,7 +61,8 @@ def date2dec(calendar = 'standard', units = False,
                     input is chosen by user, other inputs 
                     will be neglected.
        
-        PARAMETERS:
+        PARAMETERS
+        ----------
        
         calendar -> Input date format. Default value is 
                    'standard'.
@@ -98,7 +102,8 @@ def date2dec(calendar = 'standard', units = False,
                            (30 days per month)with its units at 
                            01.01.0001 00:00:00 until now.
        
-        OPTIONAL ARGUMENTS:
+        OPTIONAL ARGUMENTS
+        ------------------
  
         units    -> Time units can be set by user. Input must be a
                      string in the format 'yyyy-mm-dd hh:mm:ss'.
@@ -109,11 +114,13 @@ def date2dec(calendar = 'standard', units = False,
                      For excelerr = False, 1900 is considered as no
                      leap year.
        
-        OUTPUT:
+        OUTPUT
+        ------
        
         output -> Output numpy array with decimal date.
        
-        EXAMPLE ARRAYS:
+        EXAMPLES
+        --------
 
         #calendar = 'standard'
         >>> year   = np.array([2000,1810,1630,1510,1271,619,-1579,-4712])
@@ -240,8 +247,11 @@ def date2dec(calendar = 'standard', units = False,
         #>>> decimal = date2dec(calendar = '360_day', ascii = k)
         #>>> print np.round(decimal, 8)
         #[ 719644.52100694  359822.52100694  179911.93101852       0.        ]
-                                 
-        WRITTEN BY AP, JUNE 2010
+
+
+        History
+        -------
+        Written AP, Jun 2010
     """
     
     if (int(nt.__version__[0]) <= 0) and\

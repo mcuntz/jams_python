@@ -3,7 +3,7 @@ import numpy as np
 
 def cellarea(lat, lon, globe=False):
     """
-        Calculates the area of grid cells in metre square
+        Calculates the area of Earth grid cells in metre square
 
         Definition
         ----------

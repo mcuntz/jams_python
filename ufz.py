@@ -10,14 +10,14 @@
     >>> import ufz
     >>> help(ufz.function)
 
-    Provided functions (alphabetic)
+    Provided functions (alphabetic w/o obsolete)
     ------------------
     around         Round to the passed power of ten.
     autostring     Format number (array) with given decimal precision.
-    calcvpd        Calculates vapour pressure deficit
     cellarea       Calc areas of grid cells in m^2
     date2dec	   Converts arrays with calendar date to decimal date
     dec2date	   Converts arrays with decimal date to calendar date
+    esat           Calculates the saturation vapour pressure of water/ice.
     fread          Reads in float array from ascii file
     gap_filling    Gapfills eddy flux data (CO2, LE, H) 
     lif            Count number of lines in file
@@ -33,6 +33,7 @@
 
     
     Provided functions per category
+    -------------------------------
         Array manipulation
         Ascii files
         Data processing
@@ -41,6 +42,7 @@
         Miscellaneous
         Plotting
         Special files
+        Obsolete
     -------------------------------
     Array manipulation
     ------------------
@@ -55,7 +57,6 @@
 
     Data processing
     ---------------
-    calcvpd        Calculates vapour pressure deficit
     gap_filling    Gapfills flux data (CO2, LE, H)
     mad            Median absolute deviation test
     outlier        Rossner''s extreme standardized deviate outlier test
@@ -74,6 +75,7 @@
     -------------
     around         Round to the passed power of ten.
     autostring     Format number (array) with given decimal precision.
+    esat           Calculates the saturation vapour pressure of water/ice.
 
     Plotting
     --------
@@ -83,6 +85,10 @@
     Special files
     -------------
     readnetcdf     Reads variables or information from netcdf file
+
+    Obsolete
+    -------------
+    calcvpd        Calculates vapour pressure deficit
         
 
     History
@@ -102,6 +108,7 @@
               MC, Nov 2011 - mad
 	      MC, Nov 2011 - try netcdf and stats routines
 	      MC, Nov 2011 - autostring
+	      MC, Jan 2012 - esat, make calcvpd obsolete
 """
 # Routines provided
 
@@ -109,6 +116,7 @@ from around      import *
 from autostring  import *
 from calcvpd     import *
 from cellarea    import *
+from esat        import *
 try:
     from readnetcdf  import *
     from date2dec    import *

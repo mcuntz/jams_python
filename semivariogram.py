@@ -20,6 +20,7 @@ def semivariogram(x,y,v,nL,di,td,type='omnidirectional',model='exponential',
 
     """
     PURPOSE:
+    -------
     
     Calculates single or multiple experimental semivariogram(s) for
     spatial distributed data. X and Y coordinates and corresponding
@@ -27,17 +28,20 @@ def semivariogram(x,y,v,nL,di,td,type='omnidirectional',model='exponential',
     semivariograms can be fitted. Results are plotted in various graphs
     and the fitted model parameters are given to the output.
     
-    REQUIREMENTS:
+    REQUIREMENTS
+    ------------
     
     pylab, scipy (at least version 0.8.0), matplotlib, numpy
     
-    DEFINITION:
+    DEFINITION
+    ----------
         
     def semivariogram(x,y,v,nL,di,td,type='omnidirectional',
                       model='exponential',graph=True,lunit='m',
                       p0=(0.5,0.5,100)):
                 
-    INPUT:
+    INPUT
+    -----
         
     x    :    numpy array with longitude ('easting')
     y    :    numpy array with latitude ('northing')
@@ -51,7 +55,8 @@ def semivariogram(x,y,v,nL,di,td,type='omnidirectional',model='exponential',
               samples appear. Otherwise, an exeption appears.
               td > 180 is not allowed.
     
-    PARAMETERS:
+    PARAMETERS
+    ----------
        
     type :    type of semivariogram
     
@@ -118,7 +123,8 @@ def semivariogram(x,y,v,nL,di,td,type='omnidirectional',model='exponential',
     g     :   array(s) of variances
     c     :   array(s) of samples per lag
               
-    GRAPHS:
+    GRAPHS
+    ------
     
     Figure 1: shows a scatter plot of your original geodata
     
@@ -129,7 +135,8 @@ def semivariogram(x,y,v,nL,di,td,type='omnidirectional',model='exponential',
     Figure 4: visualize di and td, the angles and angle tolerances
               you have chosen.
     
-    EXAMPLES:
+    EXAMPLES
+    --------
     
     # provide you some sample data:
     
@@ -241,9 +248,11 @@ def semivariogram(x,y,v,nL,di,td,type='omnidirectional',model='exponential',
     [ 1.075  1.193  1.171  1.187  1.008  1.13   1.103  1.086]
     >>> print np.round(range, 0)
     [  74.  122.  132.  130.   82.  171.  310.   35.]
-    
-    WRITTEN BY AP, February 2011
-    (small code parts based on Alghalandis.com)
+
+
+    HISTORY
+    -------
+    Written AP, Feb 2011 - small code parts based on Alghalandis.com
     """
 
     if (np.shape(x)!=np.shape(y)) or (np.shape(y)!=np.shape(v)):
