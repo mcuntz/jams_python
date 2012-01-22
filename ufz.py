@@ -86,7 +86,7 @@
     tcherkez       Calculates the Tcherkez model of 13C-discrimiantion in the Calvin cycle.
 
     Math
-    -----------
+    ----
     around         Round to the passed power of ten.
     division       Divide two arrays, return "otherwise" if division by 0.
     heaviside      Heaviside (or unit step) operator
@@ -111,7 +111,7 @@
     readnetcdf     Reads variables or information from netcdf file
 
     Obsolete
-    -------------
+    --------
     calcvpd        Calculates vapour pressure deficit
         
 
@@ -180,7 +180,7 @@ date = '22.01.2012'
 
 # Main
 if __name__ == '__main__':
-    print 'UFZ Computational Hydrosystems Python Utilities.'
+    print '\nUFZ Computational Hydrosystems Python Utilities.'
     print "Version %s from %s." % (version,date)
     print ('\nUFZ routines are free software and come with '
            'ABSOLUTELY NO WARRANTY.')
@@ -189,3 +189,4 @@ if __name__ == '__main__':
           'Helmholtz Centre for Environmental Research - UFZ, Permoserstr. 15, '
           '04318 Leipzig, Germany.')
     print 'All rights reserved.'
+    print '\nIn case of questions or comments contact matthias.cuntz(at)ufz.de'
