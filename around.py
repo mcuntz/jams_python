@@ -9,20 +9,24 @@ def around(num, powten, ceil=False, floor=False):
         ----------
         def around(num, powten=None, ceil=False, floor=False):
 
+
         Input
-        ----------
+        -----
         num        number array
 
+
         Optional Input
-        ----------
+        --------------
         powten     Power of ten array
                    If missing, simple round (ceil, floor) is taken.
         ceil       ceil instead of round to the nearest power of ten
         floor      floor instead of round to the nearest power of ten
 
+
         Output
         ------
         Rounded values.
+
 
         Restrictions
         ------------
@@ -35,8 +39,9 @@ def around(num, powten, ceil=False, floor=False):
         inexact representation of decimal fractions in the IEEE floating point
         standard and errors introduced when scaling by powers of ten.'
 
-        Example
-        ----------
+
+        Examples
+        --------
         >>> around(np.array([3.5967,345.5967]), -3)
         array([   3.597,  345.597])
         

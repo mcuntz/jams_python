@@ -19,30 +19,27 @@ def semivariogram(x,y,v,nL,di,td,type='omnidirectional',model='exponential',
                   graph=True,lunit='m',p0=(0.5,0.5,100),runtimediag=True):
 
     """
-    PURPOSE:
-    -------
-    
     Calculates single or multiple experimental semivariogram(s) for
     spatial distributed data. X and Y coordinates and corresponding
     values are required in separate numpy arrays. Different theoretical
     semivariograms can be fitted. Results are plotted in various graphs
     and the fitted model parameters are given to the output.
     
+
     REQUIREMENTS
-    ------------
-    
+    ------------    
     pylab, scipy (at least version 0.8.0), matplotlib, numpy
     
+
     DEFINITION
     ----------
-        
     def semivariogram(x,y,v,nL,di,td,type='omnidirectional',
                       model='exponential',graph=True,lunit='m',
                       p0=(0.5,0.5,100)):
                 
+
     INPUT
     -----
-        
     x    :    numpy array with longitude ('easting')
     y    :    numpy array with latitude ('northing')
     v    :    numpy array with values
@@ -54,10 +51,10 @@ def semivariogram(x,y,v,nL,di,td,type='omnidirectional',model='exponential',
               enough, so that no "empty" angular span with no
               samples appear. Otherwise, an exeption appears.
               td > 180 is not allowed.
+
     
     PARAMETERS
     ----------
-       
     type :    type of semivariogram
     
         'omnidirectional' semivariogram is calculated for the hole
@@ -110,8 +107,9 @@ def semivariogram(x,y,v,nL,di,td,type='omnidirectional',model='exponential',
               are printed to the console. If False, runtime diagnostics
               print is disabled. (default=True)
        
-    OUTPUT:
-    
+
+    OUTPUT
+    ------
     nugget:   height of nugget(s) [(unit of v)**2]
     sill  :   height if sill(s) [(unit of v)**2]
     range :   distance of range [unit of x and y]
@@ -123,9 +121,9 @@ def semivariogram(x,y,v,nL,di,td,type='omnidirectional',model='exponential',
     g     :   array(s) of variances
     c     :   array(s) of samples per lag
               
+
     GRAPHS
     ------
-    
     Figure 1: shows a scatter plot of your original geodata
     
     Figure 2: shows the experimental and theoretical semivariogram
@@ -135,11 +133,10 @@ def semivariogram(x,y,v,nL,di,td,type='omnidirectional',model='exponential',
     Figure 4: visualize di and td, the angles and angle tolerances
               you have chosen.
     
+
     EXAMPLES
     --------
-    
     # provide you some sample data:
-    
     # easting
     >>> x = np.array([557509.27, 557518.11, 557526.95, 557535.79, 557544.63, 557553.47\
                     , 557544.63, 557535.79, 557526.95, 557518.11, 557526.95, 557535.79\
@@ -157,7 +154,6 @@ def semivariogram(x,y,v,nL,di,td,type='omnidirectional',model='exponential',
                     , 557473.92, 557438.56, 557403.21, 557367.85, 557332.5,  557367.85\
                     , 557403.21, 557438.56, 557473.92, 557332.50, 557261.79, 557191.08\
                     , 557261.79, 557332.50, 557403.21, 557473.92, 557544.63, 557615.34])
-                    
     # northing
     >>> y = np.array([4332422.55, 4332413.71, 4332404.87, 4332396.03, 4332387.19, 4332396.03\
                     , 4332404.87, 4332413.71, 4332422.55, 4332431.39, 4332440.23, 4332431.39\
@@ -175,7 +171,6 @@ def semivariogram(x,y,v,nL,di,td,type='omnidirectional',model='exponential',
                     , 4332281.13, 4332316.48, 4332351.84, 4332387.19, 4332422.55, 4332457.91\
                     , 4332493.26, 4332528.62, 4332563.97, 4332563.97, 4332493.26, 4332422.55\
                     , 4332351.84, 4332281.13, 4332210.42, 4332139.71, 4332069.00, 4332139.71])
-    
     # value
     >>> v = np.array([9.94691161e-01, 7.94158417e-02, 0.00000000e+00, 1.75837990e+00\
                     , 0.00000000e+00, 0.00000000e+00, 0.00000000e+00, 0.00000000e+00\

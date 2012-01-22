@@ -22,9 +22,11 @@ def fread(file, nc=0, skip=0, cskip=0, separator='',
                   header=False, full_header=False,
                   quiet=False, transpose=False):
 
+
         Input
         -----
         file         source file name
+
 
         Optional Input Parameters
         -------------------------
@@ -43,6 +45,7 @@ def fread(file, nc=0, skip=0, cskip=0, separator='',
                      sequence can be e.g. string, list or tuple
         fill_value   value to fill in if not enough columns line
                      and fill=True (default 0 and '' for header)
+
 
         Options
         -------
@@ -67,11 +70,13 @@ def fread(file, nc=0, skip=0, cskip=0, separator='',
         strarr       True:  return header as numpy array of strings
                      False: return header as list
 
+
         Output
         ------
         Either float array containing numbers from file if header=False
         or string array of file header if header=True
         or string vector of file header if header=True, full_header=True
+
 
         Restrictions
         ------------
@@ -83,8 +88,9 @@ def fread(file, nc=0, skip=0, cskip=0, separator='',
           end of file.
         Tested with python >= 2.5
 
-        Example
-        ----------
+
+        Examples
+        --------
         # Create some data
         >>> filename = 'test.dat'
         >>> file = open(filename,'w')
@@ -207,6 +213,7 @@ def fread(file, nc=0, skip=0, cskip=0, separator='',
         # Clean up doctest
         >>> import os
         >>> os.remove(filename)
+
 
         History
         -------

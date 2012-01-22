@@ -11,9 +11,6 @@ def date2dec(calendar = 'standard', units = False,
              mi = 00, sc = 00, ascii = None, eng = None):
 
     """
-        PURPOSE
-        -------
-
         Converts numpy arrays with calendar date into 
         numpy arrays with decimal date. Supported calendar
         formats are standard, gregorian, julian, proleptic_gregorian, 
@@ -32,18 +29,18 @@ def date2dec(calendar = 'standard', units = False,
         netcdftime available at:
         
         http://netcdf4-python.googlecode.com        
+
         
         DEFINITION
         ----------
-        
         def date2dec(calendar = 'standard', units = False,
              excelerr = True, yr = None, 
              mo = None, dy = None, hr = None, 
              mi = None, sc = None, ascii = None, eng = None):
                 
+
         INPUT
         -----
-        
         yr       -> input array with year
         mo       -> input array with month
         dy       -> input array with day
@@ -61,9 +58,9 @@ def date2dec(calendar = 'standard', units = False,
                     input is chosen by user, other inputs 
                     will be neglected.
        
+
         PARAMETERS
         ----------
-       
         calendar -> Input date format. Default value is 
                    'standard'.
        
@@ -102,9 +99,9 @@ def date2dec(calendar = 'standard', units = False,
                            (30 days per month)with its units at 
                            01.01.0001 00:00:00 until now.
        
+
         OPTIONAL ARGUMENTS
         ------------------
- 
         units    -> Time units can be set by user. Input must be a
                      string in the format 'yyyy-mm-dd hh:mm:ss'.
                      Default values are set automatically.
@@ -114,14 +111,14 @@ def date2dec(calendar = 'standard', units = False,
                      For excelerr = False, 1900 is considered as no
                      leap year.
        
+
         OUTPUT
         ------
-       
         output -> Output numpy array with decimal date.
        
+
         EXAMPLES
         --------
-
         #calendar = 'standard'
         >>> year   = np.array([2000,1810,1630,1510,1271,619,-1579,-4712])
         >>> month  = np.array([1,4,7,9,3,8,8,1])

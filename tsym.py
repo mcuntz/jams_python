@@ -7,18 +7,22 @@ def tsym(name):
         ----------
         def tsym(name):
 
+
         Input
-        ----------
+        -----
         name        Symbol name, case insensitive
+
 
         Output
         ------
         Raw unicode string
 
+
         Restrictions
         ------------
         Only knows a very limited number of names
         Use empty function to return names
+
 
         Known symbols
         ------------
@@ -32,8 +36,9 @@ def tsym(name):
         per mil     Permille sign
         per mille   Permille sign
 
-        Example
-        ----------
+
+        Examples
+        --------
         # \00 becomes \\x in docstring
         >>> tsym('degree')
         u'\\xb0'

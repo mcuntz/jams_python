@@ -12,10 +12,12 @@ def pack(array, mask):
         ----------
         def pack(array, mask):
 
+
         Input
         -----
         array         input array
         mask          boolean array with dimensions <= array dimensions
+
 
         Output
         ------
@@ -23,12 +25,14 @@ def pack(array, mask):
                  Last dimension has only elements that correspond to true
                  elements of mask
 
+
         Restrictions
         ------------
         All mask values false is undefined.
     
-        Example
-        -------
+
+        Examples
+        --------
         # Create some data
         # for example an island in the middle of an ocean
         >>> import numpy as np
@@ -61,6 +65,7 @@ def pack(array, mask):
         array([[ 1.,  1.,  1.,  1.,  1.,  1.,  1.,  1.,  1.],
                [ 1.,  1.,  1.,  1.,  1.,  1.,  1.,  1.,  1.]])
         
+
         History
         -------
         Written, MC, Jul. 2009

@@ -10,18 +10,22 @@ def mad(datin, z=7, deriv=0):
         ----------
         def mad(datin, z=7, deriv=0):
 
+
         Input
-        ----------
+        -----
         datin      1d array
 
+
         Optional Input
-        ----------
+        --------------
         z          Input is allowed to deviate maximum z standard deviations from the median (default: 7)
         deriv      0: Act on raw input; 1: Use first derivatives; 2: Use 2nd derivatives
+
 
         Output
         ------
         mask with false everywhere except where input deviates more than z standard deviations from median
+
 
         Restrictions
         ------------
@@ -29,8 +33,9 @@ def mad(datin, z=7, deriv=0):
             d = datin[1:n]-datin[0:n-1]
         because mean of left and right would give 0 for spikes
 
-        Example
-        ----------
+
+        Examples
+        --------
         >>> import numpy as np
         >>> y = np.array([-0.25,0.68,0.94,1.15,2.26,2.35,2.37,2.40,2.47,2.54,2.62,\
                           2.64,2.90,2.92,2.92,2.93,3.21,3.26,3.30,3.59,3.68,4.30,\
@@ -58,6 +63,7 @@ def mad(datin, z=7, deriv=0):
         >>> print my
         [-0.25 0.68 0.94 1.15 2.26 2.35 2.37 2.4 2.47 2.54 2.62 2.64 2.9 2.92 2.92
          2.93 3.21 3.26 3.3 3.59 3.68 4.3 4.64 5.34 5.42 --]
+
 
         History
         -------

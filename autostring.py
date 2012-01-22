@@ -9,12 +9,14 @@ def autostring(num, prec=0, zero=False, set_printoptions=False, join=False, join
         ----------
         def autostring(num, prec, zero=False, set_printoptions=False):
 
+
         Input
-        ----------
+        -----
         num                 number array
 
+
         Optional Input
-        ----------
+        --------------
 	prec                number of decimal places of formatted values
 	                    minimum field width for integers (default: 0)
 	zero                if True, pad values with zeros rather than blanks (default: False)
@@ -24,16 +26,19 @@ def autostring(num, prec=0, zero=False, set_printoptions=False, join=False, join
                             i.e. first flattens the array and then joins it (default: False, overwrites join)
 	sep                 separator used when joining (default: space=' ')
 
+
         Output
         ------
 	string (array) of formatted numbers
+
 
         Restrictions
         ------------
 	None
 
+
         Examples
-        ----------
+        --------
         >>> print autostring(3.5967, 3)
         3.597
 

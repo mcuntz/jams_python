@@ -12,26 +12,31 @@ def unpack(array, mask, value=0.):
         ----------
         def unpack(array, mask, value=0.):
 
+
         Input
         -----
         array         input array
         mask          boolean array with dimensions <= array dimensions
 
+
         Optional input
         -----
         value         value of the new elements (default: 0)
+
 
         Output
         ------
         results: array with mask-1 dimensions more than input array.
                  The new elements have the user-defined value.
 
+
         Restrictions
         ------------
         All mask values false is undefined.
     
-        Example
-        -------
+
+        Examples
+        --------
         # Create some data
         # for example an island in the middle of an ocean
         >>> import numpy as np
@@ -72,6 +77,7 @@ def unpack(array, mask, value=0.):
          [ 2.  2.  2.  1.  1.  1.  2.  2.  2.  2.]
          [ 2.  2.  2.  2.  2.  2.  2.  2.  2.  2.]]
        
+
         History
         -------
         Written, MC, Jul. 2009

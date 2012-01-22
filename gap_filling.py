@@ -8,25 +8,19 @@ from ufz import dec2date
 ###############################################################
 ###############################################################
 ###############################################################
-def gap_filling(tofill,Rg,Tair,vpd,dates,flag_tofill=[],\
-        Rg_flag=[],Tair_flag=[],vpd_flag=[],Rg_dev=50.,\
-        Tair_dev=2.5,vpd_dev=5,t_int = 48,TrueFilling=True):
-
+def gap_filling(tofill, Rg, Tair, vpd, dates, \
+		flag_tofill=[], Rg_flag=[], Tair_flag=[], vpd_flag=[], \
+		Rg_dev=50., Tair_dev=2.5, vpd_dev=5, t_int = 48, \
+		TrueFilling=True):
     '''
-        PURPOSE
-        -------
+        Fills gaps of flux data derived with Eddy-Covariance (EC) technique according to:
+        Reichstein et al. (2005): On the separation of net ecosystem exchange into 
+        assimilation and ecosystem respiration: review and improved algorithm.
+	Global Change Biology,11,9, p. 1424-1439.
+        
 
-        Fills gaps of flux data derived with Eddy-Covariance (EC) 
-        technique according to:
-        Reichstein et al. (2005):    
-        On the separation of net ecosystem exchange into 
-        assimilation and ecosystem respiration: review and 
-        improved algorithm. Global Change Biology,11,9,
-        p. 1424-1439.
-        
         INPUT
-        -----
-        
+        -----      
         tofill     -> input array fluxes 
         Rg         -> input array gloabal radiation in Wm-2
         Tair       -> input array Air Temperature degree Celsius
@@ -38,16 +32,15 @@ def gap_filling(tofill,Rg,Tair,vpd,dates,flag_tofill=[],\
         vpd_flag   -> input array: flags of vapour pressure deficit
         dates      -> date in decimal julian days
         
+
         PARAMETERS
         ----------
-       
-        TrueFilling -> True: real filling is performed; just 
-                        gaps are filled; gaps are flags_tofill > 0
-                       False: every data point is "filled";
+        TrueFilling -> True:  real filling is performed, i.e. just gaps are filled; gaps are flags_tofill > 0
+                       False: every data point is "filled", i.e. used for error generation
         
+
         OPTIONAL ARGUMENTS
         ------------------
- 
         Rg_dev  -> deviation threshold of global radiation (see "*")
         Tair_dev-> deviation threshold of Air Temperature (see "*")
         vpd_dev -> deviation threshold of vpd (see "*")
@@ -57,15 +50,16 @@ def gap_filling(tofill,Rg,Tair,vpd,dates,flag_tofill=[],\
         time of gap is taken +- the deviation; in a time window 
         fluxes with these values (condition +- deviation) are averaged.
         
+
         OUTPUT
         ------
-       
         filled -> Output numpy array filled data
         qc_gf -> quality classes of fills 
         
         Requires the 'numpy' package available at:
         
         http://numpy.scipy.org/ 
+
 
         History
         -------

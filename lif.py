@@ -10,9 +10,11 @@ def lif(file, noblank=False, comment='', skip=0):
         ----------
         def lif(file, noblank=False, comment='', skip=0):
 
+
         Input
         -----
         file         source file name
+
 
         Optional input parameters
         -------------------------
@@ -22,21 +24,25 @@ def lif(file, noblank=False, comment='', skip=0):
         skip         number of lines to skip at the beginning of
                        the file (default 0)
 
+
         Options
         -------
         noblank      excludes all lines that consists only of
                        whitespace characters
 
+
         Output
         ------
         number of lines in file
+
 
         Restrictions
         ------------
         Only ascii files.
     
-        Example
-        -------
+
+        Examples
+        --------
         # Create some data
         >>> filename = 'test.dat'
         >>> file = open(filename,'w')
@@ -70,6 +76,7 @@ def lif(file, noblank=False, comment='', skip=0):
         # Clean up
         >>> import os
         >>> os.remove(filename)
+
 
         History
         -------

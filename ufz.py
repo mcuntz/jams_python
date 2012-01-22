@@ -15,11 +15,15 @@
     around         Round to the passed power of ten.
     autostring     Format number (array) with given decimal precision.
     cellarea       Calc areas of grid cells in m^2
+    closest        Get the array index of the element that is closest to a given number.
+    dewpoint       Calculates the dew point from ambient humidity
     date2dec	   Converts arrays with calendar date to decimal date
     dec2date	   Converts arrays with decimal date to calendar date
+    division       Divide two arrays, return "otherwise" if division by 0.
     esat           Calculates the saturation vapour pressure of water/ice.
     fread          Reads in float array from ascii file
     gap_filling    Gapfills eddy flux data (CO2, LE, H) 
+    heaviside      Heaviside (or unit step) operator
     lif            Count number of lines in file
     mad            Median absolute deviation test
     outlier        Rossner''s extreme standardized deviate outlier test
@@ -28,8 +32,10 @@
     readnetcdf     Reads variables or information from netcdf file
     semivariogram  Calculates semivariogram from spatial data
     sread          Reads in string array from ascii file
+    tcherkez       Calculates the Tcherkez model of 13C-discrimiantion in the Calvin cycle.
     tsym           Raw unicodes for common symbols
     unpack         Similar to Fortran unpack function with mask
+    yrange         Calculates plot range from input array
 
     
     Provided functions per category
@@ -39,6 +45,9 @@
         Data processing
         Date & Time
         Grids
+        Isotopes
+        Math
+        Meteorology
         Miscellaneous
         Plotting
         Special files
@@ -46,6 +55,7 @@
     -------------------------------
     Array manipulation
     ------------------
+    closest        Get the array index of the element that is closest to a given number.
     pack           Similar to Fortran pack function with mask
     unpack         Similar to Fortran unpack function with mask
 
@@ -71,16 +81,30 @@
     -----
     cellarea       Calc areas of grid cells in m^2
 
+    Isotopes
+    --------
+    tcherkez       Calculates the Tcherkez model of 13C-discrimiantion in the Calvin cycle.
+
+    Math
+    -----------
+    around         Round to the passed power of ten.
+    division       Divide two arrays, return "otherwise" if division by 0.
+    heaviside      Heaviside (or unit step) operator
+
+    Meteorology
+    -----------
+    dewpoint       Calculates the dew point from ambient humidity
+    esat           Calculates the saturation vapour pressure of water/ice.
+
     Miscellaneous
     -------------
-    around         Round to the passed power of ten.
     autostring     Format number (array) with given decimal precision.
-    esat           Calculates the saturation vapour pressure of water/ice.
 
     Plotting
     --------
     position       Position arrays of subplots to be used with add_axes
     tsym           Raw unicodes for common symbols
+    yrange         Calculates plot range from input array
 
     Special files
     -------------
@@ -108,38 +132,51 @@
               MC, Nov 2011 - mad
 	      MC, Nov 2011 - try netcdf and stats routines
 	      MC, Nov 2011 - autostring
-	      MC, Jan 2012 - esat, make calcvpd obsolete
+	      MC, Jan 2012 - esat, closest, dewpoint, division, heaviside, tcherkez, yrange
+                           - make calcvpd obsolete
 """
 # Routines provided
-
 from around      import *
 from autostring  import *
 from calcvpd     import *
 from cellarea    import *
-from esat        import *
+from closest     import *
 try:
-    from readnetcdf  import *
     from date2dec    import *
     from dec2date    import *
+except ImportError:
+    print "No netcdf support in UFZ library. Disabled functions: date2dec, dec2date, gap_filling, readnetcdf."
+from dewpoint    import *
+from division    import *
+from esat        import *
+from fread       import *
+try:
     from gap_filling import *
 except ImportError:
-    print "No netcdf support in UFZ library. Disabled functions: readnetcdf, date2dec, dec2date, gap_filling."
-from fread       import *
+    pass
+from heaviside   import *
 from lif         import *
+from mad         import *
 try:
     from outlier     import *
 except ImportError:
     print "No extra statistics in scipy, i.e. in UFZ library. Disabled functions: outlier."
-from mad         import *
 from pack        import *
 from position    import *
+try:
+    from readnetcdf  import *
+except ImportError:
+    pass
+from semivariogram import *
 from sread       import *
+from tcherkez    import *
 from tsym        import *
 from unpack      import *
+from yrange      import *
 
 # Information
-version = '1.4'
-date = '11.11.2011'
+version = '1.5'
+date = '22.01.2012'
 
 # Main
 if __name__ == '__main__':
@@ -148,7 +185,7 @@ if __name__ == '__main__':
     print ('\nUFZ routines are free software and come with '
            'ABSOLUTELY NO WARRANTY.')
     print 'You are welcome to redistribute it.'
-    print ('\nCopyright (C) 2009-2011, Computational Hydrosystems, '
+    print ('\nCopyright (C) 2009-2012, Computational Hydrosystems, '
           'Helmholtz Centre for Environmental Research - UFZ, Permoserstr. 15, '
           '04318 Leipzig, Germany.')
     print 'All rights reserved.'

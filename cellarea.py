@@ -9,10 +9,12 @@ def cellarea(lat, lon, globe=False):
         ----------
         def cellarea(lon, lat, globe=False):
 
+
         Input
         -----
         lat          latitudes in degrees N
         lon          longitudes in degrees E
+
 
         Options
         -------
@@ -23,12 +25,14 @@ def cellarea(lat, lon, globe=False):
         ------
         array with area in m^2
 
+
         Restrictions
         ------------
         No irregular spacings.
+
     
-        Example
-        -------
+        Examples
+        --------
         # Gaussian latitudes
         >>> import numpy as np
         >>> lat = np.array([ 12.98898858, 9.27785325, 5.56671363])
@@ -37,6 +41,7 @@ def cellarea(lat, lon, globe=False):
         array([[  1.67639084e+11,   1.67639084e+11,   1.67639084e+11],
                [  1.69790428e+11,   1.69790428e+11,   1.69790428e+11],
                [  1.71229889e+11,   1.71229889e+11,   1.71229889e+11]])
+
 
         History
         -------

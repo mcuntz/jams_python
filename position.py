@@ -23,8 +23,9 @@ def position(row=1, col=1, num=1,
                      sortcol=False, golden=False, inversegolden=False,
                      figsize(1.,1.)):
 
+
         Optional Input
-        -----
+        --------------
         row            number of subplot rows (default 1)
         col            number of subplot columns (default 1)
         num            subplot number (default 1)
@@ -44,13 +45,15 @@ def position(row=1, col=1, num=1,
                        Scales everything to rectangular section
                        (default (1,1))
 
+
         Output
         ------
         position array with [left, bottom, width, height)
         to be used with fig.add_axes.
     
-        Example
-        -------
+
+        Examples
+        --------
         # Use, for example, as follows
         # fig1 = figure(1)
         # sub1 = fig1.add_axes(position(2,2,1))

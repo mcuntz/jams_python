@@ -15,15 +15,18 @@ def readnetcdf(file, var='', code=-1, reform=False, squeeze=False,
                        variables=False, codes=False, units=False, 
                        longnames=False, attributes=False, sort=False):
                      
+
         Input
         -----
         file         netcdf file name
         
+
         Optional Input Parameters
         -------------------------
         var          name of variable in netcdf file
         code         code number in attribute code
                        
+
         Options
         -------
         reform       if output is array then squeeze(array)
@@ -40,10 +43,12 @@ def readnetcdf(file, var='', code=-1, reform=False, squeeze=False,
                      sorted accoringly so that indeces still match.
         quiet        quietly return None if error occurs
                             
+
         Output
         ------
         Either float array of variable/code or information lists
         such as list of all variables in netcdf file.
+
 
         Restrictions
         ------------
@@ -51,8 +56,9 @@ def readnetcdf(file, var='', code=-1, reform=False, squeeze=False,
           they do not match the variable list anymore.
         Attributes can not be sorted nor reformed/squeezed.
                 
-        Example
-        ----------
+
+        Examples
+        --------
         >>> readnetcdf('readnetcdf_test.nc',var='is1')
         array([[ 1.,  1.,  1.,  1.],
                [ 1.,  1.,  1.,  1.]])
@@ -83,6 +89,7 @@ def readnetcdf(file, var='', code=-1, reform=False, squeeze=False,
         READNETCDF: code 127 not in file readnetcdf_test.nc.
         >>> readnetcdf('readnetcdf_test.nc')
         READNETCDF: to read variable, variable name or code has to be given.
+
 
         History
         -------

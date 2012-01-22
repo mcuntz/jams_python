@@ -17,6 +17,7 @@ def sread(file, nc=0, skip=0, cskip=0, separator='',
         This routines is exactly the same as fread but reads
         everything as strings except of floats.
         
+
         Definition
         ----------
         def sread(file, nc=0, skip=0, cskip=0, separator='',
@@ -25,10 +26,12 @@ def sread(file, nc=0, skip=0, cskip=0, separator='',
                   header=False, full_header=False,
                   quiet=False):
                      
+
         Input
         -----
         file         source file name
         
+
         Optional Input Parameters
         -------------------------
         nc           number of columns to be read (default: all)
@@ -47,6 +50,7 @@ def sread(file, nc=0, skip=0, cskip=0, separator='',
         fill_value   value to fill in if not enough columns line
                       and fill=True (default '')
                        
+
         Options
         -------
         squeeze      True:  2-dim array will be cleaned of degenerated
@@ -67,12 +71,14 @@ def sread(file, nc=0, skip=0, cskip=0, separator='',
         quiet        True:  do not show reason if read fails and returns None
                      False: show error for failed read (default)
                             
+
         Output
         ------
         Either float array containing numbers from file if header=False
         or string array of file header if header=True
         or string vector of file header if header=True, full_header=True
         
+
         Restrictions
         ------------
         If header=True then skip is counterintuitive because it is
@@ -82,8 +88,9 @@ def sread(file, nc=0, skip=0, cskip=0, separator='',
         If fill=True, blank lines are not filled but are expected
           end of file.
         
-        Example
-        ----------
+
+        Examples
+        --------
         # Create some data
         >>> filename = 'test.dat'
         >>> file = open(filename,'w')
@@ -154,6 +161,7 @@ def sread(file, nc=0, skip=0, cskip=0, separator='',
         # Clean up doctest
         >>> import os
         >>> os.remove(filename)
+
 
         History
         -------

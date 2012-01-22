@@ -14,15 +14,18 @@ def outlier(y,alpha=0.01,k=-1,quiet=True):
         ----------
         def outlier(y, alpha=alpha, k=k, quiet=quiet)
 
+
         Input
         -----
         y            Approx. normal distributed data
+
 
         Options
         -------
         alpha        Significance level (default: 0.01)
         k            Numbers of outliers to be checked (default: size(data)/2)
         quiet        True: Perform quietly (default: True)
+
 
         Output
         ------
@@ -33,17 +36,19 @@ def outlier(y,alpha=0.01,k=-1,quiet=True):
         ------------
         Assumptions: The input sample is assumed to be approximately normal distributed
 
-        Sources
-        -------
-        * Rosner B, Percentage Points for a Generalized ESD Many-Outlier Procedure,
+
+        References
+        ----------
+        Rosner B, Percentage Points for a Generalized ESD Many-Outlier Procedure,
             Technometrics, 25(2), 165-172, 1983
-        * http://www.itl.nist.gov/div898/handbook/eda/section3/eda35h3.htm (July 2010)
-        * Yu RC, Teh HW, Jaques PA, Sioutas C, Froines JR,
+        http://www.itl.nist.gov/div898/handbook/eda/section3/eda35h3.htm (July 2010)
+        Yu RC, Teh HW, Jaques PA, Sioutas C, Froines JR,
             Quality control of semi-continuous mobility size-fractionated
             particle number concentration data; atmospheric Environment 38, 3341- 3348, 2004
         
-        Example
-        -------
+
+        Examples
+        --------
         >>> import numpy as np
         >>> y = np.array([-0.25,0.68,0.94,1.15,2.26,2.35,2.37,2.40,2.47,2.54,2.62,\
                           2.64,2.90,2.92,2.92,2.93,3.21,3.26,3.30,3.59,3.68,4.30,\
@@ -73,6 +78,7 @@ def outlier(y,alpha=0.01,k=-1,quiet=True):
         >>> outlier(y,quiet=False)
         Found no outliers.
         -1
+
 
         History
         -------
