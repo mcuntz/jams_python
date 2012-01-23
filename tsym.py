@@ -68,17 +68,17 @@ def tsym(name):
     """
     #
     # Define symbol dictionary
-    symdict = { \
-               'degree'    : ur'\u00B0', \
-               'degreec'   : ur'\u2103', \
-               'degree c'  : ur'\u2103', \
-               'mu'        : ur'\u00B5', \
-               'peclet'    : ur'\u2118', \
-               'permil'    : ur'\u2030', \
-               'permille'  : ur'\u2030', \
-               'per mil'   : ur'\u2030', \
-               'per mille' : ur'\u2030' \
-              }
+    symdict = ({
+               'degree'    : ur'\u00B0',
+               'degreec'   : ur'\u2103',
+               'degree c'  : ur'\u2103',
+               'mu'        : ur'\u00B5',
+               'peclet'    : ur'\u2118',
+               'permil'    : ur'\u2030',
+               'permille'  : ur'\u2030',
+               'per mil'   : ur'\u2030',
+               'per mille' : ur'\u2030' 
+              })
 
     #
     # lookup symbol

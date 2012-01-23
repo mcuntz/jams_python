@@ -2,9 +2,6 @@
 import numpy as np
 import netcdftime as nt
 
-###############################################################
-###############################################################
-###############################################################
 def date2dec(calendar = 'standard', units = False,
              excelerr = True, yr = 0001, 
              mo = 01, dy = 01, hr = 00, 
@@ -251,22 +248,22 @@ def date2dec(calendar = 'standard', units = False,
         Written AP, Jun 2010
     """
     
-    if (int(nt.__version__[0]) <= 0) and\
-       (int(nt.__version__[2]) <= 9) and\
-       (int(nt.__version__[4]) <= 2) and\
-       (calendar == '360_day'):
+    if ((int(nt.__version__[0]) <= 0) and
+        (int(nt.__version__[2]) <= 9) and
+        (int(nt.__version__[4]) <= 2) and
+        (calendar == '360_day')):
         raise ValueError("date2dec error: Your version of netcdftime.py is equal"
                          " or below 0.9.2. The 360_day calendar does not work with"
                          " arrays here. Please download a newer one.")
     
     calendar = calendar.lower()
     # if user input of calendar is undefined:
-    if (calendar != 'standard') and (calendar != 'gregorian') and\
-       (calendar != 'julian') and (calendar != 'proleptic_gregorian') and\
-       (calendar != 'excel1900') and (calendar != 'excel1904') and\
-       (calendar != '365_day') and (calendar != 'noleap') and\
-       (calendar != '366_day') and (calendar != 'all_leap') and\
-       (calendar != '360_day'):
+    if ((calendar != 'standard') and (calendar != 'gregorian') and
+        (calendar != 'julian') and (calendar != 'proleptic_gregorian') and
+        (calendar != 'excel1900') and (calendar != 'excel1904') and
+        (calendar != '365_day') and (calendar != 'noleap') and
+        (calendar != '366_day') and (calendar != 'all_leap') and
+        (calendar != '360_day')):
         raise ValueError("date2dec error: Wrong calendar!"
                     " Choose 'standard', 'gregorian', 'julian',"
                     " 'proleptic_gregorian', 'excel1900', 'excel1904'," 

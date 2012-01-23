@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 import numpy as np
 
-def tcherkez(Rstar, Phi=0.3, T=0.056, \
-             a2=1.0012, a3=1.0058, a4=1.0161, \
-             t1=0.9924, t2=1.0008, g=20e-3, \
+def tcherkez(Rstar, Phi=0.3, T=0.056,
+             a2=1.0012, a3=1.0058, a4=1.0161,
+             t1=0.9924, t2=1.0008, g=20e-3,
              RG=False, Rchl=False, Rcyt=False, fullmodel=True):
     """
         Calculates the Tcherkez model of 13C-discrimiantion in the Calvin cycle.
