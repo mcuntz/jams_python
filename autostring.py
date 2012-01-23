@@ -108,13 +108,22 @@ def autostring(num, prec=0, zero=False, set_printoptions=False, join=False, join
 		typ = np.int32
     else:
 	typ = num.dtype
-    if (typ in [np.float16, np.float32, np.float64, np.float128]):
-	isfloat = True
-    elif (typ in [np.int8, np.int16, np.int32, np.int64, np.uint8, np.uint16, np.uint32, np.uint64]):
-	isfloat = False
+    if np.__version__ >= "1.6":
+        if (typ in [np.float16, np.float32, np.float64, np.float128]):
+            isfloat = True
+        elif (typ in [np.int8, np.int16, np.int32, np.int64, np.uint8, np.uint16, np.uint32, np.uint64]):
+            isfloat = False
+        else:
+            print "AUTOSTRING WARNING: autostring cannot work with input type: return original array."
+            return num
     else:
-	print "AUTOSTRING WARNING: autostring cannot work with input type: return original array."
-	return num
+        if (typ in [np.float32, np.float64, np.float128]):
+            isfloat = True
+        elif (typ in [np.int8, np.int16, np.int32, np.int64, np.uint8, np.uint16, np.uint32, np.uint64]):
+            isfloat = False
+        else:
+            print "AUTOSTRING WARNING: autostring cannot work with input type: return original array."
+            return num        
     # Scalar to array if necessary; Special treatment of -0.0
     if (isarr==0):
 	if (num == 0):
