@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 import numpy as np
-from ufz import around as around
+from ufz import around, tiny
 
 def yrange(arr, symmetric=False):
     """
@@ -51,7 +51,7 @@ def yrange(arr, symmetric=False):
         Written, MC, Jan 2012
     """
     #
-    eps = 1e-6
+    eps = tiny
     # Check input
     if len(arr) == 1:
         return [arr[0],arr[0]]

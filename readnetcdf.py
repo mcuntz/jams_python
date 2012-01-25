@@ -65,26 +65,42 @@ def readnetcdf(file, var='', code=-1, reform=False, squeeze=False,
         >>> readnetcdf('readnetcdf_test.nc',code=129)
         array([[ 2.,  2.,  2.,  2.],
                [ 2.,  2.,  2.,  2.]])
-        >>> readnetcdf('readnetcdf_test.nc',variables=True)
-        ['x', 'y', 'is1', 'is2']
-        >>> readnetcdf('readnetcdf_test.nc',variables=True,sort=True)
-        ['is1', 'is2', 'x', 'y']
+        >>> t1 = readnetcdf('readnetcdf_test.nc',variables=True)
+        >>> t2 = readnetcdf('readnetcdf_test.nc',variables=True,sort=True)
+        >>> t3 = readnetcdf('readnetcdf_test.nc',units=True)
+        >>> t4 = readnetcdf('readnetcdf_test.nc',units=True,sort=True)
+        >>> t5 = readnetcdf('readnetcdf_test.nc',longnames=True)
+        >>> t6 = readnetcdf('readnetcdf_test.nc',longnames=True,sort=True)
+        >>> t7 = readnetcdf('readnetcdf_test.nc',var='is1',attributes=True)
+        >>> if nc.__version__ < '0.9.9':
+        ...     [unicode(i) for i in t1]
+        ...     [unicode(i) for i in t2]
+        ...     [unicode(i) for i in t3]
+        ...     [unicode(i) for i in t4]
+        ...     [unicode(i) for i in t5]
+        ...     [unicode(i) for i in t6]
+        ...     [unicode(i) for i in t7]
+        ... else:
+        ...     t1
+        ...     t2
+        ...     t3
+        ...     t4
+        ...     t5
+        ...     t6
+        ...     t7
+        [u'x', u'y', u'is1', u'is2']
+        [u'is1', u'is2', u'x', u'y']
+        [u'xx', u'yy', u'arbitrary', u'arbitrary']
+        [u'arbitrary', u'arbitrary', u'xx', u'yy']
+        [u'x-axis', u'y-axis', u'all ones', u'all twos']
+        [u'all ones', u'all twos', u'x-axis', u'y-axis']
+        {u'units': u'arbitrary', u'long_name': u'all ones', u'code': 128}
         >>> readnetcdf('readnetcdf_test.nc',codes=True)
         array([  -1.,   -1.,  128.,  129.])
         >>> readnetcdf('readnetcdf_test.nc',codes=True,reform=True)
         array([ 128.,  129.])
         >>> readnetcdf('readnetcdf_test.nc',codes=True,sort=True)
         [128.0, 129.0, -1.0, -1.0]
-        >>> readnetcdf('readnetcdf_test.nc',units=True)
-        ['xx', 'yy', 'arbitrary', 'arbitrary']
-        >>> readnetcdf('readnetcdf_test.nc',units=True,sort=True)
-        ['arbitrary', 'arbitrary', 'xx', 'yy']
-        >>> readnetcdf('readnetcdf_test.nc',longnames=True)
-        ['x-axis', 'y-axis', 'all ones', 'all twos']
-        >>> readnetcdf('readnetcdf_test.nc',longnames=True,sort=True)
-        ['all ones', 'all twos', 'x-axis', 'y-axis']
-        >>> readnetcdf('readnetcdf_test.nc',var='is1',attributes=True)
-        {'units': 'arbitrary', 'long_name': 'all ones', 'code': 128}
         >>> readnetcdf('readnetcdf_test.nc',code=127)
         READNETCDF: code 127 not in file readnetcdf_test.nc.
         >>> readnetcdf('readnetcdf_test.nc')

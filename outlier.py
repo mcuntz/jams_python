@@ -77,7 +77,7 @@ def outlier(y,alpha=0.01,k=-1,quiet=True):
         array([51, 52, 53])
         >>> outlier(y,quiet=False)
         Found no outliers.
-        -1
+        array([-1])
 
 
         History

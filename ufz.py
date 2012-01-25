@@ -16,6 +16,7 @@
     autostring     Format number (array) with given decimal precision.
     cellarea       Calc areas of grid cells in m^2
     closest        Get the array index of the element that is closest to a given number.
+    const          Calculates plot range from input array
     dewpoint       Calculates the dew point from ambient humidity
     date2dec	   Converts arrays with calendar date to decimal date
     dec2date	   Converts arrays with decimal date to calendar date
@@ -99,6 +100,7 @@
     Miscellaneous
     -------------
     autostring     Format number (array) with given decimal precision.
+    const          Calculates plot range from input array
 
     Plotting
     --------
@@ -132,7 +134,7 @@
               MC, Nov 2011 - mad
 	      MC, Nov 2011 - try netcdf and stats routines
 	      MC, Nov 2011 - autostring
-	      MC, Jan 2012 - esat, closest, dewpoint, division, heaviside, tcherkez, yrange
+	      MC, Jan 2012 - esat, closest, dewpoint, division, heaviside, tcherkez, yrange, const
                            - make calcvpd obsolete
 """
 # Routines provided
@@ -141,6 +143,7 @@ from autostring  import *
 from calcvpd     import *
 from cellarea    import *
 from closest     import *
+from const       import *
 try:
     from date2dec    import *
     from dec2date    import *
@@ -189,4 +192,4 @@ if __name__ == '__main__':
           'Helmholtz Centre for Environmental Research - UFZ, Permoserstr. 15, '
           '04318 Leipzig, Germany.')
     print 'All rights reserved.'
-    print '\nIn case of questions or comments contact matthias.cuntz(at)ufz.de'
+    print '\nIn case of questions or comments contact matthias.cuntz(at)ufz.de\n'

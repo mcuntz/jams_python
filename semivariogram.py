@@ -1,20 +1,10 @@
 #!/usr/bin/env python
 
-global missing_package
-missing_package = False
-
 import time
-try:
-    from scipy.optimize import curve_fit # requires at least scipy 0.8.0
-except ImportError:
-    missing_package = True
 import numpy as np
 import matplotlib.cm as cm
 import matplotlib.pyplot as plt
 
-#---------------------------------------
-# main function
-#---------------------------------------
 def semivariogram(x,y,v,nL,di,td,type='omnidirectional',model='exponential',
                   graph=True,lunit='m',p0=(0.5,0.5,100),runtimediag=True):
 
@@ -26,19 +16,19 @@ def semivariogram(x,y,v,nL,di,td,type='omnidirectional',model='exponential',
     and the fitted model parameters are given to the output.
     
 
-    REQUIREMENTS
+    Requirements
     ------------    
     pylab, scipy (at least version 0.8.0), matplotlib, numpy
     
 
-    DEFINITION
+    Definition
     ----------
     def semivariogram(x,y,v,nL,di,td,type='omnidirectional',
                       model='exponential',graph=True,lunit='m',
                       p0=(0.5,0.5,100)):
                 
 
-    INPUT
+    Input
     -----
     x    :    numpy array with longitude ('easting')
     y    :    numpy array with latitude ('northing')
@@ -53,7 +43,7 @@ def semivariogram(x,y,v,nL,di,td,type='omnidirectional',model='exponential',
               td > 180 is not allowed.
 
     
-    PARAMETERS
+    Parameters
     ----------
     type :    type of semivariogram
     
@@ -108,7 +98,7 @@ def semivariogram(x,y,v,nL,di,td,type='omnidirectional',model='exponential',
               print is disabled. (default=True)
        
 
-    OUTPUT
+    Output
     ------
     nugget:   height of nugget(s) [(unit of v)**2]
     sill  :   height if sill(s) [(unit of v)**2]
@@ -122,7 +112,7 @@ def semivariogram(x,y,v,nL,di,td,type='omnidirectional',model='exponential',
     c     :   array(s) of samples per lag
               
 
-    GRAPHS
+    Graphs
     ------
     Figure 1: shows a scatter plot of your original geodata
     
@@ -134,7 +124,7 @@ def semivariogram(x,y,v,nL,di,td,type='omnidirectional',model='exponential',
               you have chosen.
     
 
-    EXAMPLES
+    Examples
     --------
     # provide you some sample data:
     # easting
@@ -154,6 +144,7 @@ def semivariogram(x,y,v,nL,di,td,type='omnidirectional',model='exponential',
                     , 557473.92, 557438.56, 557403.21, 557367.85, 557332.5,  557367.85\
                     , 557403.21, 557438.56, 557473.92, 557332.50, 557261.79, 557191.08\
                     , 557261.79, 557332.50, 557403.21, 557473.92, 557544.63, 557615.34])
+
     # northing
     >>> y = np.array([4332422.55, 4332413.71, 4332404.87, 4332396.03, 4332387.19, 4332396.03\
                     , 4332404.87, 4332413.71, 4332422.55, 4332431.39, 4332440.23, 4332431.39\
@@ -171,6 +162,7 @@ def semivariogram(x,y,v,nL,di,td,type='omnidirectional',model='exponential',
                     , 4332281.13, 4332316.48, 4332351.84, 4332387.19, 4332422.55, 4332457.91\
                     , 4332493.26, 4332528.62, 4332563.97, 4332563.97, 4332493.26, 4332422.55\
                     , 4332351.84, 4332281.13, 4332210.42, 4332139.71, 4332069.00, 4332139.71])
+
     # value
     >>> v = np.array([9.94691161e-01, 7.94158417e-02, 0.00000000e+00, 1.75837990e+00\
                     , 0.00000000e+00, 0.00000000e+00, 0.00000000e+00, 0.00000000e+00\
@@ -245,7 +237,7 @@ def semivariogram(x,y,v,nL,di,td,type='omnidirectional',model='exponential',
     [  74.  122.  132.  130.   82.  171.  310.   35.]
 
 
-    HISTORY
+    History
     -------
     Written AP, Feb 2011 - small code parts based on Alghalandis.com
     """
@@ -263,7 +255,9 @@ def semivariogram(x,y,v,nL,di,td,type='omnidirectional',model='exponential',
     if td > 180:
         raise TypeError('SemivariogramError: td > 180 is not allowed.')        
     
-    if missing_package == True:
+    try:
+        from scipy.optimize import curve_fit # requires at least scipy 0.8.0
+    except ImportError:
         model = 'nomodel'
         print 'SemivariogramWarning: the package scipy.optimize.curve_fit can not be found. It requires at least scipy 0.8.0. No fitting of experimental semivariogram(s) is possible.'
 
@@ -518,7 +512,11 @@ def semivario(r,t,xr,n,z,nL,di,td,type='omnidirectional'):     # x and y are vec
                                 g[s] += (z[p]-z[o])**2
                                 q += 1
                 k += 1
-        g[s] /= (q*2)
+        #MC: q can becore zero ???
+        if q == 0.:
+            g[s] = np.nan
+        else:
+            g[s] /= (q*2)
         c[s] = q
     h = np.array(range(nL))*L+L/2    
     h = np.delete(h,np.where(np.isnan(g)))       # ranges 

@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import numpy as np
+from ufz import RPDB
 
 def tcherkez(Rstar, Phi=0.3, T=0.056,
              a2=1.0012, a3=1.0058, a4=1.0161,
@@ -46,7 +47,7 @@ def tcherkez(Rstar, Phi=0.3, T=0.056,
 
         Restrictions
         ------------
-        If at least of RG, Rchl or Rcyt is given then fullmode=False.
+        If at least one of RG, Rchl or Rcyt is given then fullmode=False.
 
 
         References
@@ -60,27 +61,26 @@ def tcherkez(Rstar, Phi=0.3, T=0.056,
 
         Examples
         --------
-        >>> Rpdb    = 0.0123
         >>> a       = -4.4e-3
         >>> b       = -27e-3
         >>> ca    = 353e-6
         >>> ci    = 0.7*ca
         >>> Delta = a+(b-a)*ci/ca
         >>> delta_a1 = -8e-3
-        >>> Ra1      = (delta_a1+1.)*Rpdb
+        >>> Ra1      = (delta_a1+1.)*RPDB
         >>> Rstar1   = (1.-Delta)*Ra1
-        >>> print (np.array(tcherkez(Rstar1, Phi=0.3, T=0.056))/Rpdb-1.)*1000.
+        >>> print (np.array(tcherkez(Rstar1, Phi=0.3, T=0.056))/RPDB-1.)*1000.
         [ 12.76405998  17.12498323  12.97777843]
 
         >>> delta_a2 = -7.8e-3
-        >>> Ra2      = (delta_a2+1.)*Rpdb
+        >>> Ra2      = (delta_a2+1.)*RPDB
         >>> Rstar2   = (1.-Delta)*Ra2
-        >>> R1 = (np.array(tcherkez([Rstar1, Rstar2], Rcyt=True))/Rpdb-1.)*1000.
+        >>> R1 = (np.array(tcherkez([Rstar1, Rstar2], Rcyt=True))/RPDB-1.)*1000.
         >>> print R1
         [[ 12.97777843  13.18200782]]
 
         >>> R1, R2 = tcherkez([Rstar1, Rstar2], Rchl=True, Rcyt=True)
-        >>> print (R1/Rpdb-1.)*1000., (R2/Rpdb-1.)*1000.
+        >>> print (R1/RPDB-1.)*1000., (R2/RPDB-1.)*1000.
         [17.1249832296 17.3300487504] [12.9777784293 13.1820078202]
 
 
