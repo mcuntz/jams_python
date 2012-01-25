@@ -65,35 +65,35 @@ def readnetcdf(file, var='', code=-1, reform=False, squeeze=False,
         >>> readnetcdf('readnetcdf_test.nc',code=129)
         array([[ 2.,  2.,  2.,  2.],
                [ 2.,  2.,  2.,  2.]])
-        >>> t1 = readnetcdf('readnetcdf_test.nc',variables=True)
-        >>> t2 = readnetcdf('readnetcdf_test.nc',variables=True,sort=True)
-        >>> t3 = readnetcdf('readnetcdf_test.nc',units=True)
-        >>> t4 = readnetcdf('readnetcdf_test.nc',units=True,sort=True)
-        >>> t5 = readnetcdf('readnetcdf_test.nc',longnames=True)
-        >>> t6 = readnetcdf('readnetcdf_test.nc',longnames=True,sort=True)
-        >>> t7 = readnetcdf('readnetcdf_test.nc',var='is1',attributes=True)
-        >>> if nc.__version__ < '0.9.9':
-        ...     [unicode(i) for i in t1]
-        ...     [unicode(i) for i in t2]
-        ...     [unicode(i) for i in t3]
-        ...     [unicode(i) for i in t4]
-        ...     [unicode(i) for i in t5]
-        ...     [unicode(i) for i in t6]
-        ...     [unicode(i) for i in t7]
-        ... else:
-        ...     t1
-        ...     t2
-        ...     t3
-        ...     t4
-        ...     t5
-        ...     t6
-        ...     t7
+        >>> [unicode(i) for i in readnetcdf('readnetcdf_test.nc',variables=True)]
         [u'x', u'y', u'is1', u'is2']
+        >>> [unicode(i) for i in readnetcdf('readnetcdf_test.nc',variables=True,sort=True)]
         [u'is1', u'is2', u'x', u'y']
+        >>> [unicode(i) for i in readnetcdf('readnetcdf_test.nc',units=True)]
         [u'xx', u'yy', u'arbitrary', u'arbitrary']
+        >>> [unicode(i) for i in readnetcdf('readnetcdf_test.nc',units=True,sort=True)]
         [u'arbitrary', u'arbitrary', u'xx', u'yy']
+        >>> [unicode(i) for i in readnetcdf('readnetcdf_test.nc',longnames=True)]
         [u'x-axis', u'y-axis', u'all ones', u'all twos']
+        >>> [unicode(i) for i in readnetcdf('readnetcdf_test.nc',longnames=True,sort=True)]
         [u'all ones', u'all twos', u'x-axis', u'y-axis']
+
+        # old: {'units': 'arbitrary', 'long_name': 'all ones', 'code': 128}
+        # new: {u'units': u'arbitrary', u'long_name': u'all ones', u'code': 128}
+        >>> t1 = readnetcdf('readnetcdf_test.nc',var='is1',attributes=True)
+        >>> d = dict()
+        >>> for k, v in t1.iteritems():
+        ...     if type(k) == type('s'):
+        ...         if type(v) == type('s'):
+        ...             d[unicode(k)] = unicode(v)
+        ...         else:
+        ...             d[unicode(k)] = v
+        ...     else:
+        ...         if type(v) == type('s'):
+        ...             d[k] = unicode(v)
+        ...         else:
+        ...             d[k] = v
+        >>> d
         {u'units': u'arbitrary', u'long_name': u'all ones', u'code': 128}
         >>> readnetcdf('readnetcdf_test.nc',codes=True)
         array([  -1.,   -1.,  128.,  129.])
