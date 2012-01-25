@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 import numpy as np
-from ufz import RPDB
+from ufz import const
 
 def tcherkez(Rstar, Phi=0.3, T=0.056,
              a2=1.0012, a3=1.0058, a4=1.0161,
@@ -67,20 +67,20 @@ def tcherkez(Rstar, Phi=0.3, T=0.056,
         >>> ci    = 0.7*ca
         >>> Delta = a+(b-a)*ci/ca
         >>> delta_a1 = -8e-3
-        >>> Ra1      = (delta_a1+1.)*RPDB
+        >>> Ra1      = (delta_a1+1.)*const.RPDB
         >>> Rstar1   = (1.-Delta)*Ra1
-        >>> print (np.array(tcherkez(Rstar1, Phi=0.3, T=0.056))/RPDB-1.)*1000.
+        >>> print (np.array(tcherkez(Rstar1, Phi=0.3, T=0.056))/const.RPDB-1.)*1000.
         [ 12.76405998  17.12498323  12.97777843]
 
         >>> delta_a2 = -7.8e-3
-        >>> Ra2      = (delta_a2+1.)*RPDB
+        >>> Ra2      = (delta_a2+1.)*const.RPDB
         >>> Rstar2   = (1.-Delta)*Ra2
-        >>> R1 = (np.array(tcherkez([Rstar1, Rstar2], Rcyt=True))/RPDB-1.)*1000.
+        >>> R1 = (np.array(tcherkez([Rstar1, Rstar2], Rcyt=True))/const.RPDB-1.)*1000.
         >>> print R1
         [[ 12.97777843  13.18200782]]
 
         >>> R1, R2 = tcherkez([Rstar1, Rstar2], Rchl=True, Rcyt=True)
-        >>> print (R1/RPDB-1.)*1000., (R2/RPDB-1.)*1000.
+        >>> print (R1/const.RPDB-1.)*1000., (R2/const.RPDB-1.)*1000.
         [17.1249832296 17.3300487504] [12.9777784293 13.1820078202]
 
 

@@ -16,7 +16,7 @@
     autostring     Format number (array) with given decimal precision.
     cellarea       Calc areas of grid cells in m^2
     closest        Get the array index of the element that is closest to a given number.
-    const          Calculates plot range from input array
+    const          Provides physical, mathematical, computational, and isotope constants.
     dewpoint       Calculates the dew point from ambient humidity
     date2dec	   Converts arrays with calendar date to decimal date
     dec2date	   Converts arrays with decimal date to calendar date
@@ -100,7 +100,7 @@
     Miscellaneous
     -------------
     autostring     Format number (array) with given decimal precision.
-    const          Calculates plot range from input array
+    const          Provides physical, mathematical, computational, and isotope constants.
 
     Plotting
     --------
@@ -143,7 +143,7 @@ from autostring  import *
 from calcvpd     import *
 from cellarea    import *
 from closest     import *
-from const       import *
+import const
 try:
     from date2dec    import *
     from dec2date    import *
