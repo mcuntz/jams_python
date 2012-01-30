@@ -17,6 +17,7 @@
     cellarea       Calc areas of grid cells in m^2
     closest        Get the array index of the element that is closest to a given number.
     const          Provides physical, mathematical, computational, and isotope constants.
+    cuntz_gleixner Cuntz-Gleixner model of 13C discrimination
     dewpoint       Calculates the dew point from ambient humidity
     date2dec	   Converts arrays with calendar date to decimal date
     dec2date	   Converts arrays with decimal date to calendar date
@@ -101,6 +102,7 @@
     -------------
     autostring     Format number (array) with given decimal precision.
     const          Provides physical, mathematical, computational, and isotope constants.
+    cuntz_gleixner Cuntz-Gleixner model of 13C discrimination
 
     Plotting
     --------
@@ -136,46 +138,48 @@
 	      MC, Nov 2011 - autostring
 	      MC, Jan 2012 - esat, closest, dewpoint, division, heaviside, tcherkez, yrange, const
                            - make calcvpd obsolete
+                           - cuntz_gleixner
 """
 # Routines provided
-from around      import *
-from autostring  import *
-from calcvpd     import *
-from cellarea    import *
-from closest     import *
+from around         import *
+from autostring     import *
+from calcvpd        import *
+from cellarea       import *
+from closest        import *
 import const
+from cuntz_gleixner import *
 try:
     from date2dec    import *
     from dec2date    import *
 except ImportError:
     print "No netcdf support in UFZ library. Disabled functions: date2dec, dec2date, gap_filling, readnetcdf."
-from dewpoint    import *
-from division    import *
-from esat        import *
-from fread       import *
+from dewpoint       import *
+from division       import *
+from esat           import *
+from fread          import *
 try:
     from gap_filling import *
 except ImportError:
     pass
-from heaviside   import *
-from lif         import *
-from mad         import *
+from heaviside      import *
+from lif            import *
+from mad            import *
 try:
     from outlier     import *
 except ImportError:
     print "No extra statistics in scipy, i.e. in UFZ library. Disabled functions: outlier."
-from pack        import *
-from position    import *
+from pack           import *
+from position       import *
 try:
     from readnetcdf  import *
 except ImportError:
     pass
-from semivariogram import *
-from sread       import *
-from tcherkez    import *
-from tsym        import *
-from unpack      import *
-from yrange      import *
+from semivariogram  import *
+from sread          import *
+from tcherkez       import *
+from tsym           import *
+from unpack         import *
+from yrange         import *
 
 # Information
 version = '1.5'
