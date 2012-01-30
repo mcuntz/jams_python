@@ -31,7 +31,7 @@ def around(num, powten, ceil=False, floor=False):
         Restrictions
         ------------
         Powten is exactly opposite of decimal keyword of numpy.around.
-        
+
         From numpy.around documentation:
         'For values exactly halfway between rounded decimal values,
         Numpy rounds to the nearest even value. Thus 1.5 and 2.5 round to 2.0,
@@ -44,22 +44,22 @@ def around(num, powten, ceil=False, floor=False):
         --------
         >>> around(np.array([3.5967,345.5967]), -3)
         array([   3.597,  345.597])
-        
+
         >>> around(np.array([1994344,345.5967]), [3,-3])
         array([  1.99400000e+06,   3.45597000e+02])
-        
+
         >>> around(np.array([1994344,345.5967]), [3,-3], ceil=True)
         array([  1.99500000e+06,   3.45597000e+02])
-        
+
         >>> around(np.array([1994344,345.5967]), [3,-3], floor=True)
         array([  1.99400000e+06,   3.45596000e+02])
-        
+
         >>> around(np.array([3.5967,345.5967]), 3)
         array([ 0.,  0.])
-        
+
         >>> around(np.array([3.5967,345.5967]), 3, ceil=True)
         array([ 1000.,  1000.])
-        
+
 
         History
         -------
@@ -96,7 +96,7 @@ def around(num, powten, ceil=False, floor=False):
 
     return out
 
- 
+
 if __name__ == '__main__':
     import doctest
     doctest.testmod()
