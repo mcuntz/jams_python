@@ -115,10 +115,10 @@ def dec2date(indata, calendar = 'standard', units = False,
         Examples
         --------
         # Some implementations of datetime have problems with negative years
-        >>> try:
-        ...     year = dec2date(np.array([1721423]), yr = True)
-        ... except ValueError:
-        ...     print 'Your implementation of datetime has problems with negative years.'
+        >>> import datetime
+        >>> if datetime.MINYEAR > 0:
+        ...     print 'The minimum year in your datetime implementation is ', datetime.MINYEAR
+        ...     print 'i.e. it does not support negative years (BC).'
 
         #calendar = 'standard'
         >>> a = np.array([2451549.02101, 2382262.17720, 2316600.93102,\
