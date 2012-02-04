@@ -79,7 +79,6 @@ def around(num, powten, ceil=False, floor=False):
     if ((npowten != nnum) and (npowten != 1)):
         print "AROUND: powten must be scalar or have array size of input numbers."
         return None
-
     #
     # Shift decimal point
     out = num * 10.**(-ipowten)
