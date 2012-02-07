@@ -2,8 +2,6 @@
 
 import time
 import numpy as np
-import matplotlib.cm as cm
-import matplotlib.pyplot as plt
 
 def semivariogram(x,y,v,nL,di,td,type='omnidirectional',model='exponential',
                   graph=True,lunit='m',p0=(0.5,0.5,100),runtimediag=True):
@@ -355,6 +353,8 @@ def semivariogram(x,y,v,nL,di,td,type='omnidirectional',model='exponential',
     #---------------------------------------
     # plot
     if graph:
+        import matplotlib.cm as cm
+        import matplotlib.pyplot as plt
         # scatterplot of input data
         plt.figure(1)                               
         scat=plt.scatter(x,y,s=40,c=v,cmap='BrBG')                  
