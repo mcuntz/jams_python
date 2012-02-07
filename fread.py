@@ -6,7 +6,7 @@ def fread(file, nc=0, skip=0, cskip=0, separator='',
           squeeze=False, reform=False, skip_blank=False, comment='',
           fill=False, fill_value=0,
           header=False, full_header=False,
-          quiet=False, transpose=False,strarr=False):
+          quiet=False, transpose=False, strarr=False):
     """
         Read numbers into float array from a file.
         Lines or columns can be skipped.
@@ -20,7 +20,7 @@ def fread(file, nc=0, skip=0, cskip=0, separator='',
                   squeeze=False, reform=False, skip_blank=False, comment='',
                   fill=False, fill_value=0,
                   header=False, full_header=False,
-                  quiet=False, transpose=False):
+                  quiet=False, transpose=False, strarr=False):
 
 
         Input
@@ -132,7 +132,7 @@ def fread(file, nc=0, skip=0, cskip=0, separator='',
         ['head1', '1.1']
         >>> fread(filename,nc=1,skip=2,header=True,strarr=True)
         array([['head1'],
-               ['1.1']], 
+               ['1.1']],
               dtype='|S5')
 
         # skip blank lines

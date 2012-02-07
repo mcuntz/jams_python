@@ -6,7 +6,7 @@ def sread(file, nc=0, skip=0, cskip=0, separator='',
           squeeze=False, reform=False, skip_blank=False, comment='',
           fill=False, fill_value='',
           header=False, full_header=False,
-          quiet=False):
+          quiet=False, transpose=False, strarr=False):
     """
         Read strings into string array from a file.
         Lines or columns can be skipped.
@@ -16,7 +16,7 @@ def sread(file, nc=0, skip=0, cskip=0, separator='',
 
         This routines is exactly the same as fread but reads
         everything as strings except of floats.
-        
+
 
         Definition
         ----------
@@ -24,13 +24,13 @@ def sread(file, nc=0, skip=0, cskip=0, separator='',
                   squeeze=False, reform=False, skip_blank=False, comment='',
                   fill=False, fill_value='',
                   header=False, full_header=False,
-                  quiet=False):
-                     
+                  quiet=False, transpose=False, strarr=False):
+
 
         Input
         -----
         file         source file name
-        
+
 
         Optional Input Parameters
         -------------------------
@@ -42,14 +42,14 @@ def sread(file, nc=0, skip=0, cskip=0, separator='',
                        comma, semi-colon, whitespace
         skip         number of lines to skip at the beginning of
                        the file (default 0)
-        cskip        number of columns to skip at the beginning of 
+        cskip        number of columns to skip at the beginning of
                        each line (default 0)
         comment      line gets excluded if first character of line is
                       in comment sequence
                      sequence can be e.g. string, list or tuple
         fill_value   value to fill in if not enough columns line
                       and fill=True (default '')
-                       
+
 
         Options
         -------
@@ -66,18 +66,22 @@ def sread(file, nc=0, skip=0, cskip=0, separator='',
                      False  numbers in file will be returned (default)
         full_header  True:  header is a string vector of the skipped rows
                      False: header will be split in columns,
-                            exactly as the data, and will hold only the 
+                            exactly as the data, and will hold only the
                             selected columns (default)
         quiet        True:  do not show reason if read fails and returns None
                      False: show error for failed read (default)
-                            
+        transpose    True:  column-major format output(0:ncolumns,0:nlines)
+                     False: row-major format output(0:nlines,0:ncolumns) (default)
+        strarr       True:  return as numpy array of strings
+                     False: return as list
+
 
         Output
         ------
         Either float array containing numbers from file if header=False
         or string array of file header if header=True
         or string vector of file header if header=True, full_header=True
-        
+
 
         Restrictions
         ------------
@@ -87,7 +91,8 @@ def sread(file, nc=0, skip=0, cskip=0, separator='',
           with header=False and once with header=True.
         If fill=True, blank lines are not filled but are expected
           end of file.
-        
+        transpose=True has no effect on 1D output such as 1 header line
+
 
         Examples
         --------
@@ -98,7 +103,7 @@ def sread(file, nc=0, skip=0, cskip=0, separator='',
         >>> file.writelines('1.1 1.2 1.3 1.4\\n')
         >>> file.writelines('2.1 2.2 2.3 2.4\\n')
         >>> file.close()
-        
+
         # Read sample file in different ways
         # data
         >>> sread(filename,skip=1)
@@ -125,6 +130,11 @@ def sread(file, nc=0, skip=0, cskip=0, separator='',
         [['head1'], ['1.1']]
         >>> sread(filename,nc=1,skip=2,header=True,squeeze=True)
         ['head1', '1.1']
+        >>> sread(filename,nc=1,skip=2,header=True,squeeze=True,strarr=True)
+        array(['head1', '1.1'], 
+              dtype='|S5')
+        >>> sread(filename,nc=1,skip=2,header=True,squeeze=True,transpose=True)
+        ['head1', '1.1']
 
         # skip blank lines
         >>> file = open(filename,'a')
@@ -135,6 +145,19 @@ def sread(file, nc=0, skip=0, cskip=0, separator='',
         [['1.1', '1.2', '1.3', '1.4'], ['2.1', '2.2', '2.3', '2.4']]
         >>> sread(filename,skip=1,skip_blank=True)
         [['1.1', '1.2', '1.3', '1.4'], ['2.1', '2.2', '2.3', '2.4'], ['3.1', '3.2', '3.3', '3.4']]
+        >>> sread(filename,skip=1,strarr=True)
+        array([['1.1', '1.2', '1.3', '1.4'],
+               ['2.1', '2.2', '2.3', '2.4']], 
+              dtype='|S3')
+
+        >>> sread(filename,skip=1,strarr=True,transpose=True)
+        array([['1.1', '2.1'],
+               ['1.2', '2.2'],
+               ['1.3', '2.3'],
+               ['1.4', '2.4']], 
+              dtype='|S3')
+        >>> sread(filename,skip=1,transpose=True)
+        [['1.1', '2.1'], ['1.2', '2.2'], ['1.3', '2.3'], ['1.4', '2.4']]
 
         # skip comment lines
         >>> file = open(filename,'a')
@@ -165,7 +188,8 @@ def sread(file, nc=0, skip=0, cskip=0, separator='',
 
         History
         -------
-        Written, MC, Jul. 2009
+        Written, MC, Jul 2009
+                 MC, Feb 2012 - transpose
     """
     #
     # Determine number of lines in file.
@@ -225,7 +249,7 @@ def sread(file, nc=0, skip=0, cskip=0, separator='',
         res = s.split(sep)
         nres = len(res)
     count += 1
-    #   
+    #
     # Determine indeces
     if nc == 0:
         nnc = nres-cskip
@@ -268,7 +292,7 @@ def sread(file, nc=0, skip=0, cskip=0, separator='',
                             return None
                     else:
                         var = [hres[i] for i in iinc]
-                else:                    
+                else:
                     var = ['']
                     k = 0
                     while k < skip:
@@ -299,6 +323,16 @@ def sread(file, nc=0, skip=0, cskip=0, separator='',
                         k += 1
                     del var[0]
         f.close()
+        if (transpose & (np.ndim(var) > 1)):
+            var = np.transpose(var, tuple(reversed(range(np.ndim(var)))))
+            if not strarr:
+                nn   = np.size(var,axis=0)
+                lvar = range(nn)
+                for i in xrange(nn):
+                    lvar[i] = list(var[i,:])
+                var = lvar
+        if strarr:
+            var = np.array(var,dtype=np.str)
         return var
     #
     # Values
@@ -321,7 +355,7 @@ def sread(file, nc=0, skip=0, cskip=0, separator='',
                 return None
         else:
             var = [res[i] for i in iinc]
-    else:                    
+    else:
         var = ['']
         if miinc >= nres:
             if fill:
@@ -348,7 +382,7 @@ def sread(file, nc=0, skip=0, cskip=0, separator='',
         k = 1
         while k < nr:
             s = f.readline().rstrip()
-            if len(s) == 0: 
+            if len(s) == 0:
                 if skip_blank:
                     continue
                 else:
@@ -382,6 +416,17 @@ def sread(file, nc=0, skip=0, cskip=0, separator='',
             k += 1
         del var[0]
     f.close()
+    if (transpose & (np.ndim(var) > 1)):
+        var = np.transpose(var, tuple(reversed(range(np.ndim(var)))))
+        if not strarr:
+            nn   = np.size(var,axis=0)
+            lvar = range(nn)
+            for i in xrange(nn):
+                lvar[i] = list(var[i,:])
+            var = lvar
+    if strarr:
+        var = np.array(var,dtype=np.str)
+        
     return var
 
 if __name__ == '__main__':
