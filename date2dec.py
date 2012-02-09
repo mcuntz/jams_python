@@ -24,7 +24,7 @@ def date2dec(calendar = 'standard', units = False,
         http://netcdf4-python.googlecode.com
 
 
-        DEFINITION
+        Definition
         ----------
         def date2dec(calendar = 'standard', units = False,
              excelerr = True, yr = None,
@@ -32,7 +32,7 @@ def date2dec(calendar = 'standard', units = False,
              mi = None, sc = None, ascii = None, eng = None):
 
 
-        INPUT
+        Input
         -----
         yr       -> input array with year
         mo       -> input array with month
@@ -52,7 +52,7 @@ def date2dec(calendar = 'standard', units = False,
                     will be neglected.
 
 
-        PARAMETERS
+        Parameters
         ----------
         calendar -> Input date format. Default value is
                    'standard'.
@@ -94,7 +94,7 @@ def date2dec(calendar = 'standard', units = False,
            'decimal360' =  Output is decimal year with a year of 360 days, i.e. 12 month with 30 days each.
 
 
-        OPTIONAL ARGUMENTS
+        Optional Arguments
         ------------------
         units    -> Time units can be set by user. Input must be a
                      string in the format 'yyyy-mm-dd hh:mm:ss'.
@@ -106,12 +106,23 @@ def date2dec(calendar = 'standard', units = False,
                      leap year.
 
 
-        OUTPUT
+        Output
         ------
         output -> Output numpy array with decimal date.
 
 
-        EXAMPLES
+        Restrictions
+        ------------
+        Some versions of datetime do not support neagtive years,
+        i.e. Julian days < 1721423.5 = 01.01.0001 00:00.
+
+        List input is only supported up to 2 dimensions.
+
+        Requires 'netcdftime.py' from module netcdftime available at:
+        http://netcdf4-python.googlecode.com
+
+
+        Examples
         --------
         #calendar = 'standard'
 array(['05.01.2000 12:30:15', '24.04.1810 16:15:10', '15.07.1630 10:20:40',
@@ -124,8 +135,7 @@ array(['05.01.2000 12:30:15', '24.04.1810 16:15:10', '15.07.1630 10:20:40',
         >>> hour   = np.array([12,16,10,14,19,11,20,12])
         >>> minute = np.array([30,15,20,35,41,8,3,0])
         >>> second = np.array([15,10,40,50,34,37,41,0])
-        >>> decimal = date2dec(calendar = 'standard', \
-                      yr=year, mo=month, dy=day, hr=hour, mi=minute, sc=second)
+        >>> decimal = date2dec(calendar = 'standard', yr=year, mo=month, dy=day, hr=hour, mi=minute, sc=second)
         >>> print np.round(decimal, 8)
         [ 2451549.02100694  2382262.17719907  2316600.93101852  2272848.10821759
           2185367.32053241  1947385.96431713  1144563.3358912         0.        ]
@@ -244,14 +254,25 @@ array(['05.01.2000 12:30:15', '24.04.1810 16:15:10', '15.07.1630 10:20:40',
         #[ 719644.52100694  359822.52100694  179911.93101852       0.        ]
 
         >>> date2dec(yr=1992, mo=01, dy=26, hr=02, mi=00, sc=00, calendar='decimal')
-       	1992.0685336976321
+       	1992.068533707632
         >>> date2dec(ascii='26.01.1992 02:00', calendar='decimal360')
-       	1992.0696759259258
+       	1992.0696759359257
+        >>> date2dec(ascii=['26.01.1992 02:00','26.01.1992 02:00'], calendar='decimal360')
+       	[1992.0696759359257, 1992.0696759359257]
+        >>> date2dec(yr=[1992,1992], mo=01, dy=26, hr=02, mi=00, sc=00, calendar='decimal360')
+       	[1992.0696759359257, 1992.0696759359257]
+        >>> date2dec(yr=np.array([1992,1992]), mo=01, dy=26, hr=02, mi=00, sc=00, calendar='decimal360')
+       	array([ 1992.06967594,  1992.06967594])
+        >>> date2dec(ascii=[['26.01.1992 02:00','26.01.1992 02:00'], \
+                            ['26.01.1992 02:00','26.01.1992 02:00'], \
+                            ['26.01.1992 02:00','26.01.1992 02:00']], calendar='decimal360')
+       	[[1992.0696759359257, 1992.0696759359257], [1992.0696759359257, 1992.0696759359257], [1992.0696759359257, 1992.0696759359257]]
+
 
         History
         -------
         Written  AP, Jun 2010
-        Modified MC, Feb 2012 - All input can be scalar or array, also a mix
+        Modified MC, Feb 2012 - All input can be scalar, list or array, also a mix
                               - Changed checks for easier extension
                               - decimal, decimal360
     """
@@ -274,9 +295,12 @@ array(['05.01.2000 12:30:15', '24.04.1810 16:15:10', '15.07.1630 10:20:40',
     if (ascii != None) and (eng != None):
         raise ValueError("date2dec error: 'ascii' and 'eng' mutually exclusive")
     if ascii != None:
+        islist = type(ascii) != type(np.array(ascii))
         isarr = np.size(np.shape(ascii))
-        if (isarr==0):
-            ascii = np.array([ascii])
+        if (islist & (isarr > 2)):
+            raise ValueError("date2dec error: ascii input is list > 2D; Use array input")
+        if isarr == 0: ascii = np.array([ascii])
+        else: ascii = np.array(ascii)
         insize   = np.size(ascii)
         outshape = np.shape(ascii)
         asciifl  = ascii.flatten()
@@ -304,9 +328,13 @@ array(['05.01.2000 12:30:15', '24.04.1810 16:15:10', '15.07.1630 10:20:40',
                 sc[i] = 00
             timeobj[i] = nt.datetime(yr[i], mo[i], dy[i], hr[i], mi[i], sc[i])
     if eng != None:
+        islist = type(eng) != type(np.array(eng))
         isarr = np.size(np.shape(eng))
-        if (isarr==0):
-            eng = np.array([eng])
+        if isarr == 0: eng = np.array([eng])
+        else: eng = np.array(eng)
+        if (islist & (isarr > 2)):
+            raise ValueError("date2dec error: eng input is list > 2D; Use array input")
+        eng = np.array(eng)
         insize   = np.size(eng)
         outshape = np.shape(eng)
         engfl  = eng.flatten()
@@ -336,19 +364,32 @@ array(['05.01.2000 12:30:15', '24.04.1810 16:15:10', '15.07.1630 10:20:40',
     # if no ascii input, other inputs will be concidered
     # calculation of input sizes, shapes and number of axis
     if ((ascii == None) & (eng == None)):
+        isnlist1 = type(yr) == type(np.array(yr))
         isarr1 = np.size(np.shape(yr))
-        if (isarr1==0): yr = np.array([yr])
+        if isarr1 == 0: yr = np.array([yr])
+        else: yr = np.array(yr)
+        isnlist2 = type(mo) == type(np.array(mo))
         isarr2 = np.size(np.shape(mo))
-        if (isarr2==0): mo = np.array([mo])
+        if isarr2 == 0: mo = np.array([mo])
+        else: mo = np.array(mo)
+        isnlist3 = type(dy) == type(np.array(dy))
         isarr3 = np.size(np.shape(dy))
-        if (isarr3==0): dy = np.array([dy])
+        if isarr3 == 0: dy = np.array([dy])
+        else: dy = np.array(dy)
+        isnlist4 = type(hr) == type(np.array(hr))
         isarr4 = np.size(np.shape(hr))
-        if (isarr4==0): hr = np.array([hr])
+        if isarr4 == 0: hr = np.array([hr])
+        else: hr = np.array(hr)
+        isnlist5 = type(mi) == type(np.array(mi))
         isarr5 = np.size(np.shape(mi))
-        if (isarr5==0): mi = np.array([mi])
+        if isarr5 == 0: mi = np.array([mi])
+        else: mi = np.array(mi)
+        isnlist6 = type(sc) == type(np.array(sc))
         isarr6 = np.size(np.shape(sc))
-        if (isarr6==0): sc = np.array([sc])
-        isarr = isarr1 + isarr2 + isarr3 + isarr4 + isarr5 + isarr6
+        if isarr6 == 0: sc = np.array([sc])
+        else: sc = np.array(sc)
+        islist = not (isnlist1 | isnlist2 | isnlist3 | isnlist4 | isnlist5 | isnlist6)
+        isarr  = isarr1 + isarr2 + isarr3 + isarr4 + isarr5 + isarr6
         shapes = [np.shape(yr), np.shape(mo), np.shape(dy), np.shape(hr), np.shape(mi), np.shape(sc)]
         nyr    = np.size(yr)
         nmo    = np.size(mo)
@@ -360,6 +401,8 @@ array(['05.01.2000 12:30:15', '24.04.1810 16:15:10', '15.07.1630 10:20:40',
         nmax   = np.amax(sizes)
         ii     = np.argmax(sizes)
         outshape = shapes[ii]
+        if (islist & (np.size(outshape) > 2)):
+            raise ValueError("date2dec error: input is list > 2D; Use array input.")
         if nyr < nmax:
             if nyr == 1: yr  = np.ones(outshape)*yr
             else: raise ValueError("date2dec error: size of yr != max input or 1.")
@@ -421,12 +464,12 @@ array(['05.01.2000 12:30:15', '24.04.1810 16:15:10', '15.07.1630 10:20:40',
         output = nt.date2num(timeobj,'days since %s' % (units), calendar='360_day')
     elif calendar == 'decimal':
         ntime = np.size(yr)
-        leap  = (((yr%4)==0) & ((yr%100)!=0)) | ((yr%400)==0)
+        leap  = np.array((((yr%4)==0) & ((yr%100)!=0)) | ((yr%400)==0))
         tdy   = np.array(dy, dtype=np.float)
         diy   = np.array([ [-9,0, 31, 59, 90,120,151,181,212,243,273,304,334,365], \
                            [-9,0, 31, 60, 91,121,152,182,213,244,274,305,335,366] ])
         for i in xrange(ntime):
-            tdy[i] = tdy[i] + np.array(diy[leap,mo[i]], dtype=np.float)
+            tdy[i] = tdy[i] + np.array(diy[leap[i],mo[i]], dtype=np.float)
         days_year = 365.
         output    = ( np.array(yr, dtype=np.float) +
                       ((tdy-1.)*24. + np.array(hr, dtype=np.float) +
@@ -434,8 +477,9 @@ array(['05.01.2000 12:30:15', '24.04.1810 16:15:10', '15.07.1630 10:20:40',
                        np.array(sc, dtype=np.float)/3600.) /
                        ((days_year+np.array(leap, dtype=np.float))*24.) )
         # for numerical stability, i.e. back and forth transforms
-        import sys
-        output += sys.float_info.epsilon
+        #import sys
+        #output += sys.float_info.epsilon
+        output += 1e-08 # 1/3 sec
     elif calendar == 'decimal360':
         ntime = np.size(yr)
         tdy   = np.array(dy, dtype=np.float)
@@ -449,8 +493,7 @@ array(['05.01.2000 12:30:15', '24.04.1810 16:15:10', '15.07.1630 10:20:40',
                        np.array(sc, dtype=np.float)/3600.) /
                        (days_year*24.) )
         # for numerical stability, i.e. back and forth transforms
-        import sys
-        output += sys.float_info.epsilon
+        output += 1e-08 # 1/3 sec
     else:
         raise ValueError("date2dec error: calendar not implemented; should have been catched before.")
 
@@ -459,11 +502,20 @@ array(['05.01.2000 12:30:15', '24.04.1810 16:15:10', '15.07.1630 10:20:40',
     output = np.reshape(output, outshape)
     if isarr == 0:
         output = np.float(output)
+    else:
+        if islist:
+            ns = np.size(outshape)
+            if ns == 1:
+                output = [i for i in output]
+            else:
+                loutput = [ i for i in output[:,0]]
+                for i in xrange(np.size(output[:,0])):
+                    loutput[i] = list(np.squeeze(output[i,:]))
+                output = loutput
+
     return output
-# END OF FUNCTION
-###############################################################
-# DOCTEST:
+
+
 if __name__ == '__main__':
     import doctest
     doctest.testmod()
-# END
