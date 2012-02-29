@@ -1,6 +1,6 @@
 #!/usr/bin/env python
-from lif import *
 import numpy as np
+from lif import * # from ufz
 
 def sread(file, nc=0, skip=0, cskip=0, separator='',
           squeeze=False, reform=False, skip_blank=False, comment='',

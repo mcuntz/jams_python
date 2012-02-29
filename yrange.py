@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import numpy as np
-from ufz import around, const
+from around import * # from ufz
+import const         # from ufz
 
 def yrange(arr, symmetric=False):
     """

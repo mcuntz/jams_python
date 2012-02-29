@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 
-import sys
+from sys import float_info
 import numpy as np
 #import pdb
-from ufz import dec2date
+import dec2date # from ufz
 
 ###############################################################
 ###############################################################
@@ -106,7 +106,7 @@ def gap_filling(tofill, Rg, Tair, vpd, dates, \
     udef = -9999.
 
     # epsilon: Machine variable for floating point calculations
-    eps = sys.float_info.epsilon
+    eps = float_info.epsilon
 
     # number of data points per week; basic factor of the time 
     # window

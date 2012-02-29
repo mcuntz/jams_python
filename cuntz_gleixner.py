@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 import numpy as np
-from ufz import const
+import const # from ufz
 
 def cuntz_gleixner(idecdate, iGPP, iRd, iCa, iRa, igtot, sunrise, Vcyt=False,
                    date0=False,

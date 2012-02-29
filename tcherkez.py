@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 import numpy as np
-from ufz import const
+import const # from ufz
 
 def tcherkez(Rstar, Phi=0.3, T=0.056,
              a2=1.0012, a3=1.0058, a4=1.0161,
