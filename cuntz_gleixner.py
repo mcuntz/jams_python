@@ -559,7 +559,9 @@ def cuntz_gleixner(idecdate, iGPP, iRd, iCa, iRa, igtot, sunrise, Vcyt=False,
     iRnew_cyt    = np.empty(nd)      # new sucrose in cytoplasm
     iRphloem     = np.empty(nd)      # new phloem
     #
-    if nss: dVcytdt = (iVcyt-np.roll(iVcyt,1))/isecs
+    if nss: 
+        dVcytdt = (iVcyt-np.roll(iVcyt,1))/isecs
+        dVcytdt[0] = dVcytdt[1]
     #
     # Calc model
     if nss: # non-steady-state

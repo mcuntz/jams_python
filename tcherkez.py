@@ -81,7 +81,7 @@ def tcherkez(Rstar, Phi=0.3, T=0.056,
 
         >>> R1, R2 = tcherkez([Rstar1, Rstar2], Rchl=True, Rcyt=True)
         >>> print (R1/const.RPDB-1.)*1000., (R2/const.RPDB-1.)*1000.
-        [17.1249832296 17.3300487504] [12.9777784293 13.1820078202]
+        [ 17.12498323  17.33004875] [ 12.97777843  13.18200782]
 
 
         History
@@ -105,7 +105,7 @@ def tcherkez(Rstar, Phi=0.3, T=0.056,
     eps     = a3*a3tilde
     epsdash = (t1tilde+1.5*Phi)*a3*a3tilde/(3.*(1.+0.5*Phi-(1.+t2tilde)*a2*a2tilde/3.))
 
-    iRG = np.ma.array(Rstar) / (1.+Phi*(0.5-(1.+g)/(2.+g)*(eps+2.*a2*a2tilde*epsdash)/3.)+T*(a4-1.))
+    iRG = np.array(Rstar) / (1.+Phi*(0.5-(1.+g)/(2.+g)*(eps+2.*a2*a2tilde*epsdash)/3.)+T*(a4-1.))
 
     iRchl = 1./6.*(epsdash*(1.+(a2*a2tilde*t2tilde)/t2)+eps*(2.+t1tilde/t1)+a4) * iRG
     iRcyt = 1./6.*(2.*eps+3.*(a2+1.)/(a2+2.)*epsdash*a2tilde+3.*a3tilde/(2.+a3)*(a3+2.*a4/(1.+a4))) * iRG

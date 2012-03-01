@@ -3,7 +3,7 @@
 from sys import float_info
 import numpy as np
 #import pdb
-import dec2date # from ufz
+from dec2date import * # from ufz
 
 ###############################################################
 ###############################################################
