@@ -255,7 +255,10 @@ def gap_filling(tofill, Rg, Tair, vpd, dates, \
                     ## MGMG
                     #print 'window',len(period)/48
                     #print 'filled with two weeks'
-                    qc_gf[j] =  2 
+                    ### AP
+                    #qc_gf[j] =  2
+                    qc_gf[j] =  1
+                    ### AP 
                     continue
             
             # if nothing is found under similar meteo within two weeks, just
@@ -291,13 +294,18 @@ def gap_filling(tofill, Rg, Tair, vpd, dates, \
                         &(flag_sec[win_ind]==True)])    
                 tofill_st[j] = std
                 ## MGMG
-                qc_gf[j] = 3
+                ### AP
+                #qc_gf[j] = 3
+                qc_gf[j] = 1
+                ### AP
                 #print 'window',len(period)/48
                 #print number_4avg 
                 #print 'filled with radiation one week'
                 continue
-       
-        for size in range(0,3):
+       ### AP
+        #for size in range(0,3):
+        for size in range(0,2):
+       ### AP
             t_wind = t_int*(2*size+1)/2
             j1 = [j-np.arange(1,t_wind+1)+1] 
             j2 = [j+np.arange(1,t_wind)]
@@ -315,7 +323,13 @@ def gap_filling(tofill, Rg, Tair, vpd, dates, \
                 tofill_st[j] = np.std(period[(ff == 0) \
                         & (conditions==True)])
                 ## MGMG
-                qc_gf[j] = 4
+                ### AP
+                #qc_gf[j] = 4
+                if size==0:
+                    qc_gf[j] = 1
+                else: #AP
+                    qc_gf[j] = 2
+                ### AP
                 #print 'filled with 2.5 days'
                 #print 'window',len(period)/48
                 #print len(period[(conditions==True)&(period.flatten()!=udef)])
@@ -414,7 +428,8 @@ def gap_filling(tofill, Rg, Tair, vpd, dates, \
             # Flags are in a matrix array -> flat it so it can be compared
             ff = flag_tofill.flatten()[win_ind]
             if len(period[(conditions==True) & (ff==0)])>=2: 
-                ind_4_avg = (period.flatten()!=udef)&(conditions==True) 
+                #ind_4_avg = (period.flatten()!=udef)&(conditions==True) 
+                ind_4_avg = (ff==0)&(conditions==True) 
                 tofill_gf[j] = np.mean(period[ind_4_avg])
                 ## MGMG
                 tofill_st[j] = np.std(period[ind_4_avg])
