@@ -1,13 +1,7 @@
 #!/usr/bin/env python
-
-#from sys import float_info
 import numpy as np
-#import pdb
 from dec2date import * # from ufz
 
-###############################################################
-###############################################################
-###############################################################
 def gapfill(date, data, rg, tair, vpd,
             data_flag=None, rg_flag=None, tair_flag=None, vpd_flag=None,
             rg_dev=50., tair_dev=2.5, vpd_dev=5,
@@ -106,6 +100,7 @@ def gapfill(date, data, rg, tair, vpd,
         raise ValueError('Error gapfill: vpd must be 1D array.')
 
     # check flags
+    ndata = n_elements(data)
     if (data_flag != None):
         data_flg = data_flag
     else:
@@ -123,6 +118,11 @@ def gapfill(date, data, rg, tair, vpd,
     else:
         vpd_flg = np.zeros(ndata)
 
+    if ((np.size(date) != ndata) | (np.size(rg) != ndata) | (np.size(tair) != ndata) |
+        (np.size(vpd) != ndata) | (np.size(data_flg) != ndata) | (np.size(rg_flg) != ndata) |
+        (np.size(tair_flg) != ndata) | (np.size(vpd_flg) != ndata)):
+        raise ValueError('Error gapfill: inputs must have the same size.')
+        
     # -------------------------------------------------------------
     # Parameters
 
