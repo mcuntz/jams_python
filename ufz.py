@@ -24,6 +24,7 @@
     division       Divide two arrays, return "otherwise" if division by 0.
     esat           Calculates the saturation vapour pressure of water/ice.
     fread          Reads in float array from ascii file
+    gapfill        Gapfill Eddy flux data
     gap_filling    Gapfills eddy flux data (CO2, LE, H) 
     heaviside      Heaviside (or unit step) operator
     lif            Count number of lines in file
@@ -69,6 +70,7 @@
 
     Data processing
     ---------------
+    gapfill        Gapfill Eddy flux data
     gap_filling    Gapfills flux data (CO2, LE, H)
     mad            Median absolute deviation test
     outlier        Rossner''s extreme standardized deviate outlier test
@@ -139,6 +141,7 @@
 	      MC, Jan 2012 - esat, closest, dewpoint, division, heaviside, tcherkez, yrange, const
                            - make calcvpd obsolete
                            - cuntz_gleixner
+              MC, Mar 2012 - gapfill
 """
 # Routines provided
 from around         import *
@@ -157,6 +160,7 @@ from dewpoint       import *
 from division       import *
 from esat           import *
 from fread          import *
+from gapfill        import *
 try:
     from gap_filling import *
 except ImportError:
