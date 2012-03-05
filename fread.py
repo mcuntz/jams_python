@@ -132,7 +132,7 @@ def fread(file, nc=0, skip=0, cskip=0, separator='',
         ['head1', '1.1']
         >>> fread(filename,nc=1,skip=2,header=True,strarr=True)
         array([['head1'],
-               ['1.1']],
+               ['1.1']], 
               dtype='|S5')
 
         # skip blank lines

@@ -5,7 +5,7 @@ def gapfill(datein, datain, rgin, tairin, vpdin,
             data_flag=None, rg_flag=None, tair_flag=None, vpd_flag=None,
             rg_dev=50., tair_dev=2.5, vpd_dev=5,
             longestmarginalgap=60, undef=-9999., ddof=1,
-            err=False, squeeze=False):
+            err=False, shape=False):
     """
         Fills gaps of flux data from Eddy covariance measurements according to
         Reichstein et al. (2005).
@@ -53,8 +53,9 @@ def gapfill(datein, datain, rgin, tairin, vpdin,
         ddof                 Degrees of freedom tu use in calculation of standard deviation
                              for error estimate (default: 1)
         err                  if True, fill every data point, i.e. used for error generation (default: False)
-        squeeze              if False then all outputs have the same shape as datain
-                             if True, outputs will be 1D arrays
+        shape                if False then outputs are 1D arrays;
+                             if True, output have the same shape as datain
+                             if a shape tuple is given, then this tuple is used to reshape
 
 
         Ouput
@@ -223,7 +224,7 @@ def gapfill(datein, datain, rgin, tairin, vpdin,
         >>> vpd_dev  = 5.
         >>> out, qout = gapfill(dates, data, rg, tair, vpd, \
                                 data_flag, rg_flag, tair_flag, vpd_flag, \
-                                rg_dev, tair_dev, vpd_dev, squeeze=True)
+                                rg_dev, tair_dev, vpd_dev)
         >>> print out
         [  7.28490000e-01   6.02317500e-01   8.98950000e-02  -9.66602750e+00
           -1.10983017e+01  -3.30030500e+00  -4.19937000e+00  -5.95061500e+00
@@ -269,7 +270,7 @@ def gapfill(datein, datain, rgin, tairin, vpdin,
          0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1 1 1 1 1 0 1 0 0 0 1 2 0 0 0 0 2
          1 1 0 0 0 0 0 2 0 0 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 3 1 1 1
          2 1]
-        >>> sout = gapfill(dates, data, rg, tair, vpd, data_flag, squeeze=True,err=True)
+        >>> sout = gapfill(dates, data, rg, tair, vpd, data_flag, err=True)
         >>> print np.where(sout != -9999., np.array(np.abs(sout/out)*100.,dtype=np.int), -1)
         [  -1   -1   -1   -1   -1   -1   -1   -1   -1   15   -1   -1   21   -1   17
            -1   -1   19    2    3   -1   -1   -1   -1   -1 4896   -1   25   79   67
@@ -570,16 +571,22 @@ def gapfill(datein, datain, rgin, tairin, vpdin,
                     quality[j] = 3
                 break
 
-    if squeeze:
+    if shape != False:
+        if shape != True:
+            if err:
+                return np.reshape(data_std,shape)
+            else:
+                return np.reshape(data_fill,shape), np.reshape(quality,shape)
+        else
+            if err:
+                return np.reshape(data_std,inshape)
+            else:
+                return np.reshape(data_fill,inshape), np.reshape(quality,inshape)
+    else:
         if err:
             return data_std
         else:
             return data_fill, quality
-    else:
-        if err:
-            return np.reshape(data_std,inshape)
-        else:
-            return np.reshape(data_fill,inshape), np.reshape(quality,inshape)
 
 
 if __name__ == '__main__':
