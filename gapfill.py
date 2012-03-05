@@ -577,7 +577,7 @@ def gapfill(datein, datain, rgin, tairin, vpdin,
                 return np.reshape(data_std,shape)
             else:
                 return np.reshape(data_fill,shape), np.reshape(quality,shape)
-        else
+        else:
             if err:
                 return np.reshape(data_std,inshape)
             else:
