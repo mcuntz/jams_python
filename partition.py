@@ -9,8 +9,8 @@ if True:
     dates = ufz.date2dec(dy=dat[0,:], mo=dat[1,:], yr=dat[2,:], hr=dat[3,:], mi=dat[4,:]) 
     NEE   = np.squeeze(dat[7,:])
     rg    = np.squeeze(dat[10,:])
-    tair  = np.squeeze(dat[11,:])
-    tsoil = np.squeeze(dat[12,:])
+    tair  = np.squeeze(dat[11,:]) + 273.15
+    tsoil = np.squeeze(dat[12,:]) + 273.15
     undef = -9999.
     ii    = np.squeeze(np.where((NEE != undef) & (tair != undef) & (rg != undef)))
     nee   = NEE[ii]
@@ -96,18 +96,12 @@ if True:
 
     # -------------------------------------------------------------
     # Fit functions
-    def lloyd(p,t):
-        tref = 227.13
-        t0   = 283.15
-        return p[0]*np.exp(p[1]*(1./(tref-t)-1./(t-t0)))
-    
-    def lloyd_fmin(p,t,nee):
-        return np.sum((nee-lloyd(p,t))**2)
-    
-    def lloyd_amin(p,t,nee):
-        return np.sum(np.abs(nee-lloyd(p,t)))
+    def lloyd(t, p0, p1):
+        tref = 283.15
+        t0   = 227.13
+        return p0*np.exp(p1*(1./(tref-t0)-1./(t-t0)))
 
-
+    
     # -------------------------------------------------------------
     # Checks
 
@@ -122,6 +116,7 @@ if True:
     if ((np.size(t) != ndata) | (np.size(isday) != ndata)):
         raise ValueError('Error partition: inputs must have the same size.')
 
+    
     # -------------------------------------------------------------
     # Partition
 
@@ -129,15 +124,18 @@ if True:
     xx = t[ii]
     yy = nee[ii]
 
-    # Minpack**2
-    plf = opt.fmin(lloyd_fmin, np.array([2.,200.]), args=(xx,yy))
-    print 'Lloyd fmin**2: ', plf
+    plc, ple = opt.curve_fit(lloyd, xx, yy, p0=np.array([2.,200.]))
+    err      = ple * np.sum((yy-lloyd(xx,plc[0],plc[1]))**2)
+    pls      = np.sqrt(np.array([err[0,0],err[1,1]])/(np.size(ii)-2))
+    print 'Curve fit 1: ', plc, ' +- ', pls
 
-    # Minpack-abs
-    pla = opt.fmin(lloyd_amin, np.array([2.,200.]), args=(xx,yy))
-    print 'Lloyd abs: ', pla
-
-
+    
+    import matplotlib.pyplot as plt
+    plt.figure(1)
+    plt.plot(xx, yy, 'x', color='b')
+    plt.plot(xx, lloyd(xx,plc[0],plc[1]), 'k:')
+    plt.show()
+    
 
 if __name__ == '__main__':
     import doctest
