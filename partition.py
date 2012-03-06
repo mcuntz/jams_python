@@ -130,20 +130,20 @@ if True:
     tt  = t[ii]   #      "    ,        "      temperature
     nn  = nee[ii] #      "    ,        "      nee
 
-    if not local: # Global relationship for comparison
+    #
+    # Global relationship
+    if not local:
         p, c = opt.curve_fit(lloyd, tt, nn, p0=[2.,200.])      # global parameter, global cov matrix
-        #nii  = np.size(tt)
-        #res  = np.sum((nn-lloyd(tt,p[0],p[1]))**2)            # global residuals
-        #s    = np.sqrt(np.diag(c * res)/np.float(nii-2))      # global param error
-        #r    = c[0,1]/np.sqrt(c[0,0]*c[1,1])                  # corr between parameters
-        #print 'Global curve fit: ', p, ' +- ', s, 'corr=', r
         ndates   = np.size(dates)
         Reco     = np.ones(ndates)*undef
         ii       = np.squeeze(np.where((tair != undef)))
         t        = tair[ii] + 273.15
         Reco[ii] = lloyd(t, p[0], p[1])
 
-    else: # Local relationships
+    #
+    # Local relationship
+    else:
+        # 1. each 5 days, in 15 day period, fit if range of T > 5
         locp = [] # local param
         locs = [] # local err
         #locc = [] # local cov
@@ -154,9 +154,10 @@ if True:
             niii = np.size(iii)
             if niii > 6:
                 if (np.amax(tt[iii])-np.amin(tt[iii])) >= 5.:
-                    p, c = opt.curve_fit(lloyd, tt[iii], nn[iii], p0=[2.,200.])
-                    res  = np.sum((nn[iii]-lloyd(tt[iii],p[0],p[1]))**2)
-                    s    = np.sqrt(np.diag(c * res)/np.float(niii-2))
+                    p, c = opt.curve_fit(lloyd, tt[iii], nn[iii], p0=[2.,200.]) # params, covariance
+                    res  = np.sum((nn[iii]-lloyd(tt[iii],p[0],p[1]))**2)        # residuals
+                    s    = np.sqrt(np.diag(c * res)/np.float(niii-2))           # std err
+                    #s    = np.sqrt(np.diag(c * res))                            # std dev
                     locp = locp + [p]
                     locs = locs + [s]
                     #locc = locc + [c]
@@ -165,7 +166,8 @@ if True:
         locp   = np.squeeze(np.array(locp))
         locs   = np.squeeze(np.array(locs))
         #locc   = np.squeeze(np.array(locc))
-        # best local relationship (avg of first 3 best)
+
+        # 2. E0 = avg of best 3
         iii  = np.squeeze(np.where((locp[:,1] > 0.) & (locp[:,1] < 450.) & (np.abs(locs[:,1]/locp[:,1]) < 0.5)))
         niii = np.size(iii)
         if niii==0:
@@ -188,17 +190,17 @@ if True:
             bests = np.mean(ls[iis[0:3],:],axis=0)
             #cc = locc[iii[iis[0]],:]
         #corr = cc[0,1]/np.sqrt(cc[0,0]*cc[1,1])
-        #print 'Local best curve fit: ', bestp, ' +- ', bests, 'corr=', corr
-                        
+
+        # 3. Refit Rref with fixed E0, each 4 days
         refp  = [] # Rref param
         refii = [] # mean index of data points
         E0 = bestp[1]
         et = lloyd(tt, 1., E0)
-        for i in xrange(dmin,dmax,5):
+        for i in xrange(dmin,dmax,4):
             iii  = np.squeeze(np.where((jj>=i) & (jj<(i+4))))
             niii = np.size(iii)
             if niii > 3:
-                p = np.sum(nn[iii])/np.sum(et[iii])
+                p = np.sum(nn[iii]*et[iii])/np.sum(et[iii]**2)
                 refp  = refp  + [p]
                 refii = refii + [np.int((iii[0]+iii[-1])/2)]
         if len(refp) == 0:
@@ -206,13 +208,17 @@ if True:
         refp   = np.squeeze(np.array(refp))
         refii  = np.squeeze(np.array(refii))
 
+        # 4. Interpol Rref
         Rref   = np.interp(dates, jj[refii], refp)
+
+        # 5. Calc Reco
         ndates = np.size(dates)
         Reco   = np.ones(ndates)*undef
         ii    = np.squeeze(np.where((tair != undef)))
         t     = tair[ii] + 273.15
         Reco[ii]  = lloyd(t, Rref[ii], E0)
 
+    # GPP
     ii   = np.squeeze(np.where((NEE != undef) & (tair != undef)))
     GPP  = np.ones(ndates)*undef
     t    = tair[ii] + 273.15
