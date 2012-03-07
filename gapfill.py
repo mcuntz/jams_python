@@ -225,7 +225,7 @@ def gapfill(datein, datain, rgin, tairin, vpdin,
         >>> vpd_dev  = 5.
         >>> out, qout = gapfill(dates, data, rg, tair, vpd, \
                                 data_flag, rg_flag, tair_flag, vpd_flag, \
-                                rg_dev, tair_dev, vpd_dev)
+                                rg_dev, tair_dev, vpd_dev, undef=-9999.)
         >>> print out
         [  7.28490000e-01   6.02317500e-01   8.98950000e-02  -9.66602750e+00
           -1.10983017e+01  -3.30030500e+00  -4.19937000e+00  -5.95061500e+00
