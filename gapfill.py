@@ -4,7 +4,7 @@ import numpy as np
 def gapfill(datein, datain, rgin, tairin, vpdin,
             data_flag=None, rg_flag=None, tair_flag=None, vpd_flag=None,
             rg_dev=50., tair_dev=2.5, vpd_dev=5,
-            longestmarginalgap=60, undef=-9999., ddof=1,
+            longestmarginalgap=60, undef=np.nan, ddof=1,
             err=False, shape=False):
     """
         Fills gaps of flux data from Eddy covariance measurements according to
@@ -22,8 +22,8 @@ def gapfill(datein, datain, rgin, tairin, vpdin,
         def gapfill(datein, datain, rgin, tairin, vpdin,
                     data_flag=None, rg_flag=None, tair_flag=None, vpd_flag=None,
                     rg_dev=50., tair_dev=2.5, vpd_dev=5,
-                    longestmarginalgap=60, undef=-9999.,
-                    err=False):
+                    longestmarginalgap=60, undef=np.nan, ddof=1,
+                    err=False, shape=False):
 
 
         Input
@@ -49,7 +49,7 @@ def gapfill(datein, datain, rgin, tairin, vpdin,
         tair_dev             threshold for maximum deviation of air Temperature (default: 2.5)
         vpd_dev              threshold for maximum deviation of vpd (default: 5)
         longestmarginalgap   avoid extraploation into a gap longer than longestmarginalgap days (default: 60)
-        undef                undefined values in data  (default: -9999.)
+        undef                undefined values in data  (default: np.nan)
         ddof                 Degrees of freedom tu use in calculation of standard deviation
                              for error estimate (default: 1)
         err                  if True, fill every data point, i.e. used for error generation (default: False)
@@ -74,9 +74,10 @@ def gapfill(datein, datain, rgin, tairin, vpdin,
 
         Literature
         ----------
-        Reichstein et al. (2005) On the separation of net ecosystem exchange into
-          assimilation and ecosystem respiration: review and improved algorithm.
-          Global Change Biology,11,9, p. 1424-1439.
+        Reichstein et al. (2005)
+            On the separation of net ecosystem exchange into assimilation and ecosystem
+            respiration: review and improved algorithm.
+            Global Change Biology 11, 1424-1439
 
 
         Examples
@@ -270,7 +271,7 @@ def gapfill(datein, datain, rgin, tairin, vpdin,
          0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1 1 1 1 1 0 1 0 0 0 1 2 0 0 0 0 2
          1 1 0 0 0 0 0 2 0 0 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 3 1 1 1
          2 1]
-        >>> sout = gapfill(dates, data, rg, tair, vpd, data_flag, err=True)
+        >>> sout = gapfill(dates, data, rg, tair, vpd, data_flag, undef=-9999., err=True)
         >>> print np.where(sout != -9999., np.array(np.abs(sout/out)*100.,dtype=np.int), -1)
         [  -1   -1   -1   -1   -1   -1   -1   -1   -1   15   -1   -1   21   -1   17
            -1   -1   19    2    3   -1   -1   -1   -1   -1 4896   -1   25   79   67

@@ -29,6 +29,7 @@
     heaviside      Heaviside (or unit step) operator
     lif            Count number of lines in file
     mad            Median absolute deviation test
+    nee2gpp        Photosynthesis and ecosystem respiration NEE Eddy flux data
     outlier        Rossner''s extreme standardized deviate outlier test
     pack           Similar to Fortran pack function with mask
     position       Position arrays of subplots to be used with add_axes
@@ -73,6 +74,7 @@
     gapfill        Gapfill Eddy flux data
     gap_filling    Gapfills flux data (CO2, LE, H)
     mad            Median absolute deviation test
+    nee2gpp        Photosynthesis and ecosystem respiration NEE Eddy flux data
     outlier        Rossner''s extreme standardized deviate outlier test
     semivariogram  Calculates semivariogram from spatial data
 
@@ -141,7 +143,7 @@
 	      MC, Jan 2012 - esat, closest, dewpoint, division, heaviside, tcherkez, yrange, const
                            - make calcvpd obsolete
                            - cuntz_gleixner
-              MC, Mar 2012 - gapfill
+              MC, Mar 2012 - gapfill, nee2gpp
 """
 # Routines provided
 from around         import *
@@ -161,6 +163,7 @@ from division       import *
 from esat           import *
 from fread          import *
 from gapfill        import *
+from nee2gpp        import *
 try:
     from gap_filling import *
 except ImportError:
