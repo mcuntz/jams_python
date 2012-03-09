@@ -25,7 +25,7 @@ def nee2gpp(dates, nee, t, isday, rg=False, vpd=False, undef=np.nan,
 
         It uses either a fit of Reco vs. temperature to all nighttime data,
         or several fits over the season of Reco vs. temperature as in Reichstein et al. (2005),
-        or the daytime method of Lasslop et al. (2010) (not implemented yet),
+        or the daytime method of Lasslop et al. (2010),
         in order to calculate Reco and then GPP = Reco - NEE.
 
 
@@ -43,13 +43,20 @@ def nee2gpp(dates, nee, t, isday, rg=False, vpd=False, undef=np.nan,
         t             temperature [K]
 
 
+        Optional Input
+        --------------
+        If method = 'day' | 'lasslop', extra inputs are
+        rg            global radiation, i.e. shortwave down [W m-2]
+        vpd           vapour pressure deficit [Pa]
+
+
         Parameters
         ----------
         undef        undefined values in data  (default: np.nan)
                      Input arrays will be masked at undef, keeping the original mask
         method       if 'global':              fit of Reco vs. temperature to all nighttime data
                      if 'local' | 'reichtein': method of Reichstein et al. (2005)
-                     if 'day' | 'lasslop':     method of Lasslop et al. (2010) (not implemented yet)
+                     if 'day' | 'lasslop':     method of Lasslop et al. (2010)
         shape        if False then outputs are 1D arrays;
                      if True, output have the same shape as datain
                      if a shape tuple is given, then this tuple is used to reshape
@@ -153,8 +160,19 @@ def nee2gpp(dates, nee, t, isday, rg=False, vpd=False, undef=np.nan,
         #return np.sum((NEE-lloyd(T, p[0], p[1]))**2)
         return np.sum(np.abs(NEE-lloyd(T, p[0], p[1])))
 
+    def lloyd_rref(et, Rref):
+        """ If E0 is know in Lloyd & Taylor (1994) then one can calc
+            the exponential term outside the routine and the fitting
+            becomes linear """
+        return Rref*et
+
+    def cost_lloyd_rref(p, et, NEE):
+        """ Cost function for rref """
+        # return np.sum((NEE-lloyd_rref(et, p[0]))**2)
+        return np.sum(np.abs(NEE-lloyd_rref(et, p[0])))
+
     def lasslop(Rg, et, VPD, alpha, beta0, k, Rref):
-        """ Lasslop et al. (2010) is basicaly the rectangular, hyperbolic
+        """ Lasslop et al. (2010) is basically the rectangular, hyperbolic
             light-response of NEE as by Falge et al. (2001), where the
             respiration is calculated with Lloyd & Taylor (1994), and the
             maximum canopy uptake rate at light saturation decreases
@@ -181,49 +199,38 @@ def nee2gpp(dates, nee, t, isday, rg=False, vpd=False, undef=np.nan,
         """ Cost function for Lasslop """
         return np.sum(np.abs(NEE-lasslop(Rg, et, VPD, p[0], p[1], p[2], p[3])))
 
-    def lasslop_novpd(Rg, et, alpha, beta, Rref):
-        """ Lasslop et al. (2010) is basicaly the rectangular, hyperbolic
-            light-response of NEE as by Falge et al. (2001), where the
-            respiration is calculated with Lloyd & Taylor (1994).
-            This is the case where the maximum canopy uptake rate at light
-            saturation decreases is optimised as well, i.e. no VPD dependence.
-            Rg      Global radiation [W m-2]
-            et      Exponential in Lloyd & Taylor: np.exp(E0*(1./(Tref-T0)-1./(T-T0))) []
-            alpha   Light use efficiency, i.e. initial slope of light response curve [umol(C) J-1]
-            beta    Maximum CO2 uptake rate [umol(C) m-2 s-1]
-            Rref    Respiration at Tref (10 degC) [umol(C) m-2 s-1]
-        """
-        # Lloyd & Taylor (1994)
-        gamma = Rref*et
-        return -alpha*beta*Rg/(alpha*Rg+beta) + gamma
+    # def lasslop_novpd(Rg, et, alpha, beta, Rref):
+    #     """ Lasslop et al. (2010) is basically the rectangular, hyperbolic
+    #         light-response of NEE as by Falge et al. (2001), where the
+    #         respiration is calculated with Lloyd & Taylor (1994).
+    #         This is the case where the maximum canopy uptake rate at light
+    #         saturation decreases is optimised as well, i.e. no VPD dependence.
+    #         Rg      Global radiation [W m-2]
+    #         et      Exponential in Lloyd & Taylor: np.exp(E0*(1./(Tref-T0)-1./(T-T0))) []
+    #         alpha   Light use efficiency, i.e. initial slope of light response curve [umol(C) J-1]
+    #         beta    Maximum CO2 uptake rate [umol(C) m-2 s-1]
+    #         Rref    Respiration at Tref (10 degC) [umol(C) m-2 s-1]
+    #     """
+    #     # Lloyd & Taylor (1994)
+    #     gamma = Rref*et
+    #     return -alpha*beta*Rg/(alpha*Rg+beta) + gamma
 
-    def cost_lasslop_novpd(p, Rg, et, NEE):
-        """ Cost function for Lasslop without VPD dependence """
-        return np.sum(np.abs(NEE-lasslop_novpd(Rg, et, p[0], p[1], p[2])))
+    # def cost_lasslop_novpd(p, Rg, et, NEE):
+    #     """ Cost function for Lasslop without VPD dependence """
+    #     return np.sum(np.abs(NEE-lasslop_novpd(Rg, et, p[0], p[1], p[2])))
 
-    def falge(Rg, alpha, beta, gamma):
-        """ Rectangular, hyperbolic light-response of NEE as by Falge et al. (2001).
-            Rg      Global radiation [W m-2]
-            alpha   Light use efficiency, i.e. initial slope of light response curve [umol(C) J-1]
-            beta    Maximum CO2 uptake rate [umol(C) m-2 s-1]
-            gamma   Respiration [umol(C) m-2 s-1]
-        """
-        return -alpha*beta*Rg/(alpha*Rg+beta) + gamma
+    # def falge(Rg, alpha, beta, gamma):
+    #     """ Rectangular, hyperbolic light-response of NEE as by Falge et al. (2001).
+    #         Rg      Global radiation [W m-2]
+    #         alpha   Light use efficiency, i.e. initial slope of light response curve [umol(C) J-1]
+    #         beta    Maximum CO2 uptake rate [umol(C) m-2 s-1]
+    #         gamma   Respiration [umol(C) m-2 s-1]
+    #     """
+    #     return -alpha*beta*Rg/(alpha*Rg+beta) + gamma
 
-    def cost_falge(p, Rg, NEE):
-        """ Cost function for Falge """
-        return np.sum(np.abs(NEE-falge(Rg, p[0], p[1], p[2])))
-
-    def lloyd_rref(et, Rref):
-        """ If E0 is know in Lloyd & Taylor (1994) then one can calc
-            the exponential term outside the routine and the fitting
-            becomes linear """
-        return Rref*et
-
-    def cost_lloyd_rref(p, et, NEE):
-        """ Cost function for rref """
-        # return np.sum((NEE-lloyd_rref(et, p[0]))**2)
-        return np.sum(np.abs(NEE-lloyd_rref(et, p[0])))
+    # def cost_falge(p, Rg, NEE):
+    #     """ Cost function for Falge """
+    #     return np.sum(np.abs(NEE-falge(Rg, p[0], p[1], p[2])))
 
     # -------------------------------------------------------------
     # Checks
