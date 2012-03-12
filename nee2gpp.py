@@ -141,6 +141,7 @@ def nee2gpp(dates, nee, t, isday, rg=False, vpd=False, undef=np.nan,
         History
         -------
         Written  MC, Mar 2012
+        Modified AP, Mar 2012 - undef = np.nan works!
     """
 
     # -------------------------------------------------------------
@@ -281,9 +282,16 @@ def nee2gpp(dates, nee, t, isday, rg=False, vpd=False, undef=np.nan,
         if np.size(isday.mask) == 1:
             isday = np.ma.array(isday, mask=np.zeros(ndata,dtype=np.bool))
     # mask also undef
-    if np.ma.any(nee   == undef): nee   = np.ma.array(nee,   mask=(nee==undef),   keep_mask=True)
-    if np.ma.any(t     == undef): t     = np.ma.array(t,     mask=(t==undef),     keep_mask=True)
-    if np.ma.any(isday == undef): isday = np.ma.array(isday, mask=(isday==undef), keep_mask=True)
+    # AP
+    if np.isnan(undef):
+        if np.ma.any(np.isnan(nee))  : nee   = np.ma.array(nee,   mask=np.isnan(nee),   keep_mask=True)
+        if np.ma.any(np.isnan(t))    : t     = np.ma.array(t,     mask=np.isnan(t),     keep_mask=True)
+        if np.ma.any(np.isnan(isday)): isday = np.ma.array(isday, mask=np.isnan(isday), keep_mask=True)
+    else:
+    #AP
+    	if np.ma.any(nee   == undef): nee   = np.ma.array(nee,   mask=(nee==undef),   keep_mask=True)
+    	if np.ma.any(t     == undef): t     = np.ma.array(t,     mask=(t==undef),     keep_mask=True)
+    	if np.ma.any(isday == undef): isday = np.ma.array(isday, mask=(isday==undef), keep_mask=True)
 
     if ((method.lower() == 'day') | (method.lower() == 'lasslop')):
         if type(rg) != matype:
