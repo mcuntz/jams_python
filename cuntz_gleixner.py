@@ -20,7 +20,7 @@ def cuntz_gleixner(idecdate, iGPP, iRd, iCa, iRa, igtot, sunrise, Vcyt=False,
                    Rphloem=False,
                    Vstarch=False, ass13=False, disc=False,
                    Rnew_starch=False, Rnew_cyt=False,
-                   fullmodel=True):
+                   fullmodel=True, julian=True):
     """
        Calculates the Cuntz-Gleixner steady state and non-steady state models
        of 13C discrimiantion in the Calvin cycle.
@@ -44,7 +44,7 @@ def cuntz_gleixner(idecdate, iGPP, iRd, iCa, iRa, igtot, sunrise, Vcyt=False,
                           Rphloem=False,
                           Vstarch=False, ass13=False, disc=False,
                           Rnew_starch=False, Rnew_cyt=False,
-                          fullmodel=True):
+                          fullmodel=True, julian=True):
 
 
        Input
@@ -104,6 +104,7 @@ def cuntz_gleixner(idecdate, iGPP, iRd, iCa, iRa, igtot, sunrise, Vcyt=False,
        Rnew_starch   If True, output 13C/12C ratio of newly produced starch (default: False)
        Rnew_cyt      If True, output 13C/12C ratio of newly produced sugars in cytoplasm (default: False)
        fullmodel     If True, output all in the above order (default: True)
+       julian        If True, dates are given as Julian days, otherwise as decimal year (default: True)
 
 
        Output
@@ -204,7 +205,7 @@ def cuntz_gleixner(idecdate, iGPP, iRd, iCa, iRa, igtot, sunrise, Vcyt=False,
                                       daylength=daylength, Phi=Phi, s_resid=s_resid, \
                                       betas=betas, betap=betap, epsa=epsa, epsb=epsb, \
                                       epsg=epsg, epst=epst, epss=epss, epsp=epsp, \
-                                      steady=True, Vstarch=True)
+                                      steady=True, Vstarch=True, julian=False)
        >>> print Vstarch
        [  40532.56147698   70158.59646601   98220.74429006  124787.7169264
          150065.87342268  174445.4051167   197941.82132329  220569.84160386
@@ -220,7 +221,7 @@ def cuntz_gleixner(idecdate, iGPP, iRd, iCa, iRa, igtot, sunrise, Vcyt=False,
                           daylength=daylength, Phi=Phi, s_resid=s_resid, \
                           betas=betas, betap=betap, epsa=epsa, epsb=epsb, \
                           epsg=epsg, epst=epst, epss=epss, epsp=epsp, \
-                          steady=True, fullmodel=True)
+                          steady=True, fullmodel=True, julian=False)
        >>> print Rass
        [ 0.01094936  0.01092075  0.01086872  0.01083349  0.01083054  0.01085329
          0.01091213  0.01092848  0.01090373  0.01091399  0.0109335   0.01087484
@@ -309,7 +310,7 @@ def cuntz_gleixner(idecdate, iGPP, iRd, iCa, iRa, igtot, sunrise, Vcyt=False,
                           daylength=daylength, Phi=Phi, s_resid=s_resid, \
                           betas=betas, betap=betap, epsa=epsa, epsb=epsb, \
                           epsg=epsg, epst=epst, epss=epss, epsp=epsp, \
-                          steady=False, fullmodel=True)
+                          steady=False, fullmodel=True, julian=False)
         >>> print Vstarch
         [  40532.56147698   70158.59646601   98220.74429006  124787.7169264
           150065.87342268  174445.4051167   197941.82132329  220569.84160386
@@ -384,10 +385,33 @@ def cuntz_gleixner(idecdate, iGPP, iRd, iCa, iRa, igtot, sunrise, Vcyt=False,
           0.01087173  0.0108686   0.01086407  0.01084518  0.01083756  0.01086382
           0.01088164  0.01089436  0.01090345  0.01090993  0.01091457  0.01091788
           0.01092024  0.01092193]
+       >>> from dec2date import *
+       >>> from date2dec import *
+       >>> aa = dec2date(adecdate, ascii=True, calendar='decimal')
+       >>> jadecdate = date2dec(ascii=aa)
+       >>> ndecdate = 2008.918772768670806
+       >>> bb = dec2date(ndecdate, ascii=True, calendar='decimal')
+       >>> jndecdate = date2dec(ascii=bb)
+       >>> [Rass,Rm,Rchl,Rcyt,Rstarch,Rpyr,Rbio,Rphloem,Vstarch,ass13,disc,Rnew_starch,Rnew_cyt] = \
+           cuntz_gleixner(jadecdate[1:], gpp, Rd, CO2air, Ra, gtot, jndecdate, Vcyt=Vcyt, \
+                          date0=jadecdate[0], V0starch=V0starch, R0starch=R0starch, R0cyt=R0cyt, \
+                          daynight=daynight, \
+                          daylength=daylength, Phi=Phi, s_resid=s_resid, \
+                          betas=betas, betap=betap, epsa=epsa, epsb=epsb, \
+                          epsg=epsg, epst=epst, epss=epss, epsp=epsp, \
+                          steady=False, fullmodel=True, julian=True)
+        >>> # There slight differences due to precision of dates
+        >>> print Rphloem
+        [ 0.01091666  0.01089289  0.01089142  0.01086873  0.01085241  0.01084975
+          0.01086308  0.01087658  0.01087901  0.01088297  0.01089023  0.01088204
+          0.01087173  0.0108686   0.01086407  0.01084517  0.01083756  0.01086382
+          0.01088164  0.01089436  0.01090345  0.01090993  0.01091457  0.01091788
+          0.01092024  0.01092193]
 
        History
        -------
-       Written, MC, Jan 2012
+       Written,  MC, Jan 2012
+       Modified, MC, Mar 2012 - julian
     """
     #
     # Checks
@@ -507,13 +531,17 @@ def cuntz_gleixner(idecdate, iGPP, iRd, iCa, iRa, igtot, sunrise, Vcyt=False,
     iCc  = iCa - iAss/igtot             # CO2 @ chloroplast
     iVc   = np.abs(iGPP)/(1.-0.5*iPhi) # carboxylation
     # seconds
-    yr   = np.floor(idecdate)
-    leap = ((np.fmod(yr,4) == 0) & (np.fmod(yr,100) != 0)) | (np.fmod(yr,400) == 0)
-    isecs = np.rint(np.maximum(idecdate-np.roll(idecdate,1), 0.) * 86400. * (365.+leap))
-    if np.size(date0) == 0:
-        isecs[0] = np.rint((idecdate[1]-idecdate[0])*86400.*(365.+leap[0]))
+    if julian:
+        decfac = np.ones(nd)
     else:
-        isecs[0] = np.rint((idecdate[0]-date0)*86400.*(365.+leap[0]))
+        yr     = np.floor(idecdate)
+        leap   = ((np.fmod(yr,4) == 0) & (np.fmod(yr,100) != 0)) | (np.fmod(yr,400) == 0)
+        decfac = 365. + np.array(leap, dtype=np.float)
+    isecs = np.rint(np.maximum(idecdate-np.roll(idecdate,1), 0.) * 86400. * decfac)
+    if np.size(date0) == 0:
+        isecs[0] = np.rint((idecdate[1]-idecdate[0])*86400.*decfac[0])
+    else:
+        isecs[0] = np.rint((idecdate[0]-date0)*86400.*decfac[0])
     # seconds remainig until next sunrise
     nightlength     = 86400. - idaylength # length of night before
     nightlength     = np.roll(nightlength,-1)
@@ -521,7 +549,7 @@ def cuntz_gleixner(idecdate, iGPP, iRd, iCa, iRa, igtot, sunrise, Vcyt=False,
     dsecs = idaylength + nightlength
     nsecs = np.empty(nd)
     issun = sunrise
-    sr    = np.rint((idecdate - issun) * 86400. * (365.+leap))
+    sr    = np.rint((idecdate - issun) * 86400. * decfac)
     for i in xrange(nd):
         if sr[i] > 0.: sr[i:] -= dsecs[i]
         nsecs[i] = -sr[i]
@@ -529,7 +557,7 @@ def cuntz_gleixner(idecdate, iGPP, iRd, iCa, iRa, igtot, sunrise, Vcyt=False,
     if np.size(date0) == 0:
         nsecs[0] = nsecs[0] + (nsecs[0]-nsecs[1])
     else:
-        sr0 = np.rint((date0-issun)*86400.*(365.+leap[0]))
+        sr0 = np.rint((date0-issun)*86400.*decfac[0])
         if sr0 > 0.: sr0 -= dsecs[0]
         nsecs[0] = -sr0
     #
