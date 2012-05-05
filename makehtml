@@ -43,7 +43,7 @@ shift $((${OPTIND} - 1))
 #
 # Delete old html files
 if [[ ! -d "html" ]] ; then mkdir html ; fi
-\rm html/*
+\rm -f html/*
 #
 # Create header of index html
 printf "<HTML>\n" > html/index.html
