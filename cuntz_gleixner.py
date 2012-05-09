@@ -20,7 +20,7 @@ def cuntz_gleixner(idecdate, iGPP, iRd, iCa, iRa, igtot, sunrise, Vcyt=False,
                    Rphloem=False,
                    Vstarch=False, ass13=False, disc=False,
                    Rnew_starch=False, Rnew_cyt=False,
-                   fullmodel=True, julian=True):
+                   fullmodel=True, julian=True, nocheck=False):
     """
        Calculates the Cuntz-Gleixner steady state and non-steady state models
        of 13C discrimiantion in the Calvin cycle.
@@ -44,7 +44,7 @@ def cuntz_gleixner(idecdate, iGPP, iRd, iCa, iRa, igtot, sunrise, Vcyt=False,
                           Rphloem=False,
                           Vstarch=False, ass13=False, disc=False,
                           Rnew_starch=False, Rnew_cyt=False,
-                          fullmodel=True, julian=True):
+                          fullmodel=True, julian=True, nocheck=False):
 
 
        Input
@@ -56,6 +56,7 @@ def cuntz_gleixner(idecdate, iGPP, iRd, iCa, iRa, igtot, sunrise, Vcyt=False,
        iRa              13C/12C ratio of outside CO2 concentration
        igtot            Total conductance for CO2 from outside air to chloroplast [mol(CO2)/m2s]
        sunrise         decial date of first sunrise in data set
+
 
        Input (only nss model)
        -----
@@ -86,7 +87,6 @@ def cuntz_gleixner(idecdate, iGPP, iRd, iCa, iRa, igtot, sunrise, Vcyt=False,
        epsp            fractionation of biosynthesis bifurcation (default: 1e-3)
 
 
-
        Parameter
        ---------
        steady        If True, steady-state instead of non-steady-state model (default: False)
@@ -105,6 +105,7 @@ def cuntz_gleixner(idecdate, iGPP, iRd, iCa, iRa, igtot, sunrise, Vcyt=False,
        Rnew_cyt      If True, output 13C/12C ratio of newly produced sugars in cytoplasm (default: False)
        fullmodel     If True, output all in the above order (default: True)
        julian        If True, dates are given as Julian days, otherwise as decimal year (default: True)
+       nocheck       If True, do not check betap and betas ranges (default: False)
 
 
        Output
@@ -400,18 +401,34 @@ def cuntz_gleixner(idecdate, iGPP, iRd, iCa, iRa, igtot, sunrise, Vcyt=False,
                           betas=betas, betap=betap, epsa=epsa, epsb=epsb, \
                           epsg=epsg, epst=epst, epss=epss, epsp=epsp, \
                           steady=False, fullmodel=True, julian=True)
-        >>> # There slight differences due to precision of dates
-        >>> print Rphloem
-        [ 0.01091666  0.01089289  0.01089142  0.01086873  0.01085241  0.01084975
-          0.01086308  0.01087658  0.01087901  0.01088297  0.01089023  0.01088204
-          0.01087173  0.0108686   0.01086407  0.01084517  0.01083756  0.01086382
-          0.01088164  0.01089436  0.01090345  0.01090993  0.01091457  0.01091788
-          0.01092024  0.01092193]
+       >>> # There are slight differences due to precision of dates
+       >>> print Rphloem
+       [ 0.01091666  0.01089289  0.01089142  0.01086873  0.01085241  0.01084975
+         0.01086308  0.01087658  0.01087901  0.01088297  0.01089023  0.01088204
+         0.01087173  0.0108686   0.01086407  0.01084517  0.01083756  0.01086382
+         0.01088164  0.01089436  0.01090345  0.01090993  0.01091457  0.01091788
+         0.01092024  0.01092193]
+       >>> [Rass,Rm,Rchl,Rcyt,Rstarch,Rpyr,Rbio,Rphloem,Vstarch,ass13,disc,Rnew_starch,Rnew_cyt] = \
+           cuntz_gleixner(jadecdate[1:], gpp, Rd, CO2air, Ra, gtot, jndecdate, Vcyt=Vcyt, \
+                          date0=jadecdate[0], V0starch=V0starch, R0starch=R0starch, R0cyt=R0cyt, \
+                          daynight=daynight, \
+                          daylength=daylength, Phi=Phi, s_resid=s_resid, \
+                          betas=betas, betap=2./3.-0.1, epsa=epsa, epsb=epsb, \
+                          epsg=epsg, epst=epst, epss=epss, epsp=epsp, \
+                          steady=False, fullmodel=True, julian=True, nocheck=True)
+       >>> print Rphloem
+       [ 0.01091666  0.00956084  0.00932304  0.00905517  0.0088888   0.00908849
+         0.00928323  0.00946748  0.00943847  0.00939182  0.00934281  0.00927611
+         0.00915699  0.00905204  0.00896914  0.00896053  0.00895677  0.01072887
+         0.01074818  0.01076197  0.01077181  0.01077884  0.01078386  0.01078745
+         0.01079001  0.01079184]
+
 
        History
        -------
        Written,  MC, Jan 2012
        Modified, MC, Mar 2012 - julian
+       Modified, MC, May 2012 - nocheck
     """
     #
     # Checks
@@ -486,9 +503,10 @@ def cuntz_gleixner(idecdate, iGPP, iRd, iCa, iRa, igtot, sunrise, Vcyt=False,
             return False
     mini = np.amin(ibetap)
     maxi = np.amax(ibetap)
-    if ((mini < 0.66) | (maxi > 0.8)):
-        print 'CUNTZ_GLEIXNER: betap must be: 2/3 < betap < 4/5'
-        return False
+    if not nocheck:
+        if ((mini < 0.66) | (maxi > 0.8)):
+            print 'CUNTZ_GLEIXNER: betap must be: 2/3 < betap < 4/5'
+            return False
     # betas the factor of leaf respiration that is transferred to biosynthesis (default: 3*gpp/max(gpp))
     # betas*(1-betap) <= 1: if betap=2/3 -> betas<3: if betap=5/6 -> betas < 6
     if np.all(betas == False): betas = np.maximum((1./(1.-ibetap) * gpp/np.amax(gpp)) - const.tiny, 0.)
@@ -565,9 +583,10 @@ def cuntz_gleixner(idecdate, iGPP, iRd, iCa, iRa, igtot, sunrise, Vcyt=False,
     # also T of Tcherkez acts on A whereas bigT acts on GPP
     ibigT  = 1. - idaylength/86400. # =0.058*6 @ Tcherkez
     ibetar = 1. - ibetas*(1.-ibetap)
-    if np.any(ibetar <= 0.):
-        print 'CUNTZ_GLEIXNER: betar = 1-betas*(1-betap) <= 0.'
-        return False
+    if not nocheck:
+        if np.any(ibetar <= 0.):
+            print 'CUNTZ_GLEIXNER: betar = 1-betas*(1-betap) <= 0.'
+            return False
     iepsr  = np.where(ibetar > const.tiny, epss * (1.-ibetar)/ibetar, 1.) # limit to eps=1000 permil
     iepsg1 = epsg*0.5*iPhi + ibigT*(1.-0.5*iPhi)*epst
     iepsp1 = (epss*ibetas + iepsr*ibetar) / (ibetas + ibetar)
