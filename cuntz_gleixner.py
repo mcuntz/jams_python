@@ -581,7 +581,8 @@ def cuntz_gleixner(idecdate, iGPP, iRd, iCa, iRa, igtot, sunrise, Vcyt=False,
     #
     # fraction of starch synthesis, same as T of Tchekez before but with different units,
     # also T of Tcherkez acts on A whereas bigT acts on GPP
-    ibigT  = 1. - idaylength/86400. # =0.058*6 @ Tcherkez
+    tmp    = 1./86400.
+    ibigT  = 1. - idaylength*tmp # =0.058*6 @ Tcherkez
     ibetar = 1. - ibetas*(1.-ibetap)
     if not nocheck:
         if np.any(ibetar <= 0.):
@@ -614,8 +615,8 @@ def cuntz_gleixner(idecdate, iGPP, iRd, iCa, iRa, igtot, sunrise, Vcyt=False,
     if nss: # non-steady-state
         for i in xrange(nd):
             if idaynight[i] == 1: # nss day
-                tmp1     = (1.-ibigT[i]) * (1.-iPhi[i]/2.) * iVc[i]
-                tmp2     = (1.-epsb) * iVc[i] * (1.-(1.-epsg)/(1.-iepsg1[i])*iPhi[i]/2.)
+                tmp1     = (1.-ibigT[i]) * (1.-0.5*iPhi[i]) * iVc[i]
+                tmp2     = (1.-epsb) * iVc[i] * (1.-(1.-epsg)/(1.-iepsg1[i])*0.5*iPhi[i])
                 tmp3     = (1.-epsb) / (1.-iepsg1[i])
                 zaehler  = (1.-iepsa[i]) * igtot[i] * iCa[i] * iRa[i]
                 nenner   = tmp2 + (1.-iepsa[i]) * igtot[i] * iCc[i]
@@ -663,7 +664,7 @@ def cuntz_gleixner(idecdate, iGPP, iRd, iCa, iRa, igtot, sunrise, Vcyt=False,
             if idaynight[i] == 1: # ss day
                 tmp1 = (1.-iepsa[i]) * igtot[i] * iRa[i] * iCa[i]
                 tmp2 = (1.-iepsa[i]) * igtot[i] * iCc[i]
-                tmp3 = ( (1.-epsb) * iVc[i] * (1.-(1.-epsg)/(1.-iepsg1[i])*iPhi[i]/2.) -
+                tmp3 = ( (1.-epsb) * iVc[i] * (1.-(1.-epsg)/(1.-iepsg1[i])*0.5*iPhi[i]) -
                          (1.-epsb) / ((1.-iepsp1[i])*(1.-iepsg1[i])) * iRd[i] )
                 iRm[i]          = tmp1 / (tmp2+tmp3)
                 iRchl[i]        = (1.-epsb)/(1.-iepsg1[i]) * iRm[i]
