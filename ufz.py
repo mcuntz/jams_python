@@ -13,6 +13,7 @@
     Provided functions (alphabetic w/o obsolete)
     ------------------
     around         Round to the passed power of ten.
+    astr           Wrapper for autostring
     autostring     Format number (array) with given decimal precision.
     cellarea       Calc areas of grid cells in m^2
     closest        Get the array index of the element that is closest to a given number.
@@ -104,6 +105,7 @@
 
     Miscellaneous
     -------------
+    astr           Wrapper for autostring
     autostring     Format number (array) with given decimal precision.
     const          Provides physical, mathematical, computational, and isotope constants.
     cuntz_gleixner Cuntz-Gleixner model of 13C discrimination
@@ -144,6 +146,7 @@
                            - make calcvpd obsolete
                            - cuntz_gleixner
               MC, Mar 2012 - gapfill, nee2gpp
+              MC, May 2012 - astr
 """
 # Routines provided
 from around         import *

@@ -1,13 +1,15 @@
 #!/usr/bin/env python
 import numpy as np
 
-def autostring(num, prec=0, zero=False, set_printoptions=False, join=False, joinall=False, sep=' '):
+def autostring(num, prec=0, zero=False, set_printoptions=False, pp=False, join=False, joinall=False, sep=' '):
     """
         Format number (array) with given decimal precision.
 
         Definition
         ----------
-        def autostring(num, prec, zero=False, set_printoptions=False):
+        def autostring(num, prec=0, zero=False, set_printoptions=False, pp=False, join=False, joinall=False, sep=' '):
+          There is a wrapper function for convenience with the short name 'astr' that calls autostring
+        def astr(num, prec=0, zero=False, set_printoptions=False, pp=False, join=False, joinall=False, sep=' '):
 
 
         Input
@@ -21,6 +23,8 @@ def autostring(num, prec=0, zero=False, set_printoptions=False, join=False, join
 	                    minimum field width for integers (default: 0)
 	zero                if True, pad values with zeros rather than blanks (default: False)
 	set_printoptions    if True, sets linewidth to the format times size of 1st dimension (default: False)
+	pp                  shortcut for set_printoptions (default: False)
+                            it will be checked for (pp | set_printoptions)
 	join                if True, joins all individual strings of last (fastest) dimension into one string (default: False)
 	joinall             if True, joins all individual strings into single string,
                             i.e. first flattens the array and then joins it (default: False, overwrites join)
@@ -76,6 +80,14 @@ def autostring(num, prec=0, zero=False, set_printoptions=False, join=False, join
 	[['0.0' '0.0' '0.0' '0.0' '0.0' '0.0' '0.0' '0.0' '0.0' '0.0']
          ['0.0' '0.0' '0.0' '0.0' '0.0' '0.0' '0.0' '0.0' '0.0' '0.0']]
 
+        >>> print autostring(np.zeros((2,10), dtype=np.float), 1, pp=True)
+	[['0.0' '0.0' '0.0' '0.0' '0.0' '0.0' '0.0' '0.0' '0.0' '0.0']
+         ['0.0' '0.0' '0.0' '0.0' '0.0' '0.0' '0.0' '0.0' '0.0' '0.0']]
+
+        >>> print autostring(np.zeros((2,10), dtype=np.float), 1, set_printoptions=False, pp=True)
+	[['0.0' '0.0' '0.0' '0.0' '0.0' '0.0' '0.0' '0.0' '0.0' '0.0']
+         ['0.0' '0.0' '0.0' '0.0' '0.0' '0.0' '0.0' '0.0' '0.0' '0.0']]
+
         >>> print autostring(np.array([3.5967, 3.5964]), 3, join=True)
         3.597 3.596
 
@@ -86,10 +98,14 @@ def autostring(num, prec=0, zero=False, set_printoptions=False, join=False, join
         >>> print autostring(np.reshape(np.arange(20,dtype=np.float),(2,10)), 1, joinall=True, sep=';')
          0.0; 1.0; 2.0; 3.0; 4.0; 5.0; 6.0; 7.0; 8.0; 9.0;10.0;11.0;12.0;13.0;14.0;15.0;16.0;17.0;18.0;19.0
 
+        >>> print astr(np.reshape(np.arange(20,dtype=np.float),(2,10)), 1, joinall=True, sep=';')
+         0.0; 1.0; 2.0; 3.0; 4.0; 5.0; 6.0; 7.0; 8.0; 9.0;10.0;11.0;12.0;13.0;14.0;15.0;16.0;17.0;18.0;19.0
+
 
         History
         -------
-        Written, MC, Nov 2011 - from autostring.pro
+        Written,  MC, Nov 2011 - from autostring.pro
+        Modified, MC, May 2012 - pp
     """
     #
     # Check input
@@ -198,7 +214,7 @@ def autostring(num, prec=0, zero=False, set_printoptions=False, join=False, join
 	for i in xrange(nnum):
 	    out[i] = format_string.format(fnum[i])
 	out = np.reshape(out, np.shape(num))
-	if set_printoptions:
+	if (set_printoptions | pp):
 	    # num_total_chars+3 for '' and space, +isarr for []
 	    np.set_printoptions(linewidth=np.size(num,-1)*(num_total_chars+3)+isarr, threshold=nnum+1)
 	if (join | joinall): # There should be reduction routines in numpy
@@ -222,6 +238,13 @@ def autostring(num, prec=0, zero=False, set_printoptions=False, join=False, join
 	    out = outc
     # return formatted string
     return out
+
+def astr(num, prec=0, zero=False, set_printoptions=False, pp=False, join=False, joinall=False, sep=' '):
+    """
+        Wrapper function for autostring
+        def astr(num, prec=0, zero=False, set_printoptions=False, pp=False, join=False, joinall=False, sep=' '):
+    """
+    return autostring(num, prec, zero, set_printoptions, pp, join, joinall, sep)
 
  
 if __name__ == '__main__':
