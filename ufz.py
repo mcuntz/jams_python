@@ -13,7 +13,7 @@
     Provided functions (alphabetic w/o obsolete)
     ------------------
     around         Round to the passed power of ten.
-    astr           Wrapper for autostring
+    astr           Wrapper for autostring.
     autostring     Format number (array) with given decimal precision.
     cellarea       Calc areas of grid cells in m^2
     closest        Get the array index of the element that is closest to a given number.
@@ -22,6 +22,7 @@
     dewpoint       Calculates the dew point from ambient humidity
     date2dec	   Converts arrays with calendar date to decimal date
     dec2date	   Converts arrays with decimal date to calendar date
+    div            Wrapper for division.
     division       Divide two arrays, return "otherwise" if division by 0.
     esat           Calculates the saturation vapour pressure of water/ice.
     fread          Reads in float array from ascii file
@@ -95,6 +96,7 @@
     Math
     ----
     around         Round to the passed power of ten.
+    div            Wrapper for division.
     division       Divide two arrays, return "otherwise" if division by 0.
     heaviside      Heaviside (or unit step) operator
 
@@ -146,7 +148,7 @@
                            - make calcvpd obsolete
                            - cuntz_gleixner
               MC, Mar 2012 - gapfill, nee2gpp
-              MC, May 2012 - astr
+              MC, May 2012 - astr, div
 """
 # Routines provided
 from around         import *

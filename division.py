@@ -7,7 +7,9 @@ def division(a, b, otherwise=np.nan, prec=0.):
 
         Definition
         ----------
-        def division(a, b, otherwise=0., prec=0.):
+        def division(a, b, otherwise=np.nan, prec=0.):
+          There is a wrapper function for convenience with the short name 'div'
+        def div(a, b, otherwise=np.nan, prec=0.):
 
 
         Input
@@ -50,13 +52,19 @@ def division(a, b, otherwise=np.nan, prec=0.):
         >>> print division([1., 1., 1.], [2., 1., 0.], prec=1.)
         [ 0.5  nan  nan]
 
+        >>> print div([1., 1., 1.], [2., 1., 0.], prec=1.)
+        [ 0.5  nan  nan]
+
 
         History
         -------
-        Written, MC, Jan 2012
+        Written,  MC, Jan 2012
+        Modified, MC, May 2012 - div
     """
     return np.where(np.ma.abs(np.ma.array(b)) > np.abs(prec), np.ma.array(a)/np.ma.array(b), otherwise)
 
+def div(a, b, otherwise=np.nan, prec=0.):
+    return np.where(np.ma.abs(np.ma.array(b)) > np.abs(prec), np.ma.array(a)/np.ma.array(b), otherwise)
  
 if __name__ == '__main__':
     import doctest
