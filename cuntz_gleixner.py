@@ -27,13 +27,13 @@ def cuntz_gleixner(idecdate, iGPP, iRd, iCa, iRa, igtot, sunrise, Vcyt=None,
 
        Definition
        ----------
-       def cuntz_gleixner(idecdate, iGPP, iRd, iCa, iRa, igtot, sunrise, Vcyt=False,
+       def cuntz_gleixner(idecdate, iGPP, iRd, iCa, iRa, igtot, sunrise, Vcyt=None,
                           date0=False,
                           V0starch=const.tiny, R0starch=const.RPDB,
                           R0cyt=const.RPDB,
-                          daynight=False, daylength=57600,
+                          daynight=None, daylength=57600,
                           Phi=0.3, s_resid=const.tiny,
-                          betas=False, betap=0.75,
+                          betas=None, betap=0.75,
                           epsa=4.4e-3, epsb=29.5e-3,
                           epsg=20.0e-3, epst=-4.4e-3,
                           epss=10.0e-3, epsp=1.0e-3,
@@ -462,7 +462,7 @@ def cuntz_gleixner(idecdate, iGPP, iRd, iCa, iRa, igtot, sunrise, Vcyt=None,
         Rnew_cyt    = True
     # Defaults
     # Day (1) or night (0)
-    if ~np.any(daynight != None): daynight = np.where(gpp > 0., 1, 0)
+    if ~np.any(daynight != None): daynight = np.where(iGPP > 0., 1, 0)
     isarr = np.size(np.shape(daynight))
     if (isarr==0):
         idaynight = np.ones(nd, dtype=np.int) * daynight
@@ -510,7 +510,7 @@ def cuntz_gleixner(idecdate, iGPP, iRd, iCa, iRa, igtot, sunrise, Vcyt=None,
             return False
     # betas the factor of leaf respiration that is transferred to biosynthesis (default: 3*gpp/max(gpp))
     # betas*(1-betap) <= 1: if betap=2/3 -> betas<3: if betap=5/6 -> betas < 6
-    if ~np.any(betas != None): betas = np.maximum((1./(1.-ibetap) * gpp/np.amax(gpp)) - const.tiny, 0.)
+    if ~np.any(betas != None): betas = np.maximum((1./(1.-ibetap) * iGPP/np.amax(iGPP)) - const.tiny, 0.)
     isarr = np.size(np.shape(betas))
     if (isarr==0):
         ibetas = np.ones(nd) * betas
