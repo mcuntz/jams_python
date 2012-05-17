@@ -29,6 +29,7 @@
     gapfill        Gapfill Eddy flux data
     gap_filling    Gapfills eddy flux data (CO2, LE, H) 
     heaviside      Heaviside (or unit step) operator
+    lhs            Latin Hypercube Sampling of any distribution without correlations
     lif            Count number of lines in file
     mad            Median absolute deviation test
     nee2gpp        Photosynthesis and ecosystem respiration NEE Eddy flux data
@@ -99,6 +100,7 @@
     div            Wrapper for division.
     division       Divide two arrays, return "otherwise" if division by 0.
     heaviside      Heaviside (or unit step) operator
+    lhs            Latin Hypercube Sampling of any distribution without correlations
 
     Meteorology
     -----------
@@ -174,6 +176,7 @@ try:
 except ImportError:
     pass
 from heaviside      import *
+from lhs            import *
 from lif            import *
 from mad            import *
 try:
