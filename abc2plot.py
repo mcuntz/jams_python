@@ -2,7 +2,7 @@
 from roman import int2roman
 
 def abc2plot(handle, dx, dy, iplot, roman=False, lower=False, integer=False,
-             medium=False, small=False):
+             medium=False, small=False, bold=False):
     """
         Write a, b, c, ...
               A, B, C, ...
@@ -34,6 +34,8 @@ def abc2plot(handle, dx, dy, iplot, roman=False, lower=False, integer=False,
                  False: fontsize='large'
         small    True:  fontsize='small'
                  False: fontsize='large'
+        bold     True:  fontweight='bold'
+                 False: fontsize='normal'
 
 
         Output
@@ -75,9 +77,13 @@ def abc2plot(handle, dx, dy, iplot, roman=False, lower=False, integer=False,
         fs='medium'
     else:
         fs='large'
+    if bold:
+        fw='bold'
+    else:
+        fw='regular'
     xmin, xmax = handle.get_xlim()
     ymin, ymax = handle.get_ylim()
-    handle.text(xmin+dx*(xmax-xmin), ymin+dy*(ymax-ymin), t, fontsize=fs,
+    handle.text(xmin+dx*(xmax-xmin), ymin+dy*(ymax-ymin), t, fontsize=fs, fontweight=fw,
                 horizontalalignment='left', verticalalignment='bottom')
 
 
@@ -96,4 +102,5 @@ if __name__ == '__main__':
     # abc2plot(sub,0.5,0.5,2,integer=True)
     # abc2plot(sub,0.6,0.6,2,small=True)
     # abc2plot(sub,0.7,0.7,2,medium=True)
+    # abc2plot(sub,0.7,0.7,2,medium=True,bold=True)
     # plt.show()
