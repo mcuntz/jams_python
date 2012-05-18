@@ -12,6 +12,7 @@
 
     Provided functions (alphabetic w/o obsolete)
     ------------------
+    abc2plot       Write a, b, c, ... on plots
     around         Round to the passed power of ten.
     astr           Wrapper for autostring.
     autostring     Format number (array) with given decimal precision.
@@ -124,6 +125,7 @@
 
     Plotting
     --------
+    abc2plot       Write a, b, c, ... on plots
     position       Position arrays of subplots to be used with add_axes
     tsym           Raw unicodes for common symbols
     yrange         Calculates plot range from input array
@@ -161,6 +163,7 @@
               MC, May 2012 - astr, div, sobol_index, pi, roman
 """
 # Routines provided
+from abc2plot        import *
 from around          import *
 from autostring      import *
 from calcvpd         import *
