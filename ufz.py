@@ -29,6 +29,7 @@
     gapfill        Gapfill Eddy flux data
     gap_filling    Gapfills eddy flux data (CO2, LE, H) 
     heaviside      Heaviside (or unit step) operator
+    int2roman      Integer to roman numeral conversion
     lhs            Latin Hypercube Sampling of any distribution without correlations
     lif            Count number of lines in file
     mad            Median absolute deviation test
@@ -38,6 +39,7 @@
     pi             Parameter importance index PI or alternatively B index calculation
     position       Position arrays of subplots to be used with add_axes
     readnetcdf     Reads variables or information from netcdf file
+    roman2int      Roman numeral to integer conversion
     semivariogram  Calculates semivariogram from spatial data
     sobol_index    Calculates the first-order and total variance-based sensitivity indices
     sread          Reads in string array from ascii file
@@ -117,6 +119,8 @@
     autostring     Format number (array) with given decimal precision.
     const          Provides physical, mathematical, computational, and isotope constants.
     cuntz_gleixner Cuntz-Gleixner model of 13C discrimination
+    int2roman      Integer to roman numeral conversion
+    roman2int      Roman numeral to integer conversion
 
     Plotting
     --------
@@ -154,7 +158,7 @@
                            - make calcvpd obsolete
                            - cuntz_gleixner
               MC, Mar 2012 - gapfill, nee2gpp
-              MC, May 2012 - astr, div, sobol_index, pi
+              MC, May 2012 - astr, div, sobol_index, pi, roman
 """
 # Routines provided
 from around          import *
@@ -194,6 +198,7 @@ try:
     from readnetcdf  import *
 except ImportError:
     pass
+from roman           import int2roman, roman2int
 from semivariogram   import *
 from sobol_index     import *
 from sread           import *
