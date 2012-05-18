@@ -35,9 +35,11 @@
     nee2gpp        Photosynthesis and ecosystem respiration NEE Eddy flux data
     outlier        Rossner''s extreme standardized deviate outlier test
     pack           Similar to Fortran pack function with mask
+    pi             Parameter importance index PI or alternatively B index calculation
     position       Position arrays of subplots to be used with add_axes
     readnetcdf     Reads variables or information from netcdf file
     semivariogram  Calculates semivariogram from spatial data
+    sobol_index    Calculates the first-order and total variance-based sensitivity indices
     sread          Reads in string array from ascii file
     tcherkez       Calculates the Tcherkez model of 13C-discrimiantion in the Calvin cycle.
     tsym           Raw unicodes for common symbols
@@ -101,6 +103,8 @@
     division       Divide two arrays, return "otherwise" if division by 0.
     heaviside      Heaviside (or unit step) operator
     lhs            Latin Hypercube Sampling of any distribution without correlations
+    pi             Parameter importance index PI or alternatively B index calculation
+    sobol_index    Calculates the first-order and total variance-based sensitivity indices
 
     Meteorology
     -----------
@@ -150,51 +154,53 @@
                            - make calcvpd obsolete
                            - cuntz_gleixner
               MC, Mar 2012 - gapfill, nee2gpp
-              MC, May 2012 - astr, div
+              MC, May 2012 - astr, div, sobol_index, pi
 """
 # Routines provided
-from around         import *
-from autostring     import *
-from calcvpd        import *
-from cellarea       import *
-from closest        import *
+from around          import *
+from autostring      import *
+from calcvpd         import *
+from cellarea        import *
+from closest         import *
 import const
-from cuntz_gleixner import *
+from cuntz_gleixner  import *
 try:
     from date2dec    import *
     from dec2date    import *
 except ImportError:
     print "No netcdf support in UFZ library. Disabled functions: date2dec, dec2date, gap_filling, readnetcdf."
-from dewpoint       import *
-from division       import *
-from esat           import *
-from fread          import *
-from gapfill        import *
-from nee2gpp        import *
+from dewpoint        import *
+from division        import *
+from esat            import *
+from fread           import *
+from gapfill         import *
+from nee2gpp         import *
 try:
     from gap_filling import *
 except ImportError:
     pass
-from heaviside      import *
-from lhs            import *
-from lif            import *
-from mad            import *
+from heaviside       import *
+from lhs             import *
+from lif             import *
+from mad             import *
 try:
     from outlier     import *
 except ImportError:
     print "No extra statistics in scipy, i.e. in UFZ library. Disabled functions: outlier."
-from pack           import *
-from position       import *
+from pack            import *
+from pi              import *
+from position        import *
 try:
     from readnetcdf  import *
 except ImportError:
     pass
-from semivariogram  import *
-from sread          import *
-from tcherkez       import *
-from tsym           import *
-from unpack         import *
-from yrange         import *
+from semivariogram   import *
+from sobol_index     import *
+from sread           import *
+from tcherkez        import *
+from tsym            import *
+from unpack          import *
+from yrange          import *
 
 # Information
 version = '1.5'
