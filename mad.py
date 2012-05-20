@@ -13,7 +13,7 @@ def mad(datin, z=7, deriv=0):
 
         Input
         -----
-        datin      1d array
+        datin      array; mad acts on axis=0
 
 
         Optional Input
@@ -29,9 +29,11 @@ def mad(datin, z=7, deriv=0):
 
         Restrictions
         ------------
+        If input is an array then it mad checks along the zeroth axis for outlier.
+
         1st derivative is
             d = datin[1:n]-datin[0:n-1]
-        because mean of left and right would give 0 for spikes
+        because mean of left and right would give 0 for spikes.
 
 
         Examples
@@ -64,35 +66,62 @@ def mad(datin, z=7, deriv=0):
         [-0.25 0.68 0.94 1.15 2.26 2.35 2.37 2.4 2.47 2.54 2.62 2.64 2.9 2.92 2.92
          2.93 3.21 3.26 3.3 3.59 3.68 4.3 4.64 5.34 5.42 --]
 
+        >>> yy = np.transpose(np.array([y,y]))
+        >>> print np.transpose(mad(yy,z=4))
+        [[False False False False False False False False False False False False
+          False False False False False False False False False False False False
+          False  True]
+         [False False False False False False False False False False False False
+          False False False False False False False False False False False False
+          False  True]]
+
+        >>> yyy = np.transpose(np.array([y,y,y]))
+        >>> print np.transpose(mad(yyy,z=3))
+        [[ True False False False False False False False False False False False
+          False False False False False False False False False False False False
+           True  True]
+         [ True False False False False False False False False False False False
+          False False False False False False False False False False False False
+           True  True]
+         [ True False False False False False False False False False False False
+          False False False False False False False False False False False False
+           True  True]]
+
 
         History
         -------
-        Written, MC, Nov 2011
+        Written,  MC, Nov 2011
+        Modified, MC, May 2012 - act on axis=0 of array
     """
-    n      = np.size(datin)
+    sn = list(np.shape(datin))
+    n  = sn[0]
     if deriv == 0:
         m      = n
         d      = datin
     elif deriv == 1:
         m      = n-1
-        d      = datin[1:n]-datin[0:n-1]
+        sm     = sn
+        sm[0]  = m
+        dd     = np.ravel(datin)
+        d      = np.reshape(dd[1:]-dd[:-1], sm)
     elif deriv == 2:
         m      = n-2
-        d      = (datin[1:n-1]-datin[0:n-2]) - (datin[2:n]-datin[1:n-1])
+        sm     = sn
+        sm[0]  = m
+        dd     = np.ravel(datin)
+        d      = np.reshape((dd[1:-1]-dd[:-2]) - (dd[2:]-dd[1:-1]), sm)
     else:
         print 'Unimplemented option in mad'
         import sys
         sys.exit(1)
     # Median
-    md     = np.ma.median(d)
+    md     = np.ma.median(d, axis=0)
     # Median absolute deviation
     MAD    = np.ma.median(np.ma.abs(md-d))
     # Range around median
     thresh = MAD/0.6745 * z
-    # Output is false everywhere
-    res    = np.zeros(m, dtype=np.bool)
     # Except where outside z-range
-    res[:] = np.logical_or(d<(md-thresh), d>(md+thresh))
+    res = np.logical_or(d<(md-thresh), d>(md+thresh))
     
     return res
 
@@ -100,3 +129,8 @@ def mad(datin, z=7, deriv=0):
 if __name__ == '__main__':
     import doctest
     doctest.testmod()
+    # y = np.array([-0.25,0.68,0.94,1.15,2.26,2.35,2.37,2.40,2.47,2.54,2.62,\
+    #               2.64,2.90,2.92,2.92,2.93,3.21,3.26,3.30,3.59,3.68,4.30,\
+    #               4.64,5.34,5.42,8.01],dtype=np.float)
+    # yy = np.transpose(np.array([y,y]))
+    # print np.transpose(mad(yy,z=4))
