@@ -146,10 +146,10 @@ def pi(s=None, m=None, norm=None, b=False):
         ev, em = la.eigh(m)
         for i in xrange(inn):
             ind[i] = np.sum(ev[:] * np.abs(em[i,:]))
-        # Check precision because we use trace(m) instead of sum(ev) later
-        #print np.sum(ev), np.trace(m), np.abs(np.sum(ev) - np.trace(m))
-        if np.abs(np.sum(ev) - np.trace(m)) > 1e-9: # np.finfo(float).eps too little
-            print 'Warning ufz.pi: |sum(ev)-trace(m)| > float.eps: ', np.abs(np.sum(ev) - np.trace(m))
+        # # Check precision because we use trace(m) instead of sum(ev) later
+        # #print np.sum(ev), np.trace(m), np.abs(np.sum(ev) - np.trace(m))
+        # if np.abs(np.sum(ev) - np.trace(m)) > 1e-9: # np.finfo(float).eps too little
+        #     print 'Warning ufz.pi: |sum(ev)-trace(m)| > float.eps: ', np.abs(np.sum(ev) - np.trace(m))
 
     if norm != None:
         if norm.lower() == 'sum':
