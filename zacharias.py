@@ -1,45 +1,49 @@
 #!/usr/bin/env python
 import numpy as np
 
-def zacharias(h, clay, sand, db, params=None, thetar=False, thetas=False, lnalpha=False, n=False, check=True):
+def zacharias(h, clay, sand, db, params=None, thetar=False, thetas=False, lnalpha=False, n=False):
     """
         Soil water content with the van Genuchten equation and
         the pedotransfer functions of Zacharias et al. (2007).
 
         Definition
         ----------
-        def zacharias(h, clay, sand, db, params=None,
-                      thetar=False, thetas=False, lnalpha=False, n=False, check=True):
+        def zacharias(h, clay, sand, db, params=None, thetar=False, thetas=False, lnalpha=False, n=False):
 
 
         Input
         -----
-        h          number array
+        h          pressure head, scalar or array [cm], 0=saturation, 15000=wilting point
+        clay       clay content, scalar or array [%, i.e. 0-100]
+        sand       sand content, scalar or array [%, i.e. 0-100]
+        db         bulk density, scalar or array [g/cm3], quartz=2.65
 
 
         Optional Input
         --------------
-        powten     Power of ten array
-                   If missing, simple round (ceil, floor) is taken.
-        ceil       ceil instead of round to the nearest power of ten
-        floor      floor instead of round to the nearest power of ten
+        params     Parameter for Zacharias et al. (2007) pedotransfer functions
+                   If None, values from Zacharias et al. will be taken that are different
+                   betwwen sandy and non-sandy soil (<66.5% sand)
 
+
+        Options
+        -------
+        thetar     If True, outputs residual water content thetar as well [m3 m-3]
+        thetas     If True, outputs saturation water content thetas as well [m3 m-3]
+        lnalpha    If True, outpus logarithm of shape parameter alpha as well [1/cm]
+        n          If True, output exponent n as well
+        
 
         Output
         ------
-        Soil water content: theta [m^3 m^-3].
+        Soil water content theta [m^3 m^-3]
 
 
         Restrictions
         ------------
-        Powten is exactly opposite of decimal keyword of numpy.around.
-
-        From numpy.around documentation:
-        'For values exactly halfway between rounded decimal values,
-        Numpy rounds to the nearest even value. Thus 1.5 and 2.5 round to 2.0,
-        -0.5 and 0.5 round to 0.0, etc. Results may also be surprising due to the
-        inexact representation of decimal fractions in the IEEE floating point
-        standard and errors introduced when scaling by powers of ten.'
+        Does not check the validity of the parameter set, i.e. negative soil moistures
+        can occur, for example.
+        Use zacharias_check to check the parameter set first.
 
 
         Examples
@@ -138,7 +142,7 @@ def zacharias(h, clay, sand, db, params=None, thetar=False, thetas=False, lnalph
             if isand[i] < 66.5:
                 par = parclay
             else:
-                par = parsand                     
+                par = parsand
             par0[i]  = par[0]
             par1[i]  = par[1]
             par2[i]  = par[2]
@@ -162,8 +166,8 @@ def zacharias(h, clay, sand, db, params=None, thetar=False, thetas=False, lnalph
     inn     = par10 + par11*np.exp(par12*np.log(iclay))            + par13*np.exp(par14*np.log(isand))
     imm     = 1. - 1./inn
     # van Genuchten
-    itheta  = np.where(ih <= tiny, ithetas, 
-                       ithetar + (ithetas-ithetar)/np.exp(imm*np.log(1.+np.exp(inn*np.log(np.exp(ilna)*ih)))))    
+    itheta  = np.where(ih <= tiny, ithetas,
+                       ithetar + (ithetas-ithetar)/np.exp(imm*np.log(1.+np.exp(inn*np.log(np.exp(ilna)*ih)))))
     # Output
     itheta = np.reshape(itheta, ns)
     if nn==1: itheta = itheta[0]
@@ -189,10 +193,138 @@ def zacharias(h, clay, sand, db, params=None, thetar=False, thetas=False, lnalph
             out = out + [inn]
         return out
 
+def zacharias_check(params, sand=None, clay=None):
+    """
+        Checks if a given parameter set is valid for all possible soils with
+        the van Genuchten equation and the pedotransfer functions of Zacharias et al. (2007).
+
+        Definition
+        ----------
+        def zacharias_check(params, sand=None, clay=None):
+
+
+        Input
+        -----
+        params     array[15] with parameters a1, b1, ..., d4 of Zacharias et al. (2007)
+
+
+        Optional Input
+        --------------
+        clay       If given: 1. < clay < 99. then calc sand content < clay
+        sand       If given: 1. < sand < 99. then calc sand content > sand
+
+
+        Output
+        ------
+        Boolean    True:  valid parameter set for all soils
+                   False: not valid in at least one extreme case
+
+
+        Examples
+        --------
+        >>> parclay = np.array([ 0.,     0.,     0., \
+                                 0.788,  0.001, -0.263, \
+                                -0.648,  0.044, -3.168,  0.023, \
+                                 1.392,  1.212, -0.704, -0.418, -0.024])
+        >>> print zacharias_check(parclay)
+        True
+        >>> print zacharias_check(parclay, clay=66)
+        True
+        >>> parsand = np.array([ 0.,     0.,     0., \
+                                 0.890, -0.001, -0.322, \
+                                -4.197,  0.076, -0.276, 0.013, \
+                                -2.562,  3.750, -0.016, 7e-9,  4.004])
+        >>> print zacharias_check(parsand)
+        False
+        >>> print zacharias_check(parsand, sand=66)
+        True
+
+
+        History
+        -------
+        Written, MC, May 2012
+    """
+    #
+    # Check input
+    tiny = np.finfo(np.float).eps
+    if params != None:
+        if np.size(params) != 15: raise ValueError('size(params) must be 15.')
+    # Check ranges
+    isgood = True
+    if (params[0]  <   0.)   |  (params[0]  >  1.):   isgood = False
+    if (params[1]  <  -0.01) |  (params[1]  >  0.01): isgood = False
+    if (params[2]  <  -0.5)  |  (params[2]  >  0.5):  isgood = False
+    if (params[3]  <   0.)   |  (params[3]  >  1.):   isgood = False
+    if (params[4]  <  -0.01) |  (params[4]  >  0.01): isgood = False
+    if (params[5]  <  -0.5)  |  (params[5]  >  0.5):  isgood = False
+    if (params[6]  < -10.)   |  (params[6]  > 10.):   isgood = False
+    if (params[7]  <  -1.)   |  (params[7]  >  1.):   isgood = False
+    if (params[8]  <  -5.)   |  (params[8]  >  5.):   isgood = False
+    if (params[9]  <  -1.)   |  (params[9]  >  1.):   isgood = False
+    if (params[10] < -10.)   |  (params[10] > 10.):   isgood = False
+    if (params[11] < -10.)   |  (params[11] > 10.):   isgood = False
+    if (params[12] <  -5.)   |  (params[12] >  5.):   isgood = False
+    if (params[13] < -10.)   |  (params[13] > 10.):   isgood = False
+    if (params[14] <  -5.)   |  (params[14] >  5.):   isgood = False
+    # Soil ranges
+    h    = [1., 1e6]
+    if clay != None:
+        rclay = [98., 1.,   99.-clay]
+        rsand = [1.,  clay, clay]
+    elif sand != None:
+        rclay = [1.,  1.,   99.-sand]
+        rsand = [98., sand, sand]
+    else:
+        rclay = [1.,  1., 98.]
+        rsand = [98., 1.,  1.]
+    db   = [0.5, 2.3]
+    nn   = 2*3*2
+    ih    = np.empty(nn)
+    iclay = np.empty(nn)
+    isand = np.empty(nn)
+    idb   = np.empty(nn)
+    zaehl = 0
+    for i in [0,1]:
+        for j in [0,1,2]:
+            for k in [0,1]:
+                ih[zaehl]    = h[i]
+                iclay[zaehl] = rclay[j]
+                isand[zaehl] = rsand[j]
+                idb[zaehl]   = db[k]
+                zaehl += 1
+    # Calc Zacharias
+    itheta, ithetar, ithetas, ilna, inn = zacharias(ih, iclay, isand, idb, params=params,
+                                                    thetar=True, thetas=True, lnalpha=True, n=True)
+    #ia  = np.exp(ilna)
+    #imm = 1. - 1./inn
+    if np.any(ithetar < 0.) | np.any(ithetar > 1.): isgood = False
+    if np.any(ithetas < 0.) | np.any(ithetas > 1.) | np.any(ithetas < ithetar): isgood = False
+    #if np.any(ilna > 0.): isgood = False
+    if np.any(inn < 1.) | np.any(inn > 10.): isgood = False
+    #if np.any(imm < 0.): isgood = False
+    #if np.any(ia > 1.): isgood = False
+    if np.any(itheta < ithetar) | np.any(itheta > ithetas): isgood = False
+
+    return isgood
+
 
 if __name__ == '__main__':
     import doctest
     doctest.testmod()
+
+    # parclay = np.array([ 0.,     0.,     0.,
+    #                      0.788,  0.001, -0.263,
+    #                      -0.648,  0.044, -3.168,  0.023,
+    #                      1.392,  1.212, -0.704, -0.418, -0.024])
+    # print zacharias_check(parclay)
+    # print zacharias_check(parclay, clay=66)
+    # parsand = np.array([ 0.,     0.,     0.,
+    #                      0.890, -0.001, -0.322,
+    #                      -4.197,  0.076, -0.276, 0.013,
+    #                      -2.562,  3.750, -0.016, 7e-9,  4.004])
+    # print zacharias_check(parsand)
+    # print zacharias_check(parsand, sand=66)
+
     # h = np.array([0.0000000, 0.0000000, 10.000000, 31.622777, \
     #               100.00000, 199.52623, 199.52623, \
     #               501.18723, 2511.8864, 15848.932])

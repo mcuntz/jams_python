@@ -10,44 +10,47 @@
     >>> import ufz
     >>> help(ufz.function)
 
+
     Provided functions (alphabetic w/o obsolete)
     ------------------
-    abc2plot       Write a, b, c, ... on plots
-    around         Round to the passed power of ten.
-    astr           Wrapper for autostring.
-    autostring     Format number (array) with given decimal precision.
-    cellarea       Calc areas of grid cells in m^2
-    closest        Get the array index of the element that is closest to a given number.
-    const          Provides physical, mathematical, computational, and isotope constants.
-    cuntz_gleixner Cuntz-Gleixner model of 13C discrimination
-    dewpoint       Calculates the dew point from ambient humidity
-    date2dec	   Converts arrays with calendar date to decimal date
-    dec2date	   Converts arrays with decimal date to calendar date
-    div            Wrapper for division.
-    division       Divide two arrays, return "otherwise" if division by 0.
-    esat           Calculates the saturation vapour pressure of water/ice.
-    fread          Reads in float array from ascii file
-    gapfill        Gapfill Eddy flux data
-    gap_filling    Gapfills eddy flux data (CO2, LE, H) 
-    heaviside      Heaviside (or unit step) operator
-    int2roman      Integer to roman numeral conversion
-    lhs            Latin Hypercube Sampling of any distribution without correlations
-    lif            Count number of lines in file
-    mad            Median absolute deviation test
-    nee2gpp        Photosynthesis and ecosystem respiration NEE Eddy flux data
-    outlier        Rossner''s extreme standardized deviate outlier test
-    pack           Similar to Fortran pack function with mask
-    pi             Parameter importance index PI or alternatively B index calculation
-    position       Position arrays of subplots to be used with add_axes
-    readnetcdf     Reads variables or information from netcdf file
-    roman2int      Roman numeral to integer conversion
-    semivariogram  Calculates semivariogram from spatial data
-    sobol_index    Calculates the first-order and total variance-based sensitivity indices
-    sread          Reads in string array from ascii file
-    tcherkez       Calculates the Tcherkez model of 13C-discrimiantion in the Calvin cycle.
-    tsym           Raw unicodes for common symbols
-    unpack         Similar to Fortran unpack function with mask
-    yrange         Calculates plot range from input array
+    abc2plot           Write a, b, c, ... on plots
+    around             Round to the passed power of ten.
+    astr               Wrapper for autostring.
+    autostring         Format number (array) with given decimal precision.
+    cellarea           Calc areas of grid cells in m^2
+    closest            Get the array index of the element that is closest to a given number.
+    const              Provides physical, mathematical, computational, and isotope constants.
+    cuntz_gleixner     Cuntz-Gleixner model of 13C discrimination
+    dewpoint           Calculates the dew point from ambient humidity
+    date2dec	       Converts arrays with calendar date to decimal date
+    dec2date	       Converts arrays with decimal date to calendar date
+    div                Wrapper for division.
+    division           Divide two arrays, return "otherwise" if division by 0.
+    esat               Calculates the saturation vapour pressure of water/ice.
+    fread              Reads in float array from ascii file
+    gapfill            Gapfill Eddy flux data
+    gap_filling        Gapfills eddy flux data (CO2, LE, H) 
+    heaviside          Heaviside (or unit step) operator
+    int2roman          Integer to roman numeral conversion
+    lhs                Latin Hypercube Sampling of any distribution without correlations
+    lif                Count number of lines in file
+    mad                Median absolute deviation test
+    nee2gpp            Photosynthesis and ecosystem respiration NEE Eddy flux data
+    outlier            Rossner''s extreme standardized deviate outlier test
+    pack               Similar to Fortran pack function with mask
+    pi                 Parameter importance index PI or alternatively B index calculation
+    position           Position arrays of subplots to be used with add_axes
+    readnetcdf         Reads variables or information from netcdf file
+    roman2int          Roman numeral to integer conversion
+    semivariogram      Calculates semivariogram from spatial data
+    sobol_index        Calculates the first-order and total variance-based sensitivity indices
+    sread              Reads in string array from ascii file
+    tcherkez           Calculates the Tcherkez model of 13C-discrimiantion in the Calvin cycle.
+    tsym               Raw unicodes for common symbols
+    unpack             Similar to Fortran unpack function with mask
+    yrange             Calculates plot range from input array
+    zacharias          Soil water content with van Genuchten and Zacharias et al. (2007)
+    zacharias_check    Checks validity of parameter set for Zacharias et al. (2007)
 
     
     Provided functions per category
@@ -65,11 +68,13 @@
         Special files
         Obsolete
     -------------------------------
+
     Array manipulation
     ------------------
     closest        Get the array index of the element that is closest to a given number.
     pack           Similar to Fortran pack function with mask
     unpack         Similar to Fortran unpack function with mask
+
 
     Ascii files
     -----------
@@ -77,66 +82,78 @@
     lif            Count number of lines in file
     sread          Reads in string array from ascii file
 
+
     Data processing
     ---------------
-    gapfill        Gapfill Eddy flux data
-    gap_filling    Gapfills flux data (CO2, LE, H)
-    mad            Median absolute deviation test
-    nee2gpp        Photosynthesis and ecosystem respiration NEE Eddy flux data
-    outlier        Rossner''s extreme standardized deviate outlier test
-    semivariogram  Calculates semivariogram from spatial data
+    gapfill            Gapfill Eddy flux data
+    gap_filling        Gapfills flux data (CO2, LE, H)
+    mad                Median absolute deviation test
+    nee2gpp            Photosynthesis and ecosystem respiration NEE Eddy flux data
+    outlier            Rossner''s extreme standardized deviate outlier test
+    semivariogram      Calculates semivariogram from spatial data
+
 
     Date & Time
     -----------
-    date2dec	   Converts arrays with calendar date to decimal date
-    dec2date	   Converts arrays with decimal date to calendar date
+    date2dec	       Converts arrays with calendar date to decimal date
+    dec2date	       Converts arrays with decimal date to calendar date
+
 
     Grids
     -----
-    cellarea       Calc areas of grid cells in m^2
+    cellarea           Calc areas of grid cells in m^2
+
 
     Isotopes
     --------
-    tcherkez       Calculates the Tcherkez model of 13C-discrimiantion in the Calvin cycle.
+    cuntz_gleixner     Cuntz-Gleixner model of 13C discrimination
+    tcherkez           Calculates the Tcherkez model of 13C-discrimiantion in the Calvin cycle.
+
 
     Math
     ----
-    around         Round to the passed power of ten.
-    div            Wrapper for division.
-    division       Divide two arrays, return "otherwise" if division by 0.
-    heaviside      Heaviside (or unit step) operator
-    lhs            Latin Hypercube Sampling of any distribution without correlations
-    pi             Parameter importance index PI or alternatively B index calculation
-    sobol_index    Calculates the first-order and total variance-based sensitivity indices
+    around             Round to the passed power of ten.
+    div                Wrapper for division.
+    division           Divide two arrays, return "otherwise" if division by 0.
+    heaviside          Heaviside (or unit step) operator
+    lhs                Latin Hypercube Sampling of any distribution without correlations
+    pi                 Parameter importance index PI or alternatively B index calculation
+    sobol_index        Calculates the first-order and total variance-based sensitivity indices
+
 
     Meteorology
     -----------
-    dewpoint       Calculates the dew point from ambient humidity
-    esat           Calculates the saturation vapour pressure of water/ice.
+    dewpoint           Calculates the dew point from ambient humidity
+    esat               Calculates the saturation vapour pressure of water/ice.
+
 
     Miscellaneous
     -------------
-    astr           Wrapper for autostring
-    autostring     Format number (array) with given decimal precision.
-    const          Provides physical, mathematical, computational, and isotope constants.
-    cuntz_gleixner Cuntz-Gleixner model of 13C discrimination
-    int2roman      Integer to roman numeral conversion
-    roman2int      Roman numeral to integer conversion
+    astr               Wrapper for autostring
+    autostring         Format number (array) with given decimal precision.
+    const              Provides physical, mathematical, computational, and isotope constants.
+    int2roman          Integer to roman numeral conversion
+    roman2int          Roman numeral to integer conversion
+    zacharias          Soil water content with van Genuchten and Zacharias et al. (2007)
+    zacharias_check    Checks validity of parameter set for Zacharias et al. (2007)
+
 
     Plotting
     --------
-    abc2plot       Write a, b, c, ... on plots
-    position       Position arrays of subplots to be used with add_axes
-    tsym           Raw unicodes for common symbols
-    yrange         Calculates plot range from input array
+    abc2plot           Write a, b, c, ... on plots
+    position           Position arrays of subplots to be used with add_axes
+    tsym               Raw unicodes for common symbols
+    yrange             Calculates plot range from input array
+
 
     Special files
     -------------
-    readnetcdf     Reads variables or information from netcdf file
+    readnetcdf         Reads variables or information from netcdf file
+
 
     Obsolete
     --------
-    calcvpd        Calculates vapour pressure deficit
+    calcvpd            Calculates vapour pressure deficit
         
 
     History
@@ -160,7 +177,7 @@
                            - make calcvpd obsolete
                            - cuntz_gleixner
               MC, Mar 2012 - gapfill, nee2gpp
-              MC, May 2012 - astr, div, sobol_index, pi, roman
+              MC, May 2012 - astr, div, sobol_index, pi, roman, zacharias
 """
 # Routines provided
 from abc2plot        import *
@@ -209,10 +226,11 @@ from tcherkez        import *
 from tsym            import *
 from unpack          import *
 from yrange          import *
+from zacharias       import *
 
 # Information
-version = '1.5'
-date = '22.01.2012'
+version = '1.6'
+date = '25.05.2012'
 
 # Main
 if __name__ == '__main__':
