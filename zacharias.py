@@ -164,10 +164,14 @@ def zacharias(h, clay, sand, db, params=None, thetar=False, thetas=False, lnalph
     ithetas = par3  + par4*iclay                        + par5*idb
     ilna    = par6  + par7*iclay                        + par8*idb + par9*isand
     inn     = par10 + par11*np.exp(par12*np.log(iclay))            + par13*np.exp(par14*np.log(isand))
-    imm     = 1. - 1./inn
-    # van Genuchten
-    itheta  = np.where(ih <= tiny, ithetas,
-                       ithetar + (ithetas-ithetar)/np.exp(imm*np.log(1.+np.exp(inn*np.log(np.exp(ilna)*ih)))))
+    imm     = 1. - 1./np.where(inn != 0., inn, 1e-3)
+    # van Genuchten sign
+    # limit exp to 600 and log to tiny so that no over- and underflows occur
+    expmax  = 600.
+    lnah    = np.log(np.maximum(np.exp(ilna)*ih, tiny))
+    ahn     = np.exp(np.minimum(inn*lnah, expmax))
+    denom   = np.maximum(np.exp(np.minimum(imm*np.log(1.+ahn), expmax)), tiny)
+    itheta  = np.where(ih <= tiny, ithetas, ithetar + (ithetas-ithetar)/denom)
     # Output
     itheta = np.reshape(itheta, ns)
     if nn==1: itheta = itheta[0]
