@@ -42,6 +42,7 @@
     position           Position arrays of subplots to be used with add_axes
     readnetcdf         Reads variables or information from netcdf file
     roman2int          Roman numeral to integer conversion
+    saltelli           Parameter sampling for Sobol indices calculation
     semivariogram      Calculates semivariogram from spatial data
     sobol_index        Calculates the first-order and total variance-based sensitivity indices
     sread              Reads in string array from ascii file
@@ -118,6 +119,7 @@
     heaviside          Heaviside (or unit step) operator
     lhs                Latin Hypercube Sampling of any distribution without correlations
     pi                 Parameter importance index PI or alternatively B index calculation
+    saltelli           Parameter sampling for Sobol indices calculation
     sobol_index        Calculates the first-order and total variance-based sensitivity indices
 
 
@@ -177,7 +179,7 @@
                            - make calcvpd obsolete
                            - cuntz_gleixner
               MC, Mar 2012 - gapfill, nee2gpp
-              MC, May 2012 - astr, div, sobol_index, pi, roman, zacharias
+              MC, May 2012 - astr, div, sobol_index, pi, roman, zacharias, saltelli
 """
 # Routines provided
 from abc2plot        import *
@@ -219,6 +221,7 @@ try:
 except ImportError:
     pass
 from roman           import int2roman, roman2int
+from saltelli        import *
 from semivariogram   import *
 from sobol_index     import *
 from sread           import *

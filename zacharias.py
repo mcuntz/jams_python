@@ -174,25 +174,25 @@ def zacharias(h, clay, sand, db, params=None, thetar=False, thetas=False, lnalph
     itheta  = np.where(ih <= tiny, ithetas, ithetar + (ithetas-ithetar)/denom)
     # Output
     itheta = np.reshape(itheta, ns)
-    if nn==1: itheta = itheta[0]
+    if nn==1: itheta = np.float(itheta)
     if (thetar==False) & (thetas==False) & (lnalpha==False) & (n==False):
         return itheta
     else:
         out = [itheta]
         if thetar==True:
             ithetar = np.reshape(ithetar, ns)
-            if nn==1: ithetar = ithetar[0]
+            if nn==1: ithetar = np.float(ithetar)
             out = out + [ithetar]
         if thetas==True:
-            if nn==1: ithetas = ithetas[0]
+            if nn==1: ithetas = np.float(ithetas)
             ithetas = np.reshape(ithetas, ns)
             out = out + [ithetas]
         if lnalpha==True:
-            if nn==1: ilna = ilna[0]
+            if nn==1: ilna = np.float(ilna)
             ilna = np.reshape(ilna, ns)
             out = out + [ilna]
         if n==True:
-            if nn==1: inn = inn[0]
+            if nn==1: inn = np.float(inn)
             inn = np.reshape(inn, ns)
             out = out + [inn]
         return out
