@@ -97,7 +97,6 @@ def writenetcdf(fhandle, vhandle=None, var=None, time=None, isdim=False, name=No
         shand = hand.shape
         if time != None:
             svar = np.shape(var)
-            print shand, np.size(shand)
             if np.size(np.shape(time)) == 0:
                 if np.size(svar) != (np.size(shand)-1):
                     raise ValueError('writenetcdf error: Variable and handle dimensions do not agree for variable time: '+str(svar)+' and '+str(shand))
@@ -108,7 +107,6 @@ def writenetcdf(fhandle, vhandle=None, var=None, time=None, isdim=False, name=No
                 raise ValueError('writenetcdf error: Time must be scalar or index vector.')
             if np.size(shand) == 1:
                 hand[time] = var
-                print 'hand: ',repr(hand[time]),var
             elif np.size(shand) == 2:
                 hand[time,:] = var
             elif np.size(shand) == 3:
