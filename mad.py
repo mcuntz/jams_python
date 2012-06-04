@@ -92,6 +92,7 @@ def mad(datin, z=7, deriv=0):
         -------
         Written,  MC, Nov 2011
         Modified, MC, May 2012 - act on axis=0 of array
+                  MC, Jun 2012 - axis=0 did not always work: spread md and MAD to input dimensions
     """
     sn = list(np.shape(datin))
     n  = sn[0]
@@ -116,13 +117,15 @@ def mad(datin, z=7, deriv=0):
         sys.exit(1)
     # Median
     md     = np.ma.median(d, axis=0)
+    md     = np.ma.array([md for i in xrange(m)])
     # Median absolute deviation
-    MAD    = np.ma.median(np.ma.abs(md-d))
+    MAD    = np.ma.median(np.ma.abs(d-md), axis=0)
+    MAD    = np.ma.array([MAD for i in xrange(m)])
     # Range around median
-    thresh = MAD/0.6745 * z
-    # Except where outside z-range
-    res = np.logical_or(d<(md-thresh), d>(md+thresh))
-    
+    thresh = MAD * (z/0.6745)
+    # True where outside z-range
+    res = (d<(md-thresh)) | (d>(md+thresh))
+
     return res
 
 
