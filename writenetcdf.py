@@ -6,59 +6,103 @@ def writenetcdf(fhandle, vhandle=None, var=None, time=None, isdim=False, name=No
                 attributes=None, fileattributes=None, comp=False):
     """ 
         Writes dimensions, variables, dependencies and attributes to NetCDF file
-        only for 2D or 3D data
+        for 1D or 9D data
 
         except the data, all variables given to the functions have to be python lists
         
         Definition
         ----------
-        def writenetcdf(fhandle, dim='', var=None, name='DATA', dims='',
-                        attributes='', fileattributes=''):
+        def writenetcdf(fhandle, vhandle=None, var=None, time=None, isdim=False, name=None, dims=None,
+                        attributes=None, fileattributes=None, comp=False)
 
-
-        Input          Format         Description
-        -----          -----          -----------
-        fhandle         string        File handle of nc.Dataset(FileName, 'w')
-        dim      python list   Dimensions of the NetCDF file
-        var       array like    Data
-        name         string        Name of the variable
-        dims          python list   Variable Dependencies, var are assumed to be float4
-        attributes   python list   Variable Attributes
-        fileattributes  python list   Attributes of NetCDF file (history, description, ...)
-
+        Input          Format                 Description
+        -----          -----                  -----------
+        fhandle        string                 file handle of nc.Dataset(FileName, 'w')
+        vHandle        string                 varaible handle of the particular variable
+        var            array like             data (assumed to be float4)
+        time           integer or array like  particular time step of the data
+        isdim          boolean                defines if current var is a dimension
+        name           string                 name of the variable
+        dims           python list(1D)        variable dependencies (e.g. [time, x, y])
+        attributes     python list(2D)        variable attributes
+        fileattributes python list(2D)        global attributes of NetCDF file (history, description, ...)
+        comp           boolean                compress data on the fly using zlib
 
         Description
         ------
-        Please at first call the writenetcdf with the specification of the <dim>, the data 
-        of the dimensions as <var> and the attributes of the variables. Please make sure to
-        set <open> to 'True'.
+        Please at first open the NetCDF with (save fhandle to write later on into the file)
+        fhandle =  nc.Dataset("Filename", 'w', format='NETCDF4')
 
-        In the following you can put the variables into the file. 2D is always assigned ti time step 0.
-        3D arrays should contain the field data in the first and second dimension, while the third dimension
-        represents the time.
+        Afterwards call writenetcdf with the specification of the dimensions:
+        - define that the current objects is a deimension (<isdim>=True)
+        - the data of the dimensions as (<var> = ARRAY(1D) or None(unlimited dimension)), 
+        - if you like some attributes of the dimesnions (<attributes>=['units', 'm'])
+
+        Subsequently you can put the data as variables into the file:
+        - when creating a variable please save the variable handle (vhand) 
+        - be aware to specify the dimensions of the data with <dims>
+        - specify current timestep or timesteps with <time>
 
         EXAMPLES:
         ------
-        varAtt=[['units', 'hours since 2000-01-01 00:00:00'],['calendar','gregorian']]
-        writenetcdf('test.nc', dim=['time', 'None'], var =[0], attributes=varAtt, open=True)
-        
-        varAtt=[['units', 'm'],['long_name','easting'], ['missing_value', -9999.]]
-        FiAtt=[['description', 'radiation data determined from HDF5 files'],['history','Created by me'],['source','LSA SAF http://landsaf.meteo.pt/']]
-        writenetcdf('test.nc', dim=['xc', '4'], var = [1.,2.,3.,4.], attributes=varAtt, open=False)
-        
-        varAtt=[['units', 'm'],['long_name','northing'], ['missing_value', float(-9999.0)]]
-        writenetcdf('test.nc', dim=['yc', '4'], var = [5.,6.,7.,8.], attributes=varAtt, open=False)
-        
-        varAtt=[['units', 'm3s-1']               ,\
-        ['long_name','river discharge']  ,\
-        ['missing_value', -9999.]]
-        datas          = np.array([[1.,2.,3.,4.], \
-        [1.,2.,3.,4.], \
-        [1.,2.,3.,4.], \
-        [1.,2.,3.,-9999.]]) #2D
-        #datas          = np.array([  [ [1.,2.,3.,4.],[1.,2.,3.,4.],[1.,5.,6.,7.],[1.,8.,9.,10.]], [[1.,2.,3.,4.],[1.,2.,3.,4.],[1.,5.,6.,7.],[1.,8.,9.,10.]]]) #3d
-        writenetcdf('test.nc', name = 'TEST', dims  = ('time', 'yc', 'xc'), var = datas, attributes=varAtt, open=False)
-        
+        >>> import numpy as np
+        >>> import netCDF4 as nc
+        >>> data    = np.array([[-9., 5., 5., -9. ,5.,-9.,5.,     -9. ,  5., 5.,  5.], \
+                                [ 5.,-9.,-9., -9. ,5.,-9.,5., -9. , -9.,-9.,  5.], \
+                                [ 5.,-9.,-9., -9. ,5., 5.,5., -9. ,  5., 5.,  5.], \
+                                [ 5.,-9.,-9., -9. ,5.,-9.,5., -9. ,  5.,-9., -9.], \
+                                [-9., 5., 5., -9. ,5.,-9.,5., -9. ,  5., 5.,  5.] ])
+        >>> fhandle =  nc.Dataset('writenetcdf_test.nc', 'w', format='NETCDF4')
+        >>> FiAtt=([['description', 'test writing with writenetcdf.py'], \
+                    ['history'    , 'Created by Matthias Zink']         ])
+        >>> handle  = writenetcdf(fhandle, fileattributes=FiAtt)
+
+        # Dimesnions
+        >>> varName = 'time'
+        >>> dims    = None
+        >>> varAtt  =([['units',    'hours since 2011-01-01 00:00:00'], \
+                       ['calendar', 'gregorian']                       ])
+        >>> thand   = writenetcdf(fhandle, name=varName, dims=dims, attributes=varAtt, isdim=True)                
+
+        >>> varName = 'lon'
+        >>> varAtt  = ([['units'         , 'degrees_east'], \
+                        ['standard_name' , 'longitude'   ], \
+                        ['missing_value' , -9.]           ])
+        >>> dims    = np.shape(data)[0]
+        >>> var     = np.arange(np.shape(data)[0])+1
+        >>> handle  = writenetcdf(fhandle, name=varName, dims=dims, var=var, attributes=varAtt, isdim=True)
+
+        >>> varName = 'lat'
+        >>> varAtt  = ([['units'         , 'degrees_north'], \
+                        ['standard_name' , 'latitude'     ], \
+                        ['missing_value' , -9.]            ])
+        >>> dims    = np.shape(data)[1]
+        >>> var     = np.arange(np.shape(data)[1])+1
+        >>> handle  = writenetcdf(fhandle, name=varName, dims=dims, var=var, attributes=varAtt, isdim=True)
+
+        # variable & time
+        >>> varName = 'TESTING'
+        >>> varAtt  = ([['units'        , 'm'                              ], \
+                        ['long_name'     ,'Does this writing routine work?'], \
+                        ['missing_value' , -9                              ]])
+        >>> dims    = ['time','lon','lat']
+        >>> vhand   = writenetcdf(fhandle, name=varName, dims=dims, attributes=varAtt, comp=True)
+        >>> for i in xrange(2): \
+                handle  = writenetcdf(fhandle, vhand, time=i, var=data*(i+1))
+        >>> handle  = writenetcdf(fhandle, vhand, time=[2,3], var=np.array([data*2,data*3]))
+        >>> times       = [0.5, 1., 1.5, 2.]
+        >>> handle  = writenetcdf(fhandle, thand, time=range(4), var=times)
+
+        >>> from readnetcdf import *
+        >>> readnetcdf('writenetcdf_test.nc', variables=True)
+        [u'time', u'lon', u'lat', u'TESTING']
+        >>> readdata= readnetcdf('writenetcdf_test.nc', var='TESTING')
+        >>> print np.any((np.ma.getdata(readdata[0,:,:]) - data) != 0.)
+        False
+
+        >>> import os
+        >>> os.remove('writenetcdf_test.nc')
+
         History
         -------
         Written,  Matthias Zink,  Feb. 2012
@@ -141,3 +185,5 @@ def writenetcdf(fhandle, vhandle=None, var=None, time=None, isdim=False, name=No
 if __name__ == '__main__':
     import doctest
     doctest.testmod()
+
+
