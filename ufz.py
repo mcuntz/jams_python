@@ -182,6 +182,7 @@
               MC, Mar 2012 - gapfill, nee2gpp
               MC, May 2012 - astr, div, sobol_index, pi, roman, zacharias, saltelli
               MZ, Jun 2012 - writenetcdf
+              MC, Jun 2012 - roman -> romanliterals
 """
 # Routines provided
 from abc2plot        import *
@@ -222,7 +223,7 @@ try:
     from readnetcdf  import *
 except ImportError:
     pass
-from roman           import int2roman, roman2int
+from romanliterals   import int2roman, roman2int
 from saltelli        import *
 from semivariogram   import *
 from sobol_index     import *

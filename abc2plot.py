@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-from roman import int2roman
+from romanliterals import int2roman
 
 def abc2plot(handle, dx, dy, iplot, roman=False, lower=False, integer=False,
              medium=False, small=False, bold=False):
