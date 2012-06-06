@@ -49,7 +49,7 @@
     tcherkez           Calculates the Tcherkez model of 13C-discrimiantion in the Calvin cycle.
     tsym               Raw unicodes for common symbols
     unpack             Similar to Fortran unpack function with mask
-    writenetcdf        writing variables and information to a NetCDF file
+    writenetcdf        Write netCDF4 file
     yrange             Calculates plot range from input array
     zacharias          Soil water content with van Genuchten and Zacharias et al. (2007)
     zacharias_check    Checks validity of parameter set for Zacharias et al. (2007)
@@ -152,7 +152,7 @@
     Special files
     -------------
     readnetcdf         Reads variables or information from netcdf file
-    writenetcdf        writing variables and information to a NetCDF file
+    writenetcdf        Write netCDF4 file
 
     Obsolete
     --------
@@ -196,7 +196,7 @@ try:
     from date2dec    import *
     from dec2date    import *
 except ImportError:
-    print "No netcdf support in UFZ library. Disabled functions: date2dec, dec2date, gap_filling, readnetcdf."
+    print "No netcdf support in UFZ library. Disabled functions: date2dec, dec2date, gap_filling, readnetcdf, writenetcdf."
 from dewpoint        import *
 from division        import *
 from esat            import *
@@ -221,7 +221,7 @@ from position        import *
 try:
     from readnetcdf  import *
 except ImportError:
-    print "No netcdf support in UFZ library. Disabled function: writenetcdf."    
+    pass
 from roman           import int2roman, roman2int
 from saltelli        import *
 from semivariogram   import *
