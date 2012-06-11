@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 import numpy as np
-import scipy.optimize as opt # curve_fit, fmin
+import scipy.optimize as opt # curve_fit, fmin, fmin_tnc
 
 def nee2gpp(dates, nee, t, isday, rg=False, vpd=False, undef=np.nan,
             method='local', shape=False, masked=False):
