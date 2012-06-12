@@ -80,7 +80,7 @@ def kernel_regression(x, y, h=None, linear=False):
     out = np.empty(n)
     for i in xrange(n):
         dis    = xx - xx[i,:]
-        u      = (dis/np.std(dis,axis=0,ddof=1))/h
+        u      = division(dis, np.std(dis,axis=0,ddof=1)/h, np.nan)
         Kernel = 15./16. * (1.-u**2)**2 * (np.abs(u)<=1.)
         w      = np.prod(Kernel,1)
         sw     = np.sum(w)
@@ -94,11 +94,11 @@ def kernel_regression(x, y, h=None, linear=False):
                 # it works until here but the linalg is not working yet
                 # in Matlab it is: b = lhs\rhs
                 b      = np.transpose(np.dot(np.matrix(lhs).I,rhs))
-                out[i] = np.dot(w,(yo-np.dot(dis,b)))/sw
+                out[i] = division(np.dot(w,(yo-np.dot(dis,b))), sw, np.nan)
             except:
                 pass
         else:
-            out[i] = np.dot(w,y)/sw
+            out[i] = division(np.dot(w,y), sw, np.nan)
 
     return out
 
@@ -171,7 +171,7 @@ def kernel_regression_h(x, y, h0=None, linear=False):
         hLin = 0.5 + np.arange(nhLin,dtype=np.float)*0.5
         mseFun = np.zeros(nhLin)
         for i in xrange(nhLin):
-            mseFun[i] = kernel_regression_MSE(hLin[i],x,y,linear)
+            mseFun[i] = kernel_regression_MSE(hLin[i],xx,y,linear)
         if np.sum(mseFun==np.min(mseFun))==1:
             h00 = hLin[mseFun==np.min(mseFun)]
         else:
@@ -181,7 +181,7 @@ def kernel_regression_h(x, y, h0=None, linear=False):
         hLin = h00 - 0.5 + np.arange(nhLin,dtype=np.float)*0.05
         mseFun = np.zeros(nhLin)
         for i in xrange(nhLin):
-            mseFun[i] = kernel_regression_MSE(hLin[i],x,y,linear)
+            mseFun[i] = kernel_regression_MSE(hLin[i],xx,y,linear)
         if np.sum(mseFun==np.min(mseFun))==1:
             h0 = hLin[mseFun==np.min(mseFun)]
         else:
@@ -219,7 +219,7 @@ def kernel_regression_MSE(h, x, y, linear=False):
         yo = np.delete(y,i)
         # calculate kernel function
         dis    = xo - x[i,:]
-        u      = division(dis, np.std(dis,axis=0,ddof=1), np.nan)/h
+        u      = division(dis, np.std(dis,axis=0,ddof=1)/h, np.nan)
         Kernel = 15./16. * (1.-u**2)**2 * (np.abs(u)<=1.)
         # calculate weights
         w      = np.prod(Kernel,1)
@@ -235,7 +235,7 @@ def kernel_regression_MSE(h, x, y, linear=False):
                 # it works until here but the linalg is not working yet
                 # in Matlab it is: b = lhs\rhs
                 b           = np.transpose(np.dot(np.matrix(lhs).I,rhs))
-                crossval[i] = np.dot(w,(yo-np.dot(dis,b)))/sw
+                crossval[i] = division(np.dot(w,(yo-np.dot(dis,b))), sw, np.nan)
             except:
                 pass
         else:
