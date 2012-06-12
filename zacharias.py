@@ -23,7 +23,7 @@ def zacharias(h, clay, sand, db, params=None, thetar=False, thetas=False, lnalph
         --------------
         params     Parameter for Zacharias et al. (2007) pedotransfer functions
                    If None, values from Zacharias et al. will be taken that are different
-                   betwwen sandy and non-sandy soil (<66.5% sand)
+                   between sandy and non-sandy soil (<66.5% sand)
 
 
         Options

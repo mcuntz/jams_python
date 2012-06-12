@@ -64,9 +64,9 @@ def kernel_regression(x, y, h=None, linear=False):
     ss = np.shape(x)
     n  = ss[0]
     if n != np.size(y):
-        raise ValueError('size(x,0) != size(y)')
+        raise ValueError('size(x,0) != size(y): '+str(n)+' != '+str(np.size(y)))
     if np.size(ss) == 1: # to deal with 1d-arrays
-        xx = x[:,newaxis]
+        xx = x[:,np.newaxis]
     else:
         xx = x
     if linear:
@@ -156,9 +156,9 @@ def kernel_regression_h(x, y, h0=None, linear=False):
     ss = np.shape(x)
     n  = ss[0]
     if n != np.size(y):
-        raise ValueError('size(x,0) != size(y)')
+        raise ValueError('size(x,0) != size(y): '+str(n)+' != '+str(np.size(y)))
     if np.size(ss) == 1: # to deal with 1d-arrays
-        xx = x[:,newaxis]
+        xx = x[:,np.newaxis]
     else:
         xx = x
     if linear:
