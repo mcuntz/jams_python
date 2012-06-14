@@ -149,7 +149,7 @@ def kernel_regression_h(x, y, h0=None, linear=False):
         History
         -------
         Written in Matlab Yingying Dong, Boston College, July, 2008
-        Transferred to Python, MC, Jun 2011
+        Transferred to Python, MC, Jun 2011 - changed initial search of h0
     """
     #
     # Check input
@@ -165,35 +165,31 @@ def kernel_regression_h(x, y, h0=None, linear=False):
         raise ValueError('linear=True not working yet')
     #
     # determine h0
+    eps = np.finfo(np.float).eps
     if h0 == None:
-        # initial grid search
-        nhLin = 10
-        hLin = 0.5 + np.arange(nhLin,dtype=np.float)*0.5
-        mseFun = np.zeros(nhLin)
-        for i in xrange(nhLin):
-            mseFun[i] = kernel_regression_MSE(hLin[i],xx,y,linear)
-        if np.sum(mseFun==np.min(mseFun))==1:
-            h00 = hLin[mseFun==np.min(mseFun)]
-        else:
-            h00 = np.mean(hLin[mseFun==np.min(mseFun)])
-        # finer grid search
-        nhLin = 20
-        hLin = h00 - 0.5 + np.arange(nhLin,dtype=np.float)*0.05
-        mseFun = np.zeros(nhLin)
-        for i in xrange(nhLin):
-            mseFun[i] = kernel_regression_MSE(hLin[i],xx,y,linear)
-        if np.sum(mseFun==np.min(mseFun))==1:
-            h0 = hLin[mseFun==np.min(mseFun)]
-        else:
-            h0 = np.mean(hLin[mseFun==np.min(mseFun)])
-        h0 = np.float(h0)
-        h0min = h0-0.05
-        h0max = h0+0.05
+        h00    = 10.
+        nhLin  = 9
+        nrange = np.arange(nhLin,dtype=np.float)/(np.float(nhLin)-1.)
+        # search in interval [h00-10^(-k+1),h00+(10^-k+2)]
+        niter  = 2
+        for k in xrange(niter):
+            n5   = 10.**(-(k-1))
+            hLin = np.maximum(h00 - n5 + (2.*n5*nrange) * np.where(k==0, 0.4, 1.), eps)
+            mseFun = np.zeros(nhLin)
+            for i in xrange(nhLin):
+                mseFun[i] = kernel_regression_MSE(hLin[i],xx,y,linear)
+                if np.sum(mseFun==np.min(mseFun))==1:
+                    h00 = hLin[mseFun==np.min(mseFun)]
+                else:
+                    h00 = np.mean(hLin[mseFun==np.min(mseFun)])
+        h0 = np.float(h00)
+        h0min = h0 - 10.**(-niter)
+        h0max = h0 + 10.**(-niter)
     else:
         h0 = np.float(h0)
         if (h0<0.) | (h0>10.):
             raise ValueError('h0 should be 0<=h0<=10')
-        h0min = 0.
+        h0min = eps
         h0max = 10.
     #
     # Find the optimal h
