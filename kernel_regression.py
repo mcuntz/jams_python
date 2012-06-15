@@ -8,7 +8,7 @@ def kernel_regression(x, y, h=None, silverman=False):
         Multi-dimensional non-parametric kernel regression.
 
         Optimal bandwidth can be estimated by cross-validation
-        or by using Silverman's rule-of-thumb.
+        or by using Silverman''s rule-of-thumb.
 
         Definition
         ----------
@@ -26,11 +26,19 @@ def kernel_regression(x, y, h=None, silverman=False):
         h          None:  determine optimal h
                    float > 0: use for calculating regression values
         silverman  False: determine h via cross-validation
-                   True:  use Silverman's rule-of-thumb
+                   True:  use Silverman''s rule-of-thumb
+
 
         Output
         ------
         Fitted values at x
+
+
+        References
+        ----------
+        Hardle, W., & Muller, M. (2000). Multivariate and semiparametric kernel regression.
+            In M. G. Schimek (Ed.), Smoothing and regression: Approaches, computation, and
+            application (pp. 357–392). Hoboken, NJ, USA: John Wiley & Sons, Inc. doi:10.1002/9781118150658.ch12
 
 
         Examples
@@ -110,8 +118,8 @@ def kernel_regression(x, y, h=None, silverman=False):
 def kernel_regression_h(x, y, silverman=False):
     """
         Optimal bandwidth for multi-dimensional non-parametric kernel regression
-        using cross-validation or Silverman's rule-of-thumb.
-        
+        using cross-validation or Silverman''s rule-of-thumb.
+
         Definition
         ----------
         def kernel_regression_h(x, y):
@@ -126,13 +134,20 @@ def kernel_regression_h(x, y, silverman=False):
         Optional Input
         --------------
         silverman  False: determine h via cross-validation
-                   True:  use Silverman's rule-of-thumb
+                   True:  use Silverman''s rule-of-thumb
 
-        
+
         Output
         ------
         Optimal bandwidth. If multidimensional regression then h is vector,
         assuming diagonal bandwith matrix.
+
+
+        References
+        ----------
+        Hardle, W., & Muller, M. (2000). Multivariate and semiparametric kernel regression.
+            In M. G. Schimek (Ed.), Smoothing and regression: Approaches, computation, and
+            application (pp. 357–392). Hoboken, NJ, USA: John Wiley & Sons, Inc. doi:10.1002/9781118150658.ch12
 
 
         Examples
@@ -184,7 +199,7 @@ def cross_valid_h(h, x, y):
     """
         Helper function that calculates cross-validation function for the
         Nadaraya-Watson estimator, which is basically the mean square error
-        where model estimate is replaced by the jackknife estimate (Haerdle et al. 2000).
+        where model estimate is replaced by the jackknife estimate (Hardle et al. 2000).
     """
     n = np.size(x[:,0])
     # allocate output
