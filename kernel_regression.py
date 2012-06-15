@@ -3,7 +3,7 @@ import numpy as np
 import scipy.optimize as opt # fmin_tnc
 from division import *
 
-def kernel_regression(x, y, h=None, silverman=False):
+def kernel_regression(x, y, h=None, silverman=False, xout=None):
     """
         Multi-dimensional non-parametric kernel regression.
 
@@ -36,9 +36,9 @@ def kernel_regression(x, y, h=None, silverman=False):
 
         References
         ----------
-        Hardle, W., & Muller, M. (2000). Multivariate and semiparametric kernel regression.
+        Haerdle, W., & Mueller, M. (2000). Multivariate and semiparametric kernel regression.
             In M. G. Schimek (Ed.), Smoothing and regression: Approaches, computation, and
-            application (pp. 357–392). Hoboken, NJ, USA: John Wiley & Sons, Inc. doi:10.1002/9781118150658.ch12
+            application (pp. 357-392). Hoboken, NJ, USA: John Wiley & Sons, Inc. doi:10.1002/9781118150658.ch12
 
 
         Examples
@@ -67,6 +67,14 @@ def kernel_regression(x, y, h=None, silverman=False):
         >>> print kernel_regression(x,y,h)
         [ 0.69115273  0.42280858  0.54584447  0.53431539  0.52149406  0.55542563
           0.64206536  0.76189995  0.88777986  1.00014619]
+
+        >>> ss = np.shape(x)
+        >>> nn = 5
+        >>> xx = np.empty((nn,ss[1]))
+        >>> xx[:,0] = np.min(x[:,0]) + (np.max(x[:,0])-np.min(x[:,0])) * np.arange(nn,dtype=np.float)/np.float(nn)
+        >>> xx[:,1] = np.min(x[:,1]) + (np.max(x[:,1])-np.min(x[:,1])) * np.arange(nn,dtype=np.float)/np.float(nn)
+        >>> print kernel_regression(x,y,h,xout=xx)
+        [ 0.60548523  0.55523546  0.50952915  0.4911906   0.55332452]
 
 
         History
@@ -98,14 +106,26 @@ def kernel_regression(x, y, h=None, silverman=False):
             raise ValueError('size(h) must be 1 or size(x,1): ')
     #
     # Calc regression
+    if xout == None:
+        xxout = xx
+    else:
+        if np.size(np.shape(xout)) == 1:
+            xxout = xout[:,np.newaxis]
+        else:
+            xxout = xout
+    ssout = np.shape(xxout)
+    nout  = ssout[0]
+    dout  = ssout[1]
+    if d != dout:
+        raise ValueError('size(x,1) != size(xout,1): '+str(d)+' != '+str(dout))
     # Scaling first, make diagonal matrix
     hh1 = 1. / np.prod(hh)
     # allocate output
-    out = np.empty(n)
+    out = np.empty(nout)
     # Loop through each regression point
-    for i in xrange(n):
+    for i in xrange(nout):
         # scaled deference from regression point
-        z      = (xx - xx[i,:]) / hh
+        z      = (xx - xxout[i,:]) / hh
         # gaussian multivariate kernel
         kerf   = (1./np.sqrt(2.*np.pi)) * np.exp(-0.5*z*z)
         # multiplicative kernel
@@ -145,9 +165,9 @@ def kernel_regression_h(x, y, silverman=False):
 
         References
         ----------
-        Hardle, W., & Muller, M. (2000). Multivariate and semiparametric kernel regression.
+        Haerdle, W., & Mueller, M. (2000). Multivariate and semiparametric kernel regression.
             In M. G. Schimek (Ed.), Smoothing and regression: Approaches, computation, and
-            application (pp. 357–392). Hoboken, NJ, USA: John Wiley & Sons, Inc. doi:10.1002/9781118150658.ch12
+            application (pp. 357-392). Hoboken, NJ, USA: John Wiley & Sons, Inc. doi:10.1002/9781118150658.ch12
 
 
         Examples
@@ -199,7 +219,7 @@ def cross_valid_h(h, x, y):
     """
         Helper function that calculates cross-validation function for the
         Nadaraya-Watson estimator, which is basically the mean square error
-        where model estimate is replaced by the jackknife estimate (Hardle et al. 2000).
+        where model estimate is replaced by the jackknife estimate (Haerdle et al. 2000).
     """
     n = np.size(x[:,0])
     # allocate output
@@ -233,3 +253,9 @@ if __name__ == '__main__':
     # h = kernel_regression_h(x,y,silverman=True)
     # print h
     # print kernel_regression(x,y,h)
+    # ss = np.shape(x)
+    # nn = 5
+    # xx = np.empty((nn,ss[1]))
+    # xx[:,0] = np.min(x[:,0]) + (np.max(x[:,0])-np.min(x[:,0])) * np.arange(nn,dtype=np.float)/np.float(nn)
+    # xx[:,1] = np.min(x[:,1]) + (np.max(x[:,1])-np.min(x[:,1])) * np.arange(nn,dtype=np.float)/np.float(nn)
+    # print kernel_regression(x,y,h,xout=xx)
