@@ -3,16 +3,16 @@ import numpy as np
 import scipy.optimize as opt # fmin_tnc
 from division import *
 
-def kernel_regression(x, y, h=None, linear=False):
+def kernel_regression(x, y, h=None, silverman=False):
     """
-        Multi-dimensional non-parametric regression with either kernel regression
-        or local linear regression using the Quartic kernel.
+        Multi-dimensional non-parametric kernel regression.
 
-        Optimal bandwidth can be estimated by cross-validation.
+        Optimal bandwidth can be estimated by cross-validation
+        or by using Silverman's rule-of-thumb.
 
         Definition
         ----------
-        def kernel_regression(x, y, linear=False, h=None):
+        def kernel_regression(x, y, h=None, silverman=False):
 
 
         Input
@@ -23,10 +23,10 @@ def kernel_regression(x, y, h=None, linear=False):
 
         Optional Input
         --------------
-        linear     False: local constant kernel regression
-                   True:  local linear regression using the Quartic kernel
         h          None:  determine optimal h
                    float > 0: use for calculating regression values
+        silverman  False: determine h via cross-validation
+                   True:  use Silverman's rule-of-thumb
 
         Output
         ------
@@ -41,23 +41,29 @@ def kernel_regression(x, y, h=None, linear=False):
         >>> x[:,1] = 1./(np.arange(10,dtype=np.float)/9.+0.1)
         >>> y      = 1. + x[:,0]**2 - np.sin(x[:,1])**2
         >>> h = kernel_regression_h(x,y)
+        >>> print h
+        [ 0.17267991  9.51690721]
+
         >>> print kernel_regression(x,y,h)
-        [ 0.70404103  0.01294352  1.04548174  0.5591734   0.27353146  0.31533275
-          0.51589033  0.78084832  1.07240574  1.36797238]
+        [ 0.52240942  0.52569869  0.54179588  0.51780751  0.47644246  0.49230198
+          0.60344807  0.77747176  0.95450466  1.09603888]
 
         >>> print kernel_regression(x,y)
-        [ 0.70404103  0.01294352  1.04548174  0.5591734   0.27353146  0.31533275
-          0.51589033  0.78084832  1.07240574  1.36797238]
+        [ 0.52240942  0.52569869  0.54179588  0.51780751  0.47644246  0.49230198
+          0.60344807  0.77747176  0.95450466  1.09603888]
 
-        >>> print kernel_regression(x,y,h=0.5)
-        [ 0.70404103  0.01294352  0.98649551  0.56013557  0.32292917  0.34133147
-          0.52673436  0.78545776  1.07487758  1.30446591]
+        >>> h = kernel_regression_h(x,y,silverman=True)
+        >>> print h
+        [ 0.22919046  1.90338144]
+
+        >>> print kernel_regression(x,y,h)
+        [ 0.69115273  0.42280858  0.54584447  0.53431539  0.52149406  0.55542563
+          0.64206536  0.76189995  0.88777986  1.00014619]
 
 
         History
         -------
-        Written in Matlab Yingying Dong, Boston College, July, 2008
-        Transferred to Python, MC, Jun 2011
+        Written in MC, Jun 2011 - inspired by Matlab routine of Yingying Dong, Boston College
     """
     #
     # Check input
@@ -69,50 +75,46 @@ def kernel_regression(x, y, h=None, linear=False):
         xx = x[:,np.newaxis]
     else:
         xx = x
-    if linear:
-        raise ValueError('linear=True not working yet')
+    ss = np.shape(xx)
+    d  = ss[1]
     #
     # determine h
     if h == None:
-        h = kernel_regression_h(xx,y,linear=linear)
+        hh = kernel_regression_h(xx,y,silverman=silverman)
+    else:
+        if np.size(np.shape(h))==0:
+            hh = np.repeat(h,d)
+        else:
+            hh = np.array(h)
+        if (np.size(hh)!=d):
+            raise ValueError('size(h) must be 1 or size(x,1): ')
     #
     # Calc regression
+    # Scaling first, make diagonal matrix
+    hh1 = 1. / np.prod(hh)
+    # allocate output
     out = np.empty(n)
+    # Loop through each regression point
     for i in xrange(n):
-        dis    = xx - xx[i,:]
-        u      = division(dis, np.std(dis,axis=0,ddof=1)/h, np.nan)
-        Kernel = 15./16. * (1.-u**2)**2 * (np.abs(u)<=1.)
-        w      = np.prod(Kernel,1)
-        sw     = np.sum(w)
-        if linear:
-            t1     = np.transpose(dis * w[:,np.newaxis])
-            t2     = np.sum(t1,1)
-            lhs    = sw*np.dot(t1,dis) - np.outer(t2,t2)
-            rhs    = sw*np.dot(t1,y)  - np.dot(np.outer(t2,w),y)
-            out[i] = np.nan
-            try:
-                # it works until here but the linalg is not working yet
-                # in Matlab it is: b = lhs\rhs
-                b      = np.transpose(np.dot(np.matrix(lhs).I,rhs))
-                out[i] = division(np.dot(w,(yo-np.dot(dis,b))), sw, np.nan)
-            except:
-                pass
-        else:
-            out[i] = division(np.dot(w,y), sw, np.nan)
-
+        # scaled deference from regression point
+        z      = (xx - xx[i,:]) / hh
+        # gaussian multivariate kernel
+        kerf   = (1./np.sqrt(2.*np.pi)) * np.exp(-0.5*z*z)
+        # multiplicative kernel
+        w      = np.prod(kerf,1)
+        out[i] = division(np.dot(w,y), np.sum(w), np.nan)
+    #
     return out
 
 
-
-def kernel_regression_h(x, y, h0=None, linear=False):
+def kernel_regression_h(x, y, silverman=False):
     """
-        Optimal bandwidth for a multi-dimensional non-parametric regression using cross-validation.
+        Optimal bandwidth for multi-dimensional non-parametric kernel regression
+        using cross-validation or Silverman's rule-of-thumb.
         
-        Either kernel regression or local linear regression using the Quartic kernel.
-
         Definition
         ----------
-        def kernel_regression_h(x, y, linear=False, h0=None):
+        def kernel_regression_h(x, y):
 
 
         Input
@@ -123,14 +125,14 @@ def kernel_regression_h(x, y, h0=None, linear=False):
 
         Optional Input
         --------------
-        linear     False: local constant kernel regression
-                   True:  local linear regression using the Quartic kernel
-        h0         None:  determine starting value of h in cross-validation
-                   float > 0: use as starting h in cross-validation
+        silverman  False: determine h via cross-validation
+                   True:  use Silverman's rule-of-thumb
 
+        
         Output
         ------
-        Optimal bandwidth
+        Optimal bandwidth. If multidimensional regression then h is vector,
+        assuming diagonal bandwith matrix.
 
 
         Examples
@@ -141,15 +143,15 @@ def kernel_regression_h(x, y, h0=None, linear=False):
         >>> x[:,1] = 1./(np.arange(10,dtype=np.float)/9.+0.1)
         >>> y      = 1. + x[:,0]**2 - np.sin(x[:,1])**2
         >>> print kernel_regression_h(x,y)
-        0.365148365498
+        [ 0.17267991  9.51690721]
 
-        >>> print kernel_regression_h(x,y,h0=0.5)
-        0.472301961489
+        >>> print kernel_regression_h(x,y,silverman=True)
+        [ 0.22919046  1.90338144]
+
 
         History
         -------
-        Written in Matlab Yingying Dong, Boston College, July, 2008
-        Transferred to Python, MC, Jun 2011 - changed initial search of h0
+        Written in MC, Jun 2011 - inspired by Matlab routine of Yingying Dong, Boston College
     """
     #
     # Check input
@@ -161,89 +163,44 @@ def kernel_regression_h(x, y, h0=None, linear=False):
         xx = x[:,np.newaxis]
     else:
         xx = x
-    if linear:
-        raise ValueError('linear=True not working yet')
+    ss = np.shape(xx)
+    d  = ss[1]
     #
-    # determine h0
-    eps = np.finfo(np.float).eps
-    if h0 == None:
-        h00    = 10.
-        nhLin  = 9
-        nrange = np.arange(nhLin,dtype=np.float)/(np.float(nhLin)-1.)
-        # search in interval [h00-10^(-k+1),h00+(10^-k+2)]
-        niter  = 2
-        for k in xrange(niter):
-            n5   = 10.**(-(k-1))
-            hLin = np.maximum(h00 - n5 + (2.*n5*nrange) * np.where(k==0, 0.4, 1.), eps)
-            mseFun = np.zeros(nhLin)
-            for i in xrange(nhLin):
-                mseFun[i] = kernel_regression_MSE(hLin[i],xx,y,linear)
-                if np.sum(mseFun==np.min(mseFun))==1:
-                    h00 = hLin[mseFun==np.min(mseFun)]
-                else:
-                    h00 = np.mean(hLin[mseFun==np.min(mseFun)])
-        h0 = np.float(h00)
-        h0min = h0 - 10.**(-niter)
-        h0max = h0 + 10.**(-niter)
-    else:
-        h0 = np.float(h0)
-        if (h0<0.) | (h0>10.):
-            raise ValueError('h0 should be 0<=h0<=10')
-        h0min = eps
-        h0max = 10.
+    # Silvermann (1986), Scott (1992), Bowman and Azzalini (1997)
+    # Very similar to stats.gaussian_kde
+    h = (4./np.float(d+2)/np.float(n))**(1./np.float(d+4)) * np.std(xx,axis=0,ddof=1)
     #
-    # Find the optimal h
-    h, nfeval, rc  = opt.fmin_tnc(kernel_regression_MSE, [h0], bounds=[(h0min,h0max)],
-                                  args=(xx, y, linear), approx_grad=True, disp=False,
-                                  maxfun=1000, xtol=1e-10, ftol=1e-10)
-    
-    return np.float(h)
+    if not silverman:
+        # Find the optimal h
+        bounds = [(0.2*i,5.0*i) for i in h]
+        h, nfeval, rc  = opt.fmin_tnc(cross_valid_h, h, bounds=bounds,
+                                      args=(xx, y), approx_grad=True, disp=False,
+                                      maxfun=1000, xtol=1e-10, ftol=1e-10)
+    #
+    return h
 
 
-def kernel_regression_MSE(h, x, y, linear=False):
+def cross_valid_h(h, x, y):
     """
-        Helper function for kernel_regression_h that returns
-        mean square error of obs and the cross-validate kernels,
-        i.e. with one obs removed.
+        Helper function that calculates cross-validation function for the
+        Nadaraya-Watson estimator, which is basically the mean square error
+        where model estimate is replaced by the jackknife estimate (Haerdle et al. 2000).
     """
-    n, k = np.shape(x)
-    crossval  = np.ones(n)*np.nan
-    # calculate the cross validation criterion function
+    n = np.size(x[:,0])
+    # allocate output
+    out = np.empty(n)
+    # Loop through each regression point
     for i in xrange(n):
-        # remove ith observation
-        xo = np.delete(x,i,axis=0)
-        yo = np.delete(y,i)
-        # calculate kernel function
-        dis    = xo - x[i,:]
-        u      = division(dis, np.std(dis,axis=0,ddof=1)/h, np.nan)
-        Kernel = 15./16. * (1.-u**2)**2 * (np.abs(u)<=1.)
-        # calculate weights
-        w      = np.prod(Kernel,1)
-        sw     = np.sum(w)
-        # calculate yhat, using kernel or local linear regression
-        if linear:
-            t1     = np.transpose(dis * w[:,np.newaxis])
-            t2     = np.sum(t1,1)
-            lhs    = sw*np.dot(t1,dis) - np.outer(t2,t2)
-            rhs    = sw*np.dot(t1,yo)  - np.dot(np.outer(t2,w),yo)
-            crossval[i] = np.nan
-            try:
-                # it works until here but the linalg is not working yet
-                # in Matlab it is: b = lhs\rhs
-                b           = np.transpose(np.dot(np.matrix(lhs).I,rhs))
-                crossval[i] = division(np.dot(w,(yo-np.dot(dis,b))), sw, np.nan)
-            except:
-                pass
-        else:
-            crossval[i] = division(np.dot(w,yo), sw, np.nan)
-    # MSE
-    flag     = np.isfinite(crossval)
-    crossval = np.ma.array(crossval, mask=(~flag))
-    yy       = np.ma.array(y, mask=(~flag))
-    MSE = np.ma.mean((yy-crossval)*(yy-crossval))
-    MSE = np.ma.filled(MSE, fill_value=np.finfo(np.float).max)
-
-    return MSE
+        # all-1 points
+        xx     = np.delete(x,i,axis=0)
+        yy     = np.delete(y,i,axis=0)
+        z      = (xx - x[i,:]) / h
+        kerf   = (1./np.sqrt(2.*np.pi)) * np.exp(-0.5*z*z)
+        w      = np.prod(kerf,1)
+        out[i] = division(np.dot(w,yy), np.sum(w), np.nan)
+    cv = np.sum((y-out)**2) / np.float(n)
+    #
+    return cv
 
 
 if __name__ == '__main__':
@@ -253,11 +210,11 @@ if __name__ == '__main__':
     # x[:,0] = np.arange(10,dtype=np.float)/9.
     # x[:,1] = 1./(np.arange(10,dtype=np.float)/9.+0.1)
     # y      = 1. + x[:,0]**2 - np.sin(x[:,1])**2
-    # h = kernel_regression_h(x,y)
-    # yy = kernel_regression(x,y,h,linear=False)
-    # print h
     # print y
-    # print yy
+    # h = kernel_regression_h(x,y)
+    # print h
+    # print kernel_regression(x,y,h)
     # print kernel_regression(x,y)
-    # print kernel_regression_h(x,y,h0=0.5)
-    # print kernel_regression(x,y,h=0.5)
+    # h = kernel_regression_h(x,y,silverman=True)
+    # print h
+    # print kernel_regression(x,y,h)
