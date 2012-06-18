@@ -10,7 +10,7 @@
         Mathematical
             Pi, Pi2, TwoPi, Sqrt2
         Physical
-            Gravity, T0, P0, T25, sigma, R, Na
+            Gravity, T0, P0, T25, sigma, R, Na, REarth
         Isotope
             RPDB
         Computational
@@ -40,6 +40,9 @@
     >>> print tiny
     1e-06
 
+    >>> print REarth
+    6371000.
+
 
     History
     -------
@@ -59,6 +62,7 @@ T25     = 298.15        # Standard ambient temperature [K]
 sigma   = 5.67e-08      # Stefan-Boltzmann constant [W/m^2/K^4]
 R       = 8.3144621     # Ideal gas constant [J/K/mol]
 Na      = 6.02214129e23 # Avogrado number [mol^-1]
+REarth  = 6371000.      # Radius of Earth [m]
 
 # Isotope
 RPDB = 0.0112372 # Isotope ratio of VPDB-CO2

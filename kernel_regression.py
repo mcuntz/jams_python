@@ -79,7 +79,8 @@ def kernel_regression(x, y, h=None, silverman=False, xout=None):
 
         History
         -------
-        Written in MC, Jun 2011 - inspired by Matlab routine of Yingying Dong, Boston College
+        Written in MC, Jun 2011 - inspired by Matlab routines
+                                  of Yingying Dong, Boston College and Yi Cao, Cranfield University
     """
     #
     # Check input
@@ -126,11 +127,8 @@ def kernel_regression(x, y, h=None, silverman=False, xout=None):
     for i in xrange(nout):
         # scaled deference from regression point
         z      = (xx - xxout[i,:]) / hh
-        # gaussian multivariate kernel
-        kerf   = (1./np.sqrt(2.*np.pi)) * np.exp(-0.5*z*z)
-        # multiplicative kernel
-        w      = np.prod(kerf,1)
-        out[i] = division(np.dot(w,y), np.sum(w), np.nan)
+        # nadaraya-watson estimator of gaussian multivariate kernel
+        out[i] = nadaraya_watson(z, y)
     #
     return out
 
@@ -186,7 +184,8 @@ def kernel_regression_h(x, y, silverman=False):
 
         History
         -------
-        Written in MC, Jun 2011 - inspired by Matlab routine of Yingying Dong, Boston College
+        Written in MC, Jun 2011 - inspired by Matlab routines
+                                  of Yingying Dong, Boston College and Yi Cao, Cranfield University
     """
     #
     # Check input
@@ -208,9 +207,9 @@ def kernel_regression_h(x, y, silverman=False):
     if not silverman:
         # Find the optimal h
         bounds = [(0.2*i,5.0*i) for i in h]
-        h, nfeval, rc  = opt.fmin_tnc(cross_valid_h, h, bounds=bounds,
-                                      args=(xx, y), approx_grad=True, disp=False,
-                                      maxfun=1000, xtol=1e-10, ftol=1e-10)
+        h, nfeval, rc = opt.fmin_tnc(cross_valid_h, h, bounds=bounds,
+                                     args=(xx, y), approx_grad=True, disp=False,
+                                     maxfun=1000, xtol=1e-10, ftol=1e-10)
     #
     return h
 
@@ -230,13 +229,22 @@ def cross_valid_h(h, x, y):
         xx     = np.delete(x,i,axis=0)
         yy     = np.delete(y,i,axis=0)
         z      = (xx - x[i,:]) / h
-        kerf   = (1./np.sqrt(2.*np.pi)) * np.exp(-0.5*z*z)
-        w      = np.prod(kerf,1)
-        out[i] = division(np.dot(w,yy), np.sum(w), np.nan)
+        out[i] = nadaraya_watson(z, yy)
     cv = np.sum((y-out)**2) / np.float(n)
     #
     return cv
 
+
+def nadaraya_watson(z, y):
+    """
+        Helper function that calculates the Nadaraya-Watson estimator for a given kernel.
+        Until now there is only the gaussian kernel.
+    """
+    kerf   = (1./np.sqrt(2.*np.pi)) * np.exp(-0.5*z*z)
+    w      = np.prod(kerf,1)
+    out    = division(np.dot(w,y), np.sum(w), np.nan)
+    #
+    return out
 
 if __name__ == '__main__':
     import doctest

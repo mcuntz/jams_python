@@ -82,7 +82,7 @@ def cellarea(lat, lon, globe=False):
     nlat = len(lat)
     n_lat = lat[0] + dlat[0]/2. + np.cumsum(dlat)
     # 
-    # Area fo grid cells in m^2 with lat/lon in degree
+    # Area of grid cells in m^2 with lat/lon in degree
     ae  = 6.371e6    # radius of Earth
     d2r = np.pi/180. # degree to radian
     #
