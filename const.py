@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+import numpy as np
 """
     Provides physical, mathematical, computational, and isotope constants.
 
@@ -62,13 +63,15 @@ T25     = 298.15        # Standard ambient temperature [K]
 sigma   = 5.67e-08      # Stefan-Boltzmann constant [W/m^2/K^4]
 R       = 8.3144621     # Ideal gas constant [J/K/mol]
 Na      = 6.02214129e23 # Avogrado number [mol^-1]
-REarth  = 6371000.      # Radius of Earth [m]
+REarth  = 6371009.      # Radius of Earth [m]
 
 # Isotope
 RPDB = 0.0112372 # Isotope ratio of VPDB-CO2
 
 # Computational
 tiny = 1e-6
+eps  = np.finfo(np.float).eps
+
 
 if __name__ == '__main__':
     import doctest

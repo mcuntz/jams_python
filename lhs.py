@@ -79,10 +79,6 @@ def lhs(dist, param, nsample):
         idx = np.array(np.random.permutation(nsample), dtype=np.float)
         p   = (idx+ran[j,:])/np.float(nsample) # probability of cdf
         lhsout[j,:] = d(*pars).ppf(p)          # inverse of cdf
-        # if np.any(np.isnan(lhsout[j,:])):
-        #     print p
-        #     print lhsout[j,:]
-        #     raise ValueError('inverse cdf is NaN.')
 
     return np.squeeze(lhsout)
 

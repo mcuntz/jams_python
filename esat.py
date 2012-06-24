@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import numpy as np
+import const
 
 def esat(T, liquid=False, formula='GoffGratch'):
     """
@@ -132,7 +133,6 @@ def esat(T, liquid=False, formula='GoffGratch'):
     """
     #
     # Constants
-    T0 = 273.15
     knownforms = (['Buck', 'Buck_original', 'Bolton', 'Fukuta', 'GoffGratch', 'HylandWexler',
                   'IAPWS', 'MagnusTeten', 'MartiMauersberger', 'MurphyKoop',
                   'Sonntag', 'Vaisala', 'Wexler', 'WMO'])
@@ -140,27 +140,26 @@ def esat(T, liquid=False, formula='GoffGratch'):
     #
     # Check input
     if np.ma.any(np.ma.array(T) <= 0.):
-           print "ESAT: T<0 - T probably given in Celsius instead of Kelvin."
-           return False
+        raise ValueError('T<0 - T probably given in Celsius instead of Kelvin.')
     if np.ma.any(np.ma.array(T) < 100.):
            print "WARNING ESAT: T<100 - T probably given in Celsius instead of Kelvin."
-    if np.ma.any(np.ma.array(T) > (T0+100.)):
+    if np.ma.any(np.ma.array(T) > (const.T0+100.)):
            print "WARNING ESAT: T>373.15 K - something might be wrong with T."
     form = formula.lower()
     if form not in lknown:
            print "ESAT: formula not know."
            print "      Known formulas are: ", knownforms
-           return False
+           raise ValueError('')
     #
     # Split input into masked arrays
     if liquid == True:
         Tlim = 1e-3
     else:
-        Tlim = T0
+        Tlim = const.T0
     T_liq = np.ma.array(T, mask=(np.ma.array(T)<Tlim), keep_mask=True)
     T_ice = np.ma.array(T, mask=(np.ma.array(T)>=Tlim), keep_mask=True)
-    TC_liq = T_liq - T0
-    TC_ice = T_ice - T0
+    TC_liq = T_liq - const.T0
+    TC_ice = T_ice - const.T0
     #
     # Calc
     #

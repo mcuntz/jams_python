@@ -6,7 +6,7 @@ def fread(file, nc=0, skip=0, cskip=0, separator='',
           squeeze=False, reform=False, skip_blank=False, comment='',
           fill=False, fill_value=0,
           header=False, full_header=False,
-          quiet=False, transpose=False, strarr=False):
+          transpose=False, strarr=False):
     """
         Read numbers into float array from a file.
         Lines or columns can be skipped.
@@ -20,7 +20,7 @@ def fread(file, nc=0, skip=0, cskip=0, separator='',
                   squeeze=False, reform=False, skip_blank=False, comment='',
                   fill=False, fill_value=0,
                   header=False, full_header=False,
-                  quiet=False, transpose=False, strarr=False):
+                  transpose=False, strarr=False):
 
 
         Input
@@ -63,8 +63,6 @@ def fread(file, nc=0, skip=0, cskip=0, separator='',
         full_header  True:  header is a string vector of the skipped rows
                      False: header will be split in columns, exactly as the
                             data, and will hold only the selected columns (default)
-        quiet        True:  do not show reason if read fails and returns None
-                     False: show error for failed read (default)
         transpose    True:  column-major format output(0:ncolumns,0:nlines)
                      False: row-major format output(0:nlines,0:ncolumns) (default)
         strarr       True:  return header as numpy array of strings
@@ -159,7 +157,6 @@ def fread(file, nc=0, skip=0, cskip=0, separator='',
                [ 2.1,  2.2,  2.3,  2.4]])
         >>> fread(filename,skip=1,skip_blank=True)
         FREAD: Line has not enough columns to be indexed: # First comment
-        >>> fread(filename,skip=1,skip_blank=True,quiet=True)
         >>> fread(filename,skip=1,skip_blank=True,comment='#')
         FREAD: Requested elements not all numbers: ['!', 'Second', '2', 'comment']
         >>> fread(filename,skip=1,nc=[2],skip_blank=True,comment='#')
@@ -219,22 +216,20 @@ def fread(file, nc=0, skip=0, cskip=0, separator='',
         -------
         Written, MC, Jul 2009
                  MC, Apr 2011 - transpose
+                 MC, Jun 2012 - remove quiet
     """
     #
     # Determine number of lines in file.
     nr = lif(file, skip=skip, noblank=skip_blank, comment=comment)
     if nr <= 0:
-        if not quiet:
-            print "FREAD: Empty file %s." % file
+        print "FREAD: Empty file %s." % file
         return None
     #
     # Open file
     try:
         f = open(file, 'r')
     except IOError:
-        if not quiet:
-            print "FREAD: Cannot open file %s for reading." % file
-        return None
+        raise IOError('Cannot open file '+file)
     #
     # Read header and Skip lines
     count = 0
@@ -318,11 +313,8 @@ def fread(file, nc=0, skip=0, cskip=0, separator='',
                             for i in range(nnc-m):
                                 var.append(fillit)
                         else:
-                            if not quiet:
-                                print ('FREAD: First header line has not enough '
-                                       'columns to be indexed: %s' % head[0])
                             f.close()
-                            return None
+                            raise IOError('First header line has not enough columns to be indexed: '+head[0])
                     else:
                         var = [hres[i] for i in iinc]
                 else:
@@ -342,11 +334,8 @@ def fread(file, nc=0, skip=0, cskip=0, separator='',
                                 for i in range(nnc-m):
                                     htmp.append(fillit)
                             else:
-                                if not quiet:
-                                    print ('FREAD: Header line has not enough '
-                                           'columns to be indexed: %s' % head[k])
                                 f.close()
-                                return None
+                                raise IOError('Header line has not enough columns to be indexed: '+head[k])
                         else:
                             htmp = [hres[i] for i in iinc]
                         if (squeeze or reform) and (len(htmp)==1):
@@ -374,10 +363,8 @@ def fread(file, nc=0, skip=0, cskip=0, separator='',
                     m += 1
             var[iline,m:miinc+1] = fill_value
         else:
-            if not quiet:
-                print 'FREAD: First line has not enough columns to be indexed: %s' % s
             f.close()
-            return None
+            raise ValueError('First line has not enough columns to be indexed: '+s)
     else:
         var[iline,0:nnc] = np.array([float(res[i]) for i in iinc],
                                     dtype='float')
@@ -402,26 +389,24 @@ def fread(file, nc=0, skip=0, cskip=0, separator='',
                         try:
                             var[iline,m] = np.float(res[i])
                         except ValueError:
-                            if not quiet:
-                                print 'FREAD: Tried to convert "%s"  from Line: %s' % (res[i], s)
                             f.close()
-                            return None
+                            print 'Tried to convert "%s"  from Line: %s' % (res[i], s)
+                            raise ValueError('')
                         m += 1
                 var[iline,m:miinc+1] = fill_value
             else:
-                if not quiet:
-                    print 'FREAD: Line has not enough columns to be indexed: %s' % s
                 f.close()
+                print 'FREAD: Line has not enough columns to be indexed: %s' % s
+                #raise ValueError('')
                 return None
         else:
             iline += 1
             try:
-                var[iline,0:nnc] = np.array([float(res[i]) for i in iinc],
-                                            dtype='float')
+                var[iline,0:nnc] = np.array([float(res[i]) for i in iinc], dtype='float')
             except ValueError:
-                if not quiet:
-                    print 'FREAD: Requested elements not all numbers: %s' % ([res[i] for i in iinc])
+                print 'FREAD: Requested elements not all numbers: %s' % ([res[i] for i in iinc])
                 f.close()
+                #raise ValueError('')
                 return None
         count += 1
         if count == nr: break

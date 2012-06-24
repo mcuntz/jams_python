@@ -93,9 +93,7 @@ def outlier(y,alpha=0.01,k=-1,quiet=True):
     """
     # check user input
     if ((alpha<=0) or (alpha>1)):
-       print 'ERROR outlier: alpha must between 0 and 1.' 
-       import sys
-       sys.exit()
+        raise ValueError('alpha must between 0 and 1.')
 
     # Student''s t-distribution
     nn    = np.ma.count(y)
@@ -106,8 +104,8 @@ def outlier(y,alpha=0.01,k=-1,quiet=True):
         k = nn-1
     out      = 0
     outlrs   = np.zeros(k,dtype=np.float)
-    iioutlrs = np.zeros(k,dtype=np.integer)
-    i     = np.arange(k,dtype=np.integer) + 1
+    iioutlrs = np.zeros(k,dtype=np.int)
+    i     = np.arange(k,dtype=np.int) + 1
     nnip1 = np.array(nn-i+1,dtype=np.float)
     nnim1 = np.array(nn-i-1,dtype=np.float)
     pcrit = 1.-(alpha/(2.*nnip1))

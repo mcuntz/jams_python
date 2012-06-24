@@ -63,17 +63,15 @@ def interpol(xout, xin, yin):
     # If yin 1D-array then call immediately np.interp without check
     # If no np.interp wanted uncomment next line
     # isone = False
-    if np.size(yin.shape) == 1:
+    if np.ndim(yin) == 1:
         # If no np.interp wanted comment next line and uncomment the following two lines
         return np.interp(xout, xin, yin)
         # isone = True
         # yin = yin[:,np.newaxis]
     #
     # Check input
-    if np.size(xin.shape) != 1:
-        raise ValueError("x input values not 1D array")
-    if np.size(xout.shape) > 1:
-        raise ValueError("x output values not scalar or 1D array")
+    if np.ndim(xin) != 1: raise ValueError("x input values not 1D array")
+    if np.ndim(xout) > 1: raise ValueError("x output values not scalar or 1D array")
     #
     # Subscripts
     tiny = np.finfo(np.float).eps

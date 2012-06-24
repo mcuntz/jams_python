@@ -4,21 +4,6 @@ import scipy.optimize as opt # curve_fit, fmin, fmin_tnc
 
 def nee2gpp(dates, nee, t, isday, rg=False, vpd=False, undef=np.nan,
             method='local', shape=False, masked=False):
-# if True:
-#     import ufz
-#     dat    = ufz.fread('nee2gpp_test.csv', skip=2, transpose=True)
-#     dates  = ufz.date2dec(dy=dat[0,:], mo=dat[1,:], yr=dat[2,:], hr=dat[3,:], mi=dat[4,:])
-#     nee    = np.squeeze(dat[5,:])
-#     rg     = np.squeeze(dat[6,:])
-#     tair   = np.squeeze(dat[7,:])
-#     VPD    = np.squeeze(dat[8,:])
-#     undef  = -9999.
-#     method = 'day'
-#     isday  = np.where(rg > 10., True, False)
-#     t      = np.where(tair == undef, undef, tair+273.15)
-#     vpd    = np.where(VPD == undef, undef, VPD*100.)
-#     shape  = False
-#     masked = False
     """
         Calculate photosynthesis (GPP) and ecosystem respiration (Reco) from original
         Eddy flux data.
@@ -158,7 +143,6 @@ def nee2gpp(dates, nee, t, isday, rg=False, vpd=False, undef=np.nan,
 
     def cost_lloyd(p, T, NEE):
         """ Cost function for Lloyd """
-        #return np.sum((NEE-lloyd(T, p[0], p[1]))**2)
         return np.sum(np.abs(NEE-lloyd(T, p[0], p[1])))
 
     def lloyd_rref(et, Rref):
@@ -169,7 +153,6 @@ def nee2gpp(dates, nee, t, isday, rg=False, vpd=False, undef=np.nan,
 
     def cost_lloyd_rref(p, et, NEE):
         """ Cost function for rref """
-        # return np.sum((NEE-lloyd_rref(et, p[0]))**2)
         return np.sum(np.abs(NEE-lloyd_rref(et, p[0])))
 
     def lasslop(Rg, et, VPD, alpha, beta0, k, Rref):
@@ -190,8 +173,6 @@ def nee2gpp(dates, nee, t, isday, rg=False, vpd=False, undef=np.nan,
         gamma = Rref*et
         # Koerner (1995)
         VPD0  = 1000. # 10 hPa
-        #beta  = np.minimum(beta0*np.exp(-k*(VPD-VPD0)), beta0)
-        #beta  = np.where(VPD > VPD0, beta0*np.exp(-k*(VPD-VPD0)), beta0)
         kk    = np.maximum(np.minimum(-k*(VPD-VPD0), 600.), -600.)
         beta  = np.where(VPD > VPD0, beta0*np.exp(kk), beta0)
         return -alpha*beta*Rg/(alpha*Rg+beta) + gamma
@@ -200,67 +181,27 @@ def nee2gpp(dates, nee, t, isday, rg=False, vpd=False, undef=np.nan,
         """ Cost function for Lasslop """
         return np.sum(np.abs(NEE-lasslop(Rg, et, VPD, p[0], p[1], p[2], p[3])))
 
-    # def lasslop_novpd(Rg, et, alpha, beta, Rref):
-    #     """ Lasslop et al. (2010) is basically the rectangular, hyperbolic
-    #         light-response of NEE as by Falge et al. (2001), where the
-    #         respiration is calculated with Lloyd & Taylor (1994).
-    #         This is the case where the maximum canopy uptake rate at light
-    #         saturation decreases is optimised as well, i.e. no VPD dependence.
-    #         Rg      Global radiation [W m-2]
-    #         et      Exponential in Lloyd & Taylor: np.exp(E0*(1./(Tref-T0)-1./(T-T0))) []
-    #         alpha   Light use efficiency, i.e. initial slope of light response curve [umol(C) J-1]
-    #         beta    Maximum CO2 uptake rate [umol(C) m-2 s-1]
-    #         Rref    Respiration at Tref (10 degC) [umol(C) m-2 s-1]
-    #     """
-    #     # Lloyd & Taylor (1994)
-    #     gamma = Rref*et
-    #     return -alpha*beta*Rg/(alpha*Rg+beta) + gamma
-
-    # def cost_lasslop_novpd(p, Rg, et, NEE):
-    #     """ Cost function for Lasslop without VPD dependence """
-    #     return np.sum(np.abs(NEE-lasslop_novpd(Rg, et, p[0], p[1], p[2])))
-
-    # def falge(Rg, alpha, beta, gamma):
-    #     """ Rectangular, hyperbolic light-response of NEE as by Falge et al. (2001).
-    #         Rg      Global radiation [W m-2]
-    #         alpha   Light use efficiency, i.e. initial slope of light response curve [umol(C) J-1]
-    #         beta    Maximum CO2 uptake rate [umol(C) m-2 s-1]
-    #         gamma   Respiration [umol(C) m-2 s-1]
-    #     """
-    #     return -alpha*beta*Rg/(alpha*Rg+beta) + gamma
-
-    # def cost_falge(p, Rg, NEE):
-    #     """ Cost function for Falge """
-    #     return np.sum(np.abs(NEE-falge(Rg, p[0], p[1], p[2])))
-
     # -------------------------------------------------------------
     # Checks
 
     # remember shape is any
-    inshape = np.shape(nee)
+    inshape = nee.shape
     dates   = np.squeeze(dates)
     nee     = np.squeeze(nee)
     t       = np.squeeze(t)
     isday   = np.squeeze(isday)
     # Check squeezed shape
-    if np.size(np.shape(dates)) != 1:
-        raise ValueError('Error nee2gpp: squeezed dates must be 1D array.')
-    if np.size(np.shape(nee)) != 1:
-        raise ValueError('Error nee2gpp: squeezed nee must be 1D array.')
-    if np.size(np.shape(t)) != 1:
-        raise ValueError('Error nee2gpp: squeezed t must be 1D array.')
-    if np.size(np.shape(isday)) != 1:
-        raise ValueError('Error nee2gpp: squeezed isday must be 1D array.')
-    ndata = np.size(dates)
-    if ((np.size(nee) != ndata) | (np.size(t) != ndata) | (np.size(isday) != ndata)):
+    if np.ndim(dates) != 1: raise ValueError('Error nee2gpp: squeezed dates must be 1D array.')
+    if np.ndim(nee) != 1:   raise ValueError('Error nee2gpp: squeezed nee must be 1D array.')
+    if np.ndim(t) != 1:     raise ValueError('Error nee2gpp: squeezed t must be 1D array.')
+    if np.ndim(isday) != 1: raise ValueError('Error nee2gpp: squeezed isday must be 1D array.')
+    ndata = dates.size
+    if ((nee.size != ndata) | (t.size != ndata) | (isday.size != ndata)):
         raise ValueError('Error nee2gpp: inputs must have the same size.')
-
     if ((method.lower() == 'day') | (method.lower() == 'lasslop')):
-        if np.size(np.shape(rg)) != 1:
-            raise ValueError('Error nee2gpp: squeezed rg must be 1D array.')
-        if np.size(np.shape(vpd)) != 1:
-            raise ValueError('Error nee2gpp: squeezed vpd must be 1D array.')
-        if ((np.size(rg) != ndata) | (np.size(vpd) != ndata)):
+        if np.ndim(rg) != 1:  raise ValueError('Error nee2gpp: squeezed rg must be 1D array.')
+        if np.ndim(vpd) != 1: raise ValueError('Error nee2gpp: squeezed vpd must be 1D array.')
+        if ((rg.size != ndata) | (vpd.size != ndata)):
             raise ValueError('Error nee2gpp: lasslop inputs must have the same size as other inputs.')
 
     # -------------------------------------------------------------
@@ -269,17 +210,17 @@ def nee2gpp(dates, nee, t, isday, rg=False, vpd=False, undef=np.nan,
     if type(nee) != matype:
         nee = np.ma.array(nee, mask=np.zeros(ndata,dtype=np.bool))
     else:
-        if np.size(nee.mask) == 1:
+        if nee.mask.size == 1:
             nee = np.ma.array(nee, mask=np.zeros(ndata,dtype=np.bool))
     if type(t) != matype:
         t = np.ma.array(t, mask=np.zeros(ndata,dtype=np.bool))
     else:
-        if np.size(t.mask) == 1:
+        if t.mask.size == 1:
             t = np.ma.array(t, mask=np.zeros(ndata,dtype=np.bool))
     if type(isday) != matype:
         isday = np.ma.array(isday, mask=np.zeros(ndata,dtype=np.bool))
     else:
-        if np.size(isday.mask) == 1:
+        if isday.mask.size == 1:
             isday = np.ma.array(isday, mask=np.zeros(ndata,dtype=np.bool))
     # mask also undef
     # AP
@@ -297,12 +238,12 @@ def nee2gpp(dates, nee, t, isday, rg=False, vpd=False, undef=np.nan,
         if type(rg) != matype:
             rg = np.ma.array(rg, mask=np.zeros(ndata,dtype=np.bool))
         else:
-            if np.size(rg.mask) == 1:
+            if rg.mask.size == 1:
                 rg = np.ma.array(rg, mask=np.zeros(ndata,dtype=np.bool))
         if type(vpd) != matype:
             vpd = np.ma.array(vpd, mask=np.zeros(ndata,dtype=np.bool))
         else:
-            if np.size(vpd.mask) == 1:
+            if vpd.mask.size == 1:
                 vpd = np.ma.array(vpd, mask=np.zeros(ndata,dtype=np.bool))
         # mask also undef
         if np.ma.any(rg   == undef): rg  = np.ma.array(rg,  mask=(rg==undef),  keep_mask=True)
@@ -343,7 +284,7 @@ def nee2gpp(dates, nee, t, isday, rg=False, vpd=False, undef=np.nan,
         dmax = np.int(np.ceil(np.amax(jul)))  # so the search will be from noon to noon and thus includes all nights
         for i in xrange(dmin,dmax,5):
             iii  = np.squeeze(np.where((jul>=i) & (jul<(i+14))))
-            niii = np.size(iii)
+            niii = iii.size
             if niii > 6:
                 if (np.amax(tt[iii])-np.amin(tt[iii])) >= 5.:
                     p, c = opt.curve_fit(lloyd, tt[iii], net[iii], p0=[2.,200.]) # params, covariance
@@ -362,7 +303,7 @@ def nee2gpp(dates, nee, t, isday, rg=False, vpd=False, undef=np.nan,
 
         # 2. E0 = avg of best 3
         iii  = np.squeeze(np.where((locp[:,1] > 0.) & (locp[:,1] < 450.) & (np.abs(locs[:,1]/locp[:,1]) < 0.5)))
-        niii = np.size(iii)
+        niii = iii.size
         if niii==0:
             raise ValueError('No good local relationship found.')
         elif niii==1:
@@ -391,7 +332,7 @@ def nee2gpp(dates, nee, t, isday, rg=False, vpd=False, undef=np.nan,
         et    = lloyd(tt, 1., E0)
         for i in xrange(dmin,dmax,4):
             iii  = np.squeeze(np.where((jul>=i) & (jul<(i+4))))
-            niii = np.size(iii)
+            niii = iii.size
             if niii > 3:
                 # Calc directly minisation of (nee-p*et)**2
                 #p = np.sum(net[iii]*et[iii])/np.sum(et[iii]**2)
@@ -435,7 +376,7 @@ def nee2gpp(dates, nee, t, isday, rg=False, vpd=False, undef=np.nan,
         # starting values for optim
         aalpha = 0.01
         qnet   = np.sort(dnet)
-        nqnet  = np.size(qnet)
+        nqnet  = qnet.size
         abeta0 = np.abs(qnet[np.floor(0.97*nqnet)]-qnet[np.ceil(0.03*nqnet)])
         ak     = 0.
         # out
@@ -453,7 +394,7 @@ def nee2gpp(dates, nee, t, isday, rg=False, vpd=False, undef=np.nan,
             good = True
             # 1. Estimate E0 from nighttime data
             iii  = np.squeeze(np.where((njul>=i) & (njul<(i+12))))
-            niii = np.size(iii)
+            niii = iii.size
             if niii > 3:
                 #p, c = opt.curve_fit(lloyd, ntt[iii], nnet[iii], p0=[aRref,100.])
                 p  = opt.fmin(cost_lloyd, [aRref,100.], args=(ntt[iii], nnet[iii]), disp=False)
@@ -467,7 +408,7 @@ def nee2gpp(dates, nee, t, isday, rg=False, vpd=False, undef=np.nan,
                     continue
             # 2. Estimate alpha, k, beta0, Rref from daytime data
             iii  = np.squeeze(np.where((djul>=i) & (djul<(i+4))))
-            niii = np.size(iii)
+            niii = iii.size
             if niii > 3:
                 et     = lloyd(dtt[iii], 1., E0)
                 again  = True
@@ -573,3 +514,18 @@ def nee2gpp(dates, nee, t, isday, rg=False, vpd=False, undef=np.nan,
 if __name__ == '__main__':
     import doctest
     doctest.testmod()
+# if True:
+#     import ufz
+#     dat    = ufz.fread('nee2gpp_test.csv', skip=2, transpose=True)
+#     dates  = ufz.date2dec(dy=dat[0,:], mo=dat[1,:], yr=dat[2,:], hr=dat[3,:], mi=dat[4,:])
+#     nee    = np.squeeze(dat[5,:])
+#     rg     = np.squeeze(dat[6,:])
+#     tair   = np.squeeze(dat[7,:])
+#     VPD    = np.squeeze(dat[8,:])
+#     undef  = -9999.
+#     method = 'day'
+#     isday  = np.where(rg > 10., True, False)
+#     t      = np.where(tair == undef, undef, tair+273.15)
+#     vpd    = np.where(VPD == undef, undef, VPD*100.)
+#     shape  = False
+#     masked = False

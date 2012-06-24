@@ -191,14 +191,13 @@ def kernel_regression_h(x, y, silverman=False):
     # Check input
     ss = np.shape(x)
     n  = ss[0]
-    if n != np.size(y):
+    if x.shape[0] != np.size(y):
         raise ValueError('size(x,0) != size(y): '+str(n)+' != '+str(np.size(y)))
-    if np.size(ss) == 1: # to deal with 1d-arrays
+    if np.ndim(x) == 1: # to deal with 1d-arrays
         xx = x[:,np.newaxis]
     else:
         xx = x
-    ss = np.shape(xx)
-    d  = ss[1]
+    d = xx.shape[1]
     #
     # Silvermann (1986), Scott (1992), Bowman and Azzalini (1997)
     # Very similar to stats.gaussian_kde
@@ -220,7 +219,7 @@ def cross_valid_h(h, x, y):
         Nadaraya-Watson estimator, which is basically the mean square error
         where model estimate is replaced by the jackknife estimate (Haerdle et al. 2000).
     """
-    n = np.size(x[:,0])
+    n = x.shape[0]
     # allocate output
     out = np.empty(n)
     # Loop through each regression point

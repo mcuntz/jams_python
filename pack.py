@@ -70,30 +70,28 @@ def pack(array, mask):
         -------
         Written, MC, Jul. 2009
     """
-    dmask   = np.shape(mask)
-    ndmask  = len(dmask)
+    dmask   = mask.shape
+    ndmask  = np.ndim(mask)
     nmask   = mask.size
-    darray  = np.shape(array)
-    ndarray = len(darray)
+    darray  = array.shape
+    ndarray = np.ndim(array)
     narray  = array.size
     #
     # Check array and mask
     if ndarray < ndmask:
-        print 'PACK: Input array has less dimensions %s then mask %s.' % (ndarray, ndmask)
-        return None
+        raise ValueError('Input array has less dimensions '+str(ndarray)+' then mask '+str(ndmask))
     k = 0
     while k > -ndmask:
         k -= 1
         if dmask[k] != darray[k]:
-            print 'PACK: Input array and mask have the same last dimensions. Array: %s Mask: %s' % (darray, dmask)
-            return None
+            raise ValueError('Input array and mask have the same last dimensions. Array: '+str(darray)+' Mask: '+str(dmask))
     #
     # Make array and mask 1d
-    farray = np.ravel(array) # flat in Fortran=column-major mode
-    fmask  = np.ravel(mask)
-    afmask = np.empty(narray, dtype='bool')
+    farray = array.ravel() # flat in Fortran=column-major mode
+    fmask  = mask.ravel()
+    afmask = np.empty(narray, dtype=np.bool)
     nn = narray / nmask
-    k = 0
+    k  = 0
     while k < nn:
         afmask[k*nmask:(k+1)*nmask] = fmask[:]
         k += 1
@@ -114,3 +112,31 @@ def pack(array, mask):
 if __name__ == '__main__':
     import doctest
     doctest.testmod()
+    # a = np.array([[ 0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.],
+    #               [ 0.,  0.,  0.,  1.,  1.,  1.,  0.,  0.,  0.,  0.],
+    #               [ 0.,  0.,  0.,  1.,  1.,  1.,  0.,  0.,  0.,  0.],
+    #               [ 0.,  0.,  0.,  1.,  1.,  1.,  0.,  0.,  0.,  0.],
+    #               [ 0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.]])
+    # nn = list(np.shape(a))
+    # nn.insert(0,2)
+    # a3 = np.empty(nn)
+    # for i in range(2): a3[i,...] = a
+
+    # # Pack array to  keep only the island elements
+    # # Mask
+    # mask = a == 1.0
+    # b = pack(a, mask)
+    # print sum(b)
+    # #9.0
+    # print a.sum()
+    # #9.0
+    # b
+    # #array([ 1.,  1.,  1.,  1.,  1.,  1.,  1.,  1.,  1.])
+    # b3 = pack(a3, mask)
+    # print a3.sum()
+    # #18.0
+    # print b3.sum()
+    # #18.0
+    # b3
+    # #array([[ 1.,  1.,  1.,  1.,  1.,  1.,  1.,  1.,  1.],
+    # #       [ 1.,  1.,  1.,  1.,  1.,  1.,  1.,  1.,  1.]])

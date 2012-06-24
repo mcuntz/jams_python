@@ -132,7 +132,7 @@ def pi(s=None, m=None, norm=None, b=False):
     #
     if (s!=None):
       m   = np.dot(s,np.transpose(s))
-    mm  = np.shape(m)
+    mm  = m.shape
     if (mm[0] != mm[1]):
         raise ValueError('m matrix not NxN.')
     inn = mm[0]

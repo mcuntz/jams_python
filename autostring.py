@@ -109,7 +109,7 @@ def autostring(num, prec=0, zero=False, set_printoptions=False, pp=False, join=F
     """
     #
     # Check input
-    isarr = np.size(np.shape(num))
+    isarr = np.ndim(num)
     if (isarr > 2):
 	print "AUTOSTRING WARNING: autostring only works with scalars, 1D- and 2D arrays: return original array."
 	return num
@@ -143,7 +143,7 @@ def autostring(num, prec=0, zero=False, set_printoptions=False, pp=False, join=F
     # Scalar to array if necessary; Special treatment of -0.0
     if (isarr==0):
 	if (num == 0):
-	    num = num - num
+	    num = np.abs(num)
     else:
 	num = np.where(num == 0, 0, num)
     # Zero padding
@@ -208,29 +208,29 @@ def autostring(num, prec=0, zero=False, set_printoptions=False, pp=False, join=F
 	out = format_string.format(num)
     else:
 	fnum = num.flatten()
-	nnum = np.size(fnum)
+	nnum = fnum.size
 	styp = 'S{0:d}'.format(num_total_chars)
 	out = np.empty(nnum, dtype=styp)
 	for i in xrange(nnum):
 	    out[i] = format_string.format(fnum[i])
-	out = np.reshape(out, np.shape(num))
+	out = np.reshape(out, num.shape)
 	if (set_printoptions | pp):
 	    # num_total_chars+3 for '' and space, +isarr for []
-	    np.set_printoptions(linewidth=np.size(num,-1)*(num_total_chars+3)+isarr, threshold=nnum+1)
+	    np.set_printoptions(linewidth=num.shape[-1]*(num_total_chars+3)+isarr, threshold=nnum+1)
 	if (join | joinall): # There should be reduction routines in numpy
 	    if ((isarr == 1) | ((isarr==2) & joinall)):
 		if (isarr == 2):
 		    out = out.flatten()
-		for i in xrange(np.size(out)):
+		for i in xrange(out.size):
 		    if (i==0):
 			outc = out[i]
 		    else:
 			outc = outc+sep+out[i]
 	    else:
-		sform = 'S{0:d}'.format((len(out[0,0])+len(sep))*np.size(out,1))
-		outc = np.zeros(np.size(out,0), dtype=sform)
-		for j in xrange(np.size(out,0)):
-		    for i in xrange(np.size(out,1)):
+		sform = 'S{0:d}'.format((len(out[0,0])+len(sep))*out.shape[1])
+		outc = np.zeros(out.shape[0], dtype=sform)
+		for j in xrange(out.shape[0]):
+		    for i in xrange(out.shape[1]):
 			if (i==0):
 			    outc[j] = out[j,i]
 			else:

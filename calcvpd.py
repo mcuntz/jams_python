@@ -31,5 +31,5 @@ def calcvpd(rel_hum,Tair):
     print 'CALCVPD: obsolete function. Use esat: calcvpd(rh,T) = (1-rh)*esat(t)'
     print '         This function is precisely: calcvpd(rh,T) = (1-rh)*esat(T, formula="Buck_original")'
     sat_pres = 6.1121*np.exp(17.502 * (Tair - 273.15) / (Tair - 273.15 + 240.97))
-    vap_def = sat_pres*(1.- rel_hum) * 100
+    vap_def = sat_pres*(1.- rel_hum) * 100.
     return vap_def

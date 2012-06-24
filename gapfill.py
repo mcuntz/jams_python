@@ -292,27 +292,21 @@ def gapfill(datein, datain, rgin, tairin, vpdin,
 
     # -------------------------------------------------------------
     # Checks
-
     # remember shape is any
-    inshape = np.shape(datain)
+    inshape = datain.shape
     date = np.squeeze(datein)
     data = np.squeeze(datain)
     rg   = np.squeeze(rgin)
     tair = np.squeeze(tairin)
     vpd  = np.squeeze(vpdin)
-    if np.size(np.shape(date)) != 1:
-        raise ValueError('Error gapfill: squeezed dates must be 1D array.')
-    if np.size(np.shape(data)) != 1:
-        raise ValueError('Error gapfill: squeezed data must be 1D array.')
-    if np.size(np.shape(rg)) != 1:
-        raise ValueError('Error gapfill: squeezed rg must be 1D array.')
-    if np.size(np.shape(tair)) != 1:
-        raise ValueError('Error gapfill: squeezed tair must be 1D array.')
-    if np.size(np.shape(vpd)) != 1:
-        raise ValueError('Error gapfill: squeezed vpd must be 1D array.')
+    if np.ndim(date) != 1: raise ValueError('squeezed dates must be 1D array.')
+    if np.ndim(data) != 1: raise ValueError('squeezed data must be 1D array.')
+    if np.ndim(rg) != 1:   raise ValueError('squeezed rg must be 1D array.')
+    if np.ndim(tair) != 1: raise ValueError('squeezed tair must be 1D array.')
+    if np.ndim(vpd) != 1:  raise ValueError('squeezed vpd must be 1D array.')
 
     # check flags
-    ndata = np.size(data)
+    ndata = data.size
     if (data_flag != None):
         data_flg = np.squeeze(data_flag)
     else:
@@ -330,25 +324,24 @@ def gapfill(datein, datain, rgin, tairin, vpdin,
     else:
         vpd_flg = np.zeros(ndata)
 
-    if ((np.size(date) != ndata) | (np.size(rg) != ndata) | (np.size(tair) != ndata) |
-        (np.size(vpd) != ndata) | (np.size(data_flg) != ndata) | (np.size(rg_flg) != ndata) |
-        (np.size(tair_flg) != ndata) | (np.size(vpd_flg) != ndata)):
-        raise ValueError('Error gapfill: inputs must have the same size.')
+    if ((date.size != ndata) | (rg.size != ndata) | (tair.size != ndata) |
+        (vpd.size != ndata) | (data_flg.size != ndata) | (rg_flg.size != ndata) |
+        (tair_flg.size != ndata) | (vpd_flg.size != ndata)):
+        raise ValueError('inputs must have the same size.')
         
     # -------------------------------------------------------------
     # Parameters
 
     # number of data points per week; basic factor of the time
     # window
-    ddate    = date-np.roll(date,1)
-    ddate[0] = ddate[1]
+    ddate    = np.diff(date)
     if np.any((ddate-ddate[0]) > 1e-4): # ca 2.secs
-        raise ValueError('Error gapfill: dates must be equally spaced.')
+        raise ValueError('dates must be equally spaced.')
     week    = np.int(np.around(7./ddate[0]))
     nperday = week / 7
     hour    = (np.array(np.floor((date-np.trunc(date))*24.), dtype=np.int) + 12) % 24
 
-    ndata = np.size(data)
+    ndata = data.size
     if err:
         # error estimate
         data_std  = np.ones(ndata)*undef
@@ -371,10 +364,8 @@ def gapfill(datein, datain, rgin, tairin, vpdin,
     firstvalid  = np.amin(np.squeeze(np.where(data_flg==0)))
     lastvalid   = np.amax(np.squeeze(np.where(data_flg==0)))
     nn          = nperday*longestmarginalgap
-    if firstvalid > nn:
-        largemargin[0:(firstvalid-nn)] = 1
-    if lastvalid < (ndata-nn):
-        largemargin[(lastvalid+nn):]   = 1
+    if firstvalid > nn:        largemargin[0:(firstvalid-nn)] = 1
+    if lastvalid < (ndata-nn): largemargin[(lastvalid+nn):]   = 1
 
     # Fill loop over all data points
     for j in xrange(ndata):
@@ -389,7 +380,7 @@ def gapfill(datein, datain, rgin, tairin, vpdin,
         # for better overview: dynamic calculation of radiation threshold
         # minimum 20; maximum 50 [Wm-2] according to private correspondence
         # with Markus Reichstein
-        rg_devmax = np.maximum(20,np.minimum(rg[j],rg_dev))
+        rg_devmax = np.maximum(20.,np.minimum(rg[j],rg_dev))
 
         # Method 1: all met conditions
         if meteo_flg[j]:

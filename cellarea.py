@@ -49,15 +49,13 @@ def cellarea(lat, lon, globe=False):
     """
     nlat = len(lat)
     if nlat < 2:
-        print 'CELLAREA: at least 2 latitudes must be given'
-        return None
+        raise ValueError('at least 2 latitudes must be given')
     nlon = len(lon)
     if nlon < 2:
-        print 'CELLAREA: at least 2 longitudes must be given'
-        return None
+        raise ValueError('at least 2 longitudes must be given')
     #
     # cell sizes in degrees # still + or -
-    dlat = lat-np.roll(lat,1) 
+    dlat = lat-np.roll(lat,1)
     if globe:
         if lat[0] > 0: # descending lats
             l0 = 90.
@@ -70,16 +68,16 @@ def cellarea(lat, lon, globe=False):
         dlat[-1] = lat[-1]-lat[-2]
     loni = lon
     # check if meridian in lon range -> shift to -180,180
-    if np.any(abs(loni-np.roll(loni,1)) > 360./nlon):
+    if np.any(np.abs(np.diff(loni)) > 360./nlon):
         loni = np.where(loni > 180., loni-360., loni)
     # check if -180,180 longitude in lon range -> shift to 0,360
-    if np.any(abs(loni-np.roll(loni,1)) > 360./nlon):
+    if np.any(np.abs(np.diff(loni)) > 360./nlon):
         loni = np.where(loni < 0, loni+360., loni)
-    dlon = abs(loni-np.roll(loni,1))
-    dlon[0] = abs(loni[1]-loni[0])
+    dlon = np.abs(loni-np.roll(loni,1))
+    dlon[0] = np.abs(loni[1]-loni[0])
     #
     # Northern latitude of grid cell edges
-    nlat = len(lat)
+    nlat = np.size(lat)
     n_lat = lat[0] + dlat[0]/2. + np.cumsum(dlat)
     # 
     # Area of grid cells in m^2 with lat/lon in degree
@@ -89,8 +87,7 @@ def cellarea(lat, lon, globe=False):
     area = np.empty([nlat,nlon])
     dlat = np.abs(dlat[:])
     for i in range(nlon):
-        area[:,i] = (2.*(ae**2) * dlon[i]*d2r 
-                     * np.sin(0.5*dlat*d2r) * np.cos(lat*d2r))
+        area[:,i] = 2.*(ae**2) * dlon[i]*d2r * np.sin(0.5*dlat*d2r) * np.cos(lat*d2r)
     #
     return area
 

@@ -52,7 +52,6 @@ def dewpoint(pres, Celsius=False):
         -------
         Written, MC, Jan 2012
     """
-    T0 = 273.15
     pw = 611.21
     c1 = 240.97
     c2 = 17.502
@@ -61,7 +60,8 @@ def dewpoint(pres, Celsius=False):
     if Celsius:
       return out
     else:
-      return out+T0
+      import const
+      return out+const.T0
 
  
 if __name__ == '__main__':

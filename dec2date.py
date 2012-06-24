@@ -291,13 +291,13 @@ def dec2date(indata, calendar='standard', units = False,
     #
     # Input size and shape
     islist = type(indata) != type(np.array(indata))
-    isarr = np.size(np.shape(indata))
+    isarr = np.ndim(indata)
     if (islist & (isarr > 2)):
         raise ValueError("dec2date error: input is list > 2D; Use array input")
     if isarr == 0: indata = np.array([indata])
     else: indata = np.array(indata)
-    insize  = np.size(indata)
-    inshape = np.shape(indata)
+    insize  = indata.size
+    inshape = indata.shape
     indata  = indata.flatten()
 
     #

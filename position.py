@@ -110,14 +110,11 @@ def position(row=1, col=1, num=1,
     # Check
     nplots = row*col
     if num > nplots:
-        print 'POSITION: num > number of plots %s.' % (num, nplots)
-        return None
+        raise ValueError('num > number of plots: '+str(num)+' > '+str(nplots))
     if right-left <= 0.:
-        print 'POSITION: right %s < left %s.' % (right, left)
-        return None
+        raise ValueError('right > left: '+str(right)+' > '+str(left))
     if top-bottom <= 0.:
-        print 'POSITION: top %s < bottom %s.' % (top, bottom)
-        return None
+        raise ValueError('top < bottom: '+str(top)+' < '+str(bottom))
     #
     # Scaling to figsize
     scalex = figsize[1]/float(max(figsize))
@@ -130,30 +127,28 @@ def position(row=1, col=1, num=1,
     # golden ratio
     ratio = (1.+np.sqrt(5.))/2.
     if golden:
-        width = dx
+        width  = dx
         height = dx / ratio
         checkheight = (top-bottom-row*height) - (row-1)*wspace
         if checkheight < 0.:
             height = dy
-            width = dy * ratio
+            width  = dy * ratio
             checkwidth = (right-left-col*width) - (col-1)*hspace
             if checkwidth < 0.:
-                print 'POSITION: golden ratio does not work. Have to recode.'
-                return None
+                raise ValueError('golden ratio does not work. Have to recode.')
     else:
         if inversegolden:
             height = dy
-            width = dy / ratio
+            width  = dy / ratio
             checkwidth = (right-left-col*width) - (col-1)*hspace
             if checkwidth < 0.:
-                width = dx
+                width  = dx
                 height = dx * ratio
                 checkheight = (top-bottom-row*height) - (row-1)*wspace
                 if checkheight < 0.:
-                    print 'POSITION: inverse golden ratio does not work. Have to recode.'
-                    return None
+                    raise ValueError('inverse golden ratio does not work. Have to recode.')
         else:
-            width = dx
+            width  = dx
             height = dy
     #
     # order row/colmn, column/row
@@ -165,7 +160,7 @@ def position(row=1, col=1, num=1,
         icol = (num-1) % col
     #
     # position
-    pos = np.empty(4)
+    pos    = np.empty(4)
     pos[0] = left   + icol*(width+hspace)          *scalex
     pos[1] = bottom + (row-1-irow)*(height+wspace) *scaley
     pos[2] = width  *scalex

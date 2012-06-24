@@ -86,8 +86,7 @@ def lif(file, noblank=False, comment='', skip=0):
     try:
         f = open(file, 'r')
     except IOError:
-        print 'LIF: Cannot open file %s for reading.' % file
-        return 0
+        raise ValueError('Cannot open file '+file)
     # Count lines
     count = 0
     if skip > 0:

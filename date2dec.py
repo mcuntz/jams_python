@@ -125,10 +125,6 @@ def date2dec(calendar = 'standard', units = False,
         Examples
         --------
         #calendar = 'standard'
-array(['05.01.2000 12:30:15', '24.04.1810 16:15:10', '15.07.1630 10:20:40',
-           '20.09.1510 14:35:50', '18.03.1271 19:41:34', '27.08.0619 11:08:37',
-           '23.08.-1579 20:03:41', '01.01.-4712 12:00:00'],
-          dtype='|S20')
         >>> year   = np.array([2000,1810,1630,1510,1271,619,-1579,-4712])
         >>> month  = np.array([1,4,7,9,3,8,8,1])
         >>> day    = np.array([5,24,15,20,18,27,23,1])
@@ -296,13 +292,13 @@ array(['05.01.2000 12:30:15', '24.04.1810 16:15:10', '15.07.1630 10:20:40',
         raise ValueError("date2dec error: 'ascii' and 'eng' mutually exclusive")
     if ascii != None:
         islist = type(ascii) != type(np.array(ascii))
-        isarr = np.size(np.shape(ascii))
+        isarr = np.ndim(ascii)
         if (islist & (isarr > 2)):
             raise ValueError("date2dec error: ascii input is list > 2D; Use array input")
         if isarr == 0: ascii = np.array([ascii])
         else: ascii = np.array(ascii)
-        insize   = np.size(ascii)
-        outshape = np.shape(ascii)
+        insize   = ascii.size
+        outshape = ascii.shape
         asciifl  = ascii.flatten()
         timeobj  = np.zeros(insize, dtype=object)
         # slicing of ascii strings to implement in datetime object. missing seconds
@@ -329,15 +325,15 @@ array(['05.01.2000 12:30:15', '24.04.1810 16:15:10', '15.07.1630 10:20:40',
             timeobj[i] = nt.datetime(yr[i], mo[i], dy[i], hr[i], mi[i], sc[i])
     if eng != None:
         islist = type(eng) != type(np.array(eng))
-        isarr = np.size(np.shape(eng))
+        isarr = np.ndim(eng)
         if isarr == 0: eng = np.array([eng])
         else: eng = np.array(eng)
         if (islist & (isarr > 2)):
             raise ValueError("date2dec error: eng input is list > 2D; Use array input")
         eng = np.array(eng)
-        insize   = np.size(eng)
-        outshape = np.shape(eng)
-        engfl  = eng.flatten()
+        insize   = eng.size
+        outshape = eng.shape
+        engfl    = eng.flatten()
         timeobj  = np.zeros(insize, dtype=object)
         # slicing of eng strings to implement in datetime object. missing seconds
         # will be set to 00.
@@ -365,27 +361,27 @@ array(['05.01.2000 12:30:15', '24.04.1810 16:15:10', '15.07.1630 10:20:40',
     # calculation of input sizes, shapes and number of axis
     if ((ascii == None) & (eng == None)):
         isnlist1 = type(yr) == type(np.array(yr))
-        isarr1 = np.size(np.shape(yr))
+        isarr1   = np.ndim(yr)
         if isarr1 == 0: yr = np.array([yr])
         else: yr = np.array(yr)
         isnlist2 = type(mo) == type(np.array(mo))
-        isarr2 = np.size(np.shape(mo))
+        isarr2   = np.ndim(mo)
         if isarr2 == 0: mo = np.array([mo])
         else: mo = np.array(mo)
         isnlist3 = type(dy) == type(np.array(dy))
-        isarr3 = np.size(np.shape(dy))
+        isarr3   = np.ndim(dy)
         if isarr3 == 0: dy = np.array([dy])
         else: dy = np.array(dy)
         isnlist4 = type(hr) == type(np.array(hr))
-        isarr4 = np.size(np.shape(hr))
+        isarr4   = np.ndim(hr)
         if isarr4 == 0: hr = np.array([hr])
         else: hr = np.array(hr)
         isnlist5 = type(mi) == type(np.array(mi))
-        isarr5 = np.size(np.shape(mi))
+        isarr5   = np.ndim(mi)
         if isarr5 == 0: mi = np.array([mi])
         else: mi = np.array(mi)
         isnlist6 = type(sc) == type(np.array(sc))
-        isarr6 = np.size(np.shape(sc))
+        isarr6   = np.ndim(sc)
         if isarr6 == 0: sc = np.array([sc])
         else: sc = np.array(sc)
         islist = not (isnlist1 | isnlist2 | isnlist3 | isnlist4 | isnlist5 | isnlist6)
@@ -477,8 +473,6 @@ array(['05.01.2000 12:30:15', '24.04.1810 16:15:10', '15.07.1630 10:20:40',
                        np.array(sc, dtype=np.float)/3600.) /
                        ((days_year+np.array(leap, dtype=np.float))*24.) )
         # for numerical stability, i.e. back and forth transforms
-        #import sys
-        #output += sys.float_info.epsilon
         output += 1e-08 # 1/3 sec
     elif calendar == 'decimal360':
         ntime = np.size(yr)

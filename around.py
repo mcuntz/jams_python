@@ -68,8 +68,7 @@ def around(num, powten, ceil=False, floor=False):
     #
     # Check input
     if (ceil and floor):
-        print "AROUND: ceil and floor keywords given."
-        return None
+        raise ValueError('ceil and floor keywords given.')
     if (powten == None):
         ipowten = 0
     else:
@@ -77,13 +76,14 @@ def around(num, powten, ceil=False, floor=False):
     nnum = np.size(num)
     npowten = np.size(ipowten)
     if ((npowten != nnum) and (npowten != 1)):
-        print "AROUND: powten must be scalar or have array size of input numbers."
-        return None
+        raise ValueError('powten must be scalar or have array size of input numbers.')
     #
     # Shift decimal point
-    out = num * 10.**(-ipowten)
+    #out = num * 10.**(-ipowten)
+    out = num * np.exp(-ipowten*np.log(10.))
     # Round/ceil/floor
-    eps = np.MachAr().eps
+    #eps = np.MachAr().eps
+    eps = np.finfo(np.float).eps
     if (ceil):
         out = np.ceil(out-10.*eps)
     elif (floor):
@@ -91,7 +91,8 @@ def around(num, powten, ceil=False, floor=False):
     else:
        out = np.around(out)
     # Shift back decimal point
-    out *= 10.**ipowten
+    #out *= 10.**ipowten
+    out *= np.exp(ipowten*np.log(10.))
 
     return out
 

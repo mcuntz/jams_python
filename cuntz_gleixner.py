@@ -435,15 +435,14 @@ def cuntz_gleixner(idecdate, iGPP, iRd, iCa, iRa, igtot, sunrise, Vcyt=None,
     # Checks
     nss = False
     if not steady: nss = True
-    nd = np.size(idecdate)
-    ng = np.size(iGPP)
-    nr = np.size(iRd)
-    nc = np.size(iCa)
-    na = np.size(iRa)
-    ns = np.size(igtot)
+    nd = idecdate.size
+    ng = iGPP.size
+    nr = iRd.size
+    nc = iCa.size
+    na = iRa.size
+    ns = igtot.size
     if ((nd != ng) | (nd != nr) | (nd != nc) | (nd != na) | (nd != ns)):
-        print 'CUNTZ_GLEIXNER: not all input sizes are equal'
-        return False
+        raise ValueError('not all input sizes are equal')
     if (Rass | Rm | Rchl | Rcyt | Rstarch | Rpyr | Rbio | Rphloem |
         Vstarch | ass13 | disc | Rnew_starch | Rnew_cyt): fullmodel = False
     if fullmodel:
@@ -462,93 +461,84 @@ def cuntz_gleixner(idecdate, iGPP, iRd, iCa, iRa, igtot, sunrise, Vcyt=None,
         Rnew_cyt    = True
     # Defaults
     # Day (1) or night (0)
-    if ~np.any(daynight != None): daynight = np.where(iGPP > 0., 1, 0)
-    isarr = np.size(np.shape(daynight))
+    if not np.any(daynight != None): daynight = np.where(iGPP > 0., 1, 0)
+    isarr = np.ndim(daynight)
     if (isarr==0):
         idaynight = np.ones(nd, dtype=np.int) * daynight
     else:
         idaynight = daynight
-        nn = np.size(idaynight)
+        nn = idaynight.size
         if (nn != nd):
-            print 'CUNTZ_GLEIXNER: daynight must be size 1 or size(idecdate)'
-            return False
+            raise ValueError('daynight must be size 1 or size(idecdate)')
     # length of day [s]
-    isarr = np.size(np.shape(daylength))
+    isarr = np.ndim(daylength)
     if (isarr==0):
         idaylength = np.ones(nd) * daylength
     else:
         idaylength = daylength
-        nn = np.size(idaylength)
+        nn = idaylength.size
         if (nn != nd):
-            print 'CUNTZ_GLEIXNER: daylength must be size 1 or size(idecdate)'
-            return False
+            raise ValueError('daylength must be size 1 or size(idecdate)')
     # Vo/Vc: ratio of carboxylateion to oxygentation of Rubisco
-    isarr = np.size(np.shape(Phi))
+    isarr = np.ndim(Phi)
     if (isarr==0):
         iPhi = np.ones(nd) * Phi
     else:
         iPhi = Phi
-        nn = np.size(iPhi)
+        nn = iPhi.size
         if (nn != nd):
-            print 'CUNTZ_GLEIXNER: Phi=Vo/Vc must be size 1 or size(idecdate)'
-            return False
+            raise ValueError('Phi=Vo/Vc must be size 1 or size(idecdate)')
     # fraction of respiration occuring during biosynthesis: min=2/3; max=4/5
-    isarr = np.size(np.shape(betap))
+    isarr = np.ndim(betap)
     if (isarr==0):
         ibetap = np.ones(nd) * betap
     else:
         ibetap = betap
-        nn = np.size(ibetap)
+        nn = ibetap.size
         if (nn != nd):
-            print 'CUNTZ_GLEIXNER: betap must be size 1 or size(idecdate)'
-            return False
+            raise ValueError('betap must be size 1 or size(idecdate)')
     mini = np.amin(ibetap)
     maxi = np.amax(ibetap)
     if not nocheck:
         if ((mini < 0.66) | (maxi > 0.8)):
-            print 'CUNTZ_GLEIXNER: betap must be: 2/3 < betap < 4/5'
-            return False
+            raise ValueError('betap must be: 2/3 < betap < 4/5')
     # betas the factor of leaf respiration that is transferred to biosynthesis (default: 3*gpp/max(gpp))
     # betas*(1-betap) <= 1: if betap=2/3 -> betas<3: if betap=5/6 -> betas < 6
-    if ~np.any(betas != None): betas = np.maximum((1./(1.-ibetap) * iGPP/np.amax(iGPP)) - const.tiny, 0.)
-    isarr = np.size(np.shape(betas))
+    if not np.any(betas != None): betas = np.maximum((1./(1.-ibetap) * iGPP/np.amax(iGPP)) - const.tiny, 0.)
+    isarr = np.ndim(betas)
     if (isarr==0):
         ibetas = np.ones(nd) * betas
     else:
         ibetas = betas
-        nn = np.size(ibetas)
+        nn = ibetas.size
         if (nn != nd):
-            print 'CUNTZ_GLEIXNER: betas must be size 1 or size(idecdate)'
-            return False
+            raise ValueError('betas must be size 1 or size(idecdate)')
     # effective fractionation through leaf boundary layer, stomata and mesophyll
-    isarr = np.size(np.shape(epsa))
+    isarr = np.ndim(epsa)
     if (isarr==0):
         iepsa = np.ones(nd) * epsa
     else:
         iepsa = epsa
-        nn = np.size(iepsa)
+        nn = iepsa.size
         if (nn != nd):
-            print 'CUNTZ_GLEIXNER: epsa must be size 1 or size(idecdate)'
-            return False
+            raise ValueError('epsa must be size 1 or size(idecdate)')
     # Vcyt
     if (nss & (~np.any(Vcyt != None))):
-        print 'CUNTZ_GLEIXNER: Vcyt must be given if non-steady state'
-        return False
+        raise ValueError('Vcyt must be given if non-steady state')
     if nss:
-        isarr = np.size(np.shape(Vcyt))
+        isarr = np.ndim(Vcyt)
         if (isarr==0):
             iVcyt = np.ones(nd, dtype=np.int) * Vcyt
         else:
             iVcyt = Vcyt
-            nn = np.size(iVcyt)
+            nn = iVcyt.size
             if (nn != nd):
-                print 'CUNTZ_GLEIXNER: Vcyt must be size 1 or size(idecdate)'
-                return False
+                raise ValueError('Vcyt must be size 1 or size(idecdate)')
     #
     # derived variables
     iAss = np.abs(iGPP) - np.abs(iRd)  # Net assimilation
     iCc  = iCa - iAss/igtot             # CO2 @ chloroplast
-    iVc   = np.abs(iGPP)/(1.-0.5*iPhi) # carboxylation
+    iVc  = np.abs(iGPP)/(1.-0.5*iPhi) # carboxylation
     # seconds
     if julian:
         decfac = np.ones(nd)
@@ -587,8 +577,7 @@ def cuntz_gleixner(idecdate, iGPP, iRd, iCa, iRa, igtot, sunrise, Vcyt=None,
     ibetar = 1. - ibetas*(1.-ibetap)
     if not nocheck:
         if np.any(ibetar <= 0.):
-            print 'CUNTZ_GLEIXNER: betar = 1-betas*(1-betap) <= 0.'
-            return False
+            raise ValueError('betar = 1-betas*(1-betap) <= 0.')
     iepsr  = np.where(ibetar > const.tiny, epss * (1.-ibetar)/ibetar, 1.) # limit to eps=1000 permil
     iepsg1 = epsg*0.5*iPhi + ibigT*(1.-0.5*iPhi)*epst
     iepsp1 = (epss*ibetas + iepsr*ibetar) / (ibetas + ibetar)
@@ -631,29 +620,29 @@ def cuntz_gleixner(idecdate, iGPP, iRd, iCa, iRa, igtot, sunrise, Vcyt=None,
                 iRbio[i]        = (1.-epss) / (1.-iepsp1[i]) * iRcyt[i]
                 iRnew_starch[i] = (1.-epst) * iRchl[i]
                 iRnew_cyt[i]    = iRchl[i]
-                fphloem1       = (1.-ibigT[i]) * np.abs(iGPP[i]) - (ibetar[i]+ibetas[i]) * iRd[i]
+                fphloem1        = (1.-ibigT[i]) * np.abs(iGPP[i]) - (ibetar[i]+ibetas[i]) * iRd[i]
                 iRphloem[i]     = fphloem1 * iRcyt[i]
-                fphloem2       = ibetap[i] * ibetas[i] * iRd[i]
+                fphloem2        = ibetap[i] * ibetas[i] * iRd[i]
                 iRphloem[i]    += fphloem2 * (1.-epsp) * iRbio[i]
                 iRphloem[i]    /= fphloem1 + fphloem2
                 # Integrate starch
-                fstarch    = ibigT[i] * np.abs(iGPP[i])
-                Vstarchm1  = V0starch if i == 0 else iVstarch[i-1]
-                Rstarchm1  = R0starch if i == 0 else iRstarch[i-1]
+                fstarch     = ibigT[i] * np.abs(iGPP[i])
+                Vstarchm1   = V0starch if i == 0 else iVstarch[i-1]
+                Rstarchm1   = R0starch if i == 0 else iRstarch[i-1]
                 iVstarch[i] = Vstarchm1 + fstarch*isecs[i]
                 iRstarch[i] = (Rstarchm1*Vstarchm1 + fstarch*isecs[i]*iRnew_starch[i]) / iVstarch[i]
             else: # nss night
-                Vstarchm1      = V0starch if i == 0 else iVstarch[i-1]
-                fstarch        = -(Vstarchm1-s_resid)/nsecs[i]
+                Vstarchm1       = V0starch if i == 0 else iVstarch[i-1]
+                fstarch         = -(Vstarchm1-s_resid)/nsecs[i]
                 iVstarch[i]     = Vstarchm1 + fstarch*isecs[i]
-                Rstarchm1      = R0starch if i == 0 else iRstarch[i-1]
+                Rstarchm1       = R0starch if i == 0 else iRstarch[i-1]
                 iRstarch[i]     = Rstarchm1
                 iRnew_starch[i] = Rstarchm1
                 iRchl[i]        = iRnew_starch[i]
-                fs             = np.abs(fstarch)
-                k1             = fs/iVcyt[i]*iRchl[i]
-                k2             = (fs+np.abs(dVcytdt[i])) / iVcyt[i]
-                Rcytm1         = R0cyt if i == 0 else iRcyt[i-1]
+                fs              = np.abs(fstarch)
+                k1              = fs/iVcyt[i]*iRchl[i]
+                k2              = (fs+np.abs(dVcytdt[i])) / iVcyt[i]
+                Rcytm1          = R0cyt if i == 0 else iRcyt[i-1]
                 iRcyt[i]        = k1/k2 + (Rcytm1-k1/k2) * np.exp(-k2*isecs[i])
                 iRpyr[i]        = iRcyt[i]
                 iRbio[i]        = iRpyr[i] if i == 0 else iRbio[i-1]
@@ -674,22 +663,22 @@ def cuntz_gleixner(idecdate, iGPP, iRd, iCa, iRa, igtot, sunrise, Vcyt=None,
                 iRbio[i]        = (1.-epsb)/(1.-iepsg1[i])/(1.-iepsp1[i])*(1.-epss) * iRm[i]
                 iRnew_starch[i] = (1.-epst) * iRchl[i]
                 iRnew_cyt[i]    = iRchl[i]
-                fphloem1       = (1.-ibigT[i]) * np.abs(iGPP[i]) - (ibetar[i]+ibetas[i]) * iRd[i]
+                fphloem1        = (1.-ibigT[i]) * np.abs(iGPP[i]) - (ibetar[i]+ibetas[i]) * iRd[i]
                 iRphloem[i]     = fphloem1 * iRcyt[i]
-                fphloem2       = ibetap[i] * ibetas[i] * iRd[i]
+                fphloem2        = ibetap[i] * ibetas[i] * iRd[i]
                 iRphloem[i]    += fphloem2 * (1.-epsp) * iRbio[i]
                 iRphloem[i]    /= fphloem1 + fphloem2
                 # Integrate starch
-                fstarch    = ibigT[i] * np.abs(iGPP[i])
-                Vstarchm1  = V0starch if i == 0 else iVstarch[i-1]
-                Rstarchm1  = R0starch if i == 0 else iRstarch[i-1]
+                fstarch     = ibigT[i] * np.abs(iGPP[i])
+                Vstarchm1   = V0starch if i == 0 else iVstarch[i-1]
+                Rstarchm1   = R0starch if i == 0 else iRstarch[i-1]
                 iVstarch[i] = Vstarchm1 + fstarch*isecs[i]
                 iRstarch[i] = (Rstarchm1*Vstarchm1 + fstarch*isecs[i]*iRnew_starch[i]) / iVstarch[i]
             else: # ss night
-                Vstarchm1      = V0starch if i == 0 else iVstarch[i-1]
-                fstarch        = -(Vstarchm1-s_resid)/nsecs[i]
+                Vstarchm1       = V0starch if i == 0 else iVstarch[i-1]
+                fstarch         = -(Vstarchm1-s_resid)/nsecs[i]
                 iVstarch[i]     = Vstarchm1 + fstarch*isecs[i]
-                Rstarchm1      = R0starch if i == 0 else iRstarch[i-1]
+                Rstarchm1       = R0starch if i == 0 else iRstarch[i-1]
                 iRstarch[i]     = Rstarchm1
                 iRnew_starch[i] = Rstarchm1
                 iRchl[i]        = Rstarchm1

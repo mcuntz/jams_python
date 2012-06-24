@@ -65,15 +65,14 @@ def heaviside(x, value=1., unitstep=False, zero=False):
         Written, MC, Jan 2012
     """
     if zero and unitstep:
-        print "HEAVISIDE: unitstep and zero mutually exclusive."
-        return False
+        raise ValueError('unitstep and zero mutually exclusive.')
 
     if zero:
         out = np.where(np.ma.array(x) > 0., 1., 0.)
     elif unitstep:
         out = np.where(np.ma.array(x) >= 0., 1., 0.)
     else:
-        out = (np.where(np.ma.array(x) > 0., 1., 0.) - np.where(np.ma.array(x) < 0., 1., 0.) + 1.) /2.
+        out = (np.where(np.ma.array(x) > 0., 1., 0.) - np.where(np.ma.array(x) < 0., 1., 0.) + 1.) * 0.5
     out *= value
     return out
 
