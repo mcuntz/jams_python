@@ -32,6 +32,7 @@
     gap_filling            Gapfills eddy flux data (CO2, LE, H) 
     heaviside              Heaviside (or unit step) operator
     int2roman              Integer to roman numeral conversion
+    interpol               One-dimensional linear interpolation on first dimension
     kernel_regression      Multi-dimensional non-parametric regression
     kernel_regression_h    Optimal bandwidth for kernel regression
     lhs                    Latin Hypercube Sampling of any distribution without correlations
@@ -91,6 +92,7 @@
     ---------------
     gapfill                Gapfill Eddy flux data
     gap_filling            Gapfills flux data (CO2, LE, H)
+    interpol               One-dimensional linear interpolation on first dimension
     kernel_regression      Multi-dimensional non-parametric regression
     kernel_regression_h    Optimal bandwidth for kernel regression
     mad                    Median absolute deviation test
@@ -187,7 +189,7 @@
               MC, Mar 2012 - gapfill, nee2gpp
               MC, May 2012 - astr, div, sobol_index, pi, roman, zacharias, saltelli
               MZ, Jun 2012 - writenetcdf
-              MC, Jun 2012 - roman -> romanliterals
+              MC, Jun 2012 - roman -> romanliterals, interpol
 """
 # Routines provided
 from abc2plot          import *
@@ -208,16 +210,17 @@ from division          import *
 from esat              import *
 from fread             import *
 from gapfill           import *
-from nee2gpp           import *
 try:
     from gap_filling   import *
 except ImportError:
     pass
 from heaviside         import *
+from interpol          import *
 from kernel_regression import kernel_regression, kernel_regression_h
 from lhs               import *
 from lif               import *
 from mad               import *
+from nee2gpp           import *
 try:
     from outlier       import *
 except ImportError:
