@@ -71,8 +71,8 @@ def kernel_regression(x, y, h=None, silverman=False, xout=None):
         >>> ss = np.shape(x)
         >>> nn = 5
         >>> xx = np.empty((nn,ss[1]))
-        >>> xx[:,0] = np.min(x[:,0]) + (np.max(x[:,0])-np.min(x[:,0])) * np.arange(nn,dtype=np.float)/np.float(nn)
-        >>> xx[:,1] = np.min(x[:,1]) + (np.max(x[:,1])-np.min(x[:,1])) * np.arange(nn,dtype=np.float)/np.float(nn)
+        >>> xx[:,0] = np.amin(x[:,0]) + (np.amax(x[:,0])-np.amin(x[:,0])) * np.arange(nn,dtype=np.float)/np.float(nn)
+        >>> xx[:,1] = np.amin(x[:,1]) + (np.amax(x[:,1])-np.amin(x[:,1])) * np.arange(nn,dtype=np.float)/np.float(nn)
         >>> print kernel_regression(x,y,h,xout=xx)
         [ 0.60548523  0.55523546  0.50952915  0.4911906   0.55332452]
 
@@ -263,6 +263,6 @@ if __name__ == '__main__':
     # ss = np.shape(x)
     # nn = 5
     # xx = np.empty((nn,ss[1]))
-    # xx[:,0] = np.min(x[:,0]) + (np.max(x[:,0])-np.min(x[:,0])) * np.arange(nn,dtype=np.float)/np.float(nn)
-    # xx[:,1] = np.min(x[:,1]) + (np.max(x[:,1])-np.min(x[:,1])) * np.arange(nn,dtype=np.float)/np.float(nn)
+    # xx[:,0] = np.amin(x[:,0]) + (np.amax(x[:,0])-np.amin(x[:,0])) * np.arange(nn,dtype=np.float)/np.float(nn)
+    # xx[:,1] = np.amin(x[:,1]) + (np.amax(x[:,1])-np.amin(x[:,1])) * np.arange(nn,dtype=np.float)/np.float(nn)
     # print kernel_regression(x,y,h,xout=xx)

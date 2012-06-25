@@ -2,10 +2,10 @@
 import numpy as np
 import netcdftime as nt
 
-def dec2date(indata, calendar='standard', units = False,
-             excelerr = True, fulldate = None, yr = False,
-             mo = False, dy = False, hr = False, mi = False,
-             sc = False, ascii = False, eng = False):
+def dec2date(indata, calendar='standard', refdate=None, units=None,
+             excelerr=True, fulldate=None, yr=False,
+             mo=False, dy=False, hr=False, mi=False,
+             sc=False, ascii=False, eng=False):
     """
         Converts numpy arrays with decimal date into
         numpy arrays with calendar date. Supported time formats
@@ -21,10 +21,10 @@ def dec2date(indata, calendar='standard', units = False,
 
         Definition
         ----------
-        def dec2date(indata, calendar = 'standard', units = False,
-                     excelerr = True, fulldate = True, yr = False,
-                     mo = False, dy = False, hr = False, mi = False,
-                     sc = False, ascii = False, eng = False):
+        def dec2date(indata, calendar='standard', refdate=False,
+                     excelerr=True, fulldate=True, yr=False,
+                     mo=False, dy=False, hr=False, mi=False,
+                     sc=False, ascii=False, eng=False):
 
 
         Input
@@ -45,7 +45,7 @@ def dec2date(indata, calendar='standard', units = False,
                            05.03.1583 00:00:00 and gregorian
                            calendar from 15.03.1583 00:00:00
                            until now. Missing 10 days don't
-                           exsist.
+                           exist.
            'julian'    =   Input date is julian format.
                            Input is in julian calendar from
                            01.01.-4712 12:00:00 (BC) until now.
@@ -55,22 +55,22 @@ def dec2date(indata, calendar='standard', units = False,
                            01.01.0001 00:00:00 until now.
            'excel1900' =   Input date is excel 1900 format.
                            Input date is excel date with its
-                           units at 01.01.1900 00:00:00 until
+                           refdate at 01.01.1900 00:00:00 until
                            now.
            'excel1904' =   Input date is excel 1904 (lotus) format.
                            Input date is excel date with its
-                           units at 01.01.1904 00:00:00 until now.
+                           refdate at 01.01.1904 00:00:00 until now.
            '365_day', 'noleap'
                        =   Input date is 365 days format. Input date
                            consists of common years only (No leap years)
-                           with its units at 01.01.0001 00:00:00 until now.
+                           with its refdate at 01.01.0001 00:00:00 until now.
            '366_day', 'all_leap'
                        =   Input date is 366 days format. Input date
                            consists of leap years only (No common years)
-                           with its units at 01.01.0001 00:00:00 until now.
+                           with its refdate at 01.01.0001 00:00:00 until now.
            '360_day'   =   Input date is 360 days format.  Input
                            date consists of years with only 360 days
-                           (30 days per month)with its units at
+                           (30 days per month) with its refdate at
                            01.01.0001 00:00:00 until now.
            'decimal'    =  Input is decimal year.
            'decimal360' =  Input is decimal year with a year of 360 days, i.e. 12 month with 30 days each.
@@ -78,13 +78,18 @@ def dec2date(indata, calendar='standard', units = False,
 
         Optional Arguments
         ------------------
-        units    -> Time units can be set by user. Input must be a
+        refdate   -> Reference date for 'days since refdate' can be set by user. Input must be a
                      string in the format 'yyyy-mm-dd hh:mm:ss'.
-                     Default values are set automatically.
+                     Default values for different calendars are set automatically.
+        units     -> Units of the the time stamp can be given. This can only be the following two:
+                     'day as %Y%m%d.%f', or
+                     'days since refdate', with refdate in the format 'yyyy-mm-dd hh:mm:ss'.
+                     If units='day as %Y%m%d.%f' then calendar is ignored and the dates will be returned
+                     assuming that %f is fractional date from 00:00:00 h.
         excelerr  -> In Excel the year 1900 is normally considered
                      as leap year, which is wrong. By default, this
                      error is taken into account (excelerr = True).
-                     For excelerr = False, 1900 is considered as
+                     For excelerr = False, 1900 is considered as a
                      common year.
 
 
@@ -191,11 +196,19 @@ def dec2date(indata, calendar='standard', units = False,
         ['06.01.2004 12:30:15' '28.05.1954 16:25:10' '14.08.1914 10:40:55'
          '02.03.1904 00:00:00' '01.03.1904 00:00:00' '29.02.1904 00:00:00'
          '01.01.1904 00:00:00']
-        >>> asciidate = dec2date(f, calendar='excel1904', ascii=True, units='1910-01-01 00:00:00')
+        >>> asciidate = dec2date(f, calendar='excel1904', ascii=True, refdate='1910-01-01 00:00:00')
         >>> print asciidate
         ['06.01.2010 12:30:15' '28.05.1960 16:25:10' '14.08.1920 10:40:55'
          '03.03.1910 00:00:00' '02.03.1910 00:00:00' '01.03.1910 00:00:00'
          '01.01.1910 00:00:00']
+        >>> print dec2date(f, calendar='excel1904', ascii=True, units='days since 1910-01-01 00:00:00')
+        ['06.01.2010 12:30:15' '28.05.1960 16:25:10' '14.08.1920 10:40:55'
+         '03.03.1910 00:00:00' '02.03.1910 00:00:00' '01.03.1910 00:00:00'
+         '01.01.1910 00:00:00']
+        >>> print dec2date(f, calendar='excel1904', ascii=True, units='days since 1910-01-02 00:00:00')
+        ['07.01.2010 12:30:15' '29.05.1960 16:25:10' '15.08.1920 10:40:55'
+         '04.03.1910 00:00:00' '03.03.1910 00:00:00' '02.03.1910 00:00:00'
+         '02.01.1910 00:00:00']
 
         #calendar = '365_day'
         >>> g = np.array([719644.52101, 359822.52101, 179911.93102, 0.0])
@@ -240,6 +253,18 @@ def dec2date(indata, calendar='standard', units = False,
                ['02.03.1910 03:44:55', '02.03.1910 03:44:55']], 
               dtype='|S19')
 
+        >>> absolut = np.array([20070102.0034722, 20070102.0069444, 20070102.0104167, \
+                                20070102.0138889, 20070102.0173611, 20070102.0208333, 20070102.0243056])
+        >>> print dec2date(absolut, units='day as %Y%m%d.%f', ascii=True)
+        ['02.01.2007 00:05:00' '02.01.2007 00:10:00' '02.01.2007 00:15:00'
+         '02.01.2007 00:20:00' '02.01.2007 00:25:00' '02.01.2007 00:30:00'
+         '02.01.2007 00:35:00']
+        >>> absolut = [20070102.0034722, 20070102.0069444, 20070102.0104167, \
+                       20070102.0138889, 20070102.0173611, 20070102.0208333, 20070102.0243056]
+        >>> print dec2date(absolut, units='day as %Y%m%d.%f', ascii=True)
+        ['02.01.2007 00:05:00', '02.01.2007 00:10:00', '02.01.2007 00:15:00', '02.01.2007 00:20:00', '02.01.2007 00:25:00', '02.01.2007 00:30:00', '02.01.2007 00:35:00']
+
+
         History
         -------
         Written  AP, Jun 2010
@@ -247,6 +272,9 @@ def dec2date(indata, calendar='standard', units = False,
                               - Default: fulldate=True
                               - Changed checks for easier extension
                               - decimal, decimal360
+                 MC, Jun 2012 - former units keyword is now called refdate
+                              - units has now original meaning as in netcdftime
+                              - included units='day as %Y%m%d.%f'
     """
 
     #
@@ -263,8 +291,9 @@ def dec2date(indata, calendar='standard', units = False,
                          " arrays here. Please download a newer one.")
     calendar = calendar.lower()
     if (calendar not in calendars):
-        raise ValueError("dec2date error: Wrong calendar!"
-                    " Choose: "+''.join([i+' ' for i in calendars]))
+        raise ValueError("Wrong calendar! Choose: "+''.join([i+' ' for i in calendars]))
+    if (refdate!= None) & (units!=None):
+        raise ValueError("either refdate or units can be given.")
     #
     # Default
     if np.sum(np.array([yr,mo,dy,hr,mi,sc])) >= 1:
@@ -301,111 +330,167 @@ def dec2date(indata, calendar='standard', units = False,
     indata  = indata.flatten()
 
     #
-    # depending on chosen calendar and optional set of the time units
+    # depending on chosen calendar and optional set of the time refdate
     # calendar date is calculated
-    if   (calendar == 'standard') or (calendar == 'gregorian'):
-        if units == False: units = '0001-01-01 12:00:00'
-        timeobj = nt.num2date(indata-1721424, 'days since %s' % (units), calendar='gregorian')
-    elif calendar == 'julian':
-        if units == False: units = '0001-01-01 12:00:00'
-        timeobj = nt.num2date(indata-1721424, 'days since %s' % (units), calendar='julian')
-    elif calendar == 'proleptic_gregorian':
-        if units == False: units = '0001-01-00 00:00:00'
-        timeobj = nt.num2date(indata, 'days since %s' % (units), calendar = 'proleptic_gregorian')
-    elif calendar == 'excel1900':
-        if units == False: units = '1900-01-00 00:00:00'
-        if excelerr:
-            timeobj = nt.num2date(indata, 'days since %s' % (units), calendar = 'julian')
-        else:
-            timeobj = nt.num2date(indata, 'days since %s' % (units), calendar = 'gregorian')
-    elif calendar == 'excel1904':
-        if units == False: units = '1904-01-01 00:00:00'
-        timeobj = nt.num2date(indata, 'days since %s' % (units), calendar = 'gregorian')
-    elif (calendar == '365_day') or (calendar == 'noleap'):
-        if units == False: units = '0001-01-01 00:00:00'
-        timeobj = nt.num2date(indata, 'days since %s' % (units), calendar = '365_day')
-    elif (calendar == '366_day') or (calendar == 'all_leap'):
-        if units == False: units = '0001-01-01 00:00:00'
-        timeobj = nt.num2date(indata, 'days since %s' % (units), calendar = '366_day')
-    elif calendar == '360_day':
-        if units == False: units = '0001-01-01 00:00:00'
-        timeobj = nt.num2date(indata, 'days since %s' % (units), calendar = '360_day')
-    elif calendar == 'decimal':
-        fyear = np.trunc(indata)
-        year  = np.array(fyear, dtype=np.int)
-        leap  = (((year%4)==0) & ((year%100)!=0)) | ((year%400)==0)
-        fleap = np.array(leap, dtype=np.float)
-	fract_date = indata-fyear
-        days_year  = 365.
-        # date in hours
-	fhoy  = fract_date*(days_year+fleap)*24.
-        fihoy = np.trunc(fhoy)
-	ihoy  = np.array(fihoy, dtype=np.int)
-        # minutes
-        fmoy    = (fhoy-fihoy)*60.
-	fminute = np.trunc(fmoy)
-	minute  = np.array(fminute, dtype=np.int)
-        # seconds
-        second = np.array(np.trunc((fmoy-fminute)*60.), dtype=np.int)
-        # months
-	fdoy  = (fihoy/24.)+1.
-        fidoy = np.trunc(fdoy)
-	idoy  = np.array(fidoy, dtype=np.int)
-        month = np.zeros(insize, dtype=np.int)
-        diy   = np.array([ [-9,0, 31, 59, 90,120,151,181,212,243,273,304,334,365], \
-                           [-9,0, 31, 60, 91,121,152,182,213,244,274,305,335,366] ])
-        for i in xrange(insize):
-            ii = np.squeeze(np.where(idoy[i] > np.squeeze(diy[leap[i],:])))
-            month[i] = ii[-1]
-        # days
-        fday = np.zeros(insize, dtype=np.float)
-        for i in xrange(insize):
-            fday[i] = np.trunc(fdoy[i] - np.float(diy[leap[i],month[i]]))
-	day = np.array(fday, dtype=np.int)
-        # hours
-	hour = ihoy % 24
-    elif calendar == 'decimal360':
-        fyear = np.trunc(indata)
-        year  = np.array(fyear, dtype=np.int)
-	fract_date = indata-fyear
-        days_year  = 360.
-        # date in hours
-	fhoy  = fract_date*days_year*24.
-        fihoy = np.trunc(fhoy)
-	ihoy  = np.array(fihoy, dtype=np.int)
-        # minutes
-        fmoy    = (fhoy-fihoy)*60.
-	fminute = np.trunc(fmoy)
-	minute  = np.array(fminute, dtype=np.int)
-        # seconds
-        second = np.array(np.trunc((fmoy-fminute)*60.), dtype=np.int)
-        # months
-	fdoy  = (fihoy/24.)+1.
-        fidoy = np.trunc(fdoy)
-	idoy  = np.array(fidoy, dtype=np.int)
-        month = np.zeros(insize, dtype=np.int)
-        diy   = np.array([ -9, 0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330, 360 ])
-        for i in xrange(insize):
-            ii = np.squeeze(np.where(idoy[i] > diy))
-            month[i] = ii[-1]
-        # days
-        fday = np.zeros(insize, dtype=np.float)
-        for i in xrange(insize):
-            fday[i] = np.trunc(fdoy[i] - np.float(diy[month[i]]))
-	day = np.array(fday, dtype=np.int)
-        # hours
-	hour = ihoy % 24
+    if units=='day as %Y%m%d.%f':
+        fdy    = indata % 1.     # day fraction
+        indata = indata - fdy
+        day    = indata % 100.   # day
+        indata = indata - day
+        tmp    = indata % 10000.
+        month  = tmp / 100.     # month
+        indata = indata - tmp
+        year   = indata / 10000. # year
+        secs   = np.rint(fdy * 86400.)
+        hour   = np.floor(secs/3600.)
+        secs   = secs - 3600.*hour
+        minute = np.floor(secs/60.)
+        second = np.rint(secs - 60.*minute)
     else:
-        raise ValueError("dec2date error: calendar not implemented; should have been catched before.")
+        if   (calendar == 'standard') or (calendar == 'gregorian'):
+            if units != None:
+                unit = units
+            elif refdate != None:
+                #unit = 'days since %s' % (refdate)
+                unit = 'days since {0:s}'.format(refdate)
+            else:
+                unit = 'days since 0001-01-01 12:00:00'
+            timeobj = nt.num2date(indata-1721424, unit, calendar='gregorian')
+        elif calendar == 'julian':
+            if units != None:
+                unit = units
+            elif refdate != None:
+                unit = 'days since {0:s}'.format(refdate)
+            else:
+                unit = 'days since 0001-01-01 12:00:00'
+            timeobj = nt.num2date(indata-1721424, unit, calendar='julian')
+        elif calendar == 'proleptic_gregorian':
+            if units != None:
+                unit = units
+            elif refdate != None:
+                unit = 'days since {0:s}'.format(refdate)
+            else:
+                unit = 'days since 0001-01-00 00:00:00'
+            timeobj = nt.num2date(indata, unit, calendar = 'proleptic_gregorian')
+        elif calendar == 'excel1900':
+            if units != None:
+                unit = units
+            elif refdate != None:
+                unit = 'days since {0:s}'.format(refdate)
+            else:
+                unit = 'days since 1900-01-00 00:00:00'
+            if excelerr:
+                timeobj = nt.num2date(indata, unit, calendar = 'julian')
+            else:
+                timeobj = nt.num2date(indata, unit, calendar = 'gregorian')
+        elif calendar == 'excel1904':
+            if units != None:
+                unit = units
+            elif refdate != None:
+                unit = 'days since {0:s}'.format(refdate)
+            else:
+                unit = 'days since 1904-01-01 00:00:00'
+            timeobj = nt.num2date(indata, unit, calendar = 'gregorian')
+        elif (calendar == '365_day') or (calendar == 'noleap'):
+            if units != None:
+                unit = units
+            elif refdate != None:
+                unit = 'days since {0:s}'.format(refdate)
+            else:
+                unit = 'days since 0001-01-01 00:00:00'
+            timeobj = nt.num2date(indata, unit, calendar = '365_day')
+        elif (calendar == '366_day') or (calendar == 'all_leap'):
+            if units != None:
+                unit = units
+            elif refdate != None:
+                unit = 'days since {0:s}'.format(refdate)
+            else:
+                unit = 'days since 0001-01-01 00:00:00'
+            timeobj = nt.num2date(indata, unit, calendar = '366_day')
+        elif calendar == '360_day':
+            if units != None:
+                unit = units
+            elif refdate != None:
+                unit = 'days since {0:s}'.format(refdate)
+            else:
+                unit = 'days since 0001-01-01 00:00:00'
+            timeobj = nt.num2date(indata, unit, calendar = '360_day')
+        elif calendar == 'decimal':
+            fyear = np.trunc(indata)
+            year  = np.array(fyear, dtype=np.int)
+            leap  = (((year%4)==0) & ((year%100)!=0)) | ((year%400)==0)
+            fleap = np.array(leap, dtype=np.float)
+            fract_date = indata-fyear
+            days_year  = 365.
+            # date in hours
+            fhoy  = fract_date*(days_year+fleap)*24.
+            fihoy = np.trunc(fhoy)
+            ihoy  = np.array(fihoy, dtype=np.int)
+            # minutes
+            fmoy    = (fhoy-fihoy)*60.
+            fminute = np.trunc(fmoy)
+            minute  = np.array(fminute, dtype=np.int)
+            # seconds
+            second = np.array(np.trunc((fmoy-fminute)*60.), dtype=np.int)
+            # months
+            fdoy  = (fihoy/24.)+1.
+            fidoy = np.trunc(fdoy)
+            idoy  = np.array(fidoy, dtype=np.int)
+            month = np.zeros(insize, dtype=np.int)
+            diy   = np.array([ [-9,0, 31, 59, 90,120,151,181,212,243,273,304,334,365], \
+                               [-9,0, 31, 60, 91,121,152,182,213,244,274,305,335,366] ])
+            for i in xrange(insize):
+                ii = np.squeeze(np.where(idoy[i] > np.squeeze(diy[leap[i],:])))
+                month[i] = ii[-1]
+            # days
+            fday = np.zeros(insize, dtype=np.float)
+            for i in xrange(insize):
+                fday[i] = np.trunc(fdoy[i] - np.float(diy[leap[i],month[i]]))
+            day = np.array(fday, dtype=np.int)
+            # hours
+            hour = ihoy % 24
+        elif calendar == 'decimal360':
+            fyear = np.trunc(indata)
+            year  = np.array(fyear, dtype=np.int)
+            fract_date = indata-fyear
+            days_year  = 360.
+            # date in hours
+            fhoy  = fract_date*days_year*24.
+            fihoy = np.trunc(fhoy)
+            ihoy  = np.array(fihoy, dtype=np.int)
+            # minutes
+            fmoy    = (fhoy-fihoy)*60.
+            fminute = np.trunc(fmoy)
+            minute  = np.array(fminute, dtype=np.int)
+            # seconds
+            second = np.array(np.trunc((fmoy-fminute)*60.), dtype=np.int)
+            # months
+            fdoy  = (fihoy/24.)+1.
+            fidoy = np.trunc(fdoy)
+            idoy  = np.array(fidoy, dtype=np.int)
+            month = np.zeros(insize, dtype=np.int)
+            diy   = np.array([ -9, 0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330, 360 ])
+            for i in xrange(insize):
+                ii = np.squeeze(np.where(idoy[i] > diy))
+                month[i] = ii[-1]
+            # days
+            fday = np.zeros(insize, dtype=np.float)
+            for i in xrange(insize):
+                fday[i] = np.trunc(fdoy[i] - np.float(diy[month[i]]))
+            day = np.array(fday, dtype=np.int)
+            # hours
+            hour = ihoy % 24
+        else:
+            raise ValueError("dec2date error: calendar not implemented; should have been catched before.")
 
-    if (calendar not in ['decimal','decimal360']):
-        timeobjfl = timeobj.flatten()
-        year   = np.array([timeobjfl[i].year for i in xrange(insize)], dtype=np.int)
-        month  = np.array([timeobjfl[i].month for i in xrange(insize)], dtype=np.int)
-        day    = np.array([timeobjfl[i].day for i in xrange(insize)], dtype=np.int)
-        hour   = np.array([timeobjfl[i].hour for i in xrange(insize)], dtype=np.int)
-        minute = np.array([timeobjfl[i].minute for i in xrange(insize)], dtype=np.int)
-        second = np.array([timeobjfl[i].second for i in xrange(insize)], dtype=np.int)
+        if (calendar not in ['decimal','decimal360']):
+            timeobjfl = timeobj.flatten()
+            year   = np.array([timeobjfl[i].year for i in xrange(insize)], dtype=np.int)
+            month  = np.array([timeobjfl[i].month for i in xrange(insize)], dtype=np.int)
+            day    = np.array([timeobjfl[i].day for i in xrange(insize)], dtype=np.int)
+            hour   = np.array([timeobjfl[i].hour for i in xrange(insize)], dtype=np.int)
+            minute = np.array([timeobjfl[i].minute for i in xrange(insize)], dtype=np.int)
+            second = np.array([timeobjfl[i].second for i in xrange(insize)], dtype=np.int)
 
     # Ascii output
     if ascii:
