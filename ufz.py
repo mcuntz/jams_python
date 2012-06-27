@@ -43,6 +43,7 @@
     pack                   Similar to Fortran pack function with mask
     pi                     Parameter importance index PI or alternatively B index calculation
     position               Position arrays of subplots to be used with add_axes
+    readhdf5               Reads variables or information from hdf5 file
     readnetcdf             Reads variables or information from netcdf file
     roman2int              Roman numeral to integer conversion
     saltelli               Parameter sampling for Sobol indices calculation
@@ -157,6 +158,7 @@
 
     Special files
     -------------
+    readhdf5               Reads variables or information from hdf5 file
     readnetcdf             Reads variables or information from netcdf file
     writenetcdf            Write netCDF4 file
 
@@ -228,6 +230,10 @@ except ImportError:
 from pack              import *
 from pi                import *
 from position          import *
+try:
+    from readhdf5      import *
+except ImportError:
+    print "No hdf5 support in UFZ library. Disabled functions: readhdf5."
 try:
     from readnetcdf    import *
 except ImportError:
