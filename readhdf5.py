@@ -2,26 +2,26 @@
 import numpy as np
 import h5py as hdf
 
-def readhdf5(fName, var='', reform=False, squeeze=False, variables=False, 
-            attributes=False, fileattributes=False,  sort=False, quiet=False):      
+def readhdf5(fName, var='', reform=False, squeeze=False, variables=False,
+            attributes=False, fileattributes=False,  sort=False):
     """
         Get variables or prints information of hdf5 file.
 
-        
+
         Definition
         ----------
-        def readhdf5(fName, var='', reform=False, squeeze=False, variables=False, 
-                     attributes=False, fileattributes=False,  sort=False, quiet=False):   
+        def readhdf5(fName, var='', reform=False, squeeze=False, variables=False,
+                     attributes=False, fileattributes=False,  sort=False):
 
         Input
         -----
-        fName              hdf5 file name
+        fName            hdf5 file name
 
 
         Optional Input Parameters
         -------------------------
         var              name of variable in hdf5 file
-                       
+
 
         Options
         -------
@@ -32,11 +32,12 @@ def readhdf5(fName, var='', reform=False, squeeze=False, variables=False,
         fileattributes   get dictionary of all attributes of the file
         sort             sort variable names.
         quiet            quietly return None if error occurs
-                            
+
+
         Output
         ------
-        Either float array of variable/code or information lists
-        such as list of all variables in hdf5 file.
+        Either variable array or information such as list of all variables in hdf5 file.
+
 
         Examples
         --------
@@ -64,15 +65,13 @@ def readhdf5(fName, var='', reform=False, squeeze=False, variables=False,
 
         History
         -------
-        Written, Matthias Zink, June 2012
+        Written, MZ, Jun 2012
         """
     # Open hdf5 file
     try:
-      f = hdf.File(fName, 'r')
+        f = hdf.File(fName, 'r')
     except IOError:
-      if not quiet:
-        print "READHDF5: Cannot open file %s for reading." % fName
-      return None
+        raise IOError('Cannot open file: '+fName)
     # Get attributes of the file
     if fileattributes:
         attrs = dict()
@@ -99,10 +98,8 @@ def readhdf5(fName, var='', reform=False, squeeze=False, variables=False,
     # Get attributes of variables
     if attributes:
       if var not in vars:
-        if not quiet:
-          print 'READNETHDF5: variable %s not in file %s.' % (var, fName)
           f.close()
-          return None
+          raise ValueError('variable '+var+' not in file '+fname)
       attrs = dict()
       attr = f[var].attrs.keys()
       for a in attr:
@@ -111,28 +108,23 @@ def readhdf5(fName, var='', reform=False, squeeze=False, variables=False,
       return attrs
     # Get variable
     if var == '':
-      if not quiet:
-        print 'READNETHDF5: to read variable, variable name or code has to be given.'
         f.close()
-        return None
+        raise ValueError('Variable name has to be given.')
     if var != '':
       if var not in vars:
-        if not quiet:
-          print 'READNETHDF5: variable %s not in file %s.' % (var, fName)
           f.close()
-          return None
+          raise ValueError('variable '+var+' not in file '+fname)
       try:
           arr = f[var][:]
       except IOError:
-          print "READNETHDF5: Cannot read variable %s in file %s for ." % (var, fName)
-          return None
+          f.close()
+          raise IOError('Cannot read variable '+var+' in file '+fname)
       if reform or squeeze:
         f.close()
         return arr.squeeze()
       else:
         f.close()
         return arr
-# end readhdf5
 
 
 if __name__ == '__main__':
@@ -140,7 +132,7 @@ if __name__ == '__main__':
     doctest.testmod()
     # var = readhdf5('test_readhdf5.hdf5', variables=True)
     # print var
-    
+
     # varAtt = readhdf5('test_readhdf5.hdf5', var='EM_BB', attributes=True)
     # print varAtt
     # #{u'CAL_SLOPE': 999.0, u'PRODUCT': 'EM_BB', u'PRODUCT_ID': 999, u'CAL_OFFSET': 999.0, u'N_LINES': 651, u'N_COLS': 1701, u'SCALING_FACTOR': 10000.0, u'NB_BYTES': 2, u'OFFSET': 0.0, u'UNITS': 'Dimensionless', u'MISSING_VALUE': -8000, u'CLASS': 'Data'}
@@ -155,4 +147,3 @@ if __name__ == '__main__':
     # #        [-8000, -8000, -8000, ..., -8000, -8000, -8000],
     # #       [-8000, -8000, -8000, ..., -8000, -8000, -8000],
     # #       [-8000, -8000, -8000, ..., -8000, -8000, -8000]], dtype=int16)
-

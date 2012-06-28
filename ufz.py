@@ -192,6 +192,7 @@
               MC, May 2012 - astr, div, sobol_index, pi, roman, zacharias, saltelli
               MZ, Jun 2012 - writenetcdf
               MC, Jun 2012 - roman -> romanliterals, interpol
+              MZ, Jun 2012 - readhdf5
 """
 # Routines provided
 from abc2plot          import *

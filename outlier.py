@@ -135,13 +135,12 @@ def outlier(y,alpha=0.01,k=-1,quiet=True):
     if k > 1:
         for i in xrange(k-1):
             # remove the highest value from above and redo the procedure
-            mm1    = mm
+            mm1 = mm
             # Cummulative way to calculate mean and stddev
-            mm     = (mm*(nn-i) - y[thisii])/(nn-1-i)
-            ep     = ep + mm1*(nn-i) - y[thisii] - mm*(nn-1-i)
-            tt     = tt - y[thisii]*y[thisii] + (nn-i)*mm1*mm1 - (nn-1-i)*mm*mm
+            mm  = (mm*(nn-i) - y[thisii])/(nn-1-i)
+            ep  = ep + mm1*(nn-i) - y[thisii] - mm*(nn-1-i)
+            tt  = tt - y[thisii]*y[thisii] + (nn-i)*mm1*mm1 - (nn-1-i)*mm*mm
             if ((tt-ep/(nn-1-i)) < 0.):
-                #pdb.set_trace()
                 break
             ss     = np.sqrt((tt-ep/(nn-1-i))/(nn-1-i-1))
             adev   = np.ma.masked_array(np.ma.abs(y-mm), mask=np.ma.mask_or(adev.mask,y==y[thisii]))
@@ -150,7 +149,7 @@ def outlier(y,alpha=0.01,k=-1,quiet=True):
             outlrs[i+1]   = y[thisii]
             R  = (np.abs(y[thisii]-mm)) / ss
             if R > lamb[i+1]:
-                out  = i+2
+                out = i+2
 
     
     if out > 0:

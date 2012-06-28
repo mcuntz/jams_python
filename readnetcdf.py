@@ -121,7 +121,7 @@ def readnetcdf(file, var='', code=-1, reform=False, squeeze=False,
     # Variables
     vars = f.variables.keys()
     nvars = len(vars)
-    # Sort and get sort indeces
+    # Sort and get sort indices
     if sort:
         svars = sorted(vars)
         ivars = list()

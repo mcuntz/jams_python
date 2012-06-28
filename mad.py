@@ -93,6 +93,7 @@ def mad(datin, z=7, deriv=0):
         Written,  MC, Nov 2011
         Modified, MC, May 2012 - act on axis=0 of array
                   MC, Jun 2012 - axis=0 did not always work: spread md and MAD to input dimensions
+                  MC, Jun 2012 - use np.diff, remove spreads
     """
     sn = list(np.shape(datin))
     n  = sn[0]
@@ -103,24 +104,18 @@ def mad(datin, z=7, deriv=0):
         m      = n-1
         sm     = sn
         sm[0]  = m
-        dd     = np.ravel(datin)
-        d      = np.reshape(dd[1:]-dd[:-1], sm)
+        d      = np.diff(datin, axis=0)
     elif deriv == 2:
         m      = n-2
         sm     = sn
         sm[0]  = m
-        dd     = np.ravel(datin)
-        d      = np.reshape((dd[1:-1]-dd[:-2]) - (dd[2:]-dd[1:-1]), sm)
+        d      = np.diff(datin, n=2, axis=0)
     else:
-        print 'Unimplemented option in mad'
-        import sys
-        sys.exit(1)
+        raise ValueError('Unimplemented option.')
     # Median
     md     = np.ma.median(d, axis=0)
-    md     = np.ma.array([md for i in xrange(m)])
     # Median absolute deviation
     MAD    = np.ma.median(np.ma.abs(d-md), axis=0)
-    MAD    = np.ma.array([MAD for i in xrange(m)])
     # Range around median
     thresh = MAD * (z/0.6745)
     # True where outside z-range
