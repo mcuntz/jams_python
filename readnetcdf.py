@@ -4,7 +4,7 @@ import numpy as np
 
 def readnetcdf(file, var='', code=-1, reform=False, squeeze=False,
                variables=False, codes=False, units=False, longnames=False,
-               attributes=False, sort=False, quiet=False):
+               attributes=False, sort=False):
     """
         Gets variables or prints information of netcdf file.
 
@@ -41,7 +41,6 @@ def readnetcdf(file, var='', code=-1, reform=False, squeeze=False,
         attributes   get dictionary of all attributes of specific variable
         sort         sort variable names. Codes, units and longnames will be
                      sorted accoringly so that indeces still match.
-        quiet        quietly return None if error occurs
                             
 
         Output
@@ -101,23 +100,18 @@ def readnetcdf(file, var='', code=-1, reform=False, squeeze=False,
         array([ 128.,  129.])
         >>> readnetcdf('readnetcdf_test.nc',codes=True,sort=True)
         [128.0, 129.0, -1.0, -1.0]
-        >>> readnetcdf('readnetcdf_test.nc',code=127)
-        READNETCDF: code 127 not in file readnetcdf_test.nc.
-        >>> readnetcdf('readnetcdf_test.nc')
-        READNETCDF: to read variable, variable name or code has to be given.
 
 
         History
         -------
-        Written, MC, Jul. 2009
+        Written,  MC, Jul 2009
+        Modified, MC, Jun 2012 - removed quiet
         """
     # Open netcdf file
     try:
         f = nc.Dataset(file, 'r')
     except IOError:
-        if not quiet:
-            print "READNETCDF: Cannot open file %s for reading." % file
-        return None
+        raise IOError('Cannot open file for reading.'+file)
     # Variables
     vars = f.variables.keys()
     nvars = len(vars)
@@ -195,10 +189,8 @@ def readnetcdf(file, var='', code=-1, reform=False, squeeze=False,
     # Get attributes
     if attributes:
         if var not in vars:
-            if not quiet:
-                print 'READNETCDF: variable %s not in file %s.' % (var, file)
             f.close()
-            return None
+            raise ValueError('Variable '+var+' not in file '+file)
         attrs = dict()
         attr = f.variables[var].ncattrs()
         for a in attr:
@@ -207,16 +199,12 @@ def readnetcdf(file, var='', code=-1, reform=False, squeeze=False,
         return attrs
     # Get variable
     if var == '' and code==-1:
-        if not quiet:
-            print 'READNETCDF: to read variable, variable name or code has to be given.'
         f.close()
-        return None
+        raise ValueError('Variable name or code has to be given')
     if var != '':
         if var not in vars:
-            if not quiet:
-                print 'READNETCDF: variable %s not in file %s.' % (var, file)
             f.close()
-            return None
+            raise ValueError('Variable '+var+' not in file '+file)
         arr = f.variables[var][:]
         if reform or squeeze:
             f.close()
@@ -226,10 +214,8 @@ def readnetcdf(file, var='', code=-1, reform=False, squeeze=False,
             return arr
     if code != -1:
         if code not in cods:
-            if not quiet:
-                print 'READNETCDF: code %s not in file %s.' % (code, file)
             f.close()
-            return None
+            raise ValueError('Code '+str(code)+' not in file '+file)
         arr = f.variables[np.compress(cods==code, vars)[0]][:]
         if reform or squeeze:
             f.close()
