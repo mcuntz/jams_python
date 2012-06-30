@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import numpy as np
+import const # from ufz
 
 def around(num, powten, ceil=False, floor=False):
     """
@@ -79,11 +80,12 @@ def around(num, powten, ceil=False, floor=False):
         raise ValueError('powten must be scalar or have array size of input numbers.')
     #
     # Shift decimal point
-    #out = num * 10.**(-ipowten)
-    out = num * np.exp(-ipowten*np.log(10.))
+    # Does not work, too imprecise: out = num * np.exp(-ipowten*np.log(10.))
+    out = num * 10.**(-ipowten)
     # Round/ceil/floor
     #eps = np.MachAr().eps
-    eps = np.finfo(np.float).eps
+    #eps = np.finfo(np.float).eps
+    eps = const.tiny
     if (ceil):
         out = np.ceil(out-10.*eps)
     elif (floor):
@@ -91,8 +93,8 @@ def around(num, powten, ceil=False, floor=False):
     else:
        out = np.around(out)
     # Shift back decimal point
-    #out *= 10.**ipowten
-    out *= np.exp(ipowten*np.log(10.))
+    # Does not work, too imprecise: out *= np.exp(ipowten*np.log(10.))
+    out *= 10.**ipowten
 
     return out
 

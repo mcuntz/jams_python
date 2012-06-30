@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import numpy as np
-from division import *
+from division import * # from ufz
+import const           # from ufz
 
 def interpol(xout, xin, yin):
     """
@@ -74,7 +75,8 @@ def interpol(xout, xin, yin):
     if np.ndim(xout) > 1: raise ValueError("x output values not scalar or 1D array")
     #
     # Subscripts
-    tiny = np.finfo(np.float).eps
+    #tiny = np.finfo(np.float).eps
+    tiny = const.tiny
     s    = np.minimum(np.maximum(np.searchsorted(xin, xout)-1, 0), xin.size-2) # Subscript intervals
     # Distances
     ums1 = xout-xin[s]                                                         # distance from point before

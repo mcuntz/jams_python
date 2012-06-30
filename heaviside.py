@@ -44,7 +44,7 @@ def heaviside(x, value=1., unitstep=False, zero=False):
         Examples
         --------
         >>> print heaviside([-1,0.,1.])
-        [0.0 0.5 1.0]
+        [ 0.   0.5  1. ]
 
         >>> print heaviside([-1,0.,1.], zero=True)
         [ 0.  0.  1.]
@@ -53,11 +53,7 @@ def heaviside(x, value=1., unitstep=False, zero=False):
         [ 0.  1.  1.]
 
         >>> print heaviside([-1,0.,1.], value=2)
-        [0.0 1.0 2.0]
-
-        >>> print heaviside([-1,0.,1.], zero=True, unitstep=True)
-        HEAVISIDE: unitstep and zero mutually exclusive.
-        False
+        [ 0.  1.  2.]
 
 
         History

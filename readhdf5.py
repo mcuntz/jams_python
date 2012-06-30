@@ -3,15 +3,15 @@ import numpy as np
 import h5py as hdf
 
 def readhdf5(fName, var='', reform=False, squeeze=False, variables=False,
-            attributes=False, fileattributes=False,  sort=False):
+            attributes=False, fileattributes=False, sort=False):
     """
-        Get variables or prints information of hdf5 file.
+        Get variables or print information of hdf5 file.
 
 
         Definition
         ----------
         def readhdf5(fName, var='', reform=False, squeeze=False, variables=False,
-                     attributes=False, fileattributes=False,  sort=False):
+                     attributes=False, fileattributes=False, sort=False):
 
         Input
         -----
@@ -49,11 +49,10 @@ def readhdf5(fName, var='', reform=False, squeeze=False, variables=False,
         [u'chs']
 
         >>> a = readhdf5('test_readhdf5.hdf5', var='chs', attributes=True)
-        >>> for i in a: print i, a[i]
-        Double [ 1.1]
-        Inttest [99]
-        What the hell ['']
-        LLLLLL [528040]
+        >>> print a.keys()
+        [u'Double', u'Inttest', u'What the hell', u'LLLLLL']
+        >>> print a['Double']
+        [ 1.1]
 
         >>> print readhdf5('test_readhdf5.hdf5', var='chs')
         [[   1.            2.            3.            3.            2.        ]

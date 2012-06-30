@@ -119,10 +119,6 @@ def esat(T, liquid=False, formula='GoffGratch'):
         WARNING ESAT: T<100 - T probably given in Celsius instead of Kelvin.
         [  2.33584683e+03   1.30965154e-16]
 
-        >>> print esat(np.array([253.15,-9999.]))
-        ESAT: T<0 - T probably given in Celsius instead of Kelvin.
-        False
-
         >>> print esat(np.ma.array([253.15,-9999.], mask=[False,True]))
         [103.074203967 --]
 

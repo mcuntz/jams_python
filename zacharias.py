@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import numpy as np
+import const # from ufz
 
 def zacharias(h, clay, sand, db, params=None, thetar=False, thetas=False, lnalpha=False, n=False):
     """
@@ -71,7 +72,8 @@ def zacharias(h, clay, sand, db, params=None, thetar=False, thetas=False, lnalph
     """
     #
     # Check input
-    tiny = np.finfo(np.float).eps
+    #tiny = np.finfo(np.float).eps
+    tiny = const.tiny
     ih = np.where(h==0., tiny, h)
     if np.any(ih < 0.) | np.any(ih > 1e6):
         raise ValueError('h must be >=0 and <= 1e6 (=pf6)')
@@ -250,7 +252,8 @@ def zacharias_check(params, sand=None, clay=None):
     """
     #
     # Check input
-    tiny = np.finfo(np.float).eps
+    #tiny = np.finfo(np.float).eps
+    tiny = const.tiny
     if params != None:
         if np.size(params) != 15: raise ValueError('size(params) must be 15.')
     # Check ranges

@@ -44,6 +44,7 @@
     pi                     Parameter importance index PI or alternatively B index calculation
     position               Position arrays of subplots to be used with add_axes
     readhdf                Reads variables or information from hdf4 and hdf5 files
+    readhdf4               Reads variables or information from hdf4 files
     readhdf5               Reads variables or information from hdf5 file
     readnetcdf             Reads variables or information from netcdf file
     roman2int              Roman numeral to integer conversion
@@ -160,6 +161,7 @@
     Special files
     -------------
     readhdf                Reads variables or information from hdf4 and hdf5 files
+    readhdf4               Reads variables or information from hdf4 files
     readhdf5               Reads variables or information from hdf5 file
     readnetcdf             Reads variables or information from netcdf file
     writenetcdf            Write netCDF4 file
@@ -195,7 +197,7 @@
               MZ, Jun 2012 - writenetcdf
               MC, Jun 2012 - roman -> romanliterals, interpol
               MZ, Jun 2012 - readhdf5
-              MC, Jun 2012 - readhdf
+              MC, Jun 2012 - readhdf4, readhdf
 """
 # Routines provided
 from abc2plot          import *
@@ -238,6 +240,10 @@ try:
     from readhdf       import *
 except ImportError:
     print "No hdf4 and/or hdf5 support in UFZ library. Disabled functions: readhdf."
+try:
+    from readhdf4      import *
+except ImportError:
+    print "No hdf4 support in UFZ library. Disabled functions: readhdf4."
 try:
     from readhdf5      import *
 except ImportError:

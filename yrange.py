@@ -64,14 +64,17 @@ def yrange(arr, symmetric=False):
     #
     # Round to max difference between adjacent values
     sarr    = np.sort(arr)
-    maxdiff = np.amax(np.abs((sarr-np.roll(sarr,1))[1:]))
+    #maxdiff = np.amax(np.abs((sarr-np.roll(sarr,1))[1:]))
+    maxdiff = np.amax(np.diff(sarr)) 
     expom   = np.log10(maxdiff)
     if expom > 0:
-        expom = np.floor(expom+10.*eps*10.)
+        expom = np.int(np.floor(expom+10.*eps*10.))
     else:
-        expom = np.floor(expom-10.*eps)
+        expom = np.int(np.floor(expom-10.*eps))
     mini = around(minarr, expom, floor=True)
+    #mini = np.around(minarr, expom)
     maxi = around(maxarr, expom, ceil=True)
+    #maxi = np.around(maxarr, expom)
     if symmetric:
         if (mini*maxi < 0.):
             maxmax =  np.amax(np.abs([mini,maxi]))
