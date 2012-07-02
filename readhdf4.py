@@ -41,6 +41,7 @@ def readhdf4(fName, var='', reform=False, squeeze=False, variables=False,
 
         Examples
         --------
+        >>> from pyhdf.SD import SD
         >>> var = readhdf4('test_readhdf4.hdf4', fileattributes=True)
         >>> print var.keys()
         ['OldCoreMetadata.0', 'HDFEOSVersion', 'OldArchiveMetadata.0', 'OldStructMetadata.0', 'StructMetadata.0']
@@ -110,9 +111,9 @@ def readhdf4(fName, var='', reform=False, squeeze=False, variables=False,
           raise ValueError('Variable '+var+' not in file '+fname)
       try:
           arr = np.array(f.select(var).get())
-      except HDF4Error:
+      except ValueError:
           f.end()
-          raise IOError('Cannot read variable '+var+' in file '+fname)
+          raise IOError('Cannot read variable '+var+' in file '+fName)
       f.end()
       if reform or squeeze:
         return arr.squeeze()
