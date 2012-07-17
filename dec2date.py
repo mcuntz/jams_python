@@ -370,7 +370,7 @@ def dec2date(indata, calendar='standard', refdate=None, units=None,
             elif refdate != None:
                 unit = 'days since {0:s}'.format(refdate)
             else:
-                unit = 'days since 0001-01-00 00:00:00'
+                unit = 'days since 0001-01-01 00:00:00'
             timeobj = nt.num2date(indata, unit, calendar = 'proleptic_gregorian')
         elif calendar == 'excel1900':
             if units != None:
