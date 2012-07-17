@@ -27,4 +27,23 @@ https://svn.ufz.de/chs-svn/wiki/WikiPython
 The above wiki will be printed to a PDF file from time to time, which is provided in wiki.pdf.
 Be aware that the current PDF is not always up to date.
 
-Created June 2009 by Matthias Cuntz - matthias.cuntz (at) ufz.de
+Created June 2009, Copyright 2009-2012 UFZ CHS
+Contact Matthias Cuntz - mc (at) macu.de
+
+
+License
+-------
+This file is part of the UFZ Python library.
+
+The UFZ Python library is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+The UFZ Python library is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+along with The UFZ Python library. If not, see <http://www.gnu.org/licenses/>.

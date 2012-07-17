@@ -95,6 +95,26 @@ def sobol_index(s=None, ns=None, ya=None, yb=None, yc=None, si=True, sti=True):
          -0.61288843 -0.75492424 -1.31113697 -0.57241965]
 
 
+        License
+        -------
+        This file is part of the UFZ Python library.
+
+        The UFZ Python library is free software: you can redistribute it and/or modify
+        it under the terms of the GNU Lesser General Public License as published by
+        the Free Software Foundation, either version 3 of the License, or
+        (at your option) any later version.
+
+        The UFZ Python library is distributed in the hope that it will be useful,
+        but WITHOUT ANY WARRANTY; without even the implied warranty of
+        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+        GNU Lesser General Public License for more details.
+
+        You should have received a copy of the GNU Lesser General Public License
+        along with The UFZ Python library.  If not, see <http://www.gnu.org/licenses/>.
+
+        Copyright 2012 Matthias Cuntz
+
+
         History
         -------
         Written, MC, May 2012

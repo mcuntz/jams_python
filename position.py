@@ -101,6 +101,26 @@ def position(row=1, col=1, num=1,
         >>> print position(2,2,1,figsize=figsize,left=0.1,golden=True)
         [ 0.1         0.33004502  0.35        0.15731774]
 
+
+        License
+        -------
+        This file is part of the UFZ Python library.
+
+        The UFZ Python library is free software: you can redistribute it and/or modify
+        it under the terms of the GNU Lesser General Public License as published by
+        the Free Software Foundation, either version 3 of the License, or
+        (at your option) any later version.
+
+        The UFZ Python library is distributed in the hope that it will be useful,
+        but WITHOUT ANY WARRANTY; without even the implied warranty of
+        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+        GNU Lesser General Public License for more details.
+
+        You should have received a copy of the GNU Lesser General Public License
+        along with The UFZ Python library.  If not, see <http://www.gnu.org/licenses/>.
+
+        Copyright 2009 Matthias Cuntz
+
         
         History
         -------

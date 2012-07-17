@@ -66,9 +66,29 @@ def zacharias(h, clay, sand, db, params=None, thetar=False, thetas=False, lnalph
           0.28500141  0.31320842  0.03888839  0.22115267]
 
 
+        License
+        -------
+        This file is part of the UFZ Python library.
+
+        The UFZ Python library is free software: you can redistribute it and/or modify
+        it under the terms of the GNU Lesser General Public License as published by
+        the Free Software Foundation, either version 3 of the License, or
+        (at your option) any later version.
+
+        The UFZ Python library is distributed in the hope that it will be useful,
+        but WITHOUT ANY WARRANTY; without even the implied warranty of
+        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+        GNU Lesser General Public License for more details.
+
+        You should have received a copy of the GNU Lesser General Public License
+        along with The UFZ Python library.  If not, see <http://www.gnu.org/licenses/>.
+
+        Copyright 2012 Matthias Cuntz
+
+
         History
         -------
-        Written, MC, Jun 2011
+        Written, MC, Jun 2012
     """
     #
     # Check input
@@ -244,6 +264,26 @@ def zacharias_check(params, sand=None, clay=None):
         False
         >>> print zacharias_check(parsand, sand=66)
         True
+
+
+        License
+        -------
+        This file is part of the UFZ Python library.
+
+        The UFZ Python library is free software: you can redistribute it and/or modify
+        it under the terms of the GNU Lesser General Public License as published by
+        the Free Software Foundation, either version 3 of the License, or
+        (at your option) any later version.
+
+        The UFZ Python library is distributed in the hope that it will be useful,
+        but WITHOUT ANY WARRANTY; without even the implied warranty of
+        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+        GNU Lesser General Public License for more details.
+
+        You should have received a copy of the GNU Lesser General Public License
+        along with The UFZ Python library.  If not, see <http://www.gnu.org/licenses/>.
+
+        Copyright 2012 Matthias Cuntz
 
 
         History
