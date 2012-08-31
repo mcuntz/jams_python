@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 import numpy as np
 
-def pi(s=None, m=None, norm=None, b=False):
+def pi(s=None, m=None, norm=None, b=False, evalues=False, ematrix=False):
     """
         Calculates the parameter importance index PI or alternatively the B index.
         The indices can be normalised and the normalisation can be output as well,
@@ -9,7 +9,7 @@ def pi(s=None, m=None, norm=None, b=False):
 
         Definition
         ----------
-        def pi(s=s, m=m, norm=None, b=False):
+        def pi(s=s, m=m, norm=None, b=False, evalues=False, ematrix=False):
 
 
         Optional Input
@@ -24,17 +24,20 @@ def pi(s=None, m=None, norm=None, b=False):
                  'evsum': both index /= sum(eigenvectors) then index /= sum(index)
         b        True:  output B index
                  False: output PI index
+        evalues  True:  output eigenvalues
+        ematrix  True:  output eigenmatrix
 
 
         Output
         ------
-        Indices and normalisation
+        Indices and normalisation, optionally eigenvalues and eigenmatrix
 
 
         Restrictions
         ------------
         Be aware that s is (Nparams x N) matrix and Python is column-major so that
         m is s.transpose(s) (not transpose(s).s).
+        Eigenvalues are trasnformed to positive and the correpondings eigenvectors are mirrored.
 
 
         References
@@ -151,7 +154,11 @@ def pi(s=None, m=None, norm=None, b=False):
             raise ValueError("norm must be None, 'sum', 'ev', or 'evsum'.")
     #
     if (s!=None):
-      m   = np.dot(s,np.transpose(s))
+      # check if s is masked array
+      if type(s) == type(np.ones(1)):
+         m  = np.dot(s,np.transpose(s))
+      else:
+         m  = np.ma.dot(s,np.transpose(s))
     mm  = m.shape
     if (mm[0] != mm[1]):
         raise ValueError('m matrix not NxN.')
@@ -164,12 +171,17 @@ def pi(s=None, m=None, norm=None, b=False):
     else:
         import scipy.linalg as la
         ev, em = la.eigh(m)
+
+        if np.any(ev < 0.):
+            ii = np.squeeze(np.where(ev < 0.))
+            ev[ii]   *= -1.
+            em[:,ii] *= -1.
+            ii = np.argsort(ev)
+            ev = ev[ii]
+            em = em[:,ii]
+        
         for i in xrange(inn):
             ind[i] = np.sum(ev[:] * np.abs(em[i,:]))
-        # # Check precision because we use trace(m) instead of sum(ev) later
-        # #print np.sum(ev), np.trace(m), np.abs(np.sum(ev) - np.trace(m))
-        # if np.abs(np.sum(ev) - np.trace(m)) > 1e-9: # np.finfo(float).eps too little
-        #     print 'Warning ufz.pi: |sum(ev)-trace(m)| > float.eps: ', np.abs(np.sum(ev) - np.trace(m))
 
     if norm != None:
         if norm.lower() == 'sum':
@@ -184,9 +196,21 @@ def pi(s=None, m=None, norm=None, b=False):
             inorm2 = np.sum(ind)
             ind *= 1./inorm2
             inorm *= inorm2
-        return [ind, inorm]
+        out = [ind, inorm]
+        if evalues:
+            out += [ev]
+        if ematrix:
+            out += [em]
     else:
-        return ind
+        if evalues | ematrix:
+            out = [ind]
+            if evalues:
+                out += [ev]
+            if ematrix:
+                out += [em]
+        else:
+            out = ind
+    return out
 
 
 if __name__ == '__main__':

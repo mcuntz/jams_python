@@ -127,6 +127,7 @@
     div                    Wrapper for division.
     division               Divide two arrays, return "otherwise" if division by 0.
     heaviside              Heaviside (or unit step) operator
+    jab                    Jackknife-after_bootstrap
     lhs                    Latin Hypercube Sampling of any distribution without correlations
     pi                     Parameter importance index PI or alternatively B index calculation
     saltelli               Parameter sampling for Sobol indices calculation
@@ -247,6 +248,7 @@ from interpol          import *
 from kernel_regression import kernel_regression, kernel_regression_h
 from lhs               import *
 from lif               import *
+from jab               import *
 from mad               import *
 from nee2gpp           import *
 try:
