@@ -37,7 +37,6 @@ def pi(s=None, m=None, norm=None, b=False, evalues=False, ematrix=False):
         ------------
         Be aware that s is (Nparams x N) matrix and Python is column-major so that
         m is s.transpose(s) (not transpose(s).s).
-        Eigenvalues are trasnformed to positive and the correpondings eigenvectors are mirrored.
 
 
         References
@@ -172,26 +171,24 @@ def pi(s=None, m=None, norm=None, b=False, evalues=False, ematrix=False):
         import scipy.linalg as la
         ev, em = la.eigh(m)
 
-        if np.any(ev < 0.):
-            ii = np.squeeze(np.where(ev < 0.))
-            ev[ii]   *= -1.
-            em[:,ii] *= -1.
-            ii = np.argsort(ev)
-            ev = ev[ii]
-            em = em[:,ii]
-        
         for i in xrange(inn):
-            ind[i] = np.sum(ev[:] * np.abs(em[i,:]))
+            ind[i] = np.sum(np.abs(ev[:]) * np.abs(em[i,:]))
 
     if norm != None:
         if norm.lower() == 'sum':
             inorm = np.sum(ind)
             ind *= 1./inorm
         elif norm.lower() == 'ev':
-            inorm = np.trace(m)
+            if b:
+                inorm = np.trace(m)
+            else:
+                inorm = np.sum(np.abs(ev[:]))            
             ind *= 1./inorm
         elif norm.lower() == 'evsum':
-            inorm = np.trace(m)
+            if b:
+                inorm = np.trace(m)
+            else:
+                inorm = np.sum(np.abs(ev[:]))            
             ind *= 1./inorm
             inorm2 = np.sum(ind)
             ind *= 1./inorm2
