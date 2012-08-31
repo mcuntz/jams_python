@@ -35,6 +35,8 @@ def mad(datin, z=7, deriv=0):
             d = datin[1:n]-datin[0:n-1]
         because mean of left and right would give 0 for spikes.
 
+        If all(d.mask==True) then return d.mask, which is all True
+        
 
         Examples
         --------
@@ -132,6 +134,9 @@ def mad(datin, z=7, deriv=0):
         d      = np.diff(datin, n=2, axis=0)
     else:
         raise ValueError('Unimplemented option.')
+    # Shortcut if all masked
+    if np.all(d.mask == True):
+      return d.mask
     # Median
     md     = np.ma.median(d, axis=0)
     # Median absolute deviation

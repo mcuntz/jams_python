@@ -25,7 +25,7 @@
     date2dec	           Converts arrays with calendar date to decimal date
     dec2date	           Converts arrays with decimal date to calendar date
     div                    Wrapper for division.
-    division               Divide two arrays, return "otherwise" if division by 0.
+    division               Divide two arrays, return 'otherwise' if division by 0.
     esat                   Calculates the saturation vapour pressure of water/ice.
     fread                  Reads in float array from ascii file
     gapfill                Gapfill Eddy flux data
@@ -125,7 +125,7 @@
     ----
     around                 Round to the passed power of ten.
     div                    Wrapper for division.
-    division               Divide two arrays, return "otherwise" if division by 0.
+    division               Divide two arrays, return 'otherwise' if division by 0.
     heaviside              Heaviside (or unit step) operator
     jab                    Jackknife-after_bootstrap
     lhs                    Latin Hypercube Sampling of any distribution without correlations
@@ -248,7 +248,7 @@ from interpol          import *
 from kernel_regression import kernel_regression, kernel_regression_h
 from lhs               import *
 from lif               import *
-from jab               import *
+#from jab               import *
 from mad               import *
 from nee2gpp           import *
 try:
