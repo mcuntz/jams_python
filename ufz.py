@@ -20,6 +20,7 @@
     closest                Get the array index of the element that is closest to a given number.
     const                  Provides physical, mathematical, computational, and isotope constants.
     cuntz_gleixner         Cuntz-Gleixner model of 13C discrimination
+    define_brewer          Defines and registers Brewer colormap
     dewpoint               Calculates the dew point from ambient humidity
     date2dec	           Converts arrays with calendar date to decimal date
     dec2date	           Converts arrays with decimal date to calendar date
@@ -29,7 +30,7 @@
     fread                  Reads in float array from ascii file
     gapfill                Gapfill Eddy flux data
     gap_filling            Gapfills eddy flux data (CO2, LE, H) 
-    get_brewer             Defines and return Brewer colormap
+    get_brewer             Defines and returns Brewer colormap
     heaviside              Heaviside (or unit step) operator
     int2roman              Integer to roman numeral conversion
     interpol               One-dimensional linear interpolation on first dimension
@@ -156,7 +157,8 @@
     Plotting
     --------
     abc2plot               Write a, b, c, ... on plots
-    get_brewer             Defines and return Brewer colormap
+    define_brewer          Defines and registers Brewer colormap
+    get_brewer             Defines and returns Brewer colormap
     plot_brewer            Plots available Brewer color maps in pdf file
     position               Position arrays of subplots to be used with add_axes
     print_brewer           Prints available Brewer colormap names
@@ -230,7 +232,7 @@
 from abc2plot          import *
 from around            import *
 from autostring        import *
-from brewer            import get_brewer, plot_brewer, print_brewer
+from brewer            import define_brewer, get_brewer, plot_brewer, print_brewer
 from calcvpd           import *
 from cellarea          import *
 from closest           import *

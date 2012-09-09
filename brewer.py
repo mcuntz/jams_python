@@ -8,6 +8,8 @@
     ----------
     Define and get colormap
         def get_brewer(cname=None, names=False, rgb=False, rgb256=False):
+    Register colormap
+        def define_brewer(cname='all'):
     Print available colormap names
         def print_brewer(names='all'):
     Plot all colormaps in pdf file
@@ -30,6 +32,9 @@
                    else: return sequential+diverging+qualitative colormap names
         rgb        if True: return RGB value tuple between 0 and 1
         rgb256     if True: return RGB value tuple between 0 and 255
+    define_brewer
+        cname      Colormap to register colormaps (default: 'all')
+                   if 'all': registers all sequential+diverging+qualitative colormaps
     print_brewer
         names      Print colormap names (default: 'all')
                    if 'sequential': print sequential colormap names
