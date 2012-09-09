@@ -10,7 +10,6 @@
     >>> import ufz
     >>> help(ufz.function)
 
-
     Provided functions (alphabetic w/o obsolete)
     ------------------
     abc2plot               Write a, b, c, ... on plots
@@ -30,6 +29,7 @@
     fread                  Reads in float array from ascii file
     gapfill                Gapfill Eddy flux data
     gap_filling            Gapfills eddy flux data (CO2, LE, H) 
+    get_brewer             Defines and return Brewer colormap
     heaviside              Heaviside (or unit step) operator
     int2roman              Integer to roman numeral conversion
     interpol               One-dimensional linear interpolation on first dimension
@@ -42,7 +42,9 @@
     outlier                Rossner''s extreme standardized deviate outlier test
     pack                   Similar to Fortran pack function with mask
     pi                     Parameter importance index PI or alternatively B index calculation
+    plot_brewer            Plots available Brewer color maps in pdf file
     position               Position arrays of subplots to be used with add_axes
+    print_brewer           Prints available Brewer colormap names
     readhdf                Reads variables or information from hdf4 and hdf5 files
     readhdf4               Reads variables or information from hdf4 files
     readhdf5               Reads variables or information from hdf5 file
@@ -154,7 +156,10 @@
     Plotting
     --------
     abc2plot               Write a, b, c, ... on plots
+    get_brewer             Defines and return Brewer colormap
+    plot_brewer            Plots available Brewer color maps in pdf file
     position               Position arrays of subplots to be used with add_axes
+    print_brewer           Prints available Brewer colormap names
     tsym                   Raw unicodes for common symbols
     yrange                 Calculates plot range from input array
 
@@ -219,11 +224,13 @@
               MC, Jun 2012 - roman -> romanliterals, interpol
               MZ, Jun 2012 - readhdf5
               MC, Jun 2012 - readhdf4, readhdf
+              MC, Sep 2012 - brewer
 """
 # Routines provided
 from abc2plot          import *
 from around            import *
 from autostring        import *
+from brewer            import get_brewer, plot_brewer, print_brewer
 from calcvpd           import *
 from cellarea          import *
 from closest           import *
