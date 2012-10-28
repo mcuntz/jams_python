@@ -4,7 +4,7 @@ from lif import * # from ufz
 
 def sread(file, nc=0, skip=0, cskip=0, separator='',
           squeeze=False, reform=False, skip_blank=False, comment='',
-          fill=False, fill_value='',
+          fill=False, fill_value='', strip=None,
           header=False, full_header=False,
           quiet=False, transpose=False, strarr=False):
     """
@@ -22,7 +22,7 @@ def sread(file, nc=0, skip=0, cskip=0, separator='',
         ----------
         def sread(file, nc=0, skip=0, cskip=0, separator='',
                   squeeze=False, reform=False, skip_blank=False, comment='',
-                  fill=False, fill_value='',
+                  fill=False, fill_value='', strip=None,
                   header=False, full_header=False,
                   quiet=False, transpose=False, strarr=False):
 
@@ -49,6 +49,7 @@ def sread(file, nc=0, skip=0, cskip=0, separator='',
                      sequence can be e.g. string, list or tuple
         fill_value   value to fill in if not enough columns line
                       and fill=True (default '')
+        strip        Strip strings with str.strip(strip) (default: None)
 
 
         Options
@@ -96,7 +97,7 @@ def sread(file, nc=0, skip=0, cskip=0, separator='',
 
         Examples
         --------
-        # Create some data
+        >>> # Create some data
         >>> filename = 'test.dat'
         >>> file = open(filename,'w')
         >>> file.writelines('head1 head2 head3 head4\\n')
@@ -104,8 +105,8 @@ def sread(file, nc=0, skip=0, cskip=0, separator='',
         >>> file.writelines('2.1 2.2 2.3 2.4\\n')
         >>> file.close()
 
-        # Read sample file in different ways
-        # data
+        >>> # Read sample file in different ways
+        >>> # data
         >>> sread(filename,skip=1)
         [['1.1', '1.2', '1.3', '1.4'], ['2.1', '2.2', '2.3', '2.4']]
         >>> sread(filename,skip=2)
@@ -121,7 +122,7 @@ def sread(file, nc=0, skip=0, cskip=0, separator='',
         >>> sread(filename,nc=1,skip=1,reform=True)
         ['1.1', '2.1']
 
-        # header
+        >>> # header
         >>> sread(filename,nc=2,skip=1,header=True)
         ['head1', 'head2']
         >>> sread(filename,nc=2,skip=1,header=True,full_header=True)
@@ -136,7 +137,7 @@ def sread(file, nc=0, skip=0, cskip=0, separator='',
         >>> sread(filename,nc=1,skip=2,header=True,squeeze=True,transpose=True)
         ['head1', '1.1']
 
-        # skip blank lines
+        >>> # skip blank lines
         >>> file = open(filename,'a')
         >>> file.writelines('\\n')
         >>> file.writelines('3.1 3.2 3.3 3.4\\n')
@@ -159,7 +160,7 @@ def sread(file, nc=0, skip=0, cskip=0, separator='',
         >>> sread(filename,skip=1,transpose=True)
         [['1.1', '2.1'], ['1.2', '2.2'], ['1.3', '2.3'], ['1.4', '2.4']]
 
-        # skip comment lines
+        >>> # skip comment lines
         >>> file = open(filename,'a')
         >>> file.writelines('# First\\n')
         >>> file.writelines('! Second second comment\\n')
@@ -181,9 +182,24 @@ def sread(file, nc=0, skip=0, cskip=0, separator='',
         >>> sread(filename,skip=1,skip_blank=True,comment=['#','!'])
         [['1.1', '1.2', '1.3', '1.4'], ['2.1', '2.2', '2.3', '2.4'], ['3.1', '3.2', '3.3', '3.4'], ['4.1', '4.2', '4.3', '4.4']]
 
-        # Clean up doctest
+        >>> # Create some more data with escaped numbers
+        >>> filename2 = 'test2.dat'
+        >>> file = open(filename2,'w')
+        >>> file.writelines('"head1" "head2" "head3" "head4"\\n')
+        >>> file.writelines('"1.1" "1.2" "1.3" "1.4"\\n')
+        >>> file.writelines('2.1 nan Inf "NaN"\\n')
+        >>> file.close()
+        >>> sread(filename2,skip=1,strarr=True,transpose=True,strip='"')
+        array([['1.1', '2.1'],
+               ['1.2', 'nan'],
+               ['1.3', 'Inf'],
+               ['1.4', 'NaN']], 
+              dtype='|S3')
+
+        >>> # Clean up doctest
         >>> import os
         >>> os.remove(filename)
+        >>> os.remove(filename2)
 
 
         License
@@ -300,6 +316,8 @@ def sread(file, nc=0, skip=0, cskip=0, separator='',
                             m = 0
                             for i in iinc:
                                 if iinc[i] < nhres:
+                                    if strip != None:
+                                        hres[i] = hres[i].strip(strip)
                                     var.append(hres[i])
                                     m += 1
                             for i in range(nnc-m):
@@ -311,6 +329,8 @@ def sread(file, nc=0, skip=0, cskip=0, separator='',
                             f.close()
                             return None
                     else:
+                        if strip != None:
+                            hres = [hres[i].strip(strip) for i in iinc]
                         var = [hres[i] for i in iinc]
                 else:
                     var = ['']
@@ -335,6 +355,8 @@ def sread(file, nc=0, skip=0, cskip=0, separator='',
                                 f.close()
                                 return None
                         else:
+                            if strip != None:
+                                hres = [hres[i].strip(strip) for i in iinc]
                             htmp = [hres[i] for i in iinc]
                         if (squeeze or reform) and (len(htmp)==1):
                             var.extend(htmp)
@@ -363,6 +385,8 @@ def sread(file, nc=0, skip=0, cskip=0, separator='',
                 m = 0
                 for i in iinc:
                     if iinc[i] < nres:
+                        if strip != None:
+                            res[i] = res[i].strip(strip)
                         var.append(res[i])
                         m += 1
                 for i in range(nnc-m):
@@ -374,6 +398,8 @@ def sread(file, nc=0, skip=0, cskip=0, separator='',
                 f.close()
                 return None
         else:
+            if strip != None:
+                res = [res[i].strip(strip) for i in iinc]
             var = [res[i] for i in iinc]
     else:
         var = ['']
@@ -383,6 +409,8 @@ def sread(file, nc=0, skip=0, cskip=0, separator='',
                 m = 0
                 for i in iinc:
                     if iinc[i] < nres:
+                        if strip != None:
+                            res[i] = res[i].strip(strip)
                         tmp.append(res[i])
                         m += 1
                 for i in range(nnc-m):
@@ -394,6 +422,8 @@ def sread(file, nc=0, skip=0, cskip=0, separator='',
                 f.close()
                 return None
         else:
+            if strip != None:
+                res = [res[i].strip(strip) for i in iinc]
             tmp = [res[i] for i in iinc]
         if (squeeze or reform) and (len(tmp)==1):
             var.extend(tmp)
@@ -417,6 +447,8 @@ def sread(file, nc=0, skip=0, cskip=0, separator='',
                     m = 0
                     for i in iinc:
                         if iinc[i] < nres:
+                            if strip != None:
+                                res[i] = res[i].strip(strip)
                             tmp.append(res[i])
                             m += 1
                     for i in range(nnc-m):
@@ -428,6 +460,8 @@ def sread(file, nc=0, skip=0, cskip=0, separator='',
                     f.close()
                     return None
             else:
+                if strip != None:
+                    res = [res[i].strip(strip) for i in iinc]
                 tmp = [res[i] for i in iinc]
             if (squeeze or reform) and (len(tmp)==1):
                 var.extend(tmp)

@@ -4,7 +4,7 @@ from lif import * # from ufz
 
 def fread(file, nc=0, skip=0, cskip=0, separator='',
           squeeze=False, reform=False, skip_blank=False, comment='',
-          fill=False, fill_value=0,
+          fill=False, fill_value=0, strip=None,
           header=False, full_header=False,
           transpose=False, strarr=False):
     """
@@ -18,7 +18,7 @@ def fread(file, nc=0, skip=0, cskip=0, separator='',
         ----------
         def fread(file, nc=0, skip=0, cskip=0, separator='',
                   squeeze=False, reform=False, skip_blank=False, comment='',
-                  fill=False, fill_value=0,
+                  fill=False, fill_value=0, strip=None,
                   header=False, full_header=False,
                   transpose=False, strarr=False):
 
@@ -45,6 +45,8 @@ def fread(file, nc=0, skip=0, cskip=0, separator='',
                      sequence can be e.g. string, list or tuple
         fill_value   value to fill in if not enough columns line
                      and fill=True (default 0 and '' for header)
+        strip        Strip strings before conversion to float with str.strip(strip)
+                     (default: None)
 
 
         Options
@@ -89,7 +91,7 @@ def fread(file, nc=0, skip=0, cskip=0, separator='',
 
         Examples
         --------
-        # Create some data
+        >>> # Create some data
         >>> filename = 'test.dat'
         >>> file = open(filename,'w')
         >>> file.writelines('head1 head2 head3 head4\\n')
@@ -97,8 +99,8 @@ def fread(file, nc=0, skip=0, cskip=0, separator='',
         >>> file.writelines('2.1 2.2 2.3 2.4\\n')
         >>> file.close()
 
-        # Read sample file in different ways
-        # data
+        >>> # Read sample file in different ways
+        >>> # data
         >>> fread(filename,skip=1)
         array([[ 1.1,  1.2,  1.3,  1.4],
                [ 2.1,  2.2,  2.3,  2.4]])
@@ -119,7 +121,7 @@ def fread(file, nc=0, skip=0, cskip=0, separator='',
         >>> fread(filename,nc=1,skip=1,reform=True)
         array([ 1.1,  2.1])
 
-        # header
+        >>> # header
         >>> fread(filename,nc=2,skip=1,header=True)
         ['head1', 'head2']
         >>> fread(filename,nc=2,skip=1,header=True,full_header=True)
@@ -133,7 +135,7 @@ def fread(file, nc=0, skip=0, cskip=0, separator='',
                ['1.1']], 
               dtype='|S5')
 
-        # skip blank lines
+        >>> # skip blank lines
         >>> file = open(filename,'a')
         >>> file.writelines('\\n')
         >>> file.writelines('3.1 3.2 3.3 3.4\\n')
@@ -146,7 +148,7 @@ def fread(file, nc=0, skip=0, cskip=0, separator='',
                [ 2.1,  2.2,  2.3,  2.4],
                [ 3.1,  3.2,  3.3,  3.4]])
 
-        # skip comment lines
+        >>> # skip comment lines
         >>> file = open(filename,'a')
         >>> file.writelines('# First comment\\n')
         >>> file.writelines('! Second 2 comment\\n')
@@ -181,7 +183,7 @@ def fread(file, nc=0, skip=0, cskip=0, separator='',
                [ 3.1,  3.2,  3.3,  3.4],
                [ 4.1,  4.2,  4.3,  4.4]])
 
-        # fill missing columns
+        >>> # fill missing columns
         >>> file = open(filename,'a')
         >>> file.writelines('5.1 5.2\\n')
         >>> file.close()
@@ -197,7 +199,7 @@ def fread(file, nc=0, skip=0, cskip=0, separator='',
                [ 4.1,  4.2,  4.3,  4.4],
                [ 5.1,  5.2, -1. , -1. ]])
 
-        # transpose
+        >>> # transpose
         >>> fread(filename,skip=1)
         array([[ 1.1,  1.2,  1.3,  1.4],
                [ 2.1,  2.2,  2.3,  2.4]])
@@ -207,9 +209,41 @@ def fread(file, nc=0, skip=0, cskip=0, separator='',
                [ 1.3,  2.3],
                [ 1.4,  2.4]])
 
-        # Clean up doctest
+        >>> # Create some more data with Nan and Inf
+        >>> filename1 = 'test1.dat'
+        >>> file = open(filename1,'w')
+        >>> file.writelines('head1 head2 head3 head4\\n')
+        >>> file.writelines('1.1 1.2 1.3 1.4\\n')
+        >>> file.writelines('2.1 nan Inf "NaN"\\n')
+        >>> file.close()
+
+        >>> # Treat Nan and Inf with automatic strip of " and '
+        >>> fread(filename1,skip=1,transpose=True)
+        array([[ 1.1,  2.1],
+               [ 1.2,  nan],
+               [ 1.3,  inf],
+               [ 1.4,  nan]])
+
+        >>> # Create some more data with escaped numbers
+        >>> filename2 = 'test2.dat'
+        >>> file = open(filename2,'w')
+        >>> file.writelines('head1 head2 head3 head4\\n')
+        >>> file.writelines('"1.1" "1.2" "1.3" "1.4"\\n')
+        >>> file.writelines('2.1 nan Inf "NaN"\\n')
+        >>> file.close()
+
+        >>> # Strip
+        >>> fread(filename2, skip=1, transpose=True, strip='"')
+        array([[ 1.1,  2.1],
+               [ 1.2,  nan],
+               [ 1.3,  inf],
+               [ 1.4,  nan]])
+
+        >>> # Clean up doctest
         >>> import os
         >>> os.remove(filename)
+        >>> os.remove(filename1)
+        >>> os.remove(filename2)
 
 
         License
@@ -237,6 +271,7 @@ def fread(file, nc=0, skip=0, cskip=0, separator='',
         Written, MC, Jul 2009
                  MC, Apr 2011 - transpose
                  MC, Jun 2012 - remove quiet
+                 MC, Oct 2012 - treat NaN and Inf
     """
     #
     # Determine number of lines in file.
@@ -328,6 +363,8 @@ def fread(file, nc=0, skip=0, cskip=0, separator='',
                             m = 0
                             for i in iinc:
                                 if iinc[i] < nhres:
+                                    if strip != None:
+                                        hres[i] = hres[i].strip(strip)
                                     var.append(hres[i])
                                     m += 1
                             for i in range(nnc-m):
@@ -336,6 +373,8 @@ def fread(file, nc=0, skip=0, cskip=0, separator='',
                             f.close()
                             raise IOError('First header line has not enough columns to be indexed: '+head[0])
                     else:
+                        if strip != None:
+                            hres = [hres[i].strip(strip) for i in iinc]
                         var = [hres[i] for i in iinc]
                 else:
                     var = ['']
@@ -349,6 +388,8 @@ def fread(file, nc=0, skip=0, cskip=0, separator='',
                                 m = 0
                                 for i in iinc:
                                     if iinc[i] < nhres:
+                                        if strip != None:
+                                            hres[i] = hres[i].strip(strip)
                                         htmp.append(hres[i])
                                         m += 1
                                 for i in range(nnc-m):
@@ -357,6 +398,8 @@ def fread(file, nc=0, skip=0, cskip=0, separator='',
                                 f.close()
                                 raise IOError('Header line has not enough columns to be indexed: '+head[k])
                         else:
+                            if strip != None:
+                                hres = [hres[i].strip(strip) for i in iinc]
                             htmp = [hres[i] for i in iinc]
                         if (squeeze or reform) and (len(htmp)==1):
                             var.extend(htmp)
@@ -373,21 +416,45 @@ def fread(file, nc=0, skip=0, cskip=0, separator='',
     #
     # Values
     iline = 0
-    var = np.empty([nr,nnc], dtype='float')
+    var = np.empty([nr,nnc], dtype=np.float)
     if miinc >= nres:
         if fill:
             m = 0
             for i in iinc:
                 if iinc[i] < nres:
-                    var[iline,m] = np.float(res[i])
+                    if strip != None:
+                        s     = res[i].strip(strip)
+                        tests = s.lower()
+                    else:
+                        s     = res[i]
+                        tests = s.strip('"').strip("'").lower()
+                    if tests == 'nan':
+                        var[iline,m] = np.nan
+                    elif tests == 'inf':
+                        var[iline,m] = np.inf
+                    else:
+                        var[iline,m] = np.float(s)
                     m += 1
             var[iline,m:miinc+1] = fill_value
         else:
             f.close()
             raise ValueError('First line has not enough columns to be indexed: '+s)
     else:
-        var[iline,0:nnc] = np.array([float(res[i]) for i in iinc],
-                                    dtype='float')
+        z = 0
+        for i in iinc:
+            if strip != None:
+                s     = res[i].strip(strip)
+                tests = s.lower()
+            else:
+                s     = res[i]
+                tests = s.strip('"').strip("'").lower()
+            if tests == 'nan':
+                var[iline,z] = np.nan
+            elif tests == 'inf':
+                var[iline,z] = np.inf
+            else:
+                var[iline,z] = np.float(s)
+            z += 1
     # Read rest of file
     while True:
         s = f.readline().rstrip()
@@ -407,7 +474,18 @@ def fread(file, nc=0, skip=0, cskip=0, separator='',
                 for i in iinc:
                     if iinc[i] < nres:
                         try:
-                            var[iline,m] = np.float(res[i])
+                            if strip != None:
+                                s     = res[i].strip(strip)
+                                tests = s.lower()
+                            else:
+                                s     = res[i]
+                                tests = s.strip('"').strip("'").lower()
+                            if tests == 'nan':
+                                var[iline,m] = np.nan
+                            elif tests == 'inf':
+                                var[iline,m] = np.inf
+                            else:
+                                var[iline,m] = np.float(s)
                         except ValueError:
                             f.close()
                             print 'Tried to convert "%s"  from Line: %s' % (res[i], s)
@@ -422,7 +500,21 @@ def fread(file, nc=0, skip=0, cskip=0, separator='',
         else:
             iline += 1
             try:
-                var[iline,0:nnc] = np.array([float(res[i]) for i in iinc], dtype='float')
+                z = 0
+                for i in iinc:
+                    if strip != None:
+                        s     = res[i].strip(strip)
+                        tests = s.lower()
+                    else:
+                        s     = res[i]
+                        tests = s.strip('"').strip("'").lower()
+                    if tests == 'nan':
+                        var[iline,z] = np.nan
+                    elif tests == 'inf':
+                        var[iline,z] = np.inf
+                    else:
+                        var[iline,z] = np.float(s)
+                    z += 1
             except ValueError:
                 print 'FREAD: Requested elements not all numbers: %s' % ([res[i] for i in iinc])
                 f.close()
