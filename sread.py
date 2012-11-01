@@ -330,8 +330,9 @@ def sread(file, nc=0, skip=0, cskip=0, separator='',
                             return None
                     else:
                         if strip != None:
-                            hres = [hres[i].strip(strip) for i in iinc]
-                        var = [hres[i] for i in iinc]
+                            var = [hres[i].strip(strip) for i in iinc]
+                        else:
+                            var = [hres[i] for i in iinc]
                 else:
                     var = ['']
                     k = 0
@@ -356,8 +357,9 @@ def sread(file, nc=0, skip=0, cskip=0, separator='',
                                 return None
                         else:
                             if strip != None:
-                                hres = [hres[i].strip(strip) for i in iinc]
-                            htmp = [hres[i] for i in iinc]
+                                htmp = [hres[i].strip(strip) for i in iinc]
+                            else:
+                                htmp = [hres[i] for i in iinc]
                         if (squeeze or reform) and (len(htmp)==1):
                             var.extend(htmp)
                         else:
@@ -399,8 +401,9 @@ def sread(file, nc=0, skip=0, cskip=0, separator='',
                 return None
         else:
             if strip != None:
-                res = [res[i].strip(strip) for i in iinc]
-            var = [res[i] for i in iinc]
+                var = [res[i].strip(strip) for i in iinc]
+            else:
+                var = [res[i] for i in iinc]
     else:
         var = ['']
         if miinc >= nres:
@@ -423,8 +426,9 @@ def sread(file, nc=0, skip=0, cskip=0, separator='',
                 return None
         else:
             if strip != None:
-                res = [res[i].strip(strip) for i in iinc]
-            tmp = [res[i] for i in iinc]
+                tmp = [res[i].strip(strip) for i in iinc]
+            else:
+                tmp = [res[i] for i in iinc]
         if (squeeze or reform) and (len(tmp)==1):
             var.extend(tmp)
         else:
@@ -461,8 +465,9 @@ def sread(file, nc=0, skip=0, cskip=0, separator='',
                     return None
             else:
                 if strip != None:
-                    res = [res[i].strip(strip) for i in iinc]
-                tmp = [res[i] for i in iinc]
+                    tmp = [res[i].strip(strip) for i in iinc]
+                else:
+                    tmp = [res[i] for i in iinc]
             if (squeeze or reform) and (len(tmp)==1):
                 var.extend(tmp)
             else:

@@ -374,8 +374,9 @@ def fread(file, nc=0, skip=0, cskip=0, separator='',
                             raise IOError('First header line has not enough columns to be indexed: '+head[0])
                     else:
                         if strip != None:
-                            hres = [hres[i].strip(strip) for i in iinc]
-                        var = [hres[i] for i in iinc]
+                            var = [hres[i].strip(strip) for i in iinc]
+                        else:
+                            var = [hres[i] for i in iinc]
                 else:
                     var = ['']
                     k = 0
@@ -399,8 +400,9 @@ def fread(file, nc=0, skip=0, cskip=0, separator='',
                                 raise IOError('Header line has not enough columns to be indexed: '+head[k])
                         else:
                             if strip != None:
-                                hres = [hres[i].strip(strip) for i in iinc]
-                            htmp = [hres[i] for i in iinc]
+                                htmp = [hres[i].strip(strip) for i in iinc]
+                            else:
+                                htmp = [hres[i] for i in iinc]
                         if (squeeze or reform) and (len(htmp)==1):
                             var.extend(htmp)
                         else:
