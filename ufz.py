@@ -236,6 +236,7 @@
               MC, Jun 2012 - readhdf4, readhdf
               MC, Sep 2012 - brewer
               MC, Oct 2012 - savitzky_golay
+              MC, Nov 2012 - added netcdftime but no import so that available w/o netcdf
 """
 # Routines provided
 from abc2plot          import *
@@ -247,11 +248,8 @@ from cellarea          import *
 from closest           import *
 import const
 from cuntz_gleixner    import *
-try:
-    from date2dec      import *
-    from dec2date      import *
-except ImportError:
-    print "No netcdf support in UFZ library. Disabled functions: date2dec, dec2date, gap_filling, readnetcdf, writenetcdf."
+from date2dec          import *
+from dec2date          import *
 from dewpoint          import *
 from division          import *
 from esat              import *
@@ -291,7 +289,7 @@ except ImportError:
 try:
     from readnetcdf    import *
 except ImportError:
-    pass
+    print "No netcdf support in UFZ library. Disabled functions: readnetcdf, writenetcdf."
 from romanliterals     import int2roman, roman2int
 from saltelli          import *
 from savitzky_golay    import *

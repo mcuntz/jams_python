@@ -139,12 +139,12 @@ def saltelli(params, nbase, lhs=False, nskip=1):
     pB   = np.empty((nparams,nbase))
     if lhs:
         import scipy.stats as stats
-        from ufz import lhs as latin
+        from lhs import lhs # from ufz
         dist = [stats.uniform     for i in xrange(nparams)]
         pars = [(zoff[i],zmul[i]) for i in xrange(nparams)]
         dist = dist + dist # 2*nparams
         pars = pars + pars
-        lat  = latin(dist, pars, nbase)
+        lat  = lhs(dist, pars, nbase)
         for i in xrange(nparams):
             pA[i,:] = lat[i,:]
             pB[i,:] = lat[i+nparams,:]

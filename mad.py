@@ -135,8 +135,9 @@ def mad(datin, z=7, deriv=0):
     else:
         raise ValueError('Unimplemented option.')
     # Shortcut if all masked
-    if np.all(d.mask == True):
-      return d.mask
+    if type(d) == type(np.ma.empty(1)):
+        if np.all(d.mask == True):
+            return d.mask
     # Median
     md     = np.ma.median(d, axis=0)
     # Median absolute deviation

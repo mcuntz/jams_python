@@ -114,7 +114,7 @@ def writenetcdf(fhandle, vhandle=None, var=None, time=None, isdim=False, name=No
 
         # check file
         >>> from readnetcdf import *
-        >>> print readnetcdf('writenetcdf_test.nc', variables=True)
+        >>> print [unicode(i) for i in readnetcdf('writenetcdf_test.nc', variables=True)]
         [u'time', u'lon', u'lat', u'TESTING', u'TESTING2']
         >>> readdata = readnetcdf('writenetcdf_test.nc', var='TESTING')
         >>> print np.any((readdata[0,:,:] - dat) != 0.)

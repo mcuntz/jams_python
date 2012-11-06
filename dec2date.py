@@ -233,7 +233,7 @@ def dec2date(indata, calendar='standard', refdate=None, units=None,
 
         >>> dec2date(719644.52101, calendar='proleptic_gregorian', ascii = True)
         '27.04.1971 12:30:15'
-        >>> from ufz import date2dec
+        >>> from date2dec import * # from ufz
         >>> dec = date2dec(ascii='02.03.1910 03:44:55', calendar='decimal')
         >>> dec2date(dec, calendar='decimal', ascii=True)
         '02.03.1910 03:44:55'

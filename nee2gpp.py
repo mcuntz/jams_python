@@ -74,9 +74,10 @@ def nee2gpp(dates, nee, t, isday, rg=False, vpd=False, undef=np.nan,
 
         Examples
         --------
-        >>> import ufz
-        >>> dat   = ufz.fread('nee2gpp_test.csv', skip=2, transpose=True)
-        >>> dates = ufz.date2dec(dy=dat[0,:], mo=dat[1,:], yr=dat[2,:], hr=dat[3,:], mi=dat[4,:])
+        >>> from fread import * # from ufz
+        >>> from date2dec import * # from ufz
+        >>> dat   = fread('nee2gpp_test.csv', skip=2, transpose=True)
+        >>> dates = date2dec(dy=dat[0,:], mo=dat[1,:], yr=dat[2,:], hr=dat[3,:], mi=dat[4,:])
         >>> NEE   = np.squeeze(dat[5,:])
         >>> rg    = np.squeeze(dat[6,:])
         >>> tair  = np.squeeze(dat[7,:])
