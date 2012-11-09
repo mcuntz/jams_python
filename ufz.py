@@ -19,6 +19,7 @@
     cellarea               Calc areas of grid cells in m^2.
     closest                Get the array index of the element that is closest to a given number.
     const                  Provides physical, mathematical, computational, and isotope constants.
+    convex_hull            Calculate subset of points that make a convex hull around a set of 2D points. 
     cuntz_gleixner         Cuntz-Gleixner model of 13C discrimination.
     define_brewer          Defines and registers Brewer colormap.
     dewpoint               Calculates the dew point from ambient humidity.
@@ -32,10 +33,12 @@
     gap_filling            Gapfills eddy flux data (CO2, LE, H). 
     get_brewer             Defines and returns Brewer colormap.
     heaviside              Heaviside (or unit step) operator.
+    in_poly                Determines whether a 2D point falls in a polygon.
     int2roman              Integer to roman numeral conversion.
     interpol               One-dimensional linear interpolation on first dimension.
     kernel_regression      Multi-dimensional non-parametric regression.
     kernel_regression_h    Optimal bandwidth for kernel regression.
+    kriging                Krig a surface from a set of 2D points.
     lhs                    Latin Hypercube Sampling of any distribution without correlations.
     lif                    Count number of lines in file.
     mad                    Median absolute deviation test.
@@ -59,6 +62,8 @@
     sg2d                   Wrapper savitzky_golay2d.
     sobol_index            Calculates the first-order and total variance-based sensitivity indices.
     sread                  Reads in string array from ascii file.
+    srrasa                 Generates stratified random 2D points within a given rectangular area.
+    srrasa_trans           Generates stratified random 2D transects within a given rectangular area.
     tcherkez               Calculates the Tcherkez model of 13C-discrimiantion in the Calvin cycle.
     tsym                   Raw unicodes for common symbols.
     unpack                 Similar to Fortran unpack function with mask.
@@ -100,9 +105,12 @@
 
     Data processing
     ---------------
+    convex_hull            Calculate subset of points that make a convex hull around a set of 2D points.
     gapfill                Gapfill Eddy flux data.
     gap_filling            Gapfills flux data (CO2, LE, H).
+    in_poly                Determines whether a 2D point falls in a polygon.
     interpol               One-dimensional linear interpolation on first dimension.
+    kriging                Krig a surface from a set of 2D points.
     kernel_regression      Multi-dimensional non-parametric regression.
     kernel_regression_h    Optimal bandwidth for kernel regression.
     mad                    Median absolute deviation test.
@@ -113,6 +121,8 @@
     sg                     Wrapper savitzky_golay.
     sg2d                   Wrapper savitzky_golay2d.
     semivariogram          Calculates semivariogram from spatial data.
+    srrasa                 Generates stratified random 2D points within a given rectangular area.
+    srrasa_trans           Generates stratified random 2D transects within a given rectangular area.
 
 
     Date & Time
@@ -216,16 +226,16 @@
                            - pack, unpack
               MC, Aug 2009 - position
               MG, Jul 2010 - outlier
-	      AP, Jan 2011 - date2dec, dec2date
-	      AP, Feb 2011 - semivariogram
+	          AP, Jan 2011 - date2dec, dec2date
+	          AP, Feb 2011 - semivariogram
               TR, May 2011 - gap_filling
               TR, May 2011 - calcvpd
               MC, Jun 2011 - /usr/bin/python to /usr/bin/env python
                            - tsym, around
               MC, Nov 2011 - mad
-	      MC, Nov 2011 - try netcdf and stats routines
-	      MC, Nov 2011 - autostring
-	      MC, Jan 2012 - esat, closest, dewpoint, division, heaviside, tcherkez, yrange, const
+	          MC, Nov 2011 - try netcdf and stats routines
+	          MC, Nov 2011 - autostring
+	          MC, Jan 2012 - esat, closest, dewpoint, division, heaviside, tcherkez, yrange, const
                            - make calcvpd obsolete
                            - cuntz_gleixner
               MC, Mar 2012 - gapfill, nee2gpp
@@ -237,6 +247,8 @@
               MC, Sep 2012 - brewer
               MC, Oct 2012 - savitzky_golay
               MC, Nov 2012 - added netcdftime but no import so that available w/o netcdf
+              AP, Nov 2012 - convex_hull, in_poly, kriging, semivariogram update, srrasa, srrasa_trans
+                            
 """
 # Routines provided
 from abc2plot          import *
@@ -247,6 +259,7 @@ from calcvpd           import *
 from cellarea          import *
 from closest           import *
 import const
+from convex_hull       import convex_hull 
 from cuntz_gleixner    import *
 from date2dec          import *
 from dec2date          import *
@@ -260,8 +273,10 @@ try:
 except ImportError:
     pass
 from heaviside         import *
+from in_poly           import in_poly 
 from interpol          import *
 from kernel_regression import kernel_regression, kernel_regression_h
+from kriging           import kriging 
 from lhs               import *
 from lif               import *
 #from jab               import *
@@ -293,9 +308,10 @@ except ImportError:
 from romanliterals     import int2roman, roman2int
 from saltelli          import *
 from savitzky_golay    import *
-from semivariogram     import *
+from semivariogram     import semivariogram
 from sobol_index       import *
 from sread             import *
+from srrasa            import srrasa, srrasa_trans 
 from tcherkez          import *
 from tsym              import *
 from unpack            import *
