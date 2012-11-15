@@ -36,6 +36,7 @@
     in_poly                Determines whether a 2D point falls in a polygon.
     int2roman              Integer to roman numeral conversion.
     interpol               One-dimensional linear interpolation on first dimension.
+    jab                    Jackknife-after-Bootstrap error.
     kernel_regression      Multi-dimensional non-parametric regression.
     kernel_regression_h    Optimal bandwidth for kernel regression.
     kriging                Krig a surface from a set of 2D points.
@@ -148,7 +149,7 @@
     div                    Wrapper for division.
     division               Divide two arrays, return 'otherwise' if division by 0.
     heaviside              Heaviside (or unit step) operator.
-    jab                    Jackknife-after_bootstrap.
+    jab                    Jackknife-after-Bootstrap error.
     lhs                    Latin Hypercube Sampling of any distribution without correlations.
     pi                     Parameter importance index PI or alternatively B index calculation.
     saltelli               Parameter sampling for Sobol indices calculation.
@@ -279,7 +280,7 @@ from kernel_regression import kernel_regression, kernel_regression_h
 from kriging           import kriging 
 from lhs               import *
 from lif               import *
-#from jab               import *
+from jab               import *
 from mad               import *
 from nee2gpp           import *
 try:
