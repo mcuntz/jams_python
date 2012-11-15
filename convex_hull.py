@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-import numpy as n, pylab as p, time
+import numpy as n, time
 
 def convex_hull(points, graphic=True, smidgen=0.0075):
     
@@ -64,6 +64,7 @@ def convex_hull(points, graphic=True, smidgen=0.0075):
     '''
 
     if graphic:
+        import pylab as p
         p.clf()
         p.plot(points[0], points[1], 'ro')
     n_pts = points.shape[1]
