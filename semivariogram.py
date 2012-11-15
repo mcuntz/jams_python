@@ -9,9 +9,6 @@ try:
 except ImportError:
     missing_package = True
 import numpy as np
-import matplotlib.cm as cm
-import matplotlib.pyplot as plt
-import matplotlib as mpl
 
 def semivariogram(x,y,v,nL,di,td,type='omnidirectional',negscat=False,
                   model='exponential', graph=True,lunit='m',p0=(1.,1.,1.),
@@ -435,6 +432,10 @@ def semivariogram(x,y,v,nL,di,td,type='omnidirectional',negscat=False,
     #---------------------------------------
     # plot
     if graph:
+        import matplotlib.cm as cm
+        import matplotlib.pyplot as plt
+        import matplotlib as mpl
+        
         mpl.rc('font', size=20)
         mpl.rc('lines', linewidth=2)
         mpl.rc('axes', linewidth=1.5)
