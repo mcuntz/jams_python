@@ -2,8 +2,6 @@
 
 import time
 import numpy as np
-import matplotlib as mpl
-import matplotlib.pyplot as plt
 from scipy.spatial.distance import pdist, squareform
 from convex_hull import convex_hull
 from in_poly import in_poly
@@ -346,6 +344,9 @@ def kriging(x,y,z,semi_mod,semi_popt,xnew=None,ynew=None,plot=True,
     ###########################################################################
     # plotting
     if plot:
+        import matplotlib as mpl
+        import matplotlib.pyplot as plt
+        
         if not silent:
             print 'KRIG: plotting...'
         
