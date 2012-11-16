@@ -26,7 +26,7 @@ def jab(arr, ind, nind=None, weight=False, nsteps=1):
         weight    if True: do weighted estimate after Wang et al. (1997)
                   Default: False
         nsteps    Give nsteps estimates of JAB error, i.e. after each nboot/nsteps bootstraps.
-                  Deafult: 1
+                  Default: 1
 
         
         Output
@@ -92,7 +92,7 @@ def jab(arr, ind, nind=None, weight=False, nsteps=1):
 
         History
         -------
-        Written, MG, Aug 2012
+        Written,  MG, Aug 2012
         Modified, MC, Nov 2012 - rewrite
     """
 
@@ -101,7 +101,7 @@ def jab(arr, ind, nind=None, weight=False, nsteps=1):
         raise ValueError('Index array must have 2 dimensions.')
     onlyone = False
     if len(arr.shape) != 2:
-        arr = arr[:,np.newaxis]
+        arr     = arr[:,np.newaxis]
         onlyone = True
     if ind.shape[0] != arr.shape[0]:
         raise ValueError('First dimension of boostrap standard error array and index array have to match.')
@@ -113,19 +113,21 @@ def jab(arr, ind, nind=None, weight=False, nsteps=1):
         nind = ind.shape[1]
     nout = arr.shape[1]
 
+    # Produce mask with True where data point was used in bootstrap
+    mask = np.zeros((nboot,nind), dtype=np.bool)
+    for i in xrange(nboot):
+        mask[i,ind[i,:]] = True
+
     seb_i      = np.ma.empty((nind,nout,nsteps))
-    seb_i.mask = np.zeros(seb_i.shape, np.bool)
-    b_i        = np.empty((nind,nsteps))
+    seb_i.mask = np.zeros(seb_i.shape, np.bool)  # make mask array
+    b_i        = np.empty((nind,nsteps))         # number of indices
     step       = nboot//nsteps
     for k in xrange(nsteps):
-        iind    = ind[0:(k+1)*step,:]
         iarr    = arr[0:(k+1)*step,:]
-        allboot = np.arange((k+1)*step) # indices of all rows (of this step)
+        imask   = mask[0:(k+1)*step,:]
         for i in xrange(nind):
-            # rows that contain i
-            isi = np.unique(np.where(iind==i)[0]) # this is slow but I did not find anything better
-            # exclude these rows from all rows
-            isnoti = np.setxor1d(isi,allboot)
+            # Search all rows where i-th column is False, i.e. were not used in bootstrap
+            isnoti = np.where(imask[:,i]==False)[0]
             # std and number of rows for possible weighting
             b_i[i,k] = isnoti.size
             if isnoti.size == 0:
