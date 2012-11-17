@@ -2,7 +2,7 @@
 import numpy as np
 import pylab as pl
 
-def srrasa(xy,strata=5,n=3,plot=True):
+def srrasa(xy,strata=5,n=3,plot=False):
     
     '''        
         PURPOSE:
@@ -50,11 +50,11 @@ def srrasa(xy,strata=5,n=3,plot=True):
         along with The UFZ Python library.  If not,
         see <http://www.gnu.org/licenses/>.
     
-        Copyright 2009-2012 Matthias Cuntz
+        Copyright 2012 Arndt Piayda
     
         HISTORY:
-        Written, Arndt Piayda, Nov 2012
-
+        Written,  AP, Nov 2012
+        Modified, MC, Nov 2012 - default plot=False
     '''
     
     # calculate strata steps

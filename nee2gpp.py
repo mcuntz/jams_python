@@ -181,7 +181,7 @@ def nee2gpp(dates, nee, t, isday, rg=False, vpd=False, undef=np.nan,
             light-response of NEE as by Falge et al. (2001), where the
             respiration is calculated with Lloyd & Taylor (1994), and the
             maximum canopy uptake rate at light saturation decreases
-            exponential with VPD as in Koerner (1995)
+            exponentially with VPD as in Koerner (1995)
             Rg      Global radiation [W m-2]
             et      Exponential in Lloyd & Taylor: np.exp(E0*(1./(Tref-T0)-1./(T-T0))) []
             VPD     Vapour Pressure Deficit [Pa]
@@ -205,23 +205,23 @@ def nee2gpp(dates, nee, t, isday, rg=False, vpd=False, undef=np.nan,
     # -------------------------------------------------------------
     # Checks
 
-    # remember shape is any
+    # remember shape if any
     inshape = nee.shape
     dates   = np.squeeze(dates)
     nee     = np.squeeze(nee)
     t       = np.squeeze(t)
     isday   = np.squeeze(isday)
     # Check squeezed shape
-    if np.ndim(dates) != 1: raise ValueError('Error nee2gpp: squeezed dates must be 1D array.')
-    if np.ndim(nee) != 1:   raise ValueError('Error nee2gpp: squeezed nee must be 1D array.')
-    if np.ndim(t) != 1:     raise ValueError('Error nee2gpp: squeezed t must be 1D array.')
-    if np.ndim(isday) != 1: raise ValueError('Error nee2gpp: squeezed isday must be 1D array.')
+    if dates.ndim != 1: raise ValueError('Error nee2gpp: squeezed dates must be 1D array.')
+    if nee.ndim   != 1: raise ValueError('Error nee2gpp: squeezed nee must be 1D array.')
+    if t.ndim     != 1: raise ValueError('Error nee2gpp: squeezed t must be 1D array.')
+    if isday.ndim != 1: raise ValueError('Error nee2gpp: squeezed isday must be 1D array.')
     ndata = dates.size
     if ((nee.size != ndata) | (t.size != ndata) | (isday.size != ndata)):
         raise ValueError('Error nee2gpp: inputs must have the same size.')
     if ((method.lower() == 'day') | (method.lower() == 'lasslop')):
-        if np.ndim(rg) != 1:  raise ValueError('Error nee2gpp: squeezed rg must be 1D array.')
-        if np.ndim(vpd) != 1: raise ValueError('Error nee2gpp: squeezed vpd must be 1D array.')
+        if rg.ndim  != 1: raise ValueError('Error nee2gpp: squeezed rg must be 1D array.')
+        if vpd.ndim != 1: raise ValueError('Error nee2gpp: squeezed vpd must be 1D array.')
         if ((rg.size != ndata) | (vpd.size != ndata)):
             raise ValueError('Error nee2gpp: lasslop inputs must have the same size as other inputs.')
 

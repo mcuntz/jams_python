@@ -11,7 +11,7 @@ except ImportError:
 import numpy as np
 
 def semivariogram(x,y,v,nL,di,td,type='omnidirectional',negscat=False,
-                  model='exponential', graph=True,lunit='m',p0=(1.,1.,1.),
+                  model='exponential', graph=False,lunit='m',p0=(1.,1.,1.),
                   runtimediag=True):
 
     """
@@ -301,13 +301,13 @@ def semivariogram(x,y,v,nL,di,td,type='omnidirectional',negscat=False,
         along with The UFZ Python library.  If not,
         see <http://www.gnu.org/licenses/>.
     
-        Copyright 2009-2012 Matthias Cuntz
+        Copyright 2011-2012 Arndt Piayda
     
         HISTORY:
-        Written, Arndt Piayda, Feb 2011
-        Modified, Arndt Piayda, Nov 2012 - Parameter bounds for fitting algr.
-                                         - Minor errors corrected
-
+        Written,  AP, Feb 2011
+        Modified, AP, Nov 2012 - Parameter bounds for fitting algr.
+                               - Minor errors corrected
+                  MC, Nov 2012 - default graph=False
     """
     
     # check input data

@@ -6,6 +6,18 @@ Helmholtz Centre for Environmental Research - UFZ
 Permoserstr. 15
 04318 Leipzig, Germany
 
+
+The library has to be in your Python path. For example in bash:
+    export PYTHONPATH=/path/to/the/ufz/library
+It can also be installed with the usual setup.py commands using distutils:
+    python setup.py install
+If one wants to use the development capabilities of setuptools, you can use something like
+    python -c "import setuptools; execfile('setup.py')" develop
+This basically creates an .egg-link file and updates an easy-install.pth file so that the project is on sys.path by default.
+Distutils also allows to make Windows installers with
+    python setup.py bdist_wininst
+
+
 The documentation of the library is in the docstring of ufz.py so that one can get help on the
 Python prompt:
 >>> import ufz
@@ -16,7 +28,9 @@ Getting, for example, help on fread for reading ascii files:
 >>> import ufz
 >>> help(ufz.fread)
 
+
 One can produce html versions of the documentation in a directory html by calling the script: ./makehtml
+
 
 The library is maintained with a subversion system at:
 https://svn.ufz.de/chs-svn/PYTHON_chs_lib/
@@ -24,8 +38,10 @@ https://svn.ufz.de/chs-svn/PYTHON_chs_lib/
 Further information can be found at:
 https://svn.ufz.de/chs-svn/wiki/WikiPython
 
+
 The above wiki will be printed to a PDF file from time to time, which is provided in wiki.pdf.
 Be aware that the current PDF is not always up to date.
+
 
 Created June 2009, Copyright 2009-2012 UFZ CHS
 Contact Matthias Cuntz - mc (at) macu.de
