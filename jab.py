@@ -19,6 +19,7 @@ def jab(arr, ind, nind=None, weight=False, nsteps=1):
         ind       2D-array of bootstrap indices.
                   1st dim is number of bootstraps. 2nd dim is number of samples per bootstrap.
 
+
         Optional Input
         --------------
         nind      # of data points, i.e. maximal jackknife index.
@@ -54,40 +55,43 @@ def jab(arr, ind, nind=None, weight=False, nsteps=1):
 
         Example
         --------
+        # 5 Bootstrap with 2 standard error outputs, e.g. for 2 parameters
         >>> import numpy as np
-        >>> # 5 Bootstrap with 2 standard error outputs, e.g. for 2 parameters
         >>> Bstat = np.array([[ 3.625,  5.375],\
                               [ 3.625,  4.125],\
                               [ 4.625,  3.75 ],\
                               [ 4.   ,  4.5  ],\
                               [ 4.25 ,  3.625]])
-        >>> # Indices of the bootstraps
+
+        # Indices of the bootstraps
         >>> indices = np.array([[0, 0, 4, 5, 5, 3, 2, 6],\
                                 [1, 2, 3, 0, 5, 5, 4, 1],\
                                 [3, 0, 3, 5, 4, 4, 1, 7],\
                                 [0, 3, 5, 2, 2, 1, 4, 4],\
                                 [4, 4, 5, 5, 3, 3, 2, 1]])
 
-        >>> # Normal JAB
+
+        # Normal JAB
         >>> print jab(Bstat, indices)
-        [ 0.41639433  0.683304  ]
+        [ 0.13132114  0.39335039]
 
-        >>> # Weighted JAB
+
+        # Weighted JAB
         >>> print jab(Bstat, indices, weight=True)
-        [ 0.17766158  0.29154304]
+        [ 0.05603035  0.1678295 ]
 
-        >>> # Normal JAB but bootstrap was done by taking 6 samples out of 10 data points
+        # Normal JAB but bootstrap was done by taking 6 samples out of 10 data points
         >>> print jab(Bstat, indices, nind=10)
-        [ 0.52922539  0.87936986]
+        [ 0.14620639  0.37764585]
 
-        >>> # Weighted JAB with 6 out of 10 bootstrap
+        # Weighted JAB with 6 out of 10 bootstrap
         >>> print jab(Bstat[:,0], indices, nind=10)
-        0.529225385911
+        0.146206392124
 
-        >>> # Normal JAB, 2 steps
+        # Normal JAB, 2 steps
         >>> print jab(Bstat, indices, nsteps=5)
-        [[ 0.          0.          0.57282196  0.44779553  0.41639433]
-         [ 0.          0.77951196  0.67549895  0.58545341  0.683304  ]]
+        [[-- 0.0 0.661437827766 0.311804782231 0.131321139382]
+         [-- 0.0 0.578758099295 0.287799087529 0.393350393185]]
 
 
         License
@@ -138,9 +142,9 @@ def jab(arr, ind, nind=None, weight=False, nsteps=1):
     for i in xrange(nboot):
         mask[i,ind[i,:]] = True
 
-    seb_i      = np.ma.empty((nind,nout,nsteps))
-    seb_i.mask = np.zeros(seb_i.shape, np.bool)  # make mask array
-    b_i        = np.empty((nind,nsteps))         # number of indices
+    seb_i      = np.ma.empty((nind,nout,nsteps))      # std jab_i
+    seb_i.mask = np.zeros(seb_i.shape, dtype=np.bool) # make mask an array
+    b_i        = np.empty((nind,nsteps))              # number of indices
     step       = nboot//nsteps
     for k in xrange(nsteps):
         iarr    = arr[0:(k+1)*step,:]
@@ -153,16 +157,16 @@ def jab(arr, ind, nind=None, weight=False, nsteps=1):
             if isnoti.size == 0:
                 seb_i.mask[i,:,k] = True
             elif isnoti.size == 1:
-                seb_i[i,:,k] = 0.
-            else:
-                seb_i[i,:,k] = np.ma.std(iarr[isnoti,:],axis=0)
+                seb_i.mask[i,:,k] = True
+            else: # Wang et al. (1997), Eq. 3
+                seb_i[i,:,k] = np.ma.std(iarr[isnoti,:],  axis=0, ddof=0)
 
     # proposed empirical weight of Wang et al. (1997)
-    if weight:
-        w_i    = b_i.astype(np.float) / (np.float(np.sum(b_i,axis=0))/np.float(nind) + np.float(nind))
+    if weight: # Wang et al. (1997), Eq. 9
+        w_i    = b_i.astype(np.float) / (np.float(np.sum(b_i, axis=0))/np.float(nind) + np.float(nind))
         seb_i *= w_i[:,np.newaxis,:]
-    # jackknife-after-bootstrap error
-    se_jab = np.sqrt(nind-1) * np.ma.std(seb_i,axis=0)
+    # jackknife-after-bootstrap error, Wang et al. (1997), Eq. 4
+    se_jab = np.sqrt(np.float(nind-1)) * np.ma.std(seb_i, axis=0, ddof=0)
 
     if onlyone:
         if nsteps==1:
@@ -195,21 +199,21 @@ if __name__ == '__main__':
 
     # # Normal JAB
     # print jab(Bstat, indices)
-    # #[ 0.41639433  0.683304  ]
+    # #[ 0.13132114  0.39335039]
 
     # # Weighted JAB
     # print jab(Bstat, indices, weight=True)
-    # #[ 0.17766158  0.29154304]
+    # #[ 0.05603035  0.1678295 ]
 
     # # Normal JAB but bootstrap was done by taking 6 samples out of 10 data points
     # print jab(Bstat, indices, nind=10)
-    # #[ 0.52922539  0.87936986]
+    # #[ 0.14620639  0.37764585]
 
     # # Weighted JAB with 6 out of 10 bootstrap
     # print jab(Bstat[:,0], indices, nind=10)
-    # #0.529225385911
+    # #0.146206392124
 
-    # # Normal JAB, 2 steps
+    # # Normal JAB, 5 steps
     # print jab(Bstat, indices, nsteps=5)
-    # #[[ 0.          0.          0.57282196  0.44779553  0.41639433]
-    # # [ 0.          0.77951196  0.67549895  0.58545341  0.683304  ]]
+    # #[[-- 0.0 0.661437827766 0.311804782231 0.131321139382]
+    # # [-- 0.0 0.578758099295 0.287799087529 0.393350393185]]
