@@ -146,20 +146,29 @@ def jab(arr, ind, nind=None, weight=False, nsteps=1):
     seb_i.mask = np.zeros(seb_i.shape, dtype=np.bool) # make mask an array
     b_i        = np.empty((nind,nsteps))              # number of indices
     step       = nboot//nsteps
+    isnoti     = [np.empty((0),dtype=np.int) for i in xrange(nind)]
     for k in xrange(nsteps):
-        iarr    = arr[0:(k+1)*step,:]
-        imask   = mask[0:(k+1)*step,:]
+        # Searching the mask only for the current step and appending the indices
+        # seems to be marginally faster than always searching the mask from 0 to the current step
+        #   imask   = mask[0:(k+1)*step,:]
+        # and then later
+        #   isnoti = np.where(imask[:,i]==False)[0]
+        imask = mask[k*step:(k+1)*step,:] # current step
+        iarr  = arr[0:(k+1)*step,:]       # 1st to current step
         for i in xrange(nind):
-            # Search all rows where i-th column is False, i.e. were not used in bootstrap
-            isnoti = np.where(imask[:,i]==False)[0]
+            # Search all rows (in current step) where i-th column is False, i.e. were not used in bootstrap
+            iisnoti = k*step + np.where(imask[:,i]==False)[0]
+            # Concat with all steps before
+            isnoti[i] = np.concatenate((isnoti[i],iisnoti))
             # std and number of rows for possible weighting
-            b_i[i,k] = isnoti.size
-            if isnoti.size == 0:
+            isize    = isnoti[i].size
+            b_i[i,k] = isize
+            if isize == 0:
                 seb_i.mask[i,:,k] = True
-            elif isnoti.size == 1:
+            elif isize == 1:
                 seb_i.mask[i,:,k] = True
             else: # Wang et al. (1997), Eq. 3
-                seb_i[i,:,k] = np.ma.std(iarr[isnoti,:],  axis=0, ddof=0)
+                seb_i[i,:,k] = np.ma.std(iarr[isnoti[i],:], axis=0, ddof=0)
 
     # proposed empirical weight of Wang et al. (1997)
     if weight: # Wang et al. (1997), Eq. 9
@@ -168,6 +177,7 @@ def jab(arr, ind, nind=None, weight=False, nsteps=1):
     # jackknife-after-bootstrap error, Wang et al. (1997), Eq. 4
     se_jab = np.sqrt(np.float(nind-1)) * np.ma.std(seb_i, axis=0, ddof=0)
 
+    if not np.any(se_jab.mask): se_jab = se_jab.data
     if onlyone:
         if nsteps==1:
             return se_jab[0,0]
