@@ -1,5 +1,4 @@
-#!/usr/bin/python
-
+#!/usr/bin/env python
 import time
 import numpy as np
 from scipy.spatial.distance import pdist, squareform

@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 # MC, May 2012 - removed math
 #              - from numpy import *  -> import numpy as np
 import numpy as np
