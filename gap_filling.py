@@ -217,6 +217,8 @@ def gap_filling(tofill, Rg, Tair, vpd, dates, \
             rg_dev = max(20,min(rg_cond,Rg_dev))
 
             # get boolean array where meteo-conditions are in a given width
+            #import pdb
+            #pdb.set_trace()
             conditions = ((np.abs(rg_cond-Rg[win_ind])-rg_dev)<(-rg_dev*eps))&\
                          ((np.abs(tair_cond-Tair[win_ind])-Tair_dev)\
                          <(-Tair_dev*eps*10))&\

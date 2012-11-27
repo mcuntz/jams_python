@@ -44,6 +44,11 @@ import numpy as np
     >>> print REarth
     6371000.
 
+    >>> print M_WV
+    18.01528
+
+    >>> print M_DAIR
+    28.9644
 
     License
     -------
@@ -84,6 +89,9 @@ sigma   = 5.67e-08      # Stefan-Boltzmann constant [W/m^2/K^4]
 R       = 8.3144621     # Ideal gas constant [J/K/mol]
 Na      = 6.02214129e23 # Avogrado number [mol^-1]
 REarth  = 6371009.      # Radius of Earth [m]
+M_CO2   = 44.01         # Molar mass CO2 [g*mol^-1]
+M_WV    = 18.01528      # Molar mass water vapour [g*mol^-1]
+M_DAIR  = 28.9644       # Molar mass of dry air [g*mol^-1]
 
 # Isotope
 RPDB = 0.0112372 # Isotope ratio of VPDB-CO2
