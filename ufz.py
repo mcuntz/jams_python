@@ -43,7 +43,10 @@
     lhs                    Latin Hypercube Sampling of any distribution without correlations.
     lif                    Count number of lines in file.
     mad                    Median absolute deviation test.
-    nee2gpp                Photosynthesis and ecosystem respiration NEE Eddy flux data.
+    nee2gpp                Photosynthesis and ecosystem respiration from NEE Eddy flux data.
+    nee2gpp_global         nee2gpp using one fit for whole time period
+    nee2gpp_lasslop        nee2gpp using the daytime method of Lasslop et al. (2010)
+    nee2gpp_reichstein     nee2gpp using several fits as in Reichstein et al. (2005)
     outlier                Rossner''s extreme standardized deviate outlier test.
     pack                   Similar to Fortran pack function with mask.
     pi                     Parameter importance index PI or alternatively B index calculation.
@@ -115,7 +118,10 @@
     kernel_regression      Multi-dimensional non-parametric regression.
     kernel_regression_h    Optimal bandwidth for kernel regression.
     mad                    Median absolute deviation test.
-    nee2gpp                Photosynthesis and ecosystem respiration NEE Eddy flux data.
+    nee2gpp                Photosynthesis and ecosystem respiration from NEE Eddy flux data.
+    nee2gpp_global         nee2gpp using one fit for whole time period
+    nee2gpp_lasslop        nee2gpp using the daytime method of Lasslop et al. (2010)
+    nee2gpp_reichstein     nee2gpp using several fits as in Reichstein et al. (2005)
     outlier                Rossner''s extreme standardized deviate outlier test.
     savitzky_golay         Smooth (and optionally differentiate) 1D data with a Savitzky-Golay filter.
     savitzky_golay2d       Smooth (and optionally differentiate) 2D data with a Savitzky-Golay filter.
@@ -249,7 +255,7 @@
               MC, Oct 2012 - savitzky_golay
               MC, Nov 2012 - added netcdftime but no import so that available w/o netcdf
               AP, Nov 2012 - convex_hull, in_poly, kriging, semivariogram update, srrasa, srrasa_trans
-                            
+              MC, Nov 2012 - nee2gpp, nee2gpp_global, nee2gpp_lasslop, nee2gpp_reichstein
 """
 # Routines provided
 from abc2plot          import *
@@ -282,7 +288,7 @@ from lhs               import *
 from lif               import *
 from jab               import *
 from mad               import *
-from nee2gpp           import *
+from nee2gpp           import nee2gpp, nee2gpp_global, nee2gpp_lasslop, nee2gpp_reichstein
 try:
     from outlier       import *
 except ImportError:

@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 import numpy as np
-import pylab as pl
 
 def srrasa(xy,strata=5,n=3,plot=False):
     

@@ -196,6 +196,7 @@ sub.xaxis.set_minor_locator(mpl.ticker.MultipleLocator(xtick))
 ll = sub.legend(mark1, [ur'Uniform vs. Gauss'], frameon=frameon, ncol=1,
                 labelspacing=llrspace, handletextpad=llhtextpad, handlelength=llhlength,
                 loc='upper right', bbox_to_anchor=(1+llxbbox,1+llybbox), scatterpoints=1, numpoints=1)
+plt.setp(ll.get_texts(), fontsize='small')
 ufz.abc2plot(sub, dxabc, dyabc, iplot, lower=True, bold=True)
 
 iplot += 1

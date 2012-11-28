@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 import string
 
-def lif(file, noblank=False, comment='', skip=0):
+def lif(file, noblank=False, comment='', skip=0, maxcol=False):
     """
         Counts the numer of lines in a file.
         Blank (only whitespace) and comment lines can be excluded.
@@ -29,11 +29,15 @@ def lif(file, noblank=False, comment='', skip=0):
         -------
         noblank      excludes all lines that consists only of
                        whitespace characters
+        maxcol       if True, return also maximum amount of characters in one line
 
 
         Output
         ------
-        number of lines in file
+        if maxcol:
+            number of lines in file, maximum characters in a line
+        else:
+            number of lines in file
 
 
         Restrictions
@@ -72,6 +76,8 @@ def lif(file, noblank=False, comment='', skip=0):
         2
         >>> lif(filename,skip=2)
         3
+        >>> lif(filename,skip=2,maxcol=True)
+        (3, 16)
 
         # Clean up
         >>> import os
@@ -100,7 +106,8 @@ def lif(file, noblank=False, comment='', skip=0):
 
         History
         -------
-        Written, MC, Jul. 2009
+        Written,  MC, Jul 2009
+        Modified, MC, Nov 2012 - maxcol
     """
     # Open file
     try:
@@ -114,26 +121,40 @@ def lif(file, noblank=False, comment='', skip=0):
         while iskip < skip:
             l = f.readline()
             iskip += 1
+    imax = []
     if noblank and (comment != ''):        # exclude blank, exclude comment
         for line in f:
-            l = line.strip(string.whitespace)
+            ll    = line
+            imax += [len(ll)]
+            l     = ll.strip(string.whitespace)
             if (l != ''):
                 if (l[0] not in comment): count += 1
     elif noblank and (comment == ''):      # exclude blank, include comment
         for line in f:
-            l = line.strip(string.whitespace)
+            ll    = line
+            imax += [len(ll)]
+            l     = ll.strip(string.whitespace)
             if (l != ''): count += 1
     elif (not noblank) and (comment != ''):# include blank, exclude comment
         for line in f:
-            l = line.strip(string.whitespace)
+            ll    = line
+            imax += [len(ll)]
+            l     = ll.strip(string.whitespace)
             if (l == ''):
                 count += 1
             else:
                 if (l[0] not in comment): count += 1
     else:                                  # include blank, include comment
-        count = sum(1 for line in f)
+        for line in f:
+            imax += [len(line)]
+        count = len(imax)
     f.close()
-    return count
+
+    if maxcol:
+        return count, max(imax)-1 # lines include \0 at the end.
+    else:
+        return count
+
 
 if __name__ == '__main__':
     import doctest
