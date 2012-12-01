@@ -105,7 +105,8 @@ def gap_filling(tofill, Rg, Tair, vpd, dates, \
             else:
                 return 3
 
-    print 'GAP FILLING'
+    #print 'GAP FILLING'
+    
     # -------------------------------------------------------------
     # PARAMETERS
 
@@ -132,7 +133,7 @@ def gap_filling(tofill, Rg, Tair, vpd, dates, \
 
     (years,months,days,hours,minutes,sc) = dec2date(dates,\
             fulldate=True)
-    dec_time = hours + minutes/60
+    dec_time = hours + minutes/60.
     
     # container for gap quality classes
     qc_gf = np.zeros((len(tofill),1))
@@ -146,7 +147,10 @@ def gap_filling(tofill, Rg, Tair, vpd, dates, \
     # GAP FILLING PROCEDURE
     
     # flag for all meteorological conditions
-    flag_met = (Tair_flag == 0) & (vpd_flag == 0) & (Rg_flag == 0) 
+    if len(Tair_flag) == 0: Tair_flag = np.zeros(len(tofill))
+    if len(vpd_flag) == 0:  vpd_flag = np.zeros(len(tofill))
+    if len(Rg_flag) == 0:   Rg_flag = np.zeros(len(tofill))
+    flag_met = (Tair_flag == 0) & (vpd_flag == 0) & (Rg_flag == 0)
     
     # flag for all meteorological conditions and NEE; needed to flag data\
     # to associate useful data (with flag_CO2 ==0)
@@ -173,7 +177,7 @@ def gap_filling(tofill, Rg, Tair, vpd, dates, \
     # in window size slicing
     #start_y = np.min(np.where(years==year))
     #end_y   = np.max(np.where(years==year))
-            
+
     for j in range(len(tofill_gf)):      
     
         #if j == 12943 :
@@ -209,7 +213,7 @@ def gap_filling(tofill, Rg, Tair, vpd, dates, \
             j1 = [j-np.arange(1,week+1)+1] 
             j2 = [j+np.arange(1,week)]
             appended_jays = np.append(j1,j2)
-            win_ind = np.sort(np.clip(appended_jays,0,len(flag_met)-1))
+            win_ind = np.unique(np.sort(np.clip(appended_jays,0,len(flag_met)-1)))
             
             # for better overview: dynamic calculation of radiation threshold
             # minimum 20; maximum 50 [Wm-2] according to private correspondence
@@ -219,10 +223,13 @@ def gap_filling(tofill, Rg, Tair, vpd, dates, \
             # get boolean array where meteo-conditions are in a given width
             #import pdb
             #pdb.set_trace()
-            conditions = ((np.abs(rg_cond-Rg[win_ind])-rg_dev)<(-rg_dev*eps))&\
-                         ((np.abs(tair_cond-Tair[win_ind])-Tair_dev)\
-                         <(-Tair_dev*eps*10))&\
-                         ((np.abs(vpd_cond-vpd[win_ind])-vpd_dev)<(-vpd_dev*eps))
+            # conditions = ((np.abs(rg_cond-Rg[win_ind])-rg_dev)<(-rg_dev*eps))&\
+            #              ((np.abs(tair_cond-Tair[win_ind])-Tair_dev)\
+            #              <(-Tair_dev*eps*10))&\
+            #              ((np.abs(vpd_cond-vpd[win_ind])-vpd_dev)<(-vpd_dev*eps))
+            conditions = ( (np.abs(Rg[win_ind]  -rg_cond)   < rg_dev) &
+                           (np.abs(Tair[win_ind]-tair_cond) < Tair_dev) &
+                           (np.abs(vpd[win_ind] -vpd_cond)  < vpd_dev) )
             number_4avg = len(conditions[conditions&flag_total[win_ind]])
             # we need at least two samples with similar conditions
             
@@ -233,7 +240,8 @@ def gap_filling(tofill, Rg, Tair, vpd, dates, \
                 # calculate the average for gap filling of the point
                 avg = np.mean(period[(conditions==True)&\
                         (flag_total[win_ind]==True)])
-                                    #print avg
+
+                #print avg
                 tofill_gf[j] = avg
                 #### MGMG
                 std = np.std(period[(conditions==True)&\
@@ -254,13 +262,16 @@ def gap_filling(tofill, Rg, Tair, vpd, dates, \
                 j1 = [j-np.arange(1,2*week+1)+1] 
                 j2 = [j+np.arange(1,2*week)]
                 appended_jays = np.append(j1,j2)
-                win_ind = np.sort(np.clip(appended_jays,0,len(flag_met)-1))
+                win_ind = np.unique(np.sort(np.clip(appended_jays,0,len(flag_met)-1)))
                 
-                conditions = ((np.abs(rg_cond-Rg[win_ind])-rg_dev)<(-rg_dev*eps))&\
-                         ((np.abs(tair_cond-Tair[win_ind])-Tair_dev)\
-                         <(-Tair_dev*eps*10))&\
-                         ((np.abs(vpd_cond-vpd[win_ind])-vpd_dev)<(-vpd_dev*eps))
-    
+                # conditions = ((np.abs(rg_cond-Rg[win_ind])-rg_dev)<(-rg_dev*eps))&\
+                #          ((np.abs(tair_cond-Tair[win_ind])-Tair_dev)\
+                #          <(-Tair_dev*eps*10))&\
+                #          ((np.abs(vpd_cond-vpd[win_ind])-vpd_dev)<(-vpd_dev*eps))
+                conditions = ( (np.abs(Rg[win_ind]  -rg_cond)   < rg_dev) &
+                           (np.abs(Tair[win_ind]-tair_cond) < Tair_dev) &
+                           (np.abs(vpd[win_ind] -vpd_cond)  < vpd_dev) )
+
                 number_4avg = len(conditions[conditions&flag_total[win_ind]])
                                     
                 if number_4avg>=2:
@@ -293,7 +304,7 @@ def gap_filling(tofill, Rg, Tair, vpd, dates, \
             j1 = [j-np.arange(1,week+1)+1] 
             j2 = [j+np.arange(1,week)]
             app_jays = np.append(j1,j2)
-            win_ind = np.clip(app_jays,0,len(flag_met)-1)
+            win_ind = np.unique(np.sort(np.clip(app_jays,0,len(flag_met)-1)))
             
             # for better overview: dynamic calculation of radiation threshold
             # minimum 20; maximum 50 [Wm-2] according to private correspondence
@@ -301,7 +312,8 @@ def gap_filling(tofill, Rg, Tair, vpd, dates, \
             rg_dev = max(20,min(rg_cond,Rg_dev))
             
             # check for the same radation conditions within the same window
-            conditions = ((np.abs(rg_cond-Rg[win_ind])-rg_dev)<(-rg_dev*eps))
+            # conditions = ((np.abs(rg_cond-Rg[win_ind])-rg_dev)<(-rg_dev*eps))
+            conditions = ( (np.abs(Rg[win_ind]  -rg_cond)   < rg_dev) )
             number_4avg = len(conditions[conditions&flag_sec[win_ind]])
             
             if number_4avg>= 2:
@@ -326,11 +338,11 @@ def gap_filling(tofill, Rg, Tair, vpd, dates, \
         #for size in range(0,3):
         for size in range(0,2):
        ### AP
-            t_wind = t_int*(2*size+1)/2
+            t_wind = (t_int*(2*size+1))/2
             j1 = [j-np.arange(1,t_wind+1)+1] 
             j2 = [j+np.arange(1,t_wind)]
             appended_jays = np.append(j1,j2)
-            win_ind = np.sort(np.clip(appended_jays,0,len(flag_met)-1))
+            win_ind = np.unique(np.sort(np.clip(appended_jays,0,len(flag_met)-1)))
             dec_time_window = dec_time[win_ind]
             period    = tofill[win_ind]
             conditions = np.abs(dec_time_window-dec_time[j])<1.1
@@ -369,7 +381,7 @@ def gap_filling(tofill, Rg, Tair, vpd, dates, \
                 j1 = [j-np.arange(1,multi*week+1)+1]
                 j2 = [j+np.arange(1,multi*week)]
                 comb_jays = np.append(j1,j2)
-                win_ind = np.clip(comb_jays,0,len(flag_met)-1)
+                win_ind = np.unique(np.sort(np.clip(comb_jays,0,len(flag_met)-1)))
                            
                 # for better overview: dynamic calculation of radiation threshold
                 # minimum 20; maximum 50 [Wm-2] according to private correspondence
@@ -377,11 +389,14 @@ def gap_filling(tofill, Rg, Tair, vpd, dates, \
                 rg_dev = max(20,min(rg_cond,Rg_dev))
     
                 # get boolean array where meteo-conditions are in a given width
-                conditions = ((np.abs(rg_cond-Rg[win_ind])-rg_dev)<(-rg_dev*eps))&\
-                         ((np.abs(tair_cond-Tair[win_ind])-Tair_dev)\
-                         <(-Tair_dev*eps))&\
-                         ((np.abs(vpd_cond-vpd[win_ind])-vpd_dev)<(-vpd_dev*eps))
-                
+                # conditions = ((np.abs(rg_cond-Rg[win_ind])-rg_dev)<(-rg_dev*eps))&\
+                #          ((np.abs(tair_cond-Tair[win_ind])-Tair_dev)\
+                #          <(-Tair_dev*eps))&\
+                #          ((np.abs(vpd_cond-vpd[win_ind])-vpd_dev)<(-vpd_dev*eps))
+                conditions = ( (np.abs(Rg[win_ind]  -rg_cond)   < rg_dev) &
+                           (np.abs(Tair[win_ind]-tair_cond) < Tair_dev) &
+                           (np.abs(vpd[win_ind] -vpd_cond)  < vpd_dev) )
+
                 if len(conditions[(conditions==True)&\
                         (flag_sec[win_ind]==True)])>= 2:
                     period = tofill[win_ind]
@@ -406,14 +421,15 @@ def gap_filling(tofill, Rg, Tair, vpd, dates, \
             j1 = [j-np.arange(1,multi*week+1)+1]
             j2 = [j+np.arange(1,multi*week)]
             comb_jays = np.append(j1,j2)
-            win_ind = np.clip(comb_jays,0,len(flag_met)-1)
+            win_ind = np.unique(np.sort(np.clip(comb_jays,0,len(flag_met)-1)))
             # check: wether global R is available
             if Rg_flag[j] == 0:
                 #print j,'radiation'
                 rg_cond = Rg[j]
                 
                 # get boolean array where meteo-conditions are in a given width
-                conditions = ((np.abs(rg_cond-Rg[win_ind])-rg_dev)<(-rg_dev*eps))
+                # conditions = ((np.abs(rg_cond-Rg[win_ind])-rg_dev)<(-rg_dev*eps))
+                conditions = ( (np.abs(Rg[win_ind]  -rg_cond)   < rg_dev) )
                 
                 if len(conditions[(conditions==True)&\
                         (flag_sec[win_ind]==True)]) >= 2:
@@ -440,7 +456,7 @@ def gap_filling(tofill, Rg, Tair, vpd, dates, \
             j1 = [j-np.arange(1,t_wind+1)+1] 
             j2 = [j+np.arange(1,t_wind)]
             appended_jays = np.append(j1,j2)
-            win_ind = np.sort(np.clip(appended_jays,0,len(flag_met)-1))
+            win_ind = np.unique(np.sort(np.clip(appended_jays,0,len(flag_met)-1)))
             dec_time_window = dec_time[win_ind]
             period    = tofill[win_ind]
             conditions = np.abs(dec_time_window-dec_time[j])<1.1
