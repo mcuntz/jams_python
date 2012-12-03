@@ -2,7 +2,7 @@
 import numpy as np
 from dec2date import *
 
-def gapfill(datein, datain, rgin, tairin, vpdin,
+def gapfill(date, data, rg, tair, vpd,
             data_flag=None, rg_flag=None, tair_flag=None, vpd_flag=None,
             rg_dev=50., tair_dev=2.5, vpd_dev=5.,
             longestmarginalgap=60, undef=np.nan, ddof=1,
@@ -20,7 +20,7 @@ def gapfill(datein, datain, rgin, tairin, vpdin,
 
         Definition
         ----------
-        def gapfill(datein, datain, rgin, tairin, vpdin,
+        def gapfill(date, data, rg, tair, vpd,
                     data_flag=None, rg_flag=None, tair_flag=None, vpd_flag=None,
                     rg_dev=50., tair_dev=2.5, vpd_dev=5,
                     longestmarginalgap=60, undef=np.nan, ddof=1,
@@ -29,19 +29,19 @@ def gapfill(datein, datain, rgin, tairin, vpdin,
 
         Input
         -----
-        datein        julian days
-        datain        fluxes to fill
-        rgin          global radiation [W m-2]
-        tairin        air Temperature [deg C]
-        vpdin         vapour pressure deficit [hPa]
+        date        1D-array of julian days
+        data        1D-array of fluxes to fill
+        rg          1D-array of global radiation [W m-2]
+        tair        1D-array of air Temperature [deg C]
+        vpd         1D-array of vapour pressure deficit [hPa]
 
 
         Optional Input
         -------------
-        data_flag     flags of fluxes: False=good quality; True=bad data (default: False)
-        rg_flag       flags of global radiation: False=good quality; True=bad data (default: False)
-        tair_flag     flags of air temperature: False=good quality; True=bad data (default: False)
-        vpd_flag      flags of vapour pressure deficit: False=good quality; True=bad data (default: False)
+        data_flag     1D-array of flags of fluxes: False=good quality; True=bad data (default: False)
+        rg_flag       1D-array of flags of global radiation: False=good quality; True=bad data (default: False)
+        tair_flag     1D-array of flags of air temperature: False=good quality; True=bad data (default: False)
+        vpd_flag      1D-array of flags of vapour pressure deficit: False=good quality; True=bad data (default: False)
 
 
         Parameters
@@ -51,12 +51,12 @@ def gapfill(datein, datain, rgin, tairin, vpdin,
         vpd_dev              threshold for maximum deviation of vpd (default: 5)
         longestmarginalgap   avoid extraploation into a gap longer than longestmarginalgap days (default: 60)
         undef                undefined values in data  (default: np.nan)
-        ddof                 Degrees of freedom tu use in calculation of standard deviation
+        ddof                 Degrees of freedom to use in calculation of standard deviation
                              for error estimate (default: 1)
         err                  if True, fill every data point, i.e. used for error generation (default: False)
         shape                if False then outputs are 1D arrays;
-                             if True, output have the same shape as datain
-                             if a shape tuple is given, then this tuple is used to reshape
+                             if True, output have the same shape as input data;
+                             if a tuple is given, then this tuple is used to reshape.
 
 
         Ouput
@@ -153,18 +153,27 @@ def gapfill(datein, datain, rgin, tairin, vpdin,
 
     # -------------------------------------------------------------
     # Checks
-    # remember shape is any
-    inshape = datain.shape
-    date = np.squeeze(datein)
-    data = np.squeeze(datain)
-    rg   = np.squeeze(rgin)
-    tair = np.squeeze(tairin)
-    vpd  = np.squeeze(vpdin)
-    if np.ndim(date) != 1: raise ValueError('squeezed dates must be 1D array.')
-    if np.ndim(data) != 1: raise ValueError('squeezed data must be 1D array.')
-    if np.ndim(rg)   != 1: raise ValueError('squeezed rg must be 1D array.')
-    if np.ndim(tair) != 1: raise ValueError('squeezed tair must be 1D array.')
-    if np.ndim(vpd)  != 1: raise ValueError('squeezed vpd must be 1D array.')
+
+    # check input types
+    tma = type(np.ma.array((1)))
+    if type(date) == tma: raise Error('dates cannot be masked array.')
+    if type(data) == tma: data = data.filled(undef)
+    if type(rg)   == tma: rg   = rg.filled(undef)
+    if type(tair) == tma: tair = tair.filled(undef)
+    if type(vpd)  == tma: vpd  = vpd.filled(undef)
+
+    # remember shape if any
+    inshape = data.shape
+    date = np.squeeze(date)
+    data = np.squeeze(data)
+    rg   = np.squeeze(rg)
+    tair = np.squeeze(tair)
+    vpd  = np.squeeze(vpd)
+    if np.ndim(date) != 1: raise Error('squeezed dates must be 1D array.')
+    if np.ndim(data) != 1: raise Error('squeezed data must be 1D array.')
+    if np.ndim(rg)   != 1: raise Error('squeezed rg must be 1D array.')
+    if np.ndim(tair) != 1: raise Error('squeezed tair must be 1D array.')
+    if np.ndim(vpd)  != 1: raise Error('squeezed vpd must be 1D array.')
 
     # check flags
     ndata = data.size
@@ -429,15 +438,13 @@ def gapfill(datein, datain, rgin, tairin, vpdin,
 
     if shape != False:
         if shape != True:
-            if err:
-                return np.reshape(data_std,shape)
-            else:
-                return np.reshape(data_fill,shape), np.reshape(quality,shape)
+            ishape = shape
         else:
-            if err:
-                return np.reshape(data_std,inshape)
-            else:
-                return np.reshape(data_fill,inshape), np.reshape(quality,inshape)
+            ishape = inshape
+        if err:
+            return np.reshape(data_std,ishape)
+        else:
+            return np.reshape(data_fill,ishape), np.reshape(quality,ishape)
     else:
         if err:
             return data_std
