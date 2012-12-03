@@ -105,7 +105,7 @@ def gap_filling(tofill, Rg, Tair, vpd, dates, \
             else:
                 return 3
 
-    #print 'GAP FILLING'
+    print 'GAP_FILLING: obsolete function. Use gapfill.'
     
     # -------------------------------------------------------------
     # PARAMETERS

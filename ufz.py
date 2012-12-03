@@ -29,8 +29,8 @@
     division               Divide two arrays, return 'otherwise' if division by 0.
     esat                   Calculates the saturation vapour pressure of water/ice.
     fread                  Reads in float array from ascii file.
+    functions              Common functions that are used in curve_fit or fmin parameter estimations.
     gapfill                Gapfill Eddy flux data.
-    gap_filling            Gapfills eddy flux data (CO2, LE, H). 
     get_brewer             Defines and returns Brewer colormap.
     heaviside              Heaviside (or unit step) operator.
     in_poly                Determines whether a 2D point falls in a polygon.
@@ -111,7 +111,6 @@
     ---------------
     convex_hull            Calculate subset of points that make a convex hull around a set of 2D points.
     gapfill                Gapfill Eddy flux data.
-    gap_filling            Gapfills flux data (CO2, LE, H).
     in_poly                Determines whether a 2D point falls in a polygon.
     interpol               One-dimensional linear interpolation on first dimension.
     kriging                Krig a surface from a set of 2D points.
@@ -154,6 +153,7 @@
     around                 Round to the passed power of ten.
     div                    Wrapper for division.
     division               Divide two arrays, return 'otherwise' if division by 0.
+    functions              Common functions that are used in curve_fit or fmin parameter estimations.
     heaviside              Heaviside (or unit step) operator.
     jab                    Jackknife-after-Bootstrap error.
     lhs                    Latin Hypercube Sampling of any distribution without correlations.
@@ -203,6 +203,7 @@
     Obsolete
     --------
     calcvpd                Calculates vapour pressure deficit.
+    gap_filling            Gapfills flux data (CO2, LE, H).
 
 
     License
@@ -256,6 +257,8 @@
               MC, Nov 2012 - added netcdftime but no import so that available w/o netcdf
               AP, Nov 2012 - convex_hull, in_poly, kriging, semivariogram update, srrasa, srrasa_trans
               MC, Nov 2012 - nee2gpp, nee2gpp_global, nee2gpp_lasslop, nee2gpp_reichstein
+              MC, Dec 2012 - functions
+                           - make gap_filling obsolete
 """
 # Routines provided
 from abc2plot          import *
@@ -274,6 +277,7 @@ from dewpoint          import *
 from division          import *
 from esat              import *
 from fread             import *
+import functions
 from gapfill           import *
 try:
     from gap_filling   import *

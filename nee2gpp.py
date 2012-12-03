@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import numpy as np
 import scipy.optimize as opt # curve_fit, fmin, fmin_tnc
+import functions # from ufz
 
 # ----------------------------------------------------------------------
 def nee2gpp(dates, nee, t, isday, rg=False, vpd=False, undef=np.nan,
@@ -272,40 +273,27 @@ def nee2gpp_global(dates, nee, t, isday, undef=np.nan,
     t       = np.squeeze(t)
     isday   = np.squeeze(isday)
     # Check squeezed shape
-    if dates.ndim != 1: raise ValueError('Error nee2gpp_global: squeezed dates must be 1D array.')
-    if nee.ndim   != 1: raise ValueError('Error nee2gpp_global: squeezed nee must be 1D array.')
-    if t.ndim     != 1: raise ValueError('Error nee2gpp_global: squeezed t must be 1D array.')
-    if isday.ndim != 1: raise ValueError('Error nee2gpp_global: squeezed isday must be 1D array.')
+    if dates.ndim != 1: raise Error('Error nee2gpp_global: squeezed dates must be 1D array.')
+    if nee.ndim   != 1: raise Error('Error nee2gpp_global: squeezed nee must be 1D array.')
+    if t.ndim     != 1: raise Error('Error nee2gpp_global: squeezed t must be 1D array.')
+    if isday.ndim != 1: raise Error('Error nee2gpp_global: squeezed isday must be 1D array.')
     ndata = dates.size
     if ((nee.size != ndata) | (t.size != ndata) | (isday.size != ndata)):
-        raise ValueError('Error nee2gpp_global: inputs must have the same size.')
+        raise Error('Error nee2gpp_global: inputs must have the same size.')
 
     # Transform to masked array with 1D mask
-    matype = type(np.ma.array([1]))
-    if type(nee) != matype:
-        nee = np.ma.array(nee, mask=np.zeros(ndata,dtype=np.bool))
-    else:
-        if nee.mask.size == 1:
-            nee = np.ma.array(nee, mask=np.zeros(ndata,dtype=np.bool))
-    if type(t) != matype:
-        t = np.ma.array(t, mask=np.zeros(ndata,dtype=np.bool))
-    else:
-        if t.mask.size == 1:
-            t = np.ma.array(t, mask=np.zeros(ndata,dtype=np.bool))
-    if type(isday) != matype:
-        isday = np.ma.array(isday, mask=np.zeros(ndata,dtype=np.bool))
-    else:
-        if isday.mask.size == 1:
-            isday = np.ma.array(isday, mask=np.zeros(ndata,dtype=np.bool))
+    nee   = np.ma.array(nee, mask=False)
+    t     = np.ma.array(t, mask=False)
+    isday = np.ma.array(isday, mask=False)
     # mask also undef
     if np.isnan(undef):
-        if np.ma.any(np.isnan(nee))  : nee   = np.ma.array(nee,   mask=np.isnan(nee),   keep_mask=True)
-        if np.ma.any(np.isnan(t))    : t     = np.ma.array(t,     mask=np.isnan(t),     keep_mask=True)
-        if np.ma.any(np.isnan(isday)): isday = np.ma.array(isday, mask=np.isnan(isday), keep_mask=True)
+        if np.ma.any(np.isnan(nee)):   nee[np.isnan(nee)]     = np.ma.masked
+        if np.ma.any(np.isnan(t)):     t[np.isnan(t)]         = np.ma.masked
+        if np.ma.any(np.isnan(isday)): isday[np.isnan(isday)] = np.ma.masked
     else:
-    	if np.ma.any(nee   == undef): nee   = np.ma.array(nee,   mask=(nee==undef),   keep_mask=True)
-    	if np.ma.any(t     == undef): t     = np.ma.array(t,     mask=(t==undef),     keep_mask=True)
-    	if np.ma.any(isday == undef): isday = np.ma.array(isday, mask=(isday==undef), keep_mask=True)
+    	if np.ma.any(nee==undef):   nee[nee==undef]     = np.ma.masked
+    	if np.ma.any(t==undef):     t[t==undef]         = np.ma.masked
+    	if np.ma.any(isday==undef): isday[isday==undef] = np.ma.masked
 
     # Partition - Global relationship as in Reichstein et al. (2005)
 
@@ -314,11 +302,11 @@ def nee2gpp_global(dates, nee, t, isday, undef=np.nan,
     ii   = np.squeeze(np.where(~mask))
     tt   = np.ma.compressed(t[ii])
     net  = np.ma.compressed(nee[ii])
-    # p, c     = opt.curve_fit(lloyd, tt, net, p0=[2.,200.]) # global parameter, global cov matrix
-    p        = opt.fmin(cost_lloyd, [2.,200.], args=(tt, net), disp=False)
+    # p, c     = opt.curve_fit(functions.lloyd_fix, tt, net, p0=[2.,200.]) # global parameter, global cov matrix
+    p        = opt.fmin(functions.cost_lloyd_fix, [2.,200.], args=(tt, net), disp=False)
     Reco     = np.ones(ndata)*undef
     ii       = np.squeeze(np.where(~t.mask))
-    Reco[ii] = lloyd(t[ii], p[0], p[1])
+    Reco[ii] = functions.lloyd_fix(t[ii], p[0], p[1])
 
     # GPP
     GPP     = np.ones(ndata)*undef
@@ -327,8 +315,12 @@ def nee2gpp_global(dates, nee, t, isday, undef=np.nan,
 
     # Return
     if masked:
-        GPP  = np.ma.array(GPP,  mask=(GPP == undef))
-        Reco = np.ma.array(Reco, mask=(Reco == undef))
+        if np.isnan(undef):
+            GPP  = np.ma.array(GPP,  mask=np.isnan(GPP))
+            Reco = np.ma.array(Reco, mask=np.isnan(Reco))
+        else:
+            GPP  = np.ma.array(GPP,  mask=(GPP == undef))
+            Reco = np.ma.array(Reco, mask=(Reco == undef))
 
     if shape != False:
         if shape != True:
@@ -476,32 +468,18 @@ def nee2gpp_reichstein(dates, nee, t, isday, rg=False, vpd=False, undef=np.nan,
         raise ValueError('Error nee2gpp_reichstein: inputs must have the same size.')
 
     # Transform to masked array with 1D mask
-    matype = type(np.ma.array([1]))
-    if type(nee) != matype:
-        nee = np.ma.array(nee, mask=np.zeros(ndata,dtype=np.bool))
-    else:
-        if nee.mask.size == 1:
-            nee = np.ma.array(nee, mask=np.zeros(ndata,dtype=np.bool))
-    if type(t) != matype:
-        t = np.ma.array(t, mask=np.zeros(ndata,dtype=np.bool))
-    else:
-        if t.mask.size == 1:
-            t = np.ma.array(t, mask=np.zeros(ndata,dtype=np.bool))
-    if type(isday) != matype:
-        isday = np.ma.array(isday, mask=np.zeros(ndata,dtype=np.bool))
-    else:
-        if isday.mask.size == 1:
-            isday = np.ma.array(isday, mask=np.zeros(ndata,dtype=np.bool))
+    nee   = np.ma.array(nee, mask=False)
+    t     = np.ma.array(t, mask=False)
+    isday = np.ma.array(isday, mask=False)
     # mask also undef
     if np.isnan(undef):
-        if np.ma.any(np.isnan(nee))  : nee   = np.ma.array(nee,   mask=np.isnan(nee),   keep_mask=True)
-        if np.ma.any(np.isnan(t))    : t     = np.ma.array(t,     mask=np.isnan(t),     keep_mask=True)
-        if np.ma.any(np.isnan(isday)): isday = np.ma.array(isday, mask=np.isnan(isday), keep_mask=True)
+        if np.ma.any(np.isnan(nee)):   nee[np.isnan(nee)]     = np.ma.masked
+        if np.ma.any(np.isnan(t)):     t[np.isnan(t)]         = np.ma.masked
+        if np.ma.any(np.isnan(isday)): isday[np.isnan(isday)] = np.ma.masked
     else:
-    	if np.ma.any(nee   == undef): nee   = np.ma.array(nee,   mask=(nee==undef),   keep_mask=True)
-    	if np.ma.any(t     == undef): t     = np.ma.array(t,     mask=(t==undef),     keep_mask=True)
-    	if np.ma.any(isday == undef): isday = np.ma.array(isday, mask=(isday==undef), keep_mask=True)
-
+    	if np.ma.any(nee==undef):   nee[nee==undef]     = np.ma.masked
+    	if np.ma.any(t==undef):     t[t==undef]         = np.ma.masked
+    	if np.ma.any(isday==undef): isday[isday==undef] = np.ma.masked
 
     # Partition - Local relationship = Reichstein et al. (2005)
 
@@ -522,14 +500,14 @@ def nee2gpp_reichstein(dates, nee, t, isday, rg=False, vpd=False, undef=np.nan,
         niii = iii.size
         if niii > 6:
             if (np.amax(tt[iii])-np.amin(tt[iii])) >= 5.:
-                p, c = opt.curve_fit(lloyd, tt[iii], net[iii], p0=[2.,200.]) # params, covariance
-                # p = opt.fmin(cost_lloyd, [2.,200.], args=(tt[iii], net[iii]), disp=False)
-                res  = np.sum((net[iii]-lloyd(tt[iii],p[0],p[1]))**2)        # residuals
-                s    = np.sqrt(np.diag(c * res)/np.float(niii-2))            # std err
+                p, c  = opt.curve_fit(functions.lloyd_fix, tt[iii], net[iii], p0=[2.,200.]) # params, covariance
+                # p     = opt.fmin(functions.cost_lloyd_fix, [2.,200.], args=(tt[iii], net[iii]), disp=False)
+                res   = np.sum((net[iii]-functions.lloyd_fix(tt[iii],p[0],p[1]))**2)        # residuals
+                s     = np.sqrt(np.diag(c * res)/np.float(niii-2))            # std err
                 # s    = np.sqrt(np.diag(c * res))                           # std dev
-                locp = locp + [p]
-                locs = locs + [s]
-                # locc = locc + [c]
+                locp += [p]
+                locs += [s]
+                # locc += [c]
     if len(locp) == 0:
         raise ValueError('Error nee2gpp_reichstein: No local relationship found.')
     locp   = np.squeeze(np.array(locp))
@@ -564,17 +542,17 @@ def nee2gpp_reichstein(dates, nee, t, isday, rg=False, vpd=False, undef=np.nan,
     refp  = [] # Rref param
     refii = [] # mean index of data points
     E0    = bestp[1]
-    et    = lloyd(tt, 1., E0)
+    et    = functions.lloyd_fix(tt, 1., E0)
     for i in xrange(dmin,dmax,4):
         iii  = np.squeeze(np.where((jul>=i) & (jul<(i+4))))
         niii = iii.size
         if niii > 3:
             # Calc directly minisation of (nee-p*et)**2
             # p = np.sum(net[iii]*et[iii])/np.sum(et[iii]**2)
-            # p, c = opt.curve_fit(lloyd_rref, et[iii], net[iii], p0=[2.])
-            p     = opt.fmin(cost_lloyd_rref, [2.], args=(et[iii], net[iii]), disp=False)
-            refp  = refp  + [p]
-            refii = refii + [np.int((iii[0]+iii[-1])/2)]
+            # p, c = opt.curve_fit(functions.lloyd_only_rref, et[iii], net[iii], p0=[2.])
+            p      = opt.fmin(functions.cost_lloyd_only_rref, [2.], args=(et[iii], net[iii]), disp=False)
+            refp  += [p]
+            refii += [np.int((iii[0]+iii[-1])//2)]
     if len(refp) == 0:
         raise ValueError('Error nee2gpp_reichstein: No ref relationship found.')
     refp  = np.squeeze(np.array(refp))
@@ -586,7 +564,7 @@ def nee2gpp_reichstein(dates, nee, t, isday, rg=False, vpd=False, undef=np.nan,
     # 5. Calc Reco
     Reco     = np.ones(ndata)*undef
     ii       = np.squeeze(np.where(~t.mask))
-    Reco[ii] = lloyd(t[ii], Rref[ii], E0)
+    Reco[ii] = functions.lloyd_fix(t[ii], Rref[ii], E0)
 
     # GPP
     GPP     = np.ones(ndata)*undef
@@ -594,8 +572,12 @@ def nee2gpp_reichstein(dates, nee, t, isday, rg=False, vpd=False, undef=np.nan,
     GPP[ii] = Reco[ii] - nee[ii]
 
     if masked:
-        GPP  = np.ma.array(GPP,  mask=(GPP == undef))
-        Reco = np.ma.array(Reco, mask=(Reco == undef))
+        if np.isnan(undef):
+            GPP  = np.ma.array(GPP,  mask=np.isnan(GPP))
+            Reco = np.ma.array(Reco, mask=np.isnan(Reco))
+        else:
+            GPP  = np.ma.array(GPP,  mask=(GPP == undef))
+            Reco = np.ma.array(Reco, mask=(Reco == undef))
 
     if shape != False:
         if shape != True:
@@ -733,46 +715,24 @@ def nee2gpp_lasslop(dates, nee, t, isday, rg, vpd, undef=np.nan,
         raise ValueError('Error nee2gpp_lasslop: lasslop inputs must have the same size as other inputs.')
 
     # Transform to masked array with 1D mask
-    matype = type(np.ma.array([1]))
-    if type(nee) != matype:
-        nee = np.ma.array(nee, mask=np.zeros(ndata,dtype=np.bool))
-    else:
-        if nee.mask.size == 1:
-            nee = np.ma.array(nee, mask=np.zeros(ndata,dtype=np.bool))
-    if type(t) != matype:
-        t = np.ma.array(t, mask=np.zeros(ndata,dtype=np.bool))
-    else:
-        if t.mask.size == 1:
-            t = np.ma.array(t, mask=np.zeros(ndata,dtype=np.bool))
-    if type(isday) != matype:
-        isday = np.ma.array(isday, mask=np.zeros(ndata,dtype=np.bool))
-    else:
-        if isday.mask.size == 1:
-            isday = np.ma.array(isday, mask=np.zeros(ndata,dtype=np.bool))
+    nee   = np.ma.array(nee, mask=False)
+    t     = np.ma.array(t, mask=False)
+    isday = np.ma.array(isday, mask=False)
+    rg    = np.ma.array(rg, mask=False)
+    vpd   = np.ma.array(vpd, mask=False)
     # mask also undef
     if np.isnan(undef):
-        if np.ma.any(np.isnan(nee))  : nee   = np.ma.array(nee,   mask=np.isnan(nee),   keep_mask=True)
-        if np.ma.any(np.isnan(t))    : t     = np.ma.array(t,     mask=np.isnan(t),     keep_mask=True)
-        if np.ma.any(np.isnan(isday)): isday = np.ma.array(isday, mask=np.isnan(isday), keep_mask=True)
+        if np.ma.any(np.isnan(nee)):   nee[np.isnan(nee)]     = np.ma.masked
+        if np.ma.any(np.isnan(t)):     t[np.isnan(t)]         = np.ma.masked
+        if np.ma.any(np.isnan(isday)): isday[np.isnan(isday)] = np.ma.masked
+        if np.ma.any(np.isnan(rg)):    rg[np.isnan(rg)]       = np.ma.masked
+        if np.ma.any(np.isnan(vpd)):   vpd[np.isnan(vpd)]     = np.ma.masked
     else:
-    	if np.ma.any(nee   == undef): nee   = np.ma.array(nee,   mask=(nee==undef),   keep_mask=True)
-    	if np.ma.any(t     == undef): t     = np.ma.array(t,     mask=(t==undef),     keep_mask=True)
-    	if np.ma.any(isday == undef): isday = np.ma.array(isday, mask=(isday==undef), keep_mask=True)
-
-    if type(rg) != matype:
-        rg = np.ma.array(rg, mask=np.zeros(ndata,dtype=np.bool))
-    else:
-        if rg.mask.size == 1:
-            rg = np.ma.array(rg, mask=np.zeros(ndata,dtype=np.bool))
-    if type(vpd) != matype:
-        vpd = np.ma.array(vpd, mask=np.zeros(ndata,dtype=np.bool))
-    else:
-        if vpd.mask.size == 1:
-            vpd = np.ma.array(vpd, mask=np.zeros(ndata,dtype=np.bool))
-    # mask also undef
-    if np.ma.any(rg   == undef): rg  = np.ma.array(rg,  mask=(rg==undef),  keep_mask=True)
-    if np.ma.any(vpd == undef):  vpd = np.ma.array(vpd, mask=(vpd==undef), keep_mask=True)
-
+    	if np.ma.any(nee==undef):   nee[nee==undef]     = np.ma.masked
+    	if np.ma.any(t==undef):     t[t==undef]         = np.ma.masked
+    	if np.ma.any(isday==undef): isday[isday==undef] = np.ma.masked
+    	if np.ma.any(rg==undef):    rg[rg==undef]       = np.ma.masked
+    	if np.ma.any(vpd==undef):   vpd[vpd==undef]     = np.ma.masked
 
     # Partition - Lasslop et al. (2010) method
     do_lgpp = False
@@ -815,8 +775,8 @@ def nee2gpp_lasslop(dates, nee, t, isday, rg, vpd, undef=np.nan,
         iii  = np.squeeze(np.where((njul>=i) & (njul<(i+12))))
         niii = iii.size
         if niii > 3:
-            # p, c = opt.curve_fit(lloyd, ntt[iii], nnet[iii], p0=[aRref,100.])
-            p  = opt.fmin(cost_lloyd, [aRref,100.], args=(ntt[iii], nnet[iii]), disp=False)
+            # p, c = opt.curve_fit(functions.lloyd_fix, ntt[iii], nnet[iii], p0=[aRref,100.])
+            p  = opt.fmin(functions.cost_lloyd_fix, [aRref,100.], args=(ntt[iii], nnet[iii]), disp=False)
             E0 = np.maximum(p[1], 50.)
         else:
             if zaehl >= 0:
@@ -829,7 +789,7 @@ def nee2gpp_lasslop(dates, nee, t, isday, rg, vpd, undef=np.nan,
         iii  = np.squeeze(np.where((djul>=i) & (djul<(i+4))))
         niii = iii.size
         if niii > 3:
-            et     = lloyd(dtt[iii], 1., E0)
+            et     = functions.lloyd_fix(dtt[iii], 1., E0)
             again  = True
             ialpha = aalpha
             ibeta0 = abeta0
@@ -838,7 +798,7 @@ def nee2gpp_lasslop(dates, nee, t, isday, rg, vpd, undef=np.nan,
             bounds = [[None,None],[None,None],[None,None],[None,None]]
             while again:
                 again = False
-                p, nfeval, rc  = opt.fmin_tnc(cost_lasslop, [ialpha,ibeta0,ik,iRref], bounds=bounds,
+                p, nfeval, rc  = opt.fmin_tnc(functions.cost_lasslop, [ialpha,ibeta0,ik,iRref], bounds=bounds,
                                               args=(drg[iii], et, dvpd[iii], dnet[iii]),
                                               approx_grad=True, disp=False)
                 # if parameters beyond some bounds, set params and redo the optim or skip
@@ -894,18 +854,18 @@ def nee2gpp_lasslop(dates, nee, t, isday, rg, vpd, undef=np.nan,
     # 4. Calc Reco
     Reco     = np.ones(ndata)*undef
     ii       = np.squeeze(np.where(~t.mask))
-    Reco[ii] = lloyd(t[ii], Rref[ii], E0[ii])
+    Reco[ii] = functions.lloyd_fix(t[ii], Rref[ii], E0[ii])
 
     # 5. Calc GPP from light response for check
     if do_lgpp:
         alpha    = np.interp(dates, djul[lii], lE0)
         beta0    = np.interp(dates, djul[lii], lbeta0)
         k        = np.interp(dates, djul[lii], lk)
-        et       = lloyd(t, 1., E0)
+        et       = functions.lloyd_fix(t, 1., E0)
         lmask    = t.mask | isday.mask | rg.mask | vpd.mask
         ii       = np.squeeze(np.where(~lmask))
         lgpp     = np.zeros(ndata)
-        lgpp[ii] = lasslop(rg[ii], et[ii], vpd[ii], alpha[ii], beta0[ii], k[ii], Rref[ii]) - Reco[ii]
+        lgpp[ii] = functions.lasslop(rg[ii], et[ii], vpd[ii], alpha[ii], beta0[ii], k[ii], Rref[ii]) - Reco[ii]
 
     # GPP
     GPP     = np.ones(ndata)*undef
@@ -913,8 +873,12 @@ def nee2gpp_lasslop(dates, nee, t, isday, rg, vpd, undef=np.nan,
     GPP[ii] = Reco[ii] - nee[ii]
 
     if masked:
-        GPP  = np.ma.array(GPP,  mask=(GPP == undef))
-        Reco = np.ma.array(Reco, mask=(Reco == undef))
+        if np.isnan(undef):
+            GPP  = np.ma.array(GPP,  mask=np.isnan(GPP))
+            Reco = np.ma.array(Reco, mask=np.isnan(Reco))
+        else:
+            GPP  = np.ma.array(GPP,  mask=(GPP == undef))
+            Reco = np.ma.array(Reco, mask=(Reco == undef))
 
     if shape != False:
         if shape != True:
@@ -926,61 +890,61 @@ def nee2gpp_lasslop(dates, nee, t, isday, rg, vpd, undef=np.nan,
 
 
 
-# -------------------------------------------------------------
-# Fit functions
-def lloyd(T, Rref, E0):
-    """ Lloyd & Taylor (1994)
-        T       Temperature [k]
-        Rref    Respiration at Tref=10 degC [umol(C) m-2 s-1]
-        E0      Activation energy [K]
-    """
-    Tref = 283.15 #  10    [degC]
-    T0   = 227.13 # -46.02 [degC]
-    return Rref*np.exp(E0*(1./(Tref-T0)-1./(T-T0)))
+# # -------------------------------------------------------------
+# # Fit functions
+# def lloyd(T, Rref, E0):
+#     """ Lloyd & Taylor (1994)
+#         T       Temperature [k]
+#         Rref    Respiration at Tref=10 degC [umol(C) m-2 s-1]
+#         E0      Activation energy [K]
+#     """
+#     Tref = 283.15 #  10    [degC]
+#     T0   = 227.13 # -46.02 [degC]
+#     return Rref*np.exp(E0*(1./(Tref-T0)-1./(T-T0)))
 
-def cost_lloyd(p, T, NEE):
-    """ Cost function for Lloyd """
-    return np.sum(np.abs(NEE-lloyd(T, p[0], p[1])))
-
-
-
-def lloyd_rref(et, Rref):
-    """ If E0 is know in Lloyd & Taylor (1994) then one can calc
-        the exponential term outside the routine and the fitting
-        becomes linear """
-    return Rref*et
-
-def cost_lloyd_rref(p, et, NEE):
-    """ Cost function for rref """
-    return np.sum(np.abs(NEE-lloyd_rref(et, p[0])))
+# def cost_lloyd(p, T, NEE):
+#     """ Cost function for Lloyd """
+#     return np.sum(np.abs(NEE-lloyd(T, p[0], p[1])))
 
 
 
-def lasslop(Rg, et, VPD, alpha, beta0, k, Rref):
-    """ Lasslop et al. (2010) is basically the rectangular, hyperbolic
-        light-response of NEE as by Falge et al. (2001), where the
-        respiration is calculated with Lloyd & Taylor (1994), and the
-        maximum canopy uptake rate at light saturation decreases
-        exponentially with VPD as in Koerner (1995)
-        Rg      Global radiation [W m-2]
-        et      Exponential in Lloyd & Taylor: np.exp(E0*(1./(Tref-T0)-1./(T-T0))) []
-        VPD     Vapour Pressure Deficit [Pa]
-        alpha   Light use efficiency, i.e. initial slope of light response curve [umol(C) J-1]
-        beta0   Maximum CO2 uptake rate at VPD0=10 hPa [umol(C) m-2 s-1]
-        k       e-folding of exponential decrease of maximum CO2 uptake with VPD increase [Pa-1]
-        Rref    Respiration at Tref (10 degC) [umol(C) m-2 s-1]
-    """
-    # Lloyd & Taylor (1994)
-    gamma = Rref*et
-    # Koerner (1995)
-    VPD0  = 1000. # 10 hPa
-    kk    = np.maximum(np.minimum(-k*(VPD-VPD0), 600.), -600.)
-    beta  = np.where(VPD > VPD0, beta0*np.exp(kk), beta0)
-    return -alpha*beta*Rg/(alpha*Rg+beta) + gamma
+# def lloyd_rref(et, Rref):
+#     """ If E0 is know in Lloyd & Taylor (1994) then one can calc
+#         the exponential term outside the routine and the fitting
+#         becomes linear """
+#     return Rref*et
 
-def cost_lasslop(p, Rg, et, VPD, NEE):
-    """ Cost function for Lasslop """
-    return np.sum(np.abs(NEE-lasslop(Rg, et, VPD, p[0], p[1], p[2], p[3])))
+# def cost_lloyd_rref(p, et, NEE):
+#     """ Cost function for rref """
+#     return np.sum(np.abs(NEE-lloyd_rref(et, p[0])))
+
+
+
+# def lasslop(Rg, et, VPD, alpha, beta0, k, Rref):
+#     """ Lasslop et al. (2010) is basically the rectangular, hyperbolic
+#         light-response of NEE as by Falge et al. (2001), where the
+#         respiration is calculated with Lloyd & Taylor (1994), and the
+#         maximum canopy uptake rate at light saturation decreases
+#         exponentially with VPD as in Koerner (1995)
+#         Rg      Global radiation [W m-2]
+#         et      Exponential in Lloyd & Taylor: np.exp(E0*(1./(Tref-T0)-1./(T-T0))) []
+#         VPD     Vapour Pressure Deficit [Pa]
+#         alpha   Light use efficiency, i.e. initial slope of light response curve [umol(C) J-1]
+#         beta0   Maximum CO2 uptake rate at VPD0=10 hPa [umol(C) m-2 s-1]
+#         k       e-folding of exponential decrease of maximum CO2 uptake with VPD increase [Pa-1]
+#         Rref    Respiration at Tref (10 degC) [umol(C) m-2 s-1]
+#     """
+#     # Lloyd & Taylor (1994)
+#     gamma = Rref*et
+#     # Koerner (1995)
+#     VPD0  = 1000. # 10 hPa
+#     kk    = np.maximum(np.minimum(-k*(VPD-VPD0), 600.), -600.)
+#     beta  = np.where(VPD > VPD0, beta0*np.exp(kk), beta0)
+#     return -alpha*beta*Rg/(alpha*Rg+beta) + gamma
+
+# def cost_lasslop(p, Rg, et, VPD, NEE):
+#     """ Cost function for Lasslop """
+#     return np.sum(np.abs(NEE-lasslop(Rg, et, VPD, p[0], p[1], p[2], p[3])))
 
 
 
