@@ -2,33 +2,44 @@
 import numpy as n, time
 
 def convex_hull(points, graphic=False, smidgen=0.0075):
-    
-    '''
+    """
+        Calculate subset of 2D points that make a convex hull around a set of
+        2D points. Recursively eliminates points that lie inside two
+        neighbouring points until only convex hull is remaining.
+
+        
+        Definition
+        ----------
+        def convex_hull(points, graphic=True, smidgen=0.0075)
+
+       
+        Input
+        -----
+        points       ndarray (2 x m), array of points for which to find hull
+        
+        
+        Optional Input
+        --------------
+        graphic      bool, use pylab to show progress
+        smidgen      float, offset for graphic number labels - useful
+                     values depend on your data range
+        
+        
+        Output
+        ------
+        hull_points  ndarray (2 x n), convex hull surrounding points
+                
+        
+        References
+        ----------
         This routine (with additional subroutines) was coded originally by 
         Angus McMorland, 2007.
         It is a copy from the scipy cookbook page:
         http://www.scipy.org/Cookbook/Finding_Convex_Hull
-        
-        PURPOSE:
-        Calculate subset of 2D points that make a convex hull around a set of
-        2D points. Recursively eliminates points that lie inside two
-        neighbouring points until only convex hull is remaining.
-        
-        DEFINITION:
-        def convex_hull(points, graphic=True, smidgen=0.0075)
-        
-        INPUT:
-        points    : ndarray (2 x m), array of points for which to find hull
-        
-        PARAMETERS:
-        graphic   : bool, use pylab to show progress
-        smidgen   : float, offset for graphic number labels - useful
-                    values depend on your data range
-        
-        OUTPUT:
-        hull_points : ndarray (2 x n), convex hull surrounding points
+         
                              
-        EXAMPLE:
+        Examples
+        --------
         # make some points
         >>> points = n.array([[2,3,2,4,5,5,7,5,5],[1,2,4,3,6,4,3,2,1]])        
         >>> hull_xy = convex_hull(points, graphic=False, smidgen=0.075)
@@ -39,7 +50,9 @@ def convex_hull(points, graphic=False, smidgen=0.0075):
          [2 4]
          [2 1]]
         
-        LICENSE:
+        
+        License
+        -------
         This file is part of the UFZ Python library.
     
         The UFZ Python library is free software: you can redistribute it and/or 
@@ -58,10 +71,13 @@ def convex_hull(points, graphic=False, smidgen=0.0075):
     
         Copyright 2009-2012 Matthias Cuntz
     
-        HISTORY:
+    
+        History
+        -------
         Written, Arndt Piayda, Nov 2012
+        Modified, Arndt Piayda, Dec 2012 - documentation change
 
-    '''
+    """
 
     if graphic:
         import pylab as p
