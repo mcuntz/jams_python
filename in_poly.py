@@ -3,8 +3,9 @@ import numpy as np
 
 def in_poly(P, coord_x, coord_y):
     """
-        Determines whether a 2D point falls within a polygon, on a vertex or edge,
-        or is located outside of a polygon. The polygon can be convex or not.
+        Determines whether a 2D point falls within a polygon, on a vertex or
+        edge, or is located outside of a polygon. The polygon can be convex or
+        not.
 
 
         Definition
@@ -37,7 +38,8 @@ def in_poly(P, coord_x, coord_y):
         This routine is re-coded from the UFZ Fortran library.
         Copyright: Juliane Mai, 2012.
         The original version of the source code (pnpoly) was implemented by
-        W. Randolph Franklin. It had been, however, assigning insufficiently vertex/edge points.
+        W. Randolph Franklin. It had been, however, assigning insufficiently
+        vertex/edge points.
 
 
         Example
