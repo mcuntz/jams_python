@@ -2,29 +2,37 @@
 import numpy as np
 
 def srrasa(xy,strata=5,n=3,plot=False):
-    
-    '''        
-        PURPOSE:
+    """       
         Generates stratified random 2D points within a given rectangular area.
         
-        DEFINITION:
-        def srrasa(xy,strata=5,n=3,plot=True):
         
-        INPUT:
-        xy        : list of floats (4), list with the x and y coordinates 
+        Definition
+        ----------
+        def srrasa(xy,strata=5,n=3,plot=False):
+        
+        
+        Input
+        ----- 
+        xy          list of floats (4), list with the x and y coordinates 
                     enclosing the designated rectangle in the form [x1,x2,y1,y2]
         
-        PARAMETERS:
-        strata    : int, number of strata per axis
-        n         : int, number of random points in each strata
-        plot      : bool, if True, stratas and points are plotted,
-                    otherwise not:
         
-        OUTPUT:
-        rand_xy   : ndarray (n,2), x and y coordinates of the stratified random
+        Optional Input
+        --------------
+        strata      int, number of strata per axis
+        n           int, number of random points in each strata
+        plot        bool, if True, stratas and points are plotted,
+                    otherwise not
+        
+        
+        Output
+        ------
+        rand_xy     ndarray (n,2), x and y coordinates of the stratified random
                     points in the given rectangular.
+               
                              
-        EXAMPLE:
+        Examples
+        --------
         # since the result are random numbers no doctest can be performed.
         # Therefor you find only an example calling sequence here:
         rand_xy = srrasa([652219.,652290.,5772970.,5773040.],
@@ -32,7 +40,9 @@ def srrasa(xy,strata=5,n=3,plot=False):
         ->  gives you within the rectangle of the given coordinates 16 (4**2)
             stratas with 3 random points in each one.
         
-        LICENSE:
+        
+        License
+        -------
         This file is part of the UFZ Python library.
     
         The UFZ Python library is free software: you can redistribute it and/or 
@@ -51,10 +61,14 @@ def srrasa(xy,strata=5,n=3,plot=False):
     
         Copyright 2012 Arndt Piayda
     
-        HISTORY:
+    
+        History
+        -------
         Written,  AP, Nov 2012
         Modified, MC, Nov 2012 - default plot=False
-    '''
+                  AP, Dec 2012 - documentation change
+        
+    """
     
     # calculate strata steps
     sw = (xy[1]-xy[0])/strata
@@ -110,36 +124,45 @@ def srrasa(xy,strata=5,n=3,plot=False):
 
 
 
-def srrasa_trans(xy,strata=5,n=3,num=3,rl=0.5,silent=True,plot=True):
+def srrasa_trans(xy,strata=5,n=3,num=3,rl=0.5,silent=True,plot=False):
     
-    '''        
-        PURPOSE:
+    """        
         Generates stratified random 2D transects within a given rectangular
         area.
         
-        DEFINITION:
-        def srrasa(xy,strata=5,n=3,num=3,silent=True,plot=True):
         
-        INPUT:
-        xy        : list of floats (4), list with the x and y coordinates 
+        Definition
+        ----------
+        def srrasa(xy,strata=5,n=3,num=3,rl=0.5,silent=True,plot=False):
+        
+        
+        Input
+        ----- 
+        xy          list of floats (4), list with the x and y coordinates 
                     enclosing the designated rectangle in the form [x1,x2,y1,y2]
         
-        PARAMETERS:
-        strata    : int, number of strata per axis
-        n         : int, number of random transects in each strata
-        num       : int, number of points in each transect
-        rl        : float [0. to 1.], relative length of transect with respect
+        
+        Optional Input
+        --------------
+        strata      int, number of strata per axis
+        n           int, number of random transects in each strata
+        num         int, number of points in each transect
+        rl          float [0. to 1.], relative length of transect with respect
                     to width of stratum
-        silent    : bool, if False, runtime diagnostics are printed to the
+        silent      bool, if False, runtime diagnostics are printed to the
                     console, otherwise not
-        plot      : bool, if True, stratas and points are plotted,
+        plot        bool, if True, stratas and points are plotted,
                     otherwise not
         
-        OUTPUT:
-        rand_xy   : ndarray (n,2), x and y coordinates of the stratified random
+        
+        Output
+        ------
+        rand_xy     ndarray (n,2), x and y coordinates of the stratified random
                     transect points in the given rectangular.
                              
-        EXAMPLE:
+                             
+        Examples
+        --------
         # since the result are random numbers no doctest can be performed.
         # Therefor you find only an example calling sequence here:
         rand_xy = srrasa_trans([652219.,652290.,5772970.,5773040.], strata=4,
@@ -149,7 +172,9 @@ def srrasa_trans(xy,strata=5,n=3,num=3,rl=0.5,silent=True,plot=True):
             0.5*width_of_strata long and contains 5 points logarithmical
             distributed.
         
-        LICENSE:
+        
+        License
+        -------
         This file is part of the UFZ Python library.
     
         The UFZ Python library is free software: you can redistribute it and/or 
@@ -168,10 +193,13 @@ def srrasa_trans(xy,strata=5,n=3,num=3,rl=0.5,silent=True,plot=True):
     
         Copyright 2009-2012 Matthias Cuntz
     
-        HISTORY:
+    
+        History
+        -------
         Written, Arndt Piayda, Nov 2012
+        Modified, Arndt Piayda, Dec 2012 - documentation change
 
-    '''
+    """
     
     # calculate strata steps 
     sw = (xy[1]-xy[0])/strata
