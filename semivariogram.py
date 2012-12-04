@@ -12,11 +12,8 @@ import numpy as np
 
 def semivariogram(x,y,v,nL,di,td,type='omnidirectional',negscat=False,
                   model='exponential', graph=False,lunit='m',p0=(1.,1.,1.),
-                  runtimediag=True):
-
+                  runtimediag=False):
     """
-        PURPOSE:
-        
         Calculates single or multiple experimental semivariogram(s) for
         spatial distributed data. X and Y coordinates and corresponding
         values are required in separate numpy arrays. Different theoretical
@@ -24,33 +21,32 @@ def semivariogram(x,y,v,nL,di,td,type='omnidirectional',negscat=False,
         and the fitted model parameters are given to the output.
         (small code parts based on Alghalandis.com)
         
-        REQUIREMENTS:
         
-        pylab, scipy (at least version 0.8.0), matplotlib, numpy
-        
-        DEFINITION:
-            
+        Definition
+        ----------            
         def semivariogram(x,y,v,nL,di,td,type='omnidirectional',negscat=False,
-                          model='exponential',graph=True,lunit='m',
-                          p0=(0.5,0.5,100),runtimediag=True):
+                          model='exponential',graph=False,lunit='m',
+                          p0=(0.5,0.5,100),runtimediag=False):
+             
                     
-        INPUT:
-            
-        x    :    numpy array with longitude ('easting')
-        y    :    numpy array with latitude ('northing')
-        v    :    numpy array with values
-        nL   :    int with number of lags to calculate
-        di   :    list with angles to consider (in degree). di's > 180
+        Input
+        -----            
+        x         numpy array with longitude ('easting')
+        y         numpy array with latitude ('northing')
+        v         numpy array with values
+        nL        int with number of lags to calculate
+        di        list with angles to consider (in degree). di's > 180
                   or < -180 are not allowed.
-        td   :    int with one sided angle tolerance, so td=30 means
+        td        int with one sided angle tolerance, so td=30 means
                   an angular span of 60 (in degree). Choose td big
                   enough, so that no "empty" angular span with no
                   samples appear. Otherwise, an exeption is raised.
                   td > 180 is not allowed.
         
-        PARAMETERS:
-           
-        type :    type of semivariogram
+        
+        Optional Input
+        --------------
+        type      type of semivariogram
         
             'omnidirectional' semivariogram is calculated for the hole
                               circle from 0 to 180 and 0 to -180. So 
@@ -67,14 +63,14 @@ def semivariogram(x,y,v,nL,di,td,type='omnidirectional',negscat=False,
                               considered. Every angle between 0 to 180
                               and 0 to -180 are allowed.
         
-        negscat:  It is common in geostatistics to neglect large lags which
+        negscat   It is common in geostatistics to neglect large lags which
                   tend to scatter and contain outliers. By setting negscat to
                   a value between 0 and 1 (both excludet) you can cut off the 
                   tail of the experimental semivariogram and the fitting will 
                   be done only to the remaining part. If it's set to False, the
                   hole semivariogram is calculated. (default=False)
         
-        model:    type of theoretical semivariogram model to fit to the
+        model     type of theoretical semivariogram model to fit to the
                   experimental semivariogram.
                   
             'exponential'     exponential semivariogram model (default)
@@ -90,13 +86,13 @@ def semivariogram(x,y,v,nL,di,td,type='omnidirectional',negscat=False,
                               right model)
             'nomodel'         model fitting is disabled
         
-        graph:    If True, plotting is enabled. If False, plotting is
+        graph     If True, plotting is enabled. If False, plotting is
                   disabled. (default=True)
         
-        lunit:    Unit of the longitude and latitude (default=meter, 
+        lunit     Unit of the longitude and latitude (default=meter, 
                   only used for plot labeling)
         
-        p0   :    Initial guess for parameter estimation of the 
+        p0        Initial guess for parameter estimation of the 
                   theoretical semivariogram.
                   1st entry: equals approximately the nugget
                   2nd entry: equals approximately nugget-sill
@@ -105,46 +101,49 @@ def semivariogram(x,y,v,nL,di,td,type='omnidirectional',negscat=False,
                   Sometimes you have to play around with it if no
                   fitting result can be reached.
         
-        runtimediag:
+        runtimediag 
                   If True, during run time of the function, diagnostics
                   are printed to the console. If False, runtime diagnostics
                   print is disabled. (default=True)
            
-        OUTPUT:
-        
+           
+        Output
+        ------
         if model is set to 'nomodel':
-        h     :   array(s) of lags
-        g     :   array(s) of variances
-        c     :   array(s) of samples per lag
+        h         array(s) of lags
+        g         array(s) of variances
+        c         array(s) of samples per lag
         
         otherwise:
-        nugget:   height of nugget(s) [(unit of v)**2], always >=0
-        sill  :   height if sill(s) [(unit of v)**2], always >=0
-        range :   distance of range [unit of x and y], always >=0
-        vark  :   coefficient(s) of variation averaged over all three
+        nugget    height of nugget(s) [(unit of v)**2], always >=0
+        sill      height if sill(s) [(unit of v)**2], always >=0
+        range     distance of range [unit of x and y], always >=0
+        vark      coefficient(s) of variation averaged over all three
                   model parameter (goodness-of-fit) [-] 
-        pcov  :   matrices of parameter variance and covariances
+        pcov      matrices of parameter variance and covariances
                   of the model parameters
-        h     :   array(s) of lags
-        g     :   array(s) of variances
-        c     :   array(s) of samples per lag
-        mod   :   model function, either the one you selected or the model with
+        h         array(s) of lags
+        g         array(s) of variances
+        c         array(s) of samples per lag
+        mod       model function, either the one you selected or the model with
                   the best fit if you selected model='noidea' 
-        popt  :   array of optimized parameters for the model
+        popt      array of optimized parameters for the model
                   
-        GRAPHS:
-        
-        Figure 1: shows a scatter plot of your original geodata
-        
-        Figure 2: shows the experimental and theoretical semivariogram
-        
-        Figure 3: shows the number of samples in each lag and angle
-        
-        Figure 4: visualize di and td, the angles and angle tolerances
+        graphs:
+        Figure 1  shows a scatter plot of your original geodata
+        Figure 2  shows the experimental and theoretical semivariogram
+        Figure 3  shows the number of samples in each lag and angle
+        Figure 4  visualize di and td, the angles and angle tolerances
                   you have chosen.
         
-        EXAMPLES:
         
+        References
+        ----------
+        Small code parts based on Alghalandis.com.
+        
+        
+        Examples
+        --------
         # provide you some sample data:
         
         # easting
@@ -284,7 +283,9 @@ def semivariogram(x,y,v,nL,di,td,type='omnidirectional',negscat=False,
         >>> print np.round(range, 0)
         [ 100.  100.  100.  100.  100.  100.  100.   89.]
         
-        LICENSE:
+        
+        License
+        -------
         This file is part of the UFZ Python library.
     
         The UFZ Python library is free software: you can redistribute it and/or 
@@ -303,11 +304,14 @@ def semivariogram(x,y,v,nL,di,td,type='omnidirectional',negscat=False,
     
         Copyright 2011-2012 Arndt Piayda
     
-        HISTORY:
+    
+        History
+        -------
         Written,  AP, Feb 2011
         Modified, AP, Nov 2012 - Parameter bounds for fitting algr.
                                - Minor errors corrected
                   MC, Nov 2012 - default graph=False
+                  AP, Dec 2012 - documentation change
     """
     
     # check input data
