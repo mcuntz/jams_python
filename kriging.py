@@ -7,81 +7,87 @@ from in_poly import in_poly
 
 def kriging(x,y,z,semi_mod,semi_popt,xnew=None,ynew=None,plot=False,
             masked=False,silent=True,eop=None):
-    
     """
-        PURPOSE:
         Kriging a surface from a set of 2D points with a given semivariogram
         model and associated optimized parameters. Plot the surface and the
         corresponding kriging variance. The coordinates and values of the
         surface can be masked outside the convex hull of the given input points.
         Optional extraction of kriged values at distinct points within the
         surface is possible.
-        This routine is recoded and extended from a matlab script by Juliane
-        Mai.
+
         
-        REQUIREMENTS:
-        scipy, matplotlib, numpy, convex_hull, in_poly
-        
-        DEFINITION:
+        Definition
+        ----------
         def kriging(x,y,z,semi_mod,semi_popt,xnew=None,ynew=None,plot=False,
                     masked=False,silent=True,eop=None):
-                    
-        INPUT:
-        x    :     array, x coordinates
-        y    :     array, y coordinates
-        z    :     array, values
-        semi_mod:  function, semivariogram model (e.g. output from the UFZ
+
+
+        Input
+        -----
+        x          array, x coordinates
+        y          array, y coordinates
+        z          array, values
+        semi_mod   function, semivariogram model (e.g. output from the UFZ
                    semivariogram routine)
-        semi_popt: array, parameters of the semivariogram model (e.g. output
+        semi_popt  array, parameters of the semivariogram model (e.g. output
                    from the UFZ semivariogram routine)
-        xnew :     array (n), x coordinates of the desired surface, they will be
+        xnew       array (n), x coordinates of the desired surface, they will be
                    used to generate a 2D mesh for the surface. If left None, 
                    values will be kriged only for the points given in eop. 
-        ynew :     array (m), y coordinates of the desired surface, they will be
+        ynew       array (m), y coordinates of the desired surface, they will be
                    used to generate a 2D mesh for the surface. If left None, 
                    values will be kriged only for the points given in eop.
-        eop      : array (k,2), x and y coordinates of distinct points where
+        eop        array (k,2), x and y coordinates of distinct points where
                    a kriged value is desired.
-        
-        PARAMETERS:
-        plot     : bool, plots will be generated if True, otherwise not.
-        masked   : bool, if True, the output arrays will be np.ma.masked_arrays
+
+
+        Optional Input
+        --------------
+        plot       bool, plots will be generated if True, otherwise not.
+        masked     bool, if True, the output arrays will be np.ma.masked_arrays
                    where coordinates and values outside of the convex hull of
                    the input data are masked. In the generated plots these
                    values will be hidden. If False, the output arrays will be
                    np.arrays and all values within the kriging rectangle are
                    visible in the plots.
-        silent   : bool, if True, no runtime diagnostics are printed to the
+        silent     bool, if True, no runtime diagnostics are printed to the
                    console.
-           
-        OUTPUT:
+
+
+        Output
+        ------
         if eop is None:
-        xnew   : 2D array (n,m), x coordinates of the surface grid 
-        ynew   : 2D array (n,m), y coordinates of the surface grid
-        znew   : 2D array (n,m), values of the surface grid
-        varnew : 2D array (n,m), kriging variance of the surface grid
+        xnew     2D array (n,m), x coordinates of the surface grid 
+        ynew     2D array (n,m), y coordinates of the surface grid
+        znew     2D array (n,m), values of the surface grid
+        varnew   2D array (n,m), kriging variance of the surface grid
         
         if xnew is None:
-        eopz   : array (k), kriged values at the desired distinct points of eop
-        eopvar : array (k), kriging variance at the desired distinct points of
+        eopz     array (k), kriged values at the desired distinct points of eop
+        eopvar   array (k), kriging variance at the desired distinct points of
                  eop
         
         if both are not None:
-        xnew   : 2D array (n,m), x coordinates of the surface grid 
-        ynew   : 2D array (n,m), y coordinates of the surface grid
-        znew   : 2D array (n,m), values of the surface grid
-        varnew : 2D array (n,m), kriging variance of the surface grid
-        eopz   : array (k), kriged values at the desired distinct points of eop
-        eopvar : array (k), kriging variance at the desired distinct points of
-
-                  
-        GRAPHS:
+        xnew     2D array (n,m), x coordinates of the surface grid 
+        ynew     2D array (n,m), y coordinates of the surface grid
+        znew     2D array (n,m), values of the surface grid
+        varnew   2D array (n,m), kriging variance of the surface grid
+        eopz     array (k), kriged values at the desired distinct points of eop
+        eopvar   array (k), kriging variance at the desired distinct points of
         
-        kriging: surface, shows the kriged surface
+        graphs:
+        kriging surface, shows the kriged surface
+        kriging variance, shows the kriging variance
         
-        kriging: variance, shows the kriging variance
+                
+        References
+        ----------
+        This routine is recoded and extended from a matlab script by Juliane
+        Mai.
         
-        EXAMPLES:
+        
+        Examples
+        --------
         # provide you some sample data:
         >>> x = np.array([652225.,652175.,652205.,652235.,652265.,652165.,\
                           652195.,652225.,652255.,652285.,652175.,652205.,\
@@ -161,7 +167,9 @@ def kriging(x,y,z,semi_mod,semi_popt,xnew=None,ynew=None,plot=False,
         >>> print np.round(eopz,3)
         [ 6.408  1.677  3.168  1.262  4.635  6.534  2.244  2.256  2.996  2.111]
         
-        LICENSE:
+        
+        License
+        -------
         This file is part of the UFZ Python library.
     
         The UFZ Python library is free software: you can redistribute it and/or 
@@ -180,8 +188,11 @@ def kriging(x,y,z,semi_mod,semi_popt,xnew=None,ynew=None,plot=False,
     
         Copyright 2009-2012 Matthias Cuntz
     
-        HISTORY:
+    
+        History
+        -------
         Written, Arndt Piayda, Nov 2012
+        Modified, Arndt Piayda, Dec 2012 - documentation change
 
     """
     
