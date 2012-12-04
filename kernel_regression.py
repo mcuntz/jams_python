@@ -49,32 +49,33 @@ def kernel_regression(x, y, h=None, silverman=False, xout=None):
         >>> x[:,1] = 1./(np.arange(10,dtype=np.float)/9.+0.1)
         >>> y      = 1. + x[:,0]**2 - np.sin(x[:,1])**2
         >>> h = kernel_regression_h(x,y)
-        >>> print h
-        [ 0.17267991  9.51690721]
+        >>> from autostring import *
+        >>> print astr(h,6)
+        ['0.172680' '9.516907']
 
-        >>> print kernel_regression(x,y,h)
-        [ 0.52240942  0.52569869  0.54179588  0.51780751  0.47644246  0.49230198
-          0.60344807  0.77747176  0.95450466  1.09603888]
+        >>> print astr(kernel_regression(x,y,h),6)
+        ['0.522409' '0.525699' '0.541796' '0.517808' '0.476442' '0.492302'
+         '0.603448' '0.777472' '0.954505' '1.096039']
 
-        >>> print kernel_regression(x,y)
-        [ 0.52240942  0.52569869  0.54179588  0.51780751  0.47644246  0.49230198
-          0.60344807  0.77747176  0.95450466  1.09603888]
+        >>> print astr(kernel_regression(x,y),6)
+        ['0.522409' '0.525699' '0.541796' '0.517808' '0.476442' '0.492302'
+         '0.603448' '0.777472' '0.954505' '1.096039']
 
         >>> h = kernel_regression_h(x,y,silverman=True)
-        >>> print h
-        [ 0.22919046  1.90338144]
+        >>> print astr(h,6)
+        ['0.229190' '1.903381']
 
-        >>> print kernel_regression(x,y,h)
-        [ 0.69115273  0.42280858  0.54584447  0.53431539  0.52149406  0.55542563
-          0.64206536  0.76189995  0.88777986  1.00014619]
+        >>> print astr(kernel_regression(x,y,h),6)
+        ['0.691153' '0.422809' '0.545844' '0.534315' '0.521494' '0.555426'
+         '0.642065' '0.761900' '0.887780' '1.000146']
 
         >>> ss = np.shape(x)
         >>> nn = 5
         >>> xx = np.empty((nn,ss[1]))
         >>> xx[:,0] = np.amin(x[:,0]) + (np.amax(x[:,0])-np.amin(x[:,0])) * np.arange(nn,dtype=np.float)/np.float(nn)
         >>> xx[:,1] = np.amin(x[:,1]) + (np.amax(x[:,1])-np.amin(x[:,1])) * np.arange(nn,dtype=np.float)/np.float(nn)
-        >>> print kernel_regression(x,y,h,xout=xx)
-        [ 0.60548523  0.55523546  0.50952915  0.4911906   0.55332452]
+        >>> print astr(kernel_regression(x,y,h,xout=xx),6)
+        ['0.605485' '0.555235' '0.509529' '0.491191' '0.553325']
 
 
         License
@@ -195,11 +196,12 @@ def kernel_regression_h(x, y, silverman=False):
         >>> x[:,0] = np.arange(10,dtype=np.float)/9.
         >>> x[:,1] = 1./(np.arange(10,dtype=np.float)/9.+0.1)
         >>> y      = 1. + x[:,0]**2 - np.sin(x[:,1])**2
-        >>> print kernel_regression_h(x,y)
-        [ 0.17267991  9.51690721]
+        >>> from autostring import *
+        >>> print astr(kernel_regression_h(x,y),6)
+        ['0.172680' '9.516907']
 
-        >>> print kernel_regression_h(x,y,silverman=True)
-        [ 0.22919046  1.90338144]
+        >>> print astr(kernel_regression_h(x,y,silverman=True),6)
+        ['0.229190' '1.903381']
 
 
         License
