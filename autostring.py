@@ -234,6 +234,9 @@ def autostring(num, prec=0, zero=False, set_printoptions=False, pp=False, join=F
     #
     if (isarr == 0):
         out = format_string.format(num)
+        # Special treatment of -0.0
+        if np.float(out) == 0:
+            out = format_string.format(0)
     else:
         fnum = num.flatten()
         nnum = fnum.size
@@ -242,6 +245,9 @@ def autostring(num, prec=0, zero=False, set_printoptions=False, pp=False, join=F
         for i in xrange(nnum):
             out[i] = format_string.format(fnum[i])
         out = np.reshape(out, num.shape)
+        # Special treatment of -0.0
+        if np.any(out.astype(np.float) == 0):
+            out = np.where(out.astype(np.float) == 0, format_string.format(0), out)
         if (set_printoptions | pp):
             # num_total_chars+3 for '' and space, +isarr for []
             np.set_printoptions(linewidth=num.shape[-1]*(num_total_chars+3)+isarr, threshold=nnum+1)
@@ -264,13 +270,6 @@ def autostring(num, prec=0, zero=False, set_printoptions=False, pp=False, join=F
                         else:
                             outc[j] = outc[j]+sep+out[j,i]
             out = outc
-    # Special treatment of -0.0
-    if isarr == 0:
-        if np.float(out) == 0:
-            out = format_string.format(0)
-    else:
-        if np.any(out.astype(np.float) == 0):
-            out = np.where(out.astype(np.float) == 0, format_string.format(0), out)
 
     # return formatted string
     return out

@@ -116,13 +116,13 @@ def date2dec(calendar = 'standard', units = False,
         Most versions of datetime do not support neagtive years,
         i.e. Julian days < 1721423.5 = 01.01.0001 00:00.
 
-        There is an issue in proleptic_gregorian for dates before year 301:
-        ufz.dec2date(ufz.date2dec(ascii='01.01.0300 00:00:00', calendar='proleptic_gregorian'),
-                     calendar='proleptic_gregorian')
-        [300, 1, 2, 0, 0, 0]
-        ufz.dec2date(ufz.date2dec(ascii='01.01.0301 00:00:00', calendar='proleptic_gregorian'),
-                     calendar='proleptic_gregorian')
-        [301, 1, 1, 0, 0, 0]
+        There is an issue in netcdftime version < 0.9.5 in proleptic_gregorian for dates before year 301:
+          ufz.dec2date(ufz.date2dec(ascii='01.01.0300 00:00:00', calendar='proleptic_gregorian'),
+                       calendar='proleptic_gregorian')
+            [300, 1, 2, 0, 0, 0]
+          ufz.dec2date(ufz.date2dec(ascii='01.01.0301 00:00:00', calendar='proleptic_gregorian'),
+                       calendar='proleptic_gregorian')
+            [301, 1, 1, 0, 0, 0]
 
         List input is only supported up to 2 dimensions.
 
@@ -181,7 +181,7 @@ def date2dec(calendar = 'standard', units = False,
         >>> decimal = date2dec(calendar = 'proleptic_gregorian', ascii = c)
         >>> from autostring import astr
         >>> print astr(np.array(decimal), 5)
-        ['719644.52101' '359822.52101' '179911.93102' '109573.00000']
+        ['719643.52101' '359821.52101' '179910.93102' '109572.00000']
 
         #calendar = 'excel1900' WITH excelerr = True -> 1900
         #considered as leap year
@@ -468,8 +468,7 @@ def date2dec(calendar = 'standard', units = False,
         if units == False: units = '0001-01-01 12:00:00'
         output = nt.date2num(timeobj,'days since %s' % (units), calendar='julian')+1721424
     elif calendar == 'proleptic_gregorian':
-        #if units == False: units = '0001-01-01 00:00:00'
-        if units == False: units = '0001-01-00 00:00:00'
+        if units == False: units = '0001-01-01 00:00:00'
         output = nt.date2num(timeobj,'days since %s' % (units), calendar='proleptic_gregorian')
     elif calendar == 'excel1900':
         if units == False: units = '1900-01-00 00:00:00'

@@ -9,14 +9,14 @@ from calendar import monthrange
 _units = ['days','hours','minutes','seconds','day','hour','minute','second']
 _calendars = ['standard','gregorian','proleptic_gregorian','noleap','julian','all_leap','365_day','366_day','360_day']
 
-__version__ = '0.9.4'
+__version__ = '0.9.5'
 
 # Adapted from http://delete.me.uk/2005/03/iso8601.html
 ISO8601_REGEX = re.compile(r"(?P<year>[0-9]{1,4})(-(?P<month>[0-9]{1,2})(-(?P<day>[0-9]{1,2})"
-    r"((?P<separator>.)(?P<hour>[0-9]{2}):(?P<minute>[0-9]{2})(:(?P<second>[0-9]{2})(\.(?P<fraction>[0-9]+))?)?"
-    r"(?P<timezone>Z|(([-+])([0-9]{2}):([0-9]{2})))?)?)?)?"
+    r"(((?P<separator1>.)(?P<hour>[0-9]{1,2}):(?P<minute>[0-9]{1,2})(:(?P<second>[0-9]{1,2})(\.(?P<fraction>[0-9]+))?)?)?"
+    r"((?P<separator2>.?)(?P<timezone>Z|(([-+])([0-9]{1,2}):([0-9]{1,2}))))?)?)?)?"
 )
-TIMEZONE_REGEX = re.compile("(?P<prefix>[+-])(?P<hours>[0-9]{2}).(?P<minutes>[0-9]{2})")
+TIMEZONE_REGEX = re.compile("(?P<prefix>[+-])(?P<hours>[0-9]{1,2}):(?P<minutes>[0-9]{1,2})")
 
 class datetime:
     """
@@ -50,6 +50,9 @@ and format.
         return (self.year,self.month,self.day,self.hour,self.minute,self.second,self.dayofwk,self.dayofyr,-1)
     def __repr__(self):
         return self.strftime(self.format)
+    def __eq__(self, date):
+        return self.strftime('%Y-%m-%d %H:%M:%S') == date.strftime('%Y-%m-%d %H:%M:%S')
+
 
 def JulianDayFromDate(date,calendar='standard'):
 
@@ -86,8 +89,11 @@ Virginia. p. 63
         
     A = int(year/100)
 
-    jd = int(365.25 * (year + 4716)) + int(30.6001 * (month + 1)) + \
-         day - 1524.5
+    # MC
+    # jd = int(365.25 * (year + 4716)) + int(30.6001 * (month + 1)) + \
+    #      day - 1524.5
+    jd = 365.*year + int(0.25 * year + 2000.) + int(30.6001 * (month + 1)) + \
+         day + 1718994.5
 
     # optionally adjust the jd for the switch from 
     # the Julian to Gregorian Calendar
@@ -100,13 +106,13 @@ Virginia. p. 63
             # 1582 October 5 (Julian Calendar)
             B = 0
         else:
-            raise ValueError, 'impossible date (falls in gap between end of Julian calendar and beginning of Gregorian calendar'
+            raise ValueError('impossible date (falls in gap between end of Julian calendar and beginning of Gregorian calendar')
     elif calendar == 'proleptic_gregorian':
         B = 2 - A + int(A/4)
     elif calendar == 'julian':
         B = 0
     else:
-        raise ValueError, 'unknown calendar, must be one of julian,standard,gregorian,proleptic_gregorian, got %s' % calendar
+        raise ValueError('unknown calendar, must be one of julian,standard,gregorian,proleptic_gregorian, got %s' % calendar)
     
     # adjust for Julian calendar if necessary
     jd = jd + B
@@ -211,7 +217,7 @@ Virginia. p. 63
     # based on redate.py by David Finlayson.
     
     if JD < 0:
-        raise ValueError, 'Julian Day must be positive'
+        raise ValueError('Julian Day must be positive')
 
     dayofwk = int(math.fmod(int(JD + 1.5),7))
     (F, Z) = math.modf(JD + 0.5)
@@ -220,20 +226,29 @@ Virginia. p. 63
         if JD < 2299160.5:
             A = Z
         else:
-            alpha = int((Z - 1867216.25)/36524.25)
-            A = Z + 1 + alpha - int(alpha/4)
+            # MC
+            # alpha = int((Z - 1867216.25)/36524.25)
+            # A = Z + 1 + alpha - int(alpha/4)
+            alpha = int(((Z - 1867216.)-0.25)/36524.25)
+            A = Z + 1 + alpha - int(0.25*alpha)
 
     elif calendar == 'proleptic_gregorian':
-        alpha = int((Z - 1867216.25)/36524.25)
-        A = Z + 1 + alpha - int(alpha/4)
+        # MC
+        # alpha = int((Z - 1867216.25)/36524.25)
+        # A = Z + 1 + alpha - int(alpha/4)
+        alpha = int(((Z - 1867216.)-0.25)/36524.25)
+        A = Z + 1 + alpha - int(0.25*alpha)
     elif calendar == 'julian':
         A = Z
     else:
-        raise ValueError, 'unknown calendar, must be one of julian,standard,gregorian,proleptic_gregorian, got %s' % calendar
+        raise ValueError('unknown calendar, must be one of julian,standard,gregorian,proleptic_gregorian, got %s' % calendar)
 
     B = A + 1524
-    C = int((B - 122.1)/365.25)
-    D = int(365.25 * C)
+    # MC
+    # C = int((B - 122.1)/365.25)
+    # D = int(365.25 * C)
+    C = int(6680.+((B-2439870.)-122.1)/365.25)
+    D = 365*C + int(0.25 * C)
     E = int((B - D)/30.6001)
 
     # Convert to date
@@ -243,15 +258,21 @@ Virginia. p. 63
         dayofyr = nday+60
     else:
         dayofyr = nday-305
-    if E < 14:
-        month = E - 1
-    else:
-        month = E - 13
+    # MC
+    # if E < 14:
+    #     month = E - 1
+    # else:
+    #     month = E - 13
 
-    if month > 2:
-        year = C - 4716
-    else:
-        year = C - 4715
+    # if month > 2:
+    #     year = C - 4716
+    # else:
+    #     year = C - 4715
+    month = E - 1
+    if month > 12: month -= 12
+    year = C - 4715
+    if month > 2: year -= 1
+    if year <= 0: year -= 1
 
     # a leap year?
     leap = 0
@@ -260,7 +281,6 @@ Virginia. p. 63
     if calendar == 'proleptic_gregorian' or \
        (calendar in ['standard','gregorian'] and JD >= 2299160.5):
         if year % 100 == 0 and year % 400 != 0: 
-            print year % 100, year % 400
             leap = 0
     if leap and month > 2:
        dayofyr = dayofyr + leap
@@ -310,7 +330,7 @@ days. Julian Day is a fractional day with a resolution of 1 second.
     # based on redate.py by David Finlayson.
     
     if JD < 0:
-        raise ValueError, 'Julian Day must be positive'
+        raise ValueError('Julian Day must be positive')
 
     dayofwk = int(math.fmod(int(JD + 1.5),7))
     (F, Z) = math.modf(JD + 0.5)
@@ -368,7 +388,7 @@ Julian Day is a fractional day with a resolution of 1 second.
     # based on redate.py by David Finlayson.
     
     if JD < 0:
-        raise ValueError, 'Julian Day must be positive'
+        raise ValueError('Julian Day must be positive')
 
     dayofwk = int(math.fmod(int(JD + 1.5),7))
     (F, Z) = math.modf(JD + 0.5)
@@ -426,7 +446,7 @@ Julian Day is a fractional day with a resolution of 1 second.
     """
 
     if JD < 0:
-        raise ValueError, 'Julian Day must be positive'
+        raise ValueError('Julian Day must be positive')
 
     #jd = int(360. * (year + 4716)) + int(30. * (month - 1)) + day
     (F, Z) = math.modf(JD)
@@ -459,9 +479,9 @@ def _dateparse(timestr):
     timestr_split = timestr.split()
     units = timestr_split[0].lower()
     if units not in _units:
-        raise ValueError,"units must be one of 'seconds', 'minutes', 'hours' or 'days' (or singular version of these), got '%s'" % units
+        raise ValueError("units must be one of 'seconds', 'minutes', 'hours' or 'days' (or singular version of these), got '%s'" % units)
     if timestr_split[1].lower() != 'since':
-        raise ValueError,"no 'since' in unit_string"
+        raise ValueError("no 'since' in unit_string")
     # parse the date string.
     n = timestr.find('since')+6
     year,month,day,hour,minute,second,utc_offset = _parse_date(timestr[n:])
@@ -604,15 +624,15 @@ units to datetime objects.
         if calendar in _calendars:
             self.calendar = calendar
         else:
-            raise ValueError, "calendar must be one of %s, got '%s'" % (str(_calendars),calendar)
+            raise ValueError("calendar must be one of %s, got '%s'" % (str(_calendars),calendar))
         units, tzoffset, self.origin = _dateparse(unit_string)
         self.tzoffset = tzoffset # time zone offset in minutes
         self.units = units
         self.unit_string = unit_string
         if self.calendar in ['noleap','365_day'] and self.origin.month == 2 and self.origin.day == 29:
-            raise ValueError, 'cannot specify a leap day as the reference time with the noleap calendar'
+            raise ValueError('cannot specify a leap day as the reference time with the noleap calendar')
         if self.calendar == '360_day' and self.origin.day > 30:
-            raise ValueError, 'there are only 30 days in every month with the 360_day calendar'
+            raise ValueError('there are only 30 days in every month with the 360_day calendar')
         if self.calendar in ['noleap','365_day']:
             self._jd0 = _NoLeapDayFromDate(self.origin)
         elif self.calendar in ['all_leap','366_day']:
@@ -657,13 +677,13 @@ Returns a scalar if input is a scalar, else returns a numpy array.
         elif self.calendar in ['noleap','365_day']:
             if isscalar:
                 if date.month == 2 and date.day == 29:
-                    raise ValueError, 'there is no leap day in the noleap calendar'
+                    raise ValueError('there is no leap day in the noleap calendar')
                 jdelta = _NoLeapDayFromDate(date) - self._jd0
             else:
                 jdelta = []
                 for d in date.flat:
                     if d.month == 2 and d.day == 29:
-                        raise ValueError, 'there is no leap day in the noleap calendar'                    
+                        raise ValueError('there is no leap day in the noleap calendar') 
                     jdelta.append(_NoLeapDayFromDate(d)-self._jd0)
         elif self.calendar in ['all_leap','366_day']:
             if isscalar:
@@ -673,13 +693,13 @@ Returns a scalar if input is a scalar, else returns a numpy array.
         elif self.calendar == '360_day':
             if isscalar:
                 if date.day > 30:
-                    raise ValueError, 'there are only 30 days in every month with the 360_day calendar'
+                    raise ValueError('there are only 30 days in every month with the 360_day calendar')
                 jdelta = _360DayFromDate(date) - self._jd0
             else:
                 jdelta = []
                 for d in date.flat:
                     if d.day > 30:
-                        raise ValueError, 'there are only 30 days in every month with the 360_day calendar'
+                        raise ValueError('there are only 30 days in every month with the 360_day calendar')
                     jdelta.append(_360DayFromDate(d)-self._jd0)
         if not isscalar:
             jdelta = numpy.array(jdelta)
@@ -804,9 +824,9 @@ def _parse_date(datestring):
 
     Adapted from pyiso8601 (http://code.google.com/p/pyiso8601/)
     """
-    if not isinstance(datestring, basestring):
+    if not isinstance(datestring, str) and not isinstance(datestring, unicode):
         raise ValueError("Expecting a string %r" % datestring)
-    m = ISO8601_REGEX.match(datestring)
+    m = ISO8601_REGEX.match(datestring.strip())
     if not m:
         raise ValueError("Unable to parse date string %r" % datestring)
     groups = m.groupdict()
@@ -960,7 +980,7 @@ contains one.
     cdftime = utime(units,calendar=calendar)
     return cdftime.num2date(times)
 
-def _check_index(indices, dates, nctime, calendar):
+def _check_index(indices, dates, nctime, calendar, select):
     """Return True if the time indices given correspond to the given dates, 
     False otherwise.
     
@@ -977,11 +997,15 @@ def _check_index(indices, dates, nctime, calendar):
 
     calendar : string
     Calendar of nctime.
-     """
+
+    select : string
+    Index selection method.
+    """
+    N = nctime.shape[0]
     if  (indices <0).any():
        return False
        
-    if (indices >= nctime.shape[0]).any():
+    if (indices >= N).any():
         return False
         
     t = nctime[indices] 
@@ -989,9 +1013,28 @@ def _check_index(indices, dates, nctime, calendar):
 #   t=[]
 #   for ind in indices:
 #       t.append(nctime[ind])
-    return numpy.all( num2date(t, nctime.units, calendar) == dates)
 
-
+    check = num2date(t, nctime.units, calendar)
+    if select == 'exact':
+        return numpy.all(check == dates)
+        
+    elif select == 'before':
+        ta = nctime[numpy.clip(indices + 1, 0, N-1)]
+        check_after = num2date(ta, nctime.units, calendar)
+        return numpy.all(check <= dates) and numpy.all(check_after > dates)
+        
+    elif select == 'after':
+        tb = nctime[numpy.clip(indices - 1, 0, N-1)]
+        check_before = num2date(tb, nctime.units, calendar)
+        return numpy.all(check >= dates) and numpy.all(check_before < dates)
+    
+    elif select == 'nearest':
+        ta = nctime[numpy.clip(indices + 1, 0, N-1)]
+        tb = nctime[numpy.clip(indices - 1, 0, N-1)]
+        delta_after = num2date(ta, nctime.units, calendar) - check
+        delta_before = check - num2date(tb, nctime.units, calendar) 
+        delta_check = numpy.abs(dates-check)
+        return numpy.all(delta_check <= delta_after) and numpy.all(delta_check <= delta_before)
 
 def date2index(dates, nctime, calendar=None, select='exact'):
     """
@@ -1031,25 +1074,31 @@ def date2index(dates, nctime, calendar=None, select='exact'):
     # This assumes that the times are increasing uniformly.
     t0, t1 = nctime[:2]
     dt = t1 - t0
-    index = numpy.array((num-t0)/dt, int)
+    if select in ['exact', 'before']:
+        index = numpy.array((num-t0)/dt, int)
+    elif select == 'after':
+        index = numpy.array(numpy.ceil( (num-t0)/dt ), int)
+    else:
+        index = numpy.array(numpy.around( (num-t0)/dt ), int)
 
     # Checking that the index really corresponds to the given date.
     # If the times do not correspond, then it means that the times
     # are not increasing uniformly and we try the bisection method.
-    if not _check_index(index, dates, nctime, calendar):
+    if not _check_index(index, dates, nctime, calendar, select):
         
-        # Use the bisection method. Assumes the dates are ordered.
+        # Use the bisection method. Assumes nctime is ordered.
         import bisect
-        index = numpy.array([bisect.bisect_left(nctime, n) for n in num], int)
-               
-        after = index == N
+        index = numpy.array([bisect.bisect_right(nctime, n) for n in num], int)
         before = index == 0
         
+        index = numpy.array([bisect.bisect_left(nctime, n) for n in num], int)
+        after = index == N
+        
         if select in ['before', 'exact'] and numpy.any(before):
-            raise ValueError, 'At least one of the dates given is before the first date in `nctime`.'
+            raise ValueError('At least one of the dates given is before the first date in `nctime`.')
         
         if select in ['after', 'exact'] and numpy.any(after):
-            raise ValueError, 'At least one of the dates given is after the last date in `nctime`.'
+            raise ValueError('At least one of the dates given is after the last date in `nctime`.')
             
         
         # Find the dates for which the match is not perfect.
@@ -1061,7 +1110,7 @@ def date2index(dates, nctime, calendar=None, select='exact'):
                    
         if select == 'exact':
             if len(mismatch) > 0:
-                raise ValueError, 'Some of the dates specified were not found in the `nctime` variable.'
+                raise ValueError('Some of the dates specified were not found in the `nctime` variable.')
    
         elif select == 'before':
             index[after] = N

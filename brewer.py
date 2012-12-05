@@ -7,13 +7,13 @@
     Definition
     ----------
     Define and get colormap
-        def get_brewer(cname=None, names=False, rgb=False, rgb256=False, reverse=False):
+        def get_brewer(cname=None, names=False, rgb=False, rgb256=False, reverse=False, grey=False, gray=False):
     Register colormap
-        def define_brewer(cname='all', reverse=False):
+        def define_brewer(cname='all', reverse=False, grey=False, gray=False):
     Print available colormap names
         def print_brewer(names='all'):
     Plot all colormaps in pdf file
-       def plot_brewer(pdffile='brewer_colors.pdf', reverse=False):
+       def plot_brewer(pdffile='brewer_colors.pdf', reverse=False, grey=False, gray=False):
 
 
     Input
@@ -33,10 +33,14 @@
         rgb        if True: return RGB value tuple between 0 and 1
         rgb256     if True: return RGB value tuple between 0 and 255
         reverse    if True: reverse colormaps
+        grey       if True: return grey equivalent
+        gray       Same as grey
     define_brewer
         cname      Colormap to register colormaps (default: 'all')
                    if 'all': registers all sequential+diverging+qualitative colormaps
         reverse    if True: reverse colormaps
+        grey       if True: return grey equivalent
+        gray       Same as grey
     print_brewer
         names      Print colormap names (default: 'all')
                    if 'sequential': print sequential colormap names
@@ -46,6 +50,8 @@
     plot_brewer
         pdffile    Name of pdf file  (default: 'brewer_colors.pdf')
         reverse    if True: reverse colormaps
+        grey       if True: return grey equivalent
+        gray       Same as grey
 
 
     Output
@@ -1834,7 +1840,7 @@ qualitative_maps = ['set33','set34','set35','set36','set37','set38','set39','set
                     'accent4','accent5','accent6','accent7','accent8']
 
 
-def define_brewer(cname='all', reverse=False):
+def define_brewer(cname='all', reverse=False, grey=False, gray=False):
     import matplotlib.colors as col
     import matplotlib.cm as cm
     if cname.lower() == 'all':
@@ -1845,6 +1851,10 @@ def define_brewer(cname='all', reverse=False):
         exec('cpool = [ tuple([k/255. for k in j]) for j in '+i+' ]')
         if reverse:
             cpool = cpool[::-1]
+        if grey | gray:
+            for j in xrange(len(cpool)):
+                isgray = 0.2125 * cpool[j][0] + 0.7154 * cpool[j][1] + 0.072* cpool[j][2]
+                cpool[j] = (isgray,isgray,isgray)
         cmap = col.ListedColormap(cpool, i)
         cm.register_cmap(cmap=cmap)
 
@@ -1873,13 +1883,14 @@ def print_brewer(names='all'):
         print qualitative_maps
 
 
-def get_brewer(cname=None, names=False, rgb=False, rgb256=False, reverse=False):
+def get_brewer(cname=None, names=False, rgb=False, rgb256=False, reverse=False, grey=False, gray=False):
     """
         Examples
         --------
+        >>> from autostring import *
         >>> cc = get_brewer('Blues4',rgb=True)
-        >>> print cc[0]
-        (0.9372549019607843, 0.9529411764705882, 1.0)
+        >>> print astr(np.array(cc[0]), 4)
+        ['0.9373' '0.9529' '1.0000']
 
         >>> cc = get_brewer('Blues4',rgb256=True)
         >>> print cc[0]
@@ -1890,6 +1901,10 @@ def get_brewer(cname=None, names=False, rgb=False, rgb256=False, reverse=False):
         (239, 243, 255)
         >>> print cc[0]
         (33, 113, 181)
+
+        >>> cc = get_brewer('Blues4',rgb256=True,grey=True)
+        >>> print astr(np.array(cc[0]), 4)
+        ['242.9897' '242.9897' '242.9897']
     """
     if names:
         if names.lower() == 'sequential':
@@ -1907,21 +1922,29 @@ def get_brewer(cname=None, names=False, rgb=False, rgb256=False, reverse=False):
                  exec('cpool = '+cname.lower())
                  if reverse:
                      cpool = cpool[::-1]
+                 if grey | gray:
+                     for j in xrange(len(cpool)):
+                         isgray = 0.2125 * cpool[j][0] + 0.7154 * cpool[j][1] + 0.072* cpool[j][2]
+                         cpool[j] = (isgray,isgray,isgray)
                  return cpool
              elif rgb:
                  exec('cpool = [ tuple([k/255. for k in j]) for j in '+cname.lower()+' ]')
                  if reverse:
                      cpool = cpool[::-1]
+                 if grey | gray:
+                     for j in xrange(len(cpool)):
+                         isgray = 0.2125 * cpool[j][0] + 0.7154 * cpool[j][1] + 0.072* cpool[j][2]
+                         cpool[j] = (isgray,isgray,isgray)
                  return cpool
              else:
                  import matplotlib.cm as cm
-                 define_brewer(cname.lower(),reverse=reverse)
+                 define_brewer(cname.lower(),reverse=reverse, grey=grey, gray=gray)
                  return cm.get_cmap(cname.lower())
          else:
              raise ValueError('Color map name not known: '+cname)
 
 
-def plot_brewer(pdffile='brewer_colors.pdf',reverse=False):
+def plot_brewer(pdffile='brewer_colors.pdf',reverse=False, grey=False, gray=False):
     import numpy as np
     import ufz
     outtype = 'pdf'
@@ -1964,7 +1987,7 @@ def plot_brewer(pdffile='brewer_colors.pdf',reverse=False):
         sub.axis('off')
         if iplot == 1:
             fig.text(0.5, 0.97, "Sequential", ha="center", size=12)
-        cc = get_brewer(kk,reverse=reverse)
+        cc = get_brewer(kk, reverse=reverse, grey=grey, gray=gray)
         plt.pcolormesh(np.outer(np.arange(cc.N),np.ones(cc.N)),cmap=cc)
         plt.setp(sub, title=kk)
         plt.setp(sub.title,fontsize=10, rotation=90, verticalalignment='bottom')
@@ -1989,7 +2012,7 @@ def plot_brewer(pdffile='brewer_colors.pdf',reverse=False):
         sub.axis('off')
         if iplot == 1:
             fig.text(0.5, 0.97, "Diverging", ha="center", size=12)
-        cc = get_brewer(kk,reverse=reverse)
+        cc = get_brewer(kk,reverse=reverse, grey=grey, gray=gray)
         plt.pcolormesh(np.outer(np.arange(cc.N),np.ones(cc.N)),cmap=cc)
         plt.setp(sub, title=kk)
         plt.setp(sub.title,fontsize=10, rotation=90, verticalalignment='bottom')
@@ -2014,9 +2037,9 @@ def plot_brewer(pdffile='brewer_colors.pdf',reverse=False):
         sub.axis('off')
         if iplot == 1:
             fig.text(0.5, 0.97, "Qualitative", ha="center", size=12)
-        cc = get_brewer(kk,reverse=reverse)
+        cc = get_brewer(kk,reverse=reverse, grey=grey, gray=gray)
         plt.pcolormesh(np.outer(np.arange(cc.N),np.ones(cc.N)),cmap=cc)
-        # cc1 = get_brewer(kk,rgb=True,reverse=reverse)
+        # cc1 = get_brewer(kk,rgb=True,reverse=reverse, grey=grey, gray=gray)
         # mark1 = sub.plot(2, 2)
         # plt.setp(mark1, linestyle='None', marker='o', markeredgecolor=cc1[0], markerfacecolor=cc1[0])
         plt.setp(sub, title=kk)
@@ -2032,4 +2055,24 @@ if __name__ == '__main__':
     import doctest
     doctest.testmod()
 
+    # from autostring import *
+    # cc = get_brewer('Blues4',rgb=True)
+    # print astr(np.array(cc[0]), 4)
+    # #    ['0.9373' '0.9529' '1.0000']
+
+    # cc = get_brewer('Blues4',rgb256=True)
+    # print cc[0]
+    # #    (239, 243, 255)
+
+    # cc = get_brewer('Blues4',rgb256=True,reverse=True)
+    # print cc[-1]
+    # #    (239, 243, 255)
+    # print cc[0]
+    # #    (33, 113, 181)
+
+    # cc = get_brewer('Blues4',rgb256=True,grey=True)
+    # print astr(np.array(cc[0]), 4)
+    # #    ['242.9897' '242.9897' '242.9897']
+
     # plot_brewer('test.pdf', reverse=True)
+    # plot_brewer('test_gray.pdf', gray=True)
