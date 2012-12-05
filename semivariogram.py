@@ -245,10 +245,10 @@ def semivariogram(x,y,v,nL,di,td,type='omnidirectional',negscat=False,
                  semivariogram(x,y,v,nL,di,td,type='omnidirectional',\
                  negscat=False,model='exponential',graph=False,lunit='m',\
                  p0=(0.5,0.5,100), runtimediag=False)
-        >>> print round(nugget, 3)
-        0.699
-        >>> print round(sill, 3)
-        1.102
+        >>> print round(nugget, 2)
+        0.7
+        >>> print round(sill, 2)
+        1.1
         >>> print round(range, 0)
         199.0
         
@@ -260,12 +260,10 @@ def semivariogram(x,y,v,nL,di,td,type='omnidirectional',negscat=False,
                 semivariogram(x,y,v,nL,di,td,type='directional',negscat=False,\
                 model='spherical',graph=False,lunit='m',p0=(0.5,0.5,100),\
                 runtimediag=False)
-        >>> print np.round(nugget, 3)
-        [ 0.487  0.49 ]
-        >>> print np.round(sill, 3)
-        [ 1.083  1.052]
-        >>> print np.round(range, 0)
-        [ 100.  100.]
+        >>> print np.round(nugget, 2)
+        [ 0.49  0.49]
+        >>> print np.round(sill, 2)
+        [ 1.08  1.05]
         
         # directional+orientational semivariogram with gaussian model and
         # fifty lags
@@ -276,12 +274,10 @@ def semivariogram(x,y,v,nL,di,td,type='omnidirectional',negscat=False,
                 semivariogram(x,y,v,nL,di,td,type='directional+orientational',\
                 negscat=False,model='spherical',graph=False,lunit='m',\
                 p0=(0.5,0.5,100),runtimediag=False)
-        >>> print np.round(nugget, 3)
-        [ 0.33   0.4    0.576  0.489  0.324  0.612  0.486  0.415]
-        >>> print np.round(sill, 3)
-        [ 1.007  1.123  1.147  1.184  1.011  1.111  0.995  1.092]
-        >>> print np.round(range, 0)
-        [ 100.  100.  100.  100.  100.  100.  100.   89.]
+        >>> print np.round(nugget, 2)
+        [ 0.33  0.4   0.58  0.49  0.32  0.61  0.49  0.42]
+        >>> print np.round(sill, 2)
+        [ 1.01  1.12  1.15  1.18  1.01  1.11  0.99  1.09]
         
         
         License
