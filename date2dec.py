@@ -71,7 +71,7 @@ def date2dec(calendar = 'standard', units = False,
            'proleptic_gregorian'
                        =   Input date is gregorian format.
                            Input is in gregorian calendar from
-                           01.01.0001 00:00:00 until now.
+                           01.01.0000 00:00:00 until now.
            'excel1900' =   Input date is excel 1900 format.
                            Input date is excel date with its
                            units at 01.01.1900 00:00:00 until
@@ -113,8 +113,16 @@ def date2dec(calendar = 'standard', units = False,
 
         Restrictions
         ------------
-        Some versions of datetime do not support neagtive years,
+        Most versions of datetime do not support neagtive years,
         i.e. Julian days < 1721423.5 = 01.01.0001 00:00.
+
+        There is an issue in proleptic_gregorian for dates before year 301:
+        ufz.dec2date(ufz.date2dec(ascii='01.01.0300 00:00:00', calendar='proleptic_gregorian'),
+                     calendar='proleptic_gregorian')
+        [300, 1, 2, 0, 0, 0]
+        ufz.dec2date(ufz.date2dec(ascii='01.01.0301 00:00:00', calendar='proleptic_gregorian'),
+                     calendar='proleptic_gregorian')
+        [301, 1, 1, 0, 0, 0]
 
         List input is only supported up to 2 dimensions.
 
@@ -168,13 +176,12 @@ def date2dec(calendar = 'standard', units = False,
           2185367.32053241  1947385.96431713  1144563.3358912         0.        ]
 
         # calendar = 'proleptic_gregorian'
-        >>> c = np.array(['28.04.1971 12:30:15',\
-                          '28.02. 986 12:30:15',\
-                          '31.07. 493 22:20:40',\
-                          '02.01.   1 00:00:00'])
+        >>> c = ['27.04.1971 12:30:15', '27.02.0986 12:30:15', '30.07.0493 22:20:40',\
+                 '01.01.0301 00:00:00']
         >>> decimal = date2dec(calendar = 'proleptic_gregorian', ascii = c)
-        >>> print np.round(decimal, 8)
-        [  7.19644521e+05   3.59822521e+05   1.79911931e+05   1.00000000e+00]
+        >>> from autostring import astr
+        >>> print astr(np.array(decimal), 5)
+        ['719644.52101' '359822.52101' '179911.93102' '109573.00000']
 
         #calendar = 'excel1900' WITH excelerr = True -> 1900
         #considered as leap year
@@ -291,6 +298,9 @@ def date2dec(calendar = 'standard', units = False,
         Modified MC, Feb 2012 - All input can be scalar, list or array, also a mix
                               - Changed checks for easier extension
                               - decimal, decimal360
+                 MC, Dec 2012 - change unit of proleptic_gregorian
+                                from 'days since 0001-01-01 00:00:00'
+                                to   'days since 0001-01-00 00:00:00'
     """
 
     #
@@ -458,7 +468,8 @@ def date2dec(calendar = 'standard', units = False,
         if units == False: units = '0001-01-01 12:00:00'
         output = nt.date2num(timeobj,'days since %s' % (units), calendar='julian')+1721424
     elif calendar == 'proleptic_gregorian':
-        if units == False: units = '0001-01-01 00:00:00'
+        #if units == False: units = '0001-01-01 00:00:00'
+        if units == False: units = '0001-01-00 00:00:00'
         output = nt.date2num(timeobj,'days since %s' % (units), calendar='proleptic_gregorian')
     elif calendar == 'excel1900':
         if units == False: units = '1900-01-00 00:00:00'

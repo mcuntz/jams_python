@@ -3,11 +3,20 @@ Performs conversions of netCDF time coordinate data to/from datetime objects.
 """
 import math, numpy, re, time
 from datetime import datetime as real_datetime
+from datetime import tzinfo, timedelta
+from calendar import monthrange
 
 _units = ['days','hours','minutes','seconds','day','hour','minute','second']
 _calendars = ['standard','gregorian','proleptic_gregorian','noleap','julian','all_leap','365_day','366_day','360_day']
 
-__version__ = '0.7.2'
+__version__ = '0.9.4'
+
+# Adapted from http://delete.me.uk/2005/03/iso8601.html
+ISO8601_REGEX = re.compile(r"(?P<year>[0-9]{1,4})(-(?P<month>[0-9]{1,2})(-(?P<day>[0-9]{1,2})"
+    r"((?P<separator>.)(?P<hour>[0-9]{2}):(?P<minute>[0-9]{2})(:(?P<second>[0-9]{2})(\.(?P<fraction>[0-9]+))?)?"
+    r"(?P<timezone>Z|(([-+])([0-9]{2}):([0-9]{2})))?)?)?)?"
+)
+TIMEZONE_REGEX = re.compile("(?P<prefix>[+-])(?P<hours>[0-9]{2}).(?P<minutes>[0-9]{2})")
 
 class datetime:
     """
@@ -261,7 +270,7 @@ Virginia. p. 63
     (hfrac, hours) = math.modf(dfrac * 24.0)
     (mfrac, minutes) = math.modf(hfrac * 60.0)
     seconds = round(mfrac * 60.0) # seconds are rounded
-    
+
     if seconds > 59:
         seconds = 0
         minutes = minutes + 1
@@ -271,6 +280,16 @@ Virginia. p. 63
     if hours > 23:
         hours = 0
         days = days + 1
+
+    # if days exceeds number allowed in a month, flip to next month.
+    # this fixes issue 75.
+    daysinmonth = monthrange(year, month)[1]
+    if days > daysinmonth: 
+        days = 1
+        month = month + 1
+        if month > 12:
+            month = 1
+            year = year + 1
     
     # return a 'real' datetime instance if calendar is gregorian.
     if calendar == 'proleptic_gregorian' or \
@@ -652,12 +671,16 @@ Returns a scalar if input is a scalar, else returns a numpy array.
             else:
                 jdelta = [_AllLeapFromDate(d)-self._jd0 for d in date.flat]
         elif self.calendar == '360_day':
-            if self.calendar == '360_day' and date.day > 30:
-                raise ValueError, 'there are only 30 days in every month with the 360_day calendar'
             if isscalar:
+                if date.day > 30:
+                    raise ValueError, 'there are only 30 days in every month with the 360_day calendar'
                 jdelta = _360DayFromDate(date) - self._jd0
             else:
-                jdelta = [_360DayFromDate(d)-self._jd0 for d in date.flat]
+                jdelta = []
+                for d in date.flat:
+                    if d.day > 30:
+                        raise ValueError, 'there are only 30 days in every month with the 360_day calendar'
+                    jdelta.append(_360DayFromDate(d)-self._jd0)
         if not isscalar:
             jdelta = numpy.array(jdelta)
         # convert to desired units, add time zone offset.
@@ -701,6 +724,10 @@ do not exist in any real world calendar.
             time_value[0]
         except:
             isscalar = True
+        ismasked = False
+        if hasattr(time_value,'mask'):
+            mask = time_value.mask
+            ismasked = True
         if not isscalar:
             time_value = numpy.array(time_value, dtype='d')
             shape = time_value.shape
@@ -716,9 +743,20 @@ do not exist in any real world calendar.
         jd = self._jd0 + jdelta
         if self.calendar in ['julian','standard','gregorian','proleptic_gregorian']:
             if not isscalar:
-                date = [DateFromJulianDay(j,self.calendar) for j in jd.flat]
+                if ismasked:
+                    date = []
+                    for j,m in zip(jd.flat, mask.flat):
+                        if not m:
+                            date.append(DateFromJulianDay(j,self.calendar))
+                        else:
+                            date.append(None)
+                else:
+                    date = [DateFromJulianDay(j,self.calendar) for j in jd.flat]
             else:
-                date = DateFromJulianDay(jd,self.calendar)
+                if ismasked and mask.item():
+                    date = None
+                else:
+                    date = DateFromJulianDay(jd,self.calendar)
         elif self.calendar in ['noleap','365_day']:
             if not isscalar:
                 date = [_DateFromNoLeapDay(j) for j in jd.flat]
@@ -739,70 +777,54 @@ do not exist in any real world calendar.
         else:
             return numpy.reshape(numpy.array(date),shape)
 
-def _parse_date(origin):
-    """Parses a date string and returns a tuple
-    (year,month,day,hour,minute,second,utc_offset).
-    utc_offset is in minutes.
+def _parse_timezone(tzstring):
+    """Parses ISO 8601 time zone specs into tzinfo offsets
 
-    This function parses the 'origin' part of the time unit. It should be
-    something like::
-
-        2004-11-03 14:42:27.0 +2:00
-
-    Lots of things are optional; just the date is mandatory.
-
-    by Roberto De Almeida
-
-    excerpted from coards.py - http://cheeseshop.python.org/pypi/coards/
+    Adapted from pyiso8601 (http://code.google.com/p/pyiso8601/)
     """
-    # yyyy-mm-dd [hh:mm:ss[.s][ [+-]hh[:][mm]]]
-    p = re.compile( r'''(?P<year>\d{1,4})           # yyyy
-                        -                           #
-                        (?P<month>\d{1,2})          # mm or m
-                        -                           #
-                        (?P<day>\d{1,2})            # dd or d
-                                                    #
-                        (?:                         # [optional time and timezone]
-                            \s                      #
-                            (?P<hour>\d{1,2})       #   hh or h
-                            :                       #
-                            (?P<min>\d{1,2})        #   mm or m
-                            (?:
-                            \:
-                            (?P<sec>\d{1,2})        #   ss or s (optional)
-                            )?
-                                                    #
-                            (?:                     #   [optional decisecond]
-                                \.                  #       .
-                                (?P<dsec>\d)        #       s
-                            )?                      #
-                            (?:                     #   [optional timezone]
-                                \s                  #
-                                (?P<ho>[+-]?        #       [+ or -]
-                                \d{1,2})            #       hh or h
-                                :?                  #       [:]
-                                (?P<mo>\d{2})?      #       [mm]
-                            )?                      #
-                        )?                          #
-                        $                           # EOL
-                    ''', re.VERBOSE)
+    if tzstring == "Z":
+        return 0
+    # This isn't strictly correct, but it's common to encounter dates without
+    # timezones so I'll assume the default (which defaults to UTC).
+    if tzstring is None:
+        return 0
+    m = TIMEZONE_REGEX.match(tzstring)
+    prefix, hours, minutes = m.groups()
+    hours, minutes = int(hours), int(minutes)
+    if prefix == "-":
+        hours = -hours
+        minutes = -minutes
+    return minutes + hours*60.
 
-    m = p.match(origin.strip())
-    if m:
-        c = m.groupdict(0)
-        # UTC offset.
-        offset = int(c['ho'])*60 + int(c['mo'])
-        return int(c['year']),int(c['month']),int(c['day']),int(c['hour']),int(c['min']),int(c['sec']),offset
-    
-    raise Exception('Invalid date origin: %s' % origin)
+def _parse_date(datestring):
+    """Parses ISO 8601 dates into datetime objects
 
-# remove the unsupposed "%s" command.  But don't
-# do it if there's an even number of %s before the s
-# because those are all escaped.  Can't simply
-# remove the s because the result of
-#  %sY
-# should be %Y if %s isn't supported, not the
-# 4 digit year.
+    The timezone is parsed from the date string, assuming UTC
+    by default.
+
+    Adapted from pyiso8601 (http://code.google.com/p/pyiso8601/)
+    """
+    if not isinstance(datestring, basestring):
+        raise ValueError("Expecting a string %r" % datestring)
+    m = ISO8601_REGEX.match(datestring)
+    if not m:
+        raise ValueError("Unable to parse date string %r" % datestring)
+    groups = m.groupdict()
+    tzoffset_mins = _parse_timezone(groups["timezone"])
+    if groups["hour"] is None:
+        groups["hour"]=0
+    if groups["minute"] is None:
+        groups["minute"]=0
+    if groups["second"] is None:
+        groups["second"]=0
+    #if groups["fraction"] is None:
+    #    groups["fraction"] = 0
+    #else:
+    #    groups["fraction"] = int(float("0.%s" % groups["fraction"]) * 1e6)
+    return int(groups["year"]), int(groups["month"]), int(groups["day"]),\
+        int(groups["hour"]), int(groups["minute"]), int(groups["second"]),\
+        tzoffset_mins
+
 _illegal_s = re.compile(r"((^|[^%])(%%)*%s)")
 
 def _findall(text, substr):

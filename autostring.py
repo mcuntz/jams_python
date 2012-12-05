@@ -126,6 +126,7 @@ def autostring(num, prec=0, zero=False, set_printoptions=False, pp=False, join=F
         -------
         Written,  MC, Nov 2011 - from autostring.pro
         Modified, MC, May 2012 - pp
+                  MC, Dec 2012 - special treatment of -0.0 on output
     """
     #
     # Check input
@@ -263,6 +264,14 @@ def autostring(num, prec=0, zero=False, set_printoptions=False, pp=False, join=F
                         else:
                             outc[j] = outc[j]+sep+out[j,i]
             out = outc
+    # Special treatment of -0.0
+    if isarr == 0:
+        if np.float(out) == 0:
+            out = format_string.format(0)
+    else:
+        if np.any(out.astype(np.float) == 0):
+            out = np.where(out.astype(np.float) == 0, format_string.format(0), out)
+
     # return formatted string
     return out
 

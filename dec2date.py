@@ -52,7 +52,7 @@ def dec2date(indata, calendar='standard', refdate=None, units=None,
            'proleptic_gregorian'
                        =   Input date is gregorian format.
                            Input is in gregorian calendar from
-                           01.01.0001 00:00:00 until now.
+                           01.01.0000 00:00:00 until now.
            'excel1900' =   Input date is excel 1900 format.
                            Input date is excel date with its
                            refdate at 01.01.1900 00:00:00 until
@@ -111,8 +111,16 @@ def dec2date(indata, calendar='standard', refdate=None, units=None,
 
         Restrictions
         ------------
-        Some versions of datetime do not support neagtive years,
+        Most versions of datetime do not support neagtive years,
         i.e. Julian days < 1721423.5 = 01.01.0001 00:00.
+
+        There is an issue in proleptic_gregorian for dates before year 301:
+        ufz.dec2date(ufz.date2dec(ascii='01.01.0300 00:00:00', calendar='proleptic_gregorian'),
+                     calendar='proleptic_gregorian')
+        [300, 1, 2, 0, 0, 0]
+        ufz.dec2date(ufz.date2dec(ascii='01.01.0301 00:00:00', calendar='proleptic_gregorian'),
+                     calendar='proleptic_gregorian')
+        [301, 1, 1, 0, 0, 0]
 
         Requires 'netcdftime.py' from module netcdftime available at:
         http://netcdf4-python.googlecode.com
@@ -154,11 +162,11 @@ def dec2date(indata, calendar='standard', refdate=None, units=None,
         [2000 1810 1630 1510 1271  619    1]
 
         # calendar = 'proleptic_gregorian'
-        >>> c = np.array([719644.52101, 359822.52101, 179911.93102, 0.0])
+        >>> c = np.array([719644.52101, 359822.52101, 179911.93102, 109573.0])
         >>> ascii = dec2date(c, calendar='proleptic_gregorian', ascii = True)
         >>> print ascii
         ['27.04.1971 12:30:15' '27.02.0986 12:30:15' '30.07.0493 22:20:40'
-         '01.01.0001 00:00:00']
+         '01.01.0301 00:00:00']
 
         #calendar = 'excel1900' WITH excelerr = True -> 1900
         #considered as leap year
@@ -177,8 +185,11 @@ def dec2date(indata, calendar='standard', refdate=None, units=None,
         ...     asciidate = dec2date(e, calendar='excel1900', ascii = True, excelerr = False)
         ... else:
         ...     asciidate = dec2date(e, calendar='excel1900', ascii = True, excelerr = False)
-        ...     for i in xrange(4):
+        ...     for i in xrange(3):
         ...         print '0 300'
+        0 300
+        0 300
+        0 300
         0 300
         0 300
         0 300
@@ -295,6 +306,9 @@ def dec2date(indata, calendar='standard', refdate=None, units=None,
                  MC, Jun 2012 - former units keyword is now called refdate
                               - units has now original meaning as in netcdftime
                               - included units='day as %Y%m%d.%f'
+                 MC, Dec 2012 - change unit of proleptic_gregorian
+                                from 'days since 0001-01-01 00:00:00'
+                                to   'days since 0001-01-00 00:00:00'
     """
 
     #
@@ -390,7 +404,8 @@ def dec2date(indata, calendar='standard', refdate=None, units=None,
             elif refdate != None:
                 unit = 'days since {0:s}'.format(refdate)
             else:
-                unit = 'days since 0001-01-01 00:00:00'
+                #unit = 'days since 0001-01-01 00:00:00'
+                unit = 'days since 0001-01-00 00:00:00'
             timeobj = nt.num2date(indata, unit, calendar = 'proleptic_gregorian')
         elif calendar == 'excel1900':
             if units != None:
