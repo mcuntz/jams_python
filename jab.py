@@ -1,29 +1,38 @@
 #!/usr/bin/env python
 import numpy as np
 
-def jab(arr, ind, nind=None, weight=False, nsteps=1):
+def jab(arr, ind=None, nind=None, mask=None, weight=False, nsteps=1):
     """
         Jackknife-after-Bootstrap error, an approximation of the Jackknife error.
+
+        If you one gives the indices of the bootstrap, a mask will be produced that
+        tells if this sample was used in the current bootstrap:
+            mask = np.zeros((nboot,nind), dtype=np.bool)
+            for i in xrange(nboot):
+                mask[i,ind[i,:]] = True
+        One can also give this mask directly, reducing the memory amount by a factor of 64.
 
 
         Definition
         ----------
-        def jab(arr, ind, nind=None, weight=False, nsteps=1):
+        def jab(arr, ind=None, nind=None, mask=None, weight=False, nsteps=1):
 
 
         Input
         -----
         arr       1D/2D-array of bootstrap standard error outputs.
                   1st dim is number of bootstraps. Possible 2nd dim is number of bootstrap outputs.
-        
-        ind       2D-array of bootstrap indices.
-                  1st dim is number of bootstraps. 2nd dim is number of samples per bootstrap.
 
 
         Optional Input
         --------------
+        ind       2D-array of bootstrap indices. mask has priority over ind.
+                  1st dim is number of bootstraps. 2nd dim is number of samples per bootstrap.
         nind      # of data points, i.e. maximal jackknife index.
                   Default: ind.shape[1], which assumes that each bootstraps took N samples from N data points.
+                  Ignored if mask is given.
+        mask      2D-array of bollean if index used in this bootstrap. mask has priority over ind.
+                  1st dim is number of bootstraps. 2nd dim is number of samples per bootstrap.
         weight    if True: do weighted estimate after Wang et al. (1997)
                   Default: False
         nsteps    Give nsteps estimates of JAB error, i.e. after each nboot/nsteps bootstraps.
@@ -70,11 +79,16 @@ def jab(arr, ind, nind=None, weight=False, nsteps=1):
                                 [0, 3, 5, 2, 2, 1, 4, 4],\
                                 [4, 4, 5, 5, 3, 3, 2, 1]])
 
-
         # Normal JAB
         >>> print jab(Bstat, indices)
         [ 0.13132114  0.39335039]
 
+        # Normal JAB giving weights
+        >>> mask = np.zeros((Bstat.shape[0],indices.shape[1]), dtype=np.bool)
+        >>> for i in xrange(Bstat.shape[0]):
+        ...     mask[i,indices[i,:]] = True
+        >>> print jab(Bstat, mask=mask)
+        [ 0.13132114  0.39335039]
 
         # Weighted JAB
         >>> print jab(Bstat, indices, weight=True)
@@ -118,29 +132,44 @@ def jab(arr, ind, nind=None, weight=False, nsteps=1):
         -------
         Written,  MG, Aug 2012
         Modified, MC, Nov 2012 - rewrite
+                  MC, Dec 2012 - mask
     """
 
+    # Shapes: make nboot bootstraps with nind samples per bootstrap for nout parameters
+    # arr[nboot, nout]
+    # ind[nboot, nind]
+    # mask[nboot, nind]
+
     # Check input
-    if len(ind.shape) != 2:
-        raise ValueError('Index array must have 2 dimensions.')
     onlyone = False
     if len(arr.shape) != 2:
         arr     = arr[:,np.newaxis]
         onlyone = True
-    if ind.shape[0] != arr.shape[0]:
-        raise ValueError('First dimension of boostrap standard error array and index array have to match.')
-    nboot = ind.shape[0]
-    if nind != None:
-        if nind < ind.shape[1]:
-            print "Warning: nind < ind.shape[1]"
+    if mask != None:
+        if len(mask.shape) != 2:
+            raise Error('Mask array must have 2 dimensions.')
+        if mask.shape[0] != arr.shape[0]:
+            raise Error('First dimension of boostrap standard error array and mask array have to match.')
+        nboot = mask.shape[0]
+        nind  = mask.shape[1]
     else:
-        nind = ind.shape[1]
+        if len(ind.shape) != 2:
+            raise ValueError('Index array must have 2 dimensions.')
+        if ind.shape[0] != arr.shape[0]:
+            raise ValueError('First dimension of boostrap standard error array and index array have to match.')
+        nboot = ind.shape[0]
+        if nind != None:
+            if nind < ind.shape[1]:
+                print "Warning: nind < ind.shape[1]"
+        else:
+            nind = ind.shape[1]
     nout = arr.shape[1]
 
-    # Produce mask with True where data point was used in bootstrap
-    mask = np.zeros((nboot,nind), dtype=np.bool)
-    for i in xrange(nboot):
-        mask[i,ind[i,:]] = True
+    if mask == None:
+        # Produce mask with True where data point was used in bootstrap
+        mask = np.zeros((nboot,nind), dtype=np.bool)
+        for i in xrange(nboot):
+            mask[i,ind[i,:]] = True
 
     seb_i      = np.ma.empty((nind,nout,nsteps))      # std jab_i
     seb_i.mask = np.zeros(seb_i.shape, dtype=np.bool) # make mask an array
@@ -211,7 +240,14 @@ if __name__ == '__main__':
     # print jab(Bstat, indices)
     # #[ 0.13132114  0.39335039]
 
-    # # Weighted JAB
+    # # Normal JAB giving weights
+    # mask = np.zeros((Bstat.shape[0],indices.shape[1]), dtype=np.bool)
+    # for i in xrange(Bstat.shape[0]):
+    #     mask[i,indices[i,:]] = True
+    # print jab(Bstat, mask=mask)
+    # #[ 0.13132114  0.39335039]
+
+        # # Weighted JAB
     # print jab(Bstat, indices, weight=True)
     # #[ 0.05603035  0.1678295 ]
 
