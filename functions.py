@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import numpy as np
+import const # from ufz
 
 """
     Defines common functions that are used in curve_fit or fmin parameter estimations.
@@ -92,14 +93,14 @@ def arrhenius(T, E):
        T in C
        E in J
   '''
-  return np.exp((T-(ufz.const.T25-ufz.const.T0))*E/(ufz.const.T25*ufz.const.R*(T+ufz.const.T0)))
+  return np.exp((T-(const.T25-const.T0))*E/(const.T25*const.R*(T+const.T0)))
 
 def arrhenius_p(T, p):
   '''Arrhenius temperature dependence of rates
        T    in C
        p[0] in J
   '''
-  return np.exp((T-(ufz.const.T25-ufz.const.T0))*p[0]/(ufz.const.T25*ufz.const.R*(T+ufz.const.T0)))
+  return np.exp((T-(const.T25-const.T0))*p[0]/(const.T25*const.R*(T+const.T0)))
 
 def cost_arrhenius(p, T, rate):
     """ Cost function for arrhenius with sum of absolute deviations """
