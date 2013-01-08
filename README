@@ -33,7 +33,7 @@ One can produce html versions of the documentation in a directory html by callin
 
 
 The library is maintained with a subversion system at:
-https://svn.ufz.de/chs-svn/PYTHON_chs_lib/
+https://svn.ufz.de/svn/chs-svn/PYTHON_chs_lib/
 
 Further information can be found at:
 https://svn.ufz.de/chs-svn/wiki/WikiPython
