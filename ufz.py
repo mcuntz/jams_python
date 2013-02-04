@@ -13,6 +13,7 @@
     Provided functions (alphabetic w/o obsolete)
     ------------------
     abc2plot               Write a, b, c, ... on plots.
+    area_poly              Area of a polygon
     around                 Round to the passed power of ten.
     astr                   Wrapper for autostring.
     autostring             Format number (array) with given decimal precision.
@@ -109,6 +110,7 @@
 
     Data processing
     ---------------
+    area_poly              Area of a polygon
     convex_hull            Calculate subset of points that make a convex hull around a set of 2D points.
     gapfill                Gapfill Eddy flux data.
     in_poly                Determines whether a 2D point falls in a polygon.
@@ -259,9 +261,11 @@
               MC, Nov 2012 - nee2gpp, nee2gpp_global, nee2gpp_lasslop, nee2gpp_reichstein
               MC, Dec 2012 - functions
                            - make gap_filling obsolete
+              MC, Feb 2013 - area_poly
 """
 # Routines provided
 from abc2plot          import *
+from area_poly         import area_poly
 from around            import *
 from autostring        import *
 from brewer            import define_brewer, get_brewer, plot_brewer, print_brewer
