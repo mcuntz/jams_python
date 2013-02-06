@@ -24,8 +24,8 @@
     cuntz_gleixner         Cuntz-Gleixner model of 13C discrimination.
     define_brewer          Defines and registers Brewer colormap.
     dewpoint               Calculates the dew point from ambient humidity.
-    date2dec	           Converts arrays with calendar date to decimal date.
-    dec2date	           Converts arrays with decimal date to calendar date.
+    date2dec               Converts arrays with calendar date to decimal date.
+    dec2date               Converts arrays with decimal date to calendar date.
     div                    Wrapper for division.
     division               Divide two arrays, return 'otherwise' if division by 0.
     esat                   Calculates the saturation vapour pressure of water/ice.
@@ -72,6 +72,7 @@
     tcherkez               Calculates the Tcherkez model of 13C-discrimiantion in the Calvin cycle.
     tsym                   Raw unicodes for common symbols.
     unpack                 Similar to Fortran unpack function with mask.
+    volume_poly            Volume of function above a polygon
     writenetcdf            Write netCDF4 file.
     yrange                 Calculates plot range from input array.
     zacharias              Soil water content with van Genuchten and Zacharias et al. (2007).
@@ -84,7 +85,7 @@
         Ascii files
         Data processing
         Date & Time
-        Grids
+        Grids / Polygons
         Isotopes
         Math
         Meteorology
@@ -110,10 +111,8 @@
 
     Data processing
     ---------------
-    area_poly              Area of a polygon
     convex_hull            Calculate subset of points that make a convex hull around a set of 2D points.
     gapfill                Gapfill Eddy flux data.
-    in_poly                Determines whether a 2D point falls in a polygon.
     interpol               One-dimensional linear interpolation on first dimension.
     kriging                Krig a surface from a set of 2D points.
     kernel_regression      Multi-dimensional non-parametric regression.
@@ -135,13 +134,16 @@
 
     Date & Time
     -----------
-    date2dec	           Converts arrays with calendar date to decimal date.
-    dec2date	           Converts arrays with decimal date to calendar date.
+    date2dec               Converts arrays with calendar date to decimal date.
+    dec2date               Converts arrays with decimal date to calendar date.
 
 
-    Grids
-    -----
+    Grids / Polygons
+    ----------------
+    area_poly              Area of a polygon
     cellarea               Calc areas of grid cells in m^2.
+    in_poly                Determines whether a 2D point falls in a polygon.
+    volume_poly            Volume of function above a polygon
 
 
     Isotopes
@@ -236,16 +238,16 @@
                            - pack, unpack
               MC, Aug 2009 - position
               MG, Jul 2010 - outlier
-	          AP, Jan 2011 - date2dec, dec2date
-	          AP, Feb 2011 - semivariogram
+              AP, Jan 2011 - date2dec, dec2date
+              AP, Feb 2011 - semivariogram
               TR, May 2011 - gap_filling
               TR, May 2011 - calcvpd
               MC, Jun 2011 - /usr/bin/python to /usr/bin/env python
                            - tsym, around
               MC, Nov 2011 - mad
-	          MC, Nov 2011 - try netcdf and stats routines
-	          MC, Nov 2011 - autostring
-	          MC, Jan 2012 - esat, closest, dewpoint, division, heaviside, tcherkez, yrange, const
+              MC, Nov 2011 - try netcdf and stats routines
+              MC, Nov 2011 - autostring
+              MC, Jan 2012 - esat, closest, dewpoint, division, heaviside, tcherkez, yrange, const
                            - make calcvpd obsolete
                            - cuntz_gleixner
               MC, Mar 2012 - gapfill, nee2gpp
@@ -262,6 +264,7 @@
               MC, Dec 2012 - functions
                            - make gap_filling obsolete
               MC, Feb 2013 - area_poly
+              MC & JM, Feb 2013 - volume_poly
 """
 # Routines provided
 from abc2plot          import *
@@ -330,6 +333,7 @@ from srrasa            import srrasa, srrasa_trans
 from tcherkez          import *
 from tsym              import *
 from unpack            import *
+from volume_poly       import volume_poly
 try:
     from writenetcdf   import *
 except ImportError:
@@ -348,8 +352,8 @@ if __name__ == '__main__':
     print ('\nUFZ routines are free software and come with '
            'ABSOLUTELY NO WARRANTY.')
     print 'You are welcome to redistribute it.'
-    print ('\nCopyright (C) 2009-2012, Computational Hydrosystems, '
+    print ('\nCopyright (C) 2009-2013, Computational Hydrosystems, '
           'Helmholtz Centre for Environmental Research - UFZ, Permoserstr. 15, '
           '04318 Leipzig, Germany.')
     print 'All rights reserved.'
-    print '\nIn case of questions or comments contact mc (at) macu.de\n'
+    print '\nIn case of questions or comments contact matthias.cuntz (at) ufz.de\n'
