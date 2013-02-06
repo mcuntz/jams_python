@@ -590,10 +590,9 @@ def cuntz_gleixner(idecdate, iGPP, iRd, iCa, iRa, igtot, sunrise, Vcyt=None,
         if sr0 > 0.: sr0 -= dsecs[0]
         nsecs[0] = -sr0
     #
-    # fraction of starch synthesis, same as T of Tchekez before but with different units,
-    # also T of Tcherkez acts on A whereas bigT acts on GPP
+    # fraction of starch synthesis, same as T of Tchekez but with different units
     tmp    = 1./86400.
-    ibigT  = 1. - idaylength*tmp # =0.058*6 @ Tcherkez
+    ibigT  = 1. - idaylength*tmp # =0.056*6 @ Tcherkez
     ibetar = 1. - ibetas*(1.-ibetap)
     if not nocheck:
         if np.any(ibetar <= 0.):
