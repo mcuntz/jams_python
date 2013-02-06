@@ -20,7 +20,8 @@ def cuntz_gleixner(idecdate, iGPP, iRd, iCa, iRa, igtot, sunrise, Vcyt=None,
                    Rphloem=False,
                    Vstarch=False, ass13=False, disc=False,
                    Rnew_starch=False, Rnew_cyt=False,
-                   fullmodel=True, julian=True, nocheck=False):
+                   fullmodel=True, julian=True, nocheck=False,
+                   starch_mol2g=None, V0starchg=const.tiny):
     """
        Calculates the Cuntz-Gleixner steady state and non-steady state models
        of 13C discrimiantion in the Calvin cycle.
@@ -44,7 +45,8 @@ def cuntz_gleixner(idecdate, iGPP, iRd, iCa, iRa, igtot, sunrise, Vcyt=None,
                           Rphloem=False,
                           Vstarch=False, ass13=False, disc=False,
                           Rnew_starch=False, Rnew_cyt=False,
-                          fullmodel=True, julian=True, nocheck=False):
+                          fullmodel=True, julian=True, nocheck=False,
+                          starch_mol2g=None, V0starchg=const.tiny):
 
 
        Input
@@ -68,6 +70,9 @@ def cuntz_gleixner(idecdate, iGPP, iRd, iCa, iRa, igtot, sunrise, Vcyt=None,
        date0           Start date of 1st time step (default: False)
                        If False, take same time step as first time step in idecdate
        V0starch        Initial C-concentration in Starch [umol(C)/m2(leaf)] (default: 1e-6)
+       V0starchg       Initial C-concentration in Starch [g(C)/gDW] (default: 1e-6)
+       starch_mol2g    Conversion factor from [umol(C)/m2(leaf)] to [g(C)/gDW] used for starch (default: None)
+                       If given and Vstarch==True then Vstarchg will be returned as well
        R0starch        Initial 13C/12C ratio of starch pool (default: PDB)
        R0cyt           Initial 13C/12C ratio of C in cytoplasm (default: PDB)
        daynight        1/0 array of day or night (default: False)
@@ -110,8 +115,10 @@ def cuntz_gleixner(idecdate, iGPP, iRd, iCa, iRa, igtot, sunrise, Vcyt=None,
 
        Output
        ------
-       Rass, Rm, Rchl, Rcyt, Rstarch, Rpyr, Rbio, Rphloem, Vstarch, ass13,
-       disc, Rnew_starch, Rnew_cyt    if fullmodel=True
+       if fullmodel=True
+         Rass, Rm, Rchl, Rcyt, Rstarch, Rpyr, Rbio, Rphloem, Vstarch, ass13, disc, Rnew_starch, Rnew_cyt
+       and if Vstarch=True and starch_mol2g!=None
+         Vstarchg
 
 
        Restrictions
@@ -216,13 +223,14 @@ def cuntz_gleixner(idecdate, iGPP, iRd, iCa, iRa, igtot, sunrise, Vcyt=None,
          267768.63203376  222321.41792241  176874.20381105  131426.9896997
           85979.77558834   40532.56147698]
 
-       >>> [Rass,Rm,Rchl,Rcyt,Rstarch,Rpyr,Rbio,Rphloem,Vstarch,ass13,disc,Rnew_starch,Rnew_cyt] = \
+       >>> [Rass,Rm,Rchl,Rcyt,Rstarch,Rpyr,Rbio,Rphloem,Vstarch,ass13,disc,Rnew_starch,Rnew_cyt,Vstarchg] = \
            cuntz_gleixner(adecdate[1:], gpp, Rd, CO2air, Ra, gtot, ndecdate, \
                           date0=adecdate[0], V0starch=V0starch, R0starch=R0starch, daynight=daynight, \
                           daylength=daylength, Phi=Phi, s_resid=s_resid, \
                           betas=betas, betap=betap, epsa=epsa, epsb=epsb, \
                           epsg=epsg, epst=epst, epss=epss, epsp=epsp, \
-                          steady=True, fullmodel=True, julian=False)
+                          steady=True, fullmodel=True, julian=False,\
+                          starch_mol2g=1., V0starchg=V0starch)
        >>> print Rass
        [ 0.01094936  0.01092075  0.01086872  0.01083349  0.01083054  0.01085329
          0.01091213  0.01092848  0.01090373  0.01091399  0.0109335   0.01087484
@@ -297,6 +305,14 @@ def cuntz_gleixner(idecdate, iGPP, iRd, iCa, iRa, igtot, sunrise, Vcyt=None,
          0.01085705  0.01087464  0.01086671  0.01081468  0.01082473  0.01092572
          0.01092572  0.01092572  0.01092572  0.01092572  0.01092572  0.01092572
          0.01092572  0.01092572]
+       >>> print Vstarchg
+       [  40532.56147698   70158.59646601   98220.74429006  124787.7169264
+         150065.87342268  174445.4051167   197941.82132329  220569.84160386
+         242795.95142944  264660.46135486  286169.30160194  307531.6955263
+         330026.51383616  353653.90753582  378255.94686174  402857.98618767
+         419259.34573828  404110.27436783  358663.06025647  313215.84614512
+         267768.63203376  222321.41792241  176874.20381105  131426.9896997
+          85979.77558834   40532.56147698]
 
        # non-steady state
        >>> R0cyt = 0.010911449304
@@ -450,6 +466,7 @@ def cuntz_gleixner(idecdate, iGPP, iRd, iCa, iRa, igtot, sunrise, Vcyt=None,
        Modified, MC, Mar 2012 - julian
                  MC, May 2012 - nocheck
                  MC, May 2012 - Vcyt, daynight and betas=None default
+                 MC, Feb 2013 - starch_mol2g, V0starchg
     """
     #
     # Checks
@@ -548,12 +565,24 @@ def cuntz_gleixner(idecdate, iGPP, iRd, iCa, iRa, igtot, sunrise, Vcyt=None,
     if nss:
         isarr = np.ndim(Vcyt)
         if (isarr==0):
-            iVcyt = np.ones(nd, dtype=np.int) * Vcyt
+            iVcyt = np.ones(nd, dtype=np.float) * Vcyt
         else:
             iVcyt = Vcyt
             nn = iVcyt.size
             if (nn != nd):
                 raise ValueError('Vcyt must be size 1 or size(idecdate)')
+    # starch_mol2g
+    if np.any(starch_mol2g != None):
+        isarr = np.ndim(starch_mol2g)
+        if (isarr==0):
+            istarch_mol2g = np.ones(nd, dtype=np.float) * starch_mol2g
+        else:
+            istarch_mol2g = starch_mol2g
+            nn = istarch_mol2g.size
+            if (nn != nd):
+                raise ValueError('starch_mol2g must be size 1 or size(idecdate)')
+    else:
+        istarch_mol2g  = np.ones(nd, dtype=np.float)
     #
     # derived variables
     iAss = np.abs(iGPP) - np.abs(iRd)  # Net assimilation
@@ -609,6 +638,7 @@ def cuntz_gleixner(idecdate, iGPP, iRd, iCa, iRa, igtot, sunrise, Vcyt=None,
     iRchl        = np.empty(nd)      # sucrose in chloroplast
     iRstarch     = np.empty(nd)      # accumulated starch in chloroplast
     iVstarch     = np.empty(nd)      # Starch concentration
+    iVstarchg    = np.empty(nd)      # Starch concentration in gC/DW
     iRcyt        = np.empty(nd)      # sucrose in cytoplast
     iRpyr        = np.empty(nd)      # pyruvate in cytoplast
     iRbio        = np.empty(nd)      # biosynthesis in cytoplast
@@ -645,16 +675,20 @@ def cuntz_gleixner(idecdate, iGPP, iRd, iCa, iRa, igtot, sunrise, Vcyt=None,
                 iRphloem[i]    += fphloem2 * (1.-epsp) * iRbio[i]
                 iRphloem[i]    /= fphloem1 + fphloem2
                 # Integrate starch
-                fstarch     = ibigT[i] * np.abs(iGPP[i])
-                Vstarchm1   = V0starch if i == 0 else iVstarch[i-1]
-                Rstarchm1   = R0starch if i == 0 else iRstarch[i-1]
-                iVstarch[i] = Vstarchm1 + fstarch*isecs[i]
-                iRstarch[i] = (Rstarchm1*Vstarchm1 + fstarch*isecs[i]*iRnew_starch[i]) / iVstarch[i]
+                fstarch      = ibigT[i] * np.abs(iGPP[i])
+                Vstarchm1    = V0starch  if i == 0 else iVstarch[i-1]
+                Vstarchgm1   = V0starchg if i == 0 else iVstarchg[i-1]
+                Rstarchm1    = R0starch  if i == 0 else iRstarch[i-1]
+                iVstarch[i]  = Vstarchm1  + fstarch*isecs[i]
+                iVstarchg[i] = Vstarchgm1 + fstarch*isecs[i]*istarch_mol2g[i]
+                iRstarch[i]  = (Rstarchm1*Vstarchm1 + fstarch*isecs[i]*iRnew_starch[i]) / iVstarch[i]
             else: # nss night
-                Vstarchm1       = V0starch if i == 0 else iVstarch[i-1]
+                Vstarchm1       = V0starch  if i == 0 else iVstarch[i-1]
+                Vstarchgm1      = V0starchg if i == 0 else iVstarchg[i-1]
                 fstarch         = -(Vstarchm1-s_resid)/nsecs[i]
-                iVstarch[i]     = Vstarchm1 + fstarch*isecs[i]
-                Rstarchm1       = R0starch if i == 0 else iRstarch[i-1]
+                iVstarch[i]     = Vstarchm1  + fstarch*isecs[i]
+                iVstarchg[i]    = Vstarchgm1 + fstarch*isecs[i]*istarch_mol2g[i]
+                Rstarchm1       = R0starch  if i == 0 else iRstarch[i-1]
                 iRstarch[i]     = Rstarchm1
                 iRnew_starch[i] = Rstarchm1
                 iRchl[i]        = iRnew_starch[i]
@@ -688,16 +722,20 @@ def cuntz_gleixner(idecdate, iGPP, iRd, iCa, iRa, igtot, sunrise, Vcyt=None,
                 iRphloem[i]    += fphloem2 * (1.-epsp) * iRbio[i]
                 iRphloem[i]    /= fphloem1 + fphloem2
                 # Integrate starch
-                fstarch     = ibigT[i] * np.abs(iGPP[i])
-                Vstarchm1   = V0starch if i == 0 else iVstarch[i-1]
-                Rstarchm1   = R0starch if i == 0 else iRstarch[i-1]
-                iVstarch[i] = Vstarchm1 + fstarch*isecs[i]
-                iRstarch[i] = (Rstarchm1*Vstarchm1 + fstarch*isecs[i]*iRnew_starch[i]) / iVstarch[i]
+                fstarch      = ibigT[i] * np.abs(iGPP[i])
+                Vstarchm1    = V0starch  if i == 0 else iVstarch[i-1]
+                Vstarchgm1   = V0starchg if i == 0 else iVstarchg[i-1]
+                Rstarchm1    = R0starch  if i == 0 else iRstarch[i-1]
+                iVstarch[i]  = Vstarchm1  + fstarch*isecs[i]
+                iVstarchg[i] = Vstarchgm1 + fstarch*isecs[i]*istarch_mol2g[i]
+                iRstarch[i]  = (Rstarchm1*Vstarchm1 + fstarch*isecs[i]*iRnew_starch[i]) / iVstarch[i]
             else: # ss night
-                Vstarchm1       = V0starch if i == 0 else iVstarch[i-1]
+                Vstarchm1       = V0starch  if i == 0 else iVstarch[i-1]
+                Vstarchgm1      = V0starchg if i == 0 else iVstarchg[i-1]
                 fstarch         = -(Vstarchm1-s_resid)/nsecs[i]
-                iVstarch[i]     = Vstarchm1 + fstarch*isecs[i]
-                Rstarchm1       = R0starch if i == 0 else iRstarch[i-1]
+                iVstarch[i]     = Vstarchm1  + fstarch*isecs[i]
+                iVstarchg[i]    = Vstarchgm1 + fstarch*isecs[i]*istarch_mol2g[i]
+                Rstarchm1       = R0starch  if i == 0 else iRstarch[i-1]
                 iRstarch[i]     = Rstarchm1
                 iRnew_starch[i] = Rstarchm1
                 iRchl[i]        = Rstarchm1
@@ -726,6 +764,7 @@ def cuntz_gleixner(idecdate, iGPP, iRd, iCa, iRa, igtot, sunrise, Vcyt=None,
     if disc:        out += [idisc]
     if Rnew_starch: out += [iRnew_starch]
     if Rnew_cyt:    out += [iRnew_cyt]
+    if Vstarch & np.any(starch_mol2g != None): out += [iVstarchg]
 
     return out
 
