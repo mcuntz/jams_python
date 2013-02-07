@@ -206,7 +206,7 @@ def kriging(x, y, z, semi_mod, semi_popt, xnew=None, ynew=None, plot=False,
         -------
         Written, Arndt Piayda, Nov 2012
         Modified, Arndt Piayda, Dec 2012 - documentation change
-        Modified, Matthias Cuntz & Juliane May, Feb 2013 - block
+        Modified, Matthias Cuntz & Juliane Mai, Feb 2013 - block
     """
 
     if not silent:

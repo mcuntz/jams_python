@@ -80,7 +80,7 @@ def in_poly(P, coord_x, coord_y):
         You should have received a copy of the GNU Lesser General Public License
         along with The UFZ Python library.  If not, see <http://www.gnu.org/licenses/>.
 
-        Copyright 2012 Juliane May, Arndt Piayda, Matthias Cuntz
+        Copyright 2012 Juliane Mai, Arndt Piayda, Matthias Cuntz
 
 
         History
