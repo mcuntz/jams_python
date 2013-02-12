@@ -204,9 +204,10 @@ def kriging(x, y, z, semi_mod, semi_popt, xnew=None, ynew=None, plot=False,
 
         History
         -------
-        Written, Arndt Piayda, Nov 2012
-        Modified, Arndt Piayda, Dec 2012 - documentation change
-        Modified, Matthias Cuntz & Juliane Mai, Feb 2013 - block
+        Written,  Arndt Piayda & Juliane Mai, Nov 2012
+        Modified, Arndt Piayda, Dec 2012                 - documentation change
+                  Matthias Cuntz & Juliane Mai, Feb 2013 - block
+                  Matthias Cuntz, Feb 2013               - block uses volume_poly
     """
 
     if not silent:
@@ -374,46 +375,34 @@ def kriging(x, y, z, semi_mod, semi_popt, xnew=None, ynew=None, plot=False,
         from scipy.spatial   import Delaunay    # for triangulation
         from scipy.integrate import dblquad     # area integral
         from convex_hull     import convex_hull # convex hull of data points
-        from in_poly         import in_poly     # test if point is in polygon
-        from area_poly       import area_poly   # the area of a polygon
+        from volume_poly     import volume_poly # the volume above a polygon
 
         if not silent:
             print 'KRIG: block kriging...'
             start = time.time()
 
-        # Functions for the three lines of a triangle
-        # Use the global variable tria
-        def a(xx): # line between x1 and x2
-            if (tria[1,0]-tria[0,0]) == 0.:
-                return b(xx)
-            else:
-                return (tria[1,1]-tria[0,1])/(tria[1,0]-tria[0,0]) * (xx-tria[0,0]) + tria[0,1]
-        def b(xx): # line between x3 and x2
-            return (tria[2,1]-tria[0,1])/(tria[2,0]-tria[0,0]) * (xx-tria[0,0]) + tria[0,1]
-        def c(xx): # line between x2 and x3
-            if (tria[2,0]-tria[1,0]) == 0.:
-                return b(xx)
-            else:
-                return (tria[2,1]-tria[1,1])/(tria[2,0]-tria[1,0]) * (xx-tria[1,0]) + tria[1,1]
-        # Case distinction if triangle points up or down
-        def maxac(xx):
-            return np.maximum(a(xx), c(xx))
-        def minac(xx):
-            return np.minimum(a(xx), c(xx))
-        # Function to integrate
-        def semi_modyx(yy,xx,shiftyx,obsyx,f,p):
-            xx += shiftyx[1]
-            yy += shiftyx[0]
+        def semiyx(yy,xx,obsyx,f,p):
             dis = np.sqrt((xx-obsyx[1])**2 + (yy-obsyx[0])**2)
             return f(dis,p) # semivariogram(distance, parameter)
-
-        # x and y points
+        
+        # Construct B-vector
+        B     = np.empty(x.size+1, dtype=np.float)
+        B[-1] = 1.
         if (xnew is not None) and (not masked):
-            # Assume rectangle, construct 4 triangles
+            # Assume rectangle
             xmin = np.amin(xnew)
             ymin = np.amin(ynew)
             xmax = np.amax(xnew)
             ymax = np.amax(ynew)
+            # Do not calc double integral because 4 triangles are double as fast.
+            # # Calc mean semivariogramm over whole region for each point
+            # area = (xmax-xmin)*(ymax-ymin)
+            # for i in xrange(x.size):
+            #     tvol, tvol_err = dblquad(semiyx, xmin, xmax, lambda xx: ymin, lambda xx: ymax,
+            #                              args=([y[i],x[i]], semi_mod, semi_popt))
+            #     B[i] = tvol / area
+            
+            # Construct 4 triangles
             xs   = 0.5*(xmax+xmin) # centre of gravity
             ys   = 0.5*(ymax+ymin)
             ntriangles = 4
@@ -436,6 +425,11 @@ def kriging(x, y, z, semi_mod, semi_popt, xnew=None, ynew=None, plot=False,
             cxy[1,:] = [xmax,ymin]
             cxy[2,:] = [xmax,ymax]
             cxy[3,:] = [xmin,ymax]
+            # Calc mean semivariogramm over whole region for each point
+            for i in xrange(x.size):
+                tvol, tvol_err, area = volume_poly(semiyx, tri=tri, area=True,
+                                                   obsyx=[y[i],x[i]], f=semi_mod, p=semi_popt)
+                B[i] = tvol / area
         else:
             # Get convex hull and vertices
             xy  = np.array(zip(x,y))
@@ -453,54 +447,26 @@ def kriging(x, y, z, semi_mod, semi_popt, xnew=None, ynew=None, plot=False,
                 tri[i,0,:] = xy[d.convex_hull[i,0],:]
                 tri[i,1,:] = xy[d.convex_hull[i,1],:]
                 tri[i,2,:] = [xs,ys]
-
-        # Construct B-vector
-        B     = np.empty(x.size+1, dtype=np.float)
-        B[-1] = 1.
-        for i in xrange(x.size):
-            area = 0.
-            tvol = 0.
-            tvol_err = 0.
-            # Calc mean semivariogramm over whole region
-            for j in xrange(ntriangles):
-                t  = tri[j,:,:2]
-                ii = np.argsort(t[:,0])
-                tria = t[ii,:]
-                xs = np.mean(tria[:,0])
-                ys = np.mean(tria[:,1])
-                # Select only Delaunay triangles in polygon
-                # this is always true now, because we construct the triangles
-                # from the convex hull. If we were taking Delaunay output, then this
-                # would allow concave polygons; but it needs much longer.
-                if in_poly([xs,ys], cxy[:,0], cxy[:,1]) >= 0:
-                    area += area_poly(tria[:,0],tria[:,1])
-                    xmin  = np.amin(tria[:,0])
-                    ymin  = np.amin(tria[:,1])
-                    tria[:,0] -= xmin # shift for integral>0
-                    tria[:,1] -= ymin
-                    if (b(tria[1,0])>tria[1,1]): # triangle points down
-                        vol, err = dblquad(semi_modyx, tria[0,0], tria[2,0],
-                                           maxac, b,
-                                           args=([ymin,xmin],[y[i],x[i]],semi_mod,semi_popt))
-                    else:                        # triangle points up
-                        vol, err = dblquad(semi_modyx, tria[0,0], tria[2,0],
-                                           b, minac,
-                                           args=([ymin,xmin],[y[i],x[i]],semi_mod,semi_popt))
-                    tvol     += vol
-                    tvol_err += err*err
-                else:
-                    print 'What the ...'
-            B[i] = tvol / area
+            # Calc mean semivariogramm over whole region for each point
+            for i in xrange(x.size):
+                tvol, tvol_err, area = volume_poly(semiyx, tri=tri, area=True,
+                                                   obsyx=[y[i],x[i]], f=semi_mod, p=semi_popt)
+                B[i] = tvol / area
 
         # calculate lambda
         lmd = np.dot(invA, B)
         # shorten it
+        mu  = lmd[-1]
         lmd = lmd[:-1]
         B   = B[:-1]
-        # averag
-        baverage  = np.dot(z,lmd)
-        # dummy equation for error - full equation not implemented yet.
-        bvariance = np.dot(lmd.transpose(), B)
+        # average
+        baverage = np.dot(z,lmd)
+        bvariance = np.nan
+        # Kriging error - not correct yet
+        # With mean(B) as Monte-Carlo type estimate of quadruple integral
+        # But this is a bad estimate because it is almost dot(lmd,B) so that
+        # bvariance = mu
+        bvariance = np.dot(lmd,B) + mu - np.mean(B)
 
         if not silent:
             stop = time.time()
@@ -606,88 +572,88 @@ def kriging(x, y, z, semi_mod, semi_popt, xnew=None, ynew=None, plot=False,
 
 # DOCTEST:
 if __name__ == '__main__':
-    import doctest
-    doctest.testmod()
+    # import doctest
+    # doctest.testmod()
 
-    # x = np.array([652225.,652175.,652205.,652235.,652265.,652165.,\
-    #               652195.,652225.,652255.,652285.,652175.,652205.,\
-    #               652235.,652265.,652175.,652205.,652235.,652265.,\
-    #               652195.,652225.,652255.,652285.,652235.,652265.,\
-    #               652225.,652255.,652285.,652195.,652200.,652200.,\
-    #               652240.,652230.,652260.,652260.,652265.])
-    # y = np.array([5772960.,5772970.,5772970.,5772970.,5772970.,\
-    #               5772980.,5772980.,5772980.,5772980.,5772980.,\
-    #               5772990.,5772990.,5772990.,5772990.,5773000.,\
-    #               5773000.,5773000.,5773000.,5773010.,5773010.,\
-    #               5773010.,5773010.,5773020.,5773020.,5773030.,\
-    #               5773030.,5773030.,5772985.,5772990.,5772995.,\
-    #               5773015.,5773025.,5772985.,5772990.,5772995.])
-    # z = np.array([2.16512767,4.97776467,4.2279204 ,0.        ,\
-    #               8.25658422,0.01238773,5.05858306,8.33503939,\
-    #               7.53470443,7.15304826,9.45150218,8.79359049,\
-    #               0.0536634 ,0.42101194,0.22721601,1.1458486 ,\
-    #               6.79183025,2.50622739,3.76725118,3.97934707,\
-    #               0.        ,0.24743279,1.4627512 ,0.38430722,\
-    #               5.30171261,0.        ,3.17667353,3.80908144,\
-    #               7.12445478,4.83891708,6.10898131,2.93801857,\
-    #               2.56170107,2.54503559,1.72767934])
-    # # make semivariogram
-    # from semivariogram import semivariogram
-    # nL = 40
-    # di = [0]
-    # td = 180
-    # nugget,sill,range,vark,h,g,c,semi_mod,semi_popt=\
-    # semivariogram(x,y,z,nL,di,td,stype='omnidirectional',negscat=0.5,\
-    #               model='exponential',graph=False,lunit='m',\
-    #               p0=(0.,20.,1./8.),runtimediag=False)
-    # # x and y coordinates for the surface
-    # xnew = np.arange(np.amin(x),np.amax(x),5.)
-    # ynew = np.arange(np.amin(y),np.amax(y),5.)
-    # xnew, ynew, znew, varnew = kriging(x,y,z,semi_mod,semi_popt,\
-    #                                    xnew=xnew,ynew=ynew,silent=True,\
-    #                                    plot=False,masked=False,eop=None)
-    # print np.round(znew[0],3)
-    # # [ 3.576  3.758  3.912  3.937  3.884  3.83   3.792  3.759  3.71   3.613
-    # #   3.407  2.981  2.165  2.366  2.458  2.797  3.304  3.817  4.298  4.717
-    # #   4.918  4.77   4.478  4.238]
-    # print np.round(np.mean(znew),2)
-    # # 3.69
+    x = np.array([652225.,652175.,652205.,652235.,652265.,652165.,\
+                  652195.,652225.,652255.,652285.,652175.,652205.,\
+                  652235.,652265.,652175.,652205.,652235.,652265.,\
+                  652195.,652225.,652255.,652285.,652235.,652265.,\
+                  652225.,652255.,652285.,652195.,652200.,652200.,\
+                  652240.,652230.,652260.,652260.,652265.])
+    y = np.array([5772960.,5772970.,5772970.,5772970.,5772970.,\
+                  5772980.,5772980.,5772980.,5772980.,5772980.,\
+                  5772990.,5772990.,5772990.,5772990.,5773000.,\
+                  5773000.,5773000.,5773000.,5773010.,5773010.,\
+                  5773010.,5773010.,5773020.,5773020.,5773030.,\
+                  5773030.,5773030.,5772985.,5772990.,5772995.,\
+                  5773015.,5773025.,5772985.,5772990.,5772995.])
+    z = np.array([2.16512767,4.97776467,4.2279204 ,0.        ,\
+                  8.25658422,0.01238773,5.05858306,8.33503939,\
+                  7.53470443,7.15304826,9.45150218,8.79359049,\
+                  0.0536634 ,0.42101194,0.22721601,1.1458486 ,\
+                  6.79183025,2.50622739,3.76725118,3.97934707,\
+                  0.        ,0.24743279,1.4627512 ,0.38430722,\
+                  5.30171261,0.        ,3.17667353,3.80908144,\
+                  7.12445478,4.83891708,6.10898131,2.93801857,\
+                  2.56170107,2.54503559,1.72767934])
+    # make semivariogram
+    from semivariogram import semivariogram
+    nL = 40
+    di = [0]
+    td = 180
+    nugget,sill,range,vark,h,g,c,semi_mod,semi_popt=\
+    semivariogram(x,y,z,nL,di,td,stype='omnidirectional',negscat=0.5,\
+                  model='exponential',graph=False,lunit='m',\
+                  p0=(0.,20.,1./8.),runtimediag=False)
+    # x and y coordinates for the surface
+    xnew = np.arange(np.amin(x),np.amax(x),5.)
+    ynew = np.arange(np.amin(y),np.amax(y),5.)
+    xnew, ynew, znew, varnew = kriging(x,y,z,semi_mod,semi_popt,\
+                                       xnew=xnew,ynew=ynew,silent=True,\
+                                       plot=False,masked=False,eop=None)
+    print np.round(znew[0],3)
+    # [ 3.576  3.758  3.912  3.937  3.884  3.83   3.792  3.759  3.71   3.613
+    #   3.407  2.981  2.165  2.366  2.458  2.797  3.304  3.817  4.298  4.717
+    #   4.918  4.77   4.478  4.238]
+    print np.round(np.mean(znew),2)
+    # 3.69
 
-    # # block krig the surface
-    # bave, bvar = kriging(x, y, z, semi_mod, semi_popt,
-    #                      xnew=xnew, ynew=ynew,
-    #                      silent=True,plot=False,masked=False,eop=None,block=True)
-    # print np.round(bave,3)
-    # # 3.659
+    # block krig the surface
+    bave, bvar = kriging(x, y, z, semi_mod, semi_popt,
+                         xnew=xnew, ynew=ynew,
+                         silent=True,plot=False,masked=False,eop=None,block=True)
+    print np.round(bave,3)
+    # 3.659
 
-    # # krig only at points of interest
-    # poi = np.array([[652209.16,5772986.26],\
-    #                 [652281.10,5773014.27],\
-    #                 [652202.39,5772997.96],\
-    #                 [652264.51,5772992.49],\
-    #                 [652274.81,5772961.62],\
-    #                 [652204.93,5772992.82],\
-    #                 [652232.38,5773021.34],\
-    #                 [652278.25,5773019.58],\
-    #                 [652199.17,5773004.12],\
-    #                 [652276.71,5773006.25]])
-    # eopz, eopvar = kriging(x,y,z,semi_mod,semi_popt,xnew=None,\
-    #                        ynew=None,plot=False,masked=False,\
-    #                        silent=True,eop=poi)
-    # print np.round(eopz,3)
-    #     # [ 6.409  1.677  3.168  1.262  4.636  6.534  2.244  2.255  2.996  2.111]
+    # krig only at points of interest
+    poi = np.array([[652209.16,5772986.26],\
+                    [652281.10,5773014.27],\
+                    [652202.39,5772997.96],\
+                    [652264.51,5772992.49],\
+                    [652274.81,5772961.62],\
+                    [652204.93,5772992.82],\
+                    [652232.38,5773021.34],\
+                    [652278.25,5773019.58],\
+                    [652199.17,5773004.12],\
+                    [652276.71,5773006.25]])
+    eopz, eopvar = kriging(x,y,z,semi_mod,semi_popt,xnew=None,\
+                           ynew=None,plot=False,masked=False,\
+                           silent=True,eop=poi)
+    print np.round(eopz,3)
+        # [ 6.409  1.677  3.168  1.262  4.636  6.534  2.244  2.255  2.996  2.111]
 
-    # # krig both, whole surface and on points of interest
-    # xnew = np.arange(np.min(x),np.max(x),5.)
-    # ynew = np.arange(np.min(y),np.max(y),5.)
-    # xnew, ynew, znew, varnew, eopz, eopvar = kriging(x,y,z,semi_mod,\
-    #                                          semi_popt,xnew=xnew,\
-    #                                          ynew=ynew,plot=False,\
-    #                                          masked=False,silent=True,\
-    #                                          eop=poi)
-    # print np.round(znew[0],3)
-    #     # [ 3.576  3.758  3.912  3.937  3.884  3.83   3.792  3.759  3.71   3.613
-    #     #   3.407  2.981  2.165  2.366  2.458  2.797  3.304  3.817  4.298  4.717
-    #     #   4.918  4.77   4.478  4.238]
-    # print np.round(eopz,3)
-    #     # [ 6.409  1.677  3.168  1.262  4.636  6.534  2.244  2.255  2.996  2.111]
+    # krig both, whole surface and on points of interest
+    xnew = np.arange(np.min(x),np.max(x),5.)
+    ynew = np.arange(np.min(y),np.max(y),5.)
+    xnew, ynew, znew, varnew, eopz, eopvar = kriging(x,y,z,semi_mod,\
+                                             semi_popt,xnew=xnew,\
+                                             ynew=ynew,plot=False,\
+                                             masked=False,silent=True,\
+                                             eop=poi)
+    print np.round(znew[0],3)
+        # [ 3.576  3.758  3.912  3.937  3.884  3.83   3.792  3.759  3.71   3.613
+        #   3.407  2.981  2.165  2.366  2.458  2.797  3.304  3.817  4.298  4.717
+        #   4.918  4.77   4.478  4.238]
+    print np.round(eopz,3)
+        # [ 6.409  1.677  3.168  1.262  4.636  6.534  2.244  2.255  2.996  2.111]

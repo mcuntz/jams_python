@@ -6,7 +6,7 @@ from convex_hull     import convex_hull # convex hull of data points
 from in_poly         import in_poly     # test if point is in polygon
 from area_poly       import area_poly   # the area of a polygon
 
-def volume_poly(x, y, func, convexhull=False, area=False, **kwargs):
+def volume_poly(func, x=None, y=None, tri=None, convexhull=False, area=False, **kwargs):
     """
         Volume of function above polygon. The polygon will be triangulated.
         Then the volume above each triangle is integrated, and alled summed up.
@@ -19,20 +19,24 @@ def volume_poly(x, y, func, convexhull=False, area=False, **kwargs):
 
         Definition
         ----------
-        def volume_poly(x, y, func, convexhull=False, area=False, **kwargs):
+        def volume_poly(func, x=None, y=None, tri=None, convexhull=False, area=False, **kwargs):
 
 
         Input
         -----
-        x          1D array, x coordinates
-        y          1D array, y coordinates
         func       function, func(y,x,*args)
                    any unknown keyword will be passed to func
 
 
         Optional Input
         --------------
-        convexhull   bool, integrate convex hull of polygon instead of polygon itself
+        Either
+          x          1D array, x coordinates
+          y          1D array, y coordinates
+        or
+          tri        3D array (ntriangles,3,2), triangle coordinates (supercedes x, y)
+                     (ntriangles, 3 corners, xy-coords for each corner)
+        convexhull   bool, integrate convex hull of polygon instead of polygon itself (ignored if tri is given)
         area         bool, return also the area of the polygon (or the convex hull)
 
 
@@ -62,16 +66,40 @@ def volume_poly(x, y, func, convexhull=False, area=False, **kwargs):
         >>> y  = y[ii]
         >>> print np.round(np.pi * r*r,3)
         3.142
-        >>> v = volume_poly(x, y, f1, convexhull=True)
+        >>> v = volume_poly(f1, x, y, convexhull=True)
         >>> print np.round(v[0],3)
         2.996
-        >>> v = volume_poly(x, y, f1, convexhull=True, area=True)
+        >>> v = volume_poly(f1, x, y, convexhull=True, area=True)
         >>> print np.round(v[0],3), np.round(v[2],3)
         2.996 2.996
 
         >>> print np.round(0.5 * 4./3. * np.pi * r*r*r, 3)
         2.094
-        >>> v = volume_poly(x, y, f2, r=r, convexhull=True)
+        >>> v = volume_poly(f2, x, y, r=r, convexhull=True)
+        >>> print np.round(v[0], 3)
+        2.072
+
+        # Triangles outside
+        >>> xy  = np.array(zip(x,y))
+        >>> d   = Delaunay(xy[:,:])
+        >>> cxy = convex_hull(xy.transpose())
+        >>> xs  = np.mean(cxy[:,0])
+        >>> ys  = np.mean(cxy[:,1])
+
+        # Construct triangles from convex hull vertices and centre of gravity
+        >>> ntriangles = d.convex_hull.shape[0]
+        >>> tri = np.empty((ntriangles,3,2), dtype=np.float)
+        >>> for i in xrange(ntriangles):
+        ...     tri[i,0,:] = xy[d.convex_hull[i,0],:]
+        ...     tri[i,1,:] = xy[d.convex_hull[i,1],:]
+        ...     tri[i,2,:] = [xs,ys]
+        >>> v = volume_poly(f1, tri=tri, convexhull=True)
+        >>> print np.round(v[0],3)
+        2.996
+        >>> v = volume_poly(f1, tri=tri, convexhull=True, area=True)
+        >>> print np.round(v[0],3), np.round(v[2],3)
+        2.996 2.996
+        >>> v = volume_poly(f2, tri=tri, r=r, convexhull=True)
         >>> print np.round(v[0], 3)
         2.072
 
@@ -100,11 +128,8 @@ def volume_poly(x, y, func, convexhull=False, area=False, **kwargs):
         History
         -------
         Written,  Matthias Cuntz & Juliane Mai, Feb 2013
+        Modified, Matthias Cuntz, Feb 2013 - tri
     """
-
-    # check
-    if np.size(x) != np.size(y):
-            raise ValueError('volume_poly: x and y must have same dimensions')
 
     # Functions for the three lines of a triangle
     # Use the global variable tria
@@ -113,7 +138,7 @@ def volume_poly(x, y, func, convexhull=False, area=False, **kwargs):
             return b(xx)
         else:
             return (tria[1,1]-tria[0,1])/(tria[1,0]-tria[0,0]) * (xx-tria[0,0]) + tria[0,1]
-    def b(xx): # line between x3 and x2
+    def b(xx): # line between x1 and x3
         return (tria[2,1]-tria[0,1])/(tria[2,0]-tria[0,0]) * (xx-tria[0,0]) + tria[0,1]
     def c(xx): # line between x2 and x3
         if (tria[2,0]-tria[1,0]) == 0.:
@@ -135,24 +160,35 @@ def volume_poly(x, y, func, convexhull=False, area=False, **kwargs):
             kwargs = args[0]
             return func(yy,xx,**kwargs)
 
-    # Get convex hull and vertices
-    xy  = np.array(zip(x,y))
-    d   = Delaunay(xy[:,:])
-    cxy = convex_hull(xy.transpose())
-    xs  = np.mean(cxy[:,0])
-    ys  = np.mean(cxy[:,1])
-    if convexhull:
-        # Construct triangles from convex hull vertices and centre of gravity
-        ntriangles = d.convex_hull.shape[0]
-        tri = np.empty((ntriangles,3,2), dtype=np.float)
-        for i in xrange(ntriangles):
-            tri[i,0,:] = xy[d.convex_hull[i,0],:]
-            tri[i,1,:] = xy[d.convex_hull[i,1],:]
-            tri[i,2,:] = [xs,ys]
-    else:
-        # All triangles
-        tri = xy[d.vertices,:]
+    if tri is not None:
+        trigiven = True
+        tri = np.array(tri) # assure
         ntriangles = tri.shape[0]
+        if (tri.shape[1] != 3) | (tri.shape[2] != 2):
+            raise ValueError('volume_poly: tri must be triangles with dimension (ntriangles, 3, 2)')
+    else:
+        trigiven = False
+        # check
+        if np.size(x) != np.size(y):
+            raise ValueError('volume_poly: x and y must have same dimensions')
+        # Get convex hull and vertices
+        xy  = np.array(zip(x,y))
+        d   = Delaunay(xy[:,:])
+        cxy = convex_hull(xy.transpose())
+        xs  = np.mean(cxy[:,0])
+        ys  = np.mean(cxy[:,1])
+        if convexhull:
+            # Construct triangles from convex hull vertices and centre of gravity
+            ntriangles = d.convex_hull.shape[0]
+            tri = np.empty((ntriangles,3,2), dtype=np.float)
+            for i in xrange(ntriangles):
+                tri[i,0,:] = xy[d.convex_hull[i,0],:]
+                tri[i,1,:] = xy[d.convex_hull[i,1],:]
+                tri[i,2,:] = [xs,ys]
+        else:
+            # All triangles
+            tri = xy[d.vertices,:]
+            ntriangles = tri.shape[0]
 
     flaeche = 0.
     tvol = 0.
@@ -167,7 +203,10 @@ def volume_poly(x, y, func, convexhull=False, area=False, **kwargs):
         # Select only Delaunay triangles that are inside the original polygon
         # i.e. exclude triangles in concave part of polygon
         # If convexhull=True then this is always true.
-        if in_poly([xs,ys], cxy[:,0], cxy[:,1]) >= 0:
+        check_in_poly = False
+        if not trigiven:
+            check_in_poly = in_poly([xs,ys], cxy[:,0], cxy[:,1]) >= 0
+        if trigiven | check_in_poly:
             flaeche   += area_poly(tria[:,0],tria[:,1])
             xmin       = np.amin(tria[:,0])
             ymin       = np.amin(tria[:,1])
@@ -208,14 +247,39 @@ if __name__ == '__main__':
     # x  = x[ii]
     # y  = y[ii]
     # print np.round(np.pi * r*r,3)
-
-    # # v = volume_poly(x, y, f1)
-    # # print v[0], v[1]
-    # v = volume_poly(x, y, f1, convexhull=True)
+    # # 3.142
+    # v = volume_poly(f1, x, y, convexhull=True)
     # print np.round(v[0],3)
-    # v = volume_poly(x, y, f1, convexhull=True, area=True)
+    # # 2.996
+    # v = volume_poly(f1, x, y, convexhull=True, area=True)
     # print np.round(v[0],3), np.round(v[2],3)
+    # # 2.996 2.996
 
     # print np.round(0.5 * 4./3. * np.pi * r*r*r, 3)
-    # v = volume_poly(x, y, f2, r=r, convexhull=True)
+    # # 2.094
+    # v = volume_poly(f2, x, y, r=r, convexhull=True)
     # print np.round(v[0], 3)
+    # # 2.072
+
+    # # Triangles outside
+    # xy  = np.array(zip(x,y))
+    # d   = Delaunay(xy[:,:])
+    # cxy = convex_hull(xy.transpose())
+    # xs  = np.mean(cxy[:,0])
+    # ys  = np.mean(cxy[:,1])
+    # # Construct triangles from convex hull vertices and centre of gravity
+    # ntriangles = d.convex_hull.shape[0]
+    # tri = np.empty((ntriangles,3,2), dtype=np.float)
+    # for i in xrange(ntriangles):
+    #     tri[i,0,:] = xy[d.convex_hull[i,0],:]
+    #     tri[i,1,:] = xy[d.convex_hull[i,1],:]
+    #     tri[i,2,:] = [xs,ys]
+    # v = volume_poly(f1, tri=tri, convexhull=True)
+    # print np.round(v[0],3)
+    # # 2.996
+    # v = volume_poly(f1, tri=tri, convexhull=True, area=True)
+    # print np.round(v[0],3), np.round(v[2],3)
+    # # 2.996 2.996
+    # v = volume_poly(f2, tri=tri, r=r, convexhull=True)
+    # print np.round(v[0], 3)
+    # # 2.072
