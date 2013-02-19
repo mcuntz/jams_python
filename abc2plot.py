@@ -2,17 +2,18 @@
 from romanliterals import int2roman
 
 def abc2plot(handle, dx, dy, iplot, roman=False, lower=False, integer=False,
-             medium=False, small=False, bold=False):
+             medium=False, small=False, bold=False, parenthesis=False):
     """
         Write a, b, c, ...
               A, B, C, ...
               i, ii, iii, ...
-              I, II, III, ... on plots.
+              I, II, III, ...
+              a), b), c), ... on plots.
 
         Definition
         ----------
         def abc2plot(handle, dx, dy, iplot, roman=False, lower=False, integer=False,
-                     medium=False, small=False):
+                     medium=False, small=False, parenthesis=False):
 
 
         Input
@@ -24,19 +25,20 @@ def abc2plot(handle, dx, dy, iplot, roman=False, lower=False, integer=False,
 
         Optional Input
         --------------
-        roman    True:  use roman literals
-                 False: use a, b, c
-        lower    True:  use lowercase letters
-                 False: use uppercase letters
-        integer  True:  use integers
-                 False: use letters
-        medium   True:  fontsize='medium'
-                 False: fontsize='large'
-        small    True:  fontsize='small'
-                 False: fontsize='large'
-        bold     True:  fontweight='bold'
-                 False: fontsize='normal'
-
+        roman       True:  use roman literals
+                    False: use a, b, c
+        lower       True:  use lowercase letters
+                    False: use uppercase letters
+        integer     True:  use integers
+                    False: use letters
+        medium      True:  fontsize='medium'
+                    False: fontsize='large'
+        small       True:  fontsize='small'
+                    False: fontsize='large'
+        bold        True:  fontweight='bold'
+                    False: fontsize='normal'
+        parenthesis True:  close number with single paranthesis
+                    False: no parenthesis
 
         Output
         ------
@@ -76,6 +78,7 @@ def abc2plot(handle, dx, dy, iplot, roman=False, lower=False, integer=False,
         History
         -------
         Written, MC, May 2012
+        Modified, Arndt Piayda, Feb 2013 - added parenthesis option
     """
     # Check input
     if (roman & integer):
@@ -101,6 +104,8 @@ def abc2plot(handle, dx, dy, iplot, roman=False, lower=False, integer=False,
         fw='bold'
     else:
         fw='regular'
+    if parenthesis:
+        t += ')'
     xmin, xmax = handle.get_xlim()
     ymin, ymax = handle.get_ylim()
     handle.text(xmin+dx*(xmax-xmin), ymin+dy*(ymax-ymin), t, fontsize=fs, fontweight=fw,
@@ -110,17 +115,17 @@ def abc2plot(handle, dx, dy, iplot, roman=False, lower=False, integer=False,
 if __name__ == '__main__':
     import doctest
     doctest.testmod()
-    # import matplotlib.pyplot as plt
-    # fig = plt.figure()
-    # sub = fig.add_axes([0.1,0.1,0.9,0.9])
-    # m = plt.plot(range(100),'k:')
-    # abc2plot(sub,0,0,2)
-    # abc2plot(sub,0.1,0.1,2)
-    # abc2plot(sub,0.2,0.2,2,lower=True)
-    # abc2plot(sub,0.3,0.3,2,roman=True)
-    # abc2plot(sub,0.4,0.4,2,roman=True,lower=True)
-    # abc2plot(sub,0.5,0.5,2,integer=True)
-    # abc2plot(sub,0.6,0.6,2,small=True)
-    # abc2plot(sub,0.7,0.7,2,medium=True)
-    # abc2plot(sub,0.7,0.7,2,medium=True,bold=True)
-    # plt.show()
+#    import matplotlib.pyplot as plt
+#    fig = plt.figure()
+#    sub = fig.add_axes([0.1,0.1,0.9,0.9])
+#    m = plt.plot(range(100),'k:')
+#    abc2plot(sub,0,0,2)
+#    abc2plot(sub,0.1,0.1,2,parenthesis=True)
+#    abc2plot(sub,0.2,0.2,2,lower=True)
+#    abc2plot(sub,0.3,0.3,2,roman=True)
+#    abc2plot(sub,0.4,0.4,2,roman=True,lower=True)
+#    abc2plot(sub,0.5,0.5,2,integer=True)
+#    abc2plot(sub,0.6,0.6,2,small=True)
+#    abc2plot(sub,0.7,0.7,2,medium=True)
+#    abc2plot(sub,0.7,0.7,2,medium=True,bold=True)
+#    plt.show()
