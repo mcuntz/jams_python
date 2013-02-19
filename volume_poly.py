@@ -6,7 +6,7 @@ from convex_hull     import convex_hull # convex hull of data points
 from in_poly         import in_poly     # test if point is in polygon
 from area_poly       import area_poly   # the area of a polygon
 
-def volume_poly(func, x=None, y=None, tri=None, convexhull=False, area=False, **kwargs):
+def volume_poly(func, x=None, y=None, tri=None, convexhull=False, area=False, allvol=False, **kwargs):
     """
         Volume of function above polygon. The polygon will be triangulated.
         Then the volume above each triangle is integrated, and alled summed up.
@@ -38,11 +38,14 @@ def volume_poly(func, x=None, y=None, tri=None, convexhull=False, area=False, **
                      (ntriangles, 3 corners, xy-coords for each corner)
         convexhull   bool, integrate convex hull of polygon instead of polygon itself (ignored if tri is given)
         area         bool, return also the area of the polygon (or the convex hull)
+        allvol       bool, return also all volumes and areas of triangles
 
 
         Output
         ------
-        volume, integration_error, polygon area if area
+        volume, integration_error
+        polygon area if area
+        triangle volumes, areas of triangles if allvol
 
 
         References
@@ -102,6 +105,11 @@ def volume_poly(func, x=None, y=None, tri=None, convexhull=False, area=False, **
         >>> v = volume_poly(f2, tri=tri, r=r, convexhull=True)
         >>> print np.round(v[0], 3)
         2.072
+
+        # Return all volumes and areas
+        >>> v, e, vv, aa = volume_poly(f2, tri=tri, r=r, convexhull=True, allvol=True)
+        >>> print np.round(vv[0], 3)
+        0.056
 
 
         License
@@ -193,7 +201,10 @@ def volume_poly(func, x=None, y=None, tri=None, convexhull=False, area=False, **
     flaeche = 0.
     tvol = 0.
     tvol_err = 0.
+    volumes = np.zeros(ntriangles, dtype=np.float)
+    areas   = np.zeros(ntriangles, dtype=np.float)
     # Calc mean semivariogramm over whole region
+    thecount = 0
     for j in xrange(ntriangles):
         t    = tri[j,:,:]
         ii   = np.argsort(t[:,0])
@@ -207,7 +218,9 @@ def volume_poly(func, x=None, y=None, tri=None, convexhull=False, area=False, **
         if not trigiven:
             check_in_poly = in_poly([xs,ys], cxy[:,0], cxy[:,1]) >= 0
         if trigiven | check_in_poly:
-            flaeche   += area_poly(tria[:,0],tria[:,1])
+            thecount  += 1
+            areas[j]   = area_poly(tria[:,0],tria[:,1])
+            flaeche   += areas[j]
             xmin       = np.amin(tria[:,0])
             ymin       = np.amin(tria[:,1])
             tria[:,0] -= xmin # shift for integral>0
@@ -218,14 +231,19 @@ def volume_poly(func, x=None, y=None, tri=None, convexhull=False, area=False, **
             else:                        # triangle points up
                 vol, err = dblquad(funcyx, tria[0,0], tria[2,0],
                                    b, minac, args=([ymin,xmin],kwargs))
-            tvol     += vol
-            tvol_err += err*err
+            volumes[j] = vol
+            tvol      += vol
+            tvol_err  += err*err
     tvol_err = np.sqrt(tvol_err)
 
-    if area:
-        return tvol, tvol_err, flaeche
-    else:
-        return tvol, tvol_err
+    out  = [tvol]
+    out += [tvol_err]
+    if area: out += [flaeche]
+    if allvol:
+        out += [volumes[0:thecount]]
+        out += [areas[0:thecount]]
+
+    return out
 
 
 if __name__ == '__main__':
@@ -283,3 +301,6 @@ if __name__ == '__main__':
     # v = volume_poly(f2, tri=tri, r=r, convexhull=True)
     # print np.round(v[0], 3)
     # # 2.072
+    # v, e, vv, aa = volume_poly(f2, tri=tri, r=r, convexhull=True, allvol=True)
+    # print np.round(vv[0], 3)
+    # # 0.056
