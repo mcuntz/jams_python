@@ -69,19 +69,22 @@ def tcherkez(Rstar, Phi=0.3, T=0.056,
         >>> delta_a1 = -8e-3
         >>> Ra1      = (delta_a1+1.)*const.RPDB
         >>> Rstar1   = (1.-Delta)*Ra1
-        >>> print (np.array(tcherkez(Rstar1, Phi=0.3, T=0.056))/const.RPDB-1.)*1000.
-        [ 12.76405998  17.12498323  12.97777843]
+        >>> from autostring import astr
+        >>> print(astr((np.array(tcherkez(Rstar1, Phi=0.3, T=0.056))/const.RPDB-1.)*1000.,3,pp=True))
+        ['12.764' '17.125' '12.978']
 
         >>> delta_a2 = -7.8e-3
         >>> Ra2      = (delta_a2+1.)*const.RPDB
         >>> Rstar2   = (1.-Delta)*Ra2
         >>> R1 = (np.array(tcherkez([Rstar1, Rstar2], Rcyt=True))/const.RPDB-1.)*1000.
-        >>> print R1
-        [[ 12.97777843  13.18200782]]
+        >>> print(astr(R1,3,pp=True))
+        [['12.978' '13.182']]
 
         >>> R1, R2 = tcherkez([Rstar1, Rstar2], Rchl=True, Rcyt=True)
-        >>> print (R1/const.RPDB-1.)*1000., (R2/const.RPDB-1.)*1000.
-        [ 17.12498323  17.33004875] [ 12.97777843  13.18200782]
+        >>> print(astr((R1/const.RPDB-1.)*1000.,3,pp=True))
+        ['17.125' '17.330']
+        >>> print(astr((R2/const.RPDB-1.)*1000.,3,pp=True))
+        ['12.978' '13.182']
 
 
         License
@@ -101,12 +104,13 @@ def tcherkez(Rstar, Phi=0.3, T=0.056,
         You should have received a copy of the GNU Lesser General Public License
         along with The UFZ Python library.  If not, see <http://www.gnu.org/licenses/>.
 
-        Copyright 2012 Matthias Cuntz
+        Copyright 2012-2013 Matthias Cuntz
 
 
         History
         -------
-        Written, MC, Jan 2012
+        Written,  MC, Jan 2012
+        Modified, MC, Feb 2013 - ported to Python 3
     """
     #
     if (RG | Rchl | Rcyt):
@@ -144,3 +148,4 @@ def tcherkez(Rstar, Phi=0.3, T=0.056,
 if __name__ == '__main__':
     import doctest
     doctest.testmod()
+

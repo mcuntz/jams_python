@@ -37,10 +37,13 @@ def cellarea(lat, lon, globe=False):
         >>> import numpy as np
         >>> lat = np.array([ 12.98898858, 9.27785325, 5.56671363])
         >>> lon = np.array([ 0., 3.75, 7.5])
-        >>> cellarea(lat,lon)
-        array([[  1.67639084e+11,   1.67639084e+11,   1.67639084e+11],
-               [  1.69790428e+11,   1.69790428e+11,   1.69790428e+11],
-               [  1.71229889e+11,   1.71229889e+11,   1.71229889e+11]])
+        >>> from autostring import astr
+        >>> print(astr(cellarea(lat,lon)[0,:],3,pp=True))
+        ['1.676e+11' '1.676e+11' '1.676e+11']
+        >>> print(astr(cellarea(lat,lon)[1,:],3,pp=True))
+        ['1.698e+11' '1.698e+11' '1.698e+11']
+        >>> print(astr(cellarea(lat,lon)[2,:],3,pp=True))
+        ['1.712e+11' '1.712e+11' '1.712e+11']
 
 
         License
@@ -60,12 +63,13 @@ def cellarea(lat, lon, globe=False):
         You should have received a copy of the GNU Lesser General Public License
         along with The UFZ Python library.  If not, see <http://www.gnu.org/licenses/>.
 
-        Copyright 2009 Matthias Cuntz
+        Copyright 2009-2013 Matthias Cuntz
 
         
         History
         -------
-        Written, MC, Jul. 2009
+        Written,  MC, Jul 2009
+        Modified, MC, Feb 2013 - ported to Python 3
     """
     nlat = len(lat)
     if nlat < 2:

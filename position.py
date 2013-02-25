@@ -66,40 +66,41 @@ def position(row=1, col=1, num=1,
         # if you want to have a true golden ratio
         # sub = fig1.add_axes(position(1,1,1,figsize=figsize,golden=True))
 
-        # Doctest examples
-        >>> print position(2,2,1)
-        [ 0.125   0.55    0.3375  0.35  ]
-        >>> print position(2,2,1,sortcol=True)
-        [ 0.125   0.55    0.3375  0.35  ]
-        >>> print position(2,2,1,golden=True)
-        [ 0.125       0.40858647  0.3375      0.20858647]
-        >>> print position(2,2,1,inversegolden=True)
-        [ 0.125      0.55       0.2163119  0.35     ]
-        >>> print position(2,2,1,golden=True,sortcol=True)
-        [ 0.125       0.40858647  0.3375      0.20858647]
-        >>> print position(2,2,1,top=1.,bottom=0.,left=0.,right=1.,hspace=0.,wspace=0.)
-        [ 0.   0.5  0.5  0.5]
-        >>> print position(2,2,2,top=1.,bottom=0.,left=0.,right=1.,hspace=0.,wspace=0.)
-        [ 0.5  0.5  0.5  0.5]
-        >>> print position(2,2,3,top=1.,bottom=0.,left=0.,right=1.,hspace=0.,wspace=0.)
-        [ 0.   0.   0.5  0.5]
-        >>> print position(2,2,4,top=1.,bottom=0.,left=0.,right=1.,hspace=0.,wspace=0.)
-        [ 0.5  0.   0.5  0.5]
-        >>> print position(2,2,1,top=1.,bottom=0.,left=0.,right=1.,hspace=0.,wspace=0.,golden=True)
-        [ 0.          0.30901699  0.5         0.30901699]
-        >>> print position(2,2,2,top=1.,bottom=0.,left=0.,right=1.,hspace=0.,wspace=0.,golden=True)
-        [ 0.5         0.30901699  0.5         0.30901699]
-        >>> print position(2,2,3,top=1.,bottom=0.,left=0.,right=1.,hspace=0.,wspace=0.,golden=True)
-        [ 0.          0.          0.5         0.30901699]
-        >>> print position(2,2,4,top=1.,bottom=0.,left=0.,right=1.,hspace=0.,wspace=0.,golden=True)
-        [ 0.5         0.          0.5         0.30901699]
+        # Doctest examples   
+        >>> from autostring import astr
+        >>> print(astr(position(2,2,1),3,pp=True))
+        ['0.125' '0.550' '0.338' '0.350']
+        >>> print(astr(position(2,2,1,sortcol=True),3,pp=True))
+        ['0.125' '0.550' '0.338' '0.350']
+        >>> print(astr(position(2,2,1,golden=True),3,pp=True))
+        ['0.125' '0.409' '0.338' '0.209']
+        >>> print(astr(position(2,2,1,inversegolden=True),3,pp=True))
+        ['0.125' '0.550' '0.216' '0.350']
+        >>> print(astr(position(2,2,1,golden=True,sortcol=True),3,pp=True))
+        ['0.125' '0.409' '0.338' '0.209']
+        >>> print(astr(position(2,2,1,top=1.,bottom=0.,left=0.,right=1.,hspace=0.,wspace=0.),3,pp=True))
+        ['0.000' '0.500' '0.500' '0.500']
+        >>> print(astr(position(2,2,2,top=1.,bottom=0.,left=0.,right=1.,hspace=0.,wspace=0.),3,pp=True))
+        ['0.500' '0.500' '0.500' '0.500']
+        >>> print(astr(position(2,2,3,top=1.,bottom=0.,left=0.,right=1.,hspace=0.,wspace=0.),3,pp=True))
+        ['0.000' '0.000' '0.500' '0.500']
+        >>> print(astr(position(2,2,4,top=1.,bottom=0.,left=0.,right=1.,hspace=0.,wspace=0.),3,pp=True))
+        ['0.500' '0.000' '0.500' '0.500']
+        >>> print(astr(position(2,2,1,top=1.,bottom=0.,left=0.,right=1.,hspace=0.,wspace=0.,golden=True),3,pp=True))
+        ['0.000' '0.309' '0.500' '0.309']
+        >>> print(astr(position(2,2,2,top=1.,bottom=0.,left=0.,right=1.,hspace=0.,wspace=0.,golden=True),3,pp=True))
+        ['0.500' '0.309' '0.500' '0.309']
+        >>> print(astr(position(2,2,3,top=1.,bottom=0.,left=0.,right=1.,hspace=0.,wspace=0.,golden=True),3,pp=True))
+        ['0.000' '0.000' '0.500' '0.309']
+        >>> print(astr(position(2,2,4,top=1.,bottom=0.,left=0.,right=1.,hspace=0.,wspace=0.,golden=True),3,pp=True))
+        ['0.500' '0.000' '0.500' '0.309']
         >>> figsize=[8,11]
-        >>> print position(2,2,1,golden=True,sortcol=True,figsize=figsize)
-        [ 0.125       0.32442652  0.3375      0.15169925]
-        >>> print position(2,2,1,figsize=figsize,left=0.1)
-        [ 0.1         0.42727273  0.35        0.25454545]
-        >>> print position(2,2,1,figsize=figsize,left=0.1,golden=True)
-        [ 0.1         0.33004502  0.35        0.15731774]
+        >>> print(astr(position(2,2,1,golden=True,sortcol=True,figsize=figsize),3,pp=True))
+        ['0.125' '0.324' '0.338' '0.152']
+        >>> print(astr(position(2,2,1,figsize=figsize,left=0.1),3,pp=True))
+        ['0.100' '0.427' '0.350' '0.255']
+        >>> print(astr(position(2,2,1,figsize=figsize,left=0.1,golden=True),3,pp=True))
+        ['0.100' '0.330' '0.350' '0.157']
 
 
         License
@@ -119,12 +120,13 @@ def position(row=1, col=1, num=1,
         You should have received a copy of the GNU Lesser General Public License
         along with The UFZ Python library.  If not, see <http://www.gnu.org/licenses/>.
 
-        Copyright 2009 Matthias Cuntz
+        Copyright 2009-2013 Matthias Cuntz
 
         
         History
         -------
-        Written, MC, Aug. 2009
+        Written,  MC, Aug 2009
+        Modified, MC, Feb 2013 - ported to Python 3
     """
     #
     # Check
@@ -191,3 +193,4 @@ def position(row=1, col=1, num=1,
 if __name__ == '__main__':
     import doctest
     doctest.testmod()
+

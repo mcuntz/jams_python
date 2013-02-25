@@ -204,12 +204,6 @@
     writenetcdf            Write netCDF4 file.
 
 
-    Obsolete
-    --------
-    calcvpd                Calculates vapour pressure deficit.
-    gap_filling            Gapfills flux data (CO2, LE, H).
-
-
     License
     -------
     This file is part of the UFZ Python library.
@@ -227,7 +221,8 @@
     You should have received a copy of the GNU Lesser General Public License
     along with The UFZ Python library.  If not, see <http://www.gnu.org/licenses/>.
 
-    Copyright 2009-2012 Matthias Cuntz, Arndt Piayda, Matthias Zink, Tino Rau, Maren Goehler, Stephan Thober
+    Copyright 2009-2013 Matthias Cuntz, Arndt Piayda, Matthias Zink, Tino Rau, Maren Goehler,
+                        Stephan Thober, Juliane Mai
 
 
     History
@@ -265,6 +260,7 @@
                            - make gap_filling obsolete
               MC, Feb 2013 - area_poly
               MC & JM, Feb 2013 - volume_poly
+              MC, Feb 2013 - ported to Python 3
 """
 # Routines provided
 from abc2plot          import *
@@ -272,7 +268,10 @@ from area_poly         import area_poly
 from around            import *
 from autostring        import *
 from brewer            import define_brewer, get_brewer, plot_brewer, print_brewer
-from calcvpd           import *
+try:
+    from calcvpd       import *
+except ImportError:
+    pass
 from cellarea          import *
 from closest           import *
 import const
@@ -303,26 +302,26 @@ from nee2gpp           import nee2gpp, nee2gpp_global, nee2gpp_lasslop, nee2gpp_
 try:
     from outlier       import *
 except ImportError:
-    print "No extra statistics in scipy, i.e. in UFZ library. Disabled functions: outlier."
+    print("No extra statistics in scipy, i.e. in UFZ library. Disabled functions: outlier.")
 from pack              import *
 from pi                import *
 from position          import *
 try:
     from readhdf       import *
 except ImportError:
-    print "No hdf4 and/or hdf5 support in UFZ library. Disabled functions: readhdf."
+    print("No hdf4 and/or hdf5 support in UFZ library. Disabled functions: readhdf.")
 try:
     from readhdf4      import *
 except ImportError:
-    print "No hdf4 support in UFZ library. Disabled functions: readhdf4."
+    print("No hdf4 support in UFZ library. Disabled functions: readhdf4.")
 try:
     from readhdf5      import *
 except ImportError:
-    print "No hdf5 support in UFZ library. Disabled functions: readhdf5."
+    print("No hdf5 support in UFZ library. Disabled functions: readhdf5.")
 try:
     from readnetcdf    import *
 except ImportError:
-    print "No netcdf support in UFZ library. Disabled functions: readnetcdf, writenetcdf."
+    print("No netcdf support in UFZ library. Disabled functions: readnetcdf, writenetcdf.")
 from romanliterals     import int2roman, roman2int
 from saltelli          import *
 from savitzky_golay    import *
@@ -342,18 +341,16 @@ from yrange            import *
 from zacharias         import *
 
 # Information
-version = '1.6'
-date = '25.05.2012'
+version = '2.0'
+date    = '25.02.2013'
 
 # Main
 if __name__ == '__main__':
-    print '\nUFZ Computational Hydrosystems Python Utilities.'
-    print "Version %s from %s." % (version,date)
-    print ('\nUFZ routines are free software and come with '
-           'ABSOLUTELY NO WARRANTY.')
-    print 'You are welcome to redistribute it.'
-    print ('\nCopyright (C) 2009-2013, Computational Hydrosystems, '
-          'Helmholtz Centre for Environmental Research - UFZ, Permoserstr. 15, '
-          '04318 Leipzig, Germany.')
-    print 'All rights reserved.'
-    print '\nIn case of questions or comments contact matthias.cuntz (at) ufz.de\n'
+    print('\nUFZ Computational Hydrosystems Python Library.')
+    print("Version %s from %s." % (version,date))
+    print('\nThis is the README file. See als the license file gpl.txt.')
+    import io
+    f = io.open('README','r')
+    for line in f:
+        print(line,end='')
+    f.close()

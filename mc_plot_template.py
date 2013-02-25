@@ -119,7 +119,7 @@ if (outtype == 'pdf'):
   mpl.rc('figure', figsize=(8.27,11.69)) # a4 portrait
   if usetex:
     mpl.rc('text', usetex=True)
-    mpl.rc('text.latex', unicode=True)
+    mpl.rc('text.latex', str=True)
     #mpl.rc('font',**{'family':'sans-serif','sans-serif':['Helvetica']})
     mpl.rc('font',**{'family':'serif','serif':['times']})
   mpl.rc('font', size=textsize)
@@ -136,7 +136,7 @@ mpl.rc('path', simplify=False) # do not remove
 # Prepare some psudo data
 #
 
-print 'Prepare data data'
+print('Prepare data data')
 
 ndata = 1000
 mu, sigma = 0, 0.1 # mean and standard deviation
@@ -149,10 +149,10 @@ xx = np.random.normal(0, 1, ndata)
 #
 
 if (outtype == 'pdf'):
-    print 'Plot PDF ', pdffile
+    print('Plot PDF ', pdffile)
     pdf_pages = PdfPages(pdffile)
 else:
-    print 'Plot X'
+    print('Plot X')
 figsize = mpl.rcParams['figure.figsize']
 
 ifig = 0
@@ -164,7 +164,7 @@ ifig = 0
 
 ifig += 1
 iplot = 0
-print 'Plot - Fig ', ifig
+print('Plot - Fig ', ifig)
 fig = plt.figure(ifig)
 
 # Set to None for free scaling at first
@@ -176,13 +176,13 @@ xtick = 0.2
 
 iplot += 1
 xxplot = xx
-xlab   = ur'$(0,1)$'
+xlab   = r'$(0,1)$'
 yyplot = yy
-ylab   = ur'$N('+ufz.astr(mu)+','+ufz.astr(sigma,1)+')$'
+ylab   = r'$N('+ufz.astr(mu)+','+ufz.astr(sigma,1)+')$'
 sub    = fig.add_axes(ufz.position(nrow,ncol,iplot,hspace=hspace,wspace=wspace))
 mark1  = sub.plot(xxplot, yyplot)
 plt.setp(mark1, linestyle='None', marker='o', markeredgecolor=mcol1, markerfacecolor='None',
-         markersize=msize, markeredgewidth=mwidth, label=ur'UniNorm')
+         markersize=msize, markeredgewidth=mwidth, label=r'UniNorm')
 sub.grid(False)
 if xlim != None:
     plt.setp(sub, xlabel=xlab, xlim=lim)
@@ -193,19 +193,19 @@ if ylim != None:
 else:
     plt.setp(sub, ylabel=ylab)
 sub.xaxis.set_minor_locator(mpl.ticker.MultipleLocator(xtick))
-ll = sub.legend(mark1, [ur'Uniform vs. Gauss'], frameon=frameon, ncol=1,
+ll = sub.legend(mark1, [r'Uniform vs. Gauss'], frameon=frameon, ncol=1,
                 labelspacing=llrspace, handletextpad=llhtextpad, handlelength=llhlength,
                 loc='upper right', bbox_to_anchor=(1+llxbbox,1+llybbox), scatterpoints=1, numpoints=1)
 plt.setp(ll.get_texts(), fontsize='small')
 ufz.abc2plot(sub, dxabc, dyabc, iplot, lower=True, bold=True)
 
 iplot += 1
-xlab   = ur'$N('+ufz.astr(mu)+','+ufz.astr(sigma,1)+')$'
+xlab   = r'$N('+ufz.astr(mu)+','+ufz.astr(sigma,1)+')$'
 yyplot = yy
 if usetex:
-    ylab   = ur'Normed \#/bin'
+    ylab   = r'Normed \#/bin'
 else:
-    ylab   = ur'Normed #/bin'
+    ylab   = r'Normed #/bin'
 sub    = fig.add_axes(ufz.position(nrow,ncol,iplot,hspace=hspace,wspace=wspace))
 nbins  = ndata/30
 #   inbins, ibins, ipatches = sub.hist(msiboot[i,:], bins=nbins)

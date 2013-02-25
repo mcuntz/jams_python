@@ -72,13 +72,14 @@ def abc2plot(handle, dx, dy, iplot, roman=False, lower=False, integer=False,
         You should have received a copy of the GNU Lesser General Public License
         along with The UFZ Python library.  If not, see <http://www.gnu.org/licenses/>.
 
-        Copyright 2012 Matthias Cuntz
+        Copyright 2012-2013 Matthias Cuntz
 
         
         History
         -------
-        Written, MC, May 2012
-        Modified, Arndt Piayda, Feb 2013 - added parenthesis option
+        Written,  MC, May 2012
+        Modified, AP, Feb 2013 - added parenthesis option
+                  MC, Feb 2013 - ported to Python 3
     """
     # Check input
     if (roman & integer):

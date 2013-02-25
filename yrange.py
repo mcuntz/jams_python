@@ -37,13 +37,13 @@ def yrange(arr, symmetric=False):
         Examples
         --------
         >>> import numpy as np
-        >>> print yrange(np.arange(102))
+        >>> print(yrange(np.arange(102)))
         [0.0, 101.0]
         
-        >>> print yrange(np.arange(102)-10.)
+        >>> print(yrange(np.arange(102)-10.))
         [-10.0, 91.0]
         
-        >>> print yrange(np.arange(102)-10., symmetric=True)
+        >>> print(yrange(np.arange(102)-10., symmetric=True))
         [-91.0, 91.0]
 
 
@@ -64,12 +64,13 @@ def yrange(arr, symmetric=False):
         You should have received a copy of the GNU Lesser General Public License
         along with The UFZ Python library.  If not, see <http://www.gnu.org/licenses/>.
 
-        Copyright 2012 Matthias Cuntz
+        Copyright 2012-2013 Matthias Cuntz
 
 
         History
         -------
-        Written, MC, Jan 2012
+        Written,  MC, Jan 2012
+        Modified, MC, Feb 2013 - ported to Python 3
     """
     #
     #eps = tiny
@@ -108,3 +109,4 @@ def yrange(arr, symmetric=False):
 if __name__ == '__main__':
     import doctest
     doctest.testmod()
+

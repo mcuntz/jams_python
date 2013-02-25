@@ -43,23 +43,24 @@ def around(num, powten, ceil=False, floor=False):
 
         Examples
         --------
-        >>> around(np.array([3.5967,345.5967]), -3)
-        array([   3.597,  345.597])
+        >>> from autostring import astr
+        >>> print(astr(around(np.array([3.5967,345.5967]), -3),3,pp=True))
+        ['  3.597' '345.597']
 
-        >>> around(np.array([1994344,345.5967]), [3,-3])
-        array([  1.99400000e+06,   3.45597000e+02])
+        >>> print(astr(around(np.array([1994344,345.5967]), [3,-3]),3,pp=True))
+        ['1.994e+06' '3.456e+02']
 
-        >>> around(np.array([1994344,345.5967]), [3,-3], ceil=True)
-        array([  1.99500000e+06,   3.45597000e+02])
+        >>> print(astr(around(np.array([1994344,345.5967]), [3,-3], ceil=True),3,pp=True))
+        ['1.995e+06' '3.456e+02']
 
-        >>> around(np.array([1994344,345.5967]), [3,-3], floor=True)
-        array([  1.99400000e+06,   3.45596000e+02])
+        >>> print(astr(around(np.array([1994344,345.5967]), [3,-3], floor=True),3,pp=True))
+        ['1.994e+06' '3.456e+02']
 
-        >>> around(np.array([3.5967,345.5967]), 3)
-        array([ 0.,  0.])
+        >>> print(astr(around(np.array([3.5967,345.5967]), 3),3,pp=True))
+        ['0.000' '0.000']
 
-        >>> around(np.array([3.5967,345.5967]), 3, ceil=True)
-        array([ 1000.,  1000.])
+        >>> print(astr(around(np.array([3.5967,345.5967]), 3, ceil=True),3,pp=True))
+        ['1000.000' '1000.000']
 
 
         License
@@ -79,12 +80,13 @@ def around(num, powten, ceil=False, floor=False):
         You should have received a copy of the GNU Lesser General Public License
         along with The UFZ Python library.  If not, see <http://www.gnu.org/licenses/>.
 
-        Copyright 2011 Matthias Cuntz
+        Copyright 2011-2013 Matthias Cuntz
 
 
         History
         -------
-        Written, MC, Jun 2011
+        Written,  MC, Jun 2011
+        Modified, MC, Feb 2013 - ported to Python 3
     """
     #
     # Check input

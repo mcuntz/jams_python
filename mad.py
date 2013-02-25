@@ -41,35 +41,35 @@ def mad(datin, z=7, deriv=0):
         Examples
         --------
         >>> import numpy as np
-        >>> y = np.array([-0.25,0.68,0.94,1.15,2.26,2.35,2.37,2.40,2.47,2.54,2.62,\
-                          2.64,2.90,2.92,2.92,2.93,3.21,3.26,3.30,3.59,3.68,4.30,\
-                          4.64,5.34,5.42,8.01],dtype=np.float)
-        >>> print mad(y)
+        >>> y = np.array([-0.25,0.68,0.94,1.15,2.26,2.35,2.37,2.40,2.47,2.54,2.62,
+        ...               2.64,2.90,2.92,2.92,2.93,3.21,3.26,3.30,3.59,3.68,4.30,
+        ...               4.64,5.34,5.42,8.01],dtype=np.float)
+        >>> print(mad(y))
         [False False False False False False False False False False False False
          False False False False False False False False False False False False
          False False]
 
-        >>> print mad(y,z=4)
+        >>> print(mad(y,z=4))
         [False False False False False False False False False False False False
          False False False False False False False False False False False False
          False  True]
 
-        >>> print mad(y,z=3)
+        >>> print(mad(y,z=3))
         [ True False False False False False False False False False False False
          False False False False False False False False False False False False
           True  True]
 
-        >>> print mad(y,z=4,deriv=2)
+        >>> print(mad(y,z=4,deriv=2))
         [False False False False False False False False False False False False
          False False False False False False False False False False False  True]
 
         >>> my = np.ma.array(y, mask=mad(y,z=4))
-        >>> print my
+        >>> print(my)
         [-0.25 0.68 0.94 1.15 2.26 2.35 2.37 2.4 2.47 2.54 2.62 2.64 2.9 2.92 2.92
          2.93 3.21 3.26 3.3 3.59 3.68 4.3 4.64 5.34 5.42 --]
 
         >>> yy = np.transpose(np.array([y,y]))
-        >>> print np.transpose(mad(yy,z=4))
+        >>> print(np.transpose(mad(yy,z=4)))
         [[False False False False False False False False False False False False
           False False False False False False False False False False False False
           False  True]
@@ -78,7 +78,7 @@ def mad(datin, z=7, deriv=0):
           False  True]]
 
         >>> yyy = np.transpose(np.array([y,y,y]))
-        >>> print np.transpose(mad(yyy,z=3))
+        >>> print(np.transpose(mad(yyy,z=3)))
         [[ True False False False False False False False False False False False
           False False False False False False False False False False False False
            True  True]
@@ -107,7 +107,7 @@ def mad(datin, z=7, deriv=0):
         You should have received a copy of the GNU Lesser General Public License
         along with The UFZ Python library.  If not, see <http://www.gnu.org/licenses/>.
 
-        Copyright 2011-2012 Matthias Cuntz
+        Copyright 2011-2013 Matthias Cuntz
 
 
         History
@@ -116,6 +116,7 @@ def mad(datin, z=7, deriv=0):
         Modified, MC, May 2012 - act on axis=0 of array
                   MC, Jun 2012 - axis=0 did not always work: spread md and MAD to input dimensions
                   MC, Jun 2012 - use np.diff, remove spreads
+                  MC, Feb 2013 - ported to Python 3
     """
     sn = list(np.shape(datin))
     n  = sn[0]
@@ -153,8 +154,9 @@ def mad(datin, z=7, deriv=0):
 if __name__ == '__main__':
     import doctest
     doctest.testmod()
-    # y = np.array([-0.25,0.68,0.94,1.15,2.26,2.35,2.37,2.40,2.47,2.54,2.62,\
-    #               2.64,2.90,2.92,2.92,2.93,3.21,3.26,3.30,3.59,3.68,4.30,\
+    # y = np.array([-0.25,0.68,0.94,1.15,2.26,2.35,2.37,2.40,2.47,2.54,2.62,
+    #               2.64,2.90,2.92,2.92,2.93,3.21,3.26,3.30,3.59,3.68,4.30,
     #               4.64,5.34,5.42,8.01],dtype=np.float)
     # yy = np.transpose(np.array([y,y]))
     # print np.transpose(mad(yy,z=4))
+

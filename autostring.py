@@ -43,63 +43,75 @@ def autostring(num, prec=0, zero=False, set_printoptions=False, pp=False, join=F
 
         Examples
         --------
-        >>> print autostring(3.5967, 3)
+        >>> print(autostring(3.5967, 3))
         3.597
 
-        >>> print autostring(3.5967)
+        >>> print(autostring(3.5967))
         4
 
-        >>> print autostring(3, 3)
+        >>> print(autostring(3, 3))
           3
 
-        >>> print autostring(np.array([3.5967, 3.5964]), 3)
+        >>> print(autostring(np.array([3.5967, 3.5964]), 3))
         ['3.597' '3.596']
 
-        >>> print autostring(np.array([3.59, 1.123456e12]), 3)
+        >>> print(autostring(np.array([3.59, 1.123456e12]), 3))
         ['3.590e+00' '1.123e+12']
 
-        >>> print autostring(np.array([3.59, 11.1234]), 3, zero=True)
+        >>> print(autostring(np.array([3.59, 11.1234]), 3, zero=True))
         ['03.590' '11.123']
 
-        >>> print autostring(np.array([3, 11]))
+        >>> print(autostring(np.array([3, 11])))
         [' 3' '11']
 
-        >>> print autostring(np.array([3, 11]), 3)
+        >>> print(autostring(np.array([3, 11]), 3))
         ['  3' ' 11']
 
-        >>> print autostring(np.zeros((2,2), dtype=np.float), 1)
+        >>> print(autostring(np.zeros((2,2), dtype=np.float), 1))
         [['0.0' '0.0']
          ['0.0' '0.0']]
 
         >>> np.set_printoptions(threshold=10)
-        >>> print autostring(np.zeros((2,10), dtype=np.float), 1)
+        >>> print(autostring(np.zeros((2,10), dtype=np.float), 1))
         [['0.0' '0.0' '0.0' ..., '0.0' '0.0' '0.0']
          ['0.0' '0.0' '0.0' ..., '0.0' '0.0' '0.0']]
 
-        >>> print autostring(np.zeros((2,10), dtype=np.float), 1, set_printoptions=True)
+        >>> print(autostring(np.zeros((2,10), dtype=np.float), 1, set_printoptions=True))
         [['0.0' '0.0' '0.0' '0.0' '0.0' '0.0' '0.0' '0.0' '0.0' '0.0']
          ['0.0' '0.0' '0.0' '0.0' '0.0' '0.0' '0.0' '0.0' '0.0' '0.0']]
 
-        >>> print autostring(np.zeros((2,10), dtype=np.float), 1, pp=True)
+        >>> print(autostring(np.zeros((2,10), dtype=np.float), 1, pp=True))
         [['0.0' '0.0' '0.0' '0.0' '0.0' '0.0' '0.0' '0.0' '0.0' '0.0']
          ['0.0' '0.0' '0.0' '0.0' '0.0' '0.0' '0.0' '0.0' '0.0' '0.0']]
 
-        >>> print autostring(np.zeros((2,10), dtype=np.float), 1, set_printoptions=False, pp=True)
+        >>> print(autostring(np.zeros((2,10), dtype=np.float), 1, set_printoptions=False, pp=True))
         [['0.0' '0.0' '0.0' '0.0' '0.0' '0.0' '0.0' '0.0' '0.0' '0.0']
          ['0.0' '0.0' '0.0' '0.0' '0.0' '0.0' '0.0' '0.0' '0.0' '0.0']]
 
-        >>> print autostring(np.array([3.5967, 3.5964]), 3, join=True)
+        >>> print(autostring(np.array([3.5967, 3.5964]), 3, join=True))
         3.597 3.596
 
-        >>> print autostring(np.zeros((2,10), dtype=np.float), 1, join=True, sep=';')
+        >>> print(autostring(np.zeros((2,10), dtype=np.float), 1, join=True, sep=';'))
         ['0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0'
          '0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0']
 
-        >>> print autostring(np.reshape(np.arange(20,dtype=np.float),(2,10)), 1, joinall=True, sep=';')
+        >>> print(autostring(np.reshape(np.arange(20,dtype=np.float),(2,10)), 1, joinall=True, sep=';'))
          0.0; 1.0; 2.0; 3.0; 4.0; 5.0; 6.0; 7.0; 8.0; 9.0;10.0;11.0;12.0;13.0;14.0;15.0;16.0;17.0;18.0;19.0
 
-        >>> print astr(np.reshape(np.arange(20,dtype=np.float),(2,10)), 1, joinall=True, sep=';')
+        >>> print(astr(np.reshape(np.arange(20,dtype=np.float),(2,10)), 1, joinall=True, sep=';'))
          0.0; 1.0; 2.0; 3.0; 4.0; 5.0; 6.0; 7.0; 8.0; 9.0;10.0;11.0;12.0;13.0;14.0;15.0;16.0;17.0;18.0;19.0
+
+        >>> print(astr(np.array([3, 11, np.inf])))
+        ['  3' ' 11' 'inf']
+
+        >>> print(astr(np.array([3, 11, np.nan])))
+        ['  3' ' 11' 'nan']
+
+        >>> print(astr(np.ma.array([3, 11, np.nan], mask=[False,True,False])))
+        ['  3' '-- ' 'nan']
+
+        >>> print(astr(np.ma.array([3, 11, np.nan], mask=[False,False,True])))
+        [' 3' '11' '--']
 
 
         License
@@ -119,7 +131,7 @@ def autostring(num, prec=0, zero=False, set_printoptions=False, pp=False, join=F
         You should have received a copy of the GNU Lesser General Public License
         along with The UFZ Python library.  If not, see <http://www.gnu.org/licenses/>.
 
-        Copyright 2011-2012 Matthias Cuntz
+        Copyright 2011-2013 Matthias Cuntz
 
 
         History
@@ -127,12 +139,15 @@ def autostring(num, prec=0, zero=False, set_printoptions=False, pp=False, join=F
         Written,  MC, Nov 2011 - from autostring.pro
         Modified, MC, May 2012 - pp
                   MC, Dec 2012 - special treatment of -0.0 on output
+                  MC, Feb 2013 - nan, inf and masked arrays
+                  MC, Feb 2013 - ported to Python 3
     """
     #
     # Check input
+    if type(num) == type([]): num = np.array(num)
     isarr = np.ndim(num)
     if (isarr > 2):
-        print "AUTOSTRING WARNING: autostring only works with scalars, 1D- and 2D arrays: return original array."
+        print("AUTOSTRING WARNING: autostring only works with scalars, 1D- and 2D arrays: return original array.")
         return num
     # Only treat int and float
     if (isarr==0):
@@ -143,6 +158,8 @@ def autostring(num, prec=0, zero=False, set_printoptions=False, pp=False, join=F
                 typ = np.float64
             elif (type(num) == int):
                 typ = np.int32
+            else:
+                typ = type(num)
     else:
         typ = num.dtype
     try:
@@ -158,7 +175,7 @@ def autostring(num, prec=0, zero=False, set_printoptions=False, pp=False, join=F
         elif (typ in [np.int8, np.int16, np.int32, np.int64, np.uint8, np.uint16, np.uint32, np.uint64]):
             isfloat = False
         else:
-            print "AUTOSTRING WARNING: autostring cannot work with input type: return original array."
+            print("AUTOSTRING WARNING: autostring cannot work with input type: return original array.")
             return num
     else:
         if (typ in [np.float32, np.float64, lfloat]):
@@ -166,7 +183,7 @@ def autostring(num, prec=0, zero=False, set_printoptions=False, pp=False, join=F
         elif (typ in [np.int8, np.int16, np.int32, np.int64, np.uint8, np.uint16, np.uint32, np.uint64]):
             isfloat = False
         else:
-            print "AUTOSTRING WARNING: autostring cannot work with input type: return original array."
+            print("AUTOSTRING WARNING: autostring cannot work with input type: return original array.")
             return num
     # Scalar to array if necessary; Special treatment of -0.0
     if (isarr==0):
@@ -181,12 +198,31 @@ def autostring(num, prec=0, zero=False, set_printoptions=False, pp=False, join=F
         nix = ''
     #
     # If we deal with an array of numbers we take the largest for the format
-    abs_num = np.amax(np.abs(np.array(num)))
-    # leave room for the decimal point and the negative sign, if any
-    if (np.amin(num) < 0.):
-        num_sign_chars = 1
+    # deal with inf and nan
+    hasmask = False
+    hasnan  = False
+    if (isarr==0):
+        if np.isnan(num): return 'nan'
+        if np.isinf(num): return 'inf'
+        abs_num = np.ma.abs(num)
+        # leave room for the decimal point and the negative sign, if any
+        if (num < 0.):
+            num_sign_chars = 1
+        else:
+            num_sign_chars = 0
     else:
-        num_sign_chars = 0
+        if type(num) == type(np.ma.ones(1)):
+            if np.sum(num.mask) > 0: hasmask = True
+            if num.count() > np.ma.sum(np.isfinite(num)): hasnan = True
+        else:
+            if num.size > np.sum(np.isfinite(num)): hasnan = True
+        inum   = np.ma.array(num, mask=~np.isfinite(num), keep_mask=True)
+        abs_num = np.ma.max(np.ma.abs(inum))
+        # leave room for the decimal point and the negative sign, if any
+        if (np.ma.min(inum) < 0.):
+            num_sign_chars = 1
+        else:
+            num_sign_chars = 0
     #
     # Floating point
     if isfloat: # number is a float, more or less
@@ -221,6 +257,10 @@ def autostring(num, prec=0, zero=False, set_printoptions=False, pp=False, join=F
         num_total_chars   = num_sign_chars + num_prefix_chars + 1 + num_postfix_chars + num_sci_not_chars
         if (prec == 0): # no dot if prec=0
             num_total_chars -= 1
+        if hasmask: # need space for --
+            if num_total_chars < 2: num_total_chars = 2
+        if hasnan: # need space for nan or inf
+            if num_total_chars < 3: num_total_chars = 3
         format_string     = ("{0:s}{1:s}{2:d}{3:s}{4:d}{5:s}{6:s}".format('{0:', nix, num_total_chars,
                                                                           '.', num_postfix_chars, format_type, '}'))
     else: # number is an integer
@@ -230,6 +270,10 @@ def autostring(num, prec=0, zero=False, set_printoptions=False, pp=False, join=F
         else:
             num_digits = 1
         num_total_chars = np.maximum(num_digits + num_sign_chars, prec)
+        if hasmask: # need space for --
+            if num_total_chars < 2: num_total_chars = 2
+        if hasnan: # need space for nan or inf
+            if num_total_chars < 3: num_total_chars = 3
         format_string = ("{0:s}{1:s}{2:d}{3:s}{4:s}".format('{0:', nix, num_total_chars, format_type, '}'))
     #
     if (isarr == 0):
@@ -240,14 +284,21 @@ def autostring(num, prec=0, zero=False, set_printoptions=False, pp=False, join=F
     else:
         fnum = num.flatten()
         nnum = fnum.size
-        styp = 'S{0:d}'.format(num_total_chars)
+        import sys
+        if sys.hexversion > int('0x3000000',base=16):
+            styp = 'U{0:d}'.format(num_total_chars)
+        else:
+            styp = 'S{0:d}'.format(num_total_chars)
         out = np.empty(nnum, dtype=styp)
-        for i in xrange(nnum):
-            out[i] = format_string.format(fnum[i])
+        for i in range(nnum):
+            if str(fnum[i]) == '--':
+                sformat_string = ("{0:s}{1:d}s{2:s}".format('{0:', num_total_chars, '}'))
+                out[i] = sformat_string.format('--')
+            else:
+                out[i] = format_string.format(fnum[i])
+                if np.float(out[i]) == 0:
+                    out[i] = format_string.format(0)
         out = np.reshape(out, num.shape)
-        # Special treatment of -0.0
-        if np.any(out.astype(np.float) == 0):
-            out = np.where(out.astype(np.float) == 0, format_string.format(0), out)
         if (set_printoptions | pp):
             # num_total_chars+3 for '' and space, +isarr for []
             np.set_printoptions(linewidth=num.shape[-1]*(num_total_chars+3)+isarr, threshold=nnum+1)
@@ -255,16 +306,19 @@ def autostring(num, prec=0, zero=False, set_printoptions=False, pp=False, join=F
             if ((isarr == 1) | ((isarr==2) & joinall)):
                 if (isarr == 2):
                     out = out.flatten()
-                for i in xrange(out.size):
+                for i in range(out.size):
                     if (i==0):
                         outc = out[i]
                     else:
                         outc = outc+sep+out[i]
             else:
-                sform = 'S{0:d}'.format((len(out[0,0])+len(sep))*out.shape[1])
+                if sys.hexversion > int('0x3000000',base=16):
+                    sform = 'U{0:d}'.format((len(out[0,0])+len(sep))*out.shape[1])
+                else:
+                    sform = 'S{0:d}'.format((len(out[0,0])+len(sep))*out.shape[1])
                 outc = np.zeros(out.shape[0], dtype=sform)
-                for j in xrange(out.shape[0]):
-                    for i in xrange(out.shape[1]):
+                for j in range(out.shape[0]):
+                    for i in range(out.shape[1]):
                         if (i==0):
                             outc[j] = out[j,i]
                         else:
@@ -285,3 +339,12 @@ def astr(num, prec=0, zero=False, set_printoptions=False, pp=False, join=False, 
 if __name__ == '__main__':
     import doctest
     doctest.testmod()
+
+    # print(autostring(np.array([3, 11, np.nan])))
+    # #['  3' ' 11' 'nan']
+
+    # print(autostring(np.ma.array([3, 11, np.nan], mask=[False,True,False])))
+    # #['  3' '-- ' 'nan']
+
+    # print(autostring(np.ma.array([3, 11, np.nan], mask=[False,False,True])))
+    # #['  3' ' 11' '-- ']

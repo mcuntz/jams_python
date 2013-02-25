@@ -47,52 +47,53 @@ def readhdf(fName, var='', reform=False, squeeze=False, variables=False,
         --------
         >>> # HDF4
         >>> var = readhdf('test_readhdf4.hdf4', fileattributes=True)
-        >>> print var.keys()
+        >>> print(list(var.keys()))
         ['OldCoreMetadata.0', 'HDFEOSVersion', 'OldArchiveMetadata.0', 'OldStructMetadata.0', 'StructMetadata.0']
-        >>> print var['HDFEOSVersion']
+        >>> print(var['HDFEOSVersion'])
         ('HDFEOS_V2.14', 0, 4, 12)
 
         >>> var = readhdf('test_readhdf4.hdf4', variables=True)
-        >>> print var
+        >>> print(var)
         ['QC_250m_1', 'sur_refl_b02_1', 'sur_refl_b01_1', 'num_observations']
 
         >>> var = readhdf('test_readhdf4.hdf4', variables=True, sort=True)
-        >>> print var
+        >>> print(var)
         ['QC_250m_1', 'num_observations', 'sur_refl_b01_1', 'sur_refl_b02_1']
     
         >>> var = readhdf('test_readhdf4.hdf4', var='sur_refl_b01_1')
-        >>> print var
+        >>> print(var)
         [[7492 7327 7327 7131 7187]
          [6604 6604 7423 7131 7131]
          [7441 7441 7423 7423 7507]]
 
         >>> var = readhdf('test_readhdf4.hdf4', var='sur_refl_b01_1', attributes=True)
-        >>> print var.keys()
+        >>> print(list(var.keys()))
         ['_FillValue', 'Nadir Data Resolution', 'scale_factor', 'valid_range', 'add_offset', 'long_name', 'calibrated_nt', 'units', 'scale_factor_err', 'add_offset_err', 'HorizontalDatumName']
-        >>> print var['_FillValue']
+        >>> print(var['_FillValue'])
         (-28672, 3, 22, 1)
 
 
         >>> # HDF5
         >>> a = readhdf('test_readhdf5.hdf5', fileattributes=True)
-        >>> print a['NB_PARAMETERS']
+        >>> print(a['NB_PARAMETERS'])
         9
 
-        >>> print readhdf('test_readhdf5.hdf5', variables=True)
+        >>> print(readhdf('test_readhdf5.hdf5', variables=True))
         [u'chs']
 
         >>> a = readhdf('test_readhdf5.hdf5', var='chs', attributes=True)
-        >>> print a.keys()
+        >>> print(list(a.keys()))
         [u'Double', u'Inttest', u'What the hell', u'LLLLLL']
-        >>> print a['Double']
+        >>> print(a['Double'])
         [ 1.1]
 
-        >>> print readhdf('test_readhdf5.hdf5', var='chs')
-        [[   1.            2.            3.            3.            2.        ]
-         [   1.           23.          254.            5.            4.65399981]
-         [ 654.6539917    54.54000092  546.53997803  564.54602051    5.5       ]
-         [   1.10000002    2.20000005    0.            3.29999995    4.4000001 ]
-         [   0.            1.            2.            3.            0.        ]]
+        >>> from autostring import astr
+        >>> print(astr(readhdf5('test_readhdf5.hdf5', var='chs'),3,pp=True))
+        [['  1.000' '  2.000' '  3.000' '  3.000' '  2.000']
+         ['  1.000' ' 23.000' '254.000' '  5.000' '  4.654']
+         ['654.654' ' 54.540' '546.540' '564.546' '  5.500']
+         ['  1.100' '  2.200' '  0.000' '  3.300' '  4.400']
+         ['  0.000' '  1.000' '  2.000' '  3.000' '  0.000']]
 
 
         License
@@ -112,12 +113,13 @@ def readhdf(fName, var='', reform=False, squeeze=False, variables=False,
         You should have received a copy of the GNU Lesser General Public License
         along with The UFZ Python library.  If not, see <http://www.gnu.org/licenses/>.
 
-        Copyright 2012 Matthias Cuntz
+        Copyright 2012-2013 Matthias Cuntz
 
 
         History
         -------
-        Written, MC, Jun 2012
+        Written,  MC, Jun 2012
+        Modified, MC, Feb 2013 - ported to Python 3
         """
     # Open hdf5 file
     if not os.path.isfile(fName):
@@ -142,3 +144,4 @@ if __name__ == '__main__':
     doctest.testmod()
     # print readhdf('test_readhdf4.hdf4', variables=True)
     # print readhdf('test_readhdf5.hdf5', variables=True)
+

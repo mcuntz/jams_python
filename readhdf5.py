@@ -42,24 +42,25 @@ def readhdf5(fName, var='', reform=False, squeeze=False, variables=False,
         Examples
         --------
         >>> a = readhdf5('test_readhdf5.hdf5', fileattributes=True)
-        >>> print a['NB_PARAMETERS']
+        >>> print(a['NB_PARAMETERS'])
         9
 
-        >>> print readhdf5('test_readhdf5.hdf5', variables=True)
-        [u'chs']
+        >>> print([str(i) for i in readhdf5('test_readhdf5.hdf5', variables=True)])
+        ['chs']
 
         >>> a = readhdf5('test_readhdf5.hdf5', var='chs', attributes=True)
-        >>> print a.keys()
-        [u'Double', u'Inttest', u'What the hell', u'LLLLLL']
-        >>> print a['Double']
+        >>> print([str(i) for i in list(a.keys())])
+        ['Double', 'Inttest', 'What the hell', 'LLLLLL']
+        >>> print(a['Double'])
         [ 1.1]
 
-        >>> print readhdf5('test_readhdf5.hdf5', var='chs')
-        [[   1.            2.            3.            3.            2.        ]
-         [   1.           23.          254.            5.            4.65399981]
-         [ 654.6539917    54.54000092  546.53997803  564.54602051    5.5       ]
-         [   1.10000002    2.20000005    0.            3.29999995    4.4000001 ]
-         [   0.            1.            2.            3.            0.        ]]
+        >>> from autostring import astr
+        >>> print(astr(readhdf5('test_readhdf5.hdf5', var='chs'),3,pp=True))
+        [['  1.000' '  2.000' '  3.000' '  3.000' '  2.000']
+         ['  1.000' ' 23.000' '254.000' '  5.000' '  4.654']
+         ['654.654' ' 54.540' '546.540' '564.546' '  5.500']
+         ['  1.100' '  2.200' '  0.000' '  3.300' '  4.400']
+         ['  0.000' '  1.000' '  2.000' '  3.000' '  0.000']]
 
 
         License
@@ -79,12 +80,13 @@ def readhdf5(fName, var='', reform=False, squeeze=False, variables=False,
         You should have received a copy of the GNU Lesser General Public License
         along with The UFZ Python library.  If not, see <http://www.gnu.org/licenses/>.
 
-        Copyright 2012 Matthias Zink
+        Copyright 2012-2013 Matthias Zink
 
 
         History
         -------
-        Written, MZ, Jun 2012
+        Written,  MZ, Jun 2012
+        Modified, MC, Feb 2013 - ported to Python 3
         """
     # Open hdf5 file
     try:
@@ -94,13 +96,13 @@ def readhdf5(fName, var='', reform=False, squeeze=False, variables=False,
     # Get attributes of the file
     if fileattributes:
         attrs = dict()
-        attr = f.attrs.keys()
+        attr = list(f.attrs.keys())
         for a in attr:
             attrs[a] = f.attrs.get(a)
         f.close()
         return attrs
     # Variables
-    vars = f.keys()
+    vars = list(f.keys())
     nvars = len(vars)
     # Sort and get sort indices
     if sort:
@@ -120,7 +122,7 @@ def readhdf5(fName, var='', reform=False, squeeze=False, variables=False,
           f.close()
           raise ValueError('variable '+var+' not in file '+fname)
       attrs = dict()
-      attr = f[var].attrs.keys()
+      attr = list(f[var].attrs.keys())
       for a in attr:
         attrs[a] = f[var].attrs.get(a)
       f.close()
@@ -166,3 +168,4 @@ if __name__ == '__main__':
     # #        [-8000, -8000, -8000, ..., -8000, -8000, -8000],
     # #       [-8000, -8000, -8000, ..., -8000, -8000, -8000],
     # #       [-8000, -8000, -8000, ..., -8000, -8000, -8000]], dtype=int16)
+

@@ -34,11 +34,12 @@ def closest(vec, num, value=False):
         Examples
         --------
         >>> vec = np.arange(100)/99.*5.
-        >>> print closest(vec, 3.125)
+        >>> from autostring import astr
+        >>> print(astr(closest(vec, 3.125),pp=True))
         62
         
-        >>> print closest(vec, 3.125, value=True)
-        3.13131313131
+        >>> print(astr(closest(vec, 3.125, value=True),3,pp=True))
+        3.131
 
 
         License
@@ -58,12 +59,13 @@ def closest(vec, num, value=False):
         You should have received a copy of the GNU Lesser General Public License
         along with The UFZ Python library.  If not, see <http://www.gnu.org/licenses/>.
         
-        Copyright 2012 Matthias Cuntz
+        Copyright 2012-2013 Matthias Cuntz
 
         
         History
         -------
-        Written, MC, Jan 2012
+        Written,  MC, Jan 2012
+        Modified, MC, Feb 2013 - ported to Python 3
     """
     out = np.ma.argmin(np.ma.abs(np.ma.array(vec)-num))
     if value:
@@ -75,3 +77,4 @@ def closest(vec, num, value=False):
 if __name__ == '__main__':
     import doctest
     doctest.testmod()
+

@@ -8,7 +8,7 @@ def jab(arr, ind=None, nind=None, mask=None, weight=False, nsteps=1):
         If you one gives the indices of the bootstrap, a mask will be produced that
         tells if this sample was used in the current bootstrap:
             mask = np.zeros((nboot,nind), dtype=np.bool)
-            for i in xrange(nboot):
+            for i in range(nboot):
                 mask[i,ind[i,:]] = True
         One can also give this mask directly, reducing the memory amount by a factor of 64.
 
@@ -66,46 +66,47 @@ def jab(arr, ind=None, nind=None, mask=None, weight=False, nsteps=1):
         --------
         # 5 Bootstrap with 2 standard error outputs, e.g. for 2 parameters
         >>> import numpy as np
-        >>> Bstat = np.array([[ 3.625,  5.375],\
-                              [ 3.625,  4.125],\
-                              [ 4.625,  3.75 ],\
-                              [ 4.   ,  4.5  ],\
-                              [ 4.25 ,  3.625]])
+        >>> Bstat = np.array([[ 3.625,  5.375],
+        ...                   [ 3.625,  4.125],
+        ...                   [ 4.625,  3.75 ],
+        ...                   [ 4.   ,  4.5  ],
+        ...                   [ 4.25 ,  3.625]])
 
         # Indices of the bootstraps
-        >>> indices = np.array([[0, 0, 4, 5, 5, 3, 2, 6],\
-                                [1, 2, 3, 0, 5, 5, 4, 1],\
-                                [3, 0, 3, 5, 4, 4, 1, 7],\
-                                [0, 3, 5, 2, 2, 1, 4, 4],\
-                                [4, 4, 5, 5, 3, 3, 2, 1]])
+        >>> indices = np.array([[0, 0, 4, 5, 5, 3, 2, 6],
+        ...                     [1, 2, 3, 0, 5, 5, 4, 1],
+        ...                     [3, 0, 3, 5, 4, 4, 1, 7],
+        ...                     [0, 3, 5, 2, 2, 1, 4, 4],
+        ...                     [4, 4, 5, 5, 3, 3, 2, 1]])
 
         # Normal JAB
-        >>> print jab(Bstat, indices)
-        [ 0.13132114  0.39335039]
+        >>> from autostring import astr
+        >>> print(astr(jab(Bstat, indices),3,pp=True))
+        ['0.131' '0.393']
 
         # Normal JAB giving weights
         >>> mask = np.zeros((Bstat.shape[0],indices.shape[1]), dtype=np.bool)
-        >>> for i in xrange(Bstat.shape[0]):
+        >>> for i in range(Bstat.shape[0]):
         ...     mask[i,indices[i,:]] = True
-        >>> print jab(Bstat, mask=mask)
-        [ 0.13132114  0.39335039]
+        >>> print(astr(jab(Bstat, mask=mask),3,pp=True))
+        ['0.131' '0.393']
 
         # Weighted JAB
-        >>> print jab(Bstat, indices, weight=True)
-        [ 0.05603035  0.1678295 ]
+        >>> print(astr(jab(Bstat, indices, weight=True),3,pp=True))
+        ['0.056' '0.168']
 
         # Normal JAB but bootstrap was done by taking 6 samples out of 10 data points
-        >>> print jab(Bstat, indices, nind=10)
-        [ 0.14620639  0.37764585]
+        >>> print(astr(jab(Bstat, indices, nind=10),3,pp=True))
+        ['0.146' '0.378']
 
         # Weighted JAB with 6 out of 10 bootstrap
-        >>> print jab(Bstat[:,0], indices, nind=10)
-        0.146206392124
+        >>> print(astr(jab(Bstat[:,0], indices, nind=10),3,pp=True))
+        0.146
 
         # Normal JAB, 2 steps
-        >>> print jab(Bstat, indices, nsteps=5)
-        [[-- 0.0 0.661437827766 0.311804782231 0.131321139382]
-         [-- 0.0 0.578758099295 0.287799087529 0.393350393185]]
+        >>> print(astr(jab(Bstat, indices, nsteps=5),3,pp=True))
+        [['--   ' '0.000' '0.661' '0.312' '0.131']
+         ['--   ' '0.000' '0.579' '0.288' '0.393']]
 
 
         License
@@ -125,7 +126,7 @@ def jab(arr, ind=None, nind=None, mask=None, weight=False, nsteps=1):
         You should have received a copy of the GNU Lesser General Public License
         along with The UFZ Python library.  If not, see <http://www.gnu.org/licenses/>.
 
-        Copyright 2012 Maren Goehler, Matthias Cuntz
+        Copyright 2012-2013 Maren Goehler, Matthias Cuntz
 
 
         History
@@ -133,6 +134,7 @@ def jab(arr, ind=None, nind=None, mask=None, weight=False, nsteps=1):
         Written,  MG, Aug 2012
         Modified, MC, Nov 2012 - rewrite
                   MC, Dec 2012 - mask
+                  MC, Feb 2013 - ported to Python 3
     """
 
     # Shapes: make nboot bootstraps with nind samples per bootstrap for nout parameters
@@ -160,7 +162,7 @@ def jab(arr, ind=None, nind=None, mask=None, weight=False, nsteps=1):
         nboot = ind.shape[0]
         if nind != None:
             if nind < ind.shape[1]:
-                print "Warning: nind < ind.shape[1]"
+                print("Warning: nind < ind.shape[1]")
         else:
             nind = ind.shape[1]
     nout = arr.shape[1]
@@ -168,15 +170,15 @@ def jab(arr, ind=None, nind=None, mask=None, weight=False, nsteps=1):
     if mask == None:
         # Produce mask with True where data point was used in bootstrap
         mask = np.zeros((nboot,nind), dtype=np.bool)
-        for i in xrange(nboot):
+        for i in range(nboot):
             mask[i,ind[i,:]] = True
 
     seb_i      = np.ma.empty((nind,nout,nsteps))      # std jab_i
     seb_i.mask = np.zeros(seb_i.shape, dtype=np.bool) # make mask an array
     b_i        = np.empty((nind,nsteps))              # number of indices
     step       = nboot//nsteps
-    isnoti     = [np.empty((0),dtype=np.int) for i in xrange(nind)]
-    for k in xrange(nsteps):
+    isnoti     = [np.empty((0),dtype=np.int) for i in range(nind)]
+    for k in range(nsteps):
         # Searching the mask only for the current step and appending the indices
         # seems to be marginally faster than always searching the mask from 0 to the current step
         #   imask   = mask[0:(k+1)*step,:]
@@ -184,7 +186,7 @@ def jab(arr, ind=None, nind=None, mask=None, weight=False, nsteps=1):
         #   isnoti = np.where(imask[:,i]==False)[0]
         imask = mask[k*step:(k+1)*step,:] # current step
         iarr  = arr[0:(k+1)*step,:]       # 1st to current step
-        for i in xrange(nind):
+        for i in range(nind):
             # Search all rows (in current step) where i-th column is False, i.e. were not used in bootstrap
             iisnoti = k*step + np.where(imask[:,i]==False)[0]
             # Concat with all steps before
@@ -224,16 +226,16 @@ if __name__ == '__main__':
     doctest.testmod()
 
     # # 5 Bootstrap with 2 standard error outputs, e.g. for 2 parameters
-    # Bstat = np.array([[ 3.625,  5.375],\
-    #                   [ 3.625,  4.125],\
-    #                   [ 4.625,  3.75 ],\
-    #                   [ 4.   ,  4.5  ],\
+    # Bstat = np.array([[ 3.625,  5.375],
+    #                   [ 3.625,  4.125],
+    #                   [ 4.625,  3.75 ],
+    #                   [ 4.   ,  4.5  ],
     #                   [ 4.25 ,  3.625]])
     # # Indices of the bootstraps
-    # indices = np.array([[0, 0, 4, 5, 5, 3, 2, 6],\
-    #                     [1, 2, 3, 0, 5, 5, 4, 1],\
-    #                     [3, 0, 3, 5, 4, 4, 1, 7],\
-    #                     [0, 3, 5, 2, 2, 1, 4, 4],\
+    # indices = np.array([[0, 0, 4, 5, 5, 3, 2, 6],
+    #                     [1, 2, 3, 0, 5, 5, 4, 1],
+    #                     [3, 0, 3, 5, 4, 4, 1, 7],
+    #                     [0, 3, 5, 2, 2, 1, 4, 4],
     #                     [4, 4, 5, 5, 3, 3, 2, 1]])
 
     # # Normal JAB
@@ -242,7 +244,7 @@ if __name__ == '__main__':
 
     # # Normal JAB giving weights
     # mask = np.zeros((Bstat.shape[0],indices.shape[1]), dtype=np.bool)
-    # for i in xrange(Bstat.shape[0]):
+    # for i in range(Bstat.shape[0]):
     #     mask[i,indices[i,:]] = True
     # print jab(Bstat, mask=mask)
     # #[ 0.13132114  0.39335039]
@@ -263,3 +265,4 @@ if __name__ == '__main__':
     # print jab(Bstat, indices, nsteps=5)
     # #[[-- 0.0 0.661437827766 0.311804782231 0.131321139382]
     # # [-- 0.0 0.578758099295 0.287799087529 0.393350393185]]
+

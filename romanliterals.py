@@ -31,15 +31,16 @@ import numpy as np
         You should have received a copy of the GNU Lesser General Public License
         along with The UFZ Python library.  If not, see <http://www.gnu.org/licenses/>.
 
-        Copyright 2012 Matthias Cuntz
+        Copyright 2012-2013 Matthias Cuntz
 
 
         History
         -------
-        Written, MC, May 2012
+        Written,  MC, May 2012
+        Modified, MC, Feb 2013 - ported to Python 3
 """
-numeral_map = zip((1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1),
-                  ('M', 'CM', 'D', 'CD', 'C', 'XC', 'L', 'XL', 'X', 'IX', 'V', 'IV', 'I'))
+numeral_map = list(zip((1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1),
+                  ('M', 'CM', 'D', 'CD', 'C', 'XC', 'L', 'XL', 'X', 'IX', 'V', 'IV', 'I')))
 
 def int2roman(i, lower=False):
     """
@@ -78,16 +79,16 @@ def int2roman(i, lower=False):
 
         Examples
         --------
-        >>> print int2roman(1)
+        >>> print(int2roman(1))
         I
 
-        >>> print int2roman(19)
+        >>> print(int2roman(19))
         XIX
 
-        >>> print int2roman(159)
+        >>> print(int2roman(159))
         CLIX
 
-        >>> print int2roman(159,lower=True)
+        >>> print(int2roman(159,lower=True))
         clix
 
 
@@ -108,7 +109,7 @@ def int2roman(i, lower=False):
         You should have received a copy of the GNU Lesser General Public License
         along with The UFZ Python library.  If not, see <http://www.gnu.org/licenses/>.
 
-        Copyright 2012 Matthias Cuntz
+        Copyright 2012-2013 Matthias Cuntz
 
 
         History
@@ -116,12 +117,13 @@ def int2roman(i, lower=False):
         Written,  MC, May 2012 - Code from Tim Valenta
                                  http://code.activestate.com/recipes/81611-roman-numerals
         Modified, MC, May 2012 - added lower in int2roman
+                  MC, Feb 2013 - ported to Python 3
     """
     if i < 1:
         raise ValueError('integer must be > 0.')
     result = []
     for integer, numeral in numeral_map:
-        count = int(i / integer)
+        count = int(i // integer)
         result.append(numeral * count)
         i -= integer * count
     if lower: result = [ i.lower() for i in result ]
@@ -159,16 +161,16 @@ def roman2int(n):
 
         Examples
         --------
-        >>> print roman2int('I')
+        >>> print(roman2int('I'))
         1
         
-        >>> print roman2int('i')
+        >>> print(roman2int('i'))
         1
         
-        >>> print roman2int('iv')
+        >>> print(roman2int('iv'))
         4
         
-        >>> print roman2int('MCCCLIV')
+        >>> print(roman2int('MCCCLIV'))
         1354
 
 
@@ -189,15 +191,16 @@ def roman2int(n):
         You should have received a copy of the GNU Lesser General Public License
         along with The UFZ Python library.  If not, see <http://www.gnu.org/licenses/>.
 
-        Copyright 2012 Matthias Cuntz
+        Copyright 2012-2013 Matthias Cuntz
 
 
         History
         -------
         Written,  MC, May 2012 - Code from Tim Valenta
                                  http://code.activestate.com/recipes/81611-roman-numerals
+        Modified, MC, Feb 2013 - ported to Python 3
     """
-    n = unicode(n).upper()
+    n = str(n).upper()
     i = result = 0
     for integer, numeral in numeral_map:
         while n[i:i + len(numeral)] == numeral:
@@ -217,3 +220,4 @@ if __name__ == '__main__':
     # print roman2int('i')
     # print roman2int('iv')
     # print roman2int('MCCCLIV')
+

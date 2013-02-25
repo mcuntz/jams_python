@@ -49,23 +49,23 @@ def kernel_regression(x, y, h=None, silverman=False, xout=None):
         >>> x[:,1] = 1./(np.arange(10,dtype=np.float)/9.+0.1)
         >>> y      = 1. + x[:,0]**2 - np.sin(x[:,1])**2
         >>> h = kernel_regression_h(x,y)
-        >>> from autostring import *
-        >>> print astr(h,6)
+        >>> from autostring import astr
+        >>> print(astr(h,6))
         ['0.172680' '9.516907']
 
-        >>> print astr(kernel_regression(x,y,h),6)
+        >>> print(astr(kernel_regression(x,y,h),6))
         ['0.522409' '0.525699' '0.541796' '0.517808' '0.476442' '0.492302'
          '0.603448' '0.777472' '0.954505' '1.096039']
 
-        >>> print astr(kernel_regression(x,y),6)
+        >>> print(astr(kernel_regression(x,y),6))
         ['0.522409' '0.525699' '0.541796' '0.517808' '0.476442' '0.492302'
          '0.603448' '0.777472' '0.954505' '1.096039']
 
         >>> h = kernel_regression_h(x,y,silverman=True)
-        >>> print astr(h,6)
+        >>> print(astr(h,6))
         ['0.229190' '1.903381']
 
-        >>> print astr(kernel_regression(x,y,h),6)
+        >>> print(astr(kernel_regression(x,y,h),6))
         ['0.691153' '0.422809' '0.545844' '0.534315' '0.521494' '0.555426'
          '0.642065' '0.761900' '0.887780' '1.000146']
 
@@ -74,7 +74,7 @@ def kernel_regression(x, y, h=None, silverman=False, xout=None):
         >>> xx = np.empty((nn,ss[1]))
         >>> xx[:,0] = np.amin(x[:,0]) + (np.amax(x[:,0])-np.amin(x[:,0])) * np.arange(nn,dtype=np.float)/np.float(nn)
         >>> xx[:,1] = np.amin(x[:,1]) + (np.amax(x[:,1])-np.amin(x[:,1])) * np.arange(nn,dtype=np.float)/np.float(nn)
-        >>> print astr(kernel_regression(x,y,h,xout=xx),6)
+        >>> print(astr(kernel_regression(x,y,h,xout=xx),6))
         ['0.605485' '0.555235' '0.509529' '0.491191' '0.553325']
 
 
@@ -95,13 +95,14 @@ def kernel_regression(x, y, h=None, silverman=False, xout=None):
         You should have received a copy of the GNU Lesser General Public License
         along with The UFZ Python library.  If not, see <http://www.gnu.org/licenses/>.
 
-        Copyright 2012 Matthias Cuntz
+        Copyright 2012-2013 Matthias Cuntz
 
 
         History
         -------
-        Written in MC, Jun 2012 - inspired by Matlab routines
-                                  of Yingying Dong, Boston College and Yi Cao, Cranfield University
+        Written,  MC, Jun 2012 - inspired by Matlab routines
+                                 of Yingying Dong, Boston College and Yi Cao, Cranfield University
+        Modified, MC, Feb 2013 - ported to Python 3
     """
     #
     # Check input
@@ -145,7 +146,7 @@ def kernel_regression(x, y, h=None, silverman=False, xout=None):
     # allocate output
     out = np.empty(nout)
     # Loop through each regression point
-    for i in xrange(nout):
+    for i in range(nout):
         # scaled deference from regression point
         z      = (xx - xxout[i,:]) / hh
         # nadaraya-watson estimator of gaussian multivariate kernel
@@ -197,10 +198,10 @@ def kernel_regression_h(x, y, silverman=False):
         >>> x[:,1] = 1./(np.arange(10,dtype=np.float)/9.+0.1)
         >>> y      = 1. + x[:,0]**2 - np.sin(x[:,1])**2
         >>> from autostring import *
-        >>> print astr(kernel_regression_h(x,y),6)
+        >>> print(astr(kernel_regression_h(x,y),6))
         ['0.172680' '9.516907']
 
-        >>> print astr(kernel_regression_h(x,y,silverman=True),6)
+        >>> print(astr(kernel_regression_h(x,y,silverman=True),6))
         ['0.229190' '1.903381']
 
 
@@ -221,13 +222,14 @@ def kernel_regression_h(x, y, silverman=False):
         You should have received a copy of the GNU Lesser General Public License
         along with The UFZ Python library.  If not, see <http://www.gnu.org/licenses/>.
 
-        Copyright 2012 Matthias Cuntz
+        Copyright 2012-2013 Matthias Cuntz
 
 
         History
         -------
-        Written in MC, Jun 2012 - inspired by Matlab routines
-                                  of Yingying Dong, Boston College and Yi Cao, Cranfield University
+        Written,  MC, Jun 2012 - inspired by Matlab routines
+                                 of Yingying Dong, Boston College and Yi Cao, Cranfield University
+        Modified, MC, Feb 2013 - ported to Python 3
     """
     #
     # Check input
@@ -265,7 +267,7 @@ def cross_valid_h(h, x, y):
     # allocate output
     out = np.empty(n)
     # Loop through each regression point
-    for i in xrange(n):
+    for i in range(n):
         # all-1 points
         xx     = np.delete(x,i,axis=0)
         yy     = np.delete(y,i,axis=0)
@@ -308,3 +310,4 @@ if __name__ == '__main__':
     # xx[:,0] = np.amin(x[:,0]) + (np.amax(x[:,0])-np.amin(x[:,0])) * np.arange(nn,dtype=np.float)/np.float(nn)
     # xx[:,1] = np.amin(x[:,1]) + (np.amax(x[:,1])-np.amin(x[:,1])) * np.arange(nn,dtype=np.float)/np.float(nn)
     # print kernel_regression(x,y,h,xout=xx)
+

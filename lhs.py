@@ -43,15 +43,10 @@ def lhs(dist, param, nsample):
         >>> dist = [stats.norm, stats.uniform]
         >>> pars = [(50,2),(1,5)]
         >>> c    = lhs(dist, pars, 20)
-        >>> print c
-        [[ 52.8216393   51.95643181  46.71040364  50.58536004  52.13686967
-           48.67993776  50.29845536  50.86481869  48.0903917   49.10324748
-           49.60112225  49.92107575  50.05125419  51.31086834  49.2367479
-           47.78022149  53.78732955  48.50866727  45.08745643  51.41199449]
-         [  4.95018614   2.49206539   2.07835604   4.67308065   3.96909729
-            5.72365167   1.27126105   5.2597637    5.0424576    1.96953563
-            4.02458671   3.35527691   4.48947238   2.88329132   3.67296928
-            1.57887891   1.17162523   3.20865642   2.50457207   5.93753608]]
+        >>> from autostring import astr
+        >>> print(astr(c[0:2,0:4],3,pp=True))
+        [['52.822' '51.956' '46.710' '50.585']
+         [' 4.950' ' 2.492' ' 2.078' ' 4.673']]
 
 
         License
@@ -71,13 +66,14 @@ def lhs(dist, param, nsample):
         You should have received a copy of the GNU Lesser General Public License
         along with The UFZ Python library.  If not, see <http://www.gnu.org/licenses/>.
 
-        Copyright 2012 Matthias Cuntz
+        Copyright 2012-2013 Matthias Cuntz
 
 
         History
         -------
-        Written, MC, May 2012 - combination of Matlab routines of Budiman (2003)
-                                and Python routines of Flavio Codeco Coelho (2008)
+        Written,  MC, May 2012 - combination of Matlab routines of Budiman (2003)
+                                 and Python routines of Flavio Codeco Coelho (2008)
+        Modified, MC, Feb 2013 - ported to Python 3
     """
     #
     # Check input
@@ -121,3 +117,4 @@ if __name__ == '__main__':
     # plt.figure()
     # plt.plot(c[0,:],c[1,:],'ko',markersize=1.0)
     # plt.show()
+

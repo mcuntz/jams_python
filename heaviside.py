@@ -43,17 +43,18 @@ def heaviside(x, value=1., unitstep=False, zero=False):
 
         Examples
         --------
-        >>> print heaviside([-1,0.,1.])
-        [ 0.   0.5  1. ]
+        >>> from autostring import astr
+        >>> print(astr(heaviside([-1,0.,1.]),1,pp=True))
+        ['0.0' '0.5' '1.0']
 
-        >>> print heaviside([-1,0.,1.], zero=True)
-        [ 0.  0.  1.]
+        >>> print(astr(heaviside([-1,0.,1.], zero=True),1,pp=True))
+        ['0.0' '0.0' '1.0']
 
-        >>> print heaviside([-1,0.,1.], unitstep=True)
-        [ 0.  1.  1.]
+        >>> print(astr(heaviside([-1,0.,1.], unitstep=True),1,pp=True))
+        ['0.0' '1.0' '1.0']
 
-        >>> print heaviside([-1,0.,1.], value=2)
-        [ 0.  1.  2.]
+        >>> print(astr(heaviside([-1,0.,1.], value=2),1,pp=True))
+        ['0.0' '1.0' '2.0']
 
 
         License
@@ -73,12 +74,13 @@ def heaviside(x, value=1., unitstep=False, zero=False):
         You should have received a copy of the GNU Lesser General Public License
         along with The UFZ Python library.  If not, see <http://www.gnu.org/licenses/>.
 
-        Copyright 2012 Matthias Cuntz
+        Copyright 2012-2013 Matthias Cuntz
 
         
         History
         -------
-        Written, MC, Jan 2012
+        Written,  MC, Jan 2012
+        Modified, MC, Feb 2013 - ported to Python 3
     """
     if zero and unitstep:
         raise ValueError('unitstep and zero mutually exclusive.')
@@ -96,3 +98,4 @@ def heaviside(x, value=1., unitstep=False, zero=False):
 if __name__ == '__main__':
     import doctest
     doctest.testmod()
+

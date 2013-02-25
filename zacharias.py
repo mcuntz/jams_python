@@ -49,21 +49,21 @@ def zacharias(h, clay, sand, db, params=None, thetar=False, thetas=False, lnalph
 
         Examples
         --------
-        >>> h = np.array([0.0000000, 0.0000000, 10.000000, 31.622777, \
-                          100.00000, 199.52623, 199.52623, \
-                          501.18723, 2511.8864, 15848.932])
-        >>> sand = np.array([12.800000, 61.600000, 17.200000, 85.800000, \
-                             16.500000, 12.800000, 61.600000, \
-                             17.200000, 85.800000, 16.500000])
-        >>> clay = np.array([30.500000, 17.200000, 25.500000, 8.9000000, \
-                             28.100000, 30.500000, 17.200000, \
-                             25.500000, 8.9000000, 28.100000])
-        >>> rho = np.array([1.2100000, 1.3400000, 1.4600000, 1.6300000, \
-                            1.3000000, 1.2100000, 1.3400000, \
-                            1.4600000, 1.6300000, 1.3000000])
-        >>> print zacharias(h, clay, sand, rho)
-        [ 0.50027     0.45278     0.42107491  0.24487575  0.39254299  0.38144151
-          0.28500141  0.31320842  0.03888839  0.22115267]
+        >>> h = np.array([0.0000000, 0.0000000, 10.000000, 31.622777,
+        ...               100.00000, 199.52623, 199.52623,
+        ...               501.18723, 2511.8864, 15848.932])
+        >>> sand = np.array([12.800000, 61.600000, 17.200000, 85.800000,
+        ...                  16.500000, 12.800000, 61.600000,
+        ...                  17.200000, 85.800000, 16.500000])
+        >>> clay = np.array([30.500000, 17.200000, 25.500000, 8.9000000,
+        ...                  28.100000, 30.500000, 17.200000,
+        ...                  25.500000, 8.9000000, 28.100000])
+        >>> rho = np.array([1.2100000, 1.3400000, 1.4600000, 1.6300000,
+        ...                 1.3000000, 1.2100000, 1.3400000,
+        ...                 1.4600000, 1.6300000, 1.3000000])
+        >>> from autostring import astr
+        >>> print(astr(zacharias(h, clay, sand, rho),3,pp=True))
+        ['0.500' '0.453' '0.421' '0.245' '0.393' '0.381' '0.285' '0.313' '0.039' '0.221']
 
 
         License
@@ -83,12 +83,13 @@ def zacharias(h, clay, sand, db, params=None, thetar=False, thetas=False, lnalph
         You should have received a copy of the GNU Lesser General Public License
         along with The UFZ Python library.  If not, see <http://www.gnu.org/licenses/>.
 
-        Copyright 2012 Matthias Cuntz
+        Copyright 2012-2013 Matthias Cuntz
 
 
         History
         -------
-        Written, MC, Jun 2012
+        Written,  MC, Jun 2012
+        Modified, MC, Feb 2013 - ported to Python 3
     """
     #
     # Check input
@@ -160,7 +161,7 @@ def zacharias(h, clay, sand, db, params=None, thetar=False, thetas=False, lnalph
                              0.890, -0.001, -0.322,
                             -4.197,  0.076, -0.276, 0.013,
                             -2.562,  3.750, -0.016, 7e-9,  4.004])
-        for i in xrange(nn):
+        for i in range(nn):
             if isand[i] < 66.5:
                 par = parclay
             else:
@@ -248,21 +249,21 @@ def zacharias_check(params, sand=None, clay=None):
 
         Examples
         --------
-        >>> parclay = np.array([ 0.,     0.,     0., \
-                                 0.788,  0.001, -0.263, \
-                                -0.648,  0.044, -3.168,  0.023, \
-                                 1.392,  1.212, -0.704, -0.418, -0.024])
-        >>> print zacharias_check(parclay)
+        >>> parclay = np.array([ 0.,     0.,     0.,
+        ...                      0.788,  0.001, -0.263,
+        ...                     -0.648,  0.044, -3.168,  0.023,
+        ...                      1.392,  1.212, -0.704, -0.418, -0.024])
+        >>> print(zacharias_check(parclay))
         True
-        >>> print zacharias_check(parclay, clay=66)
+        >>> print(zacharias_check(parclay, clay=66))
         True
-        >>> parsand = np.array([ 0.,     0.,     0., \
-                                 0.890, -0.001, -0.322, \
-                                -4.197,  0.076, -0.276, 0.013, \
-                                -2.562,  3.750, -0.016, 7e-9,  4.004])
-        >>> print zacharias_check(parsand)
+        >>> parsand = np.array([ 0.,     0.,     0.,
+        ...                      0.890, -0.001, -0.322,
+        ...                     -4.197,  0.076, -0.276, 0.013,
+        ...                     -2.562,  3.750, -0.016, 7e-9,  4.004])
+        >>> print(zacharias_check(parsand))
         False
-        >>> print zacharias_check(parsand, sand=66)
+        >>> print(zacharias_check(parsand, sand=66))
         True
 
 
@@ -283,12 +284,13 @@ def zacharias_check(params, sand=None, clay=None):
         You should have received a copy of the GNU Lesser General Public License
         along with The UFZ Python library.  If not, see <http://www.gnu.org/licenses/>.
 
-        Copyright 2012 Matthias Cuntz
+        Copyright 2012-2013 Matthias Cuntz
 
 
         History
         -------
-        Written, MC, May 2012
+        Written,  MC, May 2012
+        Modified, MC, Feb 2013 - ported to Python 3
     """
     #
     # Check input
@@ -372,22 +374,23 @@ if __name__ == '__main__':
     # print zacharias_check(parsand)
     # print zacharias_check(parsand, sand=66)
 
-    # h = np.array([0.0000000, 0.0000000, 10.000000, 31.622777, \
-    #               100.00000, 199.52623, 199.52623, \
+    # h = np.array([0.0000000, 0.0000000, 10.000000, 31.622777,
+    #               100.00000, 199.52623, 199.52623,
     #               501.18723, 2511.8864, 15848.932])
-    # sand = np.array([12.800000, 61.600000, 17.200000, 85.800000, \
-    #                  16.500000, 12.800000, 61.600000, \
+    # sand = np.array([12.800000, 61.600000, 17.200000, 85.800000,
+    #                  16.500000, 12.800000, 61.600000,
     #                  17.200000, 85.800000, 16.500000])
-    # clay = np.array([30.500000, 17.200000, 25.500000, 8.9000000, \
-    #                  28.100000, 30.500000, 17.200000, \
+    # clay = np.array([30.500000, 17.200000, 25.500000, 8.9000000,
+    #                  28.100000, 30.500000, 17.200000,
     #                  25.500000, 8.9000000, 28.100000])
-    # rho = np.array([1.2100000, 1.3400000, 1.4600000, 1.6300000, \
-    #                 1.3000000, 1.2100000, 1.3400000, \
+    # rho = np.array([1.2100000, 1.3400000, 1.4600000, 1.6300000,
+    #                 1.3000000, 1.2100000, 1.3400000,
     #                 1.4600000, 1.6300000, 1.3000000])
     # # # From IDL code
-    # # zthetafit = np.array([0.50026998, 0.45277997, 0.42107488, 0.24487569, \
-    # #                       0.39254300, 0.38144154, 0.28500143, \
+    # # zthetafit = np.array([0.50026998, 0.45277997, 0.42107488, 0.24487569,
+    # #                       0.39254300, 0.38144154, 0.28500143,
     # #                       0.31320843, 0.038888339, 0.22115273])
     # print zacharias(h, clay, sand, rho)
     # # [ 0.50027     0.45278     0.42107491  0.24487575  0.39254299  0.38144151
     # #   0.28500141  0.31320842  0.03888839  0.22115267]
+

@@ -37,7 +37,8 @@ def area_poly(x, y):
         --------
         >>> x = np.array([1.0, 2.0, 2.0, 1.0])
         >>> y = np.array([1.0, 1.0, 2.0, 2.0])
-        >>> print area_poly(x,y)
+        >>> from autostring import astr
+        >>> print(astr(area_poly(x,y),1,pp=True))
         1.0
 
 
@@ -58,21 +59,22 @@ def area_poly(x, y):
         You should have received a copy of the GNU Lesser General Public License
         along with The UFZ Python library.  If not, see <http://www.gnu.org/licenses/>.
 
-        Copyright 2012 Matthias Cuntz
+        Copyright 2012-2013 Matthias Cuntz
 
 
         History
         -------
         Written,  MC, Nov 2012 - stackoverflow.com
+        Modified, MC, Feb 2013 - ported to Python 3
     """
 
     # Could include some checks here
-    p = zip(x,y)
+    p = list(zip(x,y))
     return 0.5 * np.abs(np.sum(x0*y1 - x1*y0 for ((x0, y0), (x1, y1)) in segments(p)))
 
 
 def segments(p):
-    return zip(p, p[1:] + [p[0]])
+    return list(zip(p, p[1:] + [p[0]]))
 
 
 if __name__ == '__main__':
@@ -82,3 +84,4 @@ if __name__ == '__main__':
     # x = np.array([1.0, 2.0, 2.0, 1.0])
     # y = np.array([1.0, 1.0, 2.0, 2.0])
     # print area_poly(x,y)
+

@@ -37,23 +37,23 @@ def interpol(xout, xin, yin):
         >>> xout = np.arange(10)*10. + 0.5
         >>> soll = np.interp(xout, xin, yin)
         >>> yout = interpol(xout, xin, yin)
-        >>> print np.any(yout != soll)
+        >>> print(np.any(yout != soll))
         False
     
         >>> sout = (3,1)
         >>> yin2 = np.transpose(np.tile(yin,sout))
         >>> yout = interpol(xout, xin, yin2)
-        >>> for i in xrange(3):
+        >>> for i in range(3):
         ...    if np.any(yout[:,i] != soll):
-        ...        print True
+        ...        print(True)
 
         >>> sout = (3,2,1)
         >>> yin3 = np.transpose(np.tile(yin,sout))
         >>> yout = interpol(xout, xin, yin3)
-        >>> for i in xrange(3):
-        ...    for j in xrange(2):
+        >>> for i in range(3):
+        ...    for j in range(2):
         ...        if np.any(yout[:,j,i] != soll):
-        ...            print True
+        ...            print(True)
 
 
         License
@@ -73,12 +73,13 @@ def interpol(xout, xin, yin):
         You should have received a copy of the GNU Lesser General Public License
         along with The UFZ Python library.  If not, see <http://www.gnu.org/licenses/>.
 
-        Copyright 2012 Matthias Cuntz
+        Copyright 2012-2013 Matthias Cuntz
 
 
         History
         -------
-        Written, MC, Jun 2012
+        Written,  MC, Jun 2012
+        Modified, MC, Feb 2013 - ported to Python 3
     """
     #
     # If yin 1D-array then call immediately np.interp without check
@@ -136,3 +137,4 @@ if __name__ == '__main__':
     # yout = interpol(xout, xin, yin3)
     # print yout[:,0,0]
     # print yout[:,1,2]
+

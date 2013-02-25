@@ -60,67 +60,68 @@ def esat(T, liquid=False, formula='GoffGratch'):
 
         Examples
         --------
-        >>> print esat(293.15)
-        2335.846831
+        >>> from autostring import astr
+        >>> print(astr(esat(293.15),3,pp=True))
+        2335.847
 
-        >>> print esat([293.15,253.15])
-        [ 2335.846831     103.07420397]
+        >>> print(astr(esat([293.15,253.15]),3,pp=True))
+        ['2335.847' ' 103.074']
 
-        >>> print esat([293.15,253.15],formula='GoffGratch')
-        [ 2335.846831     103.07420397]
+        >>> print(astr(esat([293.15,253.15],formula='GoffGratch'),3,pp=True))
+        ['2335.847' ' 103.074']
 
-        >>> print esat([293.15,253.15],formula='MartiMauersberger')
-        [ 2335.846831     103.65016977]
+        >>> print(astr(esat([293.15,253.15],formula='MartiMauersberger'),3,pp=True))
+        ['2335.847' ' 103.650']
 
-        >>> print esat([293.15,253.15],formula='MagnusTeten')
-        [ 2335.2010209    102.77068386]
+        >>> print(astr(esat([293.15,253.15],formula='MagnusTeten'),3,pp=True))
+        ['2335.201' ' 102.771']
 
-        >>> print esat([293.15,253.15],formula='buck')
-        [ 2338.33997845   103.28594449]
+        >>> print(astr(esat([293.15,253.15],formula='buck'),3,pp=True))
+        ['2338.340' ' 103.286']
 
-        >>> print esat([293.15,253.15],formula='Buck_original')
-        [ 2337.28247285   103.26704207]
+        >>> print(astr(esat([293.15,253.15],formula='Buck_original'),3,pp=True))
+        ['2337.282' ' 103.267']
 
-        >>> print esat([293.15,253.15],formula='wmo')
-        [ 2337.08019792   103.15327491]
+        >>> print(astr(esat([293.15,253.15],formula='wmo'),3,pp=True))
+        ['2337.080' ' 103.153']
 
-        >>> print esat([293.15,253.15],formula='WEXLER')
-        [ 2323.25413392   103.07420397]
+        >>> print(astr(esat([293.15,253.15],formula='WEXLER'),3,pp=True))
+        ['2323.254' ' 103.074']
 
-        >>> print esat([293.15,253.15],formula='Sonntag')
-        [ 2339.24912776   103.24877662]
+        >>> print(astr(esat([293.15,253.15],formula='Sonntag'),3,pp=True))
+        ['2339.249' ' 103.249']
 
-        >>> print esat([293.15,253.15],formula='Bolton')
-        [ 2336.94712341   103.07420397]
+        >>> print(astr(esat([293.15,253.15],formula='Bolton'),3,pp=True))
+        ['2336.947' ' 103.074']
 
-        >>> print esat([293.15,253.15],formula='Fukuta')
-        [ 2335.846831     103.07420397]
+        >>> print(astr(esat([293.15,253.15],formula='Fukuta'),3,pp=True))
+        ['2335.847' ' 103.074']
 
-        >>> print esat([293.15,253.15],formula='HylandWexler')
-        [ 2338.80370007   103.26037858]
+        >>> print(astr(esat([293.15,253.15],formula='HylandWexler'),3,pp=True))
+        ['2338.804' ' 103.260']
 
-        >>> print esat([293.15,253.15],formula='IAPWS')
-        [ 2339.19373662   103.07420397]
+        >>> print(astr(esat([293.15,253.15],formula='IAPWS'),3,pp=True))
+        ['2339.194' ' 103.074']
 
-        >>> print esat([293.15,253.15],formula='MurphyKoop')
-        [ 2339.39902267   103.25246328]
+        >>> print(astr(esat([293.15,253.15],formula='MurphyKoop'),3,pp=True))
+        ['2339.399' ' 103.252']
 
-        >>> print esat(np.array([293.15,253.15]), liquid=True)
-        [ 2335.846831     125.29249217]
+        >>> print(astr(esat(np.array([293.15,253.15]), liquid=True),3,pp=True))
+        ['2335.847' ' 125.292']
 
-        >>> print esat([293.15,253.15],formula='Fukuta', liquid=True)
-        [ 2335.846831     125.07852271]
+        >>> print(astr(esat([293.15,253.15],formula='Fukuta', liquid=True),3,pp=True))
+        ['2335.847' ' 125.079']
 
-        >>> print esat(np.array([293.15,393.15]))
+        >>> print(astr(esat(np.array([293.15,393.15])),3,pp=True))
         WARNING ESAT: T>373.15 K - something might be wrong with T.
-        [   2335.846831    198473.37761231]
+        ['  2335.847' '198473.378']
 
-        >>> print esat(np.array([293.15,93.15]))
+        >>> print(astr(esat(np.array([293.15,93.15])),3,pp=True))
         WARNING ESAT: T<100 - T probably given in Celsius instead of Kelvin.
-        [  2.33584683e+03   1.30965154e-16]
+        ['2335.847' '   0.000']
 
-        >>> print esat(np.ma.array([253.15,-9999.], mask=[False,True]))
-        [103.074203967 --]
+        >>> print(astr(esat(np.ma.array([253.15,-9999.], mask=[False,True])),3,pp=True))
+        ['103.074' '--     ']
 
 
         License
@@ -140,12 +141,13 @@ def esat(T, liquid=False, formula='GoffGratch'):
         You should have received a copy of the GNU Lesser General Public License
         along with The UFZ Python library.  If not, see <http://www.gnu.org/licenses/>.
 
-        Copyright 2012 Matthias Cuntz
+        Copyright 2012-2013 Matthias Cuntz
 
 
         History
         -------
-        Written, MC, Jan 2012
+        Written,  MC, Jan 2012
+        Modified, MC, Feb 2013 - ported to Python 3
     """
     #
     # Constants
@@ -158,13 +160,13 @@ def esat(T, liquid=False, formula='GoffGratch'):
     if np.ma.any(np.ma.array(T) <= 0.):
         raise ValueError('T<0 - T probably given in Celsius instead of Kelvin.')
     if np.ma.any(np.ma.array(T) < 100.):
-           print "WARNING ESAT: T<100 - T probably given in Celsius instead of Kelvin."
+           print("WARNING ESAT: T<100 - T probably given in Celsius instead of Kelvin.")
     if np.ma.any(np.ma.array(T) > (const.T0+100.)):
-           print "WARNING ESAT: T>373.15 K - something might be wrong with T."
+           print("WARNING ESAT: T>373.15 K - something might be wrong with T.")
     form = formula.lower()
     if form not in lknown:
-           print "ESAT: formula not know."
-           print "      Known formulas are: ", knownforms
+           print("ESAT: formula not know.")
+           print("      Known formulas are: ", knownforms)
            raise ValueError('')
     #
     # Split input into masked arrays
@@ -270,7 +272,7 @@ def esat(T, liquid=False, formula='GoffGratch'):
                               + 0.42873e-3 * (10.**(+4.76955*(1.-Ts/T_liq))-1.)
                               + 0.78614))
         else:
-            print "ESAT: formulation not known: ", formula
+            print("ESAT: formulation not known: ", formula)
             return False
         esat_liq *= 100.
     else:
@@ -322,7 +324,7 @@ def esat(T, liquid=False, formula='GoffGratch'):
             esat_ice = (10.**(-9.09685 * (Ts/T_ice-1.) - 3.56654 * np.log10(Ts/T_ice)
                               + 0.87682 * (1.-T_ice/Ts) + 0.78614))
         else:
-            print "ESAT: formulation not known: ", formula
+            print("ESAT: formulation not known: ", formula)
             return False
         esat_ice *= 100.
     else:
@@ -340,3 +342,69 @@ def esat(T, liquid=False, formula='GoffGratch'):
 if __name__ == '__main__':
     import doctest
     doctest.testmod()
+
+    # from autostring import astr
+    # print(astr(esat([293.15]),3,pp=True))
+    # # 2335.847
+
+    # print(astr(esat([253.15]),3,pp=True))
+    # # 103.074
+
+    # print(esat([293.15,253.15]))
+    # # ['2335.847' ' 103.074']
+
+    # print(astr(esat([293.15,253.15],formula='GoffGratch'),3,pp=True))
+    # # ['2335.847' ' 103.074']
+
+    # print(astr(esat([293.15,253.15],formula='MartiMauersberger'),3,pp=True))
+    # # ['2335.847' ' 103.650']
+
+    # print(astr(esat([293.15,253.15],formula='MagnusTeten'),3,pp=True))
+    # # ['2335.201' ' 102.771']
+
+    # print(astr(esat([293.15,253.15],formula='buck'),3,pp=True))
+    # # ['2338.340' ' 103.286']
+
+    # print(astr(esat([293.15,253.15],formula='Buck_original'),3,pp=True))
+    # # ['2337.282' ' 103.267']
+
+    # print(astr(esat([293.15,253.15],formula='wmo'),3,pp=True))
+    # # ['2337.080' ' 103.153']
+
+    # print(astr(esat([293.15,253.15],formula='WEXLER'),3,pp=True))
+    # # ['2323.254' ' 103.074']
+
+    # print(astr(esat([293.15,253.15],formula='Sonntag'),3,pp=True))
+    # # ['2339.249' ' 103.249']
+
+    # print(astr(esat([293.15,253.15],formula='Bolton'),3,pp=True))
+    # # ['2336.947' ' 103.074']
+
+    # print(astr(esat([293.15,253.15],formula='Fukuta'),3,pp=True))
+    # # ['2335.847' ' 103.074']
+
+    # print(astr(esat([293.15,253.15],formula='HylandWexler'),3,pp=True))
+    # # ['2338.804' ' 103.260']
+
+    # print(astr(esat([293.15,253.15],formula='IAPWS'),3,pp=True))
+    # # ['2339.194' ' 103.074']
+
+    # print(astr(esat([293.15,253.15],formula='MurphyKoop'),3,pp=True))
+    # # ['2339.399' ' 103.252']
+
+    # print(astr(esat(np.array([293.15,253.15]), liquid=True),3,pp=True))
+    # # ['2335.847' ' 125.292']
+
+    # print(astr(esat([293.15,253.15],formula='Fukuta', liquid=True),3,pp=True))
+    # # ['2335.847' ' 125.079']
+
+    # print(astr(esat(np.array([293.15,393.15])),3,pp=True))
+    # # WARNING ESAT: T>373.15 K - something might be wrong with T.
+    # # ['  2335.847' '198473.378']
+
+    # print(astr(esat(np.array([293.15,93.15])),3,pp=True))
+    # # WARNING ESAT: T<100 - T probably given in Celsius instead of Kelvin.
+    # # ['2335.847' '   0.000']
+
+    # print(astr(esat(np.ma.array([253.15,-9999.], mask=[False,True])),3,pp=True))
+    # # ['103.074' '--     ']

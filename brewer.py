@@ -99,12 +99,13 @@
     You should have received a copy of the GNU Lesser General Public License
     along with The UFZ Python library.  If not, see <http://www.gnu.org/licenses/>.
 
-    Copyright 2012 Matthias Cuntz
+    Copyright 2012-2013 Matthias Cuntz
 
 
     History
     -------
-    Written, MC, Sep 2012
+    Written,  MC, Sep 2012
+    Modified, MC, Feb 2013 - ported to Python 3
 """
 
 # Define colormaps
@@ -1848,11 +1849,13 @@ def define_brewer(cname='all', reverse=False, grey=False, gray=False):
     else:
         cmaps = [cname.lower()]
     for i in cmaps:
-        exec('cpool = [ tuple([k/255. for k in j]) for j in '+i+' ]')
+        d = {}
+        exec('cpool = [ tuple([k/255. for k in j]) for j in '+i+' ]', globals(), d)
+        cpool = d['cpool']
         if reverse:
             cpool = cpool[::-1]
         if grey | gray:
-            for j in xrange(len(cpool)):
+            for j in range(len(cpool)):
                 isgray = 0.2125 * cpool[j][0] + 0.7154 * cpool[j][1] + 0.072* cpool[j][2]
                 cpool[j] = (isgray,isgray,isgray)
         cmap = col.ListedColormap(cpool, i)
@@ -1867,72 +1870,77 @@ def print_brewer(names='all'):
         ['set33', 'set34', 'set35', 'set36', 'set37', 'set38', 'set39', 'set310', 'set311', 'set312', 'pastel13', 'pastel14', 'pastel15', 'pastel16', 'pastel17', 'pastel18', 'pastel19', 'set13', 'set14', 'set15', 'set16', 'set17', 'set18', 'set19', 'pastel23', 'pastel24', 'pastel25', 'pastel26', 'pastel27', 'pastel28', 'set23', 'set24', 'set25', 'set26', 'set27', 'set28', 'dark23', 'dark24', 'dark25', 'dark26', 'dark27', 'dark28', 'paired3', 'paired4', 'paired5', 'paired6', 'paired7', 'paired8', 'paired9', 'paired10', 'paired11', 'paired12', 'accent3', 'accent4', 'accent5', 'accent6', 'accent7', 'accent8']
     """
     if names.lower() == 'sequential':
-        print sequential_maps
+        print(sequential_maps)
     elif names.lower() == 'diverging':
-        print diverging_maps
+        print(diverging_maps)
     elif names.lower() == 'qualitative':
-        print qualitative_maps
+        print(qualitative_maps)
     else:
-        print 'Sequential color maps'
-        print sequential_maps
-        print ''
-        print 'Diverging color maps'
-        print diverging_maps
-        print ''
-        print 'Qualitative color maps'
-        print qualitative_maps
+        print('Sequential color maps')
+        print(sequential_maps)
+        print('')
+        print('Diverging color maps')
+        print(diverging_maps)
+        print('')
+        print('Qualitative color maps')
+        print(qualitative_maps)
 
 
 def get_brewer(cname=None, names=False, rgb=False, rgb256=False, reverse=False, grey=False, gray=False):
     """
         Examples
         --------
+        >>> import numpy as np
         >>> from autostring import *
         >>> cc = get_brewer('Blues4',rgb=True)
-        >>> print astr(np.array(cc[0]), 4)
+        >>> print(astr(np.array(cc[0]), 4))
         ['0.9373' '0.9529' '1.0000']
 
         >>> cc = get_brewer('Blues4',rgb256=True)
-        >>> print cc[0]
+        >>> print(cc[0])
         (239, 243, 255)
 
         >>> cc = get_brewer('Blues4',rgb256=True,reverse=True)
-        >>> print cc[-1]
+        >>> print(cc[-1])
         (239, 243, 255)
-        >>> print cc[0]
+        >>> print(cc[0])
         (33, 113, 181)
 
         >>> cc = get_brewer('Blues4',rgb256=True,grey=True)
-        >>> print astr(np.array(cc[0]), 4)
+        >>> print(astr(np.array(cc[0]), 4))
         ['242.9897' '242.9897' '242.9897']
     """
     if names:
-        if names.lower() == 'sequential':
-            return sequential_maps
-        elif names.lower() == 'diverging':
-            return diverging_maps
-        elif names.lower() == 'qualitative':
-            return qualitative_maps
-        else:
-            cmaps = sequential_maps + diverging_maps + qualitative_maps
-            return cmaps
+         if names.lower() == 'sequential':
+             return sequential_maps
+         elif names.lower() == 'diverging':
+             return diverging_maps
+         elif names.lower() == 'qualitative':
+             return qualitative_maps
+         else:
+             cmaps = sequential_maps + diverging_maps + qualitative_maps
+             return cmaps
     else:
          if (cname.lower() in sequential_maps) | (cname.lower() in diverging_maps) | (cname.lower() in qualitative_maps):
              if rgb256:
-                 exec('cpool = '+cname.lower())
+                 d = {}
+                 exec('cpool = '+cname.lower(), globals(), d)
+                 cpool = d['cpool']
                  if reverse:
                      cpool = cpool[::-1]
                  if grey | gray:
-                     for j in xrange(len(cpool)):
+                     for j in range(len(cpool)):
                          isgray = 0.2125 * cpool[j][0] + 0.7154 * cpool[j][1] + 0.072* cpool[j][2]
                          cpool[j] = (isgray,isgray,isgray)
                  return cpool
              elif rgb:
-                 exec('cpool = [ tuple([k/255. for k in j]) for j in '+cname.lower()+' ]')
+                 d = {}
+                 exec('cpool = [ tuple([k/255. for k in j]) for j in '+cname.lower()+' ]', globals(), d)
+                 cpool = d['cpool']
                  if reverse:
                      cpool = cpool[::-1]
                  if grey | gray:
-                     for j in xrange(len(cpool)):
+                     for j in range(len(cpool)):
                          isgray = 0.2125 * cpool[j][0] + 0.7154 * cpool[j][1] + 0.072* cpool[j][2]
                          cpool[j] = (isgray,isgray,isgray)
                  return cpool
@@ -1946,7 +1954,7 @@ def get_brewer(cname=None, names=False, rgb=False, rgb256=False, reverse=False, 
 
 def plot_brewer(pdffile='brewer_colors.pdf',reverse=False, grey=False, gray=False):
     import numpy as np
-    import ufz
+    from position import position
     outtype = 'pdf'
     nrow       = 6           # # of rows of subplots per figure
     ncol       = 21          # # of columns of subplots per figure
@@ -1965,7 +1973,7 @@ def plot_brewer(pdffile='brewer_colors.pdf',reverse=False, grey=False, gray=Fals
     mpl.rc('lines', linewidth=lwidth, color='black')
     mpl.rc('axes', linewidth=alwidth, labelcolor='black')
     mpl.rc('path', simplify=False) # do not remove
-    print 'Plot PDF ', pdffile
+    print('Plot PDF ', pdffile)
     pdf_pages = PdfPages(pdffile)
     figsize = mpl.rcParams['figure.figsize']
     ifig = 0
@@ -1980,10 +1988,10 @@ def plot_brewer(pdffile='brewer_colors.pdf',reverse=False, grey=False, gray=Fals
                  plt.close()
             ifig += 1
             iplot = 0
-            print 'Page ', ifig
+            print('Page ', ifig)
             fig = plt.figure(ifig)
         iplot += 1
-        sub = fig.add_axes(ufz.position(nrow,ncol,iplot,hspace=hspace,wspace=wspace))
+        sub = fig.add_axes(position(nrow,ncol,iplot,hspace=hspace,wspace=wspace))
         sub.axis('off')
         if iplot == 1:
             fig.text(0.5, 0.97, "Sequential", ha="center", size=12)
@@ -2005,10 +2013,10 @@ def plot_brewer(pdffile='brewer_colors.pdf',reverse=False, grey=False, gray=Fals
                  plt.close()
             ifig += 1
             iplot = 0
-            print 'Page ', ifig
+            print('Page ', ifig)
             fig = plt.figure(ifig)
         iplot += 1
-        sub = fig.add_axes(ufz.position(nrow,ncol,iplot,hspace=hspace,wspace=wspace))
+        sub = fig.add_axes(position(nrow,ncol,iplot,hspace=hspace,wspace=wspace))
         sub.axis('off')
         if iplot == 1:
             fig.text(0.5, 0.97, "Diverging", ha="center", size=12)
@@ -2030,10 +2038,10 @@ def plot_brewer(pdffile='brewer_colors.pdf',reverse=False, grey=False, gray=Fals
                  plt.close()
             ifig += 1
             iplot = 0
-            print 'Page ', ifig
+            print('Page ', ifig)
             fig = plt.figure(ifig)
         iplot += 1
-        sub = fig.add_axes(ufz.position(nrow,ncol,iplot,hspace=hspace,wspace=wspace))
+        sub = fig.add_axes(position(nrow,ncol,iplot,hspace=hspace,wspace=wspace))
         sub.axis('off')
         if iplot == 1:
             fig.text(0.5, 0.97, "Qualitative", ha="center", size=12)
@@ -2055,24 +2063,26 @@ if __name__ == '__main__':
     import doctest
     doctest.testmod()
 
-    # from autostring import *
+    # import numpy as np
+    # from autostring import astr
     # cc = get_brewer('Blues4',rgb=True)
-    # print astr(np.array(cc[0]), 4)
+    # print(astr(np.array(cc[0]), 4))
     # #    ['0.9373' '0.9529' '1.0000']
 
     # cc = get_brewer('Blues4',rgb256=True)
-    # print cc[0]
+    # print(cc[0])
     # #    (239, 243, 255)
 
     # cc = get_brewer('Blues4',rgb256=True,reverse=True)
-    # print cc[-1]
+    # print(cc[-1])
     # #    (239, 243, 255)
-    # print cc[0]
+    # print(cc[0])
     # #    (33, 113, 181)
 
     # cc = get_brewer('Blues4',rgb256=True,grey=True)
-    # print astr(np.array(cc[0]), 4)
+    # print(astr(np.array(cc[0]), 4))
     # #    ['242.9897' '242.9897' '242.9897']
 
     # plot_brewer('test.pdf', reverse=True)
     # plot_brewer('test_gray.pdf', gray=True)
+

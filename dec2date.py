@@ -21,8 +21,8 @@ def dec2date(indata, calendar='standard', refdate=None, units=None,
 
         Definition
         ----------
-        def dec2date(indata, calendar='standard', refdate=False,
-                     excelerr=True, fulldate=True, yr=False,
+        def dec2date(indata, calendar='standard', refdate=None, units=None,
+                     excelerr=True, fulldate=None, yr=False,
                      mo=False, dy=False, hr=False, mi=False,
                      sc=False, ascii=False, eng=False):
 
@@ -131,66 +131,65 @@ def dec2date(indata, calendar='standard', refdate=None, units=None,
         # Some implementations of datetime have problems with negative years
         >>> import datetime
         >>> if datetime.MINYEAR > 0:
-        ...     print 'The minimum year in your datetime implementation is ', datetime.MINYEAR
-        ...     print 'i.e. it does not support negative years (BC).'
+        ...     print('The minimum year in your datetime implementation is ', datetime.MINYEAR)
+        ...     print('i.e. it does not support negative years (BC).')
 
         #calendar = 'standard'
-        >>> a = np.array([2451549.02101, 2382262.17720, 2316600.93102,\
-                          2272848.10822, 2185367.32053, 1947385.96432,\
-                          1721423.5])
-        >>> year, month, day, hour, minute, second \
-            = dec2date(a, calendar= 'standard', fulldate = True)
-        >>> print year
+        >>> year   = np.array([2000,1810,1630,1510,1271,619,1])
+        >>> month  = np.array([1,4,7,9,3,8,1])
+        >>> day    = np.array([5,24,15,20,18,27,1])
+        >>> hour   = np.array([12,16,10,14,19,11,12])
+        >>> minute = np.array([30,15,20,35,41,8,0])
+        >>> second = np.array([15,10,40,50,34,37,0])
+        >>> from date2dec import *
+        >>> decimal = date2dec(calendar='standard',yr=year,mo=month,dy=day,hr=hour,mi=minute,sc=second)
+        >>> year, month, day, hour, minute, second = dec2date(decimal, calendar= 'standard', fulldate = True)
+        >>> print(year)
         [2000 1810 1630 1510 1271  619    1]
-        >>> print month
+        >>> print(month)
         [1 4 7 9 3 8 1]
-        >>> print day
+        >>> print(day)
         [ 5 24 15 20 18 27  1]
-        >>> print hour
-        [12 16 10 14 19 11  0]
-        >>> print minute
+        >>> print(hour)
+        [12 16 10 14 19 11 12]
+        >>> print(minute)
         [30 15 20 35 41  8  0]
-        >>> print second
+        >>> print(second)
         [15 10 40 50 34 37  0]
 
-        #calendar = 'julian'
-        >>> b = np.array([2451562.02101, 2382274.17720, 2316600.93102,\
-                          2272848.10822, 2185367.32053, 1947385.96432,\
-                          1721423.5])
-        >>> year = dec2date(b, calendar='julian', yr = True)
-        >>> print year
+        # calendar = 'julian'
+        >>> decimal = date2dec(calendar='julian',yr=year,mo=month,dy=day,hr=hour,mi=minute,sc=second)
+        >>> year = dec2date(decimal, calendar='julian', yr = True)
+        >>> print(year)
         [2000 1810 1630 1510 1271  619    1]
 
         # calendar = 'proleptic_gregorian'
-        >>> c = np.array([719644.52101, 359822.52101, 179911.93102, 109573.0, 1.0])
-        >>> ascii = dec2date(c, calendar='proleptic_gregorian', ascii = True)
-        >>> print ascii
-        ['28.04.1971 12:30:15' '28.02.0986 12:30:15' '31.07.0493 22:20:40'
-         '02.01.0301 00:00:00' '02.01.0001 00:00:00']
+        >>> decimal = date2dec(calendar='proleptic_gregorian',yr=year,mo=month,dy=day,hr=hour,mi=minute,sc=second)
+        >>> ascii = dec2date(decimal, calendar='proleptic_gregorian', ascii = True)
+        >>> print(ascii[::4])
+        ['05.01.2000 12:30:15' '18.03.1271 19:41:34']
 
-        #calendar = 'excel1900' WITH excelerr = True -> 1900
-        #considered as leap year
-        >>> d = np.array([36530.52101, 18410.68414, 3878.44508, 61.0, 60.0, 59.0, 1.0])
-        >>> year, day = dec2date(d, calendar='excel1900', yr = True, dy = True)
-        >>> print year
-        [2000 1950 1910 1900 1900 1900 1900]
-        >>> print day
-        [ 5 27 13  1 29 28  1]
+        # calendar = 'excel1900' WITH excelerr = True -> 1900 considered as leap year
+        >>> decimal = date2dec(calendar='excel1900',yr=year,mo=month,dy=day,hr=hour,mi=minute,sc=second)
+        >>> year, day = dec2date(decimal, calendar='excel1900', yr = True, dy = True)
+        >>> print(year)
+        [2000 1810 1630 1510 1271  619    1]
+        >>> print(day)
+        [ 5 24 15 20 18 27  1]
 
-        #calendar = 'excel1900' WITH excelerr = False -> 1900
-        #considered as NO leap year
+        # calendar = 'excel1900' WITH excelerr = False -> 1900 considered as NO leap year
         # Older versions of netcdftime.py produced unnecessary output (Line 262)
-        >>> e = np.array([36530.52101, 18410.68414, 3878.44508, 61.0, 60.0, 59.0, 1.0])
+        >>> decimal = date2dec(calendar='excel1900',yr=year,mo=month,dy=day,hr=hour,mi=minute,sc=second,excelerr=False)
         >>> if nt.__version__ < '0.9.4':
-        ...     asciidate = dec2date(e, calendar='excel1900', ascii = True, excelerr = False)
+        ...     asciidate = dec2date(decimal, calendar='excel1900', ascii = True, excelerr = False)
         ... elif nt.__version__ == '0.9.4':
-        ...     asciidate = dec2date(e, calendar='excel1900', ascii = True, excelerr = False)
-        ...     for i in xrange(3):
-        ...         print '0 300'
+        ...     asciidate = dec2date(decimal, calendar='excel1900', ascii = True, excelerr = False)
+        ...     for i in range(3):
+        ...         print('0 300')
         ... else:
-        ...     asciidate = dec2date(e, calendar='excel1900', ascii = True, excelerr = False)
-        ...     for i in xrange(7):
-        ...         print '0 300'
+        ...     asciidate = dec2date(decimal, calendar='excel1900', ascii = True, excelerr = False)
+        ...     for i in range(7):
+        ...         print('0 300')
         0 300
         0 300
         0 300
@@ -199,85 +198,63 @@ def dec2date(indata, calendar='standard', refdate=None, units=None,
         0 300
         0 300
 
-        >>> print asciidate
-        ['06.01.2000 12:30:15' '28.05.1950 16:25:10' '14.08.1910 10:40:55'
-         '02.03.1900 00:00:00' '01.03.1900 00:00:00' '28.02.1900 00:00:00'
-         '01.01.1900 00:00:00']
+        >>> print(asciidate[::4])
+        ['05.01.2000 12:30:15' '18.03.1271 19:41:34']
 
         #calendar = 'excel1904'
-        >>> f = np.array([36530.52101, 18410.68414, 3878.44508, 61.0, 60.0, 59.0, 0.0])
-        >>> asciidate = dec2date(f, calendar='excel1904', ascii = True)
-        >>> print asciidate
-        ['06.01.2004 12:30:15' '28.05.1954 16:25:10' '14.08.1914 10:40:55'
-         '02.03.1904 00:00:00' '01.03.1904 00:00:00' '29.02.1904 00:00:00'
-         '01.01.1904 00:00:00']
-        >>> asciidate = dec2date(f, calendar='excel1904', ascii=True, refdate='1910-01-01 00:00:00')
-        >>> print asciidate
-        ['06.01.2010 12:30:15' '28.05.1960 16:25:10' '14.08.1920 10:40:55'
-         '03.03.1910 00:00:00' '02.03.1910 00:00:00' '01.03.1910 00:00:00'
-         '01.01.1910 00:00:00']
-        >>> print dec2date(f, calendar='excel1904', ascii=True, units='days since 1910-01-01 00:00:00')
-        ['06.01.2010 12:30:15' '28.05.1960 16:25:10' '14.08.1920 10:40:55'
-         '03.03.1910 00:00:00' '02.03.1910 00:00:00' '01.03.1910 00:00:00'
-         '01.01.1910 00:00:00']
-        >>> print dec2date(f, calendar='excel1904', ascii=True, units='days since 1910-01-02 00:00:00')
-        ['07.01.2010 12:30:15' '29.05.1960 16:25:10' '15.08.1920 10:40:55'
-         '04.03.1910 00:00:00' '03.03.1910 00:00:00' '02.03.1910 00:00:00'
-         '02.01.1910 00:00:00']
+        >>> decimal = date2dec(calendar='excel1904',yr=year,mo=month,dy=day,hr=hour,mi=minute,sc=second)
+        >>> asciidate = dec2date(decimal, calendar='excel1904', ascii = True)
+        >>> print(asciidate[::4])
+        ['05.01.2000 12:30:15' '18.03.1271 19:41:34']
+        >>> asciidate = dec2date(decimal, calendar='excel1904', ascii=True, refdate='1910-01-01 00:00:00')
+        >>> print(asciidate[::4])
+        ['05.01.2006 12:30:15' '18.03.1277 19:41:34']
+        >>> print(dec2date(decimal[::4], calendar='excel1904', ascii=True, units='days since 1910-01-01 00:00:00'))
+        ['05.01.2006 12:30:15' '18.03.1277 19:41:34']
+        >>> print(dec2date(decimal[::4], calendar='excel1904', ascii=True, units='days since 1910-01-02 00:00:00'))
+        ['06.01.2006 12:30:15' '19.03.1277 19:41:34']
 
-        #calendar = '365_day'
-        >>> g = np.array([719644.52101, 359822.52101, 179911.93102, 0.0])
-        >>> asciidate = dec2date(g, calendar='365_day', ascii = True)
-        >>> print asciidate
-        ['18.08.1972 12:30:15' '25.10.0986 12:30:15' '28.11.0493 22:20:40'
-         '01.01.0001 00:00:00']
+        # calendar = '365_day'
+        >>> decimal = date2dec(calendar='365_day',yr=year,mo=month,dy=day,hr=hour,mi=minute,sc=second)
+        >>> asciidate = dec2date(decimal, calendar='365_day', ascii = True)
+        >>> print(asciidate[::4])
+        ['05.01.2000 12:30:15' '18.03.1271 19:41:34']
 
-        #calendar = '366_day'
-        >>> h = np.array([ 719644.52101, 359822.52101, 179911.93102, 0.0])
-        >>> asciidate = dec2date(h, calendar='366_day', ascii = True)
-        >>> print asciidate
-        ['29.03.1967 12:30:15' '14.02.0984 12:30:15' '24.07.0492 22:20:40'
-         '01.01.0001 00:00:00']
+        # calendar = '366_day'
+        >>> decimal = date2dec(calendar='366_day',yr=year,mo=month,dy=day,hr=hour,mi=minute,sc=second)
+        >>> asciidate = dec2date(decimal, calendar='366_day', ascii = True)
+        >>> print(asciidate[::4])
+        ['05.01.2000 12:30:15' '18.03.1271 19:41:34']
 
-        #calendar = '360_day'
-        #>>> k = np.array([ 719644.52101, 359822.52101, 179911.93102, 0.0])
-        #>>> asciidate = dec2date(k, calendar='360_day', ascii= True)
-        #>>> print asciidate
-        #['05.01.2000 12:30:15' '03.07.1000 12:30:15' '02.10.0500 22:20:40'
-        # '01.01.0001 00:00:00']
+        # calendar = '360_day'
+        >>> decimal = date2dec(calendar='360_day',yr=year,mo=month,dy=day,hr=hour,mi=minute,sc=second)
+        >>> asciidate = dec2date(decimal, calendar='360_day', ascii = True)
+        >>> print(asciidate[::4])
+        ['05.01.2000 12:30:15' '18.03.1271 19:41:34']
 
-        >>> dec2date(719644.52101, calendar='proleptic_gregorian', ascii = True)
-        '28.04.1971 12:30:15'
-        >>> from date2dec import * # from ufz
+        >>> print(dec2date(719644.52101, calendar='proleptic_gregorian', ascii = True))
+        28.04.1971 12:30:15
         >>> dec = date2dec(ascii='02.03.1910 03:44:55', calendar='decimal')
-        >>> dec2date(dec, calendar='decimal', ascii=True)
-        '02.03.1910 03:44:55'
+        >>> print(dec2date(dec, calendar='decimal', ascii=True))
+        02.03.1910 03:44:55
         >>> dec = date2dec(ascii='02.03.1910 03:44:55', calendar='decimal360')
-        >>> dec2date(dec, calendar='decimal360', ascii=True)
-        '02.03.1910 03:44:55'
-        >>> dec2date([dec,dec], calendar='decimal360', ascii=True)
+        >>> print(dec2date(dec, calendar='decimal360', ascii=True))
+        02.03.1910 03:44:55
+        >>> print(dec2date([dec,dec], calendar='decimal360', ascii=True))
         ['02.03.1910 03:44:55', '02.03.1910 03:44:55']
-        >>> dec2date([[dec,dec],[dec,dec],[dec,dec]], calendar='decimal360', ascii=True)
-        [['02.03.1910 03:44:55', '02.03.1910 03:44:55'], ['02.03.1910 03:44:55', '02.03.1910 03:44:55'], ['02.03.1910 03:44:55', '02.03.1910 03:44:55']]
-        >>> dec2date(np.array([dec,dec]), calendar='decimal360', ascii=True)
-        array(['02.03.1910 03:44:55', '02.03.1910 03:44:55'], 
-              dtype='|S19')
-        >>> dec2date(np.array([[dec,dec],[dec,dec],[dec,dec]]), calendar='decimal360', ascii=True)
-        array([['02.03.1910 03:44:55', '02.03.1910 03:44:55'],
-               ['02.03.1910 03:44:55', '02.03.1910 03:44:55'],
-               ['02.03.1910 03:44:55', '02.03.1910 03:44:55']], 
-              dtype='|S19')
+        >>> print(dec2date([[dec,dec],[dec,dec],[dec,dec]], calendar='decimal360', ascii=True)[0])
+        ['02.03.1910 03:44:55', '02.03.1910 03:44:55']
+        >>> print(dec2date(np.array([dec,dec]), calendar='decimal360', ascii=True))
+        ['02.03.1910 03:44:55' '02.03.1910 03:44:55']
+        >>> print(dec2date(np.array([[dec,dec],[dec,dec],[dec,dec]]), calendar='decimal360', ascii=True)[0:2,0])
+        ['02.03.1910 03:44:55' '02.03.1910 03:44:55']
 
-        >>> absolut = np.array([20070102.0034722, 20070102.0069444, 20070102.0104167, \
-                                20070102.0138889, 20070102.0173611, 20070102.0208333, 20070102.0243056])
-        >>> print dec2date(absolut, units='day as %Y%m%d.%f', ascii=True)
-        ['02.01.2007 00:05:00' '02.01.2007 00:10:00' '02.01.2007 00:15:00'
-         '02.01.2007 00:20:00' '02.01.2007 00:25:00' '02.01.2007 00:30:00'
-         '02.01.2007 00:35:00']
-        >>> absolut = [20070102.0034722, 20070102.0069444, 20070102.0104167, \
-                       20070102.0138889, 20070102.0173611, 20070102.0208333, 20070102.0243056]
-        >>> print dec2date(absolut, units='day as %Y%m%d.%f', ascii=True)
-        ['02.01.2007 00:05:00', '02.01.2007 00:10:00', '02.01.2007 00:15:00', '02.01.2007 00:20:00', '02.01.2007 00:25:00', '02.01.2007 00:30:00', '02.01.2007 00:35:00']
+        >>> absolut = np.array([20070102.0034722, 20070102.0069444])
+        >>> print(dec2date(absolut, units='day as %Y%m%d.%f', ascii=True))
+        ['02.01.2007 00:05:00' '02.01.2007 00:10:00']
+        >>> absolut = [20070102.0034722, 20070102.0069444]
+        >>> print(dec2date(absolut, units='day as %Y%m%d.%f', ascii=True))
+        ['02.01.2007 00:05:00', '02.01.2007 00:10:00']
 
 
         License
@@ -297,7 +274,7 @@ def dec2date(indata, calendar='standard', refdate=None, units=None,
         You should have received a copy of the GNU Lesser General Public License
         along with The UFZ Python library.  If not, see <http://www.gnu.org/licenses/>.
 
-        Copyright 2010-2012 Arndt Piayda, Matthias Cuntz
+        Copyright 2010-2013 Arndt Piayda, Matthias Cuntz
 
 
         History
@@ -310,6 +287,8 @@ def dec2date(indata, calendar='standard', refdate=None, units=None,
                  MC, Jun 2012 - former units keyword is now called refdate
                               - units has now original meaning as in netcdftime
                               - included units='day as %Y%m%d.%f'
+                 MC, Feb 2013 - solved Excel leap year problem.
+                 MC, Feb 2013 - ported to Python 3
     """
 
     #
@@ -413,11 +392,10 @@ def dec2date(indata, calendar='standard', refdate=None, units=None,
             elif refdate != None:
                 unit = 'days since {0:s}'.format(refdate)
             else:
-                unit = 'days since 1900-01-00 00:00:00'
+                unit = 'days since 1900-01-01 00:00:00'
             if excelerr:
-                timeobj = nt.num2date(indata, unit, calendar = 'julian')
-            else:
-                timeobj = nt.num2date(indata, unit, calendar = 'gregorian')
+                indata  = np.where(indata >= 60., indata-1, indata)
+            timeobj = nt.num2date(indata, unit, calendar = 'gregorian')
         elif calendar == 'excel1904':
             if units != None:
                 unit = units
@@ -472,14 +450,14 @@ def dec2date(indata, calendar='standard', refdate=None, units=None,
             fidoy = np.trunc(fdoy)
             idoy  = np.array(fidoy, dtype=np.int)
             month = np.zeros(insize, dtype=np.int)
-            diy   = np.array([ [-9,0, 31, 59, 90,120,151,181,212,243,273,304,334,365], \
+            diy   = np.array([ [-9,0, 31, 59, 90,120,151,181,212,243,273,304,334,365],
                                [-9,0, 31, 60, 91,121,152,182,213,244,274,305,335,366] ])
-            for i in xrange(insize):
+            for i in range(insize):
                 ii = np.squeeze(np.where(idoy[i] > np.squeeze(diy[leap[i],:])))
                 month[i] = ii[-1]
             # days
             fday = np.zeros(insize, dtype=np.float)
-            for i in xrange(insize):
+            for i in range(insize):
                 fday[i] = np.trunc(fdoy[i] - np.float(diy[leap[i],month[i]]))
             day = np.array(fday, dtype=np.int)
             # hours
@@ -505,12 +483,12 @@ def dec2date(indata, calendar='standard', refdate=None, units=None,
             idoy  = np.array(fidoy, dtype=np.int)
             month = np.zeros(insize, dtype=np.int)
             diy   = np.array([ -9, 0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330, 360 ])
-            for i in xrange(insize):
+            for i in range(insize):
                 ii = np.squeeze(np.where(idoy[i] > diy))
                 month[i] = ii[-1]
             # days
             fday = np.zeros(insize, dtype=np.float)
-            for i in xrange(insize):
+            for i in range(insize):
                 fday[i] = np.trunc(fdoy[i] - np.float(diy[month[i]]))
             day = np.array(fday, dtype=np.int)
             # hours
@@ -520,24 +498,24 @@ def dec2date(indata, calendar='standard', refdate=None, units=None,
 
         if (calendar not in ['decimal','decimal360']):
             timeobjfl = timeobj.flatten()
-            year   = np.array([timeobjfl[i].year for i in xrange(insize)], dtype=np.int)
-            month  = np.array([timeobjfl[i].month for i in xrange(insize)], dtype=np.int)
-            day    = np.array([timeobjfl[i].day for i in xrange(insize)], dtype=np.int)
-            hour   = np.array([timeobjfl[i].hour for i in xrange(insize)], dtype=np.int)
-            minute = np.array([timeobjfl[i].minute for i in xrange(insize)], dtype=np.int)
-            second = np.array([timeobjfl[i].second for i in xrange(insize)], dtype=np.int)
+            year   = np.array([timeobjfl[i].year for i in range(insize)], dtype=np.int)
+            month  = np.array([timeobjfl[i].month for i in range(insize)], dtype=np.int)
+            day    = np.array([timeobjfl[i].day for i in range(insize)], dtype=np.int)
+            hour   = np.array([timeobjfl[i].hour for i in range(insize)], dtype=np.int)
+            minute = np.array([timeobjfl[i].minute for i in range(insize)], dtype=np.int)
+            second = np.array([timeobjfl[i].second for i in range(insize)], dtype=np.int)
 
     # Ascii output
     if ascii:
         output = ( ['%02d.%02d.%04d %02d:%02d:%02d' %
-                      (day[i], month[i], year[i], hour[i], minute[i], second[i]) for i in xrange(insize)] )
+                      (day[i], month[i], year[i], hour[i], minute[i], second[i]) for i in range(insize)] )
         output = np.reshape(output, inshape)
         if isarr==0:
             output = output[0]
     # Ascii english output
     elif eng:
         output = ( ['%02d.%02d.%04d %02d:%02d:%02d' %
-                    (day[i], month[i], year[i], hour[i], minute[i], second[i]) for i in xrange(insize)] )
+                    (day[i], month[i], year[i], hour[i], minute[i], second[i]) for i in range(insize)] )
         output = np.reshape(output, inshape)
         if isarr==0:
             output = output[0]
@@ -577,7 +555,7 @@ def dec2date(indata, calendar='standard', refdate=None, units=None,
                 output = [i for i in output]
             elif ns == 2:
                 loutput = [ i for i in output[:,0]]
-                for i in xrange(np.size(output[:,0])):
+                for i in range(np.size(output[:,0])):
                     loutput[i] = list(np.squeeze(output[i,:]))
                 output = loutput
             else:
@@ -589,3 +567,4 @@ def dec2date(indata, calendar='standard', refdate=None, units=None,
 if __name__ == '__main__':
     import doctest
     doctest.testmod()
+

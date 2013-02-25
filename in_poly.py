@@ -49,17 +49,17 @@ def in_poly(P, coord_x, coord_y):
 
         # point inside polygon
         >>> P = [4.,3.]
-        >>> print in_poly(P, coord_x, coord_y)
+        >>> print(in_poly(P, coord_x, coord_y))
         1
 
         # point outside polygon
         >>> P = [8.,6.]
-        >>> print in_poly(P, coord_x, coord_y)
+        >>> print(in_poly(P, coord_x, coord_y))
         -1
 
         # point on edge/vertex of polygon
         >>> P = [2.,2.]
-        >>> print in_poly(P, coord_x, coord_y)
+        >>> print(in_poly(P, coord_x, coord_y))
         0
 
 
@@ -80,13 +80,14 @@ def in_poly(P, coord_x, coord_y):
         You should have received a copy of the GNU Lesser General Public License
         along with The UFZ Python library.  If not, see <http://www.gnu.org/licenses/>.
 
-        Copyright 2012 Juliane Mai, Arndt Piayda, Matthias Cuntz
+        Copyright 2012-2013 Juliane Mai, Arndt Piayda, Matthias Cuntz
 
 
         History
         -------
         Written,  AP, Nov 2012
         Modified, MC, Nov 2012 - documentation change, return 0 immediately
+                  MC, Feb 2013 - ported to Python 3
     """
 
     # ironing :-)
@@ -107,7 +108,7 @@ def in_poly(P, coord_x, coord_y):
     # Edge test
     if np.any((X==0.) & (Y==0.)): return 0
 
-    for i in xrange(n):
+    for i in range(n):
         # vertical Vertex test
         j = (i+1) % n
         if (coord_x[i] == coord_x[j]) and (coord_x[i] == P[0]):
@@ -142,4 +143,5 @@ def in_poly(P, coord_x, coord_y):
 if __name__ == '__main__':
     import doctest
     doctest.testmod()
+
 

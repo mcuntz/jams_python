@@ -58,25 +58,25 @@ def lif(file, noblank=False, comment='', skip=0, maxcol=False):
         >>> file.close()
 
         # Count lines
-        >>> lif(filename)
+        >>> print(lif(filename))
         5
-        >>> lif(filename,noblank=True)
+        >>> print(lif(filename,noblank=True))
         4
-        >>> lif(filename,comment='#')
+        >>> print(lif(filename,comment='#'))
         4
-        >>> lif(filename,comment='#!')
+        >>> print(lif(filename,comment='#!'))
         3
-        >>> lif(filename,comment='#S')
+        >>> print(lif(filename,comment='#S'))
         4
-        >>> lif(filename,comment=('#','L'))
+        >>> print(lif(filename,comment=('#','L')))
         3
-        >>> lif(filename,comment=['#','!'])
+        >>> print(lif(filename,comment=['#','!']))
         3
-        >>> lif(filename,comment='#!',noblank=True)
+        >>> print(lif(filename,comment='#!',noblank=True))
         2
-        >>> lif(filename,skip=2)
+        >>> print(lif(filename,skip=2))
         3
-        >>> lif(filename,skip=2,maxcol=True)
+        >>> print(lif(filename,skip=2,maxcol=True))
         (3, 16)
 
         # Clean up
@@ -101,13 +101,14 @@ def lif(file, noblank=False, comment='', skip=0, maxcol=False):
         You should have received a copy of the GNU Lesser General Public License
         along with The UFZ Python library.  If not, see <http://www.gnu.org/licenses/>.
 
-        Copyright 2009 Matthias Cuntz
+        Copyright 2009-2013 Matthias Cuntz
 
 
         History
         -------
         Written,  MC, Jul 2009
         Modified, MC, Nov 2012 - maxcol
+                  MC, Feb 2013 - ported to Python 3
     """
     # Open file
     try:

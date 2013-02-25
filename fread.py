@@ -101,52 +101,52 @@ def fread(file, nc=0, skip=0, cskip=0, separator='',
 
         >>> # Read sample file in different ways
         >>> # data
-        >>> fread(filename,skip=1)
-        array([[ 1.1,  1.2,  1.3,  1.4],
-               [ 2.1,  2.2,  2.3,  2.4]])
-        >>> fread(filename,skip=2)
-        array([[ 2.1,  2.2,  2.3,  2.4]])
-        >>> fread(filename,skip=1,cskip=1)
-        array([[ 1.2,  1.3,  1.4],
-               [ 2.2,  2.3,  2.4]])
-        >>> fread(filename,nc=2,skip=1,cskip=1)
-        array([[ 1.2,  1.3],
-               [ 2.2,  2.3]])
-        >>> fread(filename,nc=[1,3],skip=1)
-        array([[ 1.2,  1.4],
-               [ 2.2,  2.4]])
-        >>> fread(filename,nc=1,skip=1)
-        array([[ 1.1],
-               [ 2.1]])
-        >>> fread(filename,nc=1,skip=1,reform=True)
-        array([ 1.1,  2.1])
+        >>> from autostring import astr
+        >>> print(astr(fread(filename,skip=1),1,pp=True))
+        [['1.1' '1.2' '1.3' '1.4']
+         ['2.1' '2.2' '2.3' '2.4']]
+        >>> print(astr(fread(filename,skip=2),1,pp=True))
+        [['2.1' '2.2' '2.3' '2.4']]
+        >>> print(astr(fread(filename,skip=1,cskip=1),1,pp=True))
+        [['1.2' '1.3' '1.4']
+         ['2.2' '2.3' '2.4']]
+        >>> print(astr(fread(filename,nc=2,skip=1,cskip=1),1,pp=True))
+        [['1.2' '1.3']
+         ['2.2' '2.3']]
+        >>> print(astr(fread(filename,nc=[1,3],skip=1),1,pp=True))
+        [['1.2' '1.4']
+         ['2.2' '2.4']]
+        >>> print(astr(fread(filename,nc=1,skip=1),1,pp=True))
+        [['1.1']
+         ['2.1']]
+        >>> print(astr(fread(filename,nc=1,skip=1,reform=True),1,pp=True))
+        ['1.1' '2.1']
 
         >>> # header
-        >>> fread(filename,nc=2,skip=1,header=True)
+        >>> print(fread(filename,nc=2,skip=1,header=True))
         ['head1', 'head2']
-        >>> fread(filename,nc=2,skip=1,header=True,full_header=True)
+        >>> print(fread(filename,nc=2,skip=1,header=True,full_header=True))
         ['head1 head2 head3 head4']
-        >>> fread(filename,nc=1,skip=2,header=True)
+        >>> print(fread(filename,nc=1,skip=2,header=True))
         [['head1'], ['1.1']]
-        >>> fread(filename,nc=1,skip=2,header=True,squeeze=True)
+        >>> print(fread(filename,nc=1,skip=2,header=True,squeeze=True))
         ['head1', '1.1']
-        >>> fread(filename,nc=1,skip=2,header=True,strarr=True)
-        array([['head1'],
-               ['1.1']], 
-              dtype='|S5')
+        >>> print(fread(filename,nc=1,skip=2,header=True,strarr=True))
+        [['head1']
+         ['1.1']]
 
         >>> # skip blank lines
         >>> file = open(filename,'a')
         >>> file.writelines('\\n')
         >>> file.writelines('3.1 3.2 3.3 3.4\\n')
         >>> file.close()
-        >>> fread(filename,skip=1)
-        array([[ 1.1,  1.2,  1.3,  1.4],
-               [ 2.1,  2.2,  2.3,  2.4]])
-        >>> fread(filename,skip=1,skip_blank=True)
-        array([[ 1.1,  1.2,  1.3,  1.4],
-               [ 2.1,  2.2,  2.3,  2.4],
-               [ 3.1,  3.2,  3.3,  3.4]])
+        >>> print(astr(fread(filename,skip=1),1,pp=True))
+        [['1.1' '1.2' '1.3' '1.4']
+         ['2.1' '2.2' '2.3' '2.4']]
+        >>> print(astr(fread(filename,skip=1,skip_blank=True),1,pp=True))
+        [['1.1' '1.2' '1.3' '1.4']
+         ['2.1' '2.2' '2.3' '2.4']
+         ['3.1' '3.2' '3.3' '3.4']]
 
         >>> # skip comment lines
         >>> file = open(filename,'a')
@@ -154,60 +154,60 @@ def fread(file, nc=0, skip=0, cskip=0, separator='',
         >>> file.writelines('! Second 2 comment\\n')
         >>> file.writelines('4.1 4.2 4.3 4.4\\n')
         >>> file.close()
-        >>> fread(filename,skip=1)
-        array([[ 1.1,  1.2,  1.3,  1.4],
-               [ 2.1,  2.2,  2.3,  2.4]])
+        >>> print(astr(fread(filename,skip=1),1,pp=True))
+        [['1.1' '1.2' '1.3' '1.4']
+         ['2.1' '2.2' '2.3' '2.4']]
         >>> fread(filename,skip=1,skip_blank=True)
         FREAD: Line has not enough columns to be indexed: # First comment
         >>> fread(filename,skip=1,skip_blank=True,comment='#')
         FREAD: Requested elements not all numbers: ['!', 'Second', '2', 'comment']
-        >>> fread(filename,skip=1,nc=[2],skip_blank=True,comment='#')
-        array([[ 1.3],
-               [ 2.3],
-               [ 3.3],
-               [ 2. ],
-               [ 4.3]])
-        >>> fread(filename,skip=1,skip_blank=True,comment='#!')
-        array([[ 1.1,  1.2,  1.3,  1.4],
-               [ 2.1,  2.2,  2.3,  2.4],
-               [ 3.1,  3.2,  3.3,  3.4],
-               [ 4.1,  4.2,  4.3,  4.4]])
-        >>> fread(filename,skip=1,skip_blank=True,comment=('#','!'))
-        array([[ 1.1,  1.2,  1.3,  1.4],
-               [ 2.1,  2.2,  2.3,  2.4],
-               [ 3.1,  3.2,  3.3,  3.4],
-               [ 4.1,  4.2,  4.3,  4.4]])
-        >>> fread(filename,skip=1,skip_blank=True,comment=['#','!'])
-        array([[ 1.1,  1.2,  1.3,  1.4],
-               [ 2.1,  2.2,  2.3,  2.4],
-               [ 3.1,  3.2,  3.3,  3.4],
-               [ 4.1,  4.2,  4.3,  4.4]])
+        >>> print(astr(fread(filename,skip=1,nc=[2],skip_blank=True,comment='#'),1,pp=True))
+        [['1.3']
+         ['2.3']
+         ['3.3']
+         ['2.0']
+         ['4.3']]
+        >>> print(astr(fread(filename,skip=1,skip_blank=True,comment='#!'),1,pp=True))
+        [['1.1' '1.2' '1.3' '1.4']
+         ['2.1' '2.2' '2.3' '2.4']
+         ['3.1' '3.2' '3.3' '3.4']
+         ['4.1' '4.2' '4.3' '4.4']]
+        >>> print(astr(fread(filename,skip=1,skip_blank=True,comment=('#','!')),1,pp=True))
+        [['1.1' '1.2' '1.3' '1.4']
+         ['2.1' '2.2' '2.3' '2.4']
+         ['3.1' '3.2' '3.3' '3.4']
+         ['4.1' '4.2' '4.3' '4.4']]
+        >>> print(astr(fread(filename,skip=1,skip_blank=True,comment=['#','!']),1,pp=True))
+        [['1.1' '1.2' '1.3' '1.4']
+         ['2.1' '2.2' '2.3' '2.4']
+         ['3.1' '3.2' '3.3' '3.4']
+         ['4.1' '4.2' '4.3' '4.4']]
 
         >>> # fill missing columns
         >>> file = open(filename,'a')
         >>> file.writelines('5.1 5.2\\n')
         >>> file.close()
-        >>> fread(filename,skip=1)
-        array([[ 1.1,  1.2,  1.3,  1.4],
-               [ 2.1,  2.2,  2.3,  2.4]])
+        >>> print(astr(fread(filename,skip=1),1,pp=True))
+        [['1.1' '1.2' '1.3' '1.4']
+         ['2.1' '2.2' '2.3' '2.4']]
         >>> fread(filename,skip=1,skip_blank=True,comment='#!')
         FREAD: Line has not enough columns to be indexed: 5.1 5.2
-        >>> fread(filename,skip=1,skip_blank=True,comment='#!',fill=True,fill_value=-1)
-        array([[ 1.1,  1.2,  1.3,  1.4],
-               [ 2.1,  2.2,  2.3,  2.4],
-               [ 3.1,  3.2,  3.3,  3.4],
-               [ 4.1,  4.2,  4.3,  4.4],
-               [ 5.1,  5.2, -1. , -1. ]])
+        >>> print(astr(fread(filename,skip=1,skip_blank=True,comment='#!',fill=True,fill_value=-1),1,pp=True))
+        [[' 1.1' ' 1.2' ' 1.3' ' 1.4']
+         [' 2.1' ' 2.2' ' 2.3' ' 2.4']
+         [' 3.1' ' 3.2' ' 3.3' ' 3.4']
+         [' 4.1' ' 4.2' ' 4.3' ' 4.4']
+         [' 5.1' ' 5.2' '-1.0' '-1.0']]
 
         >>> # transpose
-        >>> fread(filename,skip=1)
-        array([[ 1.1,  1.2,  1.3,  1.4],
-               [ 2.1,  2.2,  2.3,  2.4]])
-        >>> fread(filename,skip=1,transpose=True)
-        array([[ 1.1,  2.1],
-               [ 1.2,  2.2],
-               [ 1.3,  2.3],
-               [ 1.4,  2.4]])
+        >>> print(astr(fread(filename,skip=1),1,pp=True))
+        [['1.1' '1.2' '1.3' '1.4']
+         ['2.1' '2.2' '2.3' '2.4']]
+        >>> print(astr(fread(filename,skip=1,transpose=True),1,pp=True))
+        [['1.1' '2.1']
+         ['1.2' '2.2']
+         ['1.3' '2.3']
+         ['1.4' '2.4']]
 
         >>> # Create some more data with Nan and Inf
         >>> filename1 = 'test1.dat'
@@ -218,11 +218,11 @@ def fread(file, nc=0, skip=0, cskip=0, separator='',
         >>> file.close()
 
         >>> # Treat Nan and Inf with automatic strip of " and '
-        >>> fread(filename1,skip=1,transpose=True)
-        array([[ 1.1,  2.1],
-               [ 1.2,  nan],
-               [ 1.3,  inf],
-               [ 1.4,  nan]])
+        >>> print(astr(fread(filename1,skip=1,transpose=True),1,pp=True))
+        [['1.1' '2.1']
+         ['1.2' 'nan']
+         ['1.3' 'inf']
+         ['1.4' 'nan']]
 
         >>> # Create some more data with escaped numbers
         >>> filename2 = 'test2.dat'
@@ -233,11 +233,11 @@ def fread(file, nc=0, skip=0, cskip=0, separator='',
         >>> file.close()
 
         >>> # Strip
-        >>> fread(filename2, skip=1, transpose=True, strip='"')
-        array([[ 1.1,  2.1],
-               [ 1.2,  nan],
-               [ 1.3,  inf],
-               [ 1.4,  nan]])
+        >>> print(astr(fread(filename2, skip=1, transpose=True, strip='"'),1,pp=True))
+        [['1.1' '2.1']
+         ['1.2' 'nan']
+         ['1.3' 'inf']
+         ['1.4' 'nan']]
 
         >>> # Clean up doctest
         >>> import os
@@ -263,21 +263,22 @@ def fread(file, nc=0, skip=0, cskip=0, separator='',
         You should have received a copy of the GNU Lesser General Public License
         along with The UFZ Python library.  If not, see <http://www.gnu.org/licenses/>.
 
-        Copyright 2009-2012 Matthias Cuntz
+        Copyright 2009-2013 Matthias Cuntz
 
 
         History
         -------
-        Written, MC, Jul 2009
-                 MC, Apr 2011 - transpose
-                 MC, Jun 2012 - remove quiet
-                 MC, Oct 2012 - treat NaN and Inf
+        Written,  MC, Jul 2009
+        Modified, MC, Apr 2011 - transpose
+                  MC, Jun 2012 - remove quiet
+                  MC, Oct 2012 - treat NaN and Inf
+                  MC, Feb 2013 - ported to Python 3
     """
     #
     # Determine number of lines in file.
     nr = lif(file, skip=skip, noblank=skip_blank, comment=comment)
     if nr <= 0:
-        print "FREAD: Empty file %s." % file
+        print("FREAD: Empty file %s." % file)
         return None
     #
     # Open file
@@ -411,7 +412,7 @@ def fread(file, nc=0, skip=0, cskip=0, separator='',
                     del var[0]
         f.close()
         if transpose:
-            var = np.transpose(var, tuple(reversed(range(np.ndim(var)))))
+            var = np.transpose(var, tuple(reversed(list(range(np.ndim(var))))))
         if strarr:
             var = np.array(var,dtype=np.str)
         return var
@@ -490,13 +491,13 @@ def fread(file, nc=0, skip=0, cskip=0, separator='',
                                 var[iline,m] = np.float(s)
                         except ValueError:
                             f.close()
-                            print 'Tried to convert "%s"  from Line: %s' % (res[i], s)
+                            print('Tried to convert "%s"  from Line: %s' % (res[i], s))
                             raise ValueError('')
                         m += 1
                 var[iline,m:miinc+1] = fill_value
             else:
                 f.close()
-                print 'FREAD: Line has not enough columns to be indexed: %s' % s
+                print('FREAD: Line has not enough columns to be indexed: %s' % s)
                 #raise ValueError('')
                 return None
         else:
@@ -518,7 +519,7 @@ def fread(file, nc=0, skip=0, cskip=0, separator='',
                         var[iline,z] = np.float(s)
                     z += 1
             except ValueError:
-                print 'FREAD: Requested elements not all numbers: %s' % ([res[i] for i in iinc])
+                print('FREAD: Requested elements not all numbers: %s' % ([res[i] for i in iinc]))
                 f.close()
                 #raise ValueError('')
                 return None
@@ -527,7 +528,7 @@ def fread(file, nc=0, skip=0, cskip=0, separator='',
     # remove allocated elements if skip_blank=True or comment!=''
     var = var[0:iline+1,0:nnc]
     if transpose:
-        var = np.transpose(var, tuple(reversed(range(np.ndim(var)))))
+        var = np.transpose(var, tuple(reversed(list(range(np.ndim(var))))))
     if (squeeze or reform):
         var = np.squeeze(var)
     f.close()

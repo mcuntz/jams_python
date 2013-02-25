@@ -107,34 +107,33 @@ def sread(file, nc=0, skip=0, cskip=0, separator='',
 
         >>> # Read sample file in different ways
         >>> # data
-        >>> sread(filename,skip=1)
+        >>> print(sread(filename,skip=1))
         [['1.1', '1.2', '1.3', '1.4'], ['2.1', '2.2', '2.3', '2.4']]
-        >>> sread(filename,skip=2)
+        >>> print(sread(filename,skip=2))
         ['2.1', '2.2', '2.3', '2.4']
-        >>> sread(filename,skip=1,cskip=1)
+        >>> print(sread(filename,skip=1,cskip=1))
         [['1.2', '1.3', '1.4'], ['2.2', '2.3', '2.4']]
-        >>> sread(filename,nc=2,skip=1,cskip=1)
+        >>> print(sread(filename,nc=2,skip=1,cskip=1))
         [['1.2', '1.3'], ['2.2', '2.3']]
-        >>> sread(filename,nc=[1,3],skip=1)
+        >>> print(sread(filename,nc=[1,3],skip=1))
         [['1.2', '1.4'], ['2.2', '2.4']]
-        >>> sread(filename,nc=1,skip=1)
+        >>> print(sread(filename,nc=1,skip=1))
         [['1.1'], ['2.1']]
-        >>> sread(filename,nc=1,skip=1,reform=True)
+        >>> print(sread(filename,nc=1,skip=1,reform=True))
         ['1.1', '2.1']
 
         >>> # header
-        >>> sread(filename,nc=2,skip=1,header=True)
+        >>> print(sread(filename,nc=2,skip=1,header=True))
         ['head1', 'head2']
-        >>> sread(filename,nc=2,skip=1,header=True,full_header=True)
+        >>> print(sread(filename,nc=2,skip=1,header=True,full_header=True))
         ['head1 head2 head3 head4']
-        >>> sread(filename,nc=1,skip=2,header=True)
+        >>> print(sread(filename,nc=1,skip=2,header=True))
         [['head1'], ['1.1']]
-        >>> sread(filename,nc=1,skip=2,header=True,squeeze=True)
+        >>> print(sread(filename,nc=1,skip=2,header=True,squeeze=True))
         ['head1', '1.1']
-        >>> sread(filename,nc=1,skip=2,header=True,squeeze=True,strarr=True)
-        array(['head1', '1.1'], 
-              dtype='|S5')
-        >>> sread(filename,nc=1,skip=2,header=True,squeeze=True,transpose=True)
+        >>> print(sread(filename,nc=1,skip=2,header=True,squeeze=True,strarr=True))
+        ['head1' '1.1']
+        >>> print(sread(filename,nc=1,skip=2,header=True,squeeze=True,transpose=True))
         ['head1', '1.1']
 
         >>> # skip blank lines
@@ -142,22 +141,20 @@ def sread(file, nc=0, skip=0, cskip=0, separator='',
         >>> file.writelines('\\n')
         >>> file.writelines('3.1 3.2 3.3 3.4\\n')
         >>> file.close()
-        >>> sread(filename,skip=1)
+        >>> print(sread(filename,skip=1))
         [['1.1', '1.2', '1.3', '1.4'], ['2.1', '2.2', '2.3', '2.4']]
-        >>> sread(filename,skip=1,skip_blank=True)
+        >>> print(sread(filename,skip=1,skip_blank=True))
         [['1.1', '1.2', '1.3', '1.4'], ['2.1', '2.2', '2.3', '2.4'], ['3.1', '3.2', '3.3', '3.4']]
-        >>> sread(filename,skip=1,strarr=True)
-        array([['1.1', '1.2', '1.3', '1.4'],
-               ['2.1', '2.2', '2.3', '2.4']], 
-              dtype='|S3')
+        >>> print(sread(filename,skip=1,strarr=True))
+        [['1.1' '1.2' '1.3' '1.4']
+         ['2.1' '2.2' '2.3' '2.4']]
 
-        >>> sread(filename,skip=1,strarr=True,transpose=True)
-        array([['1.1', '2.1'],
-               ['1.2', '2.2'],
-               ['1.3', '2.3'],
-               ['1.4', '2.4']], 
-              dtype='|S3')
-        >>> sread(filename,skip=1,transpose=True)
+        >>> print(sread(filename,skip=1,strarr=True,transpose=True))
+        [['1.1' '2.1']
+         ['1.2' '2.2']
+         ['1.3' '2.3']
+         ['1.4' '2.4']]
+        >>> print(sread(filename,skip=1,transpose=True))
         [['1.1', '2.1'], ['1.2', '2.2'], ['1.3', '2.3'], ['1.4', '2.4']]
 
         >>> # skip comment lines
@@ -166,20 +163,20 @@ def sread(file, nc=0, skip=0, cskip=0, separator='',
         >>> file.writelines('! Second second comment\\n')
         >>> file.writelines('4.1 4.2 4.3 4.4\\n')
         >>> file.close()
-        >>> sread(filename,skip=1)
+        >>> print(sread(filename,skip=1))
         [['1.1', '1.2', '1.3', '1.4'], ['2.1', '2.2', '2.3', '2.4']]
         >>> sread(filename,skip=1,skip_blank=True)
         SREAD: Line has not enough columns to be indexed: # First
         >>> sread(filename,skip=1,skip_blank=True,quiet=True)
-        >>> sread(filename,skip=1,skip_blank=True,fill=True,fill_value='M')
+        >>> print(sread(filename,skip=1,skip_blank=True,fill=True,fill_value='M'))
         [['1.1', '1.2', '1.3', '1.4'], ['2.1', '2.2', '2.3', '2.4'], ['3.1', '3.2', '3.3', '3.4'], ['#', 'First', 'M', 'M'], ['!', 'Second', 'second', 'comment'], ['4.1', '4.2', '4.3', '4.4']]
-        >>> sread(filename,skip=1,skip_blank=True,comment='#')
+        >>> print(sread(filename,skip=1,skip_blank=True,comment='#'))
         [['1.1', '1.2', '1.3', '1.4'], ['2.1', '2.2', '2.3', '2.4'], ['3.1', '3.2', '3.3', '3.4'], ['!', 'Second', 'second', 'comment'], ['4.1', '4.2', '4.3', '4.4']]
-        >>> sread(filename,skip=1,skip_blank=True,comment='#!')
+        >>> print(sread(filename,skip=1,skip_blank=True,comment='#!'))
         [['1.1', '1.2', '1.3', '1.4'], ['2.1', '2.2', '2.3', '2.4'], ['3.1', '3.2', '3.3', '3.4'], ['4.1', '4.2', '4.3', '4.4']]
-        >>> sread(filename,skip=1,skip_blank=True,comment=('#','!'))
+        >>> print(sread(filename,skip=1,skip_blank=True,comment=('#','!')))
         [['1.1', '1.2', '1.3', '1.4'], ['2.1', '2.2', '2.3', '2.4'], ['3.1', '3.2', '3.3', '3.4'], ['4.1', '4.2', '4.3', '4.4']]
-        >>> sread(filename,skip=1,skip_blank=True,comment=['#','!'])
+        >>> print(sread(filename,skip=1,skip_blank=True,comment=['#','!']))
         [['1.1', '1.2', '1.3', '1.4'], ['2.1', '2.2', '2.3', '2.4'], ['3.1', '3.2', '3.3', '3.4'], ['4.1', '4.2', '4.3', '4.4']]
 
         >>> # Create some more data with escaped numbers
@@ -189,12 +186,11 @@ def sread(file, nc=0, skip=0, cskip=0, separator='',
         >>> file.writelines('"1.1" "1.2" "1.3" "1.4"\\n')
         >>> file.writelines('2.1 nan Inf "NaN"\\n')
         >>> file.close()
-        >>> sread(filename2,skip=1,strarr=True,transpose=True,strip='"')
-        array([['1.1', '2.1'],
-               ['1.2', 'nan'],
-               ['1.3', 'Inf'],
-               ['1.4', 'NaN']], 
-              dtype='|S3')
+        >>> print(sread(filename2,skip=1,strarr=True,transpose=True,strip='"'))
+        [['1.1' '2.1']
+         ['1.2' 'nan']
+         ['1.3' 'Inf']
+         ['1.4' 'NaN']]
 
         >>> # Clean up doctest
         >>> import os
@@ -219,20 +215,21 @@ def sread(file, nc=0, skip=0, cskip=0, separator='',
         You should have received a copy of the GNU Lesser General Public License
         along with The UFZ Python library.  If not, see <http://www.gnu.org/licenses/>.
 
-        Copyright 2009-2012 Matthias Cuntz
+        Copyright 2009-2013 Matthias Cuntz
 
 
         History
         -------
-        Written, MC, Jul 2009
-                 MC, Feb 2012 - transpose
+        Written,  MC, Jul 2009
+        Modified, MC, Feb 2012 - transpose
+                  MC, Feb 2013 - ported to Python 3
     """
     #
     # Determine number of lines in file.
     nr = lif(file, skip=skip, noblank=skip_blank, comment=comment)
     if nr <= 0:
         if not quiet:
-            print "SREAD: Empty file %s." % file
+            print("SREAD: Empty file %s." % file)
         return None
     #
     # Open file
@@ -240,7 +237,7 @@ def sread(file, nc=0, skip=0, cskip=0, separator='',
         f = open(file, 'r')
     except IOError:
         if not quiet:
-            print "SREAD: Cannot open file %s for reading." % file
+            print("SREAD: Cannot open file %s for reading." % file)
         return None
     #
     # Read header and Skip lines
@@ -324,8 +321,8 @@ def sread(file, nc=0, skip=0, cskip=0, separator='',
                                 var.append(fill_value)
                         else:
                             if not quiet:
-                                print ('SREAD: First header line has not enough '
-                                       'columns to be indexed: %s' % head[0])
+                                print(('SREAD: First header line has not enough '
+                                       'columns to be indexed: %s' % head[0]))
                             f.close()
                             return None
                     else:
@@ -351,8 +348,8 @@ def sread(file, nc=0, skip=0, cskip=0, separator='',
                                     htmp.append(fill_value)
                             else:
                                 if not quiet:
-                                    print ('FREAD: Header line has not enough '
-                                           'columns to be indexed: %s' % head[k])
+                                    print(('FREAD: Header line has not enough '
+                                           'columns to be indexed: %s' % head[k]))
                                 f.close()
                                 return None
                         else:
@@ -368,11 +365,11 @@ def sread(file, nc=0, skip=0, cskip=0, separator='',
                     del var[0]
         f.close()
         if (transpose & (np.ndim(var) > 1)):
-            var = np.transpose(var, tuple(reversed(range(np.ndim(var)))))
+            var = np.transpose(var, tuple(reversed(list(range(np.ndim(var))))))
             if not strarr:
                 nn   = np.size(var,axis=0)
-                lvar = range(nn)
-                for i in xrange(nn):
+                lvar = list(range(nn))
+                for i in range(nn):
                     lvar[i] = list(var[i,:])
                 var = lvar
         if strarr:
@@ -395,8 +392,8 @@ def sread(file, nc=0, skip=0, cskip=0, separator='',
                     var.append(fill_value)
             else:
                 if not quiet:
-                    print ('SREAD: First line has not enough '
-                           'columns to be indexed: %s' % s)
+                    print(('SREAD: First line has not enough '
+                           'columns to be indexed: %s' % s))
                 f.close()
                 return None
         else:
@@ -420,8 +417,8 @@ def sread(file, nc=0, skip=0, cskip=0, separator='',
                     tmp.append(fill_value)
             else:
                 if not quiet:
-                    print ('SREAD: Line has not enough '
-                           'columns to be indexed: %s' % s)
+                    print(('SREAD: Line has not enough '
+                           'columns to be indexed: %s' % s))
                 f.close()
                 return None
         else:
@@ -459,8 +456,8 @@ def sread(file, nc=0, skip=0, cskip=0, separator='',
                         tmp.append(fill_value)
                 else:
                     if not quiet:
-                        print ('SREAD: Line has not enough '
-                               'columns to be indexed: %s' % s)
+                        print(('SREAD: Line has not enough '
+                               'columns to be indexed: %s' % s))
                     f.close()
                     return None
             else:
@@ -476,11 +473,11 @@ def sread(file, nc=0, skip=0, cskip=0, separator='',
         del var[0]
     f.close()
     if (transpose & (np.ndim(var) > 1)):
-        var = np.transpose(var, tuple(reversed(range(np.ndim(var)))))
+        var = np.transpose(var, tuple(reversed(list(range(np.ndim(var))))))
         if not strarr:
             nn   = np.size(var,axis=0)
-            lvar = range(nn)
-            for i in xrange(nn):
+            lvar = list(range(nn))
+            for i in range(nn):
                 lvar[i] = list(var[i,:])
             var = lvar
     if strarr:

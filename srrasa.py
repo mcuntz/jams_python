@@ -1,14 +1,14 @@
 #!/usr/bin/env python
 import numpy as np
 
-def srrasa(xy,strata=5,n=3,plot=False):
+def srrasa(xy, strata=5, n=3, plot=False):
     """       
         Generates stratified random 2D points within a given rectangular area.
         
         
         Definition
         ----------
-        def srrasa(xy,strata=5,n=3,plot=False):
+        def srrasa(xy, strata=5, n=3, plot=False):
         
         
         Input
@@ -33,13 +33,18 @@ def srrasa(xy,strata=5,n=3,plot=False):
                              
         Examples
         --------
-        # since the result are random numbers no doctest can be performed.
-        # Therefor you find only an example calling sequence here:
-        rand_xy = srrasa([652219.,652290.,5772970.,5773040.],
-                          strata=4, n=3, plot=True)
-        ->  gives you within the rectangle of the given coordinates 16 (4**2)
-            stratas with 3 random points in each one.
-        
+        >>> # seed for reproducible results in doctest
+        >>> np.random.seed(1)
+        >>> # gives within the rectangle of the given coordinates
+        >>> # 16 (4**2) stratas with 3 random points in each one.
+        >>> rand_xy = srrasa([652219.,652290.,5772970.,5773040.], strata=4, n=3, plot=False)
+        >>> from autostring import astr
+        >>> print(astr(rand_xy[0:4,0:2],6,pp=True))
+        [['6.522264e+05' '5.772975e+06']
+         ['6.522318e+05' '5.772973e+06']
+         ['6.522190e+05' '5.772972e+06']
+         ['6.522401e+05' '5.772979e+06']]
+
         
         License
         -------
@@ -59,7 +64,7 @@ def srrasa(xy,strata=5,n=3,plot=False):
         along with The UFZ Python library.  If not,
         see <http://www.gnu.org/licenses/>.
     
-        Copyright 2012 Arndt Piayda
+        Copyright 2012-2013 Arndt Piayda, Matthias Cuntz
     
     
         History
@@ -67,7 +72,8 @@ def srrasa(xy,strata=5,n=3,plot=False):
         Written,  AP, Nov 2012
         Modified, MC, Nov 2012 - default plot=False
                   AP, Dec 2012 - documentation change
-        
+                  MC, Feb 2013 - docstring
+                  MC, Feb 2013 - ported to Python 3
     """
     
     # calculate strata steps
@@ -80,14 +86,10 @@ def srrasa(xy,strata=5,n=3,plot=False):
     rand_xy = np.empty((strata**2*n,2))
     
     # throw random points in each strata
-    for j in xrange(strata):
-        for i in xrange(strata):
-            rand_xy[i*n+strata*n*j:(i+1)*n+strata*n*j,0] = (xsteps[i+1] - \
-                                                xsteps[i])*np.random.random(n)\
-                                                + xsteps[i]
-            rand_xy[i*n+strata*n*j:(i+1)*n+strata*n*j,1] = (ysteps[j+1] - \
-                                                ysteps[j])*np.random.random(n)\
-                                                + ysteps[j]
+    for j in range(strata):
+        for i in range(strata):
+            rand_xy[i*n+strata*n*j:(i+1)*n+strata*n*j,0] = (xsteps[i+1] - xsteps[i])*np.random.random(n) + xsteps[i]
+            rand_xy[i*n+strata*n*j:(i+1)*n+strata*n*j,1] = (ysteps[j+1] - ysteps[j])*np.random.random(n) + ysteps[j]
     
     # plot stratas and random points within
     if plot:
@@ -104,7 +106,7 @@ def srrasa(xy,strata=5,n=3,plot=False):
         sub = fig.add_subplot(111, aspect='equal')
         sub.set_xlim(xy[0],xy[1])
         sub.set_ylim(xy[2],xy[3])
-        for i in xrange(strata):
+        for i in range(strata):
             sub.axhline(y=ysteps[i], color=(166/256., 206/256., 227/256.))
             sub.axvline(x=xsteps[i], color=(166/256., 206/256., 227/256.))
         sub.scatter(rand_xy[:,0],rand_xy[:,1],marker='+', s=60,
@@ -163,14 +165,19 @@ def srrasa_trans(xy,strata=5,n=3,num=3,rl=0.5,silent=True,plot=False):
                              
         Examples
         --------
-        # since the result are random numbers no doctest can be performed.
-        # Therefor you find only an example calling sequence here:
-        rand_xy = srrasa_trans([652219.,652290.,5772970.,5773040.], strata=4,
-                                n=3, num=5, rl=0.5, silent=True, plot=True)
-        ->  gives you within the rectangle of the given coordinates 16 (4**2)
-            stratas with 3 random transects in each one. Each transect is
-            0.5*width_of_strata long and contains 5 points logarithmical
-            distributed.
+        >>> # seed for reproducible results in doctest
+        >>> np.random.seed(1)
+        >>> # gives within the rectangle of the given coordinates
+        >>> # 16 (4**2) stratas with 3 random transects in each one.
+        >>> # Each transect is 0.5*width_of_strata long and contains 5 points logarithmical distributed.
+        >>> rand_xy = srrasa_trans([652219.,652290.,5772970.,5773040.], strata=4,
+        ...                        n=3, num=5, rl=0.5, silent=True, plot=False)
+        >>> from autostring import astr
+        >>> print(astr(rand_xy[0:4,0:2],6,pp=True))
+        [['6.522264e+05' '5.772983e+06']
+         ['6.522276e+05' '5.772983e+06']
+         ['6.522292e+05' '5.772983e+06']
+         ['6.522315e+05' '5.772983e+06']]
         
         
         License
@@ -191,14 +198,14 @@ def srrasa_trans(xy,strata=5,n=3,num=3,rl=0.5,silent=True,plot=False):
         along with The UFZ Python library.  If not,
         see <http://www.gnu.org/licenses/>.
     
-        Copyright 2009-2012 Matthias Cuntz
+        Copyright 2012-2013 Arndt Piayda, Matthias Cuntz
     
     
         History
         -------
-        Written, Arndt Piayda, Nov 2012
-        Modified, Arndt Piayda, Dec 2012 - documentation change
-
+        Written,  AP, Nov 2012
+        Modified, AP, Dec 2012 - documentation change
+                  MC, Feb 2013 - ported to Python 3
     """
     
     # calculate strata steps 
@@ -212,9 +219,9 @@ def srrasa_trans(xy,strata=5,n=3,num=3,rl=0.5,silent=True,plot=False):
     rand_xy = np.empty((strata**2*n*num,2))
     
     o = 0
-    for j in xrange(strata):
-        for i in xrange(strata):
-            for k in xrange(n):
+    for j in range(strata):
+        for i in range(strata):
+            for k in range(n):
                 
                 goon = True
                 it = 0
@@ -233,22 +240,22 @@ def srrasa_trans(xy,strata=5,n=3,num=3,rl=0.5,silent=True,plot=False):
                     angle = 360 * np.random.random(1)
                     
                     # rotate transect to random angle               
-                    seedx_trans = -(seedy-seedy[0])*np.sin(np.deg2rad(angle))+\
-                                   (seedx-seedx[0])*np.cos(np.deg2rad(angle))+\
-                                    seedx[0]
-                    seedy_trans =  (seedy-seedy[0])*np.cos(np.deg2rad(angle))+\
-                                   (seedx-seedx[0])*np.sin(np.deg2rad(angle))+\
-                                    seedy[0]
+                    seedx_trans = (-(seedy-seedy[0])*np.sin(np.deg2rad(angle))+
+                                    (seedx-seedx[0])*np.cos(np.deg2rad(angle))+
+                                     seedx[0])
+                    seedy_trans =  ((seedy-seedy[0])*np.cos(np.deg2rad(angle))+
+                                    (seedx-seedx[0])*np.sin(np.deg2rad(angle))+
+                                     seedy[0])
                     
                     # test if transect is in strata
-                    if ((seedx_trans>xsteps[i]).all()) &\
-                       ((seedx_trans<xsteps[i+1]).all()) &\
-                       ((seedy_trans>ysteps[j]).all()) &\
-                       ((seedy_trans<ysteps[j+1]).all()):
+                    if (((seedx_trans>xsteps[i]).all()) &
+                        ((seedx_trans<xsteps[i+1]).all()) &
+                        ((seedy_trans>ysteps[j]).all()) &
+                        ((seedy_trans<ysteps[j+1]).all())):
                         goon = False
                     
                     if not silent:
-                        print 'strata= (', i, ',', j, ')', ' it= ', it
+                        print('strata= (', i, ',', j, ')', ' it= ', it)
                     it += 1
 
                 rand_xy[o:o+num,0] = seedx_trans
@@ -270,7 +277,7 @@ def srrasa_trans(xy,strata=5,n=3,num=3,rl=0.5,silent=True,plot=False):
         sub = fig.add_subplot(111, aspect='equal')
         sub.set_xlim(xy[0],xy[1])
         sub.set_ylim(xy[2],xy[3])
-        for i in xrange(strata):
+        for i in range(strata):
             sub.axhline(y=ysteps[i], color=(166/256., 206/256., 227/256.))
             sub.axvline(x=xsteps[i], color=(166/256., 206/256., 227/256.))
         sub.scatter(rand_xy[:,0],rand_xy[:,1],marker='+', s=60,
@@ -287,3 +294,8 @@ def srrasa_trans(xy,strata=5,n=3,num=3,rl=0.5,silent=True,plot=False):
         plt.show()
 
     return rand_xy
+
+
+if __name__ == '__main__':
+    import doctest
+    doctest.testmod()

@@ -2,10 +2,10 @@
 import numpy as np
 import netcdftime as nt
 
-def date2dec(calendar = 'standard', units = False,
-             excelerr = True, yr = 0001,
-             mo = 01, dy = 01, hr = 00,
-             mi = 00, sc = 00, ascii = None, eng = None):
+def date2dec(calendar = 'standard', units=False,
+             excelerr = True, yr=1,
+             mo=1, dy=1, hr=0, mi=0, sc=0,
+             ascii=None, eng=None):
     """
         Converts numpy arrays with calendar date into
         numpy arrays with decimal date. Supported calendar
@@ -26,10 +26,10 @@ def date2dec(calendar = 'standard', units = False,
 
         Definition
         ----------
-        def date2dec(calendar = 'standard', units = False,
-             excelerr = True, yr = None,
-             mo = None, dy = None, hr = None,
-             mi = None, sc = None, ascii = None, eng = None):
+        def date2dec(calendar = 'standard', units=False,
+                     excelerr = True, yr=1,
+                     mo=1, dy=1, hr=0, mi=0, sc=0,
+                     ascii=None, eng=None):
 
 
         Input
@@ -140,136 +140,100 @@ def date2dec(calendar = 'standard', units = False,
         >>> minute = np.array([30,15,20,35,41,8,3,0])
         >>> second = np.array([15,10,40,50,34,37,41,0])
         >>> decimal = date2dec(calendar = 'standard', yr=year, mo=month, dy=day, hr=hour, mi=minute, sc=second)
-        >>> print np.round(decimal, 8)
-        [ 2451549.02100694  2382262.17719907  2316600.93101852  2272848.10821759
-          2185367.32053241  1947385.96431713  1144563.3358912         0.        ]
-        >>> decimal = date2dec(calendar = 'standard', yr = year, mo = 06, dy = 15, hr = 12, mi = minute, sc = second)
-        >>> print np.round(decimal, 8)
-        [  2.45171102e+06   2.38231401e+06   2.31657101e+06   2.27275102e+06
-           2.18545603e+06   1.94731301e+06   1.14449400e+06   1.66000000e+02]
+        >>> from autostring import astr
+        >>> nn = year.size
+        >>> print(astr(decimal[:nn/2],14,pp=True))
+        ['2.45154902100694e+06' '2.38226217719907e+06' '2.31660093101852e+06' '2.27284810821759e+06']
+        >>> print(astr(decimal[nn/2:],14,pp=True))
+        ['2.18536732053241e+06' '1.94738596431713e+06' '1.14456333589120e+06' '0.00000000000000e+00']
+        >>> decimal = date2dec(calendar='standard', yr=year, mo=6, dy=15, hr=12, mi=minute, sc=second)
+        >>> print(astr(decimal[:nn/2],14,pp=True))
+        ['2.45171102100694e+06' '2.38231401053241e+06' '2.31657101435185e+06' '2.27275102488426e+06']
+        >>> print(astr(decimal[nn/2:],14,pp=True))
+        ['2.18545602886574e+06' '1.94731300598380e+06' '1.14449400255787e+06' '1.66000000000000e+02']
 
-        >>> a = np.array(['05.01.2000 12:30:15',\
-                              '24.04.1810 16:15:10',\
-                              '15.07.1630 10:20:40',\
-                              '20.09.1510 14:35:50',\
-                              '18.03.1271 19:41:34',\
-                              '27.08. 619 11:08:37',\
-                              '23.08.-1579 20:03:41',\
-                              '01.01.-4712 12:00:00'])
-        >>> decimal = date2dec(calendar = 'standard', ascii = a)
-        >>> print np.round(decimal, 8)
-        [ 2451549.02100694  2382262.17719907  2316600.93101852  2272848.10821759
-          2185367.32053241  1947385.96431713  1144563.3358912         0.        ]
+        # ascii input
+        >>> a = np.array(['05.01.2000 12:30:15', '24.04.1810 16:15:10', '15.07.1630 10:20:40',  '20.09.1510 14:35:50',
+        ...               '18.03.1271 19:41:34', '27.08. 619 11:08:37', '23.08.-1579 20:03:41', '01.01.-4712 12:00:00'])
+        >>> decimal = date2dec(calendar='standard', ascii=a)
+        >>> nn = a.size
+        >>> print(astr(decimal[:nn/2],14,pp=True))
+        ['2.45154902100694e+06' '2.38226217719907e+06' '2.31660093101852e+06' '2.27284810821759e+06']
+        >>> print(astr(decimal[nn/2:],14,pp=True))
+        ['2.18536732053241e+06' '1.94738596431713e+06' '1.14456333589120e+06' '0.00000000000000e+00']
 
-        #calendar = 'julian'
-        >>> b = np.array(['05.01.2000 12:30:15',\
-                          '24.04.1810 16:15:10',\
-                          '05.07.1630 10:20:40',\
-                          '20.09.1510 14:35:50',\
-                          '18.03.1271 19:41:34',\
-                          '27.08. 619 11:08:37',\
-                          '23.08.-1579 20:03:41',\
-                          '01.01.-4712 12:00:00'])
-        >>> decimal = date2dec(calendar = 'julian', ascii = b)
-        >>> print np.round(decimal, 8)
-        [ 2451562.02100694  2382274.17719907  2316600.93101852  2272848.10821759
-          2185367.32053241  1947385.96431713  1144563.3358912         0.        ]
+        # calendar = 'julian'
+        >>> decimal = date2dec(calendar='julian', ascii=a)
+        >>> print(astr(decimal[:nn/2],14,pp=True))
+        ['2.45156202100694e+06' '2.38227417719907e+06' '2.31661093101852e+06' '2.27284810821759e+06']
+        >>> print(astr(decimal[nn/2:],14,pp=True))
+        ['2.18536732053241e+06' '1.94738596431713e+06' '1.14456333589120e+06' '0.00000000000000e+00']
 
         # calendar = 'proleptic_gregorian'
-        >>> c = ['27.04.1971 12:30:15', '27.02.0986 12:30:15', '30.07.0493 22:20:40',\
-                 '01.01.0301 00:00:00']
-        >>> decimal = date2dec(calendar = 'proleptic_gregorian', ascii = c)
-        >>> from autostring import astr
-        >>> print astr(np.array(decimal), 5)
-        ['719643.52101' '359821.52101' '179910.93102' '109572.00000']
+        >>> decimal = date2dec(calendar='proleptic_gregorian', ascii=a)
+        >>> print(astr(decimal[:nn/2],14,pp=True))
+        ['730123.52100694458932' '660836.67719907406718' '595175.43101851828396' '551412.60821759235114']
+        >>> print(astr(decimal[nn/2:],14,pp=True))
+        [' 4.63934820532408e+05' ' 2.25957464317130e+05' '-5.76848164108796e+05' '-1.72138750000000e+06']
 
-        #calendar = 'excel1900' WITH excelerr = True -> 1900
-        #considered as leap year
-        >>> d = np.array(['05.01.2000 12:30:15',\
-                          '27.05.1950 16:25:10',\
-                          '13.08.1910 10:40:55',\
-                          '01.03.1900 00:00:00',\
-                          '29.02.1900 00:00:00',\
-                          '28.02.1900 00:00:00',\
-                          '01.01.1900 00:00:00'])
-        >>> decimal = date2dec(calendar = 'excel1900', ascii = d)
-        >>> print np.round(decimal, 8)
-        [  3.65305210e+04   1.84106841e+04   3.87844508e+03   6.10000000e+01
-           6.00000000e+01   5.90000000e+01   1.00000000e+00]
+        # calendar = 'excel1900' WITH excelerr=True -> 1900 considered as leap year
+        >>> d = np.array(['05.01.2000 12:30:15', '27.05.1950 16:25:10', '13.08.1910 10:40:55',
+        ...               '01.03.1900 00:00:00', '29.02.1900 00:00:00', '28.02.1900 00:00:00',
+        ...               '01.01.1900 00:00:00'])
+        >>> decimal = date2dec(calendar='excel1900', ascii=d)
+        >>> nn = d.size
+        >>> print(astr(decimal[:nn/2],14,pp=True))
+        ['36529.52100694458932' '18409.68414351856336' ' 3877.44508101837710']
+        >>> print(astr(decimal[nn/2:],14,pp=True))
+        ['60.00000000000000' '59.00000000000000' '58.00000000000000' ' 0.00000000000000']
 
-        #calendar = 'excel1900' WITH excelerr = False -> 1900
-        #considered as NO leap year
-        >>> e = np.array(['06.01.2000 12:30:15',\
-                          '28.05.1950 16:25:10',\
-                          '14.08.1910 10:40:55',\
-                          '02.03.1900 00:00:00',\
-                          '01.03.1900 00:00:00',\
-                          '28.02.1900 00:00:00',\
-                          '01.01.1900 00:00:00'])
-        >>> decimal = date2dec(calendar = 'excel1900', ascii = e, excelerr = False)
-        >>> print np.round(decimal, 8)
-        [  3.65305210e+04   1.84106841e+04   3.87844508e+03   6.10000000e+01
-           6.00000000e+01   5.90000000e+01   1.00000000e+00]
+        # calendar = 'excel1900' WITH excelerr = False -> 1900 considered as NO leap year
+        >>> decimal = date2dec(calendar='excel1900', ascii=d, excelerr=False)
+        >>> print(astr(decimal[:nn/2],14,pp=True))
+        ['36528.52100694458932' '18408.68414351856336' ' 3876.44508101837710']
+        >>> print(astr(decimal[nn/2:],14,pp=True))
+        ['59.00000000000000' '59.00000000000000' '58.00000000000000' ' 0.00000000000000']
 
-        #calendar = 'excel1904'
-        >>> f = np.array(['06.01.2004 12:30:15',\
-                          '28.05.1954 16:25:10',\
-                          '14.08.1914 10:40:55',\
-                          '02.03.1904 00:00:00',\
-                          '01.03.1904 00:00:00',\
-                          '29.02.1904 00:00:00',\
-                          '01.01.1904 00:00:00'])
-        >>> decimal = date2dec(calendar = 'excel1904', ascii = f)
-        >>> print np.round(decimal, 8)
-        [ 36530.52100694  18410.68414352   3878.44508102     61.             60.
-             59.              0.        ]
-        >>> decimal = date2dec(calendar = 'excel1904', ascii = f, units = '1890-01-01 00:00:00')
-        >>> print np.round(decimal, 8)
-        [ 41642.52100694  23522.68414352   8990.44508102   5173.           5172.
-           5171.           5112.        ]
+        # calendar = 'excel1904'
+        >>> decimal = date2dec(calendar='excel1904', ascii=d[:nn/2])
+        >>> print(astr(decimal[:nn/2],14,pp=True))
+        ['35068.52100694458932' '16948.68414351856336' ' 2416.44508101837710']
 
-        #calendar = '365_day'
-        >>> g = np.array(['18.08.1972 12:30:15',\
-                          '25.10. 986 12:30:15',\
-                          '28.11. 493 22:20:40',\
-                          '01.01.   1 00:00:00'])
-        >>> decimal = date2dec(calendar = '365_day', ascii = g)
-        >>> print np.round(decimal, 8)
-        [ 719644.52100694  359822.52100694  179911.93101852       0.        ]
+        # calendar = '365_day'
+        >>> g = np.array(['18.08.1972 12:30:15', '25.10.0986 12:30:15', '28.11.0493 22:20:40', '01.01.0001 00:00:00'])
+        >>> decimal = date2dec(calendar='365_day', ascii=g)
+        >>> nn = d.size
+        >>> print(astr(decimal[:nn],14,pp=True))
+        ['719644.52100694458932' '359822.52100694435649' '179911.93101851851679' '     0.00000000000000']
 
-        #calendar = '366_day'
-        >>> h = np.array(['29.03.1967 12:30:15',\
-                          '14.02. 984 12:30:15',\
-                          '24.07. 492 22:20:40',\
-                          '01.01.   1 00:00:00'])
-        >>> decimal = date2dec(calendar = '366_day', ascii = h)
-        >>> print np.round(decimal, 8)
-        [ 719644.52100694  359822.52100694  179911.93101852       0.        ]
+        # calendar = '366_day'
+        >>> decimal = date2dec(calendar='366_day', ascii=g)
+        >>> print(astr(decimal[:nn],14,pp=True))
+        ['721616.52100694458932' '360808.52100694435649' '180404.93101851851679' '     0.00000000000000']
 
-        # 350_day does not work with netcdftime.py version equal or below 0.9.2
-        #calendar = '360_day'
-        #>>> k = np.array(['05.01.2000 12:30:15',\
-        #                  '03.07.1000 12:30:15',\
-        #                  '02.10. 500 22:20:40',\
-        #                  '01.01.   1 00:00:00'])
-        #>>> decimal = date2dec(calendar = '360_day', ascii = k)
-        #>>> print np.round(decimal, 8)
-        #[ 719644.52100694  359822.52100694  179911.93101852       0.        ]
+        # 360_day does not work with netcdftime.py version equal or below 0.9.2
+        # calendar = '360_day'
+        >>> decimal = date2dec(calendar='360_day', ascii=g)
+        >>> print(astr(decimal[:nn],14,pp=True))
+        ['709787.52100694458932' '354894.52100694435649' '177447.93101851851679' '     0.00000000000000']
 
-        >>> date2dec(yr=1992, mo=01, dy=26, hr=02, mi=00, sc=00, calendar='decimal')
-       	1992.068533707632
-        >>> date2dec(ascii='26.01.1992 02:00', calendar='decimal360')
-       	1992.0696759359257
-        >>> date2dec(ascii=['26.01.1992 02:00','26.01.1992 02:00'], calendar='decimal360')
-       	[1992.0696759359257, 1992.0696759359257]
-        >>> date2dec(yr=[1992,1992], mo=01, dy=26, hr=02, mi=00, sc=00, calendar='decimal360')
-       	[1992.0696759359257, 1992.0696759359257]
-        >>> date2dec(yr=np.array([1992,1992]), mo=01, dy=26, hr=02, mi=00, sc=00, calendar='decimal360')
-       	array([ 1992.06967594,  1992.06967594])
-        >>> date2dec(ascii=[['26.01.1992 02:00','26.01.1992 02:00'], \
-                            ['26.01.1992 02:00','26.01.1992 02:00'], \
-                            ['26.01.1992 02:00','26.01.1992 02:00']], calendar='decimal360')
-       	[[1992.0696759359257, 1992.0696759359257], [1992.0696759359257, 1992.0696759359257], [1992.0696759359257, 1992.0696759359257]]
+        >>> print(astr(date2dec(yr=1992, mo=1, dy=26, hr=2, mi=0, sc=0, calendar='decimal'),14,pp=True))
+       	1992.06853370763201
+        >>> print(astr(date2dec(ascii='26.01.1992 02:00', calendar='decimal360'),14,pp=True))
+       	1992.06967593592572
+        >>> print(astr(date2dec(ascii=['26.01.1992 02:00','26.01.1992 02:00'], calendar='decimal360'),14,pp=True))
+        ['1992.06967593592572' '1992.06967593592572']
+        >>> print(astr(date2dec(yr=[1992,1992], mo=1, dy=26, hr=2, mi=0, sc=0, calendar='decimal360'),14,pp=True))
+        ['1992.06967593592572' '1992.06967593592572']
+        >>> print(astr(date2dec(yr=np.array([1992,1992]), mo=1, dy=26, hr=2, mi=0, sc=0, calendar='decimal360'),
+        ...            14,pp=True))
+        ['1992.06967593592572' '1992.06967593592572']
+        >>> print(astr(date2dec(ascii=[['26.01.1992 02:00','26.01.1992 02:00'],
+        ...                            ['26.01.1992 02:00','26.01.1992 02:00'],
+        ...                            ['26.01.1992 02:00','26.01.1992 02:00']], calendar='decimal360'),14,pp=True))
+        [['1992.06967593592572' '1992.06967593592572']
+         ['1992.06967593592572' '1992.06967593592572']
+         ['1992.06967593592572' '1992.06967593592572']]
 
 
         License
@@ -289,7 +253,7 @@ def date2dec(calendar = 'standard', units = False,
         You should have received a copy of the GNU Lesser General Public License
         along with The UFZ Python library.  If not, see <http://www.gnu.org/licenses/>.
 
-        Copyright 2010-2012 Arndt Piayda, Matthias Cuntz
+        Copyright 2010-2013 Arndt Piayda, Matthias Cuntz
 
 
         History
@@ -301,6 +265,8 @@ def date2dec(calendar = 'standard', units = False,
                  MC, Dec 2012 - change unit of proleptic_gregorian
                                 from 'days since 0001-01-01 00:00:00'
                                 to   'days since 0001-01-00 00:00:00'
+                 MC, Feb 2013 - solved Excel leap year problem.
+                 MC, Feb 2013 - ported to Python 3
     """
 
     #
@@ -328,6 +294,7 @@ def date2dec(calendar = 'standard', units = False,
         if isarr == 0: ascii = np.array([ascii])
         else: ascii = np.array(ascii)
         insize   = ascii.size
+        outsize  = insize
         outshape = ascii.shape
         asciifl  = ascii.flatten()
         timeobj  = np.zeros(insize, dtype=object)
@@ -339,7 +306,7 @@ def date2dec(calendar = 'standard', units = False,
         hr = np.zeros(insize, dtype=np.int)
         mi = np.zeros(insize, dtype=np.int)
         sc = np.zeros(insize, dtype=np.int)
-        for i in xrange(insize):
+        for i in range(insize):
             aa      = asciifl[i].split('.')
             dy[i]   = int(aa[0])
             mo[i]   = int(aa[1])
@@ -362,6 +329,7 @@ def date2dec(calendar = 'standard', units = False,
             raise ValueError("date2dec error: eng input is list > 2D; Use array input")
         eng = np.array(eng)
         insize   = eng.size
+        outsize  = insize
         outshape = eng.shape
         engfl    = eng.flatten()
         timeobj  = np.zeros(insize, dtype=object)
@@ -373,7 +341,7 @@ def date2dec(calendar = 'standard', units = False,
         hr = np.zeros(insize, dtype=np.int)
         mi = np.zeros(insize, dtype=np.int)
         sc = np.zeros(insize, dtype=np.int)
-        for i in xrange(np.size(eng)):
+        for i in range(insize):
             ee      = engfl[i].split('-')
             yr[i]   = int(ee[0])
             mo[i]   = int(ee[1])
@@ -457,7 +425,7 @@ def date2dec(calendar = 'standard', units = False,
         outsize = max(insize)
         timeobj = np.zeros(outsize, dtype=object)
         # datetime object is constructed
-        for i in xrange(outsize):
+        for i in range(outsize):
             timeobj[i] = nt.datetime(indate[0][i], indate[1][i], indate[2][i], indate[3][i], indate[4][i], indate[5][i])
     # depending on chosen calendar and optional set of the time units
     # decimal date is calculated
@@ -471,11 +439,15 @@ def date2dec(calendar = 'standard', units = False,
         if units == False: units = '0001-01-01 00:00:00'
         output = nt.date2num(timeobj,'days since %s' % (units), calendar='proleptic_gregorian')
     elif calendar == 'excel1900':
-        if units == False: units = '1900-01-00 00:00:00'
+        if units == False: units = '1900-01-01 00:00:00'
+        output = nt.date2num(timeobj,'days since %s' % (units), calendar='gregorian')
         if excelerr:
-            output = nt.date2num(timeobj,'days since %s' % (units), calendar='julian')
-        else:
-            output = nt.date2num(timeobj,'days since %s' % (units), calendar='gregorian')
+            output = np.where(output >= 59., output+1., output)
+            # date2num treats 29.02.1900 as 01.03.1990, i.e. is the same decimal number
+            if np.any((output >= 60.) & (output < 61.)):
+                for i in range(outsize):
+                    if (timeobj[i].year==1900) & (timeobj[i].month==2) & (timeobj[i].day==29):
+                        output[i] -= 1.
     elif calendar == 'excel1904':
         if units == False: units = '1904-01-01 00:00:00'
         output = nt.date2num(timeobj,'days since %s' % (units), calendar='gregorian')
@@ -492,9 +464,9 @@ def date2dec(calendar = 'standard', units = False,
         ntime = np.size(yr)
         leap  = np.array((((yr%4)==0) & ((yr%100)!=0)) | ((yr%400)==0))
         tdy   = np.array(dy, dtype=np.float)
-        diy   = np.array([ [-9,0, 31, 59, 90,120,151,181,212,243,273,304,334,365], \
+        diy   = np.array([ [-9,0, 31, 59, 90,120,151,181,212,243,273,304,334,365],
                            [-9,0, 31, 60, 91,121,152,182,213,244,274,305,335,366] ])
-        for i in xrange(ntime):
+        for i in range(ntime):
             tdy[i] = tdy[i] + np.array(diy[leap[i],mo[i]], dtype=np.float)
         days_year = 365.
         output    = ( np.array(yr, dtype=np.float) +
@@ -508,7 +480,7 @@ def date2dec(calendar = 'standard', units = False,
         ntime = np.size(yr)
         tdy   = np.array(dy, dtype=np.float)
         diy   = np.array([-9,  0, 30, 60, 90,120,150,180,210,240,270,300,330,360])
-        for i in xrange(ntime):
+        for i in range(ntime):
             tdy[i] = tdy[i] + np.array(diy[mo[i]], dtype=np.float)
         days_year = 360.
         output    = ( np.array(yr, dtype=np.float) +
@@ -533,7 +505,7 @@ def date2dec(calendar = 'standard', units = False,
                 output = [i for i in output]
             else:
                 loutput = [ i for i in output[:,0]]
-                for i in xrange(np.size(output[:,0])):
+                for i in range(np.size(output[:,0])):
                     loutput[i] = list(np.squeeze(output[i,:]))
                 output = loutput
 
@@ -543,3 +515,4 @@ def date2dec(calendar = 'standard', units = False,
 if __name__ == '__main__':
     import doctest
     doctest.testmod()
+

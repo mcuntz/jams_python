@@ -41,11 +41,12 @@ def dewpoint(pres, Celsius=False):
         >>> Ta = 20. + 273.15
         >>> from esat import * # from ufz
         >>> es = esat(Ta, formula='Buck_original')
-        >>> print dewpoint(es)
-        293.15
+        >>> from autostring import astr
+        >>> print(astr(dewpoint(es),3,pp=True))
+        293.150
         
-        >>> print dewpoint(es, Celsius=True)
-        20.0
+        >>> print(astr(dewpoint(es, Celsius=True),3,pp=True))
+        20.000
 
 
         License
@@ -65,12 +66,13 @@ def dewpoint(pres, Celsius=False):
         You should have received a copy of the GNU Lesser General Public License
         along with The UFZ Python library.  If not, see <http://www.gnu.org/licenses/>.
         
-        Copyright 2012 Matthias Cuntz
+        Copyright 2012-2013 Matthias Cuntz
 
         
         History
         -------
-        Written, MC, Jan 2012
+        Written,  MC, Jan 2012
+        Modified, MC, Feb 2013 - ported to Python 3
     """
     pw = 611.21
     c1 = 240.97
@@ -87,3 +89,4 @@ def dewpoint(pres, Celsius=False):
 if __name__ == '__main__':
     import doctest
     doctest.testmod()
+

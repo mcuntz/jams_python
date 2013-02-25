@@ -66,18 +66,15 @@ def savitzky_golay(y, window, order, deriv=0, rate=1):
        >>> np.random.seed(1)
        >>> t = np.linspace(-4, 4, 10)
        >>> y = np.exp( -t**2 ) + np.random.normal(0, 0.05, t.shape)
-       >>> print savitzky_golay(y, window=3, order=1)
-       [ 0.0067223   0.01048351  0.02186601  0.32004949  0.56168932  0.60865232
-         0.31034614  0.08045836 -0.00911575  0.00652022]
+       >>> from autostring import astr
+       >>> print(astr(savitzky_golay(y, window=3, order=1),3,pp=True))
+       [' 0.007' ' 0.010' ' 0.022' ' 0.320' ' 0.562' ' 0.609' ' 0.310' ' 0.080' '-0.009' ' 0.007']
 
-       >>> from autostring import *
-       >>> print astr(savitzky_golay(y, 3, 1, deriv=1), 8)
-       [' 0.00000000' '-0.05022950' ' 0.07294506' ' 0.44163340' ' 0.29515649'
-        '-0.30388564' '-0.36828562' '-0.12011968' ' 0.00921248' ' 0.00000000']
+       >>> print(astr(savitzky_golay(y, 3, 1, deriv=1),3,pp=True))
+       [' 0.000' '-0.050' ' 0.073' ' 0.442' ' 0.295' '-0.304' '-0.368' '-0.120' ' 0.009' ' 0.000']
 
-       >>> print astr(savitzky_golay(y, 3, 1, deriv=1, rate=10), 8)
-       [' 0.00000000' '-0.50229497' ' 0.72945061' ' 4.41633401' ' 2.95156495'
-        '-3.03885643' '-3.68285622' '-1.20119683' ' 0.09212482' ' 0.00000000']
+       >>> print(astr(savitzky_golay(y, 3, 1, deriv=1, rate=10),3,pp=True))
+       [' 0.000' '-0.502' ' 0.729' ' 4.416' ' 2.952' '-3.039' '-3.683' '-1.201' ' 0.092' ' 0.000']
 
 
        License
@@ -97,25 +94,26 @@ def savitzky_golay(y, window, order, deriv=0, rate=1):
        You should have received a copy of the GNU Lesser General Public License
        along with The UFZ Python library.  If not, see <http://www.gnu.org/licenses/>.
 
-       Copyright 2012 Matthias Cuntz
+       Copyright 2012-2013 Matthias Cuntz
 
 
        History
        -------
-       Written, MC, Oct 2012 - from SciPy cookbook: http://www.scipy.org/Cookbook/SavitzkyGolay
+       Written,  MC, Oct 2012 - from SciPy cookbook: http://www.scipy.org/Cookbook/SavitzkyGolay
+       Modified, MC, Feb 2013 - ported to Python 3
     """
     #
     # Check input
     try:
         window = np.abs(np.int(window))
         order  = np.abs(np.int(order))
-    except ValueError, msg:
+    except ValueError as msg:
         raise ValueError("window and order have to be of type int")
     if window % 2 != 1 or window < 1:
         raise TypeError("window size must be a positive odd number")
     if window < order + 2:
         raise TypeError("window is too small for the polynomials order")
-    order_range = range(order+1)
+    order_range = list(range(order+1))
     half_window = (window-1) // 2
     #
     # precompute coefficients (m)
@@ -216,30 +214,30 @@ def savitzky_golay2d(z, window, order, deriv=None):
        >>> X, Y = np.meshgrid(x,y)
        >>> Z = np.exp( -(X**2+Y**2))
        >>> Zn = Z + np.random.normal(0, 0.2, Z.shape)
-       >>> from autostring import *
-       >>> print astr(sg2d(Zn, window=3, order=2), 8)
-       [[' 0.07980947' ' 0.05211804' '-0.10551094' '-0.16506245' ' 0.16105317']
-        ['-0.20426342' ' 0.17009221' ' 0.66354671' ' 0.18103661' ' 0.04756387']
-        [' 0.11059771' '-0.22965185' ' 0.09383012' '-0.17015538' ' 0.23954209']]
+       >>> from autostring import astr
+       >>> print(astr(sg2d(Zn, window=3, order=2),3,pp=True))
+       [[' 0.080' ' 0.052' '-0.106' '-0.165' ' 0.161']
+        ['-0.204' ' 0.170' ' 0.664' ' 0.181' ' 0.048']
+        [' 0.111' '-0.230' ' 0.094' '-0.170' ' 0.240']]
 
        >>> s2 = sg2d( Zn, 3, 2, deriv=1)
-       >>> print astr(s2[0], 8)
-       [[' 0.15577951' ' 0.04649446' '-0.04612122' ' 0.06501884' ' 0.25715001']
-        [' 0.30484864' ' 0.08679688' '-0.00702995' '-0.05463381' ' 0.23040468']
-        [' 0.30484864' ' 0.12564873' '-0.03918197' '-0.15848258' ' 0.12036621']]
+       >>> print(astr(s2[0],3,pp=True))
+       [[' 0.156' ' 0.046' '-0.046' ' 0.065' ' 0.257']
+        [' 0.305' ' 0.087' '-0.007' '-0.055' ' 0.230']
+        [' 0.305' ' 0.126' '-0.039' '-0.158' ' 0.120']]
 
        >>> s3 = sg2d( Zn, 3, 2, deriv='both')
-       >>> if np.any(s2[0]!=s3[0]): print 'Error 01'
-       >>> if np.any(s2[1]!=s3[1]): print 'Error 02'
+       >>> if np.any(s2[0]!=s3[0]): print('Error 01')
+       >>> if np.any(s2[1]!=s3[1]): print('Error 02')
 
        >>> s2 = sg2d( Zn, 3, 2, deriv=2)
-       >>> print astr(s2, 8)
-       [['-0.06945119' ' 0.50998980' ' 0.63791906' ' 0.44568577' ' 0.12792925']
-        ['-0.10196687' '-0.04682891' '-0.01845718' ' 0.03876769' ' 0.02683618']
-        [' 0.55571728' ' 0.25086864' ' 0.00000000' ' 0.09216819' ' 0.11135048']]
+       >>> print(astr(s2,3,pp=True))
+       [['-0.069' ' 0.510' ' 0.638' ' 0.446' ' 0.128']
+        ['-0.102' '-0.047' '-0.018' ' 0.039' ' 0.027']
+        [' 0.556' ' 0.251' ' 0.000' ' 0.092' ' 0.111']]
 
        >>> s3 = sg2d( Zn, 3, 2, deriv='col')
-       >>> if np.any(s2!=s3): print 'Error 03'
+       >>> if np.any(s2!=s3): print('Error 03')
 
 
        License
@@ -259,13 +257,14 @@ def savitzky_golay2d(z, window, order, deriv=None):
        You should have received a copy of the GNU Lesser General Public License
        along with The UFZ Python library.  If not, see <http://www.gnu.org/licenses/>.
 
-       Copyright 2012 Matthias Cuntz
+       Copyright 2012-2013 Matthias Cuntz
 
 
        History
        -------
        Written,  MC, Oct 2012 - from SciPy cookbook: http://www.scipy.org/Cookbook/SavitzkyGolay
        Modified, MC, Nov 2012 - replaced fftconvolve by convolve because of crash on Mac
+                 MC, Feb 2013 - ported to Python 3
     """
     #
     # number of terms in the polynomial expression
@@ -441,3 +440,4 @@ if __name__ == '__main__':
 
     # s3 = sg2d( Zn, 3, 2, deriv='col')
     # if np.any(s2!=s3): print 'Error 03'
+

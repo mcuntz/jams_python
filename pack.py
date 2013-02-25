@@ -37,10 +37,10 @@ def pack(array, mask):
         # for example an island in the middle of an ocean
         >>> import numpy as np
         >>> a = np.array([[ 0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.],
-        ...        [ 0.,  0.,  0.,  1.,  1.,  1.,  0.,  0.,  0.,  0.],
-        ...        [ 0.,  0.,  0.,  1.,  1.,  1.,  0.,  0.,  0.,  0.],
-        ...        [ 0.,  0.,  0.,  1.,  1.,  1.,  0.,  0.,  0.,  0.],
-        ...        [ 0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.]])
+        ...               [ 0.,  0.,  0.,  1.,  1.,  1.,  0.,  0.,  0.,  0.],
+        ...               [ 0.,  0.,  0.,  1.,  1.,  1.,  0.,  0.,  0.,  0.],
+        ...               [ 0.,  0.,  0.,  1.,  1.,  1.,  0.,  0.,  0.,  0.],
+        ...               [ 0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.]])
         >>> nn = list(np.shape(a))
         >>> nn.insert(0,2)
         >>> a3 = np.empty(nn)
@@ -50,20 +50,20 @@ def pack(array, mask):
         # Mask
         >>> mask = a == 1.0
         >>> b = pack(a, mask)
-        >>> print sum(b)
+        >>> print(sum(b))
         9.0
-        >>> print a.sum()
+        >>> print(a.sum())
         9.0
-        >>> b
-        array([ 1.,  1.,  1.,  1.,  1.,  1.,  1.,  1.,  1.])
+        >>> print(b)
+        [ 1.  1.  1.  1.  1.  1.  1.  1.  1.]
         >>> b3 = pack(a3, mask)
-        >>> print a3.sum()
+        >>> print(a3.sum())
         18.0
-        >>> print b3.sum()
+        >>> print(b3.sum())
         18.0
-        >>> b3
-        array([[ 1.,  1.,  1.,  1.,  1.,  1.,  1.,  1.,  1.],
-               [ 1.,  1.,  1.,  1.,  1.,  1.,  1.,  1.,  1.]])
+        >>> print(b3)
+        [[ 1.  1.  1.  1.  1.  1.  1.  1.  1.]
+         [ 1.  1.  1.  1.  1.  1.  1.  1.  1.]]
 
 
         License
@@ -83,12 +83,13 @@ def pack(array, mask):
         You should have received a copy of the GNU Lesser General Public License
         along with The UFZ Python library.  If not, see <http://www.gnu.org/licenses/>.
 
-        Copyright 2009 Matthias Cuntz
+        Copyright 2009-2013 Matthias Cuntz
         
 
         History
         -------
-        Written, MC, Jul. 2009
+        Written,  MC, Jul 2009
+        Modified, MC, Feb 2013 - ported to Python 3
     """
     dmask   = mask.shape
     ndmask  = np.ndim(mask)
@@ -110,7 +111,7 @@ def pack(array, mask):
     farray = array.ravel() # flat in Fortran=column-major mode
     fmask  = mask.ravel()
     afmask = np.empty(narray, dtype=np.bool)
-    nn = narray / nmask
+    nn = narray // nmask
     k  = 0
     while k < nn:
         afmask[k*nmask:(k+1)*nmask] = fmask[:]
@@ -160,3 +161,4 @@ if __name__ == '__main__':
     # b3
     # #array([[ 1.,  1.,  1.,  1.,  1.,  1.,  1.,  1.,  1.],
     # #       [ 1.,  1.,  1.,  1.,  1.,  1.,  1.,  1.,  1.]])
+

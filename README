@@ -1,10 +1,12 @@
-
 This is the PYTHON library of the
 
 Department Computational Hydrosystems
 Helmholtz Centre for Environmental Research - UFZ
 Permoserstr. 15
 04318 Leipzig, Germany
+
+Created June 2009, Copyright 2009-2013 UFZ CHS
+Contact Matthias Cuntz - mc (at) macu.de
 
 
 The library has to be in your Python path. For example in bash:
@@ -24,7 +26,7 @@ Python prompt:
 >>> help(ufz)
 
 The individual functions also provide their help as doctrings.
-Getting, for example, help on fread for reading ascii files:
+Getting, for example, help on fread for reading floats from ascii files:
 >>> import ufz
 >>> help(ufz.fread)
 
@@ -43,8 +45,11 @@ The above wiki will be printed to a PDF file from time to time, which is provide
 Be aware that the current PDF is not always up to date.
 
 
-Created June 2009, Copyright 2009-2012 UFZ CHS
-Contact Matthias Cuntz - mc (at) macu.de
+The Library is compatible with Python 2 and 3 (> 2.6).
+Note that not all packages use by the library are already Python 3 ready.
+
+
+UFZ routines are free software and come with ABSOLUTELY NO WARRANTY.'
 
 
 License

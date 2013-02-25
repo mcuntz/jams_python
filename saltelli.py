@@ -48,56 +48,26 @@ def saltelli(params, nbase, lhs=False, nskip=1):
         Examples
         --------
         >>> import numpy as np
-        >>> params = np.array([[  1.00000000e+00,   1.00000000e+06], \
-                               [  1.00000000e+00,   2.00000000e+01]])
+        >>> params = np.array([[  1.00000000e+00,   1.00000000e+06],
+        ...                    [  1.00000000e+00,   2.00000000e+01]])
         >>> nbase = 10
+        >>> # seed for reproducible results in doctest
+        >>> np.random.seed(1)
         >>> out = saltelli(params, nbase)
-        >>> print out
-        [[  1.00000000e+00   5.00000500e+05   7.50000250e+05   2.50000750e+05
-            3.75000625e+05   8.75000125e+05   6.25000375e+05   1.25000875e+05
-            1.87500812e+05   6.87500312e+05   1.00000000e+00   5.00000500e+05
-            7.50000250e+05   2.50000750e+05   6.25000375e+05   1.25000875e+05
-            3.75000625e+05   8.75000125e+05   3.12500688e+05   8.12500188e+05
-            1.00000000e+00   5.00000500e+05   7.50000250e+05   2.50000750e+05
-            3.75000625e+05   8.75000125e+05   6.25000375e+05   1.25000875e+05
-            1.87500812e+05   6.87500312e+05   1.00000000e+00   5.00000500e+05
-            7.50000250e+05   2.50000750e+05   6.25000375e+05   1.25000875e+05
-            3.75000625e+05   8.75000125e+05   3.12500688e+05   8.12500188e+05]
-         [  1.00000000e+00   1.05000000e+01   5.75000000e+00   1.52500000e+01
-            8.12500000e+00   1.76250000e+01   3.37500000e+00   1.28750000e+01
-            6.93750000e+00   1.64375000e+01   1.00000000e+00   1.05000000e+01
-            5.75000000e+00   1.52500000e+01   3.37500000e+00   1.28750000e+01
-            8.12500000e+00   1.76250000e+01   1.40625000e+01   4.56250000e+00
-            1.00000000e+00   1.05000000e+01   5.75000000e+00   1.52500000e+01
-            3.37500000e+00   1.28750000e+01   8.12500000e+00   1.76250000e+01
-            1.40625000e+01   4.56250000e+00   1.00000000e+00   1.05000000e+01
-            5.75000000e+00   1.52500000e+01   8.12500000e+00   1.76250000e+01
-            3.37500000e+00   1.28750000e+01   6.93750000e+00   1.64375000e+01]]
+        >>> from autostring import astr
+        >>> print(astr(out[0:2,0:4],3,pp=True))
+        [['     1.000' '500000.500' '750000.250' '250000.750']
+         ['     1.000' '    10.500' '     5.750' '    15.250']]
 
         >>> out = saltelli(params, nbase, nskip=2)
-        >>> print out
-        [[  5.00000500e+05   7.50000250e+05   2.50000750e+05   3.75000625e+05
-            8.75000125e+05   6.25000375e+05   1.25000875e+05   1.87500812e+05
-            6.87500312e+05   9.37500062e+05   5.00000500e+05   7.50000250e+05
-            2.50000750e+05   6.25000375e+05   1.25000875e+05   3.75000625e+05
-            8.75000125e+05   3.12500688e+05   8.12500188e+05   5.62500438e+05
-            5.00000500e+05   7.50000250e+05   2.50000750e+05   3.75000625e+05
-            8.75000125e+05   6.25000375e+05   1.25000875e+05   1.87500812e+05
-            6.87500312e+05   9.37500062e+05   5.00000500e+05   7.50000250e+05
-            2.50000750e+05   6.25000375e+05   1.25000875e+05   3.75000625e+05
-            8.75000125e+05   3.12500688e+05   8.12500188e+05   5.62500438e+05]
-         [  1.05000000e+01   5.75000000e+00   1.52500000e+01   8.12500000e+00
-            1.76250000e+01   3.37500000e+00   1.28750000e+01   6.93750000e+00
-            1.64375000e+01   2.18750000e+00   1.05000000e+01   5.75000000e+00
-            1.52500000e+01   3.37500000e+00   1.28750000e+01   8.12500000e+00
-            1.76250000e+01   1.40625000e+01   4.56250000e+00   1.88125000e+01
-            1.05000000e+01   5.75000000e+00   1.52500000e+01   3.37500000e+00
-            1.28750000e+01   8.12500000e+00   1.76250000e+01   1.40625000e+01
-            4.56250000e+00   1.88125000e+01   1.05000000e+01   5.75000000e+00
-            1.52500000e+01   8.12500000e+00   1.76250000e+01   3.37500000e+00
-            1.28750000e+01   6.93750000e+00   1.64375000e+01   2.18750000e+00]]
+        >>> print(astr(out[0:2,0:4],3,pp=True))
+        [['500000.500' '750000.250' '250000.750' '375000.625']
+         ['    10.500' '     5.750' '    15.250' '     8.125']]
 
         >>> out = saltelli(params, nbase, nskip=2, lhs=True)
+        >>> print(astr(out[0:2,0:4],3,pp=True))
+        [['341702.859' '872032.577' '500011.937' '930233.327']
+         ['     1.796' '     6.102' '    16.588' '     4.568']]
 
 
         License
@@ -117,12 +87,13 @@ def saltelli(params, nbase, lhs=False, nskip=1):
         You should have received a copy of the GNU Lesser General Public License
         along with The UFZ Python library.  If not, see <http://www.gnu.org/licenses/>.
 
-        Copyright 2012 Matthias Cuntz
+        Copyright 2012-2013 Matthias Cuntz
 
 
         History
         -------
-        Written, MC, May 2012
+        Written,  MC, May 2012
+        Modified, MC, Feb 2013 - ported to Python 3
     """
     #
     # Check input
@@ -140,29 +111,29 @@ def saltelli(params, nbase, lhs=False, nskip=1):
     if lhs:
         import scipy.stats as stats
         from lhs import lhs # from ufz
-        dist = [stats.uniform     for i in xrange(nparams)]
-        pars = [(zoff[i],zmul[i]) for i in xrange(nparams)]
+        dist = [stats.uniform     for i in range(nparams)]
+        pars = [(zoff[i],zmul[i]) for i in range(nparams)]
         dist = dist + dist # 2*nparams
         pars = pars + pars
         lat  = lhs(dist, pars, nbase)
-        for i in xrange(nparams):
+        for i in range(nparams):
             pA[i,:] = lat[i,:]
             pB[i,:] = lat[i+nparams,:]
     else:
         import sobol
         sob = sobol.i4_sobol_generate(2*nparams,nbase,nskip)
-        for i in xrange(nparams):
+        for i in range(nparams):
             pA[i,:] = zoff[i] + zmul[i]*sob[i,:]
             pB[i,:] = zoff[i] + zmul[i]*sob[i+nparams,:]
     # The C sample is nparams the B sammple
-    pC = np.array([pB for i in xrange(nparams)])
+    pC = np.array([pB for i in range(nparams)])
     # where on each repeat one column is replaced by the column of A
-    for i in xrange(nparams):
+    for i in range(nparams):
         pC[i,i,:] = pA[i,:]
 
     # Reshape so that one can do runs over 2nd dim and then use ufz.sobol_index
     pout = np.empty((nparams,nso))
-    for i in xrange(nparams):
+    for i in range(nparams):
         pout[i,:] = np.concatenate((pA[i,:],pB[i,:],np.ravel(pC[:,i,:])))
 
     return pout
@@ -180,3 +151,4 @@ if __name__ == '__main__':
     # print out
     # out = saltelli(params, nbase, nskip=2,lhs=True)
     # print out
+

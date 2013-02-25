@@ -87,43 +87,37 @@ def nee2gpp(dates, nee, t, isday, rg=False, vpd=False, undef=np.nan,
         >>> isday = np.where(rg > 10., True, False)
         >>> tt    = np.where(tair == undef, undef, tair+273.15)
         >>> GPP, Reco = nee2gpp(dates, NEE, tt, isday, undef=undef, method='local')
-        >>> print GPP[1120:1128]
-        [ -9.99900000e+03  -9.99900000e+03  -9.99900000e+03   4.49101620e+00
-           8.39556274e+00   1.06881053e+01   8.54233665e+00   1.12707122e+01]
-        >>> print Reco[1120:1128]
-        [ 1.78172209  1.90616886  2.07856924  2.2560362   2.46373274  2.70757535
-          2.95064665  3.2184422 ]
+        >>> from autostring import astr
+        >>> print(astr(GPP[1120:1128],3,pp=True))
+        ['-9999.000' '-9999.000' '-9999.000' '    4.491' '    8.396' '   10.688' '    8.542' '   11.271']
+        >>> print(astr(Reco[1120:1128],3,pp=True))
+        ['1.782' '1.906' '2.079' '2.256' '2.464' '2.708' '2.951' '3.218']
         >>> GPP, Reco = nee2gpp(dates, NEE, tt, isday, undef=undef, method='local')
-        >>> print GPP[1120:1128]
-        [ -9.99900000e+03  -9.99900000e+03  -9.99900000e+03   4.49101620e+00
-           8.39556274e+00   1.06881053e+01   8.54233665e+00   1.12707122e+01]
+        >>> print(astr(GPP[1120:1128],3,pp=True))
+        ['-9999.000' '-9999.000' '-9999.000' '    4.491' '    8.396' '   10.688' '    8.542' '   11.271']
         >>> GPP, Reco = nee2gpp(dates, NEE, tt, isday, undef=undef, method='global')
-        >>> print GPP[1120:1128]
-        [ -9.99900000e+03  -9.99900000e+03  -9.99900000e+03   4.33166157e+00
-           8.18228013e+00   1.04092252e+01   8.19395317e+00   1.08427448e+01]
+        >>> print(astr(GPP[1120:1128],3,pp=True))
+        ['-9999.000' '-9999.000' '-9999.000' '    4.332' '    8.182' '   10.409' '    8.194' '   10.843']
         >>> GPP, Reco = nee2gpp(dates, NEE, tt, isday, undef=undef, method='local', masked=True)
-        >>> print GPP[1120:1128]
-        [-- -- -- 4.49101619818 8.39556273706 10.6881053462 8.54233664766
-         11.2707121977]
+        >>> print(astr(GPP[1120:1128],3,pp=True))
+        ['--    ' '--    ' '--    ' ' 4.491' ' 8.396' '10.688' ' 8.542' '11.271']
         >>> GPP, Reco = nee2gpp(dates, NEE, tt, isday, undef=undef, method='local', shape=(np.size(NEE),1))
-        >>> print GPP[1120:1128]
-        [[ -9.99900000e+03]
-         [ -9.99900000e+03]
-         [ -9.99900000e+03]
-         [  4.49101620e+00]
-         [  8.39556274e+00]
-         [  1.06881053e+01]
-         [  8.54233665e+00]
-         [  1.12707122e+01]]
+        >>> print(astr(GPP[1120:1128],3,pp=True))
+        [['-9999.000']
+         ['-9999.000']
+         ['-9999.000']
+         ['    4.491']
+         ['    8.396']
+         ['   10.688']
+         ['    8.542']
+         ['   11.271']]
         >>> VPD = np.squeeze(dat[8,:])
         >>> vpd = np.where(VPD == undef, undef, VPD*100.)
         >>> GPP, Reco = nee2gpp(dates, NEE, tt, isday, rg, vpd, undef=undef, method='day')
-        >>> print GPP[1120:1128]
-        [ -9.99900000e+03  -9.99900000e+03  -9.99900000e+03   2.89693618e+00
-           6.77103400e+00   9.06351370e+00   6.95696901e+00   9.77798943e+00]
-        >>> print Reco[1120:1128]
-        [ 0.35174817  0.42088838  0.53124809  0.66195618  0.839204    1.0829837
-          1.36527901  1.72571943]
+        >>> print(astr(GPP[1120:1128],3,pp=True))
+        ['-9999.000' '-9999.000' '-9999.000' '    2.897' '    6.771' '    9.064' '    6.957' '    9.778']
+        >>> print(astr(Reco[1120:1128],3,pp=True))
+        ['0.352' '0.421' '0.531' '0.662' '0.839' '1.083' '1.365' '1.726']
 
 
         License
@@ -143,14 +137,15 @@ def nee2gpp(dates, nee, t, isday, rg=False, vpd=False, undef=np.nan,
         You should have received a copy of the GNU Lesser General Public License
         along with The UFZ Python library.  If not, see <http://www.gnu.org/licenses/>.
 
-        Copyright 2012 Matthias Cuntz, Arndt Piayda
+        Copyright 2012-2013 Matthias Cuntz, Arndt Piayda
 
 
         History
         -------
         Written  MC, Mar 2012
         Modified AP, Mar 2012 - undef=np.nan
-        Modified MC, Nov 2012 - wrapper for individual routines nee2gpp_reichstein etc.
+                 MC, Nov 2012 - wrapper for individual routines nee2gpp_reichstein etc.
+                 MC, Feb 2013 - ported to Python 3
     """
 
     # Global relationship in Reichstein et al. (2005)
@@ -232,9 +227,9 @@ def nee2gpp_global(dates, nee, t, isday, undef=np.nan,
         >>> isday = np.where(rg > 10., True, False)
         >>> tt    = np.where(tair == undef, undef, tair+273.15)
         >>> GPP, Reco = nee2gpp(dates, NEE, tt, isday, undef=undef, method='global')
-        >>> print GPP[1120:1128]
-        [ -9.99900000e+03  -9.99900000e+03  -9.99900000e+03   4.33166157e+00
-           8.18228013e+00   1.04092252e+01   8.19395317e+00   1.08427448e+01]
+        >>> from autostring import astr
+        >>> print(astr(GPP[1120:1128],3,pp=True))
+        ['-9999.000' '-9999.000' '-9999.000' '    4.332' '    8.182' '   10.409' '    8.194' '   10.843']
 
 
         License
@@ -254,14 +249,15 @@ def nee2gpp_global(dates, nee, t, isday, undef=np.nan,
         You should have received a copy of the GNU Lesser General Public License
         along with The UFZ Python library.  If not, see <http://www.gnu.org/licenses/>.
 
-        Copyright 2012 Matthias Cuntz, Arndt Piayda
+        Copyright 2012-2013 Matthias Cuntz, Arndt Piayda
 
 
         History
         -------
         Written  MC, Mar 2012
         Modified AP, Mar 2012 - undef=np.nan
-        Modified MC, Nov 2012 - individual routine
+                 MC, Nov 2012 - individual routine
+                 MC, Feb 2013 - ported to Python 3
     """
 
     # Checks
@@ -397,30 +393,27 @@ def nee2gpp_reichstein(dates, nee, t, isday, rg=False, vpd=False, undef=np.nan,
         >>> isday = np.where(rg > 10., True, False)
         >>> tt    = np.where(tair == undef, undef, tair+273.15)
         >>> GPP, Reco = nee2gpp(dates, NEE, tt, isday, undef=undef, method='local')
-        >>> print GPP[1120:1128]
-        [ -9.99900000e+03  -9.99900000e+03  -9.99900000e+03   4.49101620e+00
-           8.39556274e+00   1.06881053e+01   8.54233665e+00   1.12707122e+01]
-        >>> print Reco[1120:1128]
-        [ 1.78172209  1.90616886  2.07856924  2.2560362   2.46373274  2.70757535
-          2.95064665  3.2184422 ]
+        >>> from autostring import astr
+        >>> print(astr(GPP[1120:1128],3,pp=True))
+        ['-9999.000' '-9999.000' '-9999.000' '    4.491' '    8.396' '   10.688' '    8.542' '   11.271']
+        >>> print(astr(Reco[1120:1128],3,pp=True))
+        ['1.782' '1.906' '2.079' '2.256' '2.464' '2.708' '2.951' '3.218']
         >>> GPP, Reco = nee2gpp(dates, NEE, tt, isday, undef=undef, method='Reichstein')
-        >>> print GPP[1120:1128]
-        [ -9.99900000e+03  -9.99900000e+03  -9.99900000e+03   4.49101620e+00
-           8.39556274e+00   1.06881053e+01   8.54233665e+00   1.12707122e+01]
+        >>> print(astr(GPP[1120:1128],3,pp=True))
+        ['-9999.000' '-9999.000' '-9999.000' '    4.491' '    8.396' '   10.688' '    8.542' '   11.271']
         >>> GPP, Reco = nee2gpp(dates, NEE, tt, isday, undef=undef, method='local', masked=True)
-        >>> print GPP[1120:1128]
-        [-- -- -- 4.49101619818 8.39556273706 10.6881053462 8.54233664766
-         11.2707121977]
+        >>> print(astr(GPP[1120:1128],3,pp=True))
+        ['--    ' '--    ' '--    ' ' 4.491' ' 8.396' '10.688' ' 8.542' '11.271']
         >>> GPP, Reco = nee2gpp(dates, NEE, tt, isday, undef=undef, method='local', shape=(np.size(NEE),1))
-        >>> print GPP[1120:1128]
-        [[ -9.99900000e+03]
-         [ -9.99900000e+03]
-         [ -9.99900000e+03]
-         [  4.49101620e+00]
-         [  8.39556274e+00]
-         [  1.06881053e+01]
-         [  8.54233665e+00]
-         [  1.12707122e+01]]
+        >>> print(astr(GPP[1120:1128],3,pp=True))
+        [['-9999.000']
+         ['-9999.000']
+         ['-9999.000']
+         ['    4.491']
+         ['    8.396']
+         ['   10.688']
+         ['    8.542']
+         ['   11.271']]
 
 
         License
@@ -440,14 +433,15 @@ def nee2gpp_reichstein(dates, nee, t, isday, rg=False, vpd=False, undef=np.nan,
         You should have received a copy of the GNU Lesser General Public License
         along with The UFZ Python library.  If not, see <http://www.gnu.org/licenses/>.
 
-        Copyright 2012 Matthias Cuntz, Arndt Piayda
+        Copyright 2012-2013 Matthias Cuntz, Arndt Piayda
 
 
         History
         -------
         Written  MC, Mar 2012
         Modified AP, Mar 2012 - undef=np.nan
-        Modified MC, Nov 2012 - individual routine
+                 MC, Nov 2012 - individual routine
+                 MC, Feb 2013 - ported to Python 3
     """
 
     # Checks
@@ -495,7 +489,7 @@ def nee2gpp_reichstein(dates, nee, t, isday, rg=False, vpd=False, undef=np.nan,
     #locc = [] # local cov
     dmin = np.int(np.floor(np.amin(jul))) # be aware that julian days starts at noon, i.e. 1.0 is 12h
     dmax = np.int(np.ceil(np.amax(jul)))  # so the search will be from noon to noon and thus includes all nights
-    for i in xrange(dmin,dmax,5):
+    for i in range(dmin,dmax,5):
         iii  = np.squeeze(np.where((jul>=i) & (jul<(i+14))))
         niii = iii.size
         if niii > 6:
@@ -543,7 +537,7 @@ def nee2gpp_reichstein(dates, nee, t, isday, rg=False, vpd=False, undef=np.nan,
     refii = [] # mean index of data points
     E0    = bestp[1]
     et    = functions.lloyd_fix(tt, 1., E0)
-    for i in xrange(dmin,dmax,4):
+    for i in range(dmin,dmax,4):
         iii  = np.squeeze(np.where((jul>=i) & (jul<(i+4))))
         niii = iii.size
         if niii > 3:
@@ -658,12 +652,11 @@ def nee2gpp_lasslop(dates, nee, t, isday, rg, vpd, undef=np.nan,
         >>> VPD = np.squeeze(dat[8,:])
         >>> vpd = np.where(VPD == undef, undef, VPD*100.)
         >>> GPP, Reco = nee2gpp(dates, NEE, tt, isday, rg, vpd, undef=undef, method='day')
-        >>> print GPP[1120:1128]
-        [ -9.99900000e+03  -9.99900000e+03  -9.99900000e+03   2.89693618e+00
-           6.77103400e+00   9.06351370e+00   6.95696901e+00   9.77798943e+00]
-        >>> print Reco[1120:1128]
-        [ 0.35174817  0.42088838  0.53124809  0.66195618  0.839204    1.0829837
-          1.36527901  1.72571943]
+        >>> from autostring import astr
+        >>> print(astr(GPP[1120:1128],3,pp=True))
+        ['-9999.000' '-9999.000' '-9999.000' '    2.897' '    6.771' '    9.064' '    6.957' '    9.778']
+        >>> print(astr(Reco[1120:1128],3,pp=True))
+        ['0.352' '0.421' '0.531' '0.662' '0.839' '1.083' '1.365' '1.726']
 
 
         License
@@ -683,14 +676,15 @@ def nee2gpp_lasslop(dates, nee, t, isday, rg, vpd, undef=np.nan,
         You should have received a copy of the GNU Lesser General Public License
         along with The UFZ Python library.  If not, see <http://www.gnu.org/licenses/>.
 
-        Copyright 2012 Matthias Cuntz, Arndt Piayda
+        Copyright 2012-2013 Matthias Cuntz, Arndt Piayda
 
 
         History
         -------
         Written  MC, Mar 2012
         Modified AP, Mar 2012 - undef=np.nan
-        Modified MC, Nov 2012 - individual routine
+                 MC, Nov 2012 - individual routine
+                 MC, Feb 2013 - ported to Python 3
     """
 
     # Checks
@@ -769,7 +763,7 @@ def nee2gpp_lasslop(dates, nee, t, isday, rg, vpd, undef=np.nan,
     dmin = np.int(np.floor(np.amin(dates)))
     dmax = np.int(np.ceil(np.amax(dates)))
     zaehl = -1
-    for i in xrange(dmin,dmax,2):
+    for i in range(dmin,dmax,2):
         good = True
         # 1. Estimate E0 from nighttime data
         iii  = np.squeeze(np.where((njul>=i) & (njul<(i+12))))
@@ -1001,3 +995,4 @@ if __name__ == '__main__':
     # print Reco[1120:1128]
     # #[ 0.35174817  0.42088838  0.53124809  0.66195618  0.839204    1.0829837
     # #  1.36527901  1.72571943]
+

@@ -55,10 +55,10 @@ def volume_poly(func, x=None, y=None, tri=None, convexhull=False, area=False, al
 
         Examples
         --------
-        >>> def f1(y,x):\
-                return 1
-        >>> def f2(y,x,r):\
-                return np.sqrt(r*r-x*x-y*y)
+        >>> def f1(y,x):
+        ...     return 1
+        >>> def f2(y,x,r):
+        ...     return np.sqrt(r*r-x*x-y*y)
         >>> r = 1.0
         >>> n = 1000
         >>> np.random.seed(1)
@@ -67,23 +67,26 @@ def volume_poly(func, x=None, y=None, tri=None, convexhull=False, area=False, al
         >>> ii = np.where(x*x+y*y <= r*r)[0]
         >>> x  = x[ii]
         >>> y  = y[ii]
-        >>> print np.round(np.pi * r*r,3)
+        >>> from autostring import astr
+        >>> print(astr(np.pi * r*r,3))
         3.142
         >>> v = volume_poly(f1, x, y, convexhull=True)
-        >>> print np.round(v[0],3)
+        >>> print(astr(v[0],3))
         2.996
         >>> v = volume_poly(f1, x, y, convexhull=True, area=True)
-        >>> print np.round(v[0],3), np.round(v[2],3)
-        2.996 2.996
+        >>> print(astr(v[0],3))
+        2.996
+        >>> print(astr(v[2],3))
+        2.996
 
-        >>> print np.round(0.5 * 4./3. * np.pi * r*r*r, 3)
+        >>> print(astr(0.5 * 4./3. * np.pi * r*r*r, 3))
         2.094
         >>> v = volume_poly(f2, x, y, r=r, convexhull=True)
-        >>> print np.round(v[0], 3)
+        >>> print(astr(v[0], 3))
         2.072
 
         # Triangles outside
-        >>> xy  = np.array(zip(x,y))
+        >>> xy  = np.array(list(zip(x,y)))
         >>> d   = Delaunay(xy[:,:])
         >>> cxy = convex_hull(xy.transpose())
         >>> xs  = np.mean(cxy[:,0])
@@ -92,23 +95,25 @@ def volume_poly(func, x=None, y=None, tri=None, convexhull=False, area=False, al
         # Construct triangles from convex hull vertices and centre of gravity
         >>> ntriangles = d.convex_hull.shape[0]
         >>> tri = np.empty((ntriangles,3,2), dtype=np.float)
-        >>> for i in xrange(ntriangles):
+        >>> for i in range(ntriangles):
         ...     tri[i,0,:] = xy[d.convex_hull[i,0],:]
         ...     tri[i,1,:] = xy[d.convex_hull[i,1],:]
         ...     tri[i,2,:] = [xs,ys]
         >>> v = volume_poly(f1, tri=tri, convexhull=True)
-        >>> print np.round(v[0],3)
+        >>> print(astr(v[0],3))
         2.996
         >>> v = volume_poly(f1, tri=tri, convexhull=True, area=True)
-        >>> print np.round(v[0],3), np.round(v[2],3)
-        2.996 2.996
+        >>> print(astr(v[0],3))
+        2.996
+        >>> print(astr(v[2],3))
+        2.996
         >>> v = volume_poly(f2, tri=tri, r=r, convexhull=True)
-        >>> print np.round(v[0], 3)
+        >>> print(astr(v[0], 3))
         2.072
 
         # Return all volumes and areas
         >>> v, e, vv, aa = volume_poly(f2, tri=tri, r=r, convexhull=True, allvol=True)
-        >>> print np.round(vv[0], 3)
+        >>> print(astr(vv[0], 3))
         0.056
 
 
@@ -135,8 +140,9 @@ def volume_poly(func, x=None, y=None, tri=None, convexhull=False, area=False, al
 
         History
         -------
-        Written,  Matthias Cuntz & Juliane Mai, Feb 2013
-        Modified, Matthias Cuntz, Feb 2013 - tri
+        Written,  MC & JM, Feb 2013
+        Modified, MC, Feb 2013 - tri
+                  MC, Feb 2013 - ported to Python 3
     """
 
     # Functions for the three lines of a triangle
@@ -180,7 +186,7 @@ def volume_poly(func, x=None, y=None, tri=None, convexhull=False, area=False, al
         if np.size(x) != np.size(y):
             raise ValueError('volume_poly: x and y must have same dimensions')
         # Get convex hull and vertices
-        xy  = np.array(zip(x,y))
+        xy  = np.array(list(zip(x,y)))
         d   = Delaunay(xy[:,:])
         cxy = convex_hull(xy.transpose())
         xs  = np.mean(cxy[:,0])
@@ -189,7 +195,7 @@ def volume_poly(func, x=None, y=None, tri=None, convexhull=False, area=False, al
             # Construct triangles from convex hull vertices and centre of gravity
             ntriangles = d.convex_hull.shape[0]
             tri = np.empty((ntriangles,3,2), dtype=np.float)
-            for i in xrange(ntriangles):
+            for i in range(ntriangles):
                 tri[i,0,:] = xy[d.convex_hull[i,0],:]
                 tri[i,1,:] = xy[d.convex_hull[i,1],:]
                 tri[i,2,:] = [xs,ys]
@@ -205,7 +211,7 @@ def volume_poly(func, x=None, y=None, tri=None, convexhull=False, area=False, al
     areas   = np.zeros(ntriangles, dtype=np.float)
     # Calc mean semivariogramm over whole region
     thecount = 0
-    for j in xrange(ntriangles):
+    for j in range(ntriangles):
         t    = tri[j,:,:]
         ii   = np.argsort(t[:,0])
         tria = t[ii,:]
@@ -288,7 +294,7 @@ if __name__ == '__main__':
     # # Construct triangles from convex hull vertices and centre of gravity
     # ntriangles = d.convex_hull.shape[0]
     # tri = np.empty((ntriangles,3,2), dtype=np.float)
-    # for i in xrange(ntriangles):
+    # for i in range(ntriangles):
     #     tri[i,0,:] = xy[d.convex_hull[i,0],:]
     #     tri[i,1,:] = xy[d.convex_hull[i,1],:]
     #     tri[i,2,:] = [xs,ys]
@@ -304,3 +310,4 @@ if __name__ == '__main__':
     # v, e, vv, aa = volume_poly(f2, tri=tri, r=r, convexhull=True, allvol=True)
     # print np.round(vv[0], 3)
     # # 0.056
+

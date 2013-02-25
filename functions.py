@@ -51,14 +51,15 @@ import const # from ufz
     >>> E0   = 126.
     >>> T    = 293.15
     >>> resp = 2.0
-    >>> print lloyd_fix(T, Rref, E0)
-    1.40590910521
-    >>> print lloyd_fix_p(T, [Rref, E0])
-    1.40590910521
-    >>> print cost_lloyd_fix([Rref, E0], T, resp)
-    0.59409089479
-    >>> print cost2_lloyd_fix([Rref, E0], T, resp)
-    0.352943991272
+    >>> from autostring import astr
+    >>> print(astr(lloyd_fix(T, Rref, E0),3,pp=True))
+    1.406
+    >>> print(astr(lloyd_fix_p(T, [Rref, E0]),3,pp=True))
+    1.406
+    >>> print(astr(cost_lloyd_fix([Rref, E0], T, resp),3,pp=True))
+    0.594
+    >>> print(astr(cost2_lloyd_fix([Rref, E0], T, resp),3,pp=True))
+    0.353
 
 
     License
@@ -78,12 +79,13 @@ import const # from ufz
     You should have received a copy of the GNU Lesser General Public License
     along with The UFZ Python library.  If not, see <http://www.gnu.org/licenses/>.
 
-    Copyright 2012 Matthias Cuntz
+    Copyright 2012-2013 Matthias Cuntz
 
 
     History
     -------
-    Written, MC, Dec 2012
+    Written,  MC, Dec 2012
+    Modified, MC, Feb 2013 - ported to Python 3
 """
 
 # -----------------------------------------------------------
@@ -311,3 +313,4 @@ if __name__ == '__main__':
     # #0.59409089479
     # print cost2_lloyd_fix([Rref, E0], T, resp)
     # #0.352943991272
+

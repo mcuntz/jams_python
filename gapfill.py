@@ -86,14 +86,15 @@ def gapfill(date, data, rg, tair, vpd,
         >>> import numpy as np
         >>> from fread import *
         >>> from date2dec import *
+        >>> from autostring import astr
         >>> ifile = 'gapfill_test.csv' # Tharandt 1998 = Online tool example file
         >>> undef = -9999.
         >>> dat   = fread(ifile, skip=2, transpose=True)
         >>> ndat  = dat.shape[1]
         >>> head  = fread(ifile, skip=2, header=True)
         >>> head1 = head[0]
-        >>> ihead = dict(zip(head1, range(len(head1))))
-        >>> for ii in xrange(len(head1)): exec(head1[ii].lower() + ' = ' + 'dat[ihead["'+head1[ii]+'"],:]')
+        >>> ihead = dict(list(zip(head1, list(range(len(head1))))))
+        >>> for ii in range(len(head1)): exec(head1[ii].lower() + ' = ' + 'dat[ihead["'+head1[ii]+'"],:]')
         >>> year  = np.ones(day.shape, dtype=day.dtype) * 1998.
         >>> hh    = hour.astype(np.int)
         >>> mn    = np.round((hour-hh)*60.)
@@ -101,29 +102,20 @@ def gapfill(date, data, rg, tair, vpd,
         >>> jdate = y0 + day
 
         >>> nee_f, nee_qc = gapfill(jdate, nee, rg, tair, vpd, data_flag=(qcnee>1), undef=undef, shape=True)
-        >>> print nee_qc[11000:11020]
-        [ 1.  1.  1.  1.  1.  1.  1.  1.  1.  2.  2.  2.  2.  2.  2.  2.  2.  2.
-          2.  2.]
-        >>> print nee_f[11000:11020]
-        [  2.14         2.76333333   1.87666667  -2.765       -6.59        -8.63454545
-         -18.6775     -15.63333333 -19.61       -15.536      -12.4025     -15.32857143
-         -14.255      -14.52333333 -13.95       -14.155      -12.90666667
-         -12.90666667 -12.725      -16.3       ]
+        >>> print(astr(nee_qc[11006:11012],0,pp=True))
+        ['1' '1' '1' '2' '2' '2']
+        >>> print(astr(nee_f[11006:11012],3,pp=True))
+        ['-18.678' '-15.633' '-19.610' '-15.536' '-12.402' '-15.329']
 
         >>> nee_std = gapfill(jdate, nee, rg, tair, vpd, data_flag=(qcnee>1), undef=undef, shape=True, err=True)
-        >>> print nee_std[11000:11020]
-        [  1.64647097e+00   1.31720664e+00   1.86345110e+00   4.14701901e+00
-           2.23898638e+00   3.29813997e+00   5.37231406e+00   1.31184234e+01
-           6.47709812e+00  -9.99900000e+03  -9.99900000e+03  -9.99900000e+03
-          -9.99900000e+03  -9.99900000e+03  -9.99900000e+03  -9.99900000e+03
-          -9.99900000e+03  -9.99900000e+03  -9.99900000e+03  -9.99900000e+03]
+        >>> print(astr(nee_std[11006:11012],3,pp=True))
+        ['    5.372' '   13.118' '    6.477' '-9999.000' '-9999.000' '-9999.000']
 
         >>> nee_err     = np.ones(nee_std.shape, dtype=np.int)*(-1)
         >>> kk          = np.where((nee_std!=undef) & (nee_f!=0.))[0]
         >>> nee_err[kk] = np.abs(nee_std[kk]/nee_f[kk]*100.).astype(np.int)
-        >>> print nee_err[11000:11020]
-        [ 76  47  99 149  33  38  28  83  33  -1  -1  -1  -1  -1  -1  -1  -1  -1
-          -1  -1]
+        >>> print(astr(nee_err[11006:11012],pp=True))
+        [' 28' ' 83' ' 33' ' -1' ' -1' ' -1']
 
 
         License
@@ -143,12 +135,13 @@ def gapfill(date, data, rg, tair, vpd,
         You should have received a copy of the GNU Lesser General Public License
         along with The UFZ Python library.  If not, see <http://www.gnu.org/licenses/>.
 
-        Copyright 2012 Matthias Cuntz
+        Copyright 2012-2013 Matthias Cuntz
 
 
         History
         -------
-        Written  MC, Mar 2012 - modified gap_filling.py
+        Written,  MC, Mar 2012 - modified gap_filling.py
+        Modified, MC, Feb 2013 - ported to Python 3
     """
 
     # -------------------------------------------------------------
@@ -208,7 +201,7 @@ def gapfill(date, data, rg, tair, vpd,
     if np.any((ddate-ddate[0]) > 1e-4): # 1e-4 are ca 2.secs
         raise ValueError('dates must be equally spaced.')
     week    = np.int(np.around(7./ddate[0]))
-    nperday = week / 7
+    nperday = week // 7
     #hour    = (np.array(np.floor((date-np.trunc(date))*24.), dtype=np.int) + 12) % 24
     hour, mi = dec2date(date, hr=True, mi=True)
     hour     = hour + mi/60.
@@ -240,7 +233,7 @@ def gapfill(date, data, rg, tair, vpd,
     if lastvalid < (ndata-nn): largemargin[(lastvalid+nn):]   = 1
 
     # Fill loop over all data points
-    for j in xrange(ndata):
+    for j in range(ndata):
         if not err:
             # no reason to go further, no gap -> continue
             if (~(data_flg[j])) | (largemargin[j] == 1): continue
@@ -328,8 +321,8 @@ def gapfill(date, data, rg, tair, vpd,
 
         # Method 3: same hour
         enough = False
-        for i in xrange(2):
-            t_win = (nperday * (2*i+1))/2
+        for i in range(2):
+            t_win = (nperday * (2*i+1))//2
             j1  = j - np.arange(1,t_win+1) + 1
             j2  = j + np.arange(1,t_win)
             jj  = np.append(j1,j2)
@@ -357,7 +350,7 @@ def gapfill(date, data, rg, tair, vpd,
         # If still nothing is found, start a new cycle with increased window size
         # Method 4: same as 1 but for 3-12 weeks
         if meteo_flg[j]:
-            for multi in xrange(3,12):
+            for multi in range(3,12):
                 j1  = j - np.arange(1,multi*week+1) + 1
                 j2  = j + np.arange(1,multi*week)
                 jj  = np.append(j1,j2)
@@ -390,7 +383,7 @@ def gapfill(date, data, rg, tair, vpd,
 
         # Method 5: same as 2 but for 2-12 weeks
         if (~(rg_flg[j])):
-            for multi in xrange(2,12):
+            for multi in range(2,12):
                 j1  = j - np.arange(1,multi*week+1) + 1
                 j2  = j + np.arange(1,multi*week)
                 jj  = np.append(j1,j2)
@@ -419,7 +412,7 @@ def gapfill(date, data, rg, tair, vpd,
                 if data_fill[j] != undef: continue
 
         # Method 6: same as 3 but for 3-120 days
-        for i in xrange(3,120):
+        for i in range(3,120):
             t_win = nperday * (2*i+1)/2
             j1  = j - np.arange(1,t_win+1) + 1
             j2  = j + np.arange(1,t_win)
@@ -467,7 +460,7 @@ if __name__ == '__main__':
     # head  = fread(ifile, skip=2, header=True)
     # head1 = head[0]
     # ihead = dict(zip(head1, range(len(head1))))
-    # for ii in xrange(len(head1)):
+    # for ii in range(len(head1)):
     #     exec(head1[ii].lower() + ' = ' + 'dat[ihead["'+head1[ii]+'"],:]')
     # # Date
     # year  = np.ones(day.shape, dtype=day.dtype) * 1998.
@@ -500,3 +493,4 @@ if __name__ == '__main__':
     # print nee_err[11000:11020]
     # #[ 76  47  99 149  33  38  28  83  33  -1  -1  -1  -1  -1  -1  -1  -1  -1
     # #  -1  -1]
+

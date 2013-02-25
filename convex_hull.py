@@ -43,12 +43,13 @@ def convex_hull(points, graphic=False, smidgen=0.0075):
         # make some points
         >>> points = n.array([[2,3,2,4,5,5,7,5,5],[1,2,4,3,6,4,3,2,1]])        
         >>> hull_xy = convex_hull(points, graphic=False, smidgen=0.075)
-        >>> print hull_xy
-        [[5 1]
-         [7 3]
-         [5 6]
-         [2 4]
-         [2 1]]
+        >>> from autostring import astr
+        >>> print(astr(hull_xy,pp=True))
+        [['5' '1']
+         ['7' '3']
+         ['5' '6']
+         ['2' '4']
+         ['2' '1']]
         
         
         License
@@ -69,14 +70,14 @@ def convex_hull(points, graphic=False, smidgen=0.0075):
         along with The UFZ Python library.  If not,
         see <http://www.gnu.org/licenses/>.
     
-        Copyright 2009-2012 Matthias Cuntz
+        Copyright 2009-2013 Arndt Piayda, Matthias Cuntz
     
     
         History
         -------
-        Written, Arndt Piayda, Nov 2012
-        Modified, Arndt Piayda, Dec 2012 - documentation change
-
+        Written,  AP, Nov 2012
+        Modified, AP, Dec 2012 - documentation change
+        Modified, MC, Feb 2013 - ported to Python 3
     """
 
     if graphic:
@@ -90,9 +91,8 @@ def convex_hull(points, graphic=False, smidgen=0.0075):
     angles = n.apply_along_axis(_angle_to_point, 0, points, centre)
     pts_ord = points[:,angles.argsort()]
     if graphic:
-        for i in xrange(n_pts):
-            p.text(pts_ord[0,i] + smidgen, pts_ord[1,i] + smidgen, \
-                   '%d' % i)
+        for i in range(n_pts):
+            p.text(pts_ord[0,i] + smidgen, pts_ord[1,i] + smidgen, '%d' % i)
     pts = [x[0] for x in zip(pts_ord.transpose())]
     prev_pts = len(pts) + 1
     k = 0
@@ -103,17 +103,12 @@ def convex_hull(points, graphic=False, smidgen=0.0075):
         i = -2
         while i < (n_pts - 2):
             Aij = area_of_triangle(centre, pts[i],     pts[(i + 1) % n_pts])
-            Ajk = area_of_triangle(centre, pts[(i + 1) % n_pts], \
-                                   pts[(i + 2) % n_pts])
+            Ajk = area_of_triangle(centre, pts[(i + 1) % n_pts], pts[(i + 2) % n_pts])
             Aik = area_of_triangle(centre, pts[i],     pts[(i + 2) % n_pts])
             if graphic:
-                _draw_triangle(centre, pts[i], pts[(i + 1) % n_pts], \
-                               facecolor='blue', alpha = 0.2)
-                _draw_triangle(centre, pts[(i + 1) % n_pts], \
-                               pts[(i + 2) % n_pts], \
-                               facecolor='green', alpha = 0.2)
-                _draw_triangle(centre, pts[i], pts[(i + 2) % n_pts], \
-                               facecolor='red', alpha = 0.2)
+                _draw_triangle(centre, pts[i], pts[(i + 1) % n_pts], facecolor='blue', alpha = 0.2)
+                _draw_triangle(centre, pts[(i + 1) % n_pts], pts[(i + 2) % n_pts], facecolor='green', alpha = 0.2)
+                _draw_triangle(centre, pts[i], pts[(i + 2) % n_pts], facecolor='red', alpha = 0.2)
             if Aij + Ajk < Aik:
                 if graphic: p.plot((pts[i + 1][0],),(pts[i + 1][1],),'go')
                 del pts[i+1]
@@ -143,3 +138,4 @@ def area_of_triangle(p1, p2, p3):
 if __name__ == "__main__":
     import doctest
     doctest.testmod()
+

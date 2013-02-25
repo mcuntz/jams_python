@@ -87,13 +87,12 @@ Virginia. p. 63
         month = month + 12
         year = year - 1
         
-    A = int(year/100)
+    A = int(year//100)
 
     # MC
     # jd = int(365.25 * (year + 4716)) + int(30.6001 * (month + 1)) + \
     #      day - 1524.5
-    jd = 365.*year + int(0.25 * year + 2000.) + int(30.6001 * (month + 1)) + \
-         day + 1718994.5
+    jd = 365.*year + int(0.25 * year + 2000.) + int(30.6001 * (month + 1)) + day + 1718994.5
 
     # optionally adjust the jd for the switch from 
     # the Julian to Gregorian Calendar
@@ -101,14 +100,14 @@ Virginia. p. 63
     if calendar in ['standard','gregorian']:
         if jd >= 2299170.5:
             # 1582 October 15 (Gregorian Calendar)
-            B = 2 - A + int(A/4)
+            B = 2 - A + int(A//4)
         elif jd < 2299160.5:
             # 1582 October 5 (Julian Calendar)
             B = 0
         else:
             raise ValueError('impossible date (falls in gap between end of Julian calendar and beginning of Gregorian calendar')
     elif calendar == 'proleptic_gregorian':
-        B = 2 - A + int(A/4)
+        B = 2 - A + int(A//4)
     elif calendar == 'julian':
         B = 0
     else:
@@ -138,8 +137,7 @@ instance.  Returns the fractional Julian Day (resolution 1 second).
         month = month + 12
         year = year - 1
         
-    jd = int(365. * (year + 4716)) + int(30.6001 * (month + 1)) + \
-         day - 1524.5
+    jd = int(365. * (year + 4716)) + int(30.6001 * (month + 1)) + day - 1524.5
     
     return jd 
 
@@ -163,8 +161,7 @@ Returns the fractional Julian Day (resolution 1 second).
         month = month + 12
         year = year - 1
         
-    jd = int(366. * (year + 4716)) + int(30.6001 * (month + 1)) + \
-         day - 1524.5
+    jd = int(366. * (year + 4716)) + int(30.6001 * (month + 1)) + day - 1524.5
     
     return jd 
 
@@ -278,8 +275,7 @@ Virginia. p. 63
     leap = 0
     if year % 4 == 0:
         leap = 1
-    if calendar == 'proleptic_gregorian' or \
-       (calendar in ['standard','gregorian'] and JD >= 2299160.5):
+    if calendar == 'proleptic_gregorian' or (calendar in ['standard','gregorian'] and JD >= 2299160.5):
         if year % 100 == 0 and year % 400 != 0: 
             leap = 0
     if leap and month > 2:
@@ -312,8 +308,7 @@ Virginia. p. 63
             year = year + 1
     
     # return a 'real' datetime instance if calendar is gregorian.
-    if calendar == 'proleptic_gregorian' or \
-            (calendar in ['standard','gregorian'] and JD >= 2299160.5):
+    if calendar == 'proleptic_gregorian' or (calendar in ['standard','gregorian'] and JD >= 2299160.5):
         return real_datetime(year,month,int(days),int(hours),int(minutes),int(seconds))
     else:
     # or else, return a 'datetime-like' instance.
@@ -554,15 +549,15 @@ Example usage:
 >>> from datetime import  datetime
 >>> cdftime = utime('hours since 0001-01-01 00:00:00')
 >>> date = datetime.now()
->>> print date
+>>> print(date)
 2006-03-17 16:04:02.561678
 >>>
 >>> t = cdftime.date2num(date)
->>> print t
+>>> print(t)
 17577328.0672
 >>>
 >>> date = cdftime.num2date(t)
->>> print date
+>>> print(date)
 2006-03-17 16:04:02
 >>>
 
@@ -824,7 +819,7 @@ def _parse_date(datestring):
 
     Adapted from pyiso8601 (http://code.google.com/p/pyiso8601/)
     """
-    if not isinstance(datestring, str) and not isinstance(datestring, unicode):
+    if not isinstance(datestring, str) and not isinstance(datestring, str):
         raise ValueError("Expecting a string %r" % datestring)
     m = ISO8601_REGEX.match(datestring.strip())
     if not m:
@@ -1139,3 +1134,4 @@ def _toscalar(a):
         return a.item()
     else:
         return a
+

@@ -49,34 +49,43 @@ def outlier(y,alpha=0.01,k=-1,quiet=True):
         Examples
         --------
         >>> import numpy as np
-        >>> y = np.array([-0.25,0.68,0.94,1.15,2.26,2.35,2.37,2.40,2.47,2.54,2.62,\
-                          2.64,2.90,2.92,2.92,2.93,3.21,3.26,3.30,3.59,3.68,4.30,\
-                          4.64,5.34,5.42,8.01],dtype=np.float)
-        >>> outlier(y,0.05,2,quiet=False)
-        # of outliers:  1
-        outliers:       [ 8.01]
-        indeces:        [25]
-        array([25])
+        >>> y = np.array([-0.25,0.68,0.94,1.15,2.26,2.35,2.37,2.40,2.47,2.54,2.62,
+        ...               2.64,2.90,2.92,2.92,2.93,3.21,3.26,3.30,3.59,3.68,4.30,
+        ...               4.64,5.34,5.42,8.01],dtype=np.float)
+        >>> print(outlier(y,0.05,2,quiet=False))
+        # of outliers
+        1
+        outliers
+        [ 8.01]
+        indeces
+        [25]
+        [25]
         >>> #
         >>> # Example from Rosner paper
-        >>> y = np.array([-0.25,0.68,0.94,1.15,1.20,1.26,1.26,1.34,1.38,1.43,1.49,\
-                          1.49,1.55,1.56,1.58,1.65,1.69,1.70,1.76,1.77,1.81,1.91,\
-                          1.94,1.96,1.99,2.06,2.09,2.10,2.14,2.15,2.23,2.24,2.26,\
-                          2.35,2.37,2.40,2.47,2.54,2.62,2.64,2.90,2.92,2.92,2.93,\
-                          3.21,3.26,3.30,3.59,3.68,4.30,4.64,5.34,5.42,6.01],dtype=np.float)
-        >>> outlier(y,0.05,10,quiet=False)
-        # of outliers:  3
-        outliers:       [ 5.34  5.42  6.01]
-        indeces:        [51 52 53]
-        array([51, 52, 53])
-        >>> outlier(y,0.05,quiet=False)
-        # of outliers:  3
-        outliers:       [ 5.34  5.42  6.01]
-        indeces:        [51 52 53]
-        array([51, 52, 53])
-        >>> outlier(y,quiet=False)
-        Found no outliers.
-        array([-1])
+        >>> y = np.array([-0.25,0.68,0.94,1.15,1.20,1.26,1.26,1.34,1.38,1.43,1.49,
+        ...               1.49,1.55,1.56,1.58,1.65,1.69,1.70,1.76,1.77,1.81,1.91,
+        ...               1.94,1.96,1.99,2.06,2.09,2.10,2.14,2.15,2.23,2.24,2.26,
+        ...               2.35,2.37,2.40,2.47,2.54,2.62,2.64,2.90,2.92,2.92,2.93,
+        ...               3.21,3.26,3.30,3.59,3.68,4.30,4.64,5.34,5.42,6.01],dtype=np.float)
+        >>> print(outlier(y,0.05,10,quiet=False))
+        # of outliers
+        3
+        outliers
+        [ 5.34  5.42  6.01]
+        indeces
+        [51 52 53]
+        [51 52 53]
+        >>> print(outlier(y,0.05,quiet=False))
+        # of outliers
+        3
+        outliers
+        [ 5.34  5.42  6.01]
+        indeces
+        [51 52 53]
+        [51 52 53]
+        >>> print(outlier(y,quiet=False))
+        outlier: Found no outliers.
+        [-1]
 
 
         License
@@ -96,19 +105,20 @@ def outlier(y,alpha=0.01,k=-1,quiet=True):
         You should have received a copy of the GNU Lesser General Public License
         along with The UFZ Python library.  If not, see <http://www.gnu.org/licenses/>.
 
-        Copyright 2010-2012 Maren Goehler, Matthias Cuntz
+        Copyright 2010-2013 Maren Goehler, Matthias Cuntz
 
 
         History
         -------
-        Written,  MG, Jul 2010
-        Modified, MC, Mar 2011 - formulation was wrong: after removal of a point, the 
-                                 absolute deviation was not recalculated with the new mean
-                                 it gives exactly the same as the example in the above NIST-webpage
-                               - calc mean and standard deviation with cummulative formula
-                                 so that there is only three sums of whole array
-                               - include case with no outliers: returns -1.
-               MC/MG, Oct 2011 - break loop if new variance < 0 in iteration
+        Written,  MG,   Jul 2010
+        Modified, MC,   Mar 2011 - formulation was wrong: after removal of a point, the 
+                                   absolute deviation was not recalculated with the new mean
+                                   it gives exactly the same as the example in the above NIST-webpage
+                                 - calc mean and standard deviation with cummulative formula
+                                   so that there is only three sums of whole array
+                                 - include case with no outliers: returns -1.
+               MC & MG, Oct 2011 - break loop if new variance < 0 in iteration
+               MC,      Feb 2013 - ported to Python 3
     """
     # check user input
     if ((alpha<=0) or (alpha>1)):
@@ -117,9 +127,9 @@ def outlier(y,alpha=0.01,k=-1,quiet=True):
     # Student''s t-distribution
     nn    = np.ma.count(y)
     if k == -1:
-        k = nn/2
-    if k > nn/2:
-        print 'WARNING: k > size(data)/2 -> set k=size(data)/2'
+        k = nn//2
+    if k > nn//2:
+        print('WARNING: k > size(data)/2 -> set k=size(data)/2')
         k = nn-1
     out      = 0
     outlrs   = np.zeros(k,dtype=np.float)
@@ -152,7 +162,7 @@ def outlier(y,alpha=0.01,k=-1,quiet=True):
         out  = 1
     
     if k > 1:
-        for i in xrange(k-1):
+        for i in range(k-1):
             # remove the highest value from above and redo the procedure
             mm1 = mm
             # Cummulative way to calculate mean and stddev
@@ -176,13 +186,16 @@ def outlier(y,alpha=0.01,k=-1,quiet=True):
         iiout = iioutlrs[0:out]
         iiout = iiout[::-1] # reverse
         if (quiet == False):
-            print '# of outliers: ', out
-            print 'outliers:      ', y[iiout]
-            print 'indeces:       ', iiout
+            print('# of outliers')
+            print(out)
+            print('outliers')
+            print(y[iiout])
+            print('indeces')
+            print(iiout)
         return iiout
     else:
         if (quiet == False):
-            print 'Found no outliers.'
+            print('outlier: Found no outliers.')
         return np.array([-1])
 
 if __name__ == '__main__':

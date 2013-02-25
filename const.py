@@ -20,35 +20,36 @@ import numpy as np
 
     Examples
     --------
-    >>> print Pi
-    3.14159265359
+    >>> from autostring import astr
+    >>> print(astr(Pi,3,pp=True))
+    3.142
 
-    >>> print Sqrt2
-    1.41421356237
+    >>> print(astr(Sqrt2,3,pp=True))
+    1.414
 
-    >>> print Gravity
-    9.81
+    >>> print(astr(Gravity,3,pp=True))
+    9.810
 
-    >>> print T0
-    273.15
+    >>> print(astr(T0,3,pp=True))
+    273.150
 
-    >>> print sigma
-    5.67e-08
+    >>> print(astr(sigma,3,pp=True))
+    5.670e-08
 
-    >>> print RPDB
-    0.0112372
+    >>> print(astr(RPDB,3,pp=True))
+    0.011
 
-    >>> print tiny
-    1e-06
+    >>> print(astr(tiny,3,pp=True))
+    1.000e-06
 
-    >>> print REarth
-    6371000.
+    >>> print(astr(REarth,3,pp=True))
+    6371000.000
 
-    >>> print M_WV
-    18.01528
+    >>> print(astr(M_WV,3,pp=True))
+    18.015
 
-    >>> print M_DAIR
-    28.9644
+    >>> print(astr(M_DAIR,3,pp=True))
+    28.964
 
     License
     -------
@@ -67,12 +68,13 @@ import numpy as np
     You should have received a copy of the GNU Lesser General Public License
     along with The UFZ Python library.  If not, see <http://www.gnu.org/licenses/>.
 
-    Copyright 2012 Matthias Cuntz
+    Copyright 2012-2013 Matthias Cuntz
 
         
     History
     -------
-    Written, MC, Jan 2012
+    Written,  MC, Jan 2012
+    Modified, MC, Feb 2013 - ported to Python 3
 """
 # Mathematical
 Pi    = 3.141592653589793238462643383279502884197    # Pi
@@ -104,3 +106,4 @@ eps  = np.finfo(np.float).eps
 if __name__ == '__main__':
     import doctest
     doctest.testmod()
+

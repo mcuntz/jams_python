@@ -37,23 +37,24 @@ def division(a, b, otherwise=np.nan, prec=0.):
 
         Examples
         --------
-        >>> print division([1., 2., 3.], 2.)
-        [ 0.5  1.   1.5]
+        >>> from autostring import astr
+        >>> print(astr(division([1., 2., 3.], 2.),1,pp=True))
+        ['0.5' '1.0' '1.5']
 
-        >>> print division([1., 1., 1.], [2., 1., 0.])
-        [ 0.5  1.   nan]
+        >>> print(astr(division([1., 1., 1.], [2., 1., 0.]),1,pp=True))
+        ['0.5' '1.0' 'nan']
 
-        >>> print division([1., 1., 1.], [2., 1., 0.], 0.)
-        [ 0.5  1.   0. ]
+        >>> print(astr(division([1., 1., 1.], [2., 1., 0.], 0.),1,pp=True))
+        ['0.5' '1.0' '0.0']
 
-        >>> print division([1., 1., 1.], [2., 1., 0.], otherwise=0.)
-        [ 0.5  1.   0. ]
+        >>> print(astr(division([1., 1., 1.], [2., 1., 0.], otherwise=0.),1,pp=True))
+        ['0.5' '1.0' '0.0']
 
-        >>> print division([1., 1., 1.], [2., 1., 0.], prec=1.)
-        [ 0.5  nan  nan]
+        >>> print(astr(division([1., 1., 1.], [2., 1., 0.], prec=1.),1,pp=True))
+        ['0.5' 'nan' 'nan']
 
-        >>> print div([1., 1., 1.], [2., 1., 0.], prec=1.)
-        [ 0.5  nan  nan]
+        >>> print(astr(div([1., 1., 1.], [2., 1., 0.], prec=1.),1,pp=True))
+        ['0.5' 'nan' 'nan']
 
 
         License
@@ -73,13 +74,14 @@ def division(a, b, otherwise=np.nan, prec=0.):
         You should have received a copy of the GNU Lesser General Public License
         along with The UFZ Python library.  If not, see <http://www.gnu.org/licenses/>.
 
-        Copyright 2012 Matthias Cuntz
+        Copyright 2012-2013 Matthias Cuntz
 
         
         History
         -------
         Written,  MC, Jan 2012
         Modified, MC, May 2012 - div
+                  MC, Feb 2013 - ported to Python 3
     """
     return np.where(np.ma.abs(np.ma.array(b)) > np.abs(prec), np.ma.array(a)/np.ma.array(b), otherwise)
 
@@ -89,3 +91,4 @@ def div(a, b, otherwise=np.nan, prec=0.):
 if __name__ == '__main__':
     import doctest
     doctest.testmod()
+

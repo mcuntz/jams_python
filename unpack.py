@@ -41,10 +41,10 @@ def unpack(array, mask, value=0.):
         # for example an island in the middle of an ocean
         >>> import numpy as np
         >>> a = np.array([[ 0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.],
-        ...        [ 0.,  0.,  0.,  1.,  1.,  1.,  0.,  0.,  0.,  0.],
-        ...        [ 0.,  0.,  0.,  1.,  1.,  1.,  0.,  0.,  0.,  0.],
-        ...        [ 0.,  0.,  0.,  1.,  1.,  1.,  0.,  0.,  0.,  0.],
-        ...        [ 0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.]])
+        ...               [ 0.,  0.,  0.,  1.,  1.,  1.,  0.,  0.,  0.,  0.],
+        ...               [ 0.,  0.,  0.,  1.,  1.,  1.,  0.,  0.,  0.,  0.],
+        ...               [ 0.,  0.,  0.,  1.,  1.,  1.,  0.,  0.,  0.,  0.],
+        ...               [ 0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.]])
         >>> nn = list(np.shape(a))
         >>> nn.insert(0,2)
         >>> a3 = np.empty(nn)
@@ -57,20 +57,20 @@ def unpack(array, mask, value=0.):
         >>> b = pack(a, mask)
         >>> b3 = pack(a3, mask)
         >>> c = unpack(b, mask)
-        >>> print np.any(a-c != 0.)
+        >>> print(np.any(a-c != 0.))
         False
-        >>> print c
+        >>> print(c)
         [[ 0.  0.  0.  0.  0.  0.  0.  0.  0.  0.]
          [ 0.  0.  0.  1.  1.  1.  0.  0.  0.  0.]
          [ 0.  0.  0.  1.  1.  1.  0.  0.  0.  0.]
          [ 0.  0.  0.  1.  1.  1.  0.  0.  0.  0.]
          [ 0.  0.  0.  0.  0.  0.  0.  0.  0.  0.]]
         >>> c3 = unpack(b3, mask)
-        >>> print np.any(a3-c3 != 0.)
+        >>> print(np.any(a3-c3 != 0.))
         False
         >>> 
         >>> d = unpack(b, mask, value=2)
-        >>> print d
+        >>> print(d)
         [[ 2.  2.  2.  2.  2.  2.  2.  2.  2.  2.]
          [ 2.  2.  2.  1.  1.  1.  2.  2.  2.  2.]
          [ 2.  2.  2.  1.  1.  1.  2.  2.  2.  2.]
@@ -95,12 +95,13 @@ def unpack(array, mask, value=0.):
         You should have received a copy of the GNU Lesser General Public License
         along with The UFZ Python library.  If not, see <http://www.gnu.org/licenses/>.
 
-        Copyright 2009 Matthias Cuntz
+        Copyright 2009-2013 Matthias Cuntz
        
 
         History
         -------
-        Written, MC, Jul. 2009
+        Written,  MC, Jul. 2009
+        Modified, MC, Feb 2013 - ported to Python 3
     """
     dmask   = np.shape(mask)
     ndmask  = len(dmask)
@@ -112,7 +113,7 @@ def unpack(array, mask, value=0.):
     # Check array and mask
     ntmask = mask.sum()
     if darray[-1] < ntmask:
-        print 'UNPACK: Last dimension of input array %s must have same size as true values in mask %s.' % (darray[-1], ntmask)
+        print('UNPACK: Last dimension of input array %s must have same size as true values in mask %s.' % (darray[-1], ntmask))
         return None
     #
     # Make multi mask array array
@@ -121,14 +122,14 @@ def unpack(array, mask, value=0.):
         icount *= darray[i]
     mask1d = np.ravel(mask)
     masknd = np.empty(icount, dtype='bool')
-    for i in range(icount/nmask):
+    for i in range(icount//nmask):
         masknd[i*nmask:(i+1)*nmask] = mask1d[:]
     #
     # Make indeces
     index = np.arange(icount)
     ii = index[masknd]
     if len(ii) != narray:
-        print 'UNPACK: Indes creation failed. Index %s Array %s.' % (len(ii), narray)
+        print('UNPACK: Indes creation failed. Index %s Array %s.' % (len(ii), narray))
         return None    
     #
     # Flat output array
@@ -147,3 +148,4 @@ def unpack(array, mask, value=0.):
 if __name__ == '__main__':
     import doctest
     doctest.testmod()
+
