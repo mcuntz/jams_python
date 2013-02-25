@@ -130,11 +130,11 @@ def readhdf4(fName, var='', reform=False, squeeze=False, variables=False,
       if var not in svars:
           f.end()
           raise ValueError('Variable '+var+' not in file '+fname)
-      try:
-          arr = np.array(f.select(var).get())
-      except ValueError:
-          f.end()
-          raise IOError('Cannot read variable '+var+' in file '+fName)
+ #     try:
+      arr = np.array(f.select(var).get())
+ #     except ValueError:
+ #         f.end()
+ #         raise IOError('Cannot read variable '+var+' in file '+fName)
       f.end()
       if reform or squeeze:
         return arr.squeeze()
@@ -145,6 +145,7 @@ def readhdf4(fName, var='', reform=False, squeeze=False, variables=False,
 if __name__ == '__main__':
     import doctest
     doctest.testmod()
+
     # var = readhdf4('test_readhdf4.hdf4', fileattributes=True)
     # print var.keys()
     # # ['OldCoreMetadata.0',
@@ -184,4 +185,3 @@ if __name__ == '__main__':
     # #  'HorizontalDatumName']
     # print var['_FillValue']
     # # (-28672, 3, 22, 1)
-

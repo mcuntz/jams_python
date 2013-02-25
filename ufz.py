@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+from __future__ import print_function
 """
     UFZ Computational Hydrosystems Python Utilities
     Module offers miscellaneous functions in different categories
