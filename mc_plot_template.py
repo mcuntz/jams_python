@@ -39,8 +39,6 @@ History
 -------
 Written, MC, Jul 2012
 """
-import numpy as np
-import ufz
 
 # -------------------------------------------------------------------------
 # Command line arguments
@@ -62,6 +60,8 @@ pdffile  = opts.pdffile
 usetex   = opts.usetex
 del parser, opts, args
 
+import numpy as np
+import ufz
 
 # -------------------------------------------------------------------------
 # Customize plots
@@ -119,8 +119,9 @@ if (outtype == 'pdf'):
   mpl.rc('figure', figsize=(8.27,11.69)) # a4 portrait
   if usetex:
     mpl.rc('text', usetex=True)
-    mpl.rc('text.latex', str=True)
+    mpl.rc('text.latex', unicode=True)
     #mpl.rc('font',**{'family':'sans-serif','sans-serif':['Helvetica']})
+    #mpl.rc('font',**{'family':'serif','serif':['Helvetica']})
     mpl.rc('font',**{'family':'serif','serif':['times']})
   mpl.rc('font', size=textsize)
 else:
