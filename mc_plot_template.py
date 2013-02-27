@@ -121,8 +121,7 @@ if (outtype == 'pdf'):
     mpl.rc('text', usetex=True)
     mpl.rc('text.latex', unicode=True)
     #mpl.rc('font',**{'family':'sans-serif','sans-serif':['Helvetica']})
-    #mpl.rc('font',**{'family':'serif','serif':['Helvetica']})
-    mpl.rc('font',**{'family':'serif','serif':['times']})
+    #mpl.rc('font',**{'family':'serif','serif':['times']})
   mpl.rc('font', size=textsize)
 else:
   import matplotlib.pyplot as plt
@@ -194,19 +193,16 @@ if ylim != None:
 else:
     plt.setp(sub, ylabel=ylab)
 sub.xaxis.set_minor_locator(mpl.ticker.MultipleLocator(xtick))
-ll = sub.legend(mark1, [r'Uniform vs. Gauss'], frameon=frameon, ncol=1,
+ll = sub.legend(mark1, [r'$\mathrm{Uniform \; vs. \; Gauss}$'], frameon=frameon, ncol=1,
                 labelspacing=llrspace, handletextpad=llhtextpad, handlelength=llhlength,
                 loc='upper right', bbox_to_anchor=(1+llxbbox,1+llybbox), scatterpoints=1, numpoints=1)
 plt.setp(ll.get_texts(), fontsize='small')
-ufz.abc2plot(sub, dxabc, dyabc, iplot, lower=True, bold=True)
+ufz.abc2plot(sub, dxabc, dyabc, iplot, lower=True, bold=True, usetex=usetex, mathrm=True, parenthesis='close')
 
 iplot += 1
 xlab   = r'$N('+ufz.astr(mu)+','+ufz.astr(sigma,1)+')$'
 yyplot = yy
-if usetex:
-    ylab   = r'Normed \#/bin'
-else:
-    ylab   = r'Normed #/bin'
+ylab   = r'$\mathrm{Normed \; \#/bin}$'
 sub    = fig.add_axes(ufz.position(nrow,ncol,iplot,hspace=hspace,wspace=wspace))
 nbins  = ndata/30
 #   inbins, ibins, ipatches = sub.hist(msiboot[i,:], bins=nbins)
@@ -225,7 +221,7 @@ if ylim != None:
     plt.setp(sub, ylabel=ylab, ylim=lim)
 else:
     plt.setp(sub, ylabel=ylab)
-ufz.abc2plot(sub, dxabc, dyabc, iplot, lower=True, bold=True)
+ufz.abc2plot(sub, dxabc, dyabc, iplot, lower=True, bold=True, usetex=usetex, mathrm=True, parenthesis='close')
 
 
 

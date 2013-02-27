@@ -1,8 +1,10 @@
 #!/usr/bin/env python
 from romanliterals import int2roman
 
-def abc2plot(handle, dx, dy, iplot, roman=False, lower=False, integer=False,
-             medium=False, small=False, bold=False, parenthesis=False):
+def abc2plot(handle, dx, dy, iplot, integer=False, roman=False, lower=False,
+             medium=False, small=False, bold=False,
+             parenthesis=None, brackets=None, braces=None, 
+             usetex=False, mathrm=False):
     """
         Write a, b, c, ...
               A, B, C, ...
@@ -12,8 +14,10 @@ def abc2plot(handle, dx, dy, iplot, roman=False, lower=False, integer=False,
 
         Definition
         ----------
-        def abc2plot(handle, dx, dy, iplot, roman=False, lower=False, integer=False,
-                     medium=False, small=False, parenthesis=False):
+        def abc2plot(handle, dx, dy, iplot, integer=False, roman=False, lower=False,
+                     medium=False, small=False, bold=False,
+                     parenthesis=None, brackets=None, braces=None, 
+                     usetex=False, mathrm=False):
 
 
         Input
@@ -25,20 +29,35 @@ def abc2plot(handle, dx, dy, iplot, roman=False, lower=False, integer=False,
 
         Optional Input
         --------------
-        roman       True:  use roman literals
-                    False: use a, b, c
-        lower       True:  use lowercase letters
-                    False: use uppercase letters
-        integer     True:  use integers
-                    False: use letters
-        medium      True:  fontsize='medium'
-                    False: fontsize='large'
-        small       True:  fontsize='small'
-                    False: fontsize='large'
-        bold        True:  fontweight='bold'
-                    False: fontsize='normal'
-        parenthesis True:  close number with single paranthesis
-                    False: no parenthesis
+        integer     True:    use integers
+                    False:   use letters (default)
+        roman       True:    use roman literals
+                    False:   use a, b, c (default)
+        lower       True:    use lowercase letters
+                    False:   use uppercase letters (default)
+        medium      True:    fontsize='medium'
+                    False:   fontsize='large'  (default)
+        small       True:    fontsize='small'
+                    False:   fontsize='large' (default)
+        bold        True:    fontweight='bold'
+                    False:   fontsize='normal' (default)
+        parenthesis 'open':  opening parenthesis in front of number
+                    'close': closing  parenthesis after number
+                    'None':  no parenthesis
+                    None:    no parenthesis (default)
+        brackets    'open':  opening brackets in front of number
+                    'close': closing  brackets after number
+                    'None':  no brackets
+                    None:    no brackets (default)
+        braces      'open':  opening braces in front of number
+                    'close': closing  braces after number
+                    'None':  no braces
+                    None:    no braces (default)
+        usetex      True:    Embed into LaTeX math environment
+                    False:   No LaTeX math mode
+        mathrm      True:    If usetex=True, surround by \mathrm{}
+                    False:   If usetex=True, standard math font.
+                
 
         Output
         ------
@@ -80,12 +99,16 @@ def abc2plot(handle, dx, dy, iplot, roman=False, lower=False, integer=False,
         Written,  MC, May 2012
         Modified, AP, Feb 2013 - added parenthesis option
                   MC, Feb 2013 - ported to Python 3
+                  MC, Feb 2013 - opening and closing parenthesis, brackets and braces
+                  MC, Feb 2013 - usetex, mathrm
     """
     # Check input
     if (roman & integer):
         raise ValueError('either roman literals or integers can be chosen.')
     if (small & medium):
         raise ValueError('either small or medium font size can be chosen.')
+
+    # Number or letter
     if roman:
         t = int2roman(iplot, lower=lower)
     elif integer:
@@ -95,6 +118,8 @@ def abc2plot(handle, dx, dy, iplot, roman=False, lower=False, integer=False,
             t = chr(96+iplot)
         else:
             t = chr(64+iplot)
+
+    # Size
     if small:
         fs='small'
     elif medium:
@@ -105,8 +130,64 @@ def abc2plot(handle, dx, dy, iplot, roman=False, lower=False, integer=False,
         fw='bold'
     else:
         fw='regular'
+
+    # parenthesis, brackets, braces
+    if (parenthesis is not None) | (brackets is not None) | (braces is not None):
+        if (((parenthesis is not None) & (brackets is not None)) |
+            ((parenthesis is not None) & (braces is not None)) |
+            ((brackets is not None) & (braces is not None))):
+            raise ValueError("parenthesis, brackets and braces mutually exclusive.")
+
     if parenthesis:
-        t += ')'
+        if parenthesis.lower() == 'open':
+            t = '(' + t
+        elif parenthesis.lower() == 'close':
+            t = t + ')'
+        elif parenthesis.lower() == 'both':
+            t = '(' + t + ')'
+        elif parenthesis.lower() == 'none':
+            pass
+        else:
+            raise ValueError("parenthesis must be either 'open', 'close', 'both', or 'none'.")
+
+    if brackets:
+        if brackets.lower() == 'open':
+            t = '[' + t
+        elif brackets.lower() == 'close':
+            t = t + ']'
+        elif brackets.lower() == 'both':
+            t = '[' + t + ']'
+        elif brackets.lower() == 'none':
+            pass
+        else:
+            raise ValueError("brackets must be either 'open', 'close', 'both', or 'none'.")
+
+    if braces:
+        if braces.lower() == 'open':
+            if usetex:
+                t = '\{' + t
+            else:
+                t = '{' + t
+        elif braces.lower() == 'close':
+            if usetex:
+                t = t + '\}'
+            else:
+                t = t + '}'
+        elif braces.lower() == 'both':
+            if usetex:
+                t = '\{' + t + '\}'
+            else:
+                t = '{' + t + '}'
+        elif braces.lower() == 'none':
+            pass
+        else:
+            raise ValueError("braces must be either 'open', 'close', 'both', or 'none'.")
+
+    if usetex:
+        if mathrm:
+            t = '\mathrm{' + t + '}'
+        t = '$' + t + '$'
+
     xmin, xmax = handle.get_xlim()
     ymin, ymax = handle.get_ylim()
     handle.text(xmin+dx*(xmax-xmin), ymin+dy*(ymax-ymin), t, fontsize=fs, fontweight=fw,
@@ -116,17 +197,65 @@ def abc2plot(handle, dx, dy, iplot, roman=False, lower=False, integer=False,
 if __name__ == '__main__':
     import doctest
     doctest.testmod()
-#    import matplotlib.pyplot as plt
-#    fig = plt.figure()
-#    sub = fig.add_axes([0.1,0.1,0.9,0.9])
-#    m = plt.plot(range(100),'k:')
-#    abc2plot(sub,0,0,2)
-#    abc2plot(sub,0.1,0.1,2,parenthesis=True)
-#    abc2plot(sub,0.2,0.2,2,lower=True)
-#    abc2plot(sub,0.3,0.3,2,roman=True)
-#    abc2plot(sub,0.4,0.4,2,roman=True,lower=True)
-#    abc2plot(sub,0.5,0.5,2,integer=True)
-#    abc2plot(sub,0.6,0.6,2,small=True)
-#    abc2plot(sub,0.7,0.7,2,medium=True)
-#    abc2plot(sub,0.7,0.7,2,medium=True,bold=True)
-#    plt.show()
+
+    # #outtype = ''
+    # outtype = 'pdf'
+    # pdffile = 'abc2plot.pdf'
+    # usetex  = True
+    # textsize = 12
+    
+    # import matplotlib as mpl
+    # if (outtype == 'pdf'):
+    #   mpl.use('PDF') # set directly after import matplotlib
+    #   import matplotlib.pyplot as plt
+    #   from matplotlib.backends.backend_pdf import PdfPages
+    #   # Customize: http://matplotlib.sourceforge.net/users/customizing.html
+    #   mpl.rc('ps', papersize='a4', usedistiller='xpdf') # ps2pdf
+    #   mpl.rc('figure', figsize=(8.27,11.69)) # a4 portrait
+    #   if usetex:
+    #     mpl.rc('text', usetex=True)
+    #     mpl.rc('text.latex', unicode=True)
+    # else:
+    #   import matplotlib.pyplot as plt
+    #   mpl.rc('figure', figsize=(4./5.*8.27,4./5.*11.69)) # a4 portrait
+    # mpl.rc('path', simplify=False) # do not remove
+
+    # if (outtype == 'pdf'):
+    #     print('Plot PDF ', pdffile)
+    #     pdf_pages = PdfPages(pdffile)
+    # else:
+    #     print('Plot X')
+    # figsize = mpl.rcParams['figure.figsize']
+
+    # fig = plt.figure()
+    # sub = fig.add_axes([0.05,0.05,0.4,0.4])
+    # m = plt.plot(range(100),'k:')
+    # abc2plot(sub,0,0,2)
+    # abc2plot(sub,0.1,0.1,2,parenthesis='close')
+    # abc2plot(sub,0.2,0.2,2,lower=True,parenthesis='open')
+    # abc2plot(sub,0.3,0.3,2,roman=True,parenthesis='both')
+    # abc2plot(sub,0.4,0.4,2,roman=True,lower=True,parenthesis='none')
+    # abc2plot(sub,0.5,0.5,2,integer=True,parenthesis='both',usetex=usetex)
+    # abc2plot(sub,0.6,0.6,2,small=True,parenthesis='both',usetex=usetex,mathrm=False)
+    # abc2plot(sub,0.7,0.7,2,medium=True,brackets='both',usetex=usetex,mathrm=True)
+    # abc2plot(sub,0.8,0.8,2,medium=True,bold=True,braces='both',usetex=usetex,mathrm=True)
+
+    # sub = fig.add_axes([0.5,0.5,0.4,0.4])
+    # m = plt.plot(range(100),'k:')
+    # abc2plot(sub,0.1,0.1,2,brackets='close')
+    # abc2plot(sub,0.2,0.2,2,lower=True,brackets='open')
+    # abc2plot(sub,0.3,0.3,2,roman=True,brackets='both',usetex=usetex,mathrm=False)
+    # abc2plot(sub,0.4,0.4,2,roman=True,lower=True,brackets='none')
+    # abc2plot(sub,0.5,0.5,2,integer=True,braces='close')
+    # abc2plot(sub,0.6,0.6,2,small=True,braces='open',usetex=usetex,mathrm=True)
+    # abc2plot(sub,0.7,0.7,2,medium=True,braces='both')
+    # abc2plot(sub,0.8,0.8,2,medium=True,bold=True,braces='none')
+
+    # if (outtype == 'pdf'):
+    #   pdf_pages.savefig(fig)
+    #   plt.close()
+      
+    # if (outtype == 'pdf'):
+    #   pdf_pages.close()
+    # else:
+    #   plt.show()
