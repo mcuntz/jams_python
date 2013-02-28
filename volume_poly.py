@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+from __future__ import print_function
 import numpy as np
 from scipy.spatial   import Delaunay    # for triangulation
 from scipy.integrate import dblquad     # area integral

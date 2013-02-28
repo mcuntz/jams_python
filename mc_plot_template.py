@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+from __future__ import print_function
 """
 The following information is the output of: python mc_plot_template.py -h
 
@@ -44,8 +45,8 @@ Written, MC, Jul 2012
 # Command line arguments
 #
 
-pdffile    = ''
-usetex     = False
+pdffile = ''
+usetex  = False
 import optparse
 parser = optparse.OptionParser(usage='%prog [options]',
                                description="This is the python plot template of Matthias Cuntz.")
@@ -56,8 +57,8 @@ parser.add_option('-t', '--usetex', action='store_true', default=usetex, dest="u
                   help="Use LaTeX to render text in pdf.")
 (opts, args) = parser.parse_args()
 
-pdffile  = opts.pdffile
-usetex   = opts.usetex
+pdffile = opts.pdffile
+usetex  = opts.usetex
 del parser, opts, args
 
 import numpy as np
@@ -73,38 +74,38 @@ else:
     outtype = 'pdf'
 
 # Main plot
-nrow       = 3           # # of rows of subplots per figure
-ncol       = 2           # # of columns of subplots per figure
-hspace     = 0.10        # x-space between subplots
-wspace     = 0.05        # y-space between subplots
-textsize   = 13          # standard text size
-dxabc      = 0.90        # % of (max-min) shift to the right from left y-axis for a,b,c,... labels
-dyabc      = 0.05        # % of (max-min) shift up from lower x-axis for a,b,c,... labels
+nrow        = 3           # # of rows of subplots per figure
+ncol        = 2           # # of columns of subplots per figure
+hspace      = 0.10        # x-space between subplots
+wspace      = 0.05        # y-space between subplots
+textsize    = 13          # standard text size
+dxabc       = 0.90        # % of (max-min) shift to the right from left y-axis for a,b,c,... labels
+dyabc       = 0.05        # % of (max-min) shift up from lower x-axis for a,b,c,... labels
 
-lwidth     = 1.5         # linewidth
-elwidth    = 1.0         # errorbar line width
-alwidth    = 1.0         # axis line width
-msize      = 1.0         # marker size
-mwidth     = 1.0         # marker edge width
+lwidth      = 1.5         # linewidth
+elwidth     = 1.0         # errorbar line width
+alwidth     = 1.0         # axis line width
+msize       = 1.0         # marker size
+mwidth      = 1.0         # marker edge width
 # color: 'b'|'g'|'r'|'c'|'m'|'y'|'k'|'w'
 #        'blue'|'green'|'red'|'cyan'|'magenta'|'yellow'|'black'|'white'
 #        hex string '#eeefff' | RGB tuple (1,0.5,1) | html names 'burlywod', 'chartreuse', ...
 #        grayscale intensity, e.g. '0.7', 'k'='0.0'
-mcol1      = (202/255.,0/255.,32/255.)     # primary marker colour
-mcol2      = '0.0'       # color of second markers
-mcol3      = '0.0'       # color of third markers
-lcol1      = (5/255.,113/255.,176/255.)       # primary line colour
-lcol2      = '0.0'       # color of second lines
-lcol3      = '0.0'       # color of third lines
+mcol1       = (202/255.,0/255.,32/255.)     # primary marker colour
+mcol2       = '0.0'       # color of second markers
+mcol3       = '0.0'       # color of third markers
+lcol1       = (5/255.,113/255.,176/255.)       # primary line colour
+lcol2       = '0.0'       # color of second lines
+lcol3       = '0.0'       # color of third lines
 
 # Legend
-llxbbox    = -0.01       # y-anchor legend bounding box
-llybbox    = 0.04        # y-anchor legend bounding box
-llrspace   = 0.          # spacing between rows in legend
-llcspace   = 1.0         # spacing between columns in legend
-llhtextpad = 0.4         # the pad between the legend handle and text
-llhlength  = 1.5         # the length of the legend handles
-frameon    = False       # if True, draw a frame around the legend. If None, use rc
+llxbbox     = -0.01       # y-anchor legend bounding box
+llybbox     = 0.04        # y-anchor legend bounding box
+llrspace    = 0.          # spacing between rows in legend
+llcspace    = 1.0         # spacing between columns in legend
+llhtextpad  = 0.4         # the pad between the legend handle and text
+llhlength   = 1.5         # the length of the legend handles
+frameon     = False       # if True, draw a frame around the legend. If None, use rc
 llxbbox2    = 0.60       # Tight bounding of symbol and text (w/o lines)
 llhtextpad2 = 0.         #                   "
 llhlength2  = 1.0        #                   "
@@ -119,9 +120,10 @@ if (outtype == 'pdf'):
   mpl.rc('figure', figsize=(8.27,11.69)) # a4 portrait
   if usetex:
     mpl.rc('text', usetex=True)
+  else:
+    #mpl.rc('font',**{'family':'sans-serif','sans-serif':['Helvetica']})
+    mpl.rc('font',**{'family':'serif','serif':['times']})
   mpl.rc('text.latex', unicode=True)
-  #mpl.rc('font',**{'family':'sans-serif','sans-serif':['Helvetica']})
-  #mpl.rc('font',**{'family':'serif','serif':['times']})
   mpl.rc('font', size=textsize)
 else:
   import matplotlib.pyplot as plt
@@ -136,7 +138,7 @@ mpl.rc('path', simplify=False) # do not remove
 # Prepare some psudo data
 #
 
-print('Prepare data data')
+print('Prepare data')
 
 ndata = 1000
 mu, sigma = 0, 0.1 # mean and standard deviation
@@ -153,7 +155,7 @@ if (outtype == 'pdf'):
     pdf_pages = PdfPages(pdffile)
 else:
     print('Plot X')
-figsize = mpl.rcParams['figure.figsize']
+# figsize = mpl.rcParams['figure.figsize']
 
 ifig = 0
 
@@ -178,7 +180,7 @@ iplot += 1
 xxplot = xx
 xlab   = r'$(0,1)$'
 yyplot = yy
-ylab   = r'$N('+ufz.astr(mu)+','+ufz.astr(sigma,1)+')$'
+ylab   = r'$\aleph('+ufz.astr(mu)+','+ufz.astr(sigma,1)+')$'
 sub    = fig.add_axes(ufz.position(nrow,ncol,iplot,hspace=hspace,wspace=wspace))
 mark1  = sub.plot(xxplot, yyplot)
 plt.setp(mark1, linestyle='None', marker='o', markeredgecolor=mcol1, markerfacecolor='None',
@@ -222,7 +224,6 @@ if ylim != None:
 else:
     plt.setp(sub, ylabel=ylab)
 ufz.abc2plot(sub, dxabc, dyabc, iplot, lower=True, bold=True, usetex=usetex, mathrm=True, parenthesis='close')
-
 
 
 if (outtype == 'pdf'):

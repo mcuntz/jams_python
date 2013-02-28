@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # MC, May 2012 - removed math
 #              - from numpy import *  -> import numpy as np
+from __future__ import print_function
 import numpy as np
 
 def i4_bit_hi1( n ):

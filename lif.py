@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+from __future__ import print_function
 import string
 
 def lif(file, noblank=False, comment='', skip=0, maxcol=False):

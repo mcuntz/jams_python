@@ -1,6 +1,7 @@
 """
 Performs conversions of netCDF time coordinate data to/from datetime objects.
 """
+from __future__ import print_function
 import math, numpy, re, time
 from datetime import datetime as real_datetime
 from datetime import tzinfo, timedelta

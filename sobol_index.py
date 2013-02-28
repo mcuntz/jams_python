@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+from __future__ import print_function
 import numpy as np
 
 def sobol_index(s=None, ns=None, ya=None, yb=None, yc=None, si=True, sti=True):
