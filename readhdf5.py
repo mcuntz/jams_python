@@ -49,8 +49,8 @@ def readhdf5(fName, var='', reform=False, squeeze=False, variables=False,
         ['chs']
 
         >>> a = readhdf5('test_readhdf5.hdf5', var='chs', attributes=True)
-        >>> print([str(i) for i in list(a.keys())])
-        ['Double', 'Inttest', 'What the hell', 'LLLLLL']
+        >>> print([ str(i) for i in sorted(a)])
+        ['Double', 'Inttest', 'LLLLLL', 'What the hell']
         >>> print(a['Double'])
         [ 1.1]
 
