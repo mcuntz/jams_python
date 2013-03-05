@@ -2,7 +2,7 @@
 from __future__ import print_function
 def tsym(name):
     """
-        Returns raw unicodes for common symbols.
+        Returns unicodes for common symbols.
 
         Definition
         ----------
@@ -40,22 +40,14 @@ def tsym(name):
 
         Examples
         --------
-        # \00 can become \\x in docstring
-        >>> import sys
-        >>> if sys.hexversion > int('0x3000000',base=16):
-        ...     if tsym('degree') == r'\\u00B0': print('Good')
-        ... else:
-        ...     if tsym('degree') == r'\u00B0': print('Good')
-        Good
+        >>> print(tsym('degree'))
+        \u00B0
         >>> print(tsym('degreec'))
         \u2103
         >>> print(tsym('degree C'))
         \u2103
-        >>> if sys.hexversion > int('0x3000000',base=16):
-        ...     if tsym('mu') == r'\\u00B5': print('Good')
-        ... else:
-        ...     if tsym('mu') == r'\u00B5': print('Good')
-        Good
+        >>> print(tsym('mu'))
+        \u00B5
         >>> print(tsym('peclet'))
         \u2118
         >>> print(tsym('permil'))
@@ -94,19 +86,20 @@ def tsym(name):
         -------
         Written,  MC, Jun 2011
         Modified, MC, Feb 2013 - ported to Python 3
+                  MC, Mar 2013 - removed raw
     """
     #
     # Define symbol dictionary
     symdict = ({
-               'degree'    : r'\u00B0',
-               'degreec'   : r'\u2103',
-               'degree c'  : r'\u2103',
-               'mu'        : r'\u00B5',
-               'peclet'    : r'\u2118',
-               'permil'    : r'\u2030',
-               'permille'  : r'\u2030',
-               'per mil'   : r'\u2030',
-               'per mille' : r'\u2030' 
+               'degree'    : '\u00B0',
+               'degreec'   : '\u2103',
+               'degree c'  : '\u2103',
+               'mu'        : '\u00B5',
+               'peclet'    : '\u2118',
+               'permil'    : '\u2030',
+               'permille'  : '\u2030',
+               'per mil'   : '\u2030',
+               'per mille' : '\u2030' 
               })
 
     #

@@ -180,7 +180,10 @@ iplot += 1
 xxplot = xx
 xlab   = r'$(0,1)$'
 yyplot = yy
-ylab   = r'$\aleph('+ufz.astr(mu)+','+ufz.astr(sigma,1)+')$'
+if usetex:
+  ylab = r'$\aleph(\mu = '+ufz.astr(mu)+', \sigma = '+ufz.astr(sigma,1)+')$'
+else:
+  ylab = r'$\aleph(\mu = '+ufz.astr(mu)+', \sigma = '+ufz.astr(sigma,1)+')$'
 sub    = fig.add_axes(ufz.position(nrow,ncol,iplot,hspace=hspace,wspace=wspace))
 mark1  = sub.plot(xxplot, yyplot)
 plt.setp(mark1, linestyle='None', marker='o', markeredgecolor=mcol1, markerfacecolor='None',
