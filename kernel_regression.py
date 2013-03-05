@@ -142,8 +142,6 @@ def kernel_regression(x, y, h=None, silverman=False, xout=None):
     dout  = ssout[1]
     if d != dout:
         raise ValueError('size(x,1) != size(xout,1): '+str(d)+' != '+str(dout))
-    # Scaling first, make diagonal matrix
-    hh1 = 1. / np.prod(hh)
     # allocate output
     out = np.empty(nout)
     # Loop through each regression point
