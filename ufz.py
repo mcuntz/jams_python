@@ -30,6 +30,7 @@ from __future__ import print_function
     div                    Wrapper for division.
     division               Divide two arrays, return 'otherwise' if division by 0.
     esat                   Calculates the saturation vapour pressure of water/ice.
+    find_in_path           Look for file in system path.
     fread                  Reads in float array from ascii file.
     functions              Common functions that are used in curve_fit or fmin parameter estimations.
     gapfill                Gapfill Eddy flux data.
@@ -75,6 +76,7 @@ from __future__ import print_function
     unpack                 Similar to Fortran unpack function with mask.
     volume_poly            Volume of function above a polygon
     writenetcdf            Write netCDF4 file.
+    xkcd                   Make plot look handdrawn.
     yrange                 Calculates plot range from input array.
     zacharias              Soil water content with van Genuchten and Zacharias et al. (2007).
     zacharias_check        Checks validity of parameter set for Zacharias et al. (2007).
@@ -178,6 +180,7 @@ from __future__ import print_function
     astr                   Wrapper for autostring.
     autostring             Format number (array) with given decimal precision.
     const                  Provides physical, mathematical, computational, and isotope constants.
+    find_in_path           Look for file in system path.
     int2roman              Integer to roman numeral conversion.
     roman2int              Roman numeral to integer conversion.
     zacharias              Soil water content with van Genuchten and Zacharias et al. (2007).
@@ -193,6 +196,7 @@ from __future__ import print_function
     position               Position arrays of subplots to be used with add_axes.
     print_brewer           Prints available Brewer colormap names.
     tsym                   Raw unicodes for common symbols.
+    xkcd                   Make plot look handdrawn.
     yrange                 Calculates plot range from input array.
 
 
@@ -262,6 +266,7 @@ from __future__ import print_function
               MC, Feb 2013 - area_poly
               MC & JM, Feb 2013 - volume_poly
               MC, Feb 2013 - ported to Python 3
+              MC, Mar 2013 - find_in_path, xkcd
 """
 # Routines provided
 from abc2plot          import *
@@ -283,6 +288,7 @@ from dec2date          import *
 from dewpoint          import *
 from division          import *
 from esat              import *
+from find_in_path      import *
 from fread             import *
 import functions
 from gapfill           import *
@@ -338,6 +344,7 @@ try:
     from writenetcdf   import *
 except ImportError:
     pass
+from xkcd              import xkcd
 from yrange            import *
 from zacharias         import *
 
