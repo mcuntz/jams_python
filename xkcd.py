@@ -64,7 +64,7 @@ def xkcd_line(x, y, xlim=None, ylim=None, mag=1.0, f1=30, f2=0.05, f3=15):
     # scale the data
     x_scaled = (x - xlim[0]) * 1. / (xlim[1] - xlim[0])
     y_scaled = (y - ylim[0]) * 1. / (ylim[1] - ylim[0])
-
+    
     # compute the total distance along the path
     dx       = x_scaled[1:] - x_scaled[:-1]
     dy       = y_scaled[1:] - y_scaled[:-1]
@@ -75,22 +75,37 @@ def xkcd_line(x, y, xlim=None, ylim=None, mag=1.0, f1=30, f2=0.05, f3=15):
     u  = np.arange(-1, Nu + 1) * 1. / (Nu - 1)
 
     # interpolate curve at sampled points
-    k            = min(3, len(x) - 1)
+    # k            = min(3, len(x) - 1)
+    k            = min(3, x.size - 1)
     res          = interpolate.splprep([x_scaled, y_scaled], s=0, k=k)
     x_int, y_int = interpolate.splev(u, res[0])
 
     # we perturb perpendicular to the drawn line
     dx   = x_int[2:] - x_int[:-2]
     dy   = y_int[2:] - y_int[:-2]
+    # horizontal or vertical lines
+    # np.sign(np.cumsum(np.random.random(dx.size)-0.5)) emulates something like a Brownian motion
+    # i.e. auto-correlated random walks around 0; just the sign interests here.
+    eps = np.maximum(np.abs(np.amax(x_scaled)-np.amin(x_scaled)), np.abs(np.amax(y_scaled)-np.amin(y_scaled)))/Nu
+    if np.all(np.abs(dx) < eps):
+        dx = np.sign(np.cumsum(np.random.random(dx.size)-0.5)) * eps
+    if np.all(np.abs(dy) < eps):
+        dy = np.sign(np.cumsum(np.random.random(dx.size)-0.5)) * eps
+    # equal distances
+    if np.all(np.sign(dx) == np.sign(dx[0])):
+        dx *= np.sign(np.cumsum(np.random.random(dx.size)-0.5))
+    if np.all(np.sign(dy) == np.sign(dy[0])):
+        dy *= np.sign(np.cumsum(np.random.random(dx.size)-0.5))
     dist = np.sqrt(dx * dx + dy * dy)
 
     # create a filtered perturbation
-    coeffs       = mag * np.random.normal(0, 0.01, len(x_int) - 2)
+    # coeffs       = mag * np.random.normal(0, 0.01, len(x_int) - 2)
+    coeffs       = mag * np.random.normal(0, 0.01, x_int.size - 2)
     b            = signal.firwin(f1, f2*dist_tot, window=('kaiser', f3))
     response     = signal.lfilter(b, 1, coeffs)
     x_int[1:-1] += response * dy / dist
     y_int[1:-1] += response * dx / dist
-
+    
     # un-scale data
     x_int = x_int[1:-1] * (xlim[1] - xlim[0]) + xlim[0]
     y_int = y_int[1:-1] * (ylim[1] - ylim[0]) + ylim[0]
@@ -225,6 +240,9 @@ def xkcd(ax,
     import matplotlib.font_manager as fm
     from find_in_path import find_in_path
 
+    # remember random state for later resetting
+    random_state = np.random.get_state()
+    
     # Get axes aspect
     ext = ax.get_window_extent().extents
     aspect = (ext[3] - ext[1]) / (ext[2] - ext[0])
@@ -336,6 +354,7 @@ def xkcd(ax,
     # modify legend
     leg = ax.get_legend()
     if leg is not None:
+        np.random.set_state(random_state) # restate random number generator for reproducible results
         leg.set_frame_on(False)
         for child in leg.get_children():
             if isinstance(child, plt.Line2D):
@@ -421,12 +440,12 @@ if __name__ == '__main__':
     # ax = fig.add_axes(pos)
 
     # x = np.linspace(0, 10, 100)
-    # ax.plot(x, np.sin(x) * np.exp(-0.1 * (x - 5) ** 2), 'b', lw=1, label='damped sine')
-    # ax.plot(x, -np.cos(x) * np.exp(-0.1 * (x - 5) ** 2), 'r', lw=1, label='damped cosine')
+    # ax.plot(x, np.sin(x) * np.exp(-0.1 * (x - 5) ** 2), 'b', lw=1, label='sine')
+    # ax.plot(x, -np.cos(x) * np.exp(-0.1 * (x - 5) ** 2), 'r', lw=1, label='cosine')
     # ax.set_title('check it out!')
     # ax.set_xlabel('x label')
     # ax.set_ylabel('y label')
-    # ax.legend(bbox_to_anchor=(1.,0.4), ncol=1, handlelength=0)
+    # ax.legend(loc='upper left', bbox_to_anchor=(0.7,0.4), ncol=1, handlelength=0)
 
     # xkcd(ax, xaxis_loc=0.0, yaxis_loc=1.0,
     #      xaxis_arrow='+-', yaxis_arrow='+-', xlabel_inside=1., title_size=textsize+2)
@@ -446,13 +465,13 @@ if __name__ == '__main__':
     # ax = fig.add_axes(pos)
 
     # x = np.linspace(0, 10, 100)
-    # ax.plot(x, np.sin(x) * np.exp(-0.1 * (x - 5) ** 2), 'b', lw=1, label='damped sine')
-    # ax.plot(x, -np.cos(x) * np.exp(-0.1 * (x - 5) ** 2), 'r', lw=1, label='damped cosine')
-    # ax.plot(x, -np.cos(x+0.1) * np.exp(-0.1 * (x - 5) ** 2), 'r', lw=1, label='damped cosine 2')
+    # ax.plot(x, np.sin(x) * np.exp(-0.1 * (x - 5) ** 2), 'b', lw=1, label='sine')
+    # ax.plot(x, -np.cos(x) * np.exp(-0.1 * (x - 5) ** 2), 'r', lw=1, label='cosine')
+    # ax.plot(x, -np.cos(x+1.0) * np.exp(-0.1 * (x - 5) ** 2), 'm', lw=1, label='shift')
     # ax.set_title('check it out!')
     # ax.set_xlabel('x label')
     # ax.set_ylabel('y label')
-    # ax.legend(bbox_to_anchor=(1.,0.4), ncol=1, handlelength=0)
+    # ax.legend(loc='upper left', bbox_to_anchor=(0.7,0.4), ncol=1, handlelength=0)
 
     # xkcd(ax, xaxis_loc=0.0, yaxis_loc=1.0,
     #      xaxis_arrow='+-', yaxis_arrow='+-', xlabel_inside=1., title_size=textsize+2)
@@ -502,7 +521,7 @@ if __name__ == '__main__':
     # ax.plot([0.32, 0.35], [0.75, 0.35], '-k', lw=0.5)
 
     # ax.text(0.9, 0.4, "embarrassment")
-    # ax.plot([1.0, 0.8], [0.55, 1.05], '-k', lw=0.5)
+    # ax.plot([0.8, 1.0], [1.05, 0.55], '-k', lw=0.5)
 
     # ax.set_title("Walking back to my\nfront door at night:")
 
