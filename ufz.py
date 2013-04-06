@@ -60,6 +60,7 @@ from __future__ import print_function
     readhdf4               Reads variables or information from hdf4 files.
     readhdf5               Reads variables or information from hdf5 file.
     readnetcdf             Reads variables or information from netcdf file.
+    rgb                    Interpolate between colours; make continuous colour maps.
     roman2int              Roman numeral to integer conversion.
     savitzky_golay         Smooth (and optionally differentiate) 1D data with a Savitzky-Golay filter.
     savitzky_golay2d       Smooth (and optionally differentiate) 2D data with a Savitzky-Golay filter.
@@ -195,6 +196,7 @@ from __future__ import print_function
     plot_brewer            Plots available Brewer color maps in pdf file.
     position               Position arrays of subplots to be used with add_axes.
     print_brewer           Prints available Brewer colormap names.
+    rgb                    Interpolate between colours; make continuous colour maps.
     tsym                   Raw unicodes for common symbols.
     xkcd                   Make plot look handdrawn.
     yrange                 Calculates plot range from input array.
@@ -233,9 +235,7 @@ from __future__ import print_function
     History
     -------
     Written,  MC, Jul 2009
-    Modified, MC, Jul 2009 - lif, fread, sread
-                           - readnetcdf, cellarea
-                           - pack, unpack
+    Modified, MC, Jul 2009 - lif, fread, sread, readnetcdf, cellarea, pack, unpack
               MC, Aug 2009 - position
               MG, Jul 2010 - outlier
               AP, Jan 2011 - date2dec, dec2date
@@ -247,9 +247,8 @@ from __future__ import print_function
               MC, Nov 2011 - mad
               MC, Nov 2011 - try netcdf and stats routines
               MC, Nov 2011 - autostring
-              MC, Jan 2012 - esat, closest, dewpoint, division, heaviside, tcherkez, yrange, const
-                           - make calcvpd obsolete
-                           - cuntz_gleixner
+              MC, Jan 2012 - esat, closest, dewpoint, division, heaviside, tcherkez, yrange, const, cuntz_gleixner
+                           - calcvpd obsolete
               MC, Mar 2012 - gapfill, nee2gpp
               MC, May 2012 - astr, div, sobol_index, pi, roman, zacharias, saltelli
               MZ, Jun 2012 - writenetcdf
@@ -262,11 +261,12 @@ from __future__ import print_function
               AP, Nov 2012 - convex_hull, in_poly, kriging, semivariogram update, srrasa, srrasa_trans
               MC, Nov 2012 - nee2gpp, nee2gpp_global, nee2gpp_lasslop, nee2gpp_reichstein
               MC, Dec 2012 - functions
-                           - make gap_filling obsolete
+                           - gap_filling obsolete
               MC, Feb 2013 - area_poly
               MC & JM, Feb 2013 - volume_poly
               MC, Feb 2013 - ported to Python 3
               MC, Mar 2013 - find_in_path, xkcd
+              MC, Apr 2013 - rgb
 """
 # Routines provided
 from abc2plot          import *
@@ -329,6 +329,7 @@ try:
     from readnetcdf    import *
 except ImportError:
     print("No netcdf support in UFZ library. Disabled functions: readnetcdf, writenetcdf.")
+from rgb               import rgb_blend, rgb_range, rgb_gradient
 from romanliterals     import int2roman, roman2int
 from saltelli          import *
 from savitzky_golay    import *
