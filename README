@@ -46,10 +46,10 @@ Be aware that the current PDF is not always up to date.
 
 
 The Library is compatible with Python 2 and 3 (> 2.6).
-Note that not all packages use by the library are already Python 3 ready.
+Note that not all packages used by the library are already Python 3 ready.
 
 
-UFZ routines are free software and come with ABSOLUTELY NO WARRANTY.'
+UFZ routines are free software and come with ABSOLUTELY NO WARRANTY.
 
 
 License
