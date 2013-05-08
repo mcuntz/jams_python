@@ -290,6 +290,7 @@ def dec2date(indata, calendar='standard', refdate=None, units=None,
                               - included units='day as %Y%m%d.%f'
                  MC, Feb 2013 - solved Excel leap year problem.
                  MC, Feb 2013 - ported to Python 3
+                 AP, May 2013 - solved eng output problem.
     """
 
     #
@@ -515,8 +516,8 @@ def dec2date(indata, calendar='standard', refdate=None, units=None,
             output = output[0]
     # Ascii english output
     elif eng:
-        output = ( ['%02d.%02d.%04d %02d:%02d:%02d' %
-                    (day[i], month[i], year[i], hour[i], minute[i], second[i]) for i in range(insize)] )
+        output = ( ['%04d-%02d-%02d %02d:%02d:%02d' %
+                    (year[i], month[i], day[i], hour[i], minute[i], second[i]) for i in range(insize)] )
         output = np.reshape(output, inshape)
         if isarr==0:
             output = output[0]
