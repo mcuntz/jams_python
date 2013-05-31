@@ -150,9 +150,9 @@ def jab(arr, ind=None, nind=None, mask=None, weight=False, nsteps=1):
         onlyone = True
     if mask != None:
         if len(mask.shape) != 2:
-            raise Error('Mask array must have 2 dimensions.')
+            raise ValueError('Mask array must have 2 dimensions.')
         if mask.shape[0] != arr.shape[0]:
-            raise Error('First dimension of boostrap standard error array and mask array have to match.')
+            raise ValueError('First dimension of boostrap standard error array and mask array have to match.')
         nboot = mask.shape[0]
         nind  = mask.shape[1]
     else:

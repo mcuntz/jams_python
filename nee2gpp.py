@@ -147,6 +147,7 @@ def nee2gpp(dates, nee, t, isday, rg=False, vpd=False, undef=np.nan,
         Modified AP, Mar 2012 - undef=np.nan
                  MC, Nov 2012 - wrapper for individual routines nee2gpp_reichstein etc.
                  MC, Feb 2013 - ported to Python 3
+                 MC, May 2013 - replaced cost functions by generel cost function cost_abs if possible
     """
 
     # Global relationship in Reichstein et al. (2005)
@@ -300,7 +301,8 @@ def nee2gpp_global(dates, nee, t, isday, undef=np.nan,
     tt   = np.ma.compressed(t[ii])
     net  = np.ma.compressed(nee[ii])
     # p, c     = opt.curve_fit(functions.lloyd_fix, tt, net, p0=[2.,200.]) # global parameter, global cov matrix
-    p        = opt.fmin(functions.cost_lloyd_fix, [2.,200.], args=(tt, net), disp=False)
+    #p        = opt.fmin(functions.cost_lloyd_fix, [2.,200.], args=(tt, net), disp=False)
+    p        = opt.fmin(functions.cost_abs, [2.,200.], args=(functions.lloyd_fix_p, tt, net), disp=False)
     Reco     = np.ones(ndata)*undef
     ii       = np.squeeze(np.where(~t.mask))
     Reco[ii] = functions.lloyd_fix(t[ii], p[0], p[1])
@@ -545,7 +547,8 @@ def nee2gpp_reichstein(dates, nee, t, isday, rg=False, vpd=False, undef=np.nan,
             # Calc directly minisation of (nee-p*et)**2
             # p = np.sum(net[iii]*et[iii])/np.sum(et[iii]**2)
             # p, c = opt.curve_fit(functions.lloyd_only_rref, et[iii], net[iii], p0=[2.])
-            p      = opt.fmin(functions.cost_lloyd_only_rref, [2.], args=(et[iii], net[iii]), disp=False)
+            #p      = opt.fmin(functions.cost_lloyd_only_rref, [2.], args=(et[iii], net[iii]), disp=False)
+            p      = opt.fmin(functions.cost_abs, [2.], args=(functions.lloyd_only_rref_p, et[iii], net[iii]), disp=False)
             refp  += [p]
             refii += [np.int((iii[0]+iii[-1])//2)]
     if len(refp) == 0:
@@ -771,7 +774,8 @@ def nee2gpp_lasslop(dates, nee, t, isday, rg, vpd, undef=np.nan,
         niii = iii.size
         if niii > 3:
             # p, c = opt.curve_fit(functions.lloyd_fix, ntt[iii], nnet[iii], p0=[aRref,100.])
-            p  = opt.fmin(functions.cost_lloyd_fix, [aRref,100.], args=(ntt[iii], nnet[iii]), disp=False)
+            #p  = opt.fmin(functions.cost_lloyd_fix, [aRref,100.], args=(ntt[iii], nnet[iii]), disp=False)
+            p  = opt.fmin(functions.cost_abs, [aRref,100.], args=(functions.lloyd_fix_p, ntt[iii], nnet[iii]), disp=False)
             E0 = np.maximum(p[1], 50.)
         else:
             if zaehl >= 0:
@@ -959,26 +963,26 @@ if __name__ == '__main__':
     # isday = np.where(rg > 10., True, False)
     # tt    = np.where(tair == undef, undef, tair+273.15)
     # GPP, Reco = nee2gpp(dates, NEE, tt, isday, undef=undef, method='local')
-    # print GPP[1120:1128]
+    # print(GPP[1120:1128])
     # #[ -9.99900000e+03  -9.99900000e+03  -9.99900000e+03   4.49101620e+00
     # #  8.39556274e+00   1.06881053e+01   8.54233665e+00   1.12707122e+01]
-    # print Reco[1120:1128]
+    # print(Reco[1120:1128])
     # #[ 1.78172209  1.90616886  2.07856924  2.2560362   2.46373274  2.70757535
     # #  2.95064665  3.2184422 ]
     # GPP, Reco = nee2gpp(dates, NEE, tt, isday, undef=undef, method='local')
-    # print GPP[1120:1128]
+    # print(GPP[1120:1128])
     # #[ -9.99900000e+03  -9.99900000e+03  -9.99900000e+03   4.49101620e+00
     # #   8.39556274e+00   1.06881053e+01   8.54233665e+00   1.12707122e+01]
     # GPP, Reco = nee2gpp(dates, NEE, tt, isday, undef=undef, method='global')
-    # print GPP[1120:1128]
+    # print(GPP[1120:1128])
     # #[ -9.99900000e+03  -9.99900000e+03  -9.99900000e+03   4.33166157e+00
     # #   8.18228013e+00   1.04092252e+01   8.19395317e+00   1.08427448e+01]
     # GPP, Reco = nee2gpp(dates, NEE, tt, isday, undef=undef, method='local', masked=True)
-    # print GPP[1120:1128]
+    # print(GPP[1120:1128])
     # #[-- -- -- 4.49101619818 8.39556273706 10.6881053462 8.54233664766
     # # 11.2707121977]
     # GPP, Reco = nee2gpp(dates, NEE, tt, isday, undef=undef, method='local', shape=(np.size(NEE),1))
-    # print GPP[1120:1128]
+    # print(GPP[1120:1128])
     # #[[ -9.99900000e+03]
     # # [ -9.99900000e+03]
     # # [ -9.99900000e+03]
@@ -990,10 +994,9 @@ if __name__ == '__main__':
     # VPD = np.squeeze(dat[8,:])
     # vpd = np.where(VPD == undef, undef, VPD*100.)
     # GPP, Reco = nee2gpp(dates, NEE, tt, isday, rg, vpd, undef=undef, method='day')
-    # print GPP[1120:1128]
+    # print(GPP[1120:1128])
     # #[ -9.99900000e+03  -9.99900000e+03  -9.99900000e+03   2.89693618e+00
     # #   6.77103400e+00   9.06351370e+00   6.95696901e+00   9.77798943e+00]
-    # print Reco[1120:1128]
+    # print(Reco[1120:1128])
     # #[ 0.35174817  0.42088838  0.53124809  0.66195618  0.839204    1.0829837
     # #  1.36527901  1.72571943]
-

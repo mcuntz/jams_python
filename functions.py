@@ -26,6 +26,16 @@ import const # from ufz
              and the parameters to fit as separate remaining arguments.
     fmin is a general minimiser with respect to the first argument, i.e. func(p,*args).
 
+    There are also two common cost functions (absolute and squared deviations) where any function
+    in the form func(x, p) can be used as second argument:
+        5. cost_abs(p, func, x, y)
+        6. cost_square(p, func, x, y)
+    Used for example as
+        p = opt.fmin(ufz.functions.cost_abs, np.array([p1,p2]), args=(ufz.functions.f1x_p,x,y), disp=False)
+    or
+        p, nfeval, rc = opt.fmin_tnc(ufz.functions.cost_square, [p1,p2], bounds=[[None,None],[None,None]],
+                                     args=(ufz.functions.f1x_p,x,y), approx_grad=True, disp=False)
+
 
     Definition
     ----------
@@ -87,7 +97,19 @@ import const # from ufz
     -------
     Written,  MC, Dec 2012
     Modified, MC, Feb 2013 - ported to Python 3
+              MC, May 2013 - general cost function cost_abs, cost_square
 """
+
+# -----------------------------------------------------------
+# general cost functions
+def cost_abs(p, func, x, y):
+    """ General cost function for robust optimising func(p, x) vs y with sum of absolute deviations"""
+    return np.sum(np.abs(y-func(x,p)))
+
+def cost_square(p, func, x, y):
+    """ General cost function for least square optimising func(p, x) vs y"""
+    return np.sum((y-func(x,p))**2)
+
 
 # -----------------------------------------------------------
 # arrhenius
@@ -296,6 +318,39 @@ def cost_lloyd_only_rref(p, et, resp):
 def cost2_lloyd_only_rref(p, et, resp):
     """ Cost function for rref  with sum of squared deviations """
     return np.sum((resp-lloyd_only_rref_p(et,p))**2)
+
+# -----------------------------------------------------------
+# sqrt(a + b/x) - theoretical form of Jackknife-after-bootstrap
+
+def sabx(x, a, b):
+  """ sqrt(a + b/x)
+        a, b  parameters
+        x     independent variable
+  """
+  return np.sqrt(a+b/x)
+
+def sabx_p(x, p):
+  """ sqrt(a + b/x)
+        p    array of size 2, parameters
+        x    independent variable
+  """
+  return np.sqrt(p[0]+p[1]/x)
+
+def cost_sabx(p,x,y):
+  ''' Cost function for sqrt of general 1/x function with sum of absolute deviations
+        p    array of size 2, parameters
+        x    independent variable
+        y    dependent variable to optimise
+  '''
+  return np.sum(np.abs(y-sabx_p(x,p)))
+
+def cost2_sabx(p,x,y):
+  ''' Cost function for sqrt of general 1/x function with sum of squared deviations
+        p    array of size 2, parameters
+        x    independent variable
+        y    dependent variable to optimise
+  '''
+  return np.sum((y-sabx_p(x,p))**2)
 
 
 if __name__ == '__main__':
