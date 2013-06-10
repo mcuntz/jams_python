@@ -20,6 +20,8 @@ from __future__ import print_function
     autostring             Format number (array) with given decimal precision.
     cellarea               Calc areas of grid cells in m^2.
     closest                Get the array index of the element that is closest to a given number.
+    colors                 Wrapper for colour.
+    colours                Define UFZ colours.
     const                  Provides physical, mathematical, computational, and isotope constants.
     convex_hull            Calculate subset of points that make a convex hull around a set of 2D points. 
     cuntz_gleixner         Cuntz-Gleixner model of 13C discrimination.
@@ -191,6 +193,8 @@ from __future__ import print_function
     Plotting
     --------
     abc2plot               Write a, b, c, ... on plots.
+    colors                 Wrapper for colour.
+    colours                Define UFZ colours.
     define_brewer          Defines and registers Brewer colormap.
     get_brewer             Defines and returns Brewer colormap.
     plot_brewer            Plots available Brewer color maps in pdf file.
@@ -267,6 +271,7 @@ from __future__ import print_function
               MC, Feb 2013 - ported to Python 3
               MC, Mar 2013 - find_in_path, xkcd
               MC, Apr 2013 - rgb
+              MC, Jun 2013 - colours
 """
 # Routines provided
 from abc2plot          import *
@@ -280,6 +285,7 @@ except ImportError:
     pass
 from cellarea          import *
 from closest           import *
+from colours            import colours, colors
 import const
 from convex_hull       import convex_hull 
 from cuntz_gleixner    import *
