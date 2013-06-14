@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 from __future__ import print_function
 """
-    Define Brewer colormap.
+    Define Brewer colormaps and similar.
 
     Provides also routines to print or plot colormaps.
 
@@ -62,9 +62,12 @@ from __future__ import print_function
 
     References
     ----------
-    Colourmaps of http://colorbrewer2.org by Cynthia A. Brewer, Geography, Pennsylvania State University.
+    Colourmaps by Cynthia A. Brewer, Geography, Pennsylvania State University
+      http://colorbrewer2.org
     Values copied from
-    http://www.personal.psu.edu/cab38/ColorBrewer/ColorBrewer_all_schemes_RGBonly4_withPalette_and_Macro.xls
+      http://www.personal.psu.edu/cab38/ColorBrewer/ColorBrewer_all_schemes_RGBonly4_withPalette_and_Macro.xls
+    Also included colour maps from Geography, University of Oregon
+      http://geography.uoregon.edu/datagraphics/color_scales.htm
 
 
     Examples
@@ -107,6 +110,7 @@ from __future__ import print_function
     -------
     Written,  MC, Sep 2012
     Modified, MC, Feb 2013 - ported to Python 3
+              MC, Jun 2013 - include Uni Oregon colours
 """
 
 # Define colormaps
@@ -382,6 +386,54 @@ accent6 = [(127, 201, 127), (190, 174, 212), (253, 192, 134), (255, 255, 153), (
 accent7 = [(127, 201, 127), (190, 174, 212), (253, 192, 134), (255, 255, 153), (56, 108, 176), (240, 2, 127), (191, 91, 23)]
 accent8 = [(127, 201, 127), (190, 174, 212), (253, 192, 134), (255, 255, 153), (56, 108, 176), (240, 2, 127), (191, 91, 23), (102, 102, 102)]
 
+# Oregon State University
+# sequential
+bu7    = [(255,  255,  255), ( 204,  253,  255), ( 153,  248,  255), ( 102,  240,  255), (  51,  228,  255),
+          (   0,  170,  204), (   0,  122,  153)]
+bu10   = [(229, 255, 255), (204, 250, 255), (178, 242, 255), (153, 229, 255), (127, 212, 255), (101, 191, 255),
+          ( 76, 165, 255), ( 50, 136, 255), ( 25, 101, 255), (  0,  63, 255)]
+step5  = [(153,  15,  15), (178,  44,  44), (204,  81,  81), (229, 126, 126), (255, 178, 178), (153,  84,  15),
+          (178, 111,  44), (204, 142,  81), (229, 177, 126), (255, 216, 178), (107, 153,  15), (133, 178,  44),
+          (163, 204,  81), (195, 229, 126), (229, 255, 178), ( 15, 107, 153), ( 44, 133, 178), ( 81, 163, 204),
+          (126, 195, 229), (178, 229, 255), ( 38,  15, 153), ( 66,  44, 178), (101,  81, 204), (143, 126, 229),
+          (191, 178, 255)]
+# diverging
+brbu10 = [(102,  47,   0), (153,  96,  53), (204, 155, 122), (216, 175, 151), (242, 218, 205), (204, 253, 255),
+          (153, 248, 255), (101, 239, 255), ( 50, 227, 255), (  0, 169, 204)]
+brbu12 = [( 51,  25,   0), (102,  47,   0), (153,  96,  53), (204, 155, 122), (216, 175, 151), (242, 218, 205),
+          (204, 253, 255), (153, 248, 255), (101, 239, 255), ( 50, 227, 255), (  0, 169, 204), (  0, 122, 153)]
+budor12 = [( 30, 142, 153), ( 81, 195, 204), (153, 249, 255), (178, 252, 255), (204, 254, 255), (229, 255, 255),
+           (255, 229, 204), (255, 202, 153), (255, 173, 101), (255, 142,  50), (204,  88,   0), (153,  63,   0)]
+budor18 = [(  0, 102, 102), (  0, 153, 153), (  0, 204, 204), (  0, 255, 255), ( 51, 255, 255), (101, 255, 255),
+           (153, 255, 255), (178, 255, 255), (203, 255, 255), (229, 255, 255), (255, 229, 203), (255, 202, 153),
+           (255, 173, 101), (255, 142,  51), (255, 110,   0), (204,  85,   0), (153,  61,   0), (102,  39,   0)]
+drdbu12 = [( 41,  10, 216), ( 38,  77, 255), ( 63, 160, 255), (114, 217, 255), (170, 247, 255), (224, 255, 255),
+           (255, 255, 191), (255, 224, 153), (255, 173, 114), (247, 109,  94), (216,  38,  50), (165,   0,  33)]
+drdbu18 = [( 36,   0, 216), ( 24,  28, 247), ( 40,  87, 255), ( 61, 135, 255), ( 86, 176, 255), (117, 211, 255),
+           (153, 234, 255), (188, 249, 255), (234, 255, 255), (255, 255, 234), (255, 241, 188), (255, 214, 153),
+           (255, 172, 117), (255, 120,  86), (255,  61,  61), (247,  39,  53), (216,  21,  47), (165,   0,  33)]
+bugn14 = [(  0,   0, 255), ( 51,  51, 255), (101, 101, 255), (153, 153, 255), (178, 178, 255), (203, 203, 255),
+          (229, 229, 255), (229, 255, 229), (203, 255, 203), (178, 255, 178), (153, 255, 153), (101, 255, 101),
+          ( 51, 255,  51), (  0, 255,   0)]
+bugr8 = [(  0, 153, 204), (102, 229, 255), (153, 255, 255), (204, 255, 255), (229, 229, 229), (153, 153, 153),
+         (102, 102, 102), ( 51,  51,  51)]
+buor8 = [(  0, 127, 255), ( 76, 195, 255), (153, 237, 255), (204, 255, 255), (255, 255, 204), (255, 238, 153),
+         (255, 195,  76), (255, 127,   0)]
+buor10 = [(  0,  84, 255), ( 50, 153, 255), (101, 204, 255), (153, 237, 255), (204, 255, 255), (255, 255, 204),
+          (255, 238, 153), (255, 204, 101), (255, 153,  50), (255,  85,   0)] 
+buor12 = [(  0,  42, 255), ( 25, 101, 255), ( 50, 153, 255), (101, 204, 255), (153, 237, 255), (204, 255, 255),
+          (255, 255, 204), (255, 238, 153), (255, 204, 101), (255, 153,  50), (255, 102,  25), (255,  42,   0)]
+buor14 = [(  7,  90, 255), ( 50, 118, 255), ( 89, 144, 255), (140, 178, 255), (191, 212, 255), (229, 238, 255),
+          (247, 249, 255), (255, 255, 204), (255, 255, 153), (255, 255,   0), (255, 204,   0), (255, 153,   0),
+          (255, 102,   0), (255,   0,   0)]
+rdylbu11b = [(165,   0,  33), (216,  38,  50), (247, 109,  94), (255, 173, 114), (255, 224, 153), (255, 255, 191),
+             (224, 255, 255), (170, 247, 255), (114, 216, 255), ( 63, 160, 255), ( 38,  76, 255)]
+gnmg16 = [(  0,  80,   0), (  0, 134,   0), (  0, 187,   0), (  0, 241,   0), ( 80, 255,  80), (134, 255, 134),
+          (187, 255, 187), (255, 255, 255), (255, 241, 255), (255, 187, 255), (255, 134, 255), (255,  80, 255),
+          (241,   0, 241), (187,   0, 187), (134,   0, 134), ( 80,   0,  80)]
+# qualitative
+cat12 = [(255, 191, 127), (255, 127,   0), (255, 255, 153), (255, 255,  50), (178, 255, 140), ( 50, 255,   0),
+         (165, 237, 255), ( 25, 178, 255), (204, 191, 255), (101,  76, 255), (255, 153, 191), (229,  25,  50)]
 
 sequential_maps = ['ylgn3','ylgn4','ylgn5','ylgn6','ylgn7','ylgn8','ylgn9','ylgnbu3','ylgnbu4',
                    'ylgnbu5','ylgnbu6','ylgnbu7','ylgnbu8','ylgnbu9','gnbu3','gnbu4','gnbu5',
@@ -396,7 +448,8 @@ sequential_maps = ['ylgn3','ylgn4','ylgn5','ylgn6','ylgn7','ylgn8','ylgn9','ylgn
                    'purples9','blues3','blues4','blues5','blues6','blues7','blues8','blues9','greens3',
                    'greens4','greens5','greens6','greens7','greens8','greens9','oranges3','oranges4',
                    'oranges5','oranges6','oranges7','oranges8','oranges9','reds3','reds4','reds5','reds6',
-                   'reds7','reds8','reds9','greys3','greys4','greys5','greys6','greys7','greys8','greys9']
+                   'reds7','reds8','reds9','greys3','greys4','greys5','greys6','greys7','greys8','greys9',
+                   'bu7', 'bu10', 'step5']
 
 diverging_maps = ['puor3','puor4','puor5','puor6','puor7','puor8','puor9','puor10','puor11','brbg3',
                   'brbg4','brbg5','brbg6','brbg7','brbg8','brbg9','brbg10','brbg11','prgn3','prgn4',
@@ -407,7 +460,9 @@ diverging_maps = ['puor3','puor4','puor5','puor6','puor7','puor8','puor9','puor1
                   'rdylbu8','rdylbu9','rdylbu10','rdylbu11','spectral3','spectral4','spectral5',
                   'spectral6','spectral7','spectral8','spectral9','spectral10','spectral11',
                   'rdylgn3','rdylgn4','rdylgn5','rdylgn6','rdylgn7','rdylgn8','rdylgn9','rdylgn10',
-                  'rdylgn11']
+                  'rdylgn11',
+                   'brbu10', 'brbu12', 'budor12', 'budor18', 'drdbu12', 'drdbu18', 'bugn14', 'bugr8',
+                   'buor8', 'buor10', 'buor12', 'buor14', 'rdylbu11b', 'gnmg16']
 
 qualitative_maps = ['set33','set34','set35','set36','set37','set38','set39','set310','set311','set312',
                     'pastel13','pastel14','pastel15','pastel16','pastel17','pastel18','pastel19','set13',
@@ -415,7 +470,8 @@ qualitative_maps = ['set33','set34','set35','set36','set37','set38','set39','set
                     'pastel26','pastel27','pastel28','set23','set24','set25','set26','set27','set28',
                     'dark23','dark24','dark25','dark26','dark27','dark28','paired3','paired4','paired5',
                     'paired6','paired7','paired8','paired9','paired10','paired11','paired12','accent3',
-                    'accent4','accent5','accent6','accent7','accent8']
+                    'accent4','accent5','accent6','accent7','accent8',
+                    'cat12']
 
 
 def define_brewer(cname='all', reverse=False, grey=False, gray=False):
@@ -444,7 +500,7 @@ def print_brewer(names='all'):
         Examples
         --------
         >>> print_brewer('qualitative')
-        ['set33', 'set34', 'set35', 'set36', 'set37', 'set38', 'set39', 'set310', 'set311', 'set312', 'pastel13', 'pastel14', 'pastel15', 'pastel16', 'pastel17', 'pastel18', 'pastel19', 'set13', 'set14', 'set15', 'set16', 'set17', 'set18', 'set19', 'pastel23', 'pastel24', 'pastel25', 'pastel26', 'pastel27', 'pastel28', 'set23', 'set24', 'set25', 'set26', 'set27', 'set28', 'dark23', 'dark24', 'dark25', 'dark26', 'dark27', 'dark28', 'paired3', 'paired4', 'paired5', 'paired6', 'paired7', 'paired8', 'paired9', 'paired10', 'paired11', 'paired12', 'accent3', 'accent4', 'accent5', 'accent6', 'accent7', 'accent8']
+        ['set33', 'set34', 'set35', 'set36', 'set37', 'set38', 'set39', 'set310', 'set311', 'set312', 'pastel13', 'pastel14', 'pastel15', 'pastel16', 'pastel17', 'pastel18', 'pastel19', 'set13', 'set14', 'set15', 'set16', 'set17', 'set18', 'set19', 'pastel23', 'pastel24', 'pastel25', 'pastel26', 'pastel27', 'pastel28', 'set23', 'set24', 'set25', 'set26', 'set27', 'set28', 'dark23', 'dark24', 'dark25', 'dark26', 'dark27', 'dark28', 'paired3', 'paired4', 'paired5', 'paired6', 'paired7', 'paired8', 'paired9', 'paired10', 'paired11', 'paired12', 'accent3', 'accent4', 'accent5', 'accent6', 'accent7', 'accent8', 'cat12']
     """
     if names.lower() == 'sequential':
         print(sequential_maps)
@@ -533,8 +589,8 @@ def plot_brewer(pdffile='brewer_colors.pdf',reverse=False, grey=False, gray=Fals
     import numpy as np
     from position import position
     outtype = 'pdf'
-    nrow       = 6           # # of rows of subplots per figure
-    ncol       = 21          # # of columns of subplots per figure
+    nrow       = 5           # # of rows of subplots per figure
+    ncol       = 14          # # of columns of subplots per figure
     hspace     = 0.01        # x-space between subplots
     wspace     = 0.08        # y-space between subplots
     textsize   = 10          # standard text size
