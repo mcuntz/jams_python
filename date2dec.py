@@ -324,8 +324,10 @@ def date2dec(calendar = 'standard', units=False,
     if eng != None:
         islist = type(eng) != type(np.array(eng))
         isarr = np.ndim(eng)
-        if isarr == 0: eng = np.array([eng])
-        else: eng = np.array(eng)
+        if isarr == 0:
+             eng = np.array([eng])
+        else:
+             eng = np.array(eng)
         if (islist & (isarr > 2)):
             raise ValueError("date2dec error: eng input is list > 2D; Use array input")
         eng = np.array(eng)
