@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-from __future__ import print_function
 """
     Define Brewer colormaps and similar.
 
@@ -112,6 +111,7 @@ from __future__ import print_function
     Modified, MC, Feb 2013 - ported to Python 3
               MC, Jun 2013 - include Uni Oregon colours
 """
+from __future__ import print_function
 
 # Define colormaps
 

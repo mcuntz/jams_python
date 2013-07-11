@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-from __future__ import print_function
 """
     UFZ Computational Hydrosystems Python Utilities
     Module offers miscellaneous functions in different categories
@@ -273,6 +272,8 @@ from __future__ import print_function
               MC, Apr 2013 - rgb
               MC, Jun 2013 - colours
 """
+from __future__ import print_function
+
 # Routines provided
 from abc2plot          import *
 from area_poly         import area_poly

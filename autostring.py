@@ -329,10 +329,10 @@ def autostring(num, prec=0, zero=False, set_printoptions=False, pp=False, join=F
     # return formatted string
     return out
 
-def astr(num, prec=0, zero=False, set_printoptions=False, pp=False, join=False, joinall=False, sep=' '):
+def astr(num, prec=0, zero=False, set_printoptions=False, pp=True, join=False, joinall=False, sep=' '):
     """
-        Wrapper function for autostring
-        def astr(num, prec=0, zero=False, set_printoptions=False, pp=False, join=False, joinall=False, sep=' '):
+        Wrapper function for autostring with pp=True by default.
+        def astr(num, prec=0, zero=False, set_printoptions=False, pp=True, join=False, joinall=False, sep=' '):
     """
     return autostring(num, prec, zero, set_printoptions, pp, join, joinall, sep)
 
