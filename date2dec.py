@@ -42,15 +42,19 @@ def date2dec(calendar = 'standard', units=False,
         mi       -> input array with minute
         sc       -> input array with second
         ascii    -> input array with strings of the format
-                    'dd.mm.yyyy hh:mm:ss'. If seconds are
-                    missing ss will be set to 00. If ascii
-                    input is chosen by user, other inputs
-                    will be neglected.
+                    'dd.mm.yyyy hh:mm:ss'. If hour, minutes
+                    and/or seconds are missing, they will be
+                    set to 00.
+                    If ascii input is chosen by user,
+                    other inputs will be neglected.
+                    ascii and eng are mutually exclusive.
         eng      -> input array with strings of the format
-                    'yyyy-mm-dd hh:mm:ss'. If seconds are
-                    missing ss will be set to 00. If eng
-                    input is chosen by user, other inputs
-                    will be neglected.
+                    'yyyy-mm-dd hh:mm:ss'. If hour, minutes
+                    and/or seconds are missing, they will be
+                    set to 00.
+                    If eng input is chosen, other inputs will
+                    be neglected.
+                    ascii and eng are mutually exclusive.
 
 
         Parameters
@@ -235,6 +239,8 @@ def date2dec(calendar = 'standard', units=False,
         [['1992.06967593592572' '1992.06967593592572']
          ['1992.06967593592572' '1992.06967593592572']
          ['1992.06967593592572' '1992.06967593592572']]
+        >>> print((date2dec(ascii='01.03.2003 00:00:00') - date2dec(ascii='01.03.2003')) == 0.)
+        True
 
 
         License
@@ -268,6 +274,7 @@ def date2dec(calendar = 'standard', units=False,
                                 to   'days since 0001-01-00 00:00:00'
                  MC, Feb 2013 - solved Excel leap year problem.
                  MC, Feb 2013 - ported to Python 3
+                 MC, Jul 2013 - ascii/eng without time defaults to 00:00:00
     """
 
     #
@@ -313,12 +320,20 @@ def date2dec(calendar = 'standard', units=False,
             mo[i]   = int(aa[1])
             tail    = aa[2].split()
             yr[i]   = int(tail[0])
-            tim     = tail[1].split(':')
-            hr[i]   = int(tim[0])
-            mi[i]   = int(tim[1])
-            if len(tim) > 2:
-                sc[i] = int(tim[2])
+            if len(tail) > 1:
+                tim     = tail[1].split(':')
+                hr[i]   = int(tim[0])
+                if len(tim) > 1:
+                    mi[i] = int(tim[1])
+                else:
+                    mi[i] = 00
+                if len(tim) > 2:
+                    sc[i] = int(tim[2])
+                else:
+                    sc[i] = 00
             else:
+                hr[i] = 00
+                mi[i] = 00
                 sc[i] = 00
             timeobj[i] = nt.datetime(yr[i], mo[i], dy[i], hr[i], mi[i], sc[i])
     if eng != None:
@@ -351,11 +366,20 @@ def date2dec(calendar = 'standard', units=False,
             tail    = ee[2].split()
             dy[i]   = int(tail[0])
             tim     = tail[1].split(':')
-            hr[i]   = int(tim[0])
-            mi[i]   = int(tim[1])
-            if len(tim) > 2:
-                sc[i] = int(tim[2])
+            if len(tail) > 1:
+                tim     = tail[1].split(':')
+                hr[i]   = int(tim[0])
+                if len(tim) > 1:
+                    mi[i] = int(tim[1])
+                else:
+                    mi[i] = 00
+                if len(tim) > 2:
+                    sc[i] = int(tim[2])
+                else:
+                    sc[i] = 00
             else:
+                hr[i] = 00
+                mi[i] = 00
                 sc[i] = 00
             timeobj[i] = nt.datetime(yr[i], mo[i], dy[i], hr[i], mi[i], sc[i])
     # if no ascii input, other inputs will be concidered
