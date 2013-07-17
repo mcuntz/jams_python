@@ -249,9 +249,14 @@ def kernel_regression_h(x, y, silverman=False):
     if not silverman:
         # Find the optimal h
         bounds = [(0.2*i,5.0*i) for i in h]
-        h, nfeval, rc = opt.fmin_tnc(cross_valid_h, h, bounds=bounds,
-                                     args=(xx, y), approx_grad=True, disp=False,
-                                     maxfun=1000, xtol=1e-10, ftol=1e-10)
+        if n<=100:
+            h, nfeval, rc = opt.fmin_tnc(cross_valid_h, h, bounds=bounds,
+                                         args=(xx, y), approx_grad=True, disp=False,
+                                         maxfun=1000, xtol=1e-10, ftol=1e-10)
+        else:
+            h, nfeval, rc = opt.fmin_tnc(boot_h, h, bounds=bounds,
+                                         args=(xx, y), approx_grad=True, disp=False,
+                                         maxfun=1000, xtol=1e-10, ftol=1e-10)
     #
     return h
 
@@ -273,6 +278,29 @@ def cross_valid_h(h, x, y):
         z      = (xx - x[i,:]) / h
         out[i] = nadaraya_watson(z, yy)
     cv = np.sum((y-out)**2) / np.float(n)
+    #
+    return cv
+
+
+def boot_h(h, x, y):
+    """
+        Helper function that calculates bootstrap function for the
+        Nadaraya-Watson estimator, which is basically the mean square error
+        where model estimate is replaced by the jackknife estimate (Haerdle et al. 2000).
+        This does basically cross_valid_h for 100 random points.
+    """
+    n   = 100
+    ind = np.random.randint(x.size,size=n)
+    # allocate output
+    out = np.empty(n)
+    # Loop through each bootstrap point
+    for i in range(n):
+        # all-1 points
+        xx     = np.delete(x,i,axis=0)
+        yy     = np.delete(y,i,axis=0)
+        z      = (xx - x[i,:]) / h
+        out[i] = nadaraya_watson(z, yy)
+    cv = np.sum((y[ind]-out)**2) / np.float(n)
     #
     return cv
 

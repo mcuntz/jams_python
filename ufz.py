@@ -31,6 +31,7 @@
     div                    Wrapper for division.
     division               Divide two arrays, return 'otherwise' if division by 0.
     esat                   Calculates the saturation vapour pressure of water/ice.
+    fill_nonfinite         Fill missing values by linear interpolation.
     find_in_path           Look for file in system path.
     fread                  Reads in float array from ascii file.
     functions              Common functions that are used in curve_fit or fmin parameter estimations.
@@ -47,6 +48,7 @@
     lhs                    Latin Hypercube Sampling of any distribution without correlations.
     lif                    Count number of lines in file.
     mad                    Median absolute deviation test.
+    means                  Calculate daily, monthly, yearly, etc. means of data depending on date stamp.
     nee2gpp                Photosynthesis and ecosystem respiration from NEE Eddy flux data.
     nee2gpp_global         nee2gpp using one fit for whole time period
     nee2gpp_lasslop        nee2gpp using the daytime method of Lasslop et al. (2010)
@@ -117,12 +119,14 @@
     Data processing
     ---------------
     convex_hull            Calculate subset of points that make a convex hull around a set of 2D points.
+    fill_nonfinite         Fill missing values by linear interpolation.
     gapfill                Gapfill Eddy flux data.
     interpol               One-dimensional linear interpolation on first dimension.
     kriging                Krig a surface from a set of 2D points.
     kernel_regression      Multi-dimensional non-parametric regression.
     kernel_regression_h    Optimal bandwidth for kernel regression.
     mad                    Median absolute deviation test.
+    means                  Calculate daily, monthly, yearly, etc. means of data depending on date stamp.
     nee2gpp                Photosynthesis and ecosystem respiration from NEE Eddy flux data.
     nee2gpp_global         nee2gpp using one fit for whole time period
     nee2gpp_lasslop        nee2gpp using the daytime method of Lasslop et al. (2010)
@@ -271,6 +275,7 @@
               MC, Mar 2013 - find_in_path, xkcd
               MC, Apr 2013 - rgb
               MC, Jun 2013 - colours
+              MC, Jul 2013 - fill_nonfinite, means
 """
 from __future__ import print_function
 
@@ -286,7 +291,7 @@ except ImportError:
     pass
 from cellarea          import *
 from closest           import *
-from colours            import colours, colors
+from colours           import colours, colors
 import const
 from convex_hull       import convex_hull 
 from cuntz_gleixner    import *
@@ -295,6 +300,7 @@ from dec2date          import *
 from dewpoint          import *
 from division          import *
 from esat              import *
+from fill_nonfinite    import fill_nonfinite
 from find_in_path      import *
 from fread             import *
 import functions
@@ -312,6 +318,7 @@ from lhs               import *
 from lif               import *
 from jab               import *
 from mad               import *
+from means             import *
 from nee2gpp           import nee2gpp, nee2gpp_global, nee2gpp_lasslop, nee2gpp_reichstein
 try:
     from outlier       import *

@@ -1,19 +1,19 @@
 #!/usr/bin/env python
 from __future__ import print_function
 """
-The following information is the output of: python mc_plot_template.py -h
-
-
-Usage: mc_plot_template.py [options]
+usage: mc_plot_template.py [-h] [-p pdffile] [-t]
+                           [additional_args [additional_args ...]]
 
 This is the python plot template of Matthias Cuntz.
 
-Options:
+positional arguments:
+  additional_args       Any additional arguments such as filenames, etc.
+
+optional arguments:
   -h, --help            show this help message and exit
-  -p File, --pdffile=File
+  -p pdffile, --pdffile pdffile
                         Name of pdf output file (default: open X-window).
   -t, --usetex          Use LaTeX to render text in pdf.
-
 
 
 License
@@ -38,28 +38,32 @@ Copyright 2012 Matthias Cuntz
 
 History
 -------
-Written, MC, Jul 2012
+Written,  MC, Jul 2012
+Modified, MC, Jul 2013 - optparse->argparse
 """
 
 # -------------------------------------------------------------------------
 # Command line arguments
 #
 
+addargs = []
 pdffile = ''
 usetex  = False
-import optparse
-parser = optparse.OptionParser(usage='%prog [options]',
-                               description="This is the python plot template of Matthias Cuntz.")
-parser.add_option('-p', '--pdffile', action='store', dest='pdffile', type='string',
-                  default=pdffile, metavar='File',
-                  help='Name of pdf output file (default: open X-window).')
-parser.add_option('-t', '--usetex', action='store_true', default=usetex, dest="usetex",
-                  help="Use LaTeX to render text in pdf.")
-(opts, args) = parser.parse_args()
+import argparse
+parser = argparse.ArgumentParser(description="This is the python plot template of Matthias Cuntz.")
+parser.add_argument('-p', '--pdffile', action='store',
+                    default=pdffile, dest='pdffile', metavar='pdffile',
+                    help='Name of pdf output file (default: open X-window).')
+parser.add_argument('-t', '--usetex', action='store_true', default=usetex, dest="usetex",
+                    help="Use LaTeX to render text in pdf.")
+parser.add_argument('further', nargs='*', metavar='additional_args',
+                   help='Any additional arguments such as filenames, etc.')
+args = parser.parse_args()
 
-pdffile = opts.pdffile
-usetex  = opts.usetex
-del parser, opts, args
+addargs = args.further
+pdffile = args.pdffile
+usetex  = args.usetex
+del parser, args
 
 import numpy as np
 import ufz
