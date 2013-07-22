@@ -118,6 +118,8 @@ def mad(datin, z=7, deriv=0):
                   MC, Jun 2012 - axis=0 did not always work: spread md and MAD to input dimensions
                   MC, Jun 2012 - use np.diff, remove spreads
                   MC, Feb 2013 - ported to Python 3
+                  MC & JM, Jul 2013 - loop over second dimension for medians faster than array :-(
+                                      but use bottleneck for speed :-)
     """
     sn = list(np.shape(datin))
     n  = sn[0]
@@ -141,13 +143,48 @@ def mad(datin, z=7, deriv=0):
         if np.all(d.mask == True):
             return d.mask
     # Median
-    md     = np.ma.median(d, axis=0)
-    # Median absolute deviation
-    MAD    = np.ma.median(np.ma.abs(d-md), axis=0)
-    # Range around median
-    thresh = MAD * (z/0.6745)
-    # True where outside z-range
-    res = (d<(md-thresh)) | (d>(md+thresh))
+    if d.ndim == 1:
+        try:
+            import bottleneck as bn
+            md     = bn.median(d)
+            # Median absolute deviation
+            MAD    = bn.median(np.ma.abs(d-md))
+            # Range around median
+            thresh = MAD * (z/0.6745)
+            # True where outside z-range
+            res = (d<(md-thresh)) | (d>(md+thresh))
+        except:
+            md     = np.ma.median(d)
+            # Median absolute deviation
+            MAD    = np.ma.median(np.ma.abs(d-md))
+            # Range around median
+            thresh = MAD * (z/0.6745)
+            # True where outside z-range
+            res = (d<(md-thresh)) | (d>(md+thresh))
+    elif d.ndim == 2:
+        try:
+            import bottleneck as bn
+            res = np.empty(d.shape, dtype=np.bool)
+            for i in range(d.shape[1]):
+                md     = bn.median(d[:,i])
+                # Median absolute deviation
+                MAD    = bn.median(np.ma.abs(d[:,i]-md))
+                # Range around median
+                thresh = MAD * (z/0.6745)
+                # True where outside z-range
+                res[:,i] = (d[:,i]<(md-thresh)) | (d[:,i]>(md+thresh))
+        except:
+            res = np.empty(d.shape, dtype=np.bool)
+            for i in range(d.shape[1]):
+                md     = np.ma.median(d[:,i])
+                # Median absolute deviation
+                MAD    = np.ma.median(np.ma.abs(d[:,i]-md))
+                # Range around median
+                thresh = MAD * (z/0.6745)
+                # True where outside z-range
+                res[:,i] = (d[:,i]<(md-thresh)) | (d[:,i]>(md+thresh))
+    else:
+        raise ValueError('datin.ndim must be <= 2')
 
     return res
 
