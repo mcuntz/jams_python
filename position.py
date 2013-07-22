@@ -4,15 +4,17 @@ import numpy as np
 
 def position(row=1, col=1, num=1,
              left=0.125, right=0.9, bottom=0.1, top=0.9,
-             wspace=0.1, hspace=0.1,
+             hspace=None, vspace=0.1, wspace=None,
              sortcol=False, golden=False, inversegolden=False,
              figsize=(1.,1.)):
     """
         Gives positions of subplots.
         To be used with add_axes instead of subplot.
+
         All dimensions are fractions of the figure width or height.
         Figure and subplot spaces are the same as for figure.subplotparams
-        except for hspace and wspace (halved).
+        except for hspace and vspace, which are halved.
+
         If the figsize keyword is given, a rectangular section of the figure
         will be used.
 
@@ -20,7 +22,7 @@ def position(row=1, col=1, num=1,
         ----------
         def position(row=1, col=1, num=1, 
                      left=0.125, right=0.9, bottom=0.1, top=0.9,
-                     wspace=0.1, hspace=0.1,
+                     hspace=None, vspace=0.1, wspace=None,
                      sortcol=False, golden=False, inversegolden=False,
                      figsize(1.,1.)):
 
@@ -35,7 +37,8 @@ def position(row=1, col=1, num=1,
         bottom         bottom border of plot (default 0.1)
         top            top border of plot (default 0.9)
         hspace         space between columns (default 0.1)
-        wspace         space between rows (default 0.1)
+        vspace         space between rows (default 0.1)
+        wspace         historical, same as vspace; will be overwritten by vspace
         sortcol        fill columns then rows (default False)
         golden         golden ratio of width/height = (1+sqrt(5))/2
                        (default False)
@@ -79,21 +82,21 @@ def position(row=1, col=1, num=1,
         ['0.125' '0.550' '0.216' '0.350']
         >>> print(astr(position(2,2,1,golden=True,sortcol=True),3,pp=True))
         ['0.125' '0.409' '0.338' '0.209']
-        >>> print(astr(position(2,2,1,top=1.,bottom=0.,left=0.,right=1.,hspace=0.,wspace=0.),3,pp=True))
+        >>> print(astr(position(2,2,1,top=1.,bottom=0.,left=0.,right=1.,hspace=0.,vspace=0.),3,pp=True))
         ['0.000' '0.500' '0.500' '0.500']
-        >>> print(astr(position(2,2,2,top=1.,bottom=0.,left=0.,right=1.,hspace=0.,wspace=0.),3,pp=True))
+        >>> print(astr(position(2,2,2,top=1.,bottom=0.,left=0.,right=1.,hspace=0.,vspace=0.),3,pp=True))
         ['0.500' '0.500' '0.500' '0.500']
-        >>> print(astr(position(2,2,3,top=1.,bottom=0.,left=0.,right=1.,hspace=0.,wspace=0.),3,pp=True))
+        >>> print(astr(position(2,2,3,top=1.,bottom=0.,left=0.,right=1.,hspace=0.,vspace=0.),3,pp=True))
         ['0.000' '0.000' '0.500' '0.500']
-        >>> print(astr(position(2,2,4,top=1.,bottom=0.,left=0.,right=1.,hspace=0.,wspace=0.),3,pp=True))
+        >>> print(astr(position(2,2,4,top=1.,bottom=0.,left=0.,right=1.,hspace=0.,vspace=0.),3,pp=True))
         ['0.500' '0.000' '0.500' '0.500']
-        >>> print(astr(position(2,2,1,top=1.,bottom=0.,left=0.,right=1.,hspace=0.,wspace=0.,golden=True),3,pp=True))
+        >>> print(astr(position(2,2,1,top=1.,bottom=0.,left=0.,right=1.,hspace=0.,vspace=0.,golden=True),3,pp=True))
         ['0.000' '0.309' '0.500' '0.309']
-        >>> print(astr(position(2,2,2,top=1.,bottom=0.,left=0.,right=1.,hspace=0.,wspace=0.,golden=True),3,pp=True))
+        >>> print(astr(position(2,2,2,top=1.,bottom=0.,left=0.,right=1.,hspace=0.,vspace=0.,golden=True),3,pp=True))
         ['0.500' '0.309' '0.500' '0.309']
-        >>> print(astr(position(2,2,3,top=1.,bottom=0.,left=0.,right=1.,hspace=0.,wspace=0.,golden=True),3,pp=True))
+        >>> print(astr(position(2,2,3,top=1.,bottom=0.,left=0.,right=1.,hspace=0.,vspace=0.,golden=True),3,pp=True))
         ['0.000' '0.000' '0.500' '0.309']
-        >>> print(astr(position(2,2,4,top=1.,bottom=0.,left=0.,right=1.,hspace=0.,wspace=0.,golden=True),3,pp=True))
+        >>> print(astr(position(2,2,4,top=1.,bottom=0.,left=0.,right=1.,hspace=0.,vspace=0.,golden=True),3,pp=True))
         ['0.500' '0.000' '0.500' '0.309']
         >>> figsize=[8,11]
         >>> print(astr(position(2,2,1,golden=True,sortcol=True,figsize=figsize),3,pp=True))
@@ -128,6 +131,7 @@ def position(row=1, col=1, num=1,
         -------
         Written,  MC, Aug 2009
         Modified, MC, Feb 2013 - ported to Python 3
+                  MC, Jul 2013 - vspace, wspace obsolete
     """
     #
     # Check
@@ -138,6 +142,12 @@ def position(row=1, col=1, num=1,
         raise ValueError('right > left: '+str(right)+' > '+str(left))
     if top-bottom <= 0.:
         raise ValueError('top < bottom: '+str(top)+' < '+str(bottom))
+    if vspace != None:
+        ivspace = vspace
+    elif wspace != None:
+        ivspace = wspace
+    else:
+        ivspace = 0.1
     #
     # Scaling to figsize
     scalex = figsize[1]/float(max(figsize))
@@ -145,14 +155,14 @@ def position(row=1, col=1, num=1,
     #
     # width, height
     dx = (right-left-(col-1)*hspace)/col
-    dy = (top-bottom-(row-1)*wspace)/row
+    dy = (top-bottom-(row-1)*ivspace)/row
     #
     # golden ratio
     ratio = (1.+np.sqrt(5.))/2.
     if golden:
         width  = dx
         height = dx / ratio
-        checkheight = (top-bottom-row*height) - (row-1)*wspace
+        checkheight = (top-bottom-row*height) - (row-1)*ivspace
         if checkheight < 0.:
             height = dy
             width  = dy * ratio
@@ -167,7 +177,7 @@ def position(row=1, col=1, num=1,
             if checkwidth < 0.:
                 width  = dx
                 height = dx * ratio
-                checkheight = (top-bottom-row*height) - (row-1)*wspace
+                checkheight = (top-bottom-row*height) - (row-1)*ivspace
                 if checkheight < 0.:
                     raise ValueError('inverse golden ratio does not work. Have to recode.')
         else:
@@ -184,8 +194,8 @@ def position(row=1, col=1, num=1,
     #
     # position
     pos    = np.empty(4)
-    pos[0] = left   + icol*(width+hspace)          *scalex
-    pos[1] = bottom + (row-1-irow)*(height+wspace) *scaley
+    pos[0] = left   + icol*(width+hspace)           *scalex
+    pos[1] = bottom + (row-1-irow)*(height+ivspace) *scaley
     pos[2] = width  *scalex
     pos[3] = height *scaley
     #

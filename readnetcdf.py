@@ -59,35 +59,35 @@ def readnetcdf(file, var='', code=-1, reform=False, squeeze=False,
 
         Examples
         --------
-        >>> print(readnetcdf('readnetcdf_test.nc',var='is1'))
+        >>> print(readnetcdf('test_readnetcdf.nc',var='is1'))
         [[ 1.  1.  1.  1.]
          [ 1.  1.  1.  1.]]
-        >>> print(readnetcdf('readnetcdf_test.nc',code=129))
+        >>> print(readnetcdf('test_readnetcdf.nc',code=129))
         [[ 2.  2.  2.  2.]
          [ 2.  2.  2.  2.]]
-        >>> print([str(i) for i in readnetcdf('readnetcdf_test.nc',variables=True)])
+        >>> print([str(i) for i in readnetcdf('test_readnetcdf.nc',variables=True)])
         ['x', 'y', 'is1', 'is2']
-        >>> print([str(i) for i in readnetcdf('readnetcdf_test.nc',variables=True,sort=True)])
+        >>> print([str(i) for i in readnetcdf('test_readnetcdf.nc',variables=True,sort=True)])
         ['is1', 'is2', 'x', 'y']
-        >>> print([str(i) for i in readnetcdf('readnetcdf_test.nc',units=True)])
+        >>> print([str(i) for i in readnetcdf('test_readnetcdf.nc',units=True)])
         ['xx', 'yy', 'arbitrary', 'arbitrary']
-        >>> print([str(i) for i in readnetcdf('readnetcdf_test.nc',units=True,sort=True)])
+        >>> print([str(i) for i in readnetcdf('test_readnetcdf.nc',units=True,sort=True)])
         ['arbitrary', 'arbitrary', 'xx', 'yy']
-        >>> print([str(i) for i in readnetcdf('readnetcdf_test.nc',longnames=True)])
+        >>> print([str(i) for i in readnetcdf('test_readnetcdf.nc',longnames=True)])
         ['x-axis', 'y-axis', 'all ones', 'all twos']
-        >>> print([str(i) for i in readnetcdf('readnetcdf_test.nc',longnames=True,sort=True)])
+        >>> print([str(i) for i in readnetcdf('test_readnetcdf.nc',longnames=True,sort=True)])
         ['all ones', 'all twos', 'x-axis', 'y-axis']
 
         # old: {'units': 'arbitrary', 'long_name': 'all ones', 'code': 128}
         # new: {u'units': u'arbitrary', u'long_name': u'all ones', u'code': 128}
-        >>> t1 = readnetcdf('readnetcdf_test.nc',var='is1',attributes=True)
+        >>> t1 = readnetcdf('test_readnetcdf.nc',var='is1',attributes=True)
         >>> print([ str(i) for i in sorted(t1)])
         ['code', 'long_name', 'units']
-        >>> print(readnetcdf('readnetcdf_test.nc',codes=True))
+        >>> print(readnetcdf('test_readnetcdf.nc',codes=True))
         [  -1.   -1.  128.  129.]
-        >>> print(readnetcdf('readnetcdf_test.nc',codes=True,reform=True))
+        >>> print(readnetcdf('test_readnetcdf.nc',codes=True,reform=True))
         [ 128.  129.]
-        >>> print(readnetcdf('readnetcdf_test.nc',codes=True,sort=True))
+        >>> print(readnetcdf('test_readnetcdf.nc',codes=True,sort=True))
         [128.0, 129.0, -1.0, -1.0]
 
 

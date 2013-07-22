@@ -22,6 +22,8 @@ ufzlightgray  = ufzgray3
 ufzdarkgrey   = ufzgray1
 ufzgrey       = ufzgray2
 ufzlightgrey  = ufzgray3
+ufzblack      = (0,0,0)
+ufzwhite      = (255,255,255)
 
 # In Emacs copy ori and query-replace-regexp
 # ^\([[:alnum:]]*\).*  ->  \1 = \1
@@ -47,6 +49,8 @@ lightgray  = ufzlightgray
 darkgrey   = ufzdarkgrey
 grey       = ufzgrey
 lightgrey  = ufzlightgrey
+black      = ufzblack
+white      = ufzwhite
 
 ufzall = ['ufzdarkblue', 'ufzblue', 'ufzlightblue',
           'ufzred', 'ufzorange', 'ufzyellow',
@@ -55,13 +59,67 @@ ufzall = ['ufzdarkblue', 'ufzblue', 'ufzlightblue',
           'ufzgrey1', 'ufzgrey2', 'ufzgrey3',
           'ufzdarkgray', 'ufzgray', 'ufzlightgray',
           'ufzdarkgrey', 'ufzgrey', 'ufzlightgrey',
+          'ufzblack', 'ufzwhite',
           'darkblue', 'blue', 'lightblue', 
           'red', 'orange', 'yellow', 
           'darkgreen', 'green', 'lightgreen', 
           'gray1', 'gray2', 'gray3', 
           'grey1', 'grey2', 'grey3', 
           'darkgray', 'gray', 'lightgray', 
-          'darkgrey', 'grey', 'lightgrey']
+          'darkgrey', 'grey', 'lightgrey',
+          'black', 'white']
+
+
+def get_colour_tuple(name, rgb256=False):
+    """
+        Helper function for coulours.
+        Returns the colour tuple from the global definition.
+
+
+        Definition
+        ----------
+        def get_colour_tuple(name, rgb256=False):
+
+
+        Input
+        -----
+        name    name of colour
+
+
+        Optional Input
+        --------------
+        rgb256     if True: return RGB value tuple between 0 and 255
+
+
+        Output
+        ------
+        rgb colour tuple
+
+
+        Examples
+        --------
+        >>> print(get_colour_tuple('ufzdarkblue', rgb256=True))
+        (0, 62, 110)
+        
+        >>> import numpy as np
+        >>> from autostring import *
+        >>> cc = get_colour_tuple('UFZDARKBLUE')
+        >>> print(astr(np.array(cc), 4))
+        ['0.0000' '0.2431' '0.4314']
+
+
+        History
+        -------
+        Written,  MC, Jun 2013 - extracted from colours
+    """
+    d = {}
+    exec('out = '+name.lower(), globals(), d)
+    out = d['out']
+    if rgb256:
+        return out
+    else:
+        return tuple([ i/255. for i in out ])
+
 
 def colours(name=False, rgb=True, rgb256=False, names=False):
     """
@@ -76,6 +134,7 @@ def colours(name=False, rgb=True, rgb256=False, names=False):
         where grey is an alias of gray and 1, 2, 3 aliases dark, none and light.
         All colours exist also without the prefix ufz.
 
+
         Definition
         ----------
         def colours(name, rgb=True, rgb256=False, names=False):
@@ -83,7 +142,7 @@ def colours(name=False, rgb=True, rgb256=False, names=False):
 
         Input
         -----
-        name    name of colour
+        name    name(s) of colours
 
 
         Optional Input
@@ -97,23 +156,29 @@ def colours(name=False, rgb=True, rgb256=False, names=False):
 
         Output
         ------
-        rgb colour tuple
+        rgb colour tuple(s)
 
 
         Examples
         --------
         >>> print(colours('ufzdarkblue', rgb256=True))
         (0, 62, 110)
+
         >>> print(colours(names=True)[0:3])
         ['ufzdarkblue', 'ufzblue', 'ufzlightblue']
+
         >>> import numpy as np
         >>> from autostring import *
         >>> cc = colours('UFZDARKBLUE')
         >>> print(astr(np.array(cc), 4))
         ['0.0000' '0.2431' '0.4314']
+
         >>> cc = colours('DarkBlue')
         >>> print(astr(np.array(cc), 4))
         ['0.0000' '0.2431' '0.4314']
+
+        >>> print(colours(['orange','ufzdarkblue'], rgb256=True))
+        [(207, 104, 0), (0, 62, 110)]
 
 
         License
@@ -139,6 +204,8 @@ def colours(name=False, rgb=True, rgb256=False, names=False):
         History
         -------
         Written,  MC, Jun 2013
+        Modified, MC, Jul 2013 - name can be iterable
+                               - added black and white
     """
     if names:
         return ufzall
@@ -146,16 +213,19 @@ def colours(name=False, rgb=True, rgb256=False, names=False):
     if name == False:
         raise ValueError('colour must be given.')
 
-    if name.lower() not in ufzall:
-        raise ValueError('colour not known.')
-
-    d = {}
-    exec('out = '+name.lower(), globals(), d)
-    out = d['out']
-    if rgb256:
+    if type(name) == type('string'):
+        if name.lower() not in ufzall: raise ValueError('colour not known.')
+        return get_colour_tuple(name, rgb256=rgb256)
+    else:
+        try:
+            iterator = iter(name)
+        except:
+            raise TypeError('colours must be string or iterable.')
+        out = list()
+        for cname in name:
+            if cname.lower() not in ufzall: raise ValueError('colour not known.')
+            out += [get_colour_tuple(cname, rgb256=rgb256)]
         return out
-
-    return tuple([ i/255. for i in out ])
 
 
 def colors(name=False, rgb=True, rgb256=False, names=False):
@@ -167,18 +237,20 @@ def colors(name=False, rgb=True, rgb256=False, names=False):
 
 
 if __name__ == '__main__':
-    import doctest
-    doctest.testmod()
+    # import doctest
+    # doctest.testmod()
 
-    # print(colours('ufzdarkblue', rgb256=True))
-    # # (0, 62, 110)
-    # print(colours(names=True)[0:3])
-    # # ['ufzdarkblue', 'ufzblue', 'ufzlightblue']
-    # import numpy as np
-    # from autostring import *
-    # cc = colours('UFZDARKBLUE')
-    # print(astr(np.array(cc), 4))
-    # # ['0.0000' '0.2431' '0.4314']
-    # cc = colours('DarkBlue')
-    # print(astr(np.array(cc), 4))
-    # # ['0.0000' '0.2431' '0.4314']
+    print(colours('ufzdarkblue', rgb256=True))
+    # (0, 62, 110)
+    print(colours(names=True)[0:3])
+    # ['ufzdarkblue', 'ufzblue', 'ufzlightblue']
+    import numpy as np
+    from autostring import *
+    cc = colours('UFZDARKBLUE')
+    print(astr(np.array(cc), 4))
+    # ['0.0000' '0.2431' '0.4314']
+    cc = colours('DarkBlue')
+    print(astr(np.array(cc), 4))
+    # ['0.0000' '0.2431' '0.4314']
+    print(colours(['orange','ufzdarkblue'], rgb256=True))
+    #[(207, 104, 0), (0, 62, 110)]

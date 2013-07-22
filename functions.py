@@ -41,14 +41,18 @@ import const # from ufz
     ----------
     Current functions are (there is always the second form with the name appended by _p;
     these are used in the cost functions).
-        arrhenius         1 param:  Arrhenius temperature dependence of biochemical rates
+        arrhenius         1 param:  Arrhenius temperature dependence of biochemical rates:
+                                    exp((T-TC25)*E/(T25*R*(T+T0))), parameter: E
         f1x               2 params: General 1/x function: a + b/x
         fexp              3 params: General exponential function: a + b * exp(c*x)
+        gauss             2 params: Gauss function: 1/(sig*sqrt(2*pi)) *exp(-(x-mu)**2/(2*sig**2)), parameter: mu, sig
         lasslop           6 params: Lasslop et al. (2010) a rectangular, hyperbolic light-response GPP
                                     with Lloyd & Taylor (1994) respiration and the maximum canopy uptake
                                     rate at light saturation decreases exponentially with VPD as in Koerner (1995)
+        line              2 params: Straight line: a + b*x
         lloyd_fix         2 params: Lloyd & Taylor (1994) Arrhenius type with T0=-46.02 degC and Tref=10 degC
         lloyd_only_rref   1 param:  Lloyd & Taylor (1994) Arrhenius type with fixed exponential term
+        poly              n params: General polynomial: c0 + c1*x + c2*x**2 + ... + cn*x**n
 
 
     Input / Output
@@ -71,6 +75,11 @@ import const # from ufz
     0.594
     >>> print(astr(cost2_lloyd_fix([Rref, E0], T, resp),3,pp=True))
     0.353
+
+    >>> print(astr(poly(T,2,1),3,pp=True))
+    295.150
+    >>> print(astr(poly_p(T,[2,1]),3,pp=True))
+    295.150
 
 
     License
@@ -206,6 +215,40 @@ def cost2_fexp(p,x,y):
 
 
 # -----------------------------------------------------------
+# Gauss: 1/(sig*sqrt(2*pi)) *exp(-(x-mu)**2/(2*sig**2))
+def gauss(x,mu,sig):
+  ''' Gauss function: 1/(sig*sqrt(2*pi)) *exp(-(x-mu)**2/(2*sig**2))
+        x    independent variable
+        mu   mean
+        sig  width
+  '''
+  return np.exp(-(x-mu)**2/(2.*sig**2))/(sig*np.sqrt(2.*np.pi))
+
+def gauss_p(x,p):
+  ''' Gauss function: 1/(sig*sqrt(2*pi)) *exp(-(x-mu)**2/(2*sig**2))
+        x    independent variable in exp
+        p    array of size 2, parameters mu and sig
+  '''
+  return np.exp(-(x-p[0])**2/(2.*p[1]**2))/(p[1]*np.sqrt(2.*np.pi))
+
+def cost_gauss(p,x,y):
+  ''' Sum of absolut errors between obs and Gauss function: 1/(sig*sqrt(2*pi)) *exp(-(x-mu)**2/(2*sig**2))
+        p    array of size 2, parameters mu and sig
+        x    independent variable in exp
+        y    dependent variable to optimise
+  '''
+  return np.sum(np.abs(y-gauss_p(x,p)))
+
+def cost2_gauss(p,x,y):
+  ''' Sum of squared errors between obs and Gauss function: 1/(sig*sqrt(2*pi)) *exp(-(x-mu)**2/(2*sig**2))
+        p    array of size 2, parameters mu and sig
+        x    independent variable in exp
+        y    dependent variable to optimise
+  '''
+  return np.sum((y-gauss_p(x,p))**2)
+
+
+# -----------------------------------------------------------
 # lasslop
 def lasslop(Rg, et, VPD, alpha, beta0, k, Rref):
     """ Lasslop et al. (2010) is basically the rectangular, hyperbolic
@@ -258,6 +301,40 @@ def cost_lasslop(p, Rg, et, VPD, NEE):
 def cost2_lasslop(p, Rg, et, VPD, NEE):
     """ Cost function for Lasslop with sum of squared deviations """
     return np.sum((NEE-lasslop(Rg, et, VPD, p[0], p[1], p[2], p[3]))**2)
+
+
+# -----------------------------------------------------------
+# a+b*x
+def line(x,a,b):
+  ''' Straight line: a + b*x
+        x    independent variable
+        a    1. const
+        b    2. const
+  '''
+  return a+b*x
+
+def line_p(x,p):
+  ''' Straight line: a + b*x
+        x    independent variable
+        p    array of size 2, parameters
+  '''
+  return p[0]+p[1]*x
+
+def cost_line(p,x,y):
+  ''' Sum of absolut errors between obs and straight line: a + b*x
+        p    array of size 2, parameters
+        x    independent variable
+        y    dependent variable to optimise
+  '''
+  return np.sum(np.abs(y-line_p(x,p)))
+
+def cost2_line(p,x,y):
+  ''' Sum of squared errors between obs and straight line: a + b*x
+        p    array of size 2, parameters
+        x    independent variable
+        y    dependent variable to optimise
+  '''
+  return np.sum((y-line_p(x,p))**2)
 
 
 # -----------------------------------------------------------
@@ -353,6 +430,40 @@ def cost2_sabx(p,x,y):
   return np.sum((y-sabx_p(x,p))**2)
 
 
+# -----------------------------------------------------------
+# c0 + c1*x + c2*x**2 + ... + cn*x**n
+def poly(x,*args):
+  ''' General polynomial: c0 + c1*x + c2*x**2 + ... + cn*x**n
+        x    independent variable
+        a    1. const
+        b    2. const
+  '''
+  return np.polynomial.polynomial.polyval(x, list(args))
+
+def poly_p(x,p):
+  ''' General polynomial: c0 + c1*x + c2*x**2 + ... + cn*x**n
+        x    independent variable
+        p    array of size n, parameters
+  '''
+  return np.polynomial.polynomial.polyval(x, p)
+
+def cost_poly(p,x,y):
+  ''' Sum of absolut errors between obs and general polynomial: c0 + c1*x + c2*x**2 + ... + cn*x**n
+        p    array of size n, parameters
+        x    independent variable
+        y    dependent variable to optimise
+  '''
+  return np.sum(np.abs(y-poly_p(x,p)))
+
+def cost2_poly(p,x,y):
+  ''' Sum of squared errors between obs and general polynomial: c0 + c1*x + c2*x**2 + ... + cn*x**n
+        p    array of size n, parameters
+        x    independent variable
+        y    dependent variable to optimise
+  '''
+  return np.sum((y-poly_p(x,p))**2)
+
+
 if __name__ == '__main__':
     import doctest
     doctest.testmod()
@@ -361,12 +472,16 @@ if __name__ == '__main__':
     # E0   = 126.
     # T    = 293.15
     # resp = 2.0
-    # print lloyd_fix(T, Rref, E0)
+    # print(lloyd_fix(T, Rref, E0))
     # #1.40590910521
-    # print lloyd_fix_p(T, [Rref, E0])
+    # print(lloyd_fix_p(T, [Rref, E0]))
     # #1.40590910521
-    # print cost_lloyd_fix([Rref, E0], T, resp)
+    # print(cost_lloyd_fix([Rref, E0], T, resp))
     # #0.59409089479
-    # print cost2_lloyd_fix([Rref, E0], T, resp)
+    # print(cost2_lloyd_fix([Rref, E0], T, resp))
     # #0.352943991272
 
+    # print(poly(T,2,1))
+    # #295.15
+    # print(poly_p(T,[2,1]))
+    # #295.15
