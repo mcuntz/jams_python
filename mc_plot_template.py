@@ -50,9 +50,9 @@ Modified, MC, Jul 2013 - optparse->argparse
 """
 
 # Hardcoded switches for plot gallery
-dorandom  = False # Scatter and histogram
-dobasemap = True # map with basemap
-docartopy = True # map with cartopy
+dorandom  = True  # Scatter and histogram
+dobasemap = False # map with basemap
+docartopy = True  # map with cartopy
 
 # python debugger
 # import pdb
@@ -172,6 +172,8 @@ mpl.rc('path', simplify=False) # do not remove
 
 if dobasemap:
     from mpl_toolkits.basemap import Basemap
+if docartopy:
+    import cartopy.crs as ccrs
 
 # -------------------------------------------------------------------------
 # Prepare some pseudo data
@@ -508,29 +510,29 @@ if dobasemap:
   ncol = 1
   cm = ufz.get_brewer('RdYlBu'+str(ncolor),reverse=True)
 
-  # # pcolormesh
-  # iplot += 1
+  # pcolormesh
+  iplot += 1
 
-  # sub  = fig.add_axes(ufz.position(nrow,ncol,iplot,hspace=hspace,vspace=vspace))
-  # m    = Basemap(projection='robin', lon_0=0, resolution='i')
-  # x, y = m(lonh,lath)
+  sub  = fig.add_axes(ufz.position(nrow,ncol,iplot,hspace=hspace,vspace=vspace))
+  m    = Basemap(projection='robin', lon_0=0, resolution='i')
+  x, y = m(lonh,lath)
 
-  # cvals  = np.amin(temp) + np.arange(ncolor+1)/np.float(ncolor)*(np.amax(temp)-np.amin(temp))
-  # norm   = mpl.colors.BoundaryNorm(cvals, cm.N)
-  # c      = plt.pcolormesh(x, y, temp, norm=norm, cmap=cm)
-  # cbar   = plt.colorbar(c, orientation='vertical')
-  # cnames = ["{0:.0f}".format(i) for i in cvals]
-  # cbar.set_ticks(cvals)
-  # cbar.set_ticklabels(cnames)
-  # for t in cbar.ax.get_yticklabels(): t.set_fontsize(cbsize)
-  # # set continents
-  # m.drawcoastlines(linewidth=0.5)
-  # m.drawcountries()
-  # # set grid
-  # parallels = np.arange(-90., 90., delat)
-  # m.drawparallels(parallels, labels=[1,0,0,0], fontsize=xsize, linewidth=0)
-  # meridians = np.arange(0., 360., delon)
-  # m.drawmeridians(meridians, labels=[0,0,0,1], fontsize=xsize, linewidth=0)
+  cvals  = np.amin(temp) + np.arange(ncolor+1)/np.float(ncolor)*(np.amax(temp)-np.amin(temp))
+  norm   = mpl.colors.BoundaryNorm(cvals, cm.N)
+  c      = plt.pcolormesh(x, y, temp, norm=norm, cmap=cm)
+  cbar   = plt.colorbar(c, orientation='vertical')
+  cnames = ["{0:.0f}".format(i) for i in cvals]
+  cbar.set_ticks(cvals)
+  cbar.set_ticklabels(cnames)
+  for t in cbar.ax.get_yticklabels(): t.set_fontsize(cbsize)
+  # set continents
+  m.drawcoastlines(linewidth=0.5)
+  m.drawcountries()
+  # set grid
+  parallels = np.arange(-90., 90., delat)
+  m.drawparallels(parallels, labels=[1,0,0,0], fontsize=xsize, linewidth=0)
+  meridians = np.arange(0., 360., delon)
+  m.drawmeridians(meridians, labels=[0,0,0,1], fontsize=xsize, linewidth=0)
 
 
   # contourf
@@ -561,7 +563,50 @@ if dobasemap:
     pdf_pages.savefig(fig)
     plt.close()
 
-  
+    
+if docartopy:
+  # -------------------------------------------------------------------------
+  # Fig 2 - Maps with basemap
+  #
+
+  ifig += 1
+  iplot = 0
+  print('Plot - Fig ', ifig)
+  fig = plt.figure(ifig)
+
+  nrow = 3
+  ncol = 1
+  cm = ufz.get_brewer('RdYlBu'+str(ncolor),reverse=True)
+  xtick = 30
+
+  iplot += 1
+
+  sub  = fig.add_axes(ufz.position(nrow,ncol,iplot,hspace=hspace,vspace=vspace),
+                      projection=ccrs.Robinson(central_longitude=0))
+
+  cvals  = np.amin(temp) + np.arange(ncolor+1)/np.float(ncolor)*(np.amax(temp)-np.amin(temp))
+  norm   = mpl.colors.BoundaryNorm(cvals, cm.N)
+  # c      = sub.contourf(lon2, lat2, temp,
+  #                       norm=norm, cmap=cm, transform=ccrs.PlateCarree())
+  c      = sub.pcolormesh(np.roll(lon2,nlon/2,1), np.roll(lat2,nlon/2,1), np.roll(temp,nlon/2,1),
+                         norm=norm, cmap=cm, transform=ccrs.PlateCarree())
+  cbar   = plt.colorbar(c, orientation='vertical')
+  cnames = [r"${0:.0f}$".format(i) for i in cvals]
+  cbar.set_ticks(cvals)
+  cbar.set_ticklabels(cnames)
+  for t in cbar.ax.get_yticklabels(): t.set_fontsize(cbsize)
+
+  sub.coastlines(resolution='110m')
+  sub.gridlines(draw_labels=False)
+  sub.set_global()
+  # sub.set_xticks(np.arange(-180., 180., delon))
+  # sub.set_yticks(np.arange(-90., 90., delat))
+
+  if (outtype == 'pdf'):
+    pdf_pages.savefig(fig)
+    plt.close()
+
+
 if (outtype == 'pdf'):
   pdf_pages.close()
 else:
