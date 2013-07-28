@@ -132,8 +132,8 @@ lcol3       = '0.0'
 lcols       = mcols
 
 # Map
-delon   = 30.        # spacing between longitude labels
-delat   = 30.        # spacing between latitude labels
+delon   = 60.        # spacing between longitude labels
+delat   = 60.        # spacing between latitude labels
 xsize   = textsize   # axis label size
 ncolor  = 10         # # of colors in plot
 cbsize  = textsize   # colorbar label size
@@ -171,7 +171,7 @@ mpl.rc('axes', linewidth=alwidth, labelcolor='black')
 mpl.rc('path', simplify=False) # do not remove
 
 if dobasemap:
-    from mpl_toolkits.basemap import Basemap
+    from mpl_toolkits.basemap import Basemap, shiftgrid
 if docartopy:
     import cartopy.crs as ccrs
 
@@ -244,12 +244,12 @@ if dorandom:
 
 if dobasemap | docartopy:
   # Pseudo temperature
-  nlon       = 36
-  nlat       = 18
+  nlon       = 360/5
+  nlat       = 180/5
   lon        = 360./(2.*nlon)        + np.arange(nlon)/np.float(nlon) * 360.
   lat        = -90. + 180./(2.*nlat) + np.arange(nlat)/np.float(nlat) * 180.
   lon2, lat2 = np.meshgrid(lon,lat)
-  temp       = (np.cos(np.deg2rad(lat2)) + np.sin(np.deg2rad(lon2)))*20.
+  temp       = (np.cos(np.deg2rad(lat2)) + np.sin(np.deg2rad(lon2*10)))*20.
 
   # grid cell edges
   lonh = np.empty((nlat+1,nlon+1), dtype=np.float)
@@ -265,6 +265,39 @@ if dobasemap | docartopy:
   lath[-1,0:nlon]     = lat2[-1,:]       + 0.5*dlat[-1,:]
   lath[0:nlat+1,nlon] = lath[0:nlat+1,nlon-1]
 
+  slon         = np.roll(lon,nlon/2) # np.where(lon>180, lon-360., lon)
+  slat         = lat
+  stemp        = np.roll(temp,nlon/2,1)
+  slon2, slat2 = np.meshgrid(slon,slat)
+  slonh = np.empty((nlat+1,nlon+1), dtype=np.float)
+  slath = np.empty((nlat+1,nlon+1), dtype=np.float)
+  dlon = np.diff(slon2,axis=1)
+  dlat = np.diff(slat2,axis=0)
+  slonh[0:nlat,0]      = slon2[:,0]        - 0.5*dlon[:,0]          # 0
+  slonh[0:nlat,1:nlon] = slonh[0:nlat,0:1] + np.cumsum(dlon,axis=1) # 1:nlon+1
+  slonh[0:nlat,-1]     = slon2[:,-1]       + 0.5*dlon[:,-1]         # nlon
+  slonh[nlat,0:nlon+1] = slonh[nlat-1,0:nlon+1]                    # lower corner of box: assign last upper boundary
+  slath[0,0:nlon]      = slat2[0,:]        - 0.5*dlat[0,:]
+  slath[1:nlat,0:nlon] = slath[0:1,0:nlon] + np.cumsum(dlat,axis=0)
+  slath[-1,0:nlon]     = slat2[-1,:]       + 0.5*dlat[-1,:]
+  slath[0:nlat+1,nlon] = slath[0:nlat+1,nlon-1]
+
+  mlon         = np.roll(np.where(lon>180, lon-360., lon),nlon/2)
+  mlat         = lat
+  mtemp        = np.roll(temp,nlon/2,1)
+  mlon2, mlat2 = np.meshgrid(mlon,mlat)
+  mlonh = np.empty((nlat+1,nlon+1), dtype=np.float)
+  mlath = np.empty((nlat+1,nlon+1), dtype=np.float)
+  dlon = np.diff(mlon2,axis=1)
+  dlat = np.diff(mlat2,axis=0)
+  mlonh[0:nlat,0]      = mlon2[:,0]        - 0.5*dlon[:,0]          # 0
+  mlonh[0:nlat,1:nlon] = mlonh[0:nlat,0:1] + np.cumsum(dlon,axis=1) # 1:nlon+1
+  mlonh[0:nlat,-1]     = mlon2[:,-1]       + 0.5*dlon[:,-1]         # nlon
+  mlonh[nlat,0:nlon+1] = mlonh[nlat-1,0:nlon+1]                    # lower corner of box: assign last upper boundary
+  mlath[0,0:nlon]      = mlat2[0,:]        - 0.5*dlat[0,:]
+  mlath[1:nlat,0:nlon] = mlath[0:1,0:nlon] + np.cumsum(dlat,axis=0)
+  mlath[-1,0:nlon]     = mlat2[-1,:]       + 0.5*dlat[-1,:]
+  mlath[0:nlat+1,nlon] = mlath[0:nlat+1,nlon-1]
 
 # -------------------------------------------------------------------------
 # Plot
@@ -509,54 +542,106 @@ if dobasemap:
   nrow = 3
   ncol = 1
   cm = ufz.get_brewer('RdYlBu'+str(ncolor),reverse=True)
-
-  # pcolormesh
+  delon = 60
+  delat = 30
+  
+  # Mollweide
   iplot += 1
 
   sub  = fig.add_axes(ufz.position(nrow,ncol,iplot,hspace=hspace,vspace=vspace))
-  m    = Basemap(projection='robin', lon_0=0, resolution='i')
-  x, y = m(lonh,lath)
+  m    = Basemap(projection='moll',lon_0=0,resolution='c')
+
+  mx, my = m(mlon2,mlat2)
+  sx, sy = m(slon2,slat2)
 
   cvals  = np.amin(temp) + np.arange(ncolor+1)/np.float(ncolor)*(np.amax(temp)-np.amin(temp))
   norm   = mpl.colors.BoundaryNorm(cvals, cm.N)
-  c      = plt.pcolormesh(x, y, temp, norm=norm, cmap=cm)
+  if nlon > 100:
+      c = m.contourf(mx, my, temp, norm=norm, cmap=cm)
+  else:
+      c = m.pcolormesh(sx, sy, stemp, norm=norm, cmap=cm)
   cbar   = plt.colorbar(c, orientation='vertical')
-  cnames = ["{0:.0f}".format(i) for i in cvals]
+  cnames = [r"${0:.0f}$".format(i) for i in cvals]
   cbar.set_ticks(cvals)
   cbar.set_ticklabels(cnames)
   for t in cbar.ax.get_yticklabels(): t.set_fontsize(cbsize)
+  clab = r'$\mathrm{T_{surf} \; [^oC]}$'
+  cbar.set_label(clab, fontsize=cbsize)
   # set continents
   m.drawcoastlines(linewidth=0.5)
   m.drawcountries()
   # set grid
-  parallels = np.arange(-90., 90., delat)
+  parallels = np.arange(-90., 90.+delat, delat)
+  m.drawparallels(parallels, labels=[1,1,0,0], fontsize=xsize, linewidth=0)
+  # meridians = np.arange(0., 360.+delon, delon)
+  # m.drawmeridians(meridians, labels=[0,0,0,1], fontsize=xsize, linewidth=0)
+
+  # LatLon
+  iplot += 1
+
+  sub  = fig.add_axes(ufz.position(nrow,ncol,iplot,hspace=hspace,vspace=vspace))
+  m    = Basemap(projection='cyl', lon_0=0, resolution='c')
+
+  mx, my = m(mlon2,mlat2)
+
+  cvals  = np.amin(temp) + np.arange(ncolor+1)/np.float(ncolor)*(np.amax(temp)-np.amin(temp))
+  norm   = mpl.colors.BoundaryNorm(cvals, cm.N)
+  if nlon > 100:
+      c = m.contourf(mx, my, mtemp, norm=norm, cmap=cm)
+  else:
+      c = m.pcolormesh(mx, my, mtemp, norm=norm, cmap=cm)
+  cbar   = plt.colorbar(c, orientation='vertical')
+  cnames = [r"${0:.0f}$".format(i) for i in cvals]
+  cbar.set_ticks(cvals)
+  cbar.set_ticklabels(cnames)
+  for t in cbar.ax.get_yticklabels(): t.set_fontsize(cbsize)
+  clab = r'$\mathrm{T_{surf} \; [^oC]}$'
+  cbar.set_label(clab, fontsize=cbsize)
+  # set continents
+  m.drawcoastlines(linewidth=0.5)
+  m.drawcountries()
+  # set grid
+  parallels = np.arange(-90., 90.+delat, delat)
   m.drawparallels(parallels, labels=[1,0,0,0], fontsize=xsize, linewidth=0)
-  meridians = np.arange(0., 360., delon)
+  meridians = np.arange(-180., 180.+delon, delon)
   m.drawmeridians(meridians, labels=[0,0,0,1], fontsize=xsize, linewidth=0)
 
+  # Germany
+  inrow  = nrow
+  incol  = ncol*2
+  iplot = iplot*2 + 1
 
-  # contourf
-  iplot += 1
+  xlim = [5.5,12.5]
+  ylim = [47,55.5]
+  delon = 2
+  delat = 2
 
-  sub  = fig.add_axes(ufz.position(nrow,ncol,iplot,hspace=hspace,vspace=vspace))
-  m    = Basemap(projection='robin', lon_0=180, resolution='c')
-  x, y = m(lon2,lat2)
+  sub  = fig.add_axes(ufz.position(inrow,incol,iplot,hspace=hspace,vspace=vspace))
+  m    = Basemap(projection='cyl', lon_0=0, resolution='c', 
+                 llcrnrlon=xlim[0], llcrnrlat=ylim[0], urcrnrlon=xlim[1], urcrnrlat=ylim[1])
+
+  mx, my = m(mlon2,mlat2)
 
   cvals  = np.amin(temp) + np.arange(ncolor+1)/np.float(ncolor)*(np.amax(temp)-np.amin(temp))
   norm   = mpl.colors.BoundaryNorm(cvals, cm.N)
-  c      = m.contourf(x, y, temp, cvals, cmap=cm)#, norm=norm)
+  if nlon > 100:
+      c = m.contourf(mx, my, mtemp, norm=norm, cmap=cm)
+  else:
+      c = m.pcolormesh(mx, my, mtemp, norm=norm, cmap=cm)
   cbar   = plt.colorbar(c, orientation='vertical')
-  cnames = ["{0:.0f}".format(i) for i in cvals]
+  cnames = [r"${0:.0f}$".format(i) for i in cvals]
   cbar.set_ticks(cvals)
   cbar.set_ticklabels(cnames)
   for t in cbar.ax.get_yticklabels(): t.set_fontsize(cbsize)
+  clab = r'$\mathrm{T_{surf} \; [^oC]}$'
+  cbar.set_label(clab, fontsize=cbsize)
   # set continents
   m.drawcoastlines(linewidth=0.5)
   m.drawcountries()
   # set grid
-  parallels = np.arange(-90., 90., delat)
+  parallels = np.arange(-90., 90.+delat, delat)
   m.drawparallels(parallels, labels=[1,0,0,0], fontsize=xsize, linewidth=0)
-  meridians = np.arange(-180., 180., delon)
+  meridians = np.arange(-180., 180.+delon, delon)
   m.drawmeridians(meridians, labels=[0,0,0,1], fontsize=xsize, linewidth=0)
 
   if (outtype == 'pdf'):
@@ -577,30 +662,124 @@ if docartopy:
   nrow = 3
   ncol = 1
   cm = ufz.get_brewer('RdYlBu'+str(ncolor),reverse=True)
-  xtick = 30
+  delon = 60
+  delat = 60
 
+  # Mollweide projection - no axis labels possible yet
+  print('Plot Mollweide')
   iplot += 1
 
   sub  = fig.add_axes(ufz.position(nrow,ncol,iplot,hspace=hspace,vspace=vspace),
-                      projection=ccrs.Robinson(central_longitude=0))
+                      projection=ccrs.Mollweide(central_longitude=0))
 
   cvals  = np.amin(temp) + np.arange(ncolor+1)/np.float(ncolor)*(np.amax(temp)-np.amin(temp))
   norm   = mpl.colors.BoundaryNorm(cvals, cm.N)
-  # c      = sub.contourf(lon2, lat2, temp,
-  #                       norm=norm, cmap=cm, transform=ccrs.PlateCarree())
-  c      = sub.pcolormesh(np.roll(lon2,nlon/2,1), np.roll(lat2,nlon/2,1), np.roll(temp,nlon/2,1),
+  if nlon > 100:
+      c = sub.contourf(lon2, lat2, temp,
+                       norm=norm, cmap=cm, transform=ccrs.PlateCarree())
+  else:
+      c = sub.pcolormesh(np.roll(lon2,nlon/2,1), np.roll(lat2,nlon/2,1), np.roll(temp,nlon/2,1),
                          norm=norm, cmap=cm, transform=ccrs.PlateCarree())
   cbar   = plt.colorbar(c, orientation='vertical')
   cnames = [r"${0:.0f}$".format(i) for i in cvals]
   cbar.set_ticks(cvals)
   cbar.set_ticklabels(cnames)
   for t in cbar.ax.get_yticklabels(): t.set_fontsize(cbsize)
+  clab = r'$\mathrm{T_{surf} \; [^oC]}$'
+  cbar.set_label(clab, fontsize=cbsize)
 
   sub.coastlines(resolution='110m')
   sub.gridlines(draw_labels=False)
   sub.set_global()
-  # sub.set_xticks(np.arange(-180., 180., delon))
-  # sub.set_yticks(np.arange(-90., 90., delat))
+
+
+  # Lat/Lon projection with labels etc.
+  print('Plot LatLon')
+  iplot += 1
+
+  sub    = fig.add_axes(ufz.position(nrow,ncol,iplot,hspace=hspace,vspace=vspace),
+                        projection=ccrs.PlateCarree(central_longitude=0))
+
+  cvals  = np.amin(temp) + np.arange(ncolor+1)/np.float(ncolor)*(np.amax(temp)-np.amin(temp))
+  norm   = mpl.colors.BoundaryNorm(cvals, cm.N)
+  if nlon > 100:
+      c = sub.contourf(lon2, lat2, temp,
+                       norm=norm, cmap=cm, transform=ccrs.PlateCarree())
+  else:
+      c = sub.pcolormesh(np.roll(lon2,nlon/2,1), np.roll(lat2,nlon/2,1), np.roll(temp,nlon/2,1),
+                         norm=norm, cmap=cm, transform=ccrs.PlateCarree())
+  cbar   = plt.colorbar(c, orientation='vertical')
+  cnames = [r"${0:.0f}$".format(i) for i in cvals]
+  cbar.set_ticks(cvals)
+  cbar.set_ticklabels(cnames)
+  for t in cbar.ax.get_yticklabels(): t.set_fontsize(cbsize)
+  clab = r'$\mathrm{T_{surf} \; [^oC]}$'
+  cbar.set_label(clab, fontsize=cbsize)
+
+  sub.coastlines(resolution='110m')
+  sub.gridlines(draw_labels=False) # DIY below
+  sub.set_global()
+  
+  sub.set_xticks(np.arange(-180., 180.+delon, delon))
+  sub.set_yticks(np.arange(-90., 90.+delat, delat))
+  ixticks = sub.get_xticks()
+  xnames  = [ r'$\mathrm{'+str(int(i))+'\,^oN}$' for i in ixticks]
+  xticknames = plt.setp(sub, xticklabels=xnames)
+  plt.setp(xticknames, fontsize='medium')
+  iyticks = sub.get_yticks()
+  ynames  = [ r'$\mathrm{'+str(int(i))+'\,^oE}$' for i in iyticks]
+  yticknames = plt.setp(sub, yticklabels=ynames)
+  plt.setp(yticknames, fontsize='medium')
+
+
+
+  # Zoom on Germany
+  print('Plot Germany')
+  inrow  = nrow
+  incol  = ncol*2
+  iplot = iplot*2 + 1
+
+  xlim = [5.5,12.5]
+  ylim = [47,55.5]
+  delon = 2
+  delat = 2
+
+  sub    = fig.add_axes(ufz.position(inrow,incol,iplot,hspace=hspace,vspace=vspace),
+                        projection=ccrs.PlateCarree())
+
+  cvals  = np.amin(temp) + np.arange(ncolor+1)/np.float(ncolor)*(np.amax(temp)-np.amin(temp))
+  norm   = mpl.colors.BoundaryNorm(cvals, cm.N)
+  if nlon > 100:
+      c = sub.contourf(lon2, lat2, temp,
+                       norm=norm, cmap=cm, transform=ccrs.PlateCarree())
+  else:
+      c = sub.pcolormesh(np.roll(lon2,nlon/2,1), np.roll(lat2,nlon/2,1), np.roll(temp,nlon/2,1),
+                         norm=norm, cmap=cm, transform=ccrs.PlateCarree())
+  cbar   = plt.colorbar(c, orientation='vertical')
+  cnames = [r"${0:.0f}$".format(i) for i in cvals]
+  cbar.set_ticks(cvals)
+  cbar.set_ticklabels(cnames)
+  for t in cbar.ax.get_yticklabels(): t.set_fontsize(cbsize)
+  clab = r'$\mathrm{T_{surf} \; [^oC]}$'
+  cbar.set_label(clab, fontsize=cbsize)
+
+  sub.coastlines(resolution='110m')
+  sub.gridlines(draw_labels=False) # DIY below
+  
+  sub.set_xticks(np.arange(-180., 180.+delon, delon))
+  sub.set_yticks(np.arange(-90., 90.+delat, delat))
+  ixticks = sub.get_xticks()
+  xnames  = [ r'$\mathrm{'+str(int(i))+'\,^oN}$' for i in ixticks]
+  xticknames = plt.setp(sub, xticklabels=xnames)
+  plt.setp(xticknames, fontsize='medium')
+  iyticks = sub.get_yticks()
+  ynames  = [ r'$\mathrm{'+str(int(i))+'\,^oE}$' for i in iyticks]
+  yticknames = plt.setp(sub, yticklabels=ynames)
+  plt.setp(yticknames, fontsize='medium')
+
+  sub.set_xlim(xlim)
+  sub.set_ylim(ylim)
+
 
   if (outtype == 'pdf'):
     pdf_pages.savefig(fig)

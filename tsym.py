@@ -27,7 +27,9 @@ def tsym(name):
 
         Known symbols
         ------------
+        deg         Degree symbol
         degree      Degree symbol
+        degc        Degree Celcius
         degreec     Degree Celcius
         degree c    Degree Celcius
         mu          Lowercase greek mu
@@ -40,8 +42,12 @@ def tsym(name):
 
         Examples
         --------
+        >>> print(tsym('deg'))
+        \u00B0
         >>> print(tsym('degree'))
         \u00B0
+        >>> print(tsym('degC'))
+        \u2103
         >>> print(tsym('degreec'))
         \u2103
         >>> print(tsym('degree C'))
@@ -91,7 +97,9 @@ def tsym(name):
     #
     # Define symbol dictionary
     symdict = ({
+               'deg'       : '\u00B0',
                'degree'    : '\u00B0',
+               'degc'      : '\u2103',
                'degreec'   : '\u2103',
                'degree c'  : '\u2103',
                'mu'        : '\u00B5',
