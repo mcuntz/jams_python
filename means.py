@@ -4,7 +4,8 @@ import numpy as np
 from date2dec import date2dec
 from dec2date import dec2date
 
-def means(date, dat, year=False, month=False, day=False, hour=False, minute=False, sum=False):
+def means(date, dat, year=False, month=False, day=False, hour=False, minute=False, 
+          meanday=False, sum=False):
     """
         Calculate daily, monthly, yearly, etc. means of data depending on date stamp.
 
@@ -12,15 +13,17 @@ def means(date, dat, year=False, month=False, day=False, hour=False, minute=Fals
         If no option is given, the mean will be over the whole first column.
 
         Returns centred dates, averages.
-        Yearly  dates are centred at June 15, 12:00h
-        Monthly dates are centred at 15th, 12:00h
-        Daily   dates are centred at 12:00h
-        Hourly  dates are centred at 30 min.
+            Yearly  dates are centred at June 15, 12:00h
+            Monthly dates are centred at 15th, 12:00h
+            Daily   dates are centred at 12:00h
+            Hourly  dates are centred at 30 min.
+            Mean daily dates centred on 30 min of 01. January of first year
 
 
         Definition
         ----------
-        def means(date, dat, year=False, month=False, day=False, hour=False, minute=False, sum=False):
+        def means(date, dat, year=False, month=False, day=False, hour=False, minute=False, 
+                  meanday=False, sum=False):
 
 
         Input
@@ -31,11 +34,12 @@ def means(date, dat, year=False, month=False, day=False, hour=False, minute=Fals
 
         Optional Input
         --------------
-        year      if True, calculate yearly  means.
-        month     if True, calculate monthly means.
-        day       if True, calculate daily   means.
-        hour      if True, calculate hourly  means.
-        minute    if True, calculate minute  means.
+        year      if True, yearly   means.
+        month     if True, monthly  means.
+        day       if True, daily    means.
+        hour      if True, hourly   means.
+        minute    if True, minutely means.
+        meanday   if True, mean daily cycle.
         sum       if True, calculate sums instead of means.
 
 
@@ -43,6 +47,8 @@ def means(date, dat, year=False, month=False, day=False, hour=False, minute=Fals
         ------
         outdate    centred date on year, month, day, etc.
         meandat    averaged data in 1st dimension.
+
+        If meanday==True, then all hours will be written; as a masked-array if hours are missing.
 
 
         Examples
@@ -68,6 +74,10 @@ def means(date, dat, year=False, month=False, day=False, hour=False, minute=Fals
         >>> odates, xout = means(jdates, x, day=True)
         >>> print(astr(xout, 3, pp=True))
         ['4.000' '2.000' '3.000']
+
+        >>> odates, xout = means(jdates, x, meanday=True)
+        >>> print(astr(xout[10:16], 3, pp=True))
+        ['--   ' '--   ' '2.500' '5.000' '6.000' '--   ']
 
         # Masked arrays
         >>> x         = np.ma.array(x, mask=np.zeros(x.size, dtype=np.bool))
@@ -149,26 +159,28 @@ def means(date, dat, year=False, month=False, day=False, hour=False, minute=Fals
         History
         -------
         Written,  MC, Jul 2013
+        Modified, MC, Jul 2013 - meanday
     """
     #
     myundef  = 9e33
-    ismasked = type(dat) == type(np.ma.zeros(1))
+    ismasked = type(dat) == np.ma.core.MaskedArray
     #
     # Assure array
     if not ismasked: dat = np.array(dat)
     #
     # Assure ND-array
     isone = False
-    if np.ndim(dat) == 1:
+    if dat.ndim == 1:
         isone = True
         dat = dat[:,np.newaxis]
     #
     # Check options
-    if day+month+year+hour+minute > 1:
+    allopts = day+month+year+hour+minute+meanday
+    if allopts > 1:
         raise ValueError("only one averaging option possible")
 
     # average 1st dim
-    if day+month+year+hour+minute == 0:
+    if allopts == 0:
         dout = 0.5*(date[-1]+date[0])
         if sum:
             out  = np.ma.sum(dat, 0)
@@ -193,13 +205,14 @@ def means(date, dat, year=False, month=False, day=False, hour=False, minute=Fals
                 out  = np.ones([nout]+list(dat.shape[1:]))*myundef
             zahl = 0
             for i in yrs:
-                dout[zahl] = date2dec(yr=i, mo=6, dy=15, hr=12)
                 ii = np.where(yr==i)[0]
-                if sum:
-                    out[zahl,:] = np.ma.sum(dat[ii,:],0)
-                else:
-                    out[zahl,:] = np.ma.mean(dat[ii,:],0)
-                zahl += 1
+                if np.size(ii) > 0:
+                    dout[zahl] = date2dec(yr=i, mo=6, dy=15, hr=12)
+                    if sum:
+                        out[zahl,:] = np.ma.sum(dat[ii,:],0)
+                    else:
+                        out[zahl,:] = np.ma.mean(dat[ii,:],0)
+                    zahl += 1
 
         # month
         if month:
@@ -294,12 +307,34 @@ def means(date, dat, year=False, month=False, day=False, hour=False, minute=Fals
                             for m in mns:
                                 ii = np.where((yr==i) & (mo==j) & (dy==k) & (hr==l) & (hr==m))[0]
                                 if np.size(ii) > 0:
-                                    dout[zahl]  = date2dec(yr=i, mo=j, dy=k, hr=l, mn=m, sc=30)
+                                    dout[zahl]  = date2dec(yr=i, mo=j, dy=k, hr=l, mi=m, sc=30)
                                     if sum:
                                         out[zahl,:] = np.ma.sum(dat[ii,:],0)
                                     else:
                                         out[zahl,:] = np.ma.mean(dat[ii,:],0)
                                     zahl += 1
+
+        # Mean daily
+        if meanday:
+            hrs  = np.arange(24)
+            nout = hrs.size
+            dout = np.ones(nout)*myundef
+            if ismasked:
+                out  = np.ma.ones([nout]+list(dat.shape[1:]))*myundef
+            else:
+                out  = np.ones([nout]+list(dat.shape[1:]))*myundef
+            zahl = 0
+            for i in hrs:
+                dout[zahl] = date2dec(yr=yr[0], mo=1, dy=1, hr=i, mi=30)
+                ii = np.where(hr==i)[0]
+                if np.size(ii) > 0:
+                    if sum:
+                        out[zahl,:] = np.ma.sum(dat[ii,:],0)
+                    else:
+                        out[zahl,:] = np.ma.mean(dat[ii,:],0)
+                zahl += 1
+            if np.any(out==myundef):
+                out = np.ma.array(out, mask=(out==myundef), keep_mask=True)
 
     ii = np.where(dout != myundef)[0]
     if len(ii) > 0:
@@ -324,6 +359,10 @@ if __name__ == '__main__':
     #          '01.01.1990 12:10:00', '01.01.1990 13:00:00', '01.01.1990 14:00:00']
     # jdates = date2dec(ascii=dates)
     # x      = np.arange(len(jdates))+1.
+    # print(dates)
+    # #['01.01.1990 12:00:00', '01.02.1990 12:00:00', '01.03.1990 12:00:00', '01.01.1990 12:10:00', '01.01.1990 13:00:00', '01.01.1990 14:00:00']
+    # print(x)
+    # #[ 1.  2.  3.  4.  5.  6.]
     # odates, xout = means(jdates, x)
     # print(astr(odates, 3, pp=True), astr(xout, 3, pp=True))
     # #2.448e+06 3.500
@@ -336,6 +375,9 @@ if __name__ == '__main__':
     # odates, xout = means(jdates, x, day=True)
     # print(astr(xout, 3, pp=True))
     # #['4.000' '2.000' '3.000']
+    # odates, xout = means(jdates, x, meanday=True)
+    # print(astr(xout[10:16], 3, pp=True))
+    # #['--   ' '--   ' '2.500' '5.000' '6.000' '--   ']
 
     # # mask
     # x         = np.ma.array(x, mask=np.zeros(x.size, dtype=np.bool))

@@ -45,6 +45,8 @@ def mad(datin, z=7, deriv=0):
         >>> y = np.array([-0.25,0.68,0.94,1.15,2.26,2.35,2.37,2.40,2.47,2.54,2.62,
         ...               2.64,2.90,2.92,2.92,2.93,3.21,3.26,3.30,3.59,3.68,4.30,
         ...               4.64,5.34,5.42,8.01],dtype=np.float)
+
+        # Normal MAD
         >>> print(mad(y))
         [False False False False False False False False False False False False
          False False False False False False False False False False False False
@@ -60,15 +62,18 @@ def mad(datin, z=7, deriv=0):
          False False False False False False False False False False False False
           True  True]
 
+        # MAD on 2nd derivatives
         >>> print(mad(y,z=4,deriv=2))
         [False False False False False False False False False False False False
          False False False False False False False False False False False  True]
 
+        # direct usage
         >>> my = np.ma.array(y, mask=mad(y,z=4))
         >>> print(my)
         [-0.25 0.68 0.94 1.15 2.26 2.35 2.37 2.4 2.47 2.54 2.62 2.64 2.9 2.92 2.92
          2.93 3.21 3.26 3.3 3.59 3.68 4.3 4.64 5.34 5.42 --]
 
+        # MAD on several dimensions
         >>> yy = np.transpose(np.array([y,y]))
         >>> print(np.transpose(mad(yy,z=4)))
         [[False False False False False False False False False False False False
@@ -89,6 +94,32 @@ def mad(datin, z=7, deriv=0):
          [ True False False False False False False False False False False False
           False False False False False False False False False False False False
            True  True]]
+
+        # Masked arrays
+        >>> my = np.ma.array(y, mask=np.zeros(y.shape))
+        >>> my.mask[-1] = True
+        >>> print(mad(my,z=4))
+        [False False False False False False False False False False False False
+         False False False False False False False False False False False False
+         False --]
+
+        >>> print(mad(my,z=3))
+        [True False False False False False False False False False False False
+         False False False False False False False False False False False True
+         True --]
+    
+        # Arrays with NaNs
+        >>> ny = y
+        >>> ny[-1] = np.nan
+        >>> print(mad(ny,z=4))
+        [False False False False False False False False False False False False
+         False False False False False False False False False False False False
+         False False]
+
+        >>> print(mad(ny,z=3))
+        [ True False False False False False False False False False False False
+         False False False False False False False False False False False  True
+          True False]
 
 
         License
@@ -118,8 +149,9 @@ def mad(datin, z=7, deriv=0):
                   MC, Jun 2012 - axis=0 did not always work: spread md and MAD to input dimensions
                   MC, Jun 2012 - use np.diff, remove spreads
                   MC, Feb 2013 - ported to Python 3
-                  MC & JM, Jul 2013 - loop over second dimension for medians faster than array :-(
+                  MC & JM, Jul 2013 - loop over second dimension for medians, faster than array calculations :-(
                                       but use bottleneck for speed :-)
+                  MC, Jul 2013 - (re-)allow masked arrays and NaNs in arrays
     """
     sn = list(np.shape(datin))
     n  = sn[0]
@@ -138,25 +170,39 @@ def mad(datin, z=7, deriv=0):
         d      = np.diff(datin, n=2, axis=0)
     else:
         raise ValueError('Unimplemented option.')
+
     # Shortcut if all masked
-    if type(d) == type(np.ma.empty(1)):
+    ismasked = type(d) == np.ma.core.MaskedArray
+    if ismasked:
         if np.all(d.mask == True):
             return d.mask
+    else:
+        if np.all(~np.isfinite(d)):
+            return np.ones(d.shape, dtype=np.bool)
+
     # Median
     if d.ndim == 1:
         try:
             import bottleneck as bn
+            if ismasked:
+                dd = d.compressed()
+            else:
+                dd = d[np.isfinite(d)]
             md     = bn.median(d)
             # Median absolute deviation
-            MAD    = bn.median(np.ma.abs(d-md))
+            MAD    = bn.median(np.abs(dd-md))
             # Range around median
             thresh = MAD * (z/0.6745)
             # True where outside z-range
             res = (d<(md-thresh)) | (d>(md+thresh))
         except:
-            md     = np.ma.median(d)
+            if ismasked:
+                dd = d.compressed()
+            else:
+                dd = d[np.isfinite(d)]
+            md     = np.median(dd)
             # Median absolute deviation
-            MAD    = np.ma.median(np.ma.abs(d-md))
+            MAD    = np.median(np.abs(dd-md))
             # Range around median
             thresh = MAD * (z/0.6745)
             # True where outside z-range
@@ -166,9 +212,14 @@ def mad(datin, z=7, deriv=0):
             import bottleneck as bn
             res = np.empty(d.shape, dtype=np.bool)
             for i in range(d.shape[1]):
-                md     = bn.median(d[:,i])
+                di = d[:,i]
+                if ismasked:
+                    dd = di.compressed()
+                else:
+                    dd = di[np.isfinite(di)]
+                md     = bn.median(dd)
                 # Median absolute deviation
-                MAD    = bn.median(np.ma.abs(d[:,i]-md))
+                MAD    = bn.median(np.abs(dd-md))
                 # Range around median
                 thresh = MAD * (z/0.6745)
                 # True where outside z-range
@@ -176,9 +227,14 @@ def mad(datin, z=7, deriv=0):
         except:
             res = np.empty(d.shape, dtype=np.bool)
             for i in range(d.shape[1]):
-                md     = np.ma.median(d[:,i])
+                di = d[:,i]
+                if ismasked:
+                    dd = di.compressed()
+                else:
+                    dd = di[np.isfinite(di)]
+                md     = np.median(dd)
                 # Median absolute deviation
-                MAD    = np.ma.median(np.ma.abs(d[:,i]-md))
+                MAD    = np.median(np.abs(dd-md))
                 # Range around median
                 thresh = MAD * (z/0.6745)
                 # True where outside z-range
@@ -192,9 +248,76 @@ def mad(datin, z=7, deriv=0):
 if __name__ == '__main__':
     import doctest
     doctest.testmod()
-    # y = np.array([-0.25,0.68,0.94,1.15,2.26,2.35,2.37,2.40,2.47,2.54,2.62,
-    #               2.64,2.90,2.92,2.92,2.93,3.21,3.26,3.30,3.59,3.68,4.30,
-    #               4.64,5.34,5.42,8.01],dtype=np.float)
-    # yy = np.transpose(np.array([y,y]))
-    # print np.transpose(mad(yy,z=4))
 
+    # import numpy as np
+    # y = np.array([-0.25,0.68,0.94,1.15,2.26,2.35,2.37,2.40,2.47,2.54,2.62,
+    #                2.64,2.90,2.92,2.92,2.93,3.21,3.26,3.30,3.59,3.68,4.30,
+    #                4.64,5.34,5.42,8.01],dtype=np.float)
+    # print(mad(y))
+    # #[False False False False False False False False False False False False
+    # # False False False False False False False False False False False False
+    # # False False]
+
+    # print(mad(y,z=4))
+    # #[False False False False False False False False False False False False
+    # # False False False False False False False False False False False False
+    # # False  True]
+
+    # print(mad(y,z=3))
+    # #[ True False False False False False False False False False False False
+    # # False False False False False False False False False False False False
+    # #  True  True]
+
+    # print(mad(y,z=4,deriv=2))
+    # #[False False False False False False False False False False False False
+    # # False False False False False False False False False False False  True]
+
+    # my = np.ma.array(y, mask=mad(y,z=4))
+    # print(my)
+    # #[-0.25 0.68 0.94 1.15 2.26 2.35 2.37 2.4 2.47 2.54 2.62 2.64 2.9 2.92 2.92
+    # # 2.93 3.21 3.26 3.3 3.59 3.68 4.3 4.64 5.34 5.42 --]
+
+    # yy = np.transpose(np.array([y,y]))
+    # print(np.transpose(mad(yy,z=4)))
+    # #[[False False False False False False False False False False False False
+    # #  False False False False False False False False False False False False
+    # #  False  True]
+    # # [False False False False False False False False False False False False
+    # #  False False False False False False False False False False False False
+    # #  False  True]]
+
+    # yyy = np.transpose(np.array([y,y,y]))
+    # print(np.transpose(mad(yyy,z=3)))
+    # #[[ True False False False False False False False False False False False
+    # #  False False False False False False False False False False False False
+    # #   True  True]
+    # # [ True False False False False False False False False False False False
+    # #  False False False False False False False False False False False False
+    # #   True  True]
+    # # [ True False False False False False False False False False False False
+    # #  False False False False False False False False False False False False
+    # #   True  True]]
+
+    # my = np.ma.array(y, mask=np.zeros(y.shape))
+    # my.mask[-1] = True
+    # print(mad(my,z=4))
+    # #[False False False False False False False False False False False False
+    # # False False False False False False False False False False False False
+    # # False --]
+
+    # print(mad(my,z=3))
+    # #[True False False False False False False False False False False False
+    # # False False False False False False False False False False False True
+    # # True --]
+    
+    # ny = y
+    # ny[-1] = np.nan
+    # print(mad(ny,z=4))
+    # #[False False False False False False False False False False False False
+    # # False False False False False False False False False False False False
+    # # False False]
+
+    # print(mad(ny,z=3))
+    # #[True False False False False False False False False False False False
+    # # False False False False False False False False False False False True
+    # # True False]
