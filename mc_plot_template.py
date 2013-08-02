@@ -66,6 +66,7 @@ import argparse
 import textwrap
 
 addargs = []
+doflag  = 3
 pdffile = ''
 usetex  = False
 parser  = argparse.ArgumentParser(
@@ -79,6 +80,11 @@ parser  = argparse.ArgumentParser(
             The template also serves as a lookup of Python tips and tricks as well as a gallery
             of plots, graphs, maps.
           '''))
+parser.add_argument('-f', '--flag', action='store',
+                    default=doflag, dest='doflag', metavar='flag', type=int,
+                    help="Bit flag (default: 3):"
+                         " 1: do this;"
+                         " 2: do that.")
 parser.add_argument('-p', '--pdffile', action='store',
                     default=pdffile, dest='pdffile', metavar='pdffile',
                     help='Name of pdf output file (default: open screen window).')
@@ -89,6 +95,7 @@ parser.add_argument('further', nargs='*', metavar='additional_args',
 
 args    = parser.parse_args()
 addargs = args.further
+doflag  = args.doflag
 pdffile = args.pdffile
 usetex  = args.usetex
 del parser, args
@@ -174,6 +181,19 @@ if dobasemap:
     from mpl_toolkits.basemap import Basemap, shiftgrid
 if docartopy:
     import cartopy.crs as ccrs
+
+
+# -------------------------------------------------------------------------
+# Analyse flag
+#
+
+# -2 is -number of possible flags, there should be the same amount of zeros in the '00' string
+dothis = False
+dothat = False
+bflag = (('00' + np.binary_repr(doflag))[-2:])[::-1] # revert for easy extension
+if bflag[0]=='1': dothis = True
+if bflag[1]=='1': dothat = True
+
 
 # -------------------------------------------------------------------------
 # Prepare some pseudo data
