@@ -56,102 +56,220 @@ def sobol_index(s=None, ns=None, ya=None, yb=None, yc=None, si=True, sti=True, m
 
         Examples
         --------
-        >>> import numpy as np
-        >>> iya = np.array([-257.0921, -152.8434,  -68.7691, -129.8188,  -89.9667])
-        >>> iyb = np.array([-174.3796, -147.3429, -119.2169, -102.7477, -160.2185])
-        >>> iyc = np.array([[-101.2691, -139.5885, -127.6342, -106.9594, -115.8792],
-        ...                [-130.0901, -154.8311,  -24.3989, -133.4675, -169.0250],
-        ...                [-180.9130, -140.7924, -127.3886,  -93.2011, -119.7757],
-        ...                [-171.2342, -146.7013, -118.9833, -102.5973, -163.5437],
-        ...                [-255.2163, -179.8984, -131.5042, -103.7205, -167.4869],
-        ...                [-258.7999, -125.7803, -116.5700, -129.3884, -157.6105],
-        ...                [-169.9223, -163.9877, -120.3642,  -89.8831, -160.3463],
-        ...                [-173.9842, -144.7646, -119.3019,  -95.3019, -182.1460],
-        ...                [-193.2946, -155.0912, -141.4387, -107.3154, -171.4209],
-        ...                [-174.3416, -147.3517, -119.2144, -102.7560, -160.2369]])
 
+        >>> import numpy as np
+        >>> import scipy.stats as stats
+        >>> import ufz
+        >>> from sobol import i4_sobol_generate
+
+        # ------------------------------------------------------------------------
+        #                                1D
+        # ------------------------------------------------------------------------
+
+        # seed for reproducible results in doctest
+        >>> np.random.seed(1)
+        
+        # number of parameter sets
+        >>> nsets = 1000
+
+        # number of parameter
+        >>> npara = 3
+
+        # randomly sample nsets with Latin-Hypercube
+        >>> dist = [stats.uniform, stats.uniform, stats.uniform]
+        >>> pars = [(-np.pi,2.0*np.pi),(-np.pi,2.0*np.pi),(-np.pi,2.0*np.pi)]
+        >>> setsa  = ufz.lhs(dist, pars, nsets)
+        >>> setsb  = ufz.lhs(dist, pars, nsets)
+
+        # Saltelli has two constants in the model
+        >>> a = 0.5
+        >>> b = 2.0
+
+        # generate model output yA and yB
+        >>> iya = np.sin(setsa[0,:])  + a*(np.sin(setsa[1,:]))**2  + b*setsa[2,:]**4  * np.sin(setsa[0,:])
+        >>> iyb = np.sin(setsb[0,:])  + a*(np.sin(setsb[1,:]))**2  + b*setsb[2,:]**4  * np.sin(setsb[0,:])
+
+        # generate model output yCi
+        >>> iyc = np.empty((npara,nsets))*np.nan
+        >>> for i in range(npara):
+        ...     tmpset = np.copy(setsb)
+        ...     tmpset[i,:] = setsa[i,:]
+        ...     iyc[i,:] = np.sin(tmpset[0,:])  + a*(np.sin(tmpset[1,:]))**2  + b*tmpset[2,:]**4  * np.sin(tmpset[0,:])
+
+        # theoretical results: has to converge for n->Infinity to this values
+        >>> vy = 0.5 + a**2/8.0 + b*np.pi**4/5.0+b**2*np.pi**8/18.0
+        >>> theo_si  = np.array([(0.5+b*np.pi**4/5.0+b**2*np.pi**8/50.0)/vy, (a**2/8.0)/vy, 0.0])
+        >>> theo_sti = np.array([(0.5+b*np.pi**4/5.0+b**2*np.pi**8/50.0+8.0/225.0*b**2*np.pi**8)/vy, (a**2/8.0)/vy, (8.0/225.0*b**2*np.pi**8)/vy])
+
+        # Theoretical results
+        >>> print('T :: si  =',ufz.astr(theo_si,3,pp=True))
+        T :: si  = ['0.372' '0.000' '0.000']
+        >>> print('T :: sti =',ufz.astr(theo_sti,3,pp=True))
+        T :: sti = ['1.000' '0.000' '0.628']
+    
         # Give 3 positional arguments
         >>> isi1, isti1 = sobol_index(iya,iyb,iyc)
         >>> from autostring import astr
-        >>> print(astr(isi1,3,pp=True))
-        ['-0.172' ' 0.685' ' 1.344' ' 1.581' ' 3.794' ' 3.325' ' 1.617' ' 1.672' ' 2.356' ' 1.631']
-        >>> print(astr(isti1,3,pp=True))
-        [' 0.972' ' 0.482' '-0.074' '-0.560' '-2.280' '-1.642' '-0.613' '-0.755' '-1.311' '-0.572']
+        >>> print('S :: si  =',astr(isi1,3,pp=True))
+        S :: si  = [' 0.353' ' 0.000' ' 0.005']
+        >>> print('S :: sti =',astr(isti1,3,pp=True))
+        S :: sti = ['1.037' '0.000' '0.647']
 
         # Give 3 optional arguments
         >>> isi2, isti2 = sobol_index(ya=iya,yb=iyb,yc=iyc)
-        >>> print(astr(isi2,3,pp=True))
-        ['-0.172' ' 0.685' ' 1.344' ' 1.581' ' 3.794' ' 3.325' ' 1.617' ' 1.672' ' 2.356' ' 1.631']
+        >>> print('S :: si  =',astr(isi2,3,pp=True))
+        S :: si  = [' 0.353' ' 0.000' ' 0.005']
 
         # Give 2 positional arguments
         >>> s = np.concatenate((iya, iyb, np.ravel(iyc)))
         >>> ns = iya.size
         >>> isi3, isti3 = sobol_index(s, ns)
-        >>> print(astr(isi3,3,pp=True))
-        ['-0.172' ' 0.685' ' 1.344' ' 1.581' ' 3.794' ' 3.325' ' 1.617' ' 1.672' ' 2.356' ' 1.631']
+        >>> print('S :: si  =',astr(isi3,3,pp=True))
+        S :: si  = [' 0.353' ' 0.000' ' 0.005']
 
         # Give 2 optional arguments
         >>> isi4, isti4 = sobol_index(s=s, ns=ns)
-        >>> print(astr(isi4,3,pp=True))
-        ['-0.172' ' 0.685' ' 1.344' ' 1.581' ' 3.794' ' 3.325' ' 1.617' ' 1.672' ' 2.356' ' 1.631']
+        >>> print('S :: si  =',astr(isi4,3,pp=True))
+        S :: si  = [' 0.353' ' 0.000' ' 0.005']
 
         # 2 optional arguments and no STi output
         >>> isi5, = sobol_index(s=s, ns=ns, si=True, sti=False)
-        >>> print(astr(isi5,3,pp=True))
-        ['-0.172' ' 0.685' ' 1.344' ' 1.581' ' 3.794' ' 3.325' ' 1.617' ' 1.672' ' 2.356' ' 1.631']
+        >>> print('S :: si  =',astr(isi5,3,pp=True))
+        S :: si  = [' 0.353' ' 0.000' ' 0.005']
 
         # 2 optional arguments and no Si output
         >>> isti5, = sobol_index(s=s, ns=ns, si=False, sti=True)
-        >>> print(astr(isti5,3,pp=True))
-        [' 0.972' ' 0.482' '-0.074' '-0.560' '-2.280' '-1.642' '-0.613' '-0.755' '-1.311' '-0.572']
+        >>> print('S :: sti =',astr(isti5,3,pp=True))
+        S :: sti = ['1.037' '0.000' '0.647']
 
-        # Indices per time step
-        # 3 times the same
-        >>> iya = np.asarray([iya, iya, iya])
-        >>> iyb = np.asarray([iyb, iyb, iyb])
-        >>> iyc = np.asarray([iyc, iyc, iyc])
+        # ------------------------------------------------------------------------
+        #                                2D
+        # ------------------------------------------------------------------------
+        # number of timepoints
+        >>> ntime = 100
+        >>> iya = np.empty((ntime,nsets))*np.nan
+        >>> iyb = np.empty((ntime,nsets))*np.nan
+        >>> iyc = np.empty((ntime,npara,nsets))*np.nan
+        >>> s   = np.empty((ntime,(npara+2)*nsets))*np.nan
+        >>> ns = nsets
+        >>> theo_si  = []
+        >>> theo_sti = []
+        >>> for t in range(ntime):
+        ...     a = 1.0*t + 50.0
+        ...     b = 2.0
+        ...     iya[t,:] = np.sin(setsa[0,:])  + a*(np.sin(setsa[1,:]))**2  + b*setsa[2,:]**4  * np.sin(setsa[0,:])
+        ...     iyb[t,:] = np.sin(setsb[0,:])  + a*(np.sin(setsb[1,:]))**2  + b*setsb[2,:]**4  * np.sin(setsb[0,:])
+        ...     for i in range(npara):
+        ...         tmpset = np.copy(setsb)
+        ...         tmpset[i,:] = setsa[i,:]
+        ...         iyc[t,i,:] = np.sin(tmpset[0,:])  + a*(np.sin(tmpset[1,:]))**2  + b*tmpset[2,:]**4  * np.sin(tmpset[0,:])
+        ...     s[t,:] = np.concatenate((iya[t,:], iyb[t,:], np.ravel(iyc[t,:,:])))
+        ...     vy = 0.5 + a**2/8.0 + b*np.pi**4/5.0+b**2*np.pi**8/18.0
+        ...     theo_si  = theo_si + [np.array([(0.5+b*np.pi**4/5.0+b**2*np.pi**8/50.0)/vy, (a**2/8.0)/vy, 0.0])]
+        ...     theo_sti = theo_sti + [np.array([(0.5+b*np.pi**4/5.0+b**2*np.pi**8/50.0+8.0/225.0*b**2*np.pi**8)/vy, (a**2/8.0)/vy, (8.0/225.0*b**2*np.pi**8)/vy])]
 
-        # standard
+        # -------------------------------------------------------------------------------------------
+        # 1D model output --> ya, yb are 2D and yc is 3D
         >>> isi1, isti1 = sobol_index(iya,iyb,iyc)
-        >>> print(astr(isi1[0,:],3,pp=True))
-        ['-0.172' ' 0.685' ' 1.344' ' 1.581' ' 3.794' ' 3.325' ' 1.617' ' 1.672' ' 2.356' ' 1.631']
-        >>> print(astr(isi1[2,:],3,pp=True))
-        ['-0.172' ' 0.685' ' 1.344' ' 1.581' ' 3.794' ' 3.325' ' 1.617' ' 1.672' ' 2.356' ' 1.631']
-        >>> print(astr(isti1[0,:],3,pp=True))
-        [' 0.972' ' 0.482' '-0.074' '-0.560' '-2.280' '-1.642' '-0.613' '-0.755' '-1.311' '-0.572']
-        >>> print(astr(isti1[2,:],3,pp=True))
-        [' 0.972' ' 0.482' '-0.074' '-0.560' '-2.280' '-1.642' '-0.613' '-0.755' '-1.311' '-0.572']
 
-        # Incl. standard mean of all time steps
+        #
+        # SI :: 1st time point
+        >>> print('S :: si[t0]  =',astr(isi1[0,:],3,pp=True))
+        S :: si[t0]  = [' 0.336' ' 0.116' '-0.002']
+        >>> print('T :: si[t0]  =',astr(theo_si[0],3,pp=True))
+        T :: si[t0]  = ['0.325' '0.127' '0.000']
+
+        #
+        # SI :: 3rd time point
+        >>> print('S :: si[t2]  =',astr(isi1[2,:],3,pp=True))
+        S :: si[t2]  = [' 0.334' ' 0.125' '-0.002']
+        >>> print('T :: si[t2]  =',astr(theo_si[2],3,pp=True))
+        T :: si[t2]  = ['0.321' '0.136' '0.000']
+
+        #
+        # STI :: 1st time point
+        >>> print('S :: sti[t0] =',astr(isti1[0,:],3,pp=True))
+        S :: sti[t0] = ['0.876' '0.138' '0.560']
+        >>> print('T :: sti[t0] =',astr(theo_sti[0],3,pp=True))
+        T :: sti[t0] = ['0.873' '0.127' '0.548']
+
+        #
+        # STI :: 3rd time point
+        >>> print('S :: sti[t2] =',astr(isti1[2,:],3,pp=True))
+        S :: sti[t2] = ['0.866' '0.147' '0.554']
+        >>> print('T :: sti[t2] =',astr(theo_sti[2],3,pp=True))
+        T :: sti[t2] = ['0.864' '0.136' '0.543']
+
+        # -------------------------------------------------------------------------------------------
         >>> isi2, isti2, msi2, msti2 = sobol_index(ya=iya,yb=iyb,yc=iyc, mean=True)
-        >>> print(astr(isi2[0,:],3,pp=True))
-        ['-0.172' ' 0.685' ' 1.344' ' 1.581' ' 3.794' ' 3.325' ' 1.617' ' 1.672' ' 2.356' ' 1.631']
-        >>> print(astr(isi2[2,:],3,pp=True))
-        ['-0.172' ' 0.685' ' 1.344' ' 1.581' ' 3.794' ' 3.325' ' 1.617' ' 1.672' ' 2.356' ' 1.631']
-        >>> print(astr(msi2,3,pp=True))
-        ['-0.172' ' 0.685' ' 1.344' ' 1.581' ' 3.794' ' 3.325' ' 1.617' ' 1.672' ' 2.356' ' 1.631']
-        >>> print(astr(msti2,3,pp=True))
-        [' 0.972' ' 0.482' '-0.074' '-0.560' '-2.280' '-1.642' '-0.613' '-0.755' '-1.311' '-0.572']
 
-        # Incl. weighted mean of all time steps
-        >>> s  = np.asarray([s,s,s])
-        >>> ns = iya.shape[1]
-        >>> isi3, isti3, wsi2, wsti2 = sobol_index(s, ns, wmean=True)
-        >>> print(astr(isi3[0,:],3,pp=True))
-        ['-0.172' ' 0.685' ' 1.344' ' 1.581' ' 3.794' ' 3.325' ' 1.617' ' 1.672' ' 2.356' ' 1.631']
-        >>> print(astr(isi3[1,:],3,pp=True))
-        ['-0.172' ' 0.685' ' 1.344' ' 1.581' ' 3.794' ' 3.325' ' 1.617' ' 1.672' ' 2.356' ' 1.631']
-        >>> print(astr(wsi2,3,pp=True))
-        ['-0.172' ' 0.685' ' 1.344' ' 1.581' ' 3.794' ' 3.325' ' 1.617' ' 1.672' ' 2.356' ' 1.631']
-        >>> print(astr(wsti2,3,pp=True))
-        [' 0.972' ' 0.482' '-0.074' '-0.560' '-2.280' '-1.642' '-0.613' '-0.755' '-1.311' '-0.572']
-        >>> isi4, isti4 = sobol_index(s=s, ns=ns)
-        >>> print(astr(isi4[0,:],3,pp=True))
-        ['-0.172' ' 0.685' ' 1.344' ' 1.581' ' 3.794' ' 3.325' ' 1.617' ' 1.672' ' 2.356' ' 1.631']
-        >>> print(astr(isi4[2,:],3,pp=True))
-        ['-0.172' ' 0.685' ' 1.344' ' 1.581' ' 3.794' ' 3.325' ' 1.617' ' 1.672' ' 2.356' ' 1.631']
+        #
+        # SI :: 1st time point
+        >>> print('S :: si[t0]  =',astr(isi2[0,:],3,pp=True))
+        S :: si[t0]  = [' 0.336' ' 0.116' '-0.002']
+        >>> print('T :: si[t0]  =',astr(theo_si[0],3,pp=True))
+        T :: si[t0]  = ['0.325' '0.127' '0.000']
 
+        #
+        # SI :: 3rd time point
+        >>> print('S :: si[t2]  =',astr(isi2[2,:],3,pp=True))
+        S :: si[t2]  = [' 0.334' ' 0.125' '-0.002']
+        >>> print('T :: si[t2]  =',astr(theo_si[2],3,pp=True))
+        T :: si[t2]  = ['0.321' '0.136' '0.000']
 
+        #
+        # SI :: mean over all timepoints
+        >>> print('S :: si_m    =',astr(msi2,3,pp=True))
+        S :: si_m    = [' 0.266' ' 0.334' '-0.005']
+
+        #
+        # STI :: mean over all timepoints
+        >>> print('S :: sti_m   =',astr(msti2,3,pp=True))
+        S :: sti_m   = ['0.631' '0.361' '0.412']
+
+        # -------------------------------------------------------------------------------------------
+        >>> isi3, isti3 = sobol_index(s=s, ns=ns)
+
+        #
+        # SI :: 1st time point
+        >>> print('S :: si[t0]  =',astr(isi3[0,:],3,pp=True))
+        S :: si[t0]  = [' 0.336' ' 0.116' '-0.002']
+        >>> print('T :: si[t0]  =',astr(theo_si[0],3,pp=True))
+        T :: si[t0]  = ['0.325' '0.127' '0.000']
+
+        #
+        # SI :: 3rd time point
+        >>> print('S :: si[t2]  =',astr(isi3[2,:],3,pp=True))
+        S :: si[t2]  = [' 0.334' ' 0.125' '-0.002']
+        >>> print('T :: si[t2]  =',astr(theo_si[2],3,pp=True))
+        T :: si[t2]  = ['0.321' '0.136' '0.000']
+    
+        # -------------------------------------------------------------------------------------------
+        >>> isi4, isti4, wsi2, wsti2 = sobol_index(s, ns, wmean=True)
+
+        #
+        # SI :: 1st time point
+        >>> print('S :: si[t0]  =',astr(isi4[0,:],3,pp=True))
+        S :: si[t0]  = [' 0.336' ' 0.116' '-0.002']
+        >>> print('T :: si[t0]  =',astr(theo_si[0],3,pp=True))
+        T :: si[t0]  = ['0.325' '0.127' '0.000']
+
+        #
+        # SI :: 3rd time point
+        >>> print('S :: si[t2]  =',astr(isi4[2,:],3,pp=True))
+        S :: si[t2]  = [' 0.334' ' 0.125' '-0.002']
+        >>> print('T :: si[t2]  =',astr(theo_si[2],3,pp=True))
+        T :: si[t2]  = ['0.321' '0.136' '0.000']
+
+        #
+        # SI :: weighted mean over all timepoints
+        >>> print('S :: si_w    =',astr(wsi2,3,pp=True))
+        S :: si_w    = [' 0.257' ' 0.360' '-0.005']
+
+        #
+        # STI :: weighted mean over all timepoints
+        >>> print('S :: sti_w   =',astr(wsti2,3,pp=True))
+        S :: sti_w   = ['0.602' '0.387' '0.395']
 
         License
         -------
@@ -221,28 +339,44 @@ def sobol_index(s=None, ns=None, ya=None, yb=None, yc=None, si=True, sti=True, m
         if not ((nsa == iyB.shape[1]) & (nsa == iyC.shape[2])):
             raise ValueError('ya and yb must have same size as yc[1].')
         nn = iyC.shape[1]
-    fnsa  = 1. / np.float(nsa)
-    fnsa1 = 1. / np.float(nsa-1)
+    fnsa   = 1. / np.float(nsa)
+    fnsa1  = 1. / np.float(nsa-1)
     f02    = fnsa*np.sum(iyA*iyB, axis=1)
-    iyAiyA = np.mean(iyA**2, axis=1)
-    varA   = iyAiyA - f02
-    isi  = np.empty((ntime,nn))
-    isti = np.empty((ntime,nn))
+    f0B    = fnsa*np.sum(iyB, axis=1)
+    # iyAiyA = np.mean(iyA**2, axis=1)
+    iyBiyB = np.mean(iyB**2, axis=1)
+    # varA   = iyAiyA - f02
+    yab    = np.append(iyA,iyB,axis=1)
+    varAB  = np.var(yab,ddof=1,axis=1)
+    varB   = iyBiyB - f0B**2
+    isi    = np.empty((ntime,nn))
+    isti   = np.empty((ntime,nn))
     for i in range(nn):
         iyCi = iyC[:,i,:]
-        iyAiyC = fnsa1*np.sum(iyA*iyCi, axis=1)
-        isi[:,i] = (iyAiyC - f02) / varA
-        iyBiyC  = fnsa1*np.sum(iyB*iyCi, axis=1)
-        isti[:,i] = 1. - (iyBiyC - f02) / varA
+        # iyAiyC = fnsa1*np.sum(iyA*iyCi, axis=1)
+        iyAiyC = fnsa*np.sum(iyA*iyCi, axis=1)
+        # isi[:,i] = (iyAiyC - f02) / varA
+        isi[:,i] = (iyAiyC - f02) / varAB
+        # iyBiyC  = fnsa1*np.sum(iyB*iyCi, axis=1)
+        iyBiyC  = fnsa*np.sum(iyB*iyCi, axis=1)
+        # isti[:,i] = 1. - (iyBiyC - f02) / varA
+        isti[:,i] = 1. - (iyBiyC - f0B**2) / varB
 
     # simple mean
     msi  = np.mean(isi,  axis=0)
     msti = np.mean(isti, axis=0)
     # weighted mean
-    varA = varA[:,np.newaxis]
-    denom = 1./np.sum(varA, axis=0)
-    wsi   = np.sum(isi*varA,  axis=0) * denom
-    wsti  = np.sum(isti*varA, axis=0) * denom
+    # varA = varA[:,np.newaxis]
+    # denom = 1./np.sum(varA, axis=0)
+    # wsi   = np.sum(isi*varA,  axis=0) * denom
+    # wsti  = np.sum(isti*varA, axis=0) * denom
+    varB    = varB[:, np.newaxis]
+    varAB   = varAB[:,np.newaxis]
+    
+    denomAB = 1./np.sum(varAB, axis=0)
+    denomB  = 1./np.sum(varB,  axis=0)
+    wsi   = np.sum(isi*varAB,  axis=0) * denomAB
+    wsti  = np.sum(isti*varB,  axis=0) * denomB
 
     if isone:
         isi  = isi[0,:]
@@ -267,90 +401,200 @@ if __name__ == '__main__':
     doctest.testmod()
 
     # import numpy as np
-    # print('1D')
-    # iya = np.array([-257.0921, -152.8434,  -68.7691, -129.8188,  -89.9667])
-    # iyb = np.array([-174.3796, -147.3429, -119.2169, -102.7477, -160.2185])
-    # iyc = np.array([[-101.2691, -139.5885, -127.6342, -106.9594, -115.8792],
-    #                [-130.0901, -154.8311,  -24.3989, -133.4675, -169.0250],
-    #                [-180.9130, -140.7924, -127.3886,  -93.2011, -119.7757],
-    #                [-171.2342, -146.7013, -118.9833, -102.5973, -163.5437],
-    #                [-255.2163, -179.8984, -131.5042, -103.7205, -167.4869],
-    #                [-258.7999, -125.7803, -116.5700, -129.3884, -157.6105],
-    #                [-169.9223, -163.9877, -120.3642,  -89.8831, -160.3463],
-    #                [-173.9842, -144.7646, -119.3019,  -95.3019, -182.1460],
-    #                [-193.2946, -155.0912, -141.4387, -107.3154, -171.4209],
-    #                [-174.3416, -147.3517, -119.2144, -102.7560, -160.2369]])
+    # import scipy.stats as stats
+    # import ufz
+    # from sobol import i4_sobol_generate
+
+    # # ------------------------------------------------------------------------
+    # #                                1D
+    # # ------------------------------------------------------------------------
+
+    # # seed for reproducible results in doctest
+    # np.random.seed(1)
+    # # number of parameter sets
+    # nsets = 1000
+    # # number of parameter
+    # npara = 3
+    # # randomly sample nsets with Latin-Hypercube
+    # dist = [stats.uniform, stats.uniform, stats.uniform]
+    # pars = [(-np.pi,2.0*np.pi),(-np.pi,2.0*np.pi),(-np.pi,2.0*np.pi)]
+    # setsa  = ufz.lhs(dist, pars, nsets)
+    # setsb  = ufz.lhs(dist, pars, nsets)
+    # # Saltelli has two constants in the model
+    # a = 0.5
+    # b = 2.0
+    # # generate model output yA and yB
+    # iya = np.sin(setsa[0,:])  + a*(np.sin(setsa[1,:]))**2  + b*setsa[2,:]**4  * np.sin(setsa[0,:])
+    # iyb = np.sin(setsb[0,:])  + a*(np.sin(setsb[1,:]))**2  + b*setsb[2,:]**4  * np.sin(setsb[0,:])
+    # # generate model output yCi
+    # iyc = np.empty((npara,nsets))*np.nan
+    # for i in range(npara):
+    #     tmpset = np.copy(setsb)
+    #     tmpset[i,:] = setsa[i,:]
+    #     iyc[i,:] = np.sin(tmpset[0,:])  + a*(np.sin(tmpset[1,:]))**2  + b*tmpset[2,:]**4  * np.sin(tmpset[0,:])
+    # # theoretical results: has to converge for n->Infinity to this values
+    # vy = 0.5 + a**2/8.0 + b*np.pi**4/5.0+b**2*np.pi**8/18.0
+    # theo_si  = np.array([(0.5+b*np.pi**4/5.0+b**2*np.pi**8/50.0)/vy, (a**2/8.0)/vy, 0.0])
+    # theo_sti = np.array([(0.5+b*np.pi**4/5.0+b**2*np.pi**8/50.0+8.0/225.0*b**2*np.pi**8)/vy, (a**2/8.0)/vy, (8.0/225.0*b**2*np.pi**8)/vy])
+
+    # # Theoretical results
+    # print('T :: si  =',ufz.astr(theo_si,3,pp=True))
+    # #T :: si  = ['0.372' '0.000' '0.000']
+    # print('T :: sti =',ufz.astr(theo_sti,3,pp=True))
+    # #T :: sti = ['1.000' '0.000' '0.628']
+    
     # # Give 3 positional arguments
     # isi1, isti1 = sobol_index(iya,iyb,iyc)
     # from autostring import astr
-    # print(astr(isi1,3,pp=True))
-    # #['-0.172' ' 0.685' ' 1.344' ' 1.581' ' 3.794' ' 3.325' ' 1.617' ' 1.672' ' 2.356' ' 1.631']
-    # print(astr(isti1,3,pp=True))
-    # #[' 0.972' ' 0.482' '-0.074' '-0.560' '-2.280' '-1.642' '-0.613' '-0.755' '-1.311' '-0.572']
+    # print('S :: si  =',astr(isi1,3,pp=True))
+    # #S :: si  = [' 0.353' ' 0.000' ' 0.005']
+    # print('S :: sti =',astr(isti1,3,pp=True))
+    # #S :: sti = ['1.037' '0.000' '0.647']
 
     # # Give 3 optional arguments
     # isi2, isti2 = sobol_index(ya=iya,yb=iyb,yc=iyc)
-    # print(astr(isi2,3,pp=True))
-    # #['-0.172' ' 0.685' ' 1.344' ' 1.581' ' 3.794' ' 3.325' ' 1.617' ' 1.672' ' 2.356' ' 1.631']
+    # print('S :: si  =',astr(isi2,3,pp=True))
+    # #S :: si  = [' 0.353' ' 0.000' ' 0.005']
 
     # # Give 2 positional arguments
     # s = np.concatenate((iya, iyb, np.ravel(iyc)))
     # ns = iya.size
     # isi3, isti3 = sobol_index(s, ns)
-    # print(astr(isi3,3,pp=True))
-    # #['-0.172' ' 0.685' ' 1.344' ' 1.581' ' 3.794' ' 3.325' ' 1.617' ' 1.672' ' 2.356' ' 1.631']
+    # print('S :: si  =',astr(isi3,3,pp=True))
+    # #S :: si  = [' 0.353' ' 0.000' ' 0.005']
 
     # # Give 2 optional arguments
     # isi4, isti4 = sobol_index(s=s, ns=ns)
-    # print(astr(isi4,3,pp=True))
-    # #['-0.172' ' 0.685' ' 1.344' ' 1.581' ' 3.794' ' 3.325' ' 1.617' ' 1.672' ' 2.356' ' 1.631']
+    # print('S :: si  =',astr(isi4,3,pp=True))
+    # #S :: si  = [' 0.353' ' 0.000' ' 0.005']
 
     # # 2 optional arguments and no STi output
     # isi5, = sobol_index(s=s, ns=ns, si=True, sti=False)
-    # print(astr(isi5,3,pp=True))
-    # #['-0.172' ' 0.685' ' 1.344' ' 1.581' ' 3.794' ' 3.325' ' 1.617' ' 1.672' ' 2.356' ' 1.631']
+    # print('S :: si  =',astr(isi5,3,pp=True))
+    # #S :: si  = [' 0.353' ' 0.000' ' 0.005']
 
     # # 2 optional arguments and no Si output
     # isti5, = sobol_index(s=s, ns=ns, si=False, sti=True)
-    # print(astr(isti5,3,pp=True))
-    # #[' 0.972' ' 0.482' '-0.074' '-0.560' '-2.280' '-1.642' '-0.613' '-0.755' '-1.311' '-0.572']
+    # print('S :: sti =',astr(isti5,3,pp=True))
+    # #S :: sti = ['1.037' '0.000' '0.647']
 
-    # print('2D')
-    # # 3 time steps the same
-    # iya = np.asarray([iya, iya, iya])
-    # iyb = np.asarray([iyb, iyb, iyb])
-    # iyc = np.asarray([iyc, iyc, iyc])
+    # # ------------------------------------------------------------------------
+    # #                                2D
+    # # ------------------------------------------------------------------------
+    # # number of timepoints
+    # ntime = 100
+    # iya = np.empty((ntime,nsets))*np.nan
+    # iyb = np.empty((ntime,nsets))*np.nan
+    # iyc = np.empty((ntime,npara,nsets))*np.nan
+    # s   = np.empty((ntime,(npara+2)*nsets))*np.nan
+    # ns = nsets
+    # theo_si  = []
+    # theo_sti = []
+    # for t in range(ntime):
+    #     a = 1.0*t + 50.0
+    #     b = 2.0
+    #     # generate model output yA and yB
+    #     iya[t,:] = np.sin(setsa[0,:])  + a*(np.sin(setsa[1,:]))**2  + b*setsa[2,:]**4  * np.sin(setsa[0,:])
+    #     iyb[t,:] = np.sin(setsb[0,:])  + a*(np.sin(setsb[1,:]))**2  + b*setsb[2,:]**4  * np.sin(setsb[0,:])
+    #     # generate model output yCi
+    #     for i in range(npara):
+    #         tmpset = np.copy(setsb)
+    #         tmpset[i,:] = setsa[i,:]
+    #         iyc[t,i,:] = np.sin(tmpset[0,:])  + a*(np.sin(tmpset[1,:]))**2  + b*tmpset[2,:]**4  * np.sin(tmpset[0,:])
+    #     # for 2 optional argument call
+    #     s[t,:] = np.concatenate((iya[t,:], iyb[t,:], np.ravel(iyc[t,:,:])))
+    #     # theoretical results: has to converge for n->Infinity to this values
+    #     vy = 0.5 + a**2/8.0 + b*np.pi**4/5.0+b**2*np.pi**8/18.0
+    #     theo_si  = theo_si + [np.array([(0.5+b*np.pi**4/5.0+b**2*np.pi**8/50.0)/vy, (a**2/8.0)/vy, 0.0])]
+    #     theo_sti = theo_sti + [np.array([(0.5+b*np.pi**4/5.0+b**2*np.pi**8/50.0+8.0/225.0*b**2*np.pi**8)/vy, (a**2/8.0)/vy, (8.0/225.0*b**2*np.pi**8)/vy])]
+    # # print('Theoretical Si:  ',ufz.astr(theo_si,3,pp=True))
+    # # print('Theoretical STi: ',ufz.astr(theo_sti,3,pp=True))
+
+    # # -------------------------------------------------------------------------------------------
+    # # 1D model output --> ya, yb are 2D and yc is 3D
     # isi1, isti1 = sobol_index(iya,iyb,iyc)
-    # print(astr(isi1[0,:],3,pp=True))
-    # #['-0.172' ' 0.685' ' 1.344' ' 1.581' ' 3.794' ' 3.325' ' 1.617' ' 1.672' ' 2.356' ' 1.631']
-    # print(astr(isi1[2,:],3,pp=True))
-    # #['-0.172' ' 0.685' ' 1.344' ' 1.581' ' 3.794' ' 3.325' ' 1.617' ' 1.672' ' 2.356' ' 1.631']
-    # print(astr(isti1[0,:],3,pp=True))
-    # #[' 0.972' ' 0.482' '-0.074' '-0.560' '-2.280' '-1.642' '-0.613' '-0.755' '-1.311' '-0.572']
-    # print(astr(isti1[2,:],3,pp=True))
-    # #[' 0.972' ' 0.482' '-0.074' '-0.560' '-2.280' '-1.642' '-0.613' '-0.755' '-1.311' '-0.572']
+    # #
+    # # SI :: 1st time point
+    # print('S :: si[t0]  =',astr(isi1[0,:],3,pp=True))
+    # #S :: si[t0]  = [' 0.336' ' 0.116' '-0.002']
+    # print('T :: si[t0]  =',astr(theo_si[0],3,pp=True))
+    # #T :: si[t0]  = ['0.325' '0.127' '0.000']
+    # #
+    # # SI :: 3rd time point
+    # print('S :: si[t2]  =',astr(isi1[2,:],3,pp=True))
+    # #S :: si[t2]  = [' 0.334' ' 0.125' '-0.002']
+    # print('T :: si[t2]  =',astr(theo_si[2],3,pp=True))
+    # #T :: si[t2]  = ['0.321' '0.136' '0.000']
+    # #
+    # # STI :: 1st time point
+    # print('S :: sti[t0] =',astr(isti1[0,:],3,pp=True))
+    # #S :: sti[t0] = ['0.876' '0.138' '0.560']
+    # print('T :: sti[t0] =',astr(theo_sti[0],3,pp=True))
+    # #T :: sti[t0] = ['0.873' '0.127' '0.548']
+    # #
+    # # STI :: 3rd time point
+    # print('S :: sti[t2] =',astr(isti1[2,:],3,pp=True))
+    # #S :: sti[t2] = ['0.866' '0.147' '0.554']
+    # print('T :: sti[t2] =',astr(theo_sti[2],3,pp=True))
+    # #T :: sti[t2] = ['0.864' '0.136' '0.543']
+
+    # # -------------------------------------------------------------------------------------------
     # isi2, isti2, msi2, msti2 = sobol_index(ya=iya,yb=iyb,yc=iyc, mean=True)
-    # print(astr(isi2[0,:],3,pp=True))
-    # #['-0.172' ' 0.685' ' 1.344' ' 1.581' ' 3.794' ' 3.325' ' 1.617' ' 1.672' ' 2.356' ' 1.631']
-    # print(astr(isi2[2,:],3,pp=True))
-    # #['-0.172' ' 0.685' ' 1.344' ' 1.581' ' 3.794' ' 3.325' ' 1.617' ' 1.672' ' 2.356' ' 1.631']
-    # print(astr(msi2,3,pp=True))
-    # #['-0.172' ' 0.685' ' 1.344' ' 1.581' ' 3.794' ' 3.325' ' 1.617' ' 1.672' ' 2.356' ' 1.631']
-    # print(astr(msti2,3,pp=True))
-    # #[' 0.972' ' 0.482' '-0.074' '-0.560' '-2.280' '-1.642' '-0.613' '-0.755' '-1.311' '-0.572']
-    # s  = np.asarray([s,s,s])
-    # ns = iya.shape[1]
-    # isi3, isti3, wsi2, wsti2 = sobol_index(s, ns, wmean=True)
-    # print(astr(isi3[0,:],3,pp=True))
-    # #['-0.172' ' 0.685' ' 1.344' ' 1.581' ' 3.794' ' 3.325' ' 1.617' ' 1.672' ' 2.356' ' 1.631']
-    # print(astr(isi3[1,:],3,pp=True))
-    # #['-0.172' ' 0.685' ' 1.344' ' 1.581' ' 3.794' ' 3.325' ' 1.617' ' 1.672' ' 2.356' ' 1.631']
-    # print(astr(wsi2,3,pp=True))
-    # #['-0.172' ' 0.685' ' 1.344' ' 1.581' ' 3.794' ' 3.325' ' 1.617' ' 1.672' ' 2.356' ' 1.631']
-    # print(astr(wsti2,3,pp=True))
-    # #[' 0.972' ' 0.482' '-0.074' '-0.560' '-2.280' '-1.642' '-0.613' '-0.755' '-1.311' '-0.572']
-    # isi4, isti4 = sobol_index(s=s, ns=ns)
-    # print(astr(isi4[0,:],3,pp=True))
-    # #['-0.172' ' 0.685' ' 1.344' ' 1.581' ' 3.794' ' 3.325' ' 1.617' ' 1.672' ' 2.356' ' 1.631']
-    # print(astr(isi4[2,:],3,pp=True))
-    # #['-0.172' ' 0.685' ' 1.344' ' 1.581' ' 3.794' ' 3.325' ' 1.617' ' 1.672' ' 2.356' ' 1.631']
+    # #
+    # # SI :: 1st time point
+    # print('S :: si[t0]  =',astr(isi2[0,:],3,pp=True))
+    # #S :: si[t0]  = [' 0.336' ' 0.116' '-0.002']
+    # print('T :: si[t0]  =',astr(theo_si[0],3,pp=True))
+    # #T :: si[t0]  = ['0.325' '0.127' '0.000']
+    # #
+    # # SI :: 3rd time point
+    # print('S :: si[t2]  =',astr(isi2[2,:],3,pp=True))
+    # #S :: si[t2]  = [' 0.334' ' 0.125' '-0.002']
+    # print('T :: si[t2]  =',astr(theo_si[2],3,pp=True))
+    # #T :: si[t2]  = ['0.321' '0.136' '0.000']
+    # #
+    # # SI :: mean over all timepoints
+    # print('S :: si_m    =',astr(msi2,3,pp=True))
+    # #S :: si_m    = [' 0.266' ' 0.334' '-0.005']
+    # #
+    # # STI :: mean over all timepoints
+    # print('S :: sti_m   =',astr(msti2,3,pp=True))
+    # #S :: sti_m   = ['0.631' '0.361' '0.412']
+
+    # # -------------------------------------------------------------------------------------------
+    # isi3, isti3 = sobol_index(s=s, ns=ns)
+    # #
+    # # SI :: 1st time point
+    # print('S :: si[t0]  =',astr(isi3[0,:],3,pp=True))
+    # #S :: si[t0]  = [' 0.336' ' 0.116' '-0.002']
+    # print('T :: si[t0]  =',astr(theo_si[0],3,pp=True))
+    # #T :: si[t0]  = ['0.325' '0.127' '0.000']
+    # #
+    # # SI :: 3rd time point
+    # print('S :: si[t2]  =',astr(isi3[2,:],3,pp=True))
+    # #S :: si[t2]  = [' 0.334' ' 0.125' '-0.002']
+    # print('T :: si[t2]  =',astr(theo_si[2],3,pp=True))
+    # #T :: si[t2]  = ['0.321' '0.136' '0.000']
+    
+    # # -------------------------------------------------------------------------------------------
+    # isi4, isti4, wsi2, wsti2 = sobol_index(s, ns, wmean=True)
+    # #
+    # # SI :: 1st time point
+    # print('S :: si[t0]  =',astr(isi4[0,:],3,pp=True))
+    # #S :: si[t0]  = [' 0.336' ' 0.116' '-0.002']
+    # print('T :: si[t0]  =',astr(theo_si[0],3,pp=True))
+    # #T :: si[t0]  = ['0.325' '0.127' '0.000']
+    # #
+    # # SI :: 3rd time point
+    # print('S :: si[t2]  =',astr(isi4[2,:],3,pp=True))
+    # #S :: si[t2]  = [' 0.334' ' 0.125' '-0.002']
+    # print('T :: si[t2]  =',astr(theo_si[2],3,pp=True))
+    # #T :: si[t2]  = ['0.321' '0.136' '0.000']
+    # #
+    # # SI :: weighted mean over all timepoints
+    # print('S :: si_w    =',astr(wsi2,3,pp=True))
+    # #S :: si_w    = [' 0.257' ' 0.360' '-0.005']
+    # #
+    # # STI :: weighted mean over all timepoints
+    # print('S :: sti_w   =',astr(wsti2,3,pp=True))
+    # #S :: sti_w   = ['0.602' '0.387' '0.395']
