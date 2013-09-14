@@ -2,15 +2,21 @@
 from __future__ import print_function
 import numpy as np
 
-def sobol_index(s=None, ns=None, ya=None, yb=None, yc=None, si=True, sti=True, mean=False, wmean=False):
+def sobol_index(s=None, ns=None, ya=None, yb=None, yc=None,
+                si=True, sti=True,
+                mean=False, wmean=False,
+                saltelli=False):
     """
         Calculates the first-order Si and total STi variance-based sensitivity indices
-        after Saltelli et al. (2008) with improvements of Saltelli (2002).
+        after Saltelli et al. (2008) with improvements of Saltelli (2002)
+        and Mai et al. (2014).
 
         Definition
         ----------
-        def sobol_index(s=None, ns=None, ya=None, yb=None, yc=None, si=True, sti=True,
-                        mean=False, wmean=False):
+        def sobol_index(s=None, ns=None, ya=None, yb=None, yc=None,
+                        si=True, sti=True,
+                        mean=False, wmean=False,
+                        saltelli=False):
 
 
         Optional Input
@@ -28,6 +34,7 @@ def sobol_index(s=None, ns=None, ya=None, yb=None, yc=None, si=True, sti=True, m
         sti        if True (default): output STi
         mean       if True: output mean Si and/or STi (if 2D/3D input)
         wmean      if True: output variance weighted mean Si and/or STi (if 2D/3D input)
+        saltelli   if True: original Saltelli without changes of Mai et al. (2014)
 
         If 2D input (3D for yc), then Si/STi will be calculated for each element in first dimension.
         Assumes that first dimension is time, i.e. calculates indices per time step.
@@ -48,9 +55,10 @@ def sobol_index(s=None, ns=None, ya=None, yb=None, yc=None, si=True, sti=True, m
 
         References
         ----------
-        Saltelli, A. (2002). Making best use of model evaluations to compute sensitivity indices.
+        Mai et a. (2014) ...
+        Saltelli, A. (2002) Making best use of model evaluations to compute sensitivity indices.
             Computer Physics Communications, 145(2), 280-297.
-        Saltelli, A. et al. (2008). Global sensitivity analysis. The primer.
+        Saltelli, A. et al. (2008) Global sensitivity analysis. The primer.
             John Wiley & Sons Inc., NJ, USA, ISBN 978-0-470-05997-5 (pp. 1-292)
 
 
@@ -131,6 +139,13 @@ def sobol_index(s=None, ns=None, ya=None, yb=None, yc=None, si=True, sti=True, m
         >>> isi4, isti4 = sobol_index(s=s, ns=ns)
         >>> print('S :: si  =',astr(isi4,3,pp=True))
         S :: si  = [' 0.353' ' 0.000' ' 0.005']
+
+        # Give 2 positional arguments and original Saltelli
+        >>> isi3, isti3 = sobol_index(s, ns, saltelli=True)
+        >>> print('Sal :: si  =',astr(isi3,3,pp=True))
+        Sal :: si  = [' 0.361' ' 0.000' ' 0.005']
+        >>> print('Sal :: sti =',astr(isti3,3,pp=True))
+        Sal :: sti = [' 1.050' '-0.020' ' 0.648']
 
         # 2 optional arguments and no STi output
         >>> isi5, = sobol_index(s=s, ns=ns, si=True, sti=False)
@@ -243,6 +258,21 @@ def sobol_index(s=None, ns=None, ya=None, yb=None, yc=None, si=True, sti=True, m
         S :: si[t2]  = [' 0.334' ' 0.125' '-0.002']
         >>> print('T :: si[t2]  =',astr(theo_si[2],3,pp=True))
         T :: si[t2]  = ['0.321' '0.136' '0.000']
+
+        # -------------------------------------------------------------------------------------------
+        >>> isi3, isti3 = sobol_index(s, ns, saltelli=True)
+
+        # SI :: 1st time point
+        >>> print('Sal :: si[t0]  =',astr(isi3[0,:],3,pp=True))
+        Sal :: si[t0]  = [' 0.347' ' 0.120' '-0.002']
+        >>> print('Tal :: si[t0]  =',astr(theo_si[0],3,pp=True))
+        Tal :: si[t0]  = ['0.325' '0.127' '0.000']
+
+        # SI :: 3rd time point
+        >>> print('Sal :: si[t2]  =',astr(isi3[2,:],3,pp=True))
+        Sal :: si[t2]  = [' 0.344' ' 0.129' '-0.002']
+        >>> print('Tal :: si[t2]  =',astr(theo_si[2],3,pp=True))
+        Tal :: si[t2]  = ['0.321' '0.136' '0.000']
     
         # -------------------------------------------------------------------------------------------
         >>> isi4, isti4, wsi2, wsti2 = sobol_index(s, ns, wmean=True)
@@ -296,6 +326,8 @@ def sobol_index(s=None, ns=None, ya=None, yb=None, yc=None, si=True, sti=True, m
         Written,  MC, May 2012
         Modified, MC, Feb 2013 - ported to Python 3
                   MC, Aug 2013 - Si per time step
+                  JM, Sep 2013 - changes of Mai et al. (2014), theoretical example in docstring
+                  MC, Sep 2013 - saltelli
     """
     # Check input
     if (si==False) & (sti==False):
@@ -339,59 +371,69 @@ def sobol_index(s=None, ns=None, ya=None, yb=None, yc=None, si=True, sti=True, m
         if not ((nsa == iyB.shape[1]) & (nsa == iyC.shape[2])):
             raise ValueError('ya and yb must have same size as yc[1].')
         nn = iyC.shape[1]
-    fnsa   = 1. / np.float(nsa)
-    fnsa1  = 1. / np.float(nsa-1)
-    f02    = fnsa*np.sum(iyA*iyB, axis=1)
-    f0B    = fnsa*np.sum(iyB, axis=1)
-    # iyAiyA = np.mean(iyA**2, axis=1)
-    iyBiyB = np.mean(iyB**2, axis=1)
-    # varA   = iyAiyA - f02
-    yab    = np.append(iyA,iyB,axis=1)
-    varAB  = np.var(yab,ddof=1,axis=1)
-    varB   = iyBiyB - f0B**2
-    isi    = np.empty((ntime,nn))
-    isti   = np.empty((ntime,nn))
+    fnsa  = 1. / np.float(nsa)
+    fnsa1 = 1. / np.float(nsa-1)
+    f02   = fnsa*np.sum(iyA*iyB, axis=1)
+    if saltelli:
+        iyAiyA = np.mean(iyA**2, axis=1)
+        varA   = iyAiyA - f02
+    else:
+        f0B    = fnsa*np.sum(iyB,    axis=1)
+        iyBiyB = np.mean(iyB**2,     axis=1)
+        yab    = np.append(iyA, iyB, axis=1)
+        varAB  = np.var(yab, ddof=1, axis=1)
+        varB   = iyBiyB - f0B**2
+    isi  = np.empty((ntime,nn))
+    isti = np.empty((ntime,nn))
     for i in range(nn):
         iyCi = iyC[:,i,:]
-        # iyAiyC = fnsa1*np.sum(iyA*iyCi, axis=1)
-        iyAiyC = fnsa*np.sum(iyA*iyCi, axis=1)
-        # isi[:,i] = (iyAiyC - f02) / varA
-        isi[:,i] = (iyAiyC - f02) / varAB
-        # iyBiyC  = fnsa1*np.sum(iyB*iyCi, axis=1)
-        iyBiyC  = fnsa*np.sum(iyB*iyCi, axis=1)
-        # isti[:,i] = 1. - (iyBiyC - f02) / varA
-        isti[:,i] = 1. - (iyBiyC - f0B**2) / varB
+        if saltelli:
+            iyAiyC    = fnsa1*np.sum(iyA*iyCi, axis=1)
+            isi[:,i]  = (iyAiyC - f02) / varA
+            iyBiyC    = fnsa1*np.sum(iyB*iyCi, axis=1)
+            isti[:,i] = 1. - (iyBiyC - f02) / varA
+        else:
+            iyAiyC    = fnsa*np.sum(iyA*iyCi, axis=1)
+            isi[:,i]  = (iyAiyC - f02) / varAB
+            iyBiyC    = fnsa*np.sum(iyB*iyCi, axis=1)
+            isti[:,i] = 1. - (iyBiyC - f0B**2) / varB
 
-    # simple mean
-    msi  = np.mean(isi,  axis=0)
-    msti = np.mean(isti, axis=0)
-    # weighted mean
-    # varA = varA[:,np.newaxis]
-    # denom = 1./np.sum(varA, axis=0)
-    # wsi   = np.sum(isi*varA,  axis=0) * denom
-    # wsti  = np.sum(isti*varA, axis=0) * denom
-    varB    = varB[:, np.newaxis]
-    varAB   = varAB[:,np.newaxis]
-    
-    denomAB = 1./np.sum(varAB, axis=0)
-    denomB  = 1./np.sum(varB,  axis=0)
-    wsi   = np.sum(isi*varAB,  axis=0) * denomAB
-    wsti  = np.sum(isti*varB,  axis=0) * denomB
+    if not isone:
+        # simple mean
+        if mean:
+            msi  = np.mean(isi,  axis=0)
+            msti = np.mean(isti, axis=0)
 
+        # weighted mean
+        if wmean:
+            if saltelli:
+                denom = 1./np.sum(varA, axis=0)
+                varA  = varA[:,np.newaxis]
+                wsi   = np.sum(isi*varA,  axis=0) * denom
+                wsti  = np.sum(isti*varA, axis=0) * denom
+            else:
+                denomAB = 1./np.sum(varAB, axis=0)
+                denomB  = 1./np.sum(varB,  axis=0)
+                varB    = varB[:, np.newaxis]
+                varAB   = varAB[:,np.newaxis]
+                wsi     = np.sum(isi*varAB, axis=0) * denomAB
+                wsti    = np.sum(isti*varB, axis=0) * denomB
+
+    # Output
     if isone:
         isi  = isi[0,:]
         isti = isti[0,:]
         
     out = []
-    if si:  out = out + [isi]
-    if sti: out = out + [isti]
+    if si:  out += [isi]
+    if sti: out += [isti]
     if not isone:
         if mean:
-            if si:  out = out + [msi]
-            if sti: out = out + [msti]
+            if si:  out += [msi]
+            if sti: out += [msti]
         if wmean:
-            if si:  out = out + [wsi]
-            if sti: out = out + [wsti]
+            if si:  out += [wsi]
+            if sti: out += [wsti]
 
     return out
 
@@ -477,6 +519,13 @@ if __name__ == '__main__':
     # isti5, = sobol_index(s=s, ns=ns, si=False, sti=True)
     # print('S :: sti =',astr(isti5,3,pp=True))
     # #S :: sti = ['1.037' '0.000' '0.647']
+
+    # # Give 2 positional arguments and original Saltelli
+    # isi3, isti3 = sobol_index(s, ns, saltelli=True)
+    # print('Sal :: si  =',astr(isi3,3,pp=True))
+    # print('Sal :: sti =',astr(isti3,3,pp=True))
+    # #Sal :: si  = [' 0.361' ' 0.000' ' 0.005']
+    # #Sal :: sti = [' 1.050' '-0.020' ' 0.648']
 
     # # ------------------------------------------------------------------------
     # #                                2D
@@ -575,6 +624,21 @@ if __name__ == '__main__':
     # #S :: si[t2]  = [' 0.334' ' 0.125' '-0.002']
     # print('T :: si[t2]  =',astr(theo_si[2],3,pp=True))
     # #T :: si[t2]  = ['0.321' '0.136' '0.000']
+
+    # # -------------------------------------------------------------------------------------------
+    # isi3, isti3 = sobol_index(s, ns, saltelli=True)
+    # #
+    # # SI :: 1st time point
+    # print('Sal :: si[t0]  =',astr(isi3[0,:],3,pp=True))
+    # #Sal :: si[t0]  = [' 0.347' ' 0.120' '-0.002']
+    # print('Tal :: si[t0]  =',astr(theo_si[0],3,pp=True))
+    # #Tal :: si[t0]  = ['0.325' '0.127' '0.000']
+    # #
+    # # SI :: 3rd time point
+    # print('Sal :: si[t2]  =',astr(isi3[2,:],3,pp=True))
+    # #Sal :: si[t2]  = [' 0.344' ' 0.129' '-0.002']
+    # print('Tal :: si[t2]  =',astr(theo_si[2],3,pp=True))
+    # #Tal :: si[t2]  = ['0.321' '0.136' '0.000']
     
     # # -------------------------------------------------------------------------------------------
     # isi4, isti4, wsi2, wsti2 = sobol_index(s, ns, wmean=True)
