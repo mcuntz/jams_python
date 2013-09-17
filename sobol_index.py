@@ -143,9 +143,9 @@ def sobol_index(s=None, ns=None, ya=None, yb=None, yc=None,
         # Give 2 positional arguments and original Saltelli
         >>> isi3, isti3 = sobol_index(s, ns, saltelli=True)
         >>> print('Sal :: si  =',astr(isi3,3,pp=True))
-        Sal :: si  = [' 0.361' ' 0.000' ' 0.005']
+        Sal :: si  = [' 0.356' ' 0.000' ' 0.005']
         >>> print('Sal :: sti =',astr(isti3,3,pp=True))
-        Sal :: sti = [' 1.050' '-0.020' ' 0.648']
+        Sal :: sti = [' 1.049' '-0.008' ' 0.652']
 
         # 2 optional arguments and no STi output
         >>> isi5, = sobol_index(s=s, ns=ns, si=True, sti=False)
@@ -235,7 +235,7 @@ def sobol_index(s=None, ns=None, ya=None, yb=None, yc=None,
         #
         # SI :: mean over all timepoints
         >>> print('S :: si_m    =',astr(msi2,3,pp=True))
-        S :: si_m    = [' 0.266' ' 0.334' '-0.005']
+        S :: si_m    = [' 0.266' ' 0.335' '-0.005']
 
         #
         # STI :: mean over all timepoints
@@ -264,13 +264,13 @@ def sobol_index(s=None, ns=None, ya=None, yb=None, yc=None,
 
         # SI :: 1st time point
         >>> print('Sal :: si[t0]  =',astr(isi3[0,:],3,pp=True))
-        Sal :: si[t0]  = [' 0.347' ' 0.120' '-0.002']
+        Sal :: si[t0]  = [' 0.342' ' 0.118' '-0.002']
         >>> print('Tal :: si[t0]  =',astr(theo_si[0],3,pp=True))
         Tal :: si[t0]  = ['0.325' '0.127' '0.000']
 
         # SI :: 3rd time point
         >>> print('Sal :: si[t2]  =',astr(isi3[2,:],3,pp=True))
-        Sal :: si[t2]  = [' 0.344' ' 0.129' '-0.002']
+        Sal :: si[t2]  = [' 0.340' ' 0.127' '-0.002']
         >>> print('Tal :: si[t2]  =',astr(theo_si[2],3,pp=True))
         Tal :: si[t2]  = ['0.321' '0.136' '0.000']
     
@@ -371,32 +371,26 @@ def sobol_index(s=None, ns=None, ya=None, yb=None, yc=None,
         if not ((nsa == iyB.shape[1]) & (nsa == iyC.shape[2])):
             raise ValueError('ya and yb must have same size as yc[1].')
         nn = iyC.shape[1]
-    fnsa  = 1. / np.float(nsa)
-    fnsa1 = 1. / np.float(nsa-1)
-    f02   = fnsa*np.sum(iyA*iyB, axis=1)
+    f02 = np.mean(iyA*iyB, axis=1)
     if saltelli:
-        iyAiyA = np.mean(iyA**2, axis=1)
-        varA   = iyAiyA - f02
+        varA   = np.var(iyA, axis=1)
     else:
-        f0B    = fnsa*np.sum(iyB,    axis=1)
-        iyBiyB = np.mean(iyB**2,     axis=1)
+        f0B    = np.mean(iyB, axis=1)**2
         yab    = np.append(iyA, iyB, axis=1)
-        varAB  = np.var(yab, ddof=1, axis=1)
-        varB   = iyBiyB - f0B**2
+        varAB  = np.var(yab, axis=1)
+        varB   = np.var(iyB, axis=1)
     isi  = np.empty((ntime,nn))
     isti = np.empty((ntime,nn))
     for i in range(nn):
-        iyCi = iyC[:,i,:]
+        iyCi   = iyC[:,i,:]
+        iyAiyC = np.mean(iyA*iyCi, axis=1)
+        iyBiyC = np.mean(iyB*iyCi, axis=1)
         if saltelli:
-            iyAiyC    = fnsa1*np.sum(iyA*iyCi, axis=1)
             isi[:,i]  = (iyAiyC - f02) / varA
-            iyBiyC    = fnsa1*np.sum(iyB*iyCi, axis=1)
             isti[:,i] = 1. - (iyBiyC - f02) / varA
         else:
-            iyAiyC    = fnsa*np.sum(iyA*iyCi, axis=1)
             isi[:,i]  = (iyAiyC - f02) / varAB
-            iyBiyC    = fnsa*np.sum(iyB*iyCi, axis=1)
-            isti[:,i] = 1. - (iyBiyC - f0B**2) / varB
+            isti[:,i] = 1. - (iyBiyC - f0B) / varB
 
     if not isone:
         # simple mean
@@ -407,13 +401,13 @@ def sobol_index(s=None, ns=None, ya=None, yb=None, yc=None,
         # weighted mean
         if wmean:
             if saltelli:
-                denom = 1./np.sum(varA, axis=0)
+                denom = 1./np.sum(varA)
                 varA  = varA[:,np.newaxis]
                 wsi   = np.sum(isi*varA,  axis=0) * denom
                 wsti  = np.sum(isti*varA, axis=0) * denom
             else:
-                denomAB = 1./np.sum(varAB, axis=0)
-                denomB  = 1./np.sum(varB,  axis=0)
+                denomAB = 1./np.sum(varAB)
+                denomB  = 1./np.sum(varB)
                 varB    = varB[:, np.newaxis]
                 varAB   = varAB[:,np.newaxis]
                 wsi     = np.sum(isi*varAB, axis=0) * denomAB
