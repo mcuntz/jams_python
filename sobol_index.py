@@ -55,7 +55,7 @@ def sobol_index(s=None, ns=None, ya=None, yb=None, yc=None,
                    'Jansen1999'   - Calculate Si and STi by expectation(variance) instead of variance(expectation) (yc=f(A_B))
                                     Si  = (var(f(A)) - 1/2n*sum_j(f(B)_j - f(A_B^i)_j)^2)/var(f(A))
                                     STi = 1/2n*sum_j(f(A)_j - f(A_B^i)_j)^2/var(f(A))
-                   'Mai2012'      - Si of Homma 1996 but denominator is variance of A and B (yc=f(A_B)) and 
+                   'Mai2012'      - Si of Homma 1996 but denominator is variance of A and B (yc=f(B_A)) and 
                                     STi of Homma 1996 but mean and variance of f(A) replaced by f(B)
                                     Si  = 1/n*sum_j(f(A)_j*(f(B_A^i)_j - f(B)_j))/var([f(A),f(B)])
                                     STi = (var(f(A))-(1/n*sum_j(f(B)_j*f(B_A^i)_j) - mean(f(B)^2)))/var(f(B))
@@ -63,7 +63,7 @@ def sobol_index(s=None, ns=None, ya=None, yb=None, yc=None,
                                     Si  = 1/n*sum_j(f(B)_j*(f(A_B^i)_j - f(A)_j))/var([f(A),f(B)])
                                     STi as Sobol2007/Saltelli2010
                    'Mai2014'      - SI of Jansen1999  but denominator is variance of A and B (yc=f(A_B))
-                                    Si  = (var(f(A)) - 1/2n*sum_j(f(B)_j - f(A_B^i)_j)^2)/var([f(A),f(B)])
+                                    Si  = (var([f(A),f(B)]) - 1/2n*sum_j(f(B)_j - f(A_B^i)_j)^2)/var([f(A),f(B)])
                                     STi as Jansen1999
 
 
