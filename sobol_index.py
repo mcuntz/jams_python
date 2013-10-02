@@ -5,7 +5,7 @@ import numpy as np
 def sobol_index(s=None, ns=None, ya=None, yb=None, yc=None,
                 si=True, sti=True,
                 mean=False, wmean=False,
-                method='Mai2014'):
+                method='Mai1999'):
     """
         Calculates the first-order Si and total STi variance-based sensitivity indices
         summarised in Saltelli et al. (2010) with improvements of Mai et al. (2014).
@@ -15,7 +15,7 @@ def sobol_index(s=None, ns=None, ya=None, yb=None, yc=None,
         def sobol_index(s=None, ns=None, ya=None, yb=None, yc=None,
                         si=True, sti=True,
                         mean=False, wmean=False,
-                        method='Mai2014'):
+                        method='Mai1999'):
 
 
         Optional Input
@@ -39,7 +39,7 @@ def sobol_index(s=None, ns=None, ya=None, yb=None, yc=None,
         sti        if True (default): output STi
         mean       if True: output mean Si and/or STi (if 2D/3D input)
         wmean      if True: output variance weighted mean Si and/or STi (if 2D/3D input)
-        method     string, case-insensitive (default: 'Mai2014')
+        method     string, case-insensitive (default: 'Mai1999')
                    'Saltelli2008' - The formulation presented in 'The Primer'. (yc=f(B_A))
                                     Si  = (1/n*sum_j(f(A)_j*f(B_A^i)_j) - mean(f(A))^2)/var(f(A))
                                     STi = (var(f(A))-(1/n*sum_j(f(B)_j*f(B_A^i)_j) - mean(f(A))^2))/var(f(A))
@@ -65,6 +65,9 @@ def sobol_index(s=None, ns=None, ya=None, yb=None, yc=None,
                    'Mai2014'      - SI of Jansen1999  but denominator is variance of A and B (yc=f(A_B))
                                     Si  = (var([f(A),f(B)]) - 1/2n*sum_j(f(B)_j - f(A_B^i)_j)^2)/var([f(A),f(B)])
                                     STi as Jansen1999
+                   'Mai1999'      - SI of Mai2013 (Saltelli2010 with var([f(A),f(B)])) and STi of Jansen1999 (yc=f(A_B))
+                                    Si  = 1/n*sum_j(f(B)_j*(f(A_B^i)_j - f(A)_j))/var([f(A),f(B)])
+                                    STi = 1/2n*sum_j(f(A)_j - f(A_B^i)_j)^2/var(f(A))
 
 
         Output
@@ -145,31 +148,31 @@ def sobol_index(s=None, ns=None, ya=None, yb=None, yc=None,
         >>> # 3 positional arguments
         >>> isi1, isti1 = sobol_index(iya,iyb,iyc2)
         >>> print('S :: si  =',astr(isi1,3,pp=True))
-        S :: si  = [' 0.325' ' 0.011' '-0.059']
+        S :: si  = [' 0.345' ' 0.000' '-0.049']
         >>> print('S :: sti =',astr(isti1,3,pp=True))
         S :: sti = ['1.014' '0.000' '0.654']
 
         >>> # 3 optional arguments
         >>> isi2, isti2 = sobol_index(ya=iya,yb=iyb,yc=iyc2)
         >>> print('S :: si  =',astr(isi2,3,pp=True))
-        S :: si  = [' 0.325' ' 0.011' '-0.059']
+        S :: si  = [' 0.345' ' 0.000' '-0.049']
 
         >>> # 2 positional arguments
         >>> s2 = np.concatenate((iya, iyb, np.ravel(iyc2)))
         >>> ns = iya.size
         >>> isi3, isti3 = sobol_index(s2, ns)
         >>> print('S :: si  =',astr(isi3,3,pp=True))
-        S :: si  = [' 0.325' ' 0.011' '-0.059']
+        S :: si  = [' 0.345' ' 0.000' '-0.049']
 
         >>> # 2 optional arguments
         >>> isi4, isti4 = sobol_index(s=s2, ns=ns)
         >>> print('S :: si  =',astr(isi4,3,pp=True))
-        S :: si  = [' 0.325' ' 0.011' '-0.059']
+        S :: si  = [' 0.345' ' 0.000' '-0.049']
 
         >>> # 2 optional arguments and no STi output
         >>> isi5 = sobol_index(s=s2, ns=ns, si=True, sti=False)
         >>> print('S :: si  =',astr(isi5,3,pp=True))
-        S :: si  = [' 0.325' ' 0.011' '-0.059']
+        S :: si  = [' 0.345' ' 0.000' '-0.049']
 
         >>> # 2 optional arguments and no Si output
         >>> isti5 = sobol_index(s=s2, ns=ns, si=False, sti=True)
@@ -226,6 +229,13 @@ def sobol_index(s=None, ns=None, ya=None, yb=None, yc=None,
         >>> print('S :: sti =',astr(isti3,3,pp=True))
         S :: sti = ['1.014' '0.000' '0.654']
 
+        >>> # Method=mai
+        >>> isi3, isti3 = sobol_index(s2, ns, method='mai1999')
+        >>> print('S :: si  =',astr(isi3,3,pp=True))
+        S :: si  = [' 0.345' ' 0.000' '-0.049']
+        >>> print('S :: sti =',astr(isti3,3,pp=True))
+        S :: sti = ['1.014' '0.000' '0.654']
+
         >>> # ------------------------------------------------------------------------
         >>> #                                2D
         >>> #
@@ -267,12 +277,12 @@ def sobol_index(s=None, ns=None, ya=None, yb=None, yc=None,
 
         >>> # SI :: 1st time point
         >>> print('S :: si[t0]  =',astr(isi1[0,:],3,pp=True))
-        S :: si[t0]  = [' 0.295' ' 0.147' '-0.056']
+        S :: si[t0]  = [' 0.290' ' 0.140' '-0.031']
         >>> print('T :: si[t0]  =',astr(theo_si[0],3,pp=True))
         T :: si[t0]  = ['0.325' '0.127' '0.000']
         >>> # SI :: 3rd time point
         >>> print('S :: si[t2]  =',astr(isi1[2,:],3,pp=True))
-        S :: si[t2]  = [' 0.293' ' 0.156' '-0.055']
+        S :: si[t2]  = [' 0.286' ' 0.149' '-0.030']
         >>> print('T :: si[t2]  =',astr(theo_si[2],3,pp=True))
         T :: si[t2]  = ['0.321' '0.136' '0.000']
         >>> # STI :: 1st time point
@@ -289,14 +299,14 @@ def sobol_index(s=None, ns=None, ya=None, yb=None, yc=None,
         >>> # Mean
         >>> isi2, isti2, msi2, msti2 = sobol_index(ya=iya,yb=iyb,yc=iyc2, mean=True)
         >>> print('S :: si_m    =',astr(msi2,3,pp=True))
-        S :: si_m    = [' 0.231' ' 0.377' '-0.037']
+        S :: si_m    = [' 0.207' ' 0.367' '-0.015']
         >>> print('S :: sti_m   =',astr(msti2,3,pp=True))
         S :: sti_m   = ['0.643' '0.351' '0.415']
     
         >>> # Weighted mean
         >>> isi4, isti4, wsi2, wsti2 = sobol_index(s2, ns, wmean=True)
         >>> print('S :: si_w    =',astr(wsi2,3,pp=True))
-        S :: si_w    = [' 0.224' ' 0.404' '-0.035']
+        S :: si_w    = [' 0.197' ' 0.394' '-0.014']
         >>> print('S :: sti_w   =',astr(wsti2,3,pp=True))
         S :: sti_w   = ['0.616' '0.377' '0.397']
 
@@ -304,7 +314,7 @@ def sobol_index(s=None, ns=None, ya=None, yb=None, yc=None,
         >>> isi3, isti3 = sobol_index(s=s2, ns=ns)
         >>> # SI :: 3rd time point
         >>> print('S :: si[t2]  =',astr(isi3[2,:],3,pp=True))
-        S :: si[t2]  = [' 0.293' ' 0.156' '-0.055']
+        S :: si[t2]  = [' 0.286' ' 0.149' '-0.030']
         >>> print('T :: si[t2]  =',astr(theo_si[2],3,pp=True))
         T :: si[t2]  = ['0.321' '0.136' '0.000']
 
@@ -356,6 +366,13 @@ def sobol_index(s=None, ns=None, ya=None, yb=None, yc=None,
         Sal :: si[t0]  = [' 0.295' ' 0.147' '-0.056']
         >>> print('Sal :: si[t2]  =',astr(isi3[2,:],3,pp=True))
         Sal :: si[t2]  = [' 0.293' ' 0.156' '-0.055']
+
+        >>> # Method=Mai
+        >>> isi3, isti3 = sobol_index(s2, ns, method='mai1999')
+        >>> print('Sal :: si[t0]  =',astr(isi3[0,:],3,pp=True))
+        Sal :: si[t0]  = [' 0.290' ' 0.140' '-0.031']
+        >>> print('Sal :: si[t2]  =',astr(isi3[2,:],3,pp=True))
+        Sal :: si[t2]  = [' 0.286' ' 0.149' '-0.030']
 
         License
         -------
@@ -495,6 +512,15 @@ def sobol_index(s=None, ns=None, ya=None, yb=None, yc=None,
             iyCi      = iyC[:,i,:]
             isi[:,i]  = 1. - np.sum((iyB -iyCi)**2, axis=1) / (2.*nsa * varAB)
             isti[:,i] = np.sum((iyA -iyCi)**2, axis=1) / (2.*nsa * varA)
+    elif mm == 'mai1999':
+        varA  = np.var(iyA,  axis=1)
+        varAB = np.var(np.append(iyA, iyB, axis=1), axis=1)
+        isi  = np.empty((ntime,nn))
+        isti = np.empty((ntime,nn))
+        for i in range(nn):
+            iyCi      = iyC[:,i,:]
+            isi[:,i]  = np.mean(iyB*(iyCi - iyA), axis=1) / varAB
+            isti[:,i] = np.sum((iyA -iyCi)**2, axis=1) / (2.*nsa * varA)
     else:
         raise ValueError('method unknown: {0}.'.format(method))
 
@@ -513,7 +539,7 @@ def sobol_index(s=None, ns=None, ya=None, yb=None, yc=None,
                 varAB   = varAB[:,np.newaxis]
                 wsi     = np.sum(isi*varAB, axis=0) * denomAB
                 wsti    = np.sum(isti*varB, axis=0) * denomB
-            elif (mm == 'mai2013') | (mm == 'mai2014'):
+            elif (mm == 'mai1999') | (mm == 'mai2013') | (mm == 'mai2014'):
                 denomAB = 1./np.sum(varAB)
                 denomA  = 1./np.sum(varA)
                 varA    = varA[:, np.newaxis]
@@ -604,31 +630,31 @@ if __name__ == '__main__':
     # # 3 positional arguments
     # isi1, isti1 = sobol_index(iya,iyb,iyc2)
     # print('S :: si  =',astr(isi1,3,pp=True))
-    # #S :: si  = [' 0.325' ' 0.011' '-0.059']
+    # #S :: si  = [' 0.345' ' 0.000' '-0.049']
     # print('S :: sti =',astr(isti1,3,pp=True))
     # #S :: sti = ['1.014' '0.000' '0.654']
 
     # # 3 optional arguments
     # isi2, isti2 = sobol_index(ya=iya,yb=iyb,yc=iyc2)
     # print('S :: si  =',astr(isi2,3,pp=True))
-    # #S :: si  = [' 0.325' ' 0.011' '-0.059']
+    # #S :: si  = [' 0.345' ' 0.000' '-0.049']
 
     # # 2 positional arguments
     # s2 = np.concatenate((iya, iyb, np.ravel(iyc2)))
     # ns = iya.size
     # isi3, isti3 = sobol_index(s2, ns)
     # print('S :: si  =',astr(isi3,3,pp=True))
-    # #S :: si  = [' 0.325' ' 0.011' '-0.059']
+    # #S :: si  = [' 0.345' ' 0.000' '-0.049']
 
     # # 2 optional arguments
     # isi4, isti4 = sobol_index(s=s2, ns=ns)
     # print('S :: si  =',astr(isi4,3,pp=True))
-    # #S :: si  = [' 0.325' ' 0.011' '-0.059']
+    # #S :: si  = [' 0.345' ' 0.000' '-0.049']
 
     # # 2 optional arguments and no STi output
     # isi5 = sobol_index(s=s2, ns=ns, si=True, sti=False)
     # print('S :: si  =',astr(isi5,3,pp=True))
-    # #S :: si  = [' 0.325' ' 0.011' '-0.059']
+    # #S :: si  = [' 0.345' ' 0.000' '-0.049']
 
     # # 2 optional arguments and no Si output
     # isti5 = sobol_index(s=s2, ns=ns, si=False, sti=True)
@@ -681,7 +707,7 @@ if __name__ == '__main__':
     # # Method=mai2014
     # isi3, isti3 = sobol_index(s2, ns, method='mai2014')
     # print('S :: si  =',astr(isi3,3,pp=True))
-    # #S :: si  = [' 0.325' ' 0.011' '-0.059']
+    # #S :: si  = [' 0.345' ' 0.000' '-0.049']
     # print('S :: sti =',astr(isti3,3,pp=True))
     # #S :: sti = ['1.014' '0.000' '0.654']
 
