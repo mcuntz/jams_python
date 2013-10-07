@@ -11,6 +11,7 @@ def kernel_regression(x, y, h=None, silverman=False, xout=None):
         Optimal bandwidth can be estimated by cross-validation
         or by using Silverman''s rule-of-thumb.
 
+
         Definition
         ----------
         def kernel_regression(x, y, h=None, silverman=False):
@@ -54,21 +55,18 @@ def kernel_regression(x, y, h=None, silverman=False, xout=None):
         >>> print(astr(h,6))
         ['0.172680' '9.516907']
 
-        >>> print(astr(kernel_regression(x,y,h),6))
-        ['0.522409' '0.525699' '0.541796' '0.517808' '0.476442' '0.492302'
-         '0.603448' '0.777472' '0.954505' '1.096039']
+        >>> print(astr(kernel_regression(x,y,h)[0:6],6))
+        ['0.522409' '0.525699' '0.541796' '0.517808' '0.476442' '0.492302']
 
-        >>> print(astr(kernel_regression(x,y),6))
-        ['0.522409' '0.525699' '0.541796' '0.517808' '0.476442' '0.492302'
-         '0.603448' '0.777472' '0.954505' '1.096039']
+        >>> print(astr(kernel_regression(x,y)[0:6],6))
+        ['0.522409' '0.525699' '0.541796' '0.517808' '0.476442' '0.492302']
 
         >>> h = kernel_regression_h(x,y,silverman=True)
         >>> print(astr(h,6))
         ['0.229190' '1.903381']
 
-        >>> print(astr(kernel_regression(x,y,h),6))
-        ['0.691153' '0.422809' '0.545844' '0.534315' '0.521494' '0.555426'
-         '0.642065' '0.761900' '0.887780' '1.000146']
+        >>> print(astr(kernel_regression(x,y,h)[0:6],6))
+        ['0.691153' '0.422809' '0.545844' '0.534315' '0.521494' '0.555426']
 
         >>> ss = np.shape(x)
         >>> nn = 5

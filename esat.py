@@ -8,7 +8,7 @@ def esat(T, liquid=False, formula='GoffGratch'):
         Calculates the saturation vapour pressure of water/ice.
         For temperatures above (and equal) 0 deg C (273.15 K), the vapour pressure over liquid water is calculated.
         For temperatures below 0 deg C, the vapour pressure over ice is calculated.
-        
+
         The optional parameter liquid=True changes the calculation to vapour pressure
         over liquid water over the entire temperature range.
 
@@ -64,65 +64,49 @@ def esat(T, liquid=False, formula='GoffGratch'):
         >>> from autostring import astr
         >>> print(astr(esat(293.15),3,pp=True))
         2335.847
-
+        >>> print(astr(esat(253.15),3,pp=True))
+        103.074
         >>> print(astr(esat([293.15,253.15]),3,pp=True))
         ['2335.847' ' 103.074']
-
         >>> print(astr(esat([293.15,253.15],formula='GoffGratch'),3,pp=True))
         ['2335.847' ' 103.074']
-
         >>> print(astr(esat([293.15,253.15],formula='MartiMauersberger'),3,pp=True))
         ['2335.847' ' 103.650']
-
         >>> print(astr(esat([293.15,253.15],formula='MagnusTeten'),3,pp=True))
         ['2335.201' ' 102.771']
-
         >>> print(astr(esat([293.15,253.15],formula='buck'),3,pp=True))
         ['2338.340' ' 103.286']
-
         >>> print(astr(esat([293.15,253.15],formula='Buck_original'),3,pp=True))
         ['2337.282' ' 103.267']
-
         >>> print(astr(esat([293.15,253.15],formula='wmo'),3,pp=True))
         ['2337.080' ' 103.153']
-
         >>> print(astr(esat([293.15,253.15],formula='WEXLER'),3,pp=True))
         ['2323.254' ' 103.074']
-
         >>> print(astr(esat([293.15,253.15],formula='Sonntag'),3,pp=True))
         ['2339.249' ' 103.249']
-
         >>> print(astr(esat([293.15,253.15],formula='Bolton'),3,pp=True))
         ['2336.947' ' 103.074']
-
         >>> print(astr(esat([293.15,253.15],formula='Fukuta'),3,pp=True))
         ['2335.847' ' 103.074']
-
         >>> print(astr(esat([293.15,253.15],formula='HylandWexler'),3,pp=True))
         ['2338.804' ' 103.260']
-
         >>> print(astr(esat([293.15,253.15],formula='IAPWS'),3,pp=True))
         ['2339.194' ' 103.074']
-
         >>> print(astr(esat([293.15,253.15],formula='MurphyKoop'),3,pp=True))
         ['2339.399' ' 103.252']
-
         >>> print(astr(esat(np.array([293.15,253.15]), liquid=True),3,pp=True))
         ['2335.847' ' 125.292']
-
         >>> print(astr(esat([293.15,253.15],formula='Fukuta', liquid=True),3,pp=True))
         ['2335.847' ' 125.079']
-
         >>> print(astr(esat(np.array([293.15,393.15])),3,pp=True))
-        WARNING ESAT: T>373.15 K - something might be wrong with T.
+        esat.py: UserWarning: T>373.15 K - something might be wrong with T.
         ['  2335.847' '198473.378']
-
         >>> print(astr(esat(np.array([293.15,93.15])),3,pp=True))
-        WARNING ESAT: T<100 - T probably given in Celsius instead of Kelvin.
+        esat.py: UserWarning: T<100 - T probably given in Celsius instead of Kelvin.
         ['2335.847' '   0.000']
-
         >>> print(astr(esat(np.ma.array([253.15,-9999.], mask=[False,True])),3,pp=True))
         ['103.074' '--     ']
+
 
 
         License
@@ -149,6 +133,7 @@ def esat(T, liquid=False, formula='GoffGratch'):
         -------
         Written,  MC, Jan 2012
         Modified, MC, Feb 2013 - ported to Python 3
+                  MC, Oct 2013 - changed masked array handling
     """
     #
     # Constants
@@ -158,32 +143,48 @@ def esat(T, liquid=False, formula='GoffGratch'):
     lknown = [i.lower() for i in knownforms]
     #
     # Check input
-    if np.ma.any(np.ma.array(T) <= 0.):
+    T = np.ma.array(T)
+    if np.ma.any(T <= 0.):
         raise ValueError('T<0 - T probably given in Celsius instead of Kelvin.')
-    if np.ma.any(np.ma.array(T) < 100.):
-           print("WARNING ESAT: T<100 - T probably given in Celsius instead of Kelvin.")
-    if np.ma.any(np.ma.array(T) > (const.T0+100.)):
-           print("WARNING ESAT: T>373.15 K - something might be wrong with T.")
+    if np.ma.any(T < 100.):
+        print("esat.py: UserWarning: T<100 - T probably given in Celsius instead of Kelvin.")
+    if np.ma.any(T > (const.T0+100.)):
+        print("esat.py: UserWarning: T>373.15 K - something might be wrong with T.")
     form = formula.lower()
     if form not in lknown:
-           print("ESAT: formula not know.")
-           print("      Known formulas are: ", knownforms)
-           raise ValueError('')
+        raise ValueError('Formula not know. Known formulas are {:s}'.format(knownforms))
     #
     # Split input into masked arrays
     if liquid == True:
         Tlim = 1e-3
     else:
         Tlim = const.T0
-    T_liq = np.ma.array(T, mask=(np.ma.array(T)<Tlim), keep_mask=True)
-    T_ice = np.ma.array(T, mask=(np.ma.array(T)>=Tlim), keep_mask=True)
-    TC_liq = T_liq - const.T0
-    TC_ice = T_ice - const.T0
+
+    if T.size > 1:
+        isone = False
+        ii = np.ma.where(T>=Tlim)[0]
+        jj = np.ma.where(T<Tlim)[0]
+        if np.size(ii) > 0:
+            T_liq  = T[ii]
+        if np.size(jj) > 0:
+            T_ice  = T[jj]
+    else:
+        isone = True
+        if T>=Tlim:
+            ii = [0]
+            jj = []
+            T_liq = T
+        else:
+            ii = []
+            jj = [0]
+            T_ice = T
+    esat_out = T.copy() # to conserve mask
     #
     # Calc
     #
     # Liquid
-    if np.ma.any(T_liq > 0.):
+    if np.size(ii) > 0:
+        TC_liq = T_liq - const.T0
         if form == 'buck':
             '''Bucks vapour pressure formulation based on Tetens formula
                Buck Research, Model CR-1A Hygrometer Operating Manual, Sep 2001'''
@@ -273,14 +274,16 @@ def esat(T, liquid=False, formula='GoffGratch'):
                               + 0.42873e-3 * (10.**(+4.76955*(1.-Ts/T_liq))-1.)
                               + 0.78614))
         else:
-            print("ESAT: formulation not known: ", formula)
-            return False
+            raise ValueError("formulation not known: {:s}".format(formula))
         esat_liq *= 100.
-    else:
-        esat_liq = np.ma.array(T_liq, mask=(T_liq>0.), keep_mask=True) # mask all
+        if isone:
+            esat_out = esat_liq
+        else:
+            esat_out[ii] = esat_liq
     #
-    # Ice        
-    if np.ma.any(T_ice > 0.):
+    # Ice
+    if np.size(jj) > 0:
+        TC_ice = T_ice - const.T0
         if form == 'buck':
             '''Bucks vapour pressure formulation based on Tetens formula
                Buck Research, Model CR-1A Hygrometer Operating Manual, Sep 2001'''
@@ -294,7 +297,7 @@ def esat(T, liquid=False, formula='GoffGratch'):
             '''Smithsonian Meteorological Tables, 5th edition, p. 350, 1984'''
             ei0    = 6.1071   # mbar
             Ts     = 273.16   # freezing point in K
-            esat_ice = (10.**(-9.09718 * (Ts/T_ice-1.) - 3.56654 * np.log10(Ts/T_ice)
+            esat_ice = np.ma.exp(np.log(10.)*(-9.09718 * (Ts/T_ice-1.) - 3.56654 * np.ma.log10(Ts/T_ice)
                               + 0.876793 * (1.-T_ice/Ts) + np.log10(ei0)))
         elif (form == 'hylandwexler'):
             '''Hyland, R. W. and A. Wexler, Formulations for the Thermodynamic Properties of
@@ -325,33 +328,29 @@ def esat(T, liquid=False, formula='GoffGratch'):
             esat_ice = (10.**(-9.09685 * (Ts/T_ice-1.) - 3.56654 * np.log10(Ts/T_ice)
                               + 0.87682 * (1.-T_ice/Ts) + 0.78614))
         else:
-            print("ESAT: formulation not known: ", formula)
-            return False
+            raise ValueError("formulation not known: {:s}".format(formula))
         esat_ice *= 100.
-    else:
-        esat_ice = np.ma.array(T_ice, mask=(T_ice>0.), keep_mask=True) # mask all
+        if isone:
+            esat_out = esat_ice
+        else:
+            esat_out[jj] = esat_ice
     #
-    # Merge liq and ice
-    esat_out = np.ma.filled(esat_liq,0.) + np.ma.filled(esat_ice,0.)
-    if np.ma.count_masked(T) != 0:
-        esat_out = np.ma.array(esat_out, mask=T.mask)
-    #
-    # Finish    
+    # Finish
     return esat_out
 
- 
+
 if __name__ == '__main__':
     import doctest
     doctest.testmod()
 
     # from autostring import astr
-    # print(astr(esat([293.15]),3,pp=True))
+    # print(astr(esat(293.15),3,pp=True))
     # # 2335.847
 
-    # print(astr(esat([253.15]),3,pp=True))
+    # print(astr(esat(253.15),3,pp=True))
     # # 103.074
 
-    # print(esat([293.15,253.15]))
+    # print(astr(esat([293.15,253.15]),3,pp=True))
     # # ['2335.847' ' 103.074']
 
     # print(astr(esat([293.15,253.15],formula='GoffGratch'),3,pp=True))
@@ -400,11 +399,11 @@ if __name__ == '__main__':
     # # ['2335.847' ' 125.079']
 
     # print(astr(esat(np.array([293.15,393.15])),3,pp=True))
-    # # WARNING ESAT: T>373.15 K - something might be wrong with T.
+    # # esat.py: UserWarning: T>373.15 K - something might be wrong with T.
     # # ['  2335.847' '198473.378']
 
     # print(astr(esat(np.array([293.15,93.15])),3,pp=True))
-    # # WARNING ESAT: T<100 - T probably given in Celsius instead of Kelvin.
+    # # esat.py: UserWarning: T<100 - T probably given in Celsius instead of Kelvin.
     # # ['2335.847' '   0.000']
 
     # print(astr(esat(np.ma.array([253.15,-9999.], mask=[False,True])),3,pp=True))

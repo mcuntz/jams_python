@@ -30,6 +30,7 @@
     dec2date               Converts arrays with decimal date to calendar date.
     div                    Wrapper for division.
     division               Divide two arrays, return 'otherwise' if division by 0.
+    elementary_effects     Morris measures mu, stddev and mu*
     esat                   Calculates the saturation vapour pressure of water/ice.
     fill_nonfinite         Fill missing values by linear interpolation.
     find_in_path           Look for file in system path.
@@ -49,6 +50,7 @@
     lif                    Count number of lines in file.
     mad                    Median absolute deviation test.
     means                  Calculate daily, monthly, yearly, etc. means of data depending on date stamp.
+    morris_sampling        Sampling of optimised trajectories for Morris measures / elementary effects
     nee2gpp                Photosynthesis and ecosystem respiration from NEE Eddy flux data.
     nee2gpp_global         nee2gpp using one fit for whole time period
     nee2gpp_lasslop        nee2gpp using the daytime method of Lasslop et al. (2010)
@@ -68,6 +70,7 @@
     savitzky_golay         Smooth (and optionally differentiate) 1D data with a Savitzky-Golay filter.
     savitzky_golay2d       Smooth (and optionally differentiate) 2D data with a Savitzky-Golay filter.
     saltelli               Parameter sampling for Sobol indices calculation.
+    sce                    Shuffle-Complex-Evolution algorithm for function min(max)imisation
     semivariogram          Calculates semivariogram from spatial data.
     sg                     Wrapper savitzky_golay.
     sg2d                   Wrapper savitzky_golay2d.
@@ -166,12 +169,15 @@
     around                 Round to the passed power of ten.
     div                    Wrapper for division.
     division               Divide two arrays, return 'otherwise' if division by 0.
+    elementary_effects     Morris measures mu, stddev and mu*
     functions              Common functions that are used in curve_fit or fmin parameter estimations.
     heaviside              Heaviside (or unit step) operator.
     jab                    Jackknife-after-Bootstrap error.
     lhs                    Latin Hypercube Sampling of any distribution without correlations.
+    morris_sampling        Sampling of optimised trajectories for Morris measures / elementary effects
     pi                     Parameter importance index PI or alternatively B index calculation.
     saltelli               Parameter sampling for Sobol indices calculation.
+    sce                    Shuffle-Complex-Evolution algorithm for function min(max)imisation
     sobol_index            Calculates the first-order and total variance-based sensitivity indices.
 
 
@@ -276,6 +282,7 @@
               MC, Apr 2013 - rgb
               MC, Jun 2013 - colours
               MC, Jul 2013 - fill_nonfinite, means
+              MC, Oct 2013 - morris, sce
 """
 from __future__ import print_function
 
@@ -319,6 +326,7 @@ from lif               import *
 from jab               import *
 from mad               import *
 from means             import *
+from morris            import morris_sampling, elementary_effects
 from nee2gpp           import nee2gpp, nee2gpp_global, nee2gpp_lasslop, nee2gpp_reichstein
 try:
     from outlier       import *
@@ -347,6 +355,7 @@ from rgb               import rgb_blend, rgb_range, rgb_gradient
 from romanliterals     import int2roman, roman2int
 from saltelli          import *
 from savitzky_golay    import *
+from sce               import sce
 from semivariogram     import semivariogram
 from sobol_index       import *
 from sread             import *
@@ -364,8 +373,8 @@ from yrange            import *
 from zacharias         import *
 
 # Information
-version = '2.0'
-date    = '25.02.2013'
+version = '2.1'
+date    = '07.10.2013'
 
 # Main
 if __name__ == '__main__':

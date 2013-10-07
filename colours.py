@@ -237,20 +237,20 @@ def colors(name=False, rgb=True, rgb256=False, names=False):
 
 
 if __name__ == '__main__':
-    # import doctest
-    # doctest.testmod()
+    import doctest
+    doctest.testmod()
 
-    print(colours('ufzdarkblue', rgb256=True))
-    # (0, 62, 110)
-    print(colours(names=True)[0:3])
-    # ['ufzdarkblue', 'ufzblue', 'ufzlightblue']
-    import numpy as np
-    from autostring import *
-    cc = colours('UFZDARKBLUE')
-    print(astr(np.array(cc), 4))
-    # ['0.0000' '0.2431' '0.4314']
-    cc = colours('DarkBlue')
-    print(astr(np.array(cc), 4))
-    # ['0.0000' '0.2431' '0.4314']
-    print(colours(['orange','ufzdarkblue'], rgb256=True))
-    #[(207, 104, 0), (0, 62, 110)]
+    # print(colours('ufzdarkblue', rgb256=True))
+    # # (0, 62, 110)
+    # print(colours(names=True)[0:3])
+    # # ['ufzdarkblue', 'ufzblue', 'ufzlightblue']
+    # import numpy as np
+    # from autostring import *
+    # cc = colours('UFZDARKBLUE')
+    # print(astr(np.array(cc), 4))
+    # # ['0.0000' '0.2431' '0.4314']
+    # cc = colours('DarkBlue')
+    # print(astr(np.array(cc), 4))
+    # # ['0.0000' '0.2431' '0.4314']
+    # print(colours(['orange','ufzdarkblue'], rgb256=True))
+    # #[(207, 104, 0), (0, 62, 110)]

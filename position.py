@@ -4,7 +4,7 @@ import numpy as np
 
 def position(row=1, col=1, num=1,
              left=0.125, right=0.9, bottom=0.1, top=0.9,
-             hspace=None, vspace=None, wspace=None,
+             hspace=0.1, vspace=None, wspace=None,
              sortcol=False, golden=False, inversegolden=False,
              figsize=(1.,1.)):
     """
@@ -20,11 +20,11 @@ def position(row=1, col=1, num=1,
 
         Definition
         ----------
-        def position(row=1, col=1, num=1, 
+        def position(row=1, col=1, num=1,
                      left=0.125, right=0.9, bottom=0.1, top=0.9,
-                     hspace=None, vspace=0.1, wspace=None,
+                     hspace=0.1, vspace=None, wspace=None,
                      sortcol=False, golden=False, inversegolden=False,
-                     figsize(1.,1.)):
+                     figsize=(1.,1.)):
 
 
         Optional Input

@@ -102,9 +102,9 @@ def semivariogram(x, y, v, nL, di, td, stype='omnidirectional', negscat=False,
         Output
         ------
         if model is set to 'nomodel':
-        h         array(s) of lags
-        g         array(s) of variances
-        c         array(s) of samples per lag
+        h         list(s) of lags
+        g         list(s) of variances
+        c         list(s) of samples per lag
 
         otherwise:
         nugget    height of nugget(s) [(unit of v)**2], always >=0
@@ -224,16 +224,12 @@ def semivariogram(x, y, v, nL, di, td, stype='omnidirectional', negscat=False,
         >>> td = 180
         >>> di = [0]
         >>> nL = 50
-        >>> h,g,c = semivariogram(x,y,v,nL,di,td,stype='omnidirectional',
-        ...                       negscat=False, model='nomodel',graph=False,lunit='m',
-        ...                       p0=(0.5,0.5,100),runtimediag=False)
+        >>> h, g, c = semivariogram(x,y,v,nL,di,td,stype='omnidirectional',
+        ...                         negscat=False, model='nomodel',graph=False,lunit='m',
+        ...                         p0=(0.5,0.5,100),runtimediag=False)
         >>> from autostring import astr
-        >>> print(astr(g, 3))
-        [['0.550' '0.776' '0.619' '0.849' '0.991' '1.033' '1.067' '1.106' '1.079'
-          '1.002' '1.119' '1.060' '0.935' '0.789' '1.117' '1.125' '1.063' '1.015'
-          '1.041' '0.911' '1.077' '1.116' '1.202' '1.195' '0.935' '0.918' '0.946'
-          '0.596' '1.035' '1.153' '1.205' '1.635' '1.384' '0.806' '0.006' '1.409'
-          '0.748' '0.310' '0.977' '1.950' '1.748' '1.087']]
+        >>> print(astr(g[0][0:9], 3))
+        ['0.550' '0.776' '0.619' '0.849' '0.991' '1.033' '1.067' '1.106' '1.079']
         >>> nugget,sill,irange,cork,h,g,c,semi_mod,semi_popt = semivariogram(
         ...      x,y,v,nL,di,td,stype='omnidirectional',
         ...      negscat=False,model='exponential',graph=False,lunit='m',
