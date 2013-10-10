@@ -44,7 +44,7 @@ def fread(file, nc=0, skip=0, cskip=0, separator='',
         comment      line gets excluded if first character of line is
                      in comment sequence
                      sequence can be e.g. string, list or tuple
-        fill_value   value to fill in if not enough columns line
+        fill_value   value to fill in if not enough columns per line
                      and fill=True (default 0 and '' for header)
         strip        Strip strings before conversion to float with str.strip(strip)
                      (default: None)
@@ -331,7 +331,7 @@ def fread(file, nc=0, skip=0, cskip=0, separator='',
         nres = len(res)
     count += 1
     #
-    # Determine indeces
+    # Determine indices
     if nc == 0:
         nnc = nres-cskip
         iinc = np.arange(nnc, dtype='int') + cskip
@@ -437,7 +437,10 @@ def fread(file, nc=0, skip=0, cskip=0, separator='',
                     elif tests == 'inf':
                         var[iline,m] = np.inf
                     else:
-                        var[iline,m] = np.float(s)
+                        if (s=='') & fill:
+                            var[iline,m] = fill_value
+                        else:
+                            var[iline,m] = np.float(s)
                     m += 1
             var[iline,m:miinc+1] = fill_value
         else:
@@ -457,7 +460,10 @@ def fread(file, nc=0, skip=0, cskip=0, separator='',
             elif tests == 'inf':
                 var[iline,z] = np.inf
             else:
-                var[iline,z] = np.float(s)
+                if (s=='') & fill:
+                    var[iline,z] = fill_value
+                else:
+                    var[iline,z] = np.float(s)
             z += 1
     # Read rest of file
     while True:
@@ -489,7 +495,10 @@ def fread(file, nc=0, skip=0, cskip=0, separator='',
                             elif tests == 'inf':
                                 var[iline,m] = np.inf
                             else:
-                                var[iline,m] = np.float(s)
+                                if (s=='') & fill:
+                                    var[iline,m] = fill_value
+                                else:
+                                    var[iline,m] = np.float(s)
                         except ValueError:
                             f.close()
                             print('Tried to convert "%s"  from Line: %s' % (res[i], s))
@@ -517,7 +526,10 @@ def fread(file, nc=0, skip=0, cskip=0, separator='',
                     elif tests == 'inf':
                         var[iline,z] = np.inf
                     else:
-                        var[iline,z] = np.float(s)
+                        if (s=='') & fill:
+                            var[iline,z] = fill_value
+                        else:
+                            var[iline,z] = np.float(s)
                     z += 1
             except ValueError:
                 print('FREAD: Requested elements not all numbers: %s' % ([res[i] for i in iinc]))
