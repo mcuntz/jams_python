@@ -405,8 +405,8 @@ if dorandom:
 
   sub.xaxis.set_minor_locator(mpl.ticker.MultipleLocator(xtick)) # tick locations
 
-  if xlim != None: plt.setp(sub, xlim=lim) # set axis limit if wanted
-  if ylim != None: plt.setp(sub, ylim=lim)
+  if xlim != None: plt.setp(sub, xlim=xlim) # set axis limit if wanted
+  if ylim != None: plt.setp(sub, ylim=ylim)
 
   ll = sub.legend(mark1, [r'$\mathrm{Uniform \; vs. \; Gauss}$'], frameon=frameon, ncol=1,
                   labelspacing=llrspace, handletextpad=llhtextpad, handlelength=llhlength,
@@ -441,8 +441,8 @@ if dorandom:
   plt.setp(sub, ylabel=ylab)
   sub.grid(False)
 
-  if xlim != None: plt.setp(sub, xlim=lim) # set axis limit if wanted
-  if ylim != None: plt.setp(sub, ylim=lim)
+  if xlim != None: plt.setp(sub, xlim=xlim) # set axis limit if wanted
+  if ylim != None: plt.setp(sub, ylim=ylim)
 
   ll = sub.legend(line1+line2, [r'$\mathrm{Theoretical}$',r'$\mathrm{Fitted}$'], frameon=frameon, ncol=1,
                   labelspacing=llrspace, handletextpad=llhtextpad, handlelength=llhlength,
@@ -468,8 +468,8 @@ if dorandom:
 
   sub.xaxis.set_minor_locator(mpl.ticker.MultipleLocator(xtick)) # tick locations
 
-  if xlim != None: plt.setp(sub, xlim=lim) # set axis limit if wanted
-  if ylim != None: plt.setp(sub, ylim=lim)
+  if xlim != None: plt.setp(sub, xlim=xlim) # set axis limit if wanted
+  if ylim != None: plt.setp(sub, ylim=ylim)
 
   ll = sub.legend(mark1, [r'$\mathrm{Uniform \; vs. \; Gauss}$'], frameon=frameon, ncol=1,
                   labelspacing=llrspace, handletextpad=llhtextpad, handlelength=llhlength,
@@ -501,8 +501,8 @@ if dorandom:
 
   sub.xaxis.set_minor_locator(mpl.ticker.MultipleLocator(xtick)) # tick locations
 
-  if xlim != None: plt.setp(sub, xlim=lim) # set axis limit if wanted
-  if ylim != None: plt.setp(sub, ylim=lim)
+  if xlim != None: plt.setp(sub, xlim=xlim) # set axis limit if wanted
+  if ylim != None: plt.setp(sub, ylim=ylim)
 
   ll = sub.legend(mark1, [r'$\mathrm{Uniform \; vs. \; Gauss}$'], frameon=frameon, ncol=1,
                   labelspacing=llrspace, handletextpad=llhtextpad, handlelength=llhlength,
@@ -538,8 +538,8 @@ if dorandom:
 
   sub.xaxis.set_minor_locator(mpl.ticker.MultipleLocator(xtick)) # tick locations
 
-  if xlim != None: plt.setp(sub, xlim=lim) # set axis limit if wanted
-  if ylim != None: plt.setp(sub, ylim=lim)
+  if xlim != None: plt.setp(sub, xlim=xlim) # set axis limit if wanted
+  if ylim != None: plt.setp(sub, ylim=ylim)
 
   ufz.abc2plot(sub, dxabc, dyabc, iplot, lower=True, bold=True, usetex=usetex, mathrm=True, parenthesis='close')
 
