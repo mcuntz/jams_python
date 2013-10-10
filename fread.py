@@ -44,7 +44,7 @@ def fread(file, nc=0, skip=0, cskip=0, separator='',
         comment      line gets excluded if first character of line is
                      in comment sequence
                      sequence can be e.g. string, list or tuple
-        fill_value   value to fill in if not enough columns per line
+        fill_value   value to fill in empty cells or if not enough columns per line
                      and fill=True (default 0 and '' for header)
         strip        Strip strings before conversion to float with str.strip(strip)
                      (default: None)
@@ -274,6 +274,7 @@ def fread(file, nc=0, skip=0, cskip=0, separator='',
                   MC, Jun 2012 - remove quiet
                   MC, Oct 2012 - treat NaN and Inf
                   MC, Feb 2013 - ported to Python 3
+                  MC, Oct 2013 - fill_value in empty cells
     """
     #
     # Determine number of lines in file.
