@@ -188,21 +188,21 @@ def date2dec(calendar = 'standard', units=False,
         >>> decimal = date2dec(calendar='excel1900', ascii=d)
         >>> nn = d.size
         >>> print(astr(decimal[:nn/2],14,pp=True))
-        ['36529.52100694458932' '18409.68414351856336' ' 3877.44508101837710']
+        ['36530.52100694458932' '18410.68414351856336' ' 3878.44508101837710']
         >>> print(astr(decimal[nn/2:],14,pp=True))
-        ['60.00000000000000' '59.00000000000000' '58.00000000000000' ' 0.00000000000000']
+        ['61.00000000000000' '60.00000000000000' '59.00000000000000' ' 1.00000000000000']
 
         # calendar = 'excel1900' WITH excelerr = False -> 1900 considered as NO leap year
         >>> decimal = date2dec(calendar='excel1900', ascii=d, excelerr=False)
         >>> print(astr(decimal[:nn/2],14,pp=True))
-        ['36528.52100694458932' '18408.68414351856336' ' 3876.44508101837710']
+        ['36529.52100694458932' '18409.68414351856336' ' 3877.44508101837710']
         >>> print(astr(decimal[nn/2:],14,pp=True))
-        ['59.00000000000000' '59.00000000000000' '58.00000000000000' ' 0.00000000000000']
+        ['60.00000000000000' '60.00000000000000' '59.00000000000000' ' 1.00000000000000']
 
         # calendar = 'excel1904'
         >>> decimal = date2dec(calendar='excel1904', ascii=d[:nn/2])
         >>> print(astr(decimal[:nn/2],14,pp=True))
-        ['35068.52100694458932' '16948.68414351856336' ' 2416.44508101837710']
+        ['35069.52100694458932' '16949.68414351856336' ' 2417.44508101837710']
 
         # calendar = '365_day'
         >>> g = np.array(['18.08.1972 12:30:15', '25.10.0986 12:30:15', '28.11.0493 22:20:40', '01.01.0001 00:00:00'])
@@ -275,6 +275,7 @@ def date2dec(calendar = 'standard', units=False,
                  MC, Feb 2013 - solved Excel leap year problem.
                  MC, Feb 2013 - ported to Python 3
                  MC, Jul 2013 - ascii/eng without time defaults to 00:00:00
+                 MC, Oct 2013 - Excel starts at 1 not at 0
     """
 
     #
@@ -466,17 +467,17 @@ def date2dec(calendar = 'standard', units=False,
         if units == False: units = '0001-01-01 00:00:00'
         output = nt.date2num(timeobj,'days since %s' % (units), calendar='proleptic_gregorian')
     elif calendar == 'excel1900':
-        if units == False: units = '1900-01-01 00:00:00'
+        if units == False: units = '1900-01-00 00:00:00'
         output = nt.date2num(timeobj,'days since %s' % (units), calendar='gregorian')
         if excelerr:
-            output = np.where(output >= 59., output+1., output)
+            output = np.where(output >= 60., output+1., output)
             # date2num treats 29.02.1900 as 01.03.1990, i.e. is the same decimal number
-            if np.any((output >= 60.) & (output < 61.)):
+            if np.any((output >= 61.) & (output < 62.)):
                 for i in range(outsize):
                     if (timeobj[i].year==1900) & (timeobj[i].month==2) & (timeobj[i].day==29):
                         output[i] -= 1.
     elif calendar == 'excel1904':
-        if units == False: units = '1904-01-01 00:00:00'
+        if units == False: units = '1904-01-00 00:00:00'
         output = nt.date2num(timeobj,'days since %s' % (units), calendar='gregorian')
     elif (calendar == '365_day') or (calendar == 'noleap'):
         if units == False: units = '0001-01-01 00:00:00'

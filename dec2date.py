@@ -207,13 +207,36 @@ def dec2date(indata, calendar='standard', refdate=None, units=None,
         >>> asciidate = dec2date(decimal, calendar='excel1904', ascii = True)
         >>> print(asciidate[::4])
         ['05.01.2000 12:30:15' '18.03.1271 19:41:34']
-        >>> asciidate = dec2date(decimal, calendar='excel1904', ascii=True, refdate='1910-01-01 00:00:00')
+        >>> asciidate = dec2date(decimal, calendar='excel1904', ascii=True, refdate='1910-01-00 00:00:00')
         >>> print(asciidate[::4])
         ['05.01.2006 12:30:15' '18.03.1277 19:41:34']
-        >>> print(dec2date(decimal[::4], calendar='excel1904', ascii=True, units='days since 1910-01-01 00:00:00'))
+        >>> print(dec2date(decimal[::4], calendar='excel1904', ascii=True, units='days since 1910-01-00 00:00:00'))
         ['05.01.2006 12:30:15' '18.03.1277 19:41:34']
-        >>> print(dec2date(decimal[::4], calendar='excel1904', ascii=True, units='days since 1910-01-02 00:00:00'))
+        >>> print(dec2date(decimal[::4], calendar='excel1904', ascii=True, units='days since 1910-01-01 00:00:00'))
         ['06.01.2006 12:30:15' '19.03.1277 19:41:34']
+
+        # check especially 1900 (no) leap year in Excel
+        >>> year1   = np.array([1900,1900,1900,1900])
+        >>> month1  = np.array([2,2,3,1])
+        >>> day1    = np.array([28,29,1,1])
+        >>> decimal = date2dec(calendar='excel1900', yr=year1, mo=month1, dy=day1)
+        >>> month2, day2 = dec2date(decimal, calendar='excel1900', mo=True, dy=True)
+        >>> print(month2)
+        [2 2 3 1]
+        >>> print(day2)
+        [28 29  1  1]
+        >>> decimal = date2dec(calendar='excel1900', yr=year1, mo=month1, dy=day1, excelerr=False)
+        >>> month2, day2 = dec2date(decimal, calendar='excel1900', mo=True, dy=True, excelerr=False)
+        >>> print(month2)
+        [2 3 3 1]
+        >>> print(day2)
+        [28  1  1  1]
+        >>> decimal = date2dec(calendar='excel1904', yr=year1, mo=month1, dy=day1)
+        >>> month2, day2 = dec2date(decimal, calendar='excel1904', mo=True, dy=True)
+        >>> print(month2)
+        [2 3 3 1]
+        >>> print(day2)
+        [28  1  1  1]
 
         # calendar = '365_day'
         >>> decimal = date2dec(calendar='365_day',yr=year,mo=month,dy=day,hr=hour,mi=minute,sc=second)
@@ -291,6 +314,7 @@ def dec2date(indata, calendar='standard', refdate=None, units=None,
                  MC, Feb 2013 - solved Excel leap year problem.
                  MC, Feb 2013 - ported to Python 3
                  AP, May 2013 - solved eng output problem.
+                 MC, Oct 2013 - Excel starts at 1 not at 0
     """
 
     #
@@ -394,17 +418,19 @@ def dec2date(indata, calendar='standard', refdate=None, units=None,
             elif refdate != None:
                 unit = 'days since {0:s}'.format(refdate)
             else:
-                unit = 'days since 1900-01-01 00:00:00'
+                unit = 'days since 1900-01-00 00:00:00'
             if excelerr:
-                indata  = np.where(indata >= 60., indata-1, indata)
-            timeobj = nt.num2date(indata, unit, calendar = 'gregorian')
+                indata1 = np.where(indata >= 61., indata-1, indata)
+                timeobj = nt.num2date(indata1, unit, calendar = 'gregorian')
+            else:
+                timeobj = nt.num2date(indata, unit, calendar = 'gregorian')
         elif calendar == 'excel1904':
             if units != None:
                 unit = units
             elif refdate != None:
                 unit = 'days since {0:s}'.format(refdate)
             else:
-                unit = 'days since 1904-01-01 00:00:00'
+                unit = 'days since 1904-01-00 00:00:00'
             timeobj = nt.num2date(indata, unit, calendar = 'gregorian')
         elif (calendar == '365_day') or (calendar == 'noleap'):
             if units != None:
@@ -506,6 +532,11 @@ def dec2date(indata, calendar='standard', refdate=None, units=None,
             hour   = np.array([timeobjfl[i].hour for i in range(insize)], dtype=np.int)
             minute = np.array([timeobjfl[i].minute for i in range(insize)], dtype=np.int)
             second = np.array([timeobjfl[i].second for i in range(insize)], dtype=np.int)
+            if (calendar == 'excel1900') & excelerr:
+                ii  = np.where((indata >= 60.) & (indata < 61.))[0]
+                if np.size(ii) > 0:
+                    month[ii] = 2
+                    day[ii]   = 29
 
     # Ascii output
     if ascii:
