@@ -3,7 +3,7 @@ from __future__ import print_function
 from romanliterals import int2roman
 
 def abc2plot(handle, dx, dy, iplot, integer=False, roman=False, lower=False,
-             medium=False, small=False, bold=False,
+             small=False, medium=None, large=False, bold=False,
              parenthesis=None, brackets=None, braces=None, 
              usetex=False, mathrm=False):
     """
@@ -16,7 +16,7 @@ def abc2plot(handle, dx, dy, iplot, integer=False, roman=False, lower=False,
         Definition
         ----------
         def abc2plot(handle, dx, dy, iplot, integer=False, roman=False, lower=False,
-                     medium=False, small=False, bold=False,
+                     small=False, medium=True, large=False, bold=False,
                      parenthesis=None, brackets=None, braces=None, 
                      usetex=False, mathrm=False):
 
@@ -36,10 +36,9 @@ def abc2plot(handle, dx, dy, iplot, integer=False, roman=False, lower=False,
                     False:   use a, b, c (default)
         lower       True:    use lowercase letters
                     False:   use uppercase letters (default)
-        medium      True:    fontsize='medium'
-                    False:   fontsize='large'  (default)
         small       True:    fontsize='small'
-                    False:   fontsize='large' (default)
+        medium      True:    fontsize='medium' (default)
+        large       True:    fontsize='large'
         bold        True:    fontweight='bold'
                     False:   fontsize='normal' (default)
         parenthesis 'open':  opening parenthesis in front of number
@@ -56,9 +55,9 @@ def abc2plot(handle, dx, dy, iplot, integer=False, roman=False, lower=False,
                     None:    no braces (default)
         usetex      True:    Embed into LaTeX math environment
                     False:   No LaTeX math mode
-        mathrm      True:    If usetex=True, surround by \mathrm{}
+        mathrm      True:    If usetex=True, surround by \mathrm{} or \mathbf{} if bold=True
                     False:   If usetex=True, standard math font.
-                
+
 
         Output
         ------
@@ -102,12 +101,20 @@ def abc2plot(handle, dx, dy, iplot, integer=False, roman=False, lower=False,
                   MC, Feb 2013 - ported to Python 3
                   MC, Feb 2013 - opening and closing parenthesis, brackets and braces
                   MC, Feb 2013 - usetex, mathrm
+                  MC, Oct 2013 - \mathbf, large, default medium
     """
     # Check input
     if (roman & integer):
         raise ValueError('either roman literals or integers can be chosen.')
-    if (small & medium):
-        raise ValueError('either small or medium font size can be chosen.')
+    if medium is None:
+        medium = True
+        if (small & large):
+            raise ValueError('only one of small, medium or large font size can be chosen.')
+        if small: medium = False
+        if large: medium = False
+    else:
+        if (small | large):
+            raise ValueError('only one of small, medium or large font size can be chosen.')
 
     # Number or letter
     if roman:
@@ -121,12 +128,11 @@ def abc2plot(handle, dx, dy, iplot, integer=False, roman=False, lower=False,
             t = chr(64+iplot)
 
     # Size
-    if small:
-        fs='small'
-    elif medium:
-        fs='medium'
-    else:
-        fs='large'
+    if small:  fs='small'
+    if medium: fs='medium'
+    if large:  fs='large'
+
+    # Weight
     if bold:
         fw='bold'
     else:
@@ -186,7 +192,12 @@ def abc2plot(handle, dx, dy, iplot, integer=False, roman=False, lower=False,
 
     if usetex:
         if mathrm:
-            t = '\mathrm{' + t + '}'
+            if bold:
+                t = '\mathbf{' + t + '}'
+            else:
+                t = '\mathrm{' + t + '}'
+        if small:  t = '\small ' + t
+        if large:  t = '\large ' + t
         t = '$' + t + '$'
 
     xmin, xmax = handle.get_xlim()
