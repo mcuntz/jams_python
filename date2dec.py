@@ -3,7 +3,7 @@ from __future__ import print_function
 import numpy as np
 import netcdftime as nt
 
-def date2dec(calendar = 'standard', units=False,
+def date2dec(calendar = 'standard', units=None,
              excelerr = True, yr=1,
              mo=1, dy=1, hr=0, mi=0, sc=0,
              ascii=None, eng=None):
@@ -27,7 +27,7 @@ def date2dec(calendar = 'standard', units=False,
 
         Definition
         ----------
-        def date2dec(calendar = 'standard', units=False,
+        def date2dec(calendar = 'standard', units=None,
                      excelerr = True, yr=1,
                      mo=1, dy=1, hr=0, mi=0, sc=0,
                      ascii=None, eng=None):
@@ -101,8 +101,8 @@ def date2dec(calendar = 'standard', units=False,
 
         Optional Arguments
         ------------------
-        units    -> Time units can be set by user. Input must be a
-                     string in the format 'yyyy-mm-dd hh:mm:ss'.
+        units     -> Time units can be set by user. Input must be a
+                     string in the format 'days since yyyy-mm-dd hh:mm:ss'.
                      Default values are set automatically.
         excelerr  -> In Excel the year 1900 is normally considered
                      as leap year, which is wrong. By default, this
@@ -276,6 +276,7 @@ def date2dec(calendar = 'standard', units=False,
                  MC, Feb 2013 - ported to Python 3
                  MC, Jul 2013 - ascii/eng without time defaults to 00:00:00
                  MC, Oct 2013 - Excel starts at 1 not at 0
+                 MC, Oct 2013 - units bugs, e.g. 01.01.0001 was substracted if Julian calendar even with units
     """
 
     #
@@ -458,18 +459,29 @@ def date2dec(calendar = 'standard', units=False,
     # depending on chosen calendar and optional set of the time units
     # decimal date is calculated
     if (calendar == 'standard') or (calendar == 'gregorian'):
-        if units == False: units = '0001-01-01 12:00:00'
-        output = nt.date2num(timeobj,'days since %s' % (units), calendar='gregorian')+1721424
+        if units is None:
+            units = 'days since 0001-01-01 12:00:00'
+            dec0 = 1721424
+        else:
+            dec0 = 0
+        output = nt.date2num(timeobj, units, calendar='gregorian')+dec0
     elif calendar == 'julian':
-        if units == False: units = '0001-01-01 12:00:00'
-        output = nt.date2num(timeobj,'days since %s' % (units), calendar='julian')+1721424
+        if units is None:
+            units = 'days since 0001-01-01 12:00:00'
+            dec0 = 1721424
+        else:
+            dec0 = 0
+        output = nt.date2num(timeobj, units, calendar='julian')+dec0
     elif calendar == 'proleptic_gregorian':
-        if units == False: units = '0001-01-01 00:00:00'
-        output = nt.date2num(timeobj,'days since %s' % (units), calendar='proleptic_gregorian')
+        if units is None: units = 'days since 0001-01-01 00:00:00'
+        output = nt.date2num(timeobj, units, calendar='proleptic_gregorian')
     elif calendar == 'excel1900':
-        if units == False: units = '1900-01-00 00:00:00'
-        output = nt.date2num(timeobj,'days since %s' % (units), calendar='gregorian')
-        if excelerr:
+        doerr = False
+        if units is None:
+            units = 'days since 1900-01-00 00:00:00'
+            if excelerr: doerr = True
+        output = nt.date2num(timeobj, units, calendar='gregorian')
+        if doerr:
             output = np.where(output >= 60., output+1., output)
             # date2num treats 29.02.1900 as 01.03.1990, i.e. is the same decimal number
             if np.any((output >= 61.) & (output < 62.)):
@@ -477,17 +489,17 @@ def date2dec(calendar = 'standard', units=False,
                     if (timeobj[i].year==1900) & (timeobj[i].month==2) & (timeobj[i].day==29):
                         output[i] -= 1.
     elif calendar == 'excel1904':
-        if units == False: units = '1904-01-00 00:00:00'
-        output = nt.date2num(timeobj,'days since %s' % (units), calendar='gregorian')
+        if units is None: units = 'days since 1904-01-00 00:00:00'
+        output = nt.date2num(timeobj, units, calendar='gregorian')
     elif (calendar == '365_day') or (calendar == 'noleap'):
-        if units == False: units = '0001-01-01 00:00:00'
-        output = nt.date2num(timeobj,'days since %s' % (units), calendar='365_day')
+        if units is None: units = 'days since 0001-01-01 00:00:00'
+        output = nt.date2num(timeobj, units, calendar='365_day')
     elif (calendar == '366_day') or (calendar == 'all_leap'):
-        if units == False: units = '0001-01-01 00:00:00'
-        output = nt.date2num(timeobj,'days since %s' % (units), calendar='366_day')
+        if units is None: units = 'days since 0001-01-01 00:00:00'
+        output = nt.date2num(timeobj, units, calendar='366_day')
     elif calendar == '360_day':
-        if units == False: units = '0001-01-01 00:00:00'
-        output = nt.date2num(timeobj,'days since %s' % (units), calendar='360_day')
+        if units is None: units = 'days since 0001-01-01 00:00:00'
+        output = nt.date2num(timeobj, units, calendar='360_day')
     elif calendar == 'decimal':
         ntime = np.size(yr)
         leap  = np.array((((yr%4)==0) & ((yr%100)!=0)) | ((yr%400)==0))

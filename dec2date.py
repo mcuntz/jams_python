@@ -315,6 +315,7 @@ def dec2date(indata, calendar='standard', refdate=None, units=None,
                  MC, Feb 2013 - ported to Python 3
                  AP, May 2013 - solved eng output problem.
                  MC, Oct 2013 - Excel starts at 1 not at 0
+                 MC, Oct 2013 - units bugs, e.g. 01.01.0001 was substracted if Julian calendar even with units
     """
 
     #
@@ -387,7 +388,8 @@ def dec2date(indata, calendar='standard', refdate=None, units=None,
         minute = np.floor(secs/60.)
         second = np.rint(secs - 60.*minute)
     else:
-        if   (calendar == 'standard') or (calendar == 'gregorian'):
+        if (calendar == 'standard') or (calendar == 'gregorian'):
+            dec0 = 0
             if units != None:
                 unit = units
             elif refdate != None:
@@ -395,15 +397,18 @@ def dec2date(indata, calendar='standard', refdate=None, units=None,
                 unit = 'days since {0:s}'.format(refdate)
             else:
                 unit = 'days since 0001-01-01 12:00:00'
-            timeobj = nt.num2date(indata-1721424, unit, calendar='gregorian')
+                dec0 = 1721424
+            timeobj = nt.num2date(indata-dec0, unit, calendar='gregorian')
         elif calendar == 'julian':
+            dec0 = 0
             if units != None:
                 unit = units
             elif refdate != None:
                 unit = 'days since {0:s}'.format(refdate)
             else:
                 unit = 'days since 0001-01-01 12:00:00'
-            timeobj = nt.num2date(indata-1721424, unit, calendar='julian')
+                dec0 = 1721424
+            timeobj = nt.num2date(indata-dec0, unit, calendar='julian')
         elif calendar == 'proleptic_gregorian':
             if units != None:
                 unit = units
@@ -413,13 +418,15 @@ def dec2date(indata, calendar='standard', refdate=None, units=None,
                 unit = 'days since 0001-01-01 00:00:00'
             timeobj = nt.num2date(indata, unit, calendar = 'proleptic_gregorian')
         elif calendar == 'excel1900':
+            doerr = False
             if units != None:
                 unit = units
             elif refdate != None:
                 unit = 'days since {0:s}'.format(refdate)
             else:
                 unit = 'days since 1900-01-00 00:00:00'
-            if excelerr:
+                if excelerr: doerr = True
+            if doerr:
                 indata1 = np.where(indata >= 61., indata-1, indata)
                 timeobj = nt.num2date(indata1, unit, calendar = 'gregorian')
             else:
