@@ -2,14 +2,14 @@
 from __future__ import print_function
 import numpy as np
 
-def mad(datin, z=7, deriv=0):
+def mad(datin, z=7, deriv=0, nozero=False):
     """
         Median absolute deviation test, either on raw values, 1st or 2nd derivatives.
         Returns mask with false everywhere except where <(median-MAD*z/0.6745) or >(md+MAD*z/0.6745).
 
         Definition
         ----------
-        def mad(datin, z=7, deriv=0):
+        def mad(datin, z=7, deriv=0, nozero=False):
 
 
         Input
@@ -21,6 +21,7 @@ def mad(datin, z=7, deriv=0):
         --------------
         z          Input is allowed to deviate maximum z standard deviations from the median (default: 7)
         deriv      0: Act on raw input; 1: Use first derivatives; 2: Use 2nd derivatives
+        nozero     If True: exclude 0. from input
 
 
         Output
@@ -99,7 +100,7 @@ def mad(datin, z=7, deriv=0):
         >>> my = np.ma.array(y, mask=np.zeros(y.shape))
         >>> my.mask[-1] = True
         >>> print(mad(my,z=4))
-        [False False False False False False False False False False False False
+        [True False False False False False False False False False False False
          False False False False False False False False False False False False
          False --]
 
@@ -107,12 +108,12 @@ def mad(datin, z=7, deriv=0):
         [True False False False False False False False False False False False
          False False False False False False False False False False False True
          True --]
-    
+
         # Arrays with NaNs
-        >>> ny = y
+        >>> ny = y.copy()
         >>> ny[-1] = np.nan
         >>> print(mad(ny,z=4))
-        [False False False False False False False False False False False False
+        [ True False False False False False False False False False False False
          False False False False False False False False False False False False
          False False]
 
@@ -120,6 +121,19 @@ def mad(datin, z=7, deriv=0):
         [ True False False False False False False False False False False False
          False False False False False False False False False False False  True
           True False]
+
+        # Exclude zeros
+        >>> zy = y.copy()
+        >>> zy[1] = 0.
+        >>> print(mad(zy,z=3))
+        [ True  True False False False False False False False False False False
+         False False False False False False False False False False False False
+          True  True]
+
+        >>> print(mad(zy,z=3,nozero=True))
+        [ True False False False False False False False False False False False
+         False False False False False False False False False False False False
+          True  True]
 
 
         License
@@ -152,57 +166,63 @@ def mad(datin, z=7, deriv=0):
                   MC & JM, Jul 2013 - loop over second dimension for medians, faster than array calculations :-(
                                       but use bottleneck for speed :-)
                   MC, Jul 2013 - (re-)allow masked arrays and NaNs in arrays
+                  MC, Oct 2013 - nozero, bug in NaN treatment with dim=1
     """
-    sn = list(np.shape(datin))
+    if nozero:
+        idatin = datin.copy()
+        ii = np.where(idatin == 0.)[0]
+        if ii.size > 0: idatin[ii] = np.nan
+    else:
+        idatin = datin
+    sn = list(np.shape(idatin))
     n  = sn[0]
     if deriv == 0:
         m      = n
-        d      = datin
+        d      = idatin
     elif deriv == 1:
         m      = n-1
         sm     = sn
         sm[0]  = m
-        d      = np.diff(datin, axis=0)
+        d      = np.diff(idatin, axis=0)
     elif deriv == 2:
         m      = n-2
         sm     = sn
         sm[0]  = m
-        d      = np.diff(datin, n=2, axis=0)
+        d      = np.diff(idatin, n=2, axis=0)
     else:
         raise ValueError('Unimplemented option.')
 
+
     # Shortcut if all masked
     ismasked = type(d) == np.ma.core.MaskedArray
-    if ismasked:
-        if np.all(d.mask == True):
+    if not ismasked:
+        ii = np.where(~np.isfinite(d))[0]
+        d  = np.ma.array(d)
+        if ii.size > 0: d[ii] = np.ma.masked
+    
+    if np.all(d.mask == True):
+        if ismasked:
             return d.mask
-    else:
-        if np.all(~np.isfinite(d)):
+        else:
             return np.ones(d.shape, dtype=np.bool)
 
     # Median
     if d.ndim == 1:
         try:
             import bottleneck as bn
-            if ismasked:
-                dd = d.compressed()
-            else:
-                dd = d[np.isfinite(d)]
-            md     = bn.median(d)
+            dd = d.compressed()
+            md = bn.median(dd)
             # Median absolute deviation
-            MAD    = bn.median(np.abs(dd-md))
+            MAD = bn.median(np.abs(dd-md))
             # Range around median
             thresh = MAD * (z/0.6745)
             # True where outside z-range
             res = (d<(md-thresh)) | (d>(md+thresh))
         except:
-            if ismasked:
-                dd = d.compressed()
-            else:
-                dd = d[np.isfinite(d)]
-            md     = np.median(dd)
+            dd = d.compressed()
+            md = np.median(dd)
             # Median absolute deviation
-            MAD    = np.median(np.abs(dd-md))
+            MAD = np.median(np.abs(dd-md))
             # Range around median
             thresh = MAD * (z/0.6745)
             # True where outside z-range
@@ -213,13 +233,10 @@ def mad(datin, z=7, deriv=0):
             res = np.empty(d.shape, dtype=np.bool)
             for i in range(d.shape[1]):
                 di = d[:,i]
-                if ismasked:
-                    dd = di.compressed()
-                else:
-                    dd = di[np.isfinite(di)]
-                md     = bn.median(dd)
+                dd = di.compressed()
+                md = bn.median(dd)
                 # Median absolute deviation
-                MAD    = bn.median(np.abs(dd-md))
+                MAD = bn.median(np.abs(dd-md))
                 # Range around median
                 thresh = MAD * (z/0.6745)
                 # True where outside z-range
@@ -228,13 +245,10 @@ def mad(datin, z=7, deriv=0):
             res = np.empty(d.shape, dtype=np.bool)
             for i in range(d.shape[1]):
                 di = d[:,i]
-                if ismasked:
-                    dd = di.compressed()
-                else:
-                    dd = di[np.isfinite(di)]
-                md     = np.median(dd)
+                dd = di.compressed()
+                md = np.median(dd)
                 # Median absolute deviation
-                MAD    = np.median(np.abs(dd-md))
+                MAD = np.median(np.abs(dd-md))
                 # Range around median
                 thresh = MAD * (z/0.6745)
                 # True where outside z-range
@@ -242,7 +256,14 @@ def mad(datin, z=7, deriv=0):
     else:
         raise ValueError('datin.ndim must be <= 2')
 
-    return res
+    if ismasked:
+        return res
+    else:
+        resmasked = type(res) == np.ma.core.MaskedArray
+        if resmasked: # got masked because of NaNs
+            return np.where(res.mask, False, res)
+        else:
+            return res
 
 
 if __name__ == '__main__':
