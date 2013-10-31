@@ -39,7 +39,7 @@ def jab(arr, ind=None, nind=None, mask=None, weight=False, nsteps=1):
         nsteps    Give nsteps estimates of JAB error, i.e. after each nboot/nsteps bootstraps.
                   Default: 1
 
-        
+
         Output
         ------
         Array of Jacknife-after-boostrap errors.
@@ -221,10 +221,10 @@ def jab(arr, ind=None, nind=None, mask=None, weight=False, nsteps=1):
         else:
             return se_jab
 
-    
+
 if __name__ == '__main__':
     import doctest
-    doctest.testmod()
+    doctest.testmod(optionflags=doctest.NORMALIZE_WHITESPACE)
 
     # # 5 Bootstrap with 2 standard error outputs, e.g. for 2 parameters
     # Bstat = np.array([[ 3.625,  5.375],

@@ -21,7 +21,7 @@ def in_poly(P, coord_x, coord_y):
         coord_x   np.array, x coordinates of the polygon
         coord_y   np.array, y coordinates of the polygon
 
-        
+
         Output
         ------
         integer, 1 = point inside polygon
@@ -89,6 +89,7 @@ def in_poly(P, coord_x, coord_y):
         Written,  AP, Nov 2012
         Modified, MC, Nov 2012 - documentation change, return 0 immediately
                   MC, Feb 2013 - ported to Python 3
+                  MC, Oct 2013 - inpoly
     """
 
     # ironing :-)
@@ -105,7 +106,7 @@ def in_poly(P, coord_x, coord_y):
     # relative coordinates
     X = coord_x - P[0]
     Y = coord_y - P[1]
-    
+
     # Edge test
     if np.any((X==0.) & (Y==0.)): return 0
 
@@ -141,8 +142,38 @@ def in_poly(P, coord_x, coord_y):
                 erg = -erg
     return erg
 
+
+def inpoly(*args, **kwargs):
+    """
+        wrapper for in_poly
+        def in_poly(P, coord_x, coord_y):
+
+
+        Example
+        --------
+        >>> coord_x = np.array([2.,2.,5.,7.,5.])
+        >>> coord_y = np.array([1.,4.,6.,3.,1.])
+
+        # point inside polygon
+        >>> P = [4.,3.]
+        >>> print(inpoly(P, coord_x, coord_y))
+        1
+
+        # point outside polygon
+        >>> P = [8.,6.]
+        >>> print(inpoly(P, coord_x, coord_y))
+        -1
+
+        # point on edge/vertex of polygon
+        >>> P = [2.,2.]
+        >>> print(inpoly(P, coord_x, coord_y))
+        0
+    """
+    return in_poly(*args, **kwargs)
+
+
 if __name__ == '__main__':
     import doctest
-    doctest.testmod()
+    doctest.testmod(optionflags=doctest.NORMALIZE_WHITESPACE)
 
 

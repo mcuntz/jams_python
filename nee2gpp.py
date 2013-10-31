@@ -888,69 +888,10 @@ def nee2gpp_lasslop(dates, nee, t, isday, rg, vpd, undef=np.nan,
         return GPP, Reco
 
 
-
-# # -------------------------------------------------------------
-# # Fit functions
-# def lloyd(T, Rref, E0):
-#     """ Lloyd & Taylor (1994)
-#         T       Temperature [k]
-#         Rref    Respiration at Tref=10 degC [umol(C) m-2 s-1]
-#         E0      Activation energy [K]
-#     """
-#     Tref = 283.15 #  10    [degC]
-#     T0   = 227.13 # -46.02 [degC]
-#     return Rref*np.exp(E0*(1./(Tref-T0)-1./(T-T0)))
-
-# def cost_lloyd(p, T, NEE):
-#     """ Cost function for Lloyd """
-#     return np.sum(np.abs(NEE-lloyd(T, p[0], p[1])))
-
-
-
-# def lloyd_rref(et, Rref):
-#     """ If E0 is know in Lloyd & Taylor (1994) then one can calc
-#         the exponential term outside the routine and the fitting
-#         becomes linear """
-#     return Rref*et
-
-# def cost_lloyd_rref(p, et, NEE):
-#     """ Cost function for rref """
-#     return np.sum(np.abs(NEE-lloyd_rref(et, p[0])))
-
-
-
-# def lasslop(Rg, et, VPD, alpha, beta0, k, Rref):
-#     """ Lasslop et al. (2010) is basically the rectangular, hyperbolic
-#         light-response of NEE as by Falge et al. (2001), where the
-#         respiration is calculated with Lloyd & Taylor (1994), and the
-#         maximum canopy uptake rate at light saturation decreases
-#         exponentially with VPD as in Koerner (1995)
-#         Rg      Global radiation [W m-2]
-#         et      Exponential in Lloyd & Taylor: np.exp(E0*(1./(Tref-T0)-1./(T-T0))) []
-#         VPD     Vapour Pressure Deficit [Pa]
-#         alpha   Light use efficiency, i.e. initial slope of light response curve [umol(C) J-1]
-#         beta0   Maximum CO2 uptake rate at VPD0=10 hPa [umol(C) m-2 s-1]
-#         k       e-folding of exponential decrease of maximum CO2 uptake with VPD increase [Pa-1]
-#         Rref    Respiration at Tref (10 degC) [umol(C) m-2 s-1]
-#     """
-#     # Lloyd & Taylor (1994)
-#     gamma = Rref*et
-#     # Koerner (1995)
-#     VPD0  = 1000. # 10 hPa
-#     kk    = np.maximum(np.minimum(-k*(VPD-VPD0), 600.), -600.)
-#     beta  = np.where(VPD > VPD0, beta0*np.exp(kk), beta0)
-#     return -alpha*beta*Rg/(alpha*Rg+beta) + gamma
-
-# def cost_lasslop(p, Rg, et, VPD, NEE):
-#     """ Cost function for Lasslop """
-#     return np.sum(np.abs(NEE-lasslop(Rg, et, VPD, p[0], p[1], p[2], p[3])))
-
-
-
 # -------------------------------------------------------------
 if __name__ == '__main__':
     import doctest
-    doctest.testmod()
+    doctest.testmod(optionflags=doctest.NORMALIZE_WHITESPACE)
 
     # from fread import * # from ufz
     # from date2dec import * # from ufz

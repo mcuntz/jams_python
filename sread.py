@@ -483,9 +483,9 @@ def sread(file, nc=0, skip=0, cskip=0, separator='',
             var = lvar
     if strarr:
         var = np.array(var,dtype=np.str)
-        
+
     return var
 
 if __name__ == '__main__':
     import doctest
-    doctest.testmod()
+    doctest.testmod(optionflags=doctest.NORMALIZE_WHITESPACE)

@@ -554,5 +554,5 @@ def date2dec(calendar = 'standard', units=None,
 
 if __name__ == '__main__':
     import doctest
-    doctest.testmod()
+    doctest.testmod(optionflags=doctest.NORMALIZE_WHITESPACE)
 

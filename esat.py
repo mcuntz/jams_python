@@ -12,6 +12,7 @@ def esat(T, liquid=False, formula='GoffGratch'):
         The optional parameter liquid=True changes the calculation to vapour pressure
         over liquid water over the entire temperature range.
 
+
         Definition
         ----------
         def esat(T, liquid=False, undef=False, formula='GoffGratch'):
@@ -341,7 +342,7 @@ def esat(T, liquid=False, formula='GoffGratch'):
 
 if __name__ == '__main__':
     import doctest
-    doctest.testmod()
+    doctest.testmod(optionflags=doctest.NORMALIZE_WHITESPACE)
 
     # from autostring import astr
     # print(astr(esat(293.15),3,pp=True))

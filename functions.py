@@ -34,6 +34,7 @@
         p, nfeval, rc = opt.fmin_tnc(ufz.functions.cost_square, [p1,p2], bounds=[[None,None],[None,None]],
                                      args=(ufz.functions.f1x_p,x,y), approx_grad=True, disp=False)
 
+
     Definition
     ----------
     Current functions are (there is always the second form with the name appended by _p;
@@ -577,7 +578,7 @@ def six_hump_camelback(x):
 
 if __name__ == '__main__':
     import doctest
-    doctest.testmod()
+    doctest.testmod(optionflags=doctest.NORMALIZE_WHITESPACE)
 
     # Rref = 1.0
     # E0   = 126.

@@ -7,6 +7,7 @@ def mad(datin, z=7, deriv=0, nozero=False):
         Median absolute deviation test, either on raw values, 1st or 2nd derivatives.
         Returns mask with false everywhere except where <(median-MAD*z/0.6745) or >(md+MAD*z/0.6745).
 
+
         Definition
         ----------
         def mad(datin, z=7, deriv=0, nozero=False):
@@ -38,7 +39,7 @@ def mad(datin, z=7, deriv=0, nozero=False):
         because mean of left and right would give 0 for spikes.
 
         If all(d.mask==True) then return d.mask, which is all True
-        
+
 
         Examples
         --------
@@ -199,7 +200,7 @@ def mad(datin, z=7, deriv=0, nozero=False):
         ii = np.where(~np.isfinite(d))[0]
         d  = np.ma.array(d)
         if ii.size > 0: d[ii] = np.ma.masked
-    
+
     if np.all(d.mask == True):
         if ismasked:
             return d.mask
@@ -268,7 +269,7 @@ def mad(datin, z=7, deriv=0, nozero=False):
 
 if __name__ == '__main__':
     import doctest
-    doctest.testmod()
+    doctest.testmod(optionflags=doctest.NORMALIZE_WHITESPACE)
 
     # import numpy as np
     # y = np.array([-0.25,0.68,0.94,1.15,2.26,2.35,2.37,2.40,2.47,2.54,2.62,
@@ -330,7 +331,7 @@ if __name__ == '__main__':
     # #[True False False False False False False False False False False False
     # # False False False False False False False False False False False True
     # # True --]
-    
+
     # ny = y
     # ny[-1] = np.nan
     # print(mad(ny,z=4))

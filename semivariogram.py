@@ -688,7 +688,7 @@ def sphvar(h,p):
     # out1 = p[0]+p[1]
     # out2 = out1
     # if p[2] != 0.: out2 = p[0]+p[1]*(1.5*(abs(h)/p[2]) - 0.5*(abs(h)/p[2])**3
-    # return np.where((np.abs(h)>=0.) & (np.abs(h)<=p[2]), out1, out2)                          
+    # return np.where((np.abs(h)>=0.) & (np.abs(h)<=p[2]), out1, out2)
 
 # range of spherical model at a given sill
 def sphrange(sill,p):
@@ -714,7 +714,7 @@ def absdif(p,x,y,func):
 # DOCTEST:
 if __name__ == '__main__':
     import doctest
-    doctest.testmod()
+    doctest.testmod(optionflags=doctest.NORMALIZE_WHITESPACE)
 
     # # easting
     # x = np.array([557509.27,557518.11,557526.95,557535.79,557544.63,

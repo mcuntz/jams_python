@@ -15,6 +15,7 @@ def heaviside(x, value=1., unitstep=False, zero=False):
             H =  0  for x =< 0
             H =  1  for x >  0
 
+
         Definition
         ----------
         def heaviside(x, value=1., unitstep=False, zero=False):
@@ -77,7 +78,7 @@ def heaviside(x, value=1., unitstep=False, zero=False):
 
         Copyright 2012-2013 Matthias Cuntz
 
-        
+
         History
         -------
         Written,  MC, Jan 2012
@@ -95,8 +96,8 @@ def heaviside(x, value=1., unitstep=False, zero=False):
     out *= value
     return out
 
- 
+
 if __name__ == '__main__':
     import doctest
-    doctest.testmod()
+    doctest.testmod(optionflags=doctest.NORMALIZE_WHITESPACE)
 

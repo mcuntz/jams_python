@@ -6,6 +6,7 @@ def nan_helper(y, nan=False, inf=False, undef=None):
     """
         Helper to handle indices and logical indices of NaNs, Infs or undefs.
 
+
         Definition
         ----------
         def nan_helper(y, nan=False, inf=False, undef=None):
@@ -169,7 +170,7 @@ def fill_nonfinite(xin, nan=None, inf=None, undef=None):
 
 if __name__ == '__main__':
     import doctest
-    doctest.testmod()
+    doctest.testmod(optionflags=doctest.NORMALIZE_WHITESPACE)
 
     # from autostring import astr
     # a = np.array([1, 2, 3])

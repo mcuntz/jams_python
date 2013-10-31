@@ -7,6 +7,7 @@ def lif(file, noblank=False, comment='', skip=0, maxcol=False):
         Counts the numer of lines in a file.
         Blank (only whitespace) and comment lines can be excluded.
 
+
         Definition
         ----------
         def lif(file, noblank=False, comment='', skip=0):
@@ -44,7 +45,7 @@ def lif(file, noblank=False, comment='', skip=0, maxcol=False):
         Restrictions
         ------------
         Only ascii files.
-    
+
 
         Examples
         --------
@@ -160,4 +161,4 @@ def lif(file, noblank=False, comment='', skip=0, maxcol=False):
 
 if __name__ == '__main__':
     import doctest
-    doctest.testmod()
+    doctest.testmod(optionflags=doctest.NORMALIZE_WHITESPACE)

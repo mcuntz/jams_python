@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 from __future__ import print_function
 import numpy as np                       # array manipulation
-import netCDF4 as nc                     # netCDF interphase
 
 def writenetcdf(fhandle, vhandle=None, var=None, time=None, isdim=False, name=None, dims=None,
                 attributes=None, fileattributes=None, comp=False, vartype=None):
@@ -10,6 +9,7 @@ def writenetcdf(fhandle, vhandle=None, var=None, time=None, isdim=False, name=No
         for 1D to 6D data.
 
         All attribues must be lists; except the data itself.
+
 
         Definition
         ----------
@@ -159,7 +159,6 @@ def writenetcdf(fhandle, vhandle=None, var=None, time=None, isdim=False, name=No
                   MC,      Jun 2012 - vartype
                   MC,      Feb 2013 - ported to Python 3
     """
-
     # create File attributes
     if fileattributes != None:
         for i in range(len(fileattributes)):
@@ -242,5 +241,8 @@ def writenetcdf(fhandle, vhandle=None, var=None, time=None, isdim=False, name=No
 
 if __name__ == '__main__':
     import doctest
-    doctest.testmod()
-
+    try:
+        import netCDF4 as nc
+        doctest.testmod(optionflags=doctest.NORMALIZE_WHITESPACE)
+    except:
+        raise IOError('No NetCDF4 support available.')

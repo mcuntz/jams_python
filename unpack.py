@@ -9,6 +9,7 @@ def unpack(array, mask, value=0.):
         The unpacked elements will be set to user-defined value.
         The mask can have any dimensions up to the array dimensions.
 
+
         Definition
         ----------
         def unpack(array, mask, value=0.):
@@ -34,7 +35,7 @@ def unpack(array, mask, value=0.):
         Restrictions
         ------------
         All mask values false is undefined.
-    
+
 
         Examples
         --------
@@ -69,7 +70,7 @@ def unpack(array, mask, value=0.):
         >>> c3 = unpack(b3, mask)
         >>> print(np.any(a3-c3 != 0.))
         False
-        >>> 
+        >>>
         >>> d = unpack(b, mask, value=2)
         >>> print(d)
         [[ 2.  2.  2.  2.  2.  2.  2.  2.  2.  2.]
@@ -97,7 +98,7 @@ def unpack(array, mask, value=0.):
         along with The UFZ Python library.  If not, see <http://www.gnu.org/licenses/>.
 
         Copyright 2009-2013 Matthias Cuntz
-       
+
 
         History
         -------
@@ -131,7 +132,7 @@ def unpack(array, mask, value=0.):
     ii = index[masknd]
     if len(ii) != narray:
         print('UNPACK: Indes creation failed. Index %s Array %s.' % (len(ii), narray))
-        return None    
+        return None
     #
     # Flat output array
     array1d = np.ravel(array)
@@ -148,5 +149,5 @@ def unpack(array, mask, value=0.):
 
 if __name__ == '__main__':
     import doctest
-    doctest.testmod()
+    doctest.testmod(optionflags=doctest.NORMALIZE_WHITESPACE)
 

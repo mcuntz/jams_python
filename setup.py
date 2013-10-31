@@ -4,7 +4,7 @@ from distutils.core import setup
 setup(name='ufz',
       packages=['ufz'],
       package_dir={'ufz': ''},
-      version='2.1',
+      version='2.2',
       description='UFZ Computational Hydrosystems Python Library',
       author='UFZ Department Computational Hydrosystems (CHS)',
       maintainer='Matthias Cuntz',

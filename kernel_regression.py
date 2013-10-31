@@ -314,9 +314,10 @@ def nadaraya_watson(z, y):
     #
     return out
 
+
 if __name__ == '__main__':
     import doctest
-    doctest.testmod()
+    doctest.testmod(optionflags=doctest.NORMALIZE_WHITESPACE)
     # x = np.zeros((10,2))
     # x[:,0] = np.arange(10,dtype=np.float)/9.
     # x[:,1] = 1./(np.arange(10,dtype=np.float)/9.+0.1)

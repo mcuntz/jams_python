@@ -60,12 +60,12 @@ ufzall = ['ufzdarkblue', 'ufzblue', 'ufzlightblue',
           'ufzdarkgray', 'ufzgray', 'ufzlightgray',
           'ufzdarkgrey', 'ufzgrey', 'ufzlightgrey',
           'ufzblack', 'ufzwhite',
-          'darkblue', 'blue', 'lightblue', 
-          'red', 'orange', 'yellow', 
-          'darkgreen', 'green', 'lightgreen', 
-          'gray1', 'gray2', 'gray3', 
-          'grey1', 'grey2', 'grey3', 
-          'darkgray', 'gray', 'lightgray', 
+          'darkblue', 'blue', 'lightblue',
+          'red', 'orange', 'yellow',
+          'darkgreen', 'green', 'lightgreen',
+          'gray1', 'gray2', 'gray3',
+          'grey1', 'grey2', 'grey3',
+          'darkgray', 'gray', 'lightgray',
           'darkgrey', 'grey', 'lightgrey',
           'black', 'white']
 
@@ -100,7 +100,7 @@ def get_colour_tuple(name, rgb256=False):
         --------
         >>> print(get_colour_tuple('ufzdarkblue', rgb256=True))
         (0, 62, 110)
-        
+
         >>> import numpy as np
         >>> from autostring import *
         >>> cc = get_colour_tuple('UFZDARKBLUE')
@@ -228,17 +228,39 @@ def colours(name=False, rgb=True, rgb256=False, names=False):
         return out
 
 
-def colors(name=False, rgb=True, rgb256=False, names=False):
+def colors(*args, **kwargs):
     """
         Wrapper function for colours
         def colours(name=False, rgb=True, rgb256=False, names=False):
+
+
+        Examples
+        --------
+        >>> print(colors('ufzdarkblue', rgb256=True))
+        (0, 62, 110)
+
+        >>> print(colors(names=True)[0:3])
+        ['ufzdarkblue', 'ufzblue', 'ufzlightblue']
+
+        >>> import numpy as np
+        >>> from autostring import *
+        >>> cc = colors('UFZDARKBLUE')
+        >>> print(astr(np.array(cc), 4))
+        ['0.0000' '0.2431' '0.4314']
+
+        >>> cc = colors('DarkBlue')
+        >>> print(astr(np.array(cc), 4))
+        ['0.0000' '0.2431' '0.4314']
+
+        >>> print(colors(['orange','ufzdarkblue'], rgb256=True))
+        [(207, 104, 0), (0, 62, 110)]
     """
-    return colours(name, rgb, rgb256, names)
+    return colours(*args, **kwargs)
 
 
 if __name__ == '__main__':
     import doctest
-    doctest.testmod()
+    doctest.testmod(optionflags=doctest.NORMALIZE_WHITESPACE)
 
     # print(colours('ufzdarkblue', rgb256=True))
     # # (0, 62, 110)

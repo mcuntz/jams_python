@@ -3,35 +3,35 @@ from __future__ import print_function
 import numpy as np
 
 def srrasa(xy, strata=5, n=3, plot=False):
-    """       
+    """
         Generates stratified random 2D points within a given rectangular area.
-        
-        
+
+
         Definition
         ----------
         def srrasa(xy, strata=5, n=3, plot=False):
-        
-        
+
+
         Input
-        ----- 
-        xy          list of floats (4), list with the x and y coordinates 
+        -----
+        xy          list of floats (4), list with the x and y coordinates
                     enclosing the designated rectangle in the form [x1,x2,y1,y2]
-        
-        
+
+
         Optional Input
         --------------
         strata      int, number of strata per axis
         n           int, number of random points in each strata
         plot        bool, if True, stratas and points are plotted,
                     otherwise not
-        
-        
+
+
         Output
         ------
         rand_xy     ndarray (n,2), x and y coordinates of the stratified random
                     points in the given rectangular.
-               
-                             
+
+
         Examples
         --------
         >>> # seed for reproducible results in doctest
@@ -46,28 +46,28 @@ def srrasa(xy, strata=5, n=3, plot=False):
          ['6.522190e+05' '5.772972e+06']
          ['6.522401e+05' '5.772979e+06']]
 
-        
+
         License
         -------
         This file is part of the UFZ Python library.
-    
-        The UFZ Python library is free software: you can redistribute it and/or 
-        modify it under the terms of the GNU Lesser General Public License as 
+
+        The UFZ Python library is free software: you can redistribute it and/or
+        modify it under the terms of the GNU Lesser General Public License as
         published by the Free Software Foundation, either version 3 of the License,
         or (at your option) any later version.
-    
+
         The UFZ Python library is distributed in the hope that it will be useful,
         but WITHOUT ANY WARRANTY; without even the implied warranty of
         MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
         GNU Lesser General Public License for more details.
-    
+
         You should have received a copy of the GNU Lesser General Public License
         along with The UFZ Python library.  If not,
         see <http://www.gnu.org/licenses/>.
-    
+
         Copyright 2012-2013 Arndt Piayda, Matthias Cuntz
-    
-    
+
+
         History
         -------
         Written,  AP, Nov 2012
@@ -76,22 +76,22 @@ def srrasa(xy, strata=5, n=3, plot=False):
                   MC, Feb 2013 - docstring
                   MC, Feb 2013 - ported to Python 3
     """
-    
+
     # calculate strata steps
     sw = (xy[1]-xy[0])/strata
     sh = (xy[3]-xy[2])/strata
     xsteps = np.arange(xy[0],xy[1]+sw,sw)
     ysteps = np.arange(xy[2],xy[3]+sh,sh)
-    
+
     # make output array
     rand_xy = np.empty((strata**2*n,2))
-    
+
     # throw random points in each strata
     for j in range(strata):
         for i in range(strata):
             rand_xy[i*n+strata*n*j:(i+1)*n+strata*n*j,0] = (xsteps[i+1] - xsteps[i])*np.random.random(n) + xsteps[i]
             rand_xy[i*n+strata*n*j:(i+1)*n+strata*n*j,1] = (ysteps[j+1] - ysteps[j])*np.random.random(n) + ysteps[j]
-    
+
     # plot stratas and random points within
     if plot:
         import matplotlib as mpl
@@ -99,10 +99,10 @@ def srrasa(xy, strata=5, n=3, plot=False):
         mpl.rc('font', size=20)
         mpl.rc('lines', linewidth=2)
         mpl.rc('axes', linewidth=1.5)
-        mpl.rc('xtick.major', width=1.5) 
-        mpl.rc('ytick.major', width=1.5) 
+        mpl.rc('xtick.major', width=1.5)
+        mpl.rc('ytick.major', width=1.5)
         mpl.rcParams['lines.markersize']=6
-        
+
         fig = plt.figure('stratified random sampling')
         sub = fig.add_subplot(111, aspect='equal')
         sub.set_xlim(xy[0],xy[1])
@@ -128,23 +128,23 @@ def srrasa(xy, strata=5, n=3, plot=False):
 
 
 def srrasa_trans(xy,strata=5,n=3,num=3,rl=0.5,silent=True,plot=False):
-    
-    """        
+
+    """
         Generates stratified random 2D transects within a given rectangular
         area.
-        
-        
+
+
         Definition
         ----------
         def srrasa(xy,strata=5,n=3,num=3,rl=0.5,silent=True,plot=False):
-        
-        
+
+
         Input
-        ----- 
-        xy          list of floats (4), list with the x and y coordinates 
+        -----
+        xy          list of floats (4), list with the x and y coordinates
                     enclosing the designated rectangle in the form [x1,x2,y1,y2]
-        
-        
+
+
         Optional Input
         --------------
         strata      int, number of strata per axis
@@ -156,14 +156,14 @@ def srrasa_trans(xy,strata=5,n=3,num=3,rl=0.5,silent=True,plot=False):
                     console, otherwise not
         plot        bool, if True, stratas and points are plotted,
                     otherwise not
-        
-        
+
+
         Output
         ------
         rand_xy     ndarray (n,2), x and y coordinates of the stratified random
                     transect points in the given rectangular.
-                             
-                             
+
+
         Examples
         --------
         >>> # seed for reproducible results in doctest
@@ -179,82 +179,82 @@ def srrasa_trans(xy,strata=5,n=3,num=3,rl=0.5,silent=True,plot=False):
          ['6.522276e+05' '5.772983e+06']
          ['6.522292e+05' '5.772983e+06']
          ['6.522315e+05' '5.772983e+06']]
-        
-        
+
+
         License
         -------
         This file is part of the UFZ Python library.
-    
-        The UFZ Python library is free software: you can redistribute it and/or 
-        modify it under the terms of the GNU Lesser General Public License as 
+
+        The UFZ Python library is free software: you can redistribute it and/or
+        modify it under the terms of the GNU Lesser General Public License as
         published by the Free Software Foundation, either version 3 of the License,
         or (at your option) any later version.
-    
+
         The UFZ Python library is distributed in the hope that it will be useful,
         but WITHOUT ANY WARRANTY; without even the implied warranty of
         MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
         GNU Lesser General Public License for more details.
-    
+
         You should have received a copy of the GNU Lesser General Public License
         along with The UFZ Python library.  If not,
         see <http://www.gnu.org/licenses/>.
-    
+
         Copyright 2012-2013 Arndt Piayda, Matthias Cuntz
-    
-    
+
+
         History
         -------
         Written,  AP, Nov 2012
         Modified, AP, Dec 2012 - documentation change
                   MC, Feb 2013 - ported to Python 3
     """
-    
-    # calculate strata steps 
+
+    # calculate strata steps
     sw = (xy[1]-xy[0])/strata
     sh = (xy[3]-xy[2])/strata
     xsteps = np.arange(xy[0],xy[1]+sw,sw)
     ysteps = np.arange(xy[2],xy[3]+sh,sh)
     tl = sw*rl
-    
+
     # make output array
     rand_xy = np.empty((strata**2*n*num,2))
-    
+
     o = 0
     for j in range(strata):
         for i in range(strata):
             for k in range(n):
-                
+
                 goon = True
                 it = 0
                 while goon:
                     # random seed in strata
                     seedx=(xsteps[i+1]-xsteps[i])*np.random.random(1)+xsteps[i]
                     seedy=(ysteps[j+1]-ysteps[j])*np.random.random(1)+ysteps[j]
-                    
+
                     # make logarithmic transect
                     tx   =np.arange(1,num+1)
                     dis  =np.sort(tl-np.log(tx)/np.max(np.log(tx))*tl)
                     seedx=np.repeat(seedx,num)+dis
                     seedy=np.repeat(seedy,num)
-                    
+
                     # random angle in strata [deg]
                     angle = 360 * np.random.random(1)
-                    
-                    # rotate transect to random angle               
+
+                    # rotate transect to random angle
                     seedx_trans = (-(seedy-seedy[0])*np.sin(np.deg2rad(angle))+
                                     (seedx-seedx[0])*np.cos(np.deg2rad(angle))+
                                      seedx[0])
                     seedy_trans =  ((seedy-seedy[0])*np.cos(np.deg2rad(angle))+
                                     (seedx-seedx[0])*np.sin(np.deg2rad(angle))+
                                      seedy[0])
-                    
+
                     # test if transect is in strata
                     if (((seedx_trans>xsteps[i]).all()) &
                         ((seedx_trans<xsteps[i+1]).all()) &
                         ((seedy_trans>ysteps[j]).all()) &
                         ((seedy_trans<ysteps[j+1]).all())):
                         goon = False
-                    
+
                     if not silent:
                         print('strata= (', i, ',', j, ')', ' it= ', it)
                     it += 1
@@ -262,7 +262,7 @@ def srrasa_trans(xy,strata=5,n=3,num=3,rl=0.5,silent=True,plot=False):
                 rand_xy[o:o+num,0] = seedx_trans
                 rand_xy[o:o+num,1] = seedy_trans
                 o += num
-    
+
     # plot stratas and random transect points within
     if plot:
         import matplotlib as mpl
@@ -270,10 +270,10 @@ def srrasa_trans(xy,strata=5,n=3,num=3,rl=0.5,silent=True,plot=False):
         mpl.rc('font', size=20)
         mpl.rc('lines', linewidth=2)
         mpl.rc('axes', linewidth=1.5)
-        mpl.rc('xtick.major', width=1.5) 
-        mpl.rc('ytick.major', width=1.5) 
+        mpl.rc('xtick.major', width=1.5)
+        mpl.rc('ytick.major', width=1.5)
         mpl.rcParams['lines.markersize']=6
-        
+
         fig = plt.figure('stratified random transect sampling')
         sub = fig.add_subplot(111, aspect='equal')
         sub.set_xlim(xy[0],xy[1])
@@ -299,4 +299,4 @@ def srrasa_trans(xy,strata=5,n=3,num=3,rl=0.5,silent=True,plot=False):
 
 if __name__ == '__main__':
     import doctest
-    doctest.testmod()
+    doctest.testmod(optionflags=doctest.NORMALIZE_WHITESPACE)

@@ -8,6 +8,7 @@ def zacharias(h, clay, sand, db, params=None, thetar=False, thetas=False, lnalph
         Soil water content with the van Genuchten equation and
         the pedotransfer functions of Zacharias et al. (2007).
 
+
         Definition
         ----------
         def zacharias(h, clay, sand, db, params=None, thetar=False, thetas=False, lnalpha=False, n=False):
@@ -34,7 +35,7 @@ def zacharias(h, clay, sand, db, params=None, thetar=False, thetas=False, lnalph
         thetas     If True, outputs saturation water content thetas as well [m3 m-3]
         lnalpha    If True, outpus logarithm of shape parameter alpha as well [1/cm]
         n          If True, output exponent n as well
-        
+
 
         Output
         ------
@@ -360,7 +361,7 @@ def zacharias_check(params, sand=None, clay=None):
 
 if __name__ == '__main__':
     import doctest
-    doctest.testmod()
+    doctest.testmod(optionflags=doctest.NORMALIZE_WHITESPACE)
 
     # parclay = np.array([ 0.,     0.,     0.,
     #                      0.788,  0.001, -0.263,

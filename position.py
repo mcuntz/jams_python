@@ -18,6 +18,7 @@ def position(row=1, col=1, num=1,
         If the figsize keyword is given, a rectangular section of the figure
         will be used.
 
+
         Definition
         ----------
         def position(row=1, col=1, num=1,
@@ -54,7 +55,7 @@ def position(row=1, col=1, num=1,
         ------
         position array with [left, bottom, width, height)
         to be used with fig.add_axes.
-    
+
 
         Examples
         --------
@@ -70,7 +71,7 @@ def position(row=1, col=1, num=1,
         # if you want to have a true golden ratio
         # sub = fig1.add_axes(position(1,1,1,figsize=figsize,golden=True))
 
-        # Doctest examples   
+        # Doctest examples
         >>> from autostring import astr
         >>> print(astr(position(2,2,1),3,pp=True))
         ['0.125' '0.550' '0.338' '0.350']
@@ -126,7 +127,7 @@ def position(row=1, col=1, num=1,
 
         Copyright 2009-2013 Matthias Cuntz
 
-        
+
         History
         -------
         Written,  MC, Aug 2009
@@ -203,5 +204,5 @@ def position(row=1, col=1, num=1,
 
 if __name__ == '__main__':
     import doctest
-    doctest.testmod()
+    doctest.testmod(optionflags=doctest.NORMALIZE_WHITESPACE)
 

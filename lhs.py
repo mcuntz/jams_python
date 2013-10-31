@@ -7,6 +7,7 @@ def lhs(dist, param, nsample):
     """
         Latin Hypercube Sampling of any distribution without correlations after Stein (1987).
 
+
         Definition
         ----------
         def lhs(dist, param, nsample):
@@ -31,7 +32,7 @@ def lhs(dist, param, nsample):
 
         References
         ----------
-        Stein, M. 1987. Large Sample Properties of Simulations Using Latin Hypercube Sampling. 
+        Stein, M. 1987. Large Sample Properties of Simulations Using Latin Hypercube Sampling.
             Technometrics 29:143-151
 
 
@@ -84,7 +85,7 @@ def lhs(dist, param, nsample):
     else:
         assert len(dist) == len(param)
     ndist = len(dist)
-    
+
     # LHS
     ran    = np.random.uniform(0.,1.,(ndist,nsample))
     lhsout = np.empty((ndist,nsample))
@@ -102,7 +103,7 @@ def lhs(dist, param, nsample):
 
 if __name__ == '__main__':
     import doctest
-    doctest.testmod()
+    doctest.testmod(optionflags=doctest.NORMALIZE_WHITESPACE)
     # import matplotlib.pyplot as plt
     # dist = [stats.norm, stats.uniform]
     # pars = [(50,2),(1,5)]
@@ -111,7 +112,7 @@ if __name__ == '__main__':
     # plt.hist(c[0,:])
     # plt.figure()
     # plt.hist(c[1,:])
-    
+
     # dist = [stats.uniform, stats.uniform]
     # pars = [(50,2),(1,5)]
     # c    = lhs(dist, pars, 20000)

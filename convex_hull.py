@@ -8,41 +8,41 @@ def convex_hull(points, graphic=False, smidgen=0.0075):
         2D points. Recursively eliminates points that lie inside two
         neighbouring points until only convex hull is remaining.
 
-        
+
         Definition
         ----------
         def convex_hull(points, graphic=True, smidgen=0.0075)
 
-       
+
         Input
         -----
         points       ndarray (2 x m), array of points for which to find hull
-        
-        
+
+
         Optional Input
         --------------
         graphic      bool, use pylab to show progress
         smidgen      float, offset for graphic number labels - useful
                      values depend on your data range
-        
-        
+
+
         Output
         ------
         hull_points  ndarray (2 x n), convex hull surrounding points
-                
-        
+
+
         References
         ----------
-        This routine (with additional subroutines) was coded originally by 
+        This routine (with additional subroutines) was coded originally by
         Angus McMorland, 2007.
         It is a copy from the scipy cookbook page:
         http://www.scipy.org/Cookbook/Finding_Convex_Hull
-         
-                             
+
+
         Examples
         --------
         # make some points
-        >>> points = n.array([[2,3,2,4,5,5,7,5,5],[1,2,4,3,6,4,3,2,1]])        
+        >>> points = n.array([[2,3,2,4,5,5,7,5,5],[1,2,4,3,6,4,3,2,1]])
         >>> hull_xy = convex_hull(points, graphic=False, smidgen=0.075)
         >>> from autostring import astr
         >>> print(astr(hull_xy,pp=True))
@@ -51,29 +51,29 @@ def convex_hull(points, graphic=False, smidgen=0.0075):
          ['5' '6']
          ['2' '4']
          ['2' '1']]
-        
-        
+
+
         License
         -------
         This file is part of the UFZ Python library.
-    
-        The UFZ Python library is free software: you can redistribute it and/or 
-        modify it under the terms of the GNU Lesser General Public License as 
+
+        The UFZ Python library is free software: you can redistribute it and/or
+        modify it under the terms of the GNU Lesser General Public License as
         published by the Free Software Foundation, either version 3 of the License,
         or (at your option) any later version.
-    
+
         The UFZ Python library is distributed in the hope that it will be useful,
         but WITHOUT ANY WARRANTY; without even the implied warranty of
         MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
         GNU Lesser General Public License for more details.
-    
+
         You should have received a copy of the GNU Lesser General Public License
         along with The UFZ Python library.  If not,
         see <http://www.gnu.org/licenses/>.
-    
+
         Copyright 2009-2013 Arndt Piayda, Matthias Cuntz
-    
-    
+
+
         History
         -------
         Written,  AP, Nov 2012
@@ -138,5 +138,5 @@ def area_of_triangle(p1, p2, p3):
 
 if __name__ == "__main__":
     import doctest
-    doctest.testmod()
+    doctest.testmod(optionflags=doctest.NORMALIZE_WHITESPACE)
 

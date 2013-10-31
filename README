@@ -46,7 +46,14 @@ Be aware that the current PDF is not always up to date.
 
 
 The Library is compatible with Python 2 and 3 (> 2.6).
-Note that not all packages used by the library are already Python 3 ready.
+Note that not all packages but one used by the library are already Python 3 ready (except pyhdf).
+Reading HDF4 files is thus disabled in python 3.
+
+Essential third-party libraries are numpy and scipy.
+Reading of special files needs pyhdf, h5py and netCDF4 for HDF4, HDF5 and NetCDF files, resp.
+Some functions provide visual checks using matplotlib for plotting.
+mad.py uses bottleneck, if available.
+mc_plot_template.py shows some matplotlib capabilities. It uses basemap and cartopy for maps, if available.
 
 
 UFZ routines are free software and come with ABSOLUTELY NO WARRANTY.

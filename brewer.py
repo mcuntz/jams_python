@@ -4,6 +4,7 @@
 
     Provides also routines to print or plot colormaps.
 
+
     Definition
     ----------
     Define and get colormap
@@ -420,7 +421,7 @@ bugr8 = [(  0, 153, 204), (102, 229, 255), (153, 255, 255), (204, 255, 255), (22
 buor8 = [(  0, 127, 255), ( 76, 195, 255), (153, 237, 255), (204, 255, 255), (255, 255, 204), (255, 238, 153),
          (255, 195,  76), (255, 127,   0)]
 buor10 = [(  0,  84, 255), ( 50, 153, 255), (101, 204, 255), (153, 237, 255), (204, 255, 255), (255, 255, 204),
-          (255, 238, 153), (255, 204, 101), (255, 153,  50), (255,  85,   0)] 
+          (255, 238, 153), (255, 204, 101), (255, 153,  50), (255,  85,   0)]
 buor12 = [(  0,  42, 255), ( 25, 101, 255), ( 50, 153, 255), (101, 204, 255), (153, 237, 255), (204, 255, 255),
           (255, 255, 204), (255, 238, 153), (255, 204, 101), (255, 153,  50), (255, 102,  25), (255,  42,   0)]
 buor14 = [(  7,  90, 255), ( 50, 118, 255), ( 89, 144, 255), (140, 178, 255), (191, 212, 255), (229, 238, 255),
@@ -610,7 +611,7 @@ def plot_brewer(pdffile='brewer_colors.pdf',reverse=False, grey=False, gray=Fals
     pdf_pages = PdfPages(pdffile)
     figsize = mpl.rcParams['figure.figsize']
     ifig = 0
-    
+
     nmaps = len(sequential_maps)
     npage = nrow*ncol
     zaehl = 0
@@ -694,7 +695,7 @@ def plot_brewer(pdffile='brewer_colors.pdf',reverse=False, grey=False, gray=Fals
 
 if __name__ == '__main__':
     import doctest
-    doctest.testmod()
+    doctest.testmod(optionflags=doctest.NORMALIZE_WHITESPACE)
 
     # import numpy as np
     # from autostring import astr

@@ -6,6 +6,7 @@ def closest(vec, num, value=False):
     """
         Determine the array index in a vector of the element that is closest in value to a given number.
 
+
         Definition
         ----------
         def closest(vec, num, value=False):
@@ -38,7 +39,7 @@ def closest(vec, num, value=False):
         >>> from autostring import astr
         >>> print(astr(closest(vec, 3.125),pp=True))
         62
-        
+
         >>> print(astr(closest(vec, 3.125, value=True),3,pp=True))
         3.131
 
@@ -59,10 +60,10 @@ def closest(vec, num, value=False):
 
         You should have received a copy of the GNU Lesser General Public License
         along with The UFZ Python library.  If not, see <http://www.gnu.org/licenses/>.
-        
+
         Copyright 2012-2013 Matthias Cuntz
 
-        
+
         History
         -------
         Written,  MC, Jan 2012
@@ -74,8 +75,8 @@ def closest(vec, num, value=False):
     else:
       return out
 
- 
+
 if __name__ == '__main__':
     import doctest
-    doctest.testmod()
+    doctest.testmod(optionflags=doctest.NORMALIZE_WHITESPACE)
 

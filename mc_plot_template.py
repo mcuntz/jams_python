@@ -51,7 +51,7 @@ Modified, MC, Jul 2013 - optparse->argparse
 
 # Hardcoded switches for plot gallery
 dorandom  = True  # Scatter and histogram
-dobasemap = False # map with basemap
+dobasemap = True  # map with basemap
 docartopy = True  # map with cartopy
 
 # python debugger
@@ -178,9 +178,16 @@ mpl.rc('axes', linewidth=alwidth, labelcolor='black')
 mpl.rc('path', simplify=False) # do not remove
 
 if dobasemap:
-    from mpl_toolkits.basemap import Basemap, shiftgrid
+    try:
+        from mpl_toolkits.basemap import Basemap, shiftgrid
+    except:
+        dobasemap = False
+        
 if docartopy:
-    import cartopy.crs as ccrs
+    try:
+        import cartopy.crs as ccrs
+    except:
+        docartopy = False
 
 
 # -------------------------------------------------------------------------
@@ -264,8 +271,8 @@ if dorandom:
 
 if dobasemap | docartopy:
   # Pseudo temperature
-  nlon       = 360/5
-  nlat       = 180/5
+  nlon       = 360//5
+  nlat       = 180//5
   lon        = 360./(2.*nlon)        + np.arange(nlon)/np.float(nlon) * 360.
   lat        = -90. + 180./(2.*nlat) + np.arange(nlat)/np.float(nlat) * 180.
   lon2, lat2 = np.meshgrid(lon,lat)
@@ -285,9 +292,9 @@ if dobasemap | docartopy:
   lath[-1,0:nlon]     = lat2[-1,:]       + 0.5*dlat[-1,:]
   lath[0:nlat+1,nlon] = lath[0:nlat+1,nlon-1]
 
-  slon         = np.roll(lon,nlon/2) # np.where(lon>180, lon-360., lon)
+  slon         = np.roll(lon,nlon//2) # np.where(lon>180, lon-360., lon)
   slat         = lat
-  stemp        = np.roll(temp,nlon/2,1)
+  stemp        = np.roll(temp,nlon//2,1)
   slon2, slat2 = np.meshgrid(slon,slat)
   slonh = np.empty((nlat+1,nlon+1), dtype=np.float)
   slath = np.empty((nlat+1,nlon+1), dtype=np.float)
@@ -302,9 +309,9 @@ if dobasemap | docartopy:
   slath[-1,0:nlon]     = slat2[-1,:]       + 0.5*dlat[-1,:]
   slath[0:nlat+1,nlon] = slath[0:nlat+1,nlon-1]
 
-  mlon         = np.roll(np.where(lon>180, lon-360., lon),nlon/2)
+  mlon         = np.roll(np.where(lon>180, lon-360., lon),nlon//2)
   mlat         = lat
-  mtemp        = np.roll(temp,nlon/2,1)
+  mtemp        = np.roll(temp,nlon//2,1)
   mlon2, mlat2 = np.meshgrid(mlon,mlat)
   mlonh = np.empty((nlat+1,nlon+1), dtype=np.float)
   mlath = np.empty((nlat+1,nlon+1), dtype=np.float)
@@ -420,7 +427,7 @@ if dorandom:
   ymin, ymax = sub.get_ylim()
   plt.setp(sub, xlim=[xmin,xmax], ylim=[ymin,ymax])
 
-  
+
   # Gauss curve
   iplot += 1
   xlab   = r'$N('+ufz.astr(mu)+','+ufz.astr(sigma,1)+')$'
@@ -510,7 +517,7 @@ if dorandom:
   plt.setp(ll.get_texts(), fontsize='small')
 
   ufz.abc2plot(sub, dxabc, dyabc, iplot, lower=True, bold=True, usetex=usetex, mathrm=True, parenthesis='close')
-  
+
   ylab2 = r'$\aleph(\mu = '+ufz.astr(mu)+', \sigma = '+ufz.astr(sigma/2.,2)+')$'
   sub2  = sub.twinx()
   mark2 = sub2.plot(uniform, gauss*0.5)
@@ -543,12 +550,12 @@ if dorandom:
 
   ufz.abc2plot(sub, dxabc, dyabc, iplot, lower=True, bold=True, usetex=usetex, mathrm=True, parenthesis='close')
 
-    
+
   if (outtype == 'pdf'):
     pdf_pages.savefig(fig)
     plt.close()
 
-    
+
 if dobasemap:
   # -------------------------------------------------------------------------
   # Fig 2 - Maps with basemap
@@ -564,7 +571,7 @@ if dobasemap:
   cm = ufz.get_brewer('RdYlBu'+str(ncolor),reverse=True)
   delon = 60
   delat = 30
-  
+
   # Mollweide
   iplot += 1
 
@@ -637,7 +644,7 @@ if dobasemap:
   delat = 2
 
   sub  = fig.add_axes(ufz.position(inrow,incol,iplot,hspace=hspace,vspace=vspace))
-  m    = Basemap(projection='cyl', lon_0=0, resolution='c', 
+  m    = Basemap(projection='cyl', lon_0=0, resolution='c',
                  llcrnrlon=xlim[0], llcrnrlat=ylim[0], urcrnrlon=xlim[1], urcrnrlat=ylim[1])
 
   mx, my = m(mlon2,mlat2)
@@ -668,7 +675,7 @@ if dobasemap:
     pdf_pages.savefig(fig)
     plt.close()
 
-    
+
 if docartopy:
   # -------------------------------------------------------------------------
   # Fig 2 - Maps with basemap
@@ -698,7 +705,7 @@ if docartopy:
       c = sub.contourf(lon2, lat2, temp,
                        norm=norm, cmap=cm, transform=ccrs.PlateCarree())
   else:
-      c = sub.pcolormesh(np.roll(lon2,nlon/2,1), np.roll(lat2,nlon/2,1), np.roll(temp,nlon/2,1),
+      c = sub.pcolormesh(np.roll(lon2,nlon//2,1), np.roll(lat2,nlon//2,1), np.roll(temp,nlon//2,1),
                          norm=norm, cmap=cm, transform=ccrs.PlateCarree())
   cbar   = plt.colorbar(c, orientation='vertical')
   cnames = [r"${0:.0f}$".format(i) for i in cvals]
@@ -726,7 +733,7 @@ if docartopy:
       c = sub.contourf(lon2, lat2, temp,
                        norm=norm, cmap=cm, transform=ccrs.PlateCarree())
   else:
-      c = sub.pcolormesh(np.roll(lon2,nlon/2,1), np.roll(lat2,nlon/2,1), np.roll(temp,nlon/2,1),
+      c = sub.pcolormesh(np.roll(lon2,nlon//2,1), np.roll(lat2,nlon//2,1), np.roll(temp,nlon//2,1),
                          norm=norm, cmap=cm, transform=ccrs.PlateCarree())
   cbar   = plt.colorbar(c, orientation='vertical')
   cnames = [r"${0:.0f}$".format(i) for i in cvals]
@@ -739,7 +746,7 @@ if docartopy:
   sub.coastlines(resolution='110m')
   sub.gridlines(draw_labels=False) # DIY below
   sub.set_global()
-  
+
   sub.set_xticks(np.arange(-180., 180.+delon, delon))
   sub.set_yticks(np.arange(-90., 90.+delat, delat))
   ixticks = sub.get_xticks()
@@ -773,7 +780,7 @@ if docartopy:
       c = sub.contourf(lon2, lat2, temp,
                        norm=norm, cmap=cm, transform=ccrs.PlateCarree())
   else:
-      c = sub.pcolormesh(np.roll(lon2,nlon/2,1), np.roll(lat2,nlon/2,1), np.roll(temp,nlon/2,1),
+      c = sub.pcolormesh(np.roll(lon2,nlon//2,1), np.roll(lat2,nlon//2,1), np.roll(temp,nlon//2,1),
                          norm=norm, cmap=cm, transform=ccrs.PlateCarree())
   cbar   = plt.colorbar(c, orientation='vertical')
   cnames = [r"${0:.0f}$".format(i) for i in cvals]
@@ -785,7 +792,7 @@ if docartopy:
 
   sub.coastlines(resolution='110m')
   sub.gridlines(draw_labels=False) # DIY below
-  
+
   sub.set_xticks(np.arange(-180., 180.+delon, delon))
   sub.set_yticks(np.arange(-90., 90.+delat, delat))
   ixticks = sub.get_xticks()

@@ -8,7 +8,7 @@ def find_in_path(filename):
        Find the file named filename in the sys.path.
        Returns the full path name if found, None if not found.
 
-       
+
        Definition
        ----------
        def find_in_path(filename):
@@ -32,7 +32,7 @@ def find_in_path(filename):
        ... else:
        ...     print('Yes')
        Yes
-    
+
        >>> datei = 'Humor_Sans.ttf'
        >>> isdatei = find_in_path(datei)
        >>> if isdatei is None:
@@ -74,7 +74,7 @@ def find_in_path(filename):
 
 if __name__ == '__main__':
     import doctest
-    doctest.testmod()
+    doctest.testmod(optionflags=doctest.NORMALIZE_WHITESPACE)
 
     # datei = 'Humor-Sans.ttf'
     # isdatei = find_in_path(datei)
@@ -83,7 +83,7 @@ if __name__ == '__main__':
     # else:
     #     print('Yes')
     # # Yes
-    
+
     # datei = 'Humor_Sans.ttf'
     # isdatei = find_in_path(datei)
     # if isdatei is None:

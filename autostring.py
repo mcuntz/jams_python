@@ -6,6 +6,7 @@ def autostring(num, prec=0, zero=False, set_printoptions=False, pp=False, join=F
     """
         Format number (array) with given decimal precision.
 
+
         Definition
         ----------
         def autostring(num, prec=0, zero=False, set_printoptions=False, pp=False, join=False, joinall=False, sep=' '):
@@ -54,13 +55,13 @@ def autostring(num, prec=0, zero=False, set_printoptions=False, pp=False, join=F
           3
 
         >>> print(autostring(np.array([3.5967, 3.5964]), 3))
-        ['3.597' '3.596']
+        ['3.597'  '3.596']
 
         >>> print(autostring(np.array([3.59, 1.123456e12]), 3))
-        ['3.590e+00' '1.123e+12']
+        ['3.590e+00'  '1.123e+12']
 
         >>> print(autostring(np.array([3.59, 11.1234]), 3, zero=True))
-        ['03.590' '11.123']
+        ['03.590'  '11.123']
 
         >>> print(autostring(np.array([3, 11])))
         [' 3' '11']
@@ -99,19 +100,19 @@ def autostring(num, prec=0, zero=False, set_printoptions=False, pp=False, join=F
         >>> print(autostring(np.reshape(np.arange(20,dtype=np.float),(2,10)), 1, joinall=True, sep=';'))
          0.0; 1.0; 2.0; 3.0; 4.0; 5.0; 6.0; 7.0; 8.0; 9.0;10.0;11.0;12.0;13.0;14.0;15.0;16.0;17.0;18.0;19.0
 
-        >>> print(astr(np.reshape(np.arange(20,dtype=np.float),(2,10)), 1, joinall=True, sep=';'))
+        >>> print(autostring(np.reshape(np.arange(20,dtype=np.float),(2,10)), 1, joinall=True, sep=';'))
          0.0; 1.0; 2.0; 3.0; 4.0; 5.0; 6.0; 7.0; 8.0; 9.0;10.0;11.0;12.0;13.0;14.0;15.0;16.0;17.0;18.0;19.0
 
-        >>> print(astr(np.array([3, 11, np.inf])))
+        >>> print(autostring(np.array([3, 11, np.inf])))
         ['  3' ' 11' 'inf']
 
-        >>> print(astr(np.array([3, 11, np.nan])))
+        >>> print(autostring(np.array([3, 11, np.nan])))
         ['  3' ' 11' 'nan']
 
-        >>> print(astr(np.ma.array([3, 11, np.nan], mask=[False,True,False])))
+        >>> print(autostring(np.ma.array([3, 11, np.nan], mask=[False,True,False])))
         ['  3' '-- ' 'nan']
 
-        >>> print(astr(np.ma.array([3, 11, np.nan], mask=[False,False,True])))
+        >>> print(autostring(np.ma.array([3, 11, np.nan], mask=[False,False,True])))
         [' 3' '11' '--']
 
 
@@ -329,17 +330,89 @@ def autostring(num, prec=0, zero=False, set_printoptions=False, pp=False, join=F
     # return formatted string
     return out
 
+
 def astr(num, prec=0, zero=False, set_printoptions=False, pp=True, join=False, joinall=False, sep=' '):
     """
         Wrapper function for autostring with pp=True by default.
-        def astr(num, prec=0, zero=False, set_printoptions=False, pp=True, join=False, joinall=False, sep=' '):
+        def autostring(num, prec=0, zero=False, set_printoptions=False, pp=False, join=False, joinall=False, sep=' '):
+
+
+        Examples
+        --------
+        >>> print(astr(3.5967, 3))
+        3.597
+
+        >>> print(astr(3.5967))
+        4
+
+        >>> print(astr(3, 3))
+          3
+
+        >>> print(astr(np.array([3.5967, 3.5964]), 3))
+        ['3.597' '3.596']
+
+        >>> print(astr(np.array([3.59, 1.123456e12]), 3))
+        ['3.590e+00' '1.123e+12']
+
+        >>> print(astr(np.array([3.59, 11.1234]), 3, zero=True))
+        ['03.590' '11.123']
+
+        >>> print(astr(np.array([3, 11])))
+        [' 3' '11']
+
+        >>> print(astr(np.array([3, 11]), 3))
+        ['  3' ' 11']
+
+        >>> print(astr(np.zeros((2,2), dtype=np.float), 1))
+        [['0.0' '0.0']
+         ['0.0' '0.0']]
+
+        >>> np.set_printoptions(threshold=10)
+        >>> print(astr(np.zeros((2,10), dtype=np.float), 1))
+        [['0.0' '0.0' '0.0' '0.0' '0.0' '0.0' '0.0' '0.0' '0.0' '0.0']
+         ['0.0' '0.0' '0.0' '0.0' '0.0' '0.0' '0.0' '0.0' '0.0' '0.0']]
+
+        >>> print(astr(np.zeros((2,10), dtype=np.float), 1, set_printoptions=True))
+        [['0.0' '0.0' '0.0' '0.0' '0.0' '0.0' '0.0' '0.0' '0.0' '0.0']
+         ['0.0' '0.0' '0.0' '0.0' '0.0' '0.0' '0.0' '0.0' '0.0' '0.0']]
+
+        >>> print(astr(np.zeros((2,10), dtype=np.float), 1, pp=True))
+        [['0.0' '0.0' '0.0' '0.0' '0.0' '0.0' '0.0' '0.0' '0.0' '0.0']
+         ['0.0' '0.0' '0.0' '0.0' '0.0' '0.0' '0.0' '0.0' '0.0' '0.0']]
+
+        >>> print(astr(np.zeros((2,10), dtype=np.float), 1, set_printoptions=False, pp=True))
+        [['0.0' '0.0' '0.0' '0.0' '0.0' '0.0' '0.0' '0.0' '0.0' '0.0']
+         ['0.0' '0.0' '0.0' '0.0' '0.0' '0.0' '0.0' '0.0' '0.0' '0.0']]
+
+        >>> print(astr(np.array([3.5967, 3.5964]), 3, join=True))
+        3.597 3.596
+
+        >>> print(astr(np.zeros((2,10), dtype=np.float), 1, join=True, sep=';'))
+        ['0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0'
+         '0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0']
+
+        >>> print(astr(np.reshape(np.arange(20,dtype=np.float),(2,10)), 1, joinall=True, sep=';'))
+         0.0; 1.0; 2.0; 3.0; 4.0; 5.0; 6.0; 7.0; 8.0; 9.0;10.0;11.0;12.0;13.0;14.0;15.0;16.0;17.0;18.0;19.0
+
+        >>> print(astr(np.array([3, 11, np.inf])))
+        ['  3' ' 11' 'inf']
+
+        >>> print(astr(np.array([3, 11, np.nan])))
+        ['  3' ' 11' 'nan']
+
+        >>> print(astr(np.ma.array([3, 11, np.nan], mask=[False,True,False])))
+        ['  3' '-- ' 'nan']
+
+        >>> print(astr(np.ma.array([3, 11, np.nan], mask=[False,False,True])))
+        [' 3' '11' '--']
     """
-    return autostring(num, prec, zero, set_printoptions, pp, join, joinall, sep)
+    return autostring(num, prec=prec, zero=zero, set_printoptions=set_printoptions,
+                      pp=pp, join=join, joinall=joinall, sep=sep)
 
 
 if __name__ == '__main__':
     import doctest
-    doctest.testmod()
+    doctest.testmod(optionflags=doctest.NORMALIZE_WHITESPACE)
 
     # print(autostring(np.array([3, 11, np.nan])))
     # #['  3' ' 11' 'nan']

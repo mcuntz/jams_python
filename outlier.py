@@ -4,15 +4,16 @@ import numpy as np
 import scipy.stats as s
 #import pdb
 
-def outlier(y,alpha=0.01,k=-1,quiet=True):
+def outlier(y, alpha=0.01, k=-1, quiet=True):
     """
         Estimates the number of outliers in an approximately normal distributed sample
         according to Rossner''s (1983) generalized Extreme Studentized Deviate (ESD).
         It returns the indeces of the outliers.
 
+
         Definition
         ----------
-        def outlier(y, alpha=alpha, k=k, quiet=quiet)
+        def outlier(y, alpha=0.01, k=-1, quiet=True):
 
 
         Input
@@ -30,7 +31,7 @@ def outlier(y,alpha=0.01,k=-1,quiet=True):
         Output
         ------
         Indeces of outliers in input array
-        
+
 
         Restrictions
         ------------
@@ -45,7 +46,7 @@ def outlier(y,alpha=0.01,k=-1,quiet=True):
         Yu RC, Teh HW, Jaques PA, Sioutas C, Froines JR,
             Quality control of semi-continuous mobility size-fractionated
             particle number concentration data; atmospheric Environment 38, 3341- 3348, 2004
-        
+
 
         Examples
         --------
@@ -112,7 +113,7 @@ def outlier(y,alpha=0.01,k=-1,quiet=True):
         History
         -------
         Written,  MG,   Jul 2010
-        Modified, MC,   Mar 2011 - formulation was wrong: after removal of a point, the 
+        Modified, MC,   Mar 2011 - formulation was wrong: after removal of a point, the
                                    absolute deviation was not recalculated with the new mean
                                    it gives exactly the same as the example in the above NIST-webpage
                                  - calc mean and standard deviation with cummulative formula
@@ -120,6 +121,7 @@ def outlier(y,alpha=0.01,k=-1,quiet=True):
                                  - include case with no outliers: returns -1.
                MC & MG, Oct 2011 - break loop if new variance < 0 in iteration
                MC,      Feb 2013 - ported to Python 3
+               MC,      Oct 2013 - rossner
     """
     # check user input
     if ((alpha<=0) or (alpha>1)):
@@ -151,7 +153,7 @@ def outlier(y,alpha=0.01,k=-1,quiet=True):
     ep       = np.ma.sum(dev)
     tt       = np.ma.sum(dev*dev)
     ss       = np.ma.sqrt((tt-ep/nn)/(nn-1))
-    
+
     adev        = np.ma.abs(dev)
     thisii      = np.ma.argmax(adev)
     iioutlrs[0] = thisii
@@ -161,7 +163,7 @@ def outlier(y,alpha=0.01,k=-1,quiet=True):
     # Test R against t-distribution
     if R > lamb[0]:
         out  = 1
-    
+
     if k > 1:
         for i in range(k-1):
             # remove the highest value from above and redo the procedure
@@ -181,7 +183,7 @@ def outlier(y,alpha=0.01,k=-1,quiet=True):
             if R > lamb[i+1]:
                 out = i+2
 
-    
+
     if out > 0:
         # report results
         iiout = iioutlrs[0:out]
@@ -199,6 +201,57 @@ def outlier(y,alpha=0.01,k=-1,quiet=True):
             print('outlier: Found no outliers.')
         return np.array([-1])
 
+
+def rossner(*args, **kwargs):
+    """
+        Wrapper for outlier
+        def outlier(y, alpha=0.01, k=-1, quiet=True):
+
+
+        Examples
+        --------
+        >>> import numpy as np
+        >>> y = np.array([-0.25,0.68,0.94,1.15,2.26,2.35,2.37,2.40,2.47,2.54,2.62,
+        ...               2.64,2.90,2.92,2.92,2.93,3.21,3.26,3.30,3.59,3.68,4.30,
+        ...               4.64,5.34,5.42,8.01],dtype=np.float)
+        >>> print(rossner(y,0.05,2,quiet=False))
+        # of outliers
+        1
+        outliers
+        [ 8.01]
+        indeces
+        [25]
+        [25]
+        >>> #
+        >>> # Example from Rosner paper
+        >>> y = np.array([-0.25,0.68,0.94,1.15,1.20,1.26,1.26,1.34,1.38,1.43,1.49,
+        ...               1.49,1.55,1.56,1.58,1.65,1.69,1.70,1.76,1.77,1.81,1.91,
+        ...               1.94,1.96,1.99,2.06,2.09,2.10,2.14,2.15,2.23,2.24,2.26,
+        ...               2.35,2.37,2.40,2.47,2.54,2.62,2.64,2.90,2.92,2.92,2.93,
+        ...               3.21,3.26,3.30,3.59,3.68,4.30,4.64,5.34,5.42,6.01],dtype=np.float)
+        >>> print(rossner(y,0.05,10,quiet=False))
+        # of outliers
+        3
+        outliers
+        [ 5.34  5.42  6.01]
+        indeces
+        [51 52 53]
+        [51 52 53]
+        >>> print(rossner(y,0.05,quiet=False))
+        # of outliers
+        3
+        outliers
+        [ 5.34  5.42  6.01]
+        indeces
+        [51 52 53]
+        [51 52 53]
+        >>> print(rossner(y,quiet=False))
+        outlier: Found no outliers.
+        [-1]
+    """
+    return outlier(*args, **kwargs)
+
+
 if __name__ == '__main__':
     import doctest
-    doctest.testmod()
+    doctest.testmod(optionflags=doctest.NORMALIZE_WHITESPACE)

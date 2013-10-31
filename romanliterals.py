@@ -4,6 +4,7 @@ import numpy as np
 """
         Convert integer to and from roman numerals.
 
+
         Routines
         ----------
         int2roman    integer to roman numeral
@@ -164,13 +165,13 @@ def roman2int(n):
         --------
         >>> print(roman2int('I'))
         1
-        
+
         >>> print(roman2int('i'))
         1
-        
+
         >>> print(roman2int('iv'))
         4
-        
+
         >>> print(roman2int('MCCCLIV'))
         1354
 
@@ -212,7 +213,7 @@ def roman2int(n):
 
 if __name__ == '__main__':
     import doctest
-    doctest.testmod()
+    doctest.testmod(optionflags=doctest.NORMALIZE_WHITESPACE)
     # print int2roman(1)
     # print int2roman(19)
     # print int2roman(159)

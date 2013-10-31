@@ -4,6 +4,7 @@ def tsym(name):
     """
         Returns unicodes for common symbols.
 
+
         Definition
         ----------
         def tsym(name):
@@ -107,7 +108,7 @@ def tsym(name):
                'permil'    : '\u2030',
                'permille'  : '\u2030',
                'per mil'   : '\u2030',
-               'per mille' : '\u2030' 
+               'per mille' : '\u2030'
               })
 
     #
@@ -122,4 +123,4 @@ def tsym(name):
 
 if __name__ == '__main__':
     import doctest
-    doctest.testmod()
+    doctest.testmod(optionflags=doctest.NORMALIZE_WHITESPACE)

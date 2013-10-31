@@ -15,6 +15,7 @@ def fread(file, nc=0, skip=0, cskip=0, separator='',
         Blank (only whitespace) and comment lines can be excluded.
         The header of the file can be read separately.
 
+
         Definition
         ----------
         def fread(file, nc=0, skip=0, cskip=0, separator='',
@@ -550,4 +551,4 @@ def fread(file, nc=0, skip=0, cskip=0, separator='',
 
 if __name__ == '__main__':
     import doctest
-    doctest.testmod()
+    doctest.testmod(optionflags=doctest.NORMALIZE_WHITESPACE)

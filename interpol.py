@@ -12,11 +12,12 @@ def interpol(xout, xin, yin):
         If yin is an ND array and xin and xout are 1D, then yin is interpolated in
         its first dimension.
 
+
         Definition
         ----------
         def interpol(xout, xin, yin):
 
-        
+
         Input
         -----
         xout    1D array of the x-coordinates of the interpolated values if yin is ND array.
@@ -40,7 +41,7 @@ def interpol(xout, xin, yin):
         >>> yout = interpol(xout, xin, yin)
         >>> print(np.any(yout != soll))
         False
-    
+
         >>> sout = (3,1)
         >>> yin2 = np.transpose(np.tile(yin,sout))
         >>> yout = interpol(xout, xin, yin2)
@@ -120,13 +121,13 @@ def interpol(xout, xin, yin):
 
 if __name__ == '__main__':
     import doctest
-    doctest.testmod()
+    doctest.testmod(optionflags=doctest.NORMALIZE_WHITESPACE)
     # xin  = np.arange(360, dtype=np.float)
     # yin  = np.sin(xin)
     # xout = np.arange(10)*10. + 0.5
     # print np.interp(xout, xin, yin)
     # print interpol(xout, xin, yin)
-    
+
     # sout = (10,1)
     # yin2 = np.transpose(np.tile(yin,sout))
     # yout = interpol(xout, xin, yin2)

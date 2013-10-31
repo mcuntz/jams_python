@@ -6,11 +6,11 @@ def division(a, b, otherwise=np.nan, prec=0.):
     """
         Divide two arrays, return "otherwise" if division by 0.
 
+
         Definition
         ----------
         def division(a, b, otherwise=np.nan, prec=0.):
-          There is a wrapper function for convenience with the short name 'div'
-        def div(a, b, otherwise=np.nan, prec=0.):
+          There is a wrapper function for convenience with the short name 'div'.
 
 
         Input
@@ -54,9 +54,6 @@ def division(a, b, otherwise=np.nan, prec=0.):
         >>> print(astr(division([1., 1., 1.], [2., 1., 0.], prec=1.),1,pp=True))
         ['0.5' 'nan' 'nan']
 
-        >>> print(astr(div([1., 1., 1.], [2., 1., 0.], prec=1.),1,pp=True))
-        ['0.5' 'nan' 'nan']
-
 
         License
         -------
@@ -77,7 +74,7 @@ def division(a, b, otherwise=np.nan, prec=0.):
 
         Copyright 2012-2013 Matthias Cuntz
 
-        
+
         History
         -------
         Written,  MC, Jan 2012
@@ -86,10 +83,35 @@ def division(a, b, otherwise=np.nan, prec=0.):
     """
     return np.where(np.ma.abs(np.ma.array(b)) > np.abs(prec), np.ma.array(a)/np.ma.array(b), otherwise)
 
-def div(a, b, otherwise=np.nan, prec=0.):
-    return np.where(np.ma.abs(np.ma.array(b)) > np.abs(prec), np.ma.array(a)/np.ma.array(b), otherwise)
- 
+
+def div(*args, **kwargs):
+    """
+        Wrapper function for division
+        def division(a, b, otherwise=np.nan, prec=0.):
+
+
+        Examples
+        --------
+        >>> from autostring import astr
+        >>> print(astr(div([1., 2., 3.], 2.),1,pp=True))
+        ['0.5' '1.0' '1.5']
+
+        >>> print(astr(div([1., 1., 1.], [2., 1., 0.]),1,pp=True))
+        ['0.5' '1.0' 'nan']
+
+        >>> print(astr(div([1., 1., 1.], [2., 1., 0.], 0.),1,pp=True))
+        ['0.5' '1.0' '0.0']
+
+        >>> print(astr(div([1., 1., 1.], [2., 1., 0.], otherwise=0.),1,pp=True))
+        ['0.5' '1.0' '0.0']
+
+        >>> print(astr(div([1., 1., 1.], [2., 1., 0.], prec=1.),1,pp=True))
+        ['0.5' 'nan' 'nan']
+    """
+    return division(*args, **kwargs)
+
+
 if __name__ == '__main__':
     import doctest
-    doctest.testmod()
+    doctest.testmod(optionflags=doctest.NORMALIZE_WHITESPACE)
 

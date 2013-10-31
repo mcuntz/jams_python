@@ -8,6 +8,7 @@ def saltelli(params, nbase, lhs=False, nskip=1):
         for the calculation of Sobol indices as described by
         Saltelli (2002) and Saltelli et al. (2007).
 
+
         Definition
         ----------
         def saltelli(params, nbase, lhs=False, nskip=1):
@@ -142,7 +143,7 @@ def saltelli(params, nbase, lhs=False, nskip=1):
 
 if __name__ == '__main__':
     import doctest
-    doctest.testmod()
+    doctest.testmod(optionflags=doctest.NORMALIZE_WHITESPACE)
     # params = np.array([[  1.00000000e+00,   1.00000000e+06],
     #                    [  1.00000000e+00,   2.00000000e+01]])
     # nbase = 10

@@ -10,6 +10,7 @@ def sobol_index(s=None, ns=None, ya=None, yb=None, yc=None,
         Calculates the first-order Si and total STi variance-based sensitivity indices
         summarised in Saltelli et al. (2010) with improvements of Mai et al. (2014).
 
+
         Definition
         ----------
         def sobol_index(s=None, ns=None, ya=None, yb=None, yc=None,
@@ -34,7 +35,7 @@ def sobol_index(s=None, ns=None, ya=None, yb=None, yc=None,
         If 2D input (3D for yc), then Si/STi will be calculated for each element in first dimension.
         Assumes that first dimension is time, i.e. calculates indices per time step.
         mean and wmean give then the mean and variance weighted mean of the time steps, resp.
-        
+
         si         if True (default): output Si
         sti        if True (default): output STi
         mean       if True: output mean Si and/or STi (if 2D/3D input)
@@ -55,7 +56,7 @@ def sobol_index(s=None, ns=None, ya=None, yb=None, yc=None,
                    'Jansen1999'   - Calculate Si and STi by expectation(variance) instead of variance(expectation) (yc=f(A_B))
                                     Si  = (var(f(A)) - 1/2n*sum_j(f(B)_j - f(A_B^i)_j)^2)/var(f(A))
                                     STi = 1/2n*sum_j(f(A)_j - f(A_B^i)_j)^2/var(f(A))
-                   'Mai2012'      - Si of Homma 1996 but denominator is variance of A and B (yc=f(B_A)) and 
+                   'Mai2012'      - Si of Homma 1996 but denominator is variance of A and B (yc=f(B_A)) and
                                     STi of Homma 1996 but mean and variance of f(A) replaced by f(B)
                                     Si  = 1/n*sum_j(f(A)_j*(f(B_A^i)_j - f(B)_j))/var([f(A),f(B)])
                                     STi = (var(f(A))-(1/n*sum_j(f(B)_j*f(B_A^i)_j) - mean(f(B)^2)))/var(f(B))
@@ -144,7 +145,7 @@ def sobol_index(s=None, ns=None, ya=None, yb=None, yc=None,
         T :: si  = ['0.372' '0.000' '0.000']
         >>> print('T :: sti =',astr(theo_sti,3,pp=True))
         T :: sti = ['1.000' '0.000' '0.628']
-    
+
         >>> # 3 positional arguments
         >>> isi1, isti1 = sobol_index(iya,iyb,iyc2)
         >>> print('S :: si  =',astr(isi1,3,pp=True))
@@ -302,7 +303,7 @@ def sobol_index(s=None, ns=None, ya=None, yb=None, yc=None,
         S :: si_m    = [' 0.207' ' 0.367' '-0.015']
         >>> print('S :: sti_m   =',astr(msti2,3,pp=True))
         S :: sti_m   = ['0.643' '0.351' '0.415']
-    
+
         >>> # Weighted mean
         >>> isi4, isti4, wsi2, wsti2 = sobol_index(s2, ns, wmean=True)
         >>> print('S :: si_w    =',astr(wsi2,3,pp=True))
@@ -556,7 +557,7 @@ def sobol_index(s=None, ns=None, ya=None, yb=None, yc=None,
     if isone:
         isi  = isi[0,:]
         isti = isti[0,:]
-        
+
     out = []
     if si:  out += [isi]
     if sti: out += [isti]
@@ -567,7 +568,7 @@ def sobol_index(s=None, ns=None, ya=None, yb=None, yc=None,
         if wmean:
             if si:  out += [wsi]
             if sti: out += [wsti]
-    
+
     if len(out) == 1:
         return out[0]
     else:
@@ -576,7 +577,7 @@ def sobol_index(s=None, ns=None, ya=None, yb=None, yc=None,
 
 if __name__ == '__main__':
     import doctest
-    doctest.testmod()
+    doctest.testmod(optionflags=doctest.NORMALIZE_WHITESPACE)
 
     # import numpy as np
     # import scipy.stats as stats

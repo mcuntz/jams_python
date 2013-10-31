@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 from __future__ import print_function
-import netCDF4 as nc
 import numpy as np
 
 def readnetcdf(file, var='', code=-1, reform=False, squeeze=False,
@@ -9,24 +8,24 @@ def readnetcdf(file, var='', code=-1, reform=False, squeeze=False,
     """
         Gets variables or prints information of netcdf file.
 
-        
+
         Definition
         ----------
         def readnetcdf(file, var='', code=-1, reform=False, squeeze=False,
-                       variables=False, codes=False, units=False, 
+                       variables=False, codes=False, units=False,
                        longnames=False, attributes=False, sort=False):
-                     
+
 
         Input
         -----
         file         netcdf file name
-        
+
 
         Optional Input Parameters
         -------------------------
         var          name of variable in netcdf file
         code         code number in attribute code
-                       
+
 
         Options
         -------
@@ -42,7 +41,7 @@ def readnetcdf(file, var='', code=-1, reform=False, squeeze=False,
         attributes   get dictionary of all attributes of specific variable
         sort         sort variable names. Codes, units and longnames will be
                      sorted accoringly so that indeces still match.
-                            
+
 
         Output
         ------
@@ -55,7 +54,7 @@ def readnetcdf(file, var='', code=-1, reform=False, squeeze=False,
         If codes, units or longnames are reformed/squeezed,
           they do not match the variable list anymore.
         Attributes can not be sorted nor reformed/squeezed.
-                
+
 
         Examples
         --------
@@ -116,7 +115,12 @@ def readnetcdf(file, var='', code=-1, reform=False, squeeze=False,
         Written,  MC, Jul 2009
         Modified, MC, Jun 2012 - removed quiet
                   MC, Feb 2013 - ported to Python 3
-        """
+                  MC, Oct 2013 - netcdfread, ncread, readnc
+    """
+    try:
+        import netCDF4 as nc
+    except:
+        raise IOError('No NetCDF4 support available.')
     # Open netcdf file
     try:
         f = nc.Dataset(file, 'r')
@@ -234,7 +238,143 @@ def readnetcdf(file, var='', code=-1, reform=False, squeeze=False,
             f.close()
             return arr
 
+
+def netcdfread(*args, **kwargs):
+    """
+        Wrapper for readnetcdf
+        def readnetcdf(file, var='', code=-1, reform=False, squeeze=False,
+                       variables=False, codes=False, units=False,
+                       longnames=False, attributes=False, sort=False):
+
+
+        Examples
+        --------
+        >>> print(netcdfread('test_readnetcdf.nc',var='is1'))
+        [[ 1.  1.  1.  1.]
+         [ 1.  1.  1.  1.]]
+        >>> print(netcdfread('test_readnetcdf.nc',code=129))
+        [[ 2.  2.  2.  2.]
+         [ 2.  2.  2.  2.]]
+        >>> print([str(i) for i in netcdfread('test_readnetcdf.nc',variables=True)])
+        ['x', 'y', 'is1', 'is2']
+        >>> print([str(i) for i in netcdfread('test_readnetcdf.nc',variables=True,sort=True)])
+        ['is1', 'is2', 'x', 'y']
+        >>> print([str(i) for i in netcdfread('test_readnetcdf.nc',units=True)])
+        ['xx', 'yy', 'arbitrary', 'arbitrary']
+        >>> print([str(i) for i in netcdfread('test_readnetcdf.nc',units=True,sort=True)])
+        ['arbitrary', 'arbitrary', 'xx', 'yy']
+        >>> print([str(i) for i in netcdfread('test_readnetcdf.nc',longnames=True)])
+        ['x-axis', 'y-axis', 'all ones', 'all twos']
+        >>> print([str(i) for i in netcdfread('test_readnetcdf.nc',longnames=True,sort=True)])
+        ['all ones', 'all twos', 'x-axis', 'y-axis']
+
+        # old: {'units': 'arbitrary', 'long_name': 'all ones', 'code': 128}
+        # new: {u'units': u'arbitrary', u'long_name': u'all ones', u'code': 128}
+        >>> t1 = netcdfread('test_readnetcdf.nc',var='is1',attributes=True)
+        >>> print([ str(i) for i in sorted(t1)])
+        ['code', 'long_name', 'units']
+        >>> print(netcdfread('test_readnetcdf.nc',codes=True))
+        [  -1.   -1.  128.  129.]
+        >>> print(netcdfread('test_readnetcdf.nc',codes=True,reform=True))
+        [ 128.  129.]
+        >>> print(netcdfread('test_readnetcdf.nc',codes=True,sort=True))
+        [128.0, 129.0, -1.0, -1.0]
+    """
+    return readnetcdf(*args, **kwargs)
+
+
+def ncread(*args, **kwargs):
+    """
+        Wrapper for readnetcdf
+        def readnetcdf(file, var='', code=-1, reform=False, squeeze=False,
+                       variables=False, codes=False, units=False,
+                       longnames=False, attributes=False, sort=False):
+
+
+        Examples
+        --------
+        >>> print(ncread('test_readnetcdf.nc',var='is1'))
+        [[ 1.  1.  1.  1.]
+         [ 1.  1.  1.  1.]]
+        >>> print(ncread('test_readnetcdf.nc',code=129))
+        [[ 2.  2.  2.  2.]
+         [ 2.  2.  2.  2.]]
+        >>> print([str(i) for i in ncread('test_readnetcdf.nc',variables=True)])
+        ['x', 'y', 'is1', 'is2']
+        >>> print([str(i) for i in ncread('test_readnetcdf.nc',variables=True,sort=True)])
+        ['is1', 'is2', 'x', 'y']
+        >>> print([str(i) for i in ncread('test_readnetcdf.nc',units=True)])
+        ['xx', 'yy', 'arbitrary', 'arbitrary']
+        >>> print([str(i) for i in ncread('test_readnetcdf.nc',units=True,sort=True)])
+        ['arbitrary', 'arbitrary', 'xx', 'yy']
+        >>> print([str(i) for i in ncread('test_readnetcdf.nc',longnames=True)])
+        ['x-axis', 'y-axis', 'all ones', 'all twos']
+        >>> print([str(i) for i in ncread('test_readnetcdf.nc',longnames=True,sort=True)])
+        ['all ones', 'all twos', 'x-axis', 'y-axis']
+
+        # old: {'units': 'arbitrary', 'long_name': 'all ones', 'code': 128}
+        # new: {u'units': u'arbitrary', u'long_name': u'all ones', u'code': 128}
+        >>> t1 = ncread('test_readnetcdf.nc',var='is1',attributes=True)
+        >>> print([ str(i) for i in sorted(t1)])
+        ['code', 'long_name', 'units']
+        >>> print(ncread('test_readnetcdf.nc',codes=True))
+        [  -1.   -1.  128.  129.]
+        >>> print(ncread('test_readnetcdf.nc',codes=True,reform=True))
+        [ 128.  129.]
+        >>> print(ncread('test_readnetcdf.nc',codes=True,sort=True))
+        [128.0, 129.0, -1.0, -1.0]
+    """
+    return readnetcdf(*args, **kwargs)
+
+
+def readnc(*args, **kwargs):
+    """
+        Wrapper for readnetcdf
+        def readnetcdf(file, var='', code=-1, reform=False, squeeze=False,
+                       variables=False, codes=False, units=False,
+                       longnames=False, attributes=False, sort=False):
+
+
+        Examples
+        --------
+        >>> print(readnc('test_readnetcdf.nc',var='is1'))
+        [[ 1.  1.  1.  1.]
+         [ 1.  1.  1.  1.]]
+        >>> print(readnc('test_readnetcdf.nc',code=129))
+        [[ 2.  2.  2.  2.]
+         [ 2.  2.  2.  2.]]
+        >>> print([str(i) for i in readnc('test_readnetcdf.nc',variables=True)])
+        ['x', 'y', 'is1', 'is2']
+        >>> print([str(i) for i in readnc('test_readnetcdf.nc',variables=True,sort=True)])
+        ['is1', 'is2', 'x', 'y']
+        >>> print([str(i) for i in readnc('test_readnetcdf.nc',units=True)])
+        ['xx', 'yy', 'arbitrary', 'arbitrary']
+        >>> print([str(i) for i in readnc('test_readnetcdf.nc',units=True,sort=True)])
+        ['arbitrary', 'arbitrary', 'xx', 'yy']
+        >>> print([str(i) for i in readnc('test_readnetcdf.nc',longnames=True)])
+        ['x-axis', 'y-axis', 'all ones', 'all twos']
+        >>> print([str(i) for i in readnc('test_readnetcdf.nc',longnames=True,sort=True)])
+        ['all ones', 'all twos', 'x-axis', 'y-axis']
+
+        # old: {'units': 'arbitrary', 'long_name': 'all ones', 'code': 128}
+        # new: {u'units': u'arbitrary', u'long_name': u'all ones', u'code': 128}
+        >>> t1 = readnc('test_readnetcdf.nc',var='is1',attributes=True)
+        >>> print([ str(i) for i in sorted(t1)])
+        ['code', 'long_name', 'units']
+        >>> print(readnc('test_readnetcdf.nc',codes=True))
+        [  -1.   -1.  128.  129.]
+        >>> print(readnc('test_readnetcdf.nc',codes=True,reform=True))
+        [ 128.  129.]
+        >>> print(readnc('test_readnetcdf.nc',codes=True,sort=True))
+        [128.0, 129.0, -1.0, -1.0]
+    """
+    return readnetcdf(*args, **kwargs)
+
+
 if __name__ == '__main__':
     import doctest
-    doctest.testmod()
-
+    try:
+        import netCDF4 as nc
+    except ImportError:
+        raise ImportError('No NetCDF4 support available.')
+    doctest.testmod(optionflags=doctest.NORMALIZE_WHITESPACE)

@@ -9,6 +9,7 @@ def pack(array, mask):
         into a one dimension under a mask.
         The mask can have any dimensions up to teh array dimensions
 
+
         Definition
         ----------
         def pack(array, mask):
@@ -30,7 +31,7 @@ def pack(array, mask):
         Restrictions
         ------------
         All mask values false is undefined.
-    
+
 
         Examples
         --------
@@ -85,7 +86,7 @@ def pack(array, mask):
         along with The UFZ Python library.  If not, see <http://www.gnu.org/licenses/>.
 
         Copyright 2009-2013 Matthias Cuntz
-        
+
 
         History
         -------
@@ -133,7 +134,7 @@ def pack(array, mask):
 
 if __name__ == '__main__':
     import doctest
-    doctest.testmod()
+    doctest.testmod(optionflags=doctest.NORMALIZE_WHITESPACE)
     # a = np.array([[ 0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.],
     #               [ 0.,  0.,  0.,  1.,  1.,  1.,  0.,  0.,  0.,  0.],
     #               [ 0.,  0.,  0.,  1.,  1.,  1.,  0.,  0.,  0.,  0.],

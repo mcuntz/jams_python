@@ -21,7 +21,7 @@ def yrange(arr, symmetric=False):
 
         Optional Input
         --------------
-        symmetric  if True, range will be symmetric around 0. if min(arr) <0 and max(arr)>0.
+        symmetric  if True, range will be symmetric around 0. if min(arr)<0 and max(arr)>0.
 
 
         Output
@@ -40,10 +40,10 @@ def yrange(arr, symmetric=False):
         >>> import numpy as np
         >>> print(yrange(np.arange(102)))
         [0.0, 101.0]
-        
+
         >>> print(yrange(np.arange(102)-10.))
         [-10.0, 91.0]
-        
+
         >>> print(yrange(np.arange(102)-10., symmetric=True))
         [-91.0, 91.0]
 
@@ -87,7 +87,7 @@ def yrange(arr, symmetric=False):
     # Round to max difference between adjacent values
     sarr    = np.sort(arr)
     #maxdiff = np.amax(np.abs((sarr-np.roll(sarr,1))[1:]))
-    maxdiff = np.amax(np.diff(sarr)) 
+    maxdiff = np.amax(np.diff(sarr))
     expom   = np.log10(maxdiff)
     if expom > 0:
         expom = np.int(np.floor(expom+10.*eps*10.))
@@ -106,8 +106,8 @@ def yrange(arr, symmetric=False):
     # Return range
     return [mini,maxi]
 
- 
+
 if __name__ == '__main__':
     import doctest
-    doctest.testmod()
+    doctest.testmod(optionflags=doctest.NORMALIZE_WHITESPACE)
 

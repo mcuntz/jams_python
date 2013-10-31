@@ -27,6 +27,7 @@ def cuntz_gleixner(idecdate, iGPP, iRd, iCa, iRa, igtot, sunrise, Vcyt=None,
        Calculates the Cuntz-Gleixner steady state and non-steady state models
        of 13C discrimiantion in the Calvin cycle.
 
+
        Definition
        ----------
        def cuntz_gleixner(idecdate, iGPP, iRd, iCa, iRa, igtot, sunrise, Vcyt=None,
@@ -653,6 +654,6 @@ def cuntz_gleixner(idecdate, iGPP, iRd, iCa, iRa, igtot, sunrise, Vcyt=None,
 
 if __name__ == '__main__':
     import doctest
-    doctest.testmod()
+    doctest.testmod(optionflags=doctest.NORMALIZE_WHITESPACE)
 
 

@@ -6,6 +6,7 @@ import const   # from ufz
 """
     Interpolate between colours; make continuous colour maps.
 
+
     Definition
     ----------
     Calculates colour between two colors
@@ -247,7 +248,7 @@ def rgb_gradient(colours, fractions, n=255, cmap=None):
 
 if __name__ == '__main__':
     import doctest
-    doctest.testmod()
+    doctest.testmod(optionflags=doctest.NORMALIZE_WHITESPACE)
 
     # r = (1.0,0.0,0.0)
     # b = (0.0,0.0,1.0)

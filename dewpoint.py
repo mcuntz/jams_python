@@ -6,6 +6,7 @@ def dewpoint(pres, Celsius=False):
     """
         Calculates the dew point [K] from ambient humidity [Pa].
 
+
         Definition
         ----------
         def dewpoint(pres):
@@ -45,7 +46,7 @@ def dewpoint(pres, Celsius=False):
         >>> from autostring import astr
         >>> print(astr(dewpoint(es),3,pp=True))
         293.150
-        
+
         >>> print(astr(dewpoint(es, Celsius=True),3,pp=True))
         20.000
 
@@ -66,10 +67,10 @@ def dewpoint(pres, Celsius=False):
 
         You should have received a copy of the GNU Lesser General Public License
         along with The UFZ Python library.  If not, see <http://www.gnu.org/licenses/>.
-        
+
         Copyright 2012-2013 Matthias Cuntz
 
-        
+
         History
         -------
         Written,  MC, Jan 2012
@@ -86,8 +87,8 @@ def dewpoint(pres, Celsius=False):
       import const
       return out+const.T0
 
- 
+
 if __name__ == '__main__':
     import doctest
-    doctest.testmod()
+    doctest.testmod(optionflags=doctest.NORMALIZE_WHITESPACE)
 

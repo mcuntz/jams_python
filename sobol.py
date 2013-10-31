@@ -16,7 +16,7 @@ def i4_bit_hi1( n ):
 #       0           0     0
 #       1           1     1
 #       2          10     2
-#       3          11     2 
+#       3          11     2
 #       4         100     3
 #       5         101     3
 #       6         110     3
@@ -77,7 +77,7 @@ def i4_bit_lo0( n ):
 #       0           0     1
 #       1           1     2
 #       2          10     1
-#       3          11     3 
+#       3          11     3
 #       4         100     1
 #       5         101     2
 #       6         110     1
@@ -199,7 +199,7 @@ def i4_sobol( dim_num, seed ):
 #
 #		Bennett Fox,
 #		Algorithm 647:
-#		Implementation and Relative Efficiency of Quasirandom 
+#		Implementation and Relative Efficiency of Quasirandom
 #		Sequence Generators,
 #		ACM Transactions on Mathematical Software,
 #		Volume 12, Number 4, pages 362-376, 1986.
@@ -208,10 +208,10 @@ def i4_sobol( dim_num, seed ):
 #		USSR Computational Mathematics and Mathematical Physics,
 #		Volume 16, pages 236-242, 1977.
 #
-#		Ilya Sobol, Levitan, 
-#		The Production of Points Uniformly Distributed in a Multidimensional 
+#		Ilya Sobol, Levitan,
+#		The Production of Points Uniformly Distributed in a Multidimensional
 #		Cube (in Russian),
-#		Preprint IPM Akad. Nauk SSSR, 
+#		Preprint IPM Akad. Nauk SSSR,
 #		Number 40, Moscow 1976.
 #
 #	Parameters:
@@ -277,7 +277,7 @@ def i4_sobol( dim_num, seed ):
 			1, 3, 7, 9, 5,13,13,11, 3,15,
 			5, 3,15, 7, 9,13, 9, 1,11, 7,
 			5,15, 1,15,11, 5, 3, 1, 7, 9 ])
-	
+
 		v[7:40,4] = np.transpose([
 			9, 3,27,
 			15,29,21,23,19,11,25, 7,13,17,
@@ -323,8 +323,8 @@ def i4_sobol( dim_num, seed ):
 #	Check parameters.
 #
 		if ( dim_num < 1 or dim_max < dim_num ):
-			print('I4_SOBOL - Fatal error!') 
-			print('	The spatial dimension DIM_NUM should satisfy:') 
+			print('I4_SOBOL - Fatal error!')
+			print('	The spatial dimension DIM_NUM should satisfy:')
 			print('		1 <= DIM_NUM <= %d'%dim_max)
 			print('	But this input value is DIM_NUM = %d'%dim_num)
 			return
@@ -496,7 +496,7 @@ def i4_uniform( a, b, seed ):
 #		Output, integer SEED, the updated seed.
 #
 	if ( seed == 0 ):
-		print('I4_UNIFORM - Fatal error!') 
+		print('I4_UNIFORM - Fatal error!')
 		print('	Input SEED = 0!')
 
 	seed = np.floor( seed )
@@ -573,7 +573,7 @@ def prime_ge( n ):
 #		Input, integer N, the number to be bounded.
 #
 #		Output, integer P, the smallest prime number that is greater
-#		than or equal to N.	
+#		than or equal to N.
 #
 	p = max( np.ceil( n ), 2 )
 	while ( not isprime( p ) ):

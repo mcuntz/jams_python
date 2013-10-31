@@ -4,7 +4,7 @@ from romanliterals import int2roman
 
 def abc2plot(handle, dx, dy, iplot, integer=False, roman=False, lower=False,
              small=False, medium=None, large=False, bold=False,
-             parenthesis=None, brackets=None, braces=None, 
+             parenthesis=None, brackets=None, braces=None,
              usetex=False, mathrm=False):
     """
         Write a, b, c, ...
@@ -13,11 +13,12 @@ def abc2plot(handle, dx, dy, iplot, integer=False, roman=False, lower=False,
               I, II, III, ...
               a), b), c), ... on plots.
 
+
         Definition
         ----------
         def abc2plot(handle, dx, dy, iplot, integer=False, roman=False, lower=False,
                      small=False, medium=True, large=False, bold=False,
-                     parenthesis=None, brackets=None, braces=None, 
+                     parenthesis=None, brackets=None, braces=None,
                      usetex=False, mathrm=False):
 
 
@@ -68,7 +69,7 @@ def abc2plot(handle, dx, dy, iplot, integer=False, roman=False, lower=False,
         ------------
         If output is letter then iplot>26 gives unexpected results.
 
-        
+
         Examples
         --------
         >>> None
@@ -93,7 +94,7 @@ def abc2plot(handle, dx, dy, iplot, integer=False, roman=False, lower=False,
 
         Copyright 2012-2013 Matthias Cuntz
 
-        
+
         History
         -------
         Written,  MC, May 2012
@@ -208,14 +209,14 @@ def abc2plot(handle, dx, dy, iplot, integer=False, roman=False, lower=False,
 
 if __name__ == '__main__':
     import doctest
-    doctest.testmod()
+    doctest.testmod(optionflags=doctest.NORMALIZE_WHITESPACE)
 
     # #outtype = ''
     # outtype = 'pdf'
     # pdffile = 'abc2plot.pdf'
     # usetex  = True
     # textsize = 12
-    
+
     # import matplotlib as mpl
     # if (outtype == 'pdf'):
     #   mpl.use('PDF') # set directly after import matplotlib
@@ -266,7 +267,7 @@ if __name__ == '__main__':
     # if (outtype == 'pdf'):
     #   pdf_pages.savefig(fig)
     #   plt.close()
-      
+
     # if (outtype == 'pdf'):
     #   pdf_pages.close()
     # else:

@@ -10,6 +10,7 @@ def tcherkez(Rstar, Phi=0.3, T=0.056,
     """
         Calculates the Tcherkez model of 13C-discrimiantion in the Calvin cycle.
 
+
         Definition
         ----------
         def tcherkez(Rstar, Phi=0.3, T=0.056, a2=1.0012, a3=1.0058, a4=1.0161,
@@ -31,7 +32,7 @@ def tcherkez(Rstar, Phi=0.3, T=0.056,
         a3        Same for C-3 of FBP (default: 1.0058)
         a4        Same for C-4 of FBP (default: 1.0161)
         t1        Inverse fractionation associated with trankelotase
-                  for C-1 in E4P (erythrose-4-phosphate) and R5P (ribose-5-phosphate) (default: 0.9924) 
+                  for C-1 in E4P (erythrose-4-phosphate) and R5P (ribose-5-phosphate) (default: 0.9924)
         t2        Same for C-2 of X5P (xylulose-5-phosphate) (default: 1.0008)
         g         Isotope discrimination of photorespiratory decarboxylation of Gly (Glycine) (default: 20e-3)
         RG        If True, output isotope ratio of G3P (3-phosphoglyceraldehyde
@@ -145,8 +146,8 @@ def tcherkez(Rstar, Phi=0.3, T=0.056,
 
     return out
 
- 
+
 if __name__ == '__main__':
     import doctest
-    doctest.testmod()
+    doctest.testmod(optionflags=doctest.NORMALIZE_WHITESPACE)
 

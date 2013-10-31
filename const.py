@@ -4,6 +4,7 @@ import numpy as np
 """
     Provides physical, mathematical, computational, and isotope constants.
 
+
     Definition
     ----------
     Pi = 3.141592653589793238462643383279502884197
@@ -71,7 +72,7 @@ import numpy as np
 
     Copyright 2012-2013 Matthias Cuntz
 
-        
+
     History
     -------
     Written,  MC, Jan 2012
@@ -106,5 +107,5 @@ eps  = np.finfo(np.float).eps
 
 if __name__ == '__main__':
     import doctest
-    doctest.testmod()
+    doctest.testmod(optionflags=doctest.NORMALIZE_WHITESPACE)
 

@@ -8,6 +8,7 @@ def pi(s=None, m=None, norm=None, b=False, evalues=False, ematrix=False):
         The indices can be normalised and the normalisation can be output as well,
         e.g. to calculate PI-tilde aferwards.
 
+
         Definition
         ----------
         def pi(s=s, m=m, norm=None, b=False, evalues=False, ematrix=False):
@@ -171,13 +172,13 @@ def pi(s=None, m=None, norm=None, b=False, evalues=False, ematrix=False):
             if b:
                 inorm = np.trace(m)
             else:
-                inorm = np.sum(np.abs(ev[:]))            
+                inorm = np.sum(np.abs(ev[:]))
             ind *= 1./inorm
         elif norm.lower() == 'evsum':
             if b:
                 inorm = np.trace(m)
             else:
-                inorm = np.sum(np.abs(ev[:]))            
+                inorm = np.sum(np.abs(ev[:]))
             ind *= 1./inorm
             inorm2 = np.sum(ind)
             ind *= 1./inorm2
@@ -201,7 +202,7 @@ def pi(s=None, m=None, norm=None, b=False, evalues=False, ematrix=False):
 
 if __name__ == '__main__':
     import doctest
-    doctest.testmod()
+    doctest.testmod(optionflags=doctest.NORMALIZE_WHITESPACE)
     # s = np.array([[ 0.000630519,  0.000699618,  0.001640544,  0.000429059,  0.000460696],
     #               [ 0.000181144,  0.000200996,  0.000477661,  0.000109410,  0.000117478],
     #               [-0.000048173, -0.000053453, -0.000126809, -0.000031822, -0.000034169],

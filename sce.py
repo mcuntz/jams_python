@@ -250,7 +250,7 @@ def sce(functn, x0, bl, bu,
        ngs               number of complexes (default: 2)
        npg               number of points in each complex (default: 2*nopt+1)
        nps               number of points in each sub-complex (default: nopt+1)
-       mings             minimum number of complexes required if the number of complexes is allowed to reduce as the 
+       mings             minimum number of complexes required if the number of complexes is allowed to reduce as the
                          optimization proceeds (default: ngs)
        nspl              number of evolution steps allowed for each complex before complex shuffling (default: 2*nopt+1)
        seed              if >0, the random number seed (default: 0)
@@ -286,7 +286,7 @@ def sce(functn, x0, bl, bu,
        Example
        -------
        >>> import numpy as np
-       >>> from functions import ackley, rosenbrock       
+       >>> from functions import ackley, rosenbrock
        >>> from autostring import astr
 
        >>> bl = np.array([-5.,-2.])
@@ -561,7 +561,7 @@ def sce(functn, x0, bl, bu,
 
 if __name__ == '__main__':
     import doctest
-    doctest.testmod()
+    doctest.testmod(optionflags=doctest.NORMALIZE_WHITESPACE)
 
     # #-------------------------------------------------------------------------------
     # # Name:        Test for Shuffled Complex Evolution Algorithm implementation
@@ -582,7 +582,7 @@ if __name__ == '__main__':
 
     # # PARAMETERS TO TUNE THE ALGORITHM
     # # Definition:import doctest
-    # doctest.testmod()
+    # doctest.testmod(optionflags=doctest.NORMALIZE_WHITESPACE)
 
     # #  seed = the random seed number (for repetetive testing purpose;pos integers)
     # #  iniflg = flag for initial parameter array (=1, included it in initial
@@ -593,7 +593,7 @@ if __name__ == '__main__':
     # #  kstop = maximum number of evolution loops before convergency
     # #  pcento = the percentage change allowed in kstop loops before convergency
     # maxn=10000
-    
+
     # # PARAMETERS FOR OPTIMIZATION PROBLEM
     # # Definition:
     # #  x0 = the initial parameter array at the start; np.array
@@ -669,7 +669,7 @@ if __name__ == '__main__':
     # plot the trace of the parametersvalue
     # '''
     # import matplotlib.pyplot as plt
-    
+
     # fig=plt.figure()
 
     # ax1 = plt.subplot(121)

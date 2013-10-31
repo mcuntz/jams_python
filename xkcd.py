@@ -64,7 +64,7 @@ def xkcd_line(x, y, xlim=None, ylim=None, mag=1.0, f1=30, f2=0.05, f3=15):
     # scale the data
     x_scaled = (x - xlim[0]) * 1. / (xlim[1] - xlim[0])
     y_scaled = (y - ylim[0]) * 1. / (ylim[1] - ylim[0])
-    
+
     # compute the total distance along the path
     dx       = x_scaled[1:] - x_scaled[:-1]
     dy       = y_scaled[1:] - y_scaled[:-1]
@@ -105,7 +105,7 @@ def xkcd_line(x, y, xlim=None, ylim=None, mag=1.0, f1=30, f2=0.05, f3=15):
     response     = signal.lfilter(b, 1, coeffs)
     x_int[1:-1] += response * dy / dist
     y_int[1:-1] += response * dx / dist
-    
+
     # un-scale data
     x_int = x_int[1:-1] * (xlim[1] - xlim[0]) + xlim[0]
     y_int = y_int[1:-1] * (ylim[1] - ylim[0]) + ylim[0]
@@ -155,7 +155,7 @@ def xkcd(ax,
 
         Optional Input
         --------------
-        
+
         mag                            float; the magnitude of the distortion (default: 1.0)
         f1, f2, f3                     int, float, int; filtering parameters.
                                        f1 gives the size of the window (default: 50)
@@ -242,7 +242,7 @@ def xkcd(ax,
 
     # remember random state for later resetting
     random_state = np.random.get_state()
-    
+
     # Get axes aspect
     ext = ax.get_window_extent().extents
     aspect = (ext[3] - ext[1]) / (ext[2] - ext[0])
@@ -379,7 +379,7 @@ def xkcd(ax,
 
 if __name__ == '__main__':
     import doctest
-    doctest.testmod()
+    doctest.testmod(optionflags=doctest.NORMALIZE_WHITESPACE)
 
     # import numpy as np
     # import ufz
@@ -482,14 +482,14 @@ if __name__ == '__main__':
 
     # # ----------------------------------------------------------------------------------
     # # Example 2
-        
+
     # # Some helper functions
     # def norm(x, x0, sigma):
     #     return np.exp(-0.5 * (x - x0) ** 2 / sigma ** 2)
 
     # def sigmoid(x, x0, alpha):
     #     return 1. / (1. + np.exp(- (x - x0) / alpha))
-        
+
     # # define the curves
     # x = np.linspace(0, 1, 100)
     # y1 = np.sqrt(norm(x, 0.7, 0.05)) + 0.2 * (1.5 - sigmoid(x, 0.8, 0.05))

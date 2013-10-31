@@ -80,7 +80,7 @@ def segments(p):
 
 if __name__ == '__main__':
     import doctest
-    doctest.testmod()
+    doctest.testmod(optionflags=doctest.NORMALIZE_WHITESPACE)
 
     # x = np.array([1.0, 2.0, 2.0, 1.0])
     # y = np.array([1.0, 1.0, 2.0, 2.0])

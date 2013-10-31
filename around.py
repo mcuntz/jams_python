@@ -7,6 +7,7 @@ def around(num, powten, ceil=False, floor=False):
     """
         Round to the passed power of ten.
 
+
         Definition
         ----------
         def around(num, powten=None, ceil=False, floor=False):
@@ -124,4 +125,4 @@ def around(num, powten, ceil=False, floor=False):
 
 if __name__ == '__main__':
     import doctest
-    doctest.testmod()
+    doctest.testmod(optionflags=doctest.NORMALIZE_WHITESPACE)

@@ -22,7 +22,7 @@
     colors                 Wrapper for colour.
     colours                Define UFZ colours.
     const                  Provides physical, mathematical, computational, and isotope constants.
-    convex_hull            Calculate subset of points that make a convex hull around a set of 2D points. 
+    convex_hull            Calculate subset of points that make a convex hull around a set of 2D points.
     cuntz_gleixner         Cuntz-Gleixner model of 13C discrimination.
     define_brewer          Defines and registers Brewer colormap.
     dewpoint               Calculates the dew point from ambient humidity.
@@ -38,8 +38,12 @@
     functions              Common functions that are used in curve_fit or fmin parameter estimations.
     gapfill                Gapfill Eddy flux data.
     get_brewer             Defines and returns Brewer colormap.
+    hdfread                Wrapper for readhdf.
+    hdf4read               Wrapper for readhdf4.
+    hdf5read               Wrapper for readhdf5.
     heaviside              Heaviside (or unit step) operator.
     in_poly                Determines whether a 2D point falls in a polygon.
+    inpoly                 Wrapper for in_poly.
     int2roman              Integer to roman numeral conversion.
     interpol               One-dimensional linear interpolation on first dimension.
     jab                    Jackknife-after-Bootstrap error.
@@ -51,10 +55,12 @@
     mad                    Median absolute deviation test.
     means                  Calculate daily, monthly, yearly, etc. means of data depending on date stamp.
     morris_sampling        Sampling of optimised trajectories for Morris measures / elementary effects
+    ncread                 Wrapper for readnetcdf.
     nee2gpp                Photosynthesis and ecosystem respiration from NEE Eddy flux data.
     nee2gpp_global         nee2gpp using one fit for whole time period
     nee2gpp_lasslop        nee2gpp using the daytime method of Lasslop et al. (2010)
     nee2gpp_reichstein     nee2gpp using several fits as in Reichstein et al. (2005)
+    netcdfread             Wrapper for readnetcdf.
     outlier                Rossner''s extreme standardized deviate outlier test.
     pack                   Similar to Fortran pack function with mask.
     pi                     Parameter importance index PI or alternatively B index calculation.
@@ -64,9 +70,11 @@
     readhdf                Reads variables or information from hdf4 and hdf5 files.
     readhdf4               Reads variables or information from hdf4 files.
     readhdf5               Reads variables or information from hdf5 file.
+    readnc                 Wrapper for readnetcdf.
     readnetcdf             Reads variables or information from netcdf file.
     rgb                    Interpolate between colours; make continuous colour maps.
     roman2int              Roman numeral to integer conversion.
+    rossner                Wrapper for outlier.
     savitzky_golay         Smooth (and optionally differentiate) 1D data with a Savitzky-Golay filter.
     savitzky_golay2d       Smooth (and optionally differentiate) 2D data with a Savitzky-Golay filter.
     saltelli               Parameter sampling for Sobol indices calculation.
@@ -88,7 +96,7 @@
     zacharias              Soil water content with van Genuchten and Zacharias et al. (2007).
     zacharias_check        Checks validity of parameter set for Zacharias et al. (2007).
 
-    
+
     Provided functions per category
     -------------------------------
         Array manipulation
@@ -135,6 +143,7 @@
     nee2gpp_lasslop        nee2gpp using the daytime method of Lasslop et al. (2010)
     nee2gpp_reichstein     nee2gpp using several fits as in Reichstein et al. (2005)
     outlier                Rossner''s extreme standardized deviate outlier test.
+    rossner                Wrapper for outlier.
     savitzky_golay         Smooth (and optionally differentiate) 1D data with a Savitzky-Golay filter.
     savitzky_golay2d       Smooth (and optionally differentiate) 2D data with a Savitzky-Golay filter.
     sg                     Wrapper savitzky_golay.
@@ -155,6 +164,7 @@
     area_poly              Area of a polygon
     cellarea               Calc areas of grid cells in m^2.
     in_poly                Determines whether a 2D point falls in a polygon.
+    inpoly                 Wrapper for in_poly.
     volume_poly            Volume of function above a polygon
 
 
@@ -217,9 +227,15 @@
 
     Special files
     -------------
+    hdfread                Wrapper for readhdf.
+    hdf4read               Wrapper for readhdf4.
+    hdf5read               Wrapper for readhdf5.
+    ncread                 Wrapper for readnetcdf.
+    netcdfread             Wrapper for readnetcdf.
     readhdf                Reads variables or information from hdf4 and hdf5 files.
     readhdf4               Reads variables or information from hdf4 files.
     readhdf5               Reads variables or information from hdf5 file.
+    readnc                 Wrapper for readnetcdf.
     readnetcdf             Reads variables or information from netcdf file.
     writenetcdf            Write netCDF4 file.
 
@@ -282,7 +298,7 @@
               MC, Apr 2013 - rgb
               MC, Jun 2013 - colours
               MC, Jul 2013 - fill_nonfinite, means
-              MC, Oct 2013 - morris, sce
+              MC, Oct 2013 - morris, sce, inpoly, rossner, netcdfread, ncread, readnc, hdfread, hdf4read, hdf5read
 """
 from __future__ import print_function
 
@@ -295,12 +311,12 @@ from brewer            import define_brewer, get_brewer, plot_brewer, print_brew
 try:
     from calcvpd       import *
 except ImportError:
-    pass
+    pass # obsolete
 from cellarea          import *
 from closest           import *
 from colours           import colours, colors
 import const
-from convex_hull       import convex_hull 
+from convex_hull       import convex_hull
 from cuntz_gleixner    import *
 from date2dec          import *
 from dec2date          import *
@@ -315,12 +331,12 @@ from gapfill           import *
 try:
     from gap_filling   import *
 except ImportError:
-    pass
+    pass # obsolete
 from heaviside         import *
-from in_poly           import in_poly 
+from in_poly           import in_poly, inpoly
 from interpol          import *
 from kernel_regression import kernel_regression, kernel_regression_h
-from kriging           import kriging 
+from kriging           import kriging
 from lhs               import *
 from lif               import *
 from jab               import *
@@ -329,28 +345,16 @@ from means             import *
 from morris            import morris_sampling, elementary_effects
 from nee2gpp           import nee2gpp, nee2gpp_global, nee2gpp_lasslop, nee2gpp_reichstein
 try:
-    from outlier       import *
-except ImportError:
-    print("No extra statistics in scipy, i.e. in UFZ library. Disabled functions: outlier.")
+    from outlier       import outlier, rossner
+except:
+    print("No extra statistics in scipy, i.e. in UFZ library. Disabled functions: outlier, rossner.")
 from pack              import *
 from pi                import *
 from position          import *
-try:
-    from readhdf       import *
-except ImportError:
-    print("No hdf4 and/or hdf5 support in UFZ library. Disabled functions: readhdf.")
-try:
-    from readhdf4      import *
-except ImportError:
-    print("No hdf4 support in UFZ library. Disabled functions: readhdf4.")
-try:
-    from readhdf5      import *
-except ImportError:
-    print("No hdf5 support in UFZ library. Disabled functions: readhdf5.")
-try:
-    from readnetcdf    import *
-except ImportError:
-    print("No netcdf support in UFZ library. Disabled functions: readnetcdf, writenetcdf.")
+from readhdf           import readhdf, hdfread
+from readhdf4          import readhdf4, hdf4read
+from readhdf5          import readhdf5, hdf5read
+from readnetcdf        import readnetcdf, netcdfread, ncread, readnc
 from rgb               import rgb_blend, rgb_range, rgb_gradient
 from romanliterals     import int2roman, roman2int
 from saltelli          import *
@@ -359,22 +363,19 @@ from sce               import sce
 from semivariogram     import semivariogram
 from sobol_index       import *
 from sread             import *
-from srrasa            import srrasa, srrasa_trans 
+from srrasa            import srrasa, srrasa_trans
 from tcherkez          import *
 from tsym              import *
 from unpack            import *
 from volume_poly       import volume_poly
-try:
-    from writenetcdf   import *
-except ImportError:
-    pass
+from writenetcdf       import *
 from xkcd              import xkcd
 from yrange            import *
 from zacharias         import *
 
 # Information
-version = '2.1'
-date    = '07.10.2013'
+version = '2.2'
+date    = '31.10.2013'
 
 # Main
 if __name__ == '__main__':

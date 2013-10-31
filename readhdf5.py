@@ -1,10 +1,9 @@
 #!/usr/bin/env python
 from __future__ import print_function
 import numpy as np
-import h5py as hdf
 
 def readhdf5(fName, var='', reform=False, squeeze=False, variables=False,
-            attributes=False, fileattributes=False, sort=False):
+             attributes=False, fileattributes=False, sort=False):
     """
         Get variables or print information of hdf5 file.
 
@@ -88,10 +87,15 @@ def readhdf5(fName, var='', reform=False, squeeze=False, variables=False,
         -------
         Written,  MZ, Jun 2012
         Modified, MC, Feb 2013 - ported to Python 3
-        """
+                  MC, Oct 2013 - hdf5read
+    """
+    try:
+        import h5py as hdf5
+    except:
+        raise Error('No HDF5 support available, i.e. h5py')
     # Open hdf5 file
     try:
-        f = hdf.File(fName, 'r')
+        f = hdf5.File(fName, 'r')
     except IOError:
         raise IOError('Cannot open file: '+fName)
     # Get attributes of the file
@@ -149,9 +153,47 @@ def readhdf5(fName, var='', reform=False, squeeze=False, variables=False,
         return arr
 
 
+def hdf5read(*args, **kwargs):
+    """
+        Wrapper for readhdf5.
+        def readhdf5(fName, var='', reform=False, squeeze=False, variables=False,
+                     attributes=False, fileattributes=False, sort=False):
+
+
+        Examples
+        --------
+        >>> a = hdf5read('test_readhdf5.hdf5', fileattributes=True)
+        >>> print(a['NB_PARAMETERS'])
+        9
+
+        >>> print([str(i) for i in hdf5read('test_readhdf5.hdf5', variables=True)])
+        ['chs']
+
+        >>> a = hdf5read('test_readhdf5.hdf5', var='chs', attributes=True)
+        >>> print([ str(i) for i in sorted(a)])
+        ['Double', 'Inttest', 'LLLLLL', 'What the hell']
+        >>> print(a['Double'])
+        [ 1.1]
+
+        >>> from autostring import astr
+        >>> print(astr(hdf5read('test_readhdf5.hdf5', var='chs'),3,pp=True))
+        [['  1.000' '  2.000' '  3.000' '  3.000' '  2.000']
+         ['  1.000' ' 23.000' '254.000' '  5.000' '  4.654']
+         ['654.654' ' 54.540' '546.540' '564.546' '  5.500']
+         ['  1.100' '  2.200' '  0.000' '  3.300' '  4.400']
+         ['  0.000' '  1.000' '  2.000' '  3.000' '  0.000']]
+    """
+    return readhdf5(*args, **kwargs)
+
+
 if __name__ == '__main__':
     import doctest
-    doctest.testmod()
+    try:
+        import h5py as hdf5
+    except ImportError:
+        raise ImportError('No HDF5 support available, i.e. h5py')
+    doctest.testmod(optionflags=doctest.NORMALIZE_WHITESPACE)
+
     # var = readhdf5('test_readhdf5.hdf5', variables=True)
     # print var
 

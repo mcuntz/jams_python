@@ -6,6 +6,7 @@ def cellarea(lat, lon, globe=False):
     """
         Calculates the area of Earth grid cells in metre square
 
+
         Definition
         ----------
         def cellarea(lon, lat, globe=False):
@@ -31,7 +32,7 @@ def cellarea(lat, lon, globe=False):
         ------------
         No irregular spacings.
 
-    
+
         Examples
         --------
         # Gaussian latitudes
@@ -66,7 +67,7 @@ def cellarea(lat, lon, globe=False):
 
         Copyright 2009-2013 Matthias Cuntz
 
-        
+
         History
         -------
         Written,  MC, Jul 2009
@@ -104,7 +105,7 @@ def cellarea(lat, lon, globe=False):
     # Northern latitude of grid cell edges
     nlat = np.size(lat)
     n_lat = lat[0] + dlat[0]/2. + np.cumsum(dlat)
-    # 
+    #
     # Area of grid cells in m^2 with lat/lon in degree
     ae  = 6.371e6    # radius of Earth
     d2r = np.pi/180. # degree to radian
@@ -118,4 +119,4 @@ def cellarea(lat, lon, globe=False):
 
 if __name__ == '__main__':
     import doctest
-    doctest.testmod()
+    doctest.testmod(optionflags=doctest.NORMALIZE_WHITESPACE)

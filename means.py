@@ -4,7 +4,7 @@ import numpy as np
 from date2dec import date2dec
 from dec2date import dec2date
 
-def means(date, dat, year=False, month=False, day=False, hour=False, minute=False, 
+def means(date, dat, year=False, month=False, day=False, hour=False, minute=False,
           meanday=False, sum=False):
     """
         Calculate daily, monthly, yearly, etc. means of data depending on date stamp.
@@ -22,7 +22,7 @@ def means(date, dat, year=False, month=False, day=False, hour=False, minute=Fals
 
         Definition
         ----------
-        def means(date, dat, year=False, month=False, day=False, hour=False, minute=False, 
+        def means(date, dat, year=False, month=False, day=False, hour=False, minute=False,
                   meanday=False, sum=False):
 
 
@@ -185,13 +185,13 @@ def means(date, dat, year=False, month=False, day=False, hour=False, minute=Fals
         if sum:
             out  = np.ma.sum(dat, 0)
         else:
-            out  = np.ma.mean(dat, 0)            
+            out  = np.ma.mean(dat, 0)
         if isone:
             return dout, out[0]
         else:
             return dout, out
     else:
-        
+
         yr, mo, dy, hr, mn, sc = dec2date(date)
 
         # year
@@ -351,7 +351,7 @@ def means(date, dat, year=False, month=False, day=False, hour=False, minute=Fals
 
 if __name__ == '__main__':
     import doctest
-    doctest.testmod()
+    doctest.testmod(optionflags=doctest.NORMALIZE_WHITESPACE)
 
     # from autostring import astr
     # from date2dec import date2dec

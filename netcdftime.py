@@ -1,7 +1,6 @@
 """
 Performs conversions of netCDF time coordinate data to/from datetime objects.
 """
-from __future__ import print_function
 import math, numpy, re, time
 from datetime import datetime as real_datetime
 from datetime import tzinfo, timedelta
@@ -10,7 +9,7 @@ from calendar import monthrange
 _units = ['days','hours','minutes','seconds','day','hour','minute','second']
 _calendars = ['standard','gregorian','proleptic_gregorian','noleap','julian','all_leap','365_day','366_day','360_day']
 
-__version__ = '0.9.5'
+__version__ = '1.0'
 
 # Adapted from http://delete.me.uk/2005/03/iso8601.html
 ISO8601_REGEX = re.compile(r"(?P<year>[0-9]{1,4})(-(?P<month>[0-9]{1,2})(-(?P<day>[0-9]{1,2})"
@@ -62,7 +61,7 @@ def JulianDayFromDate(date,calendar='standard'):
 creates a Julian Day from a 'datetime-like' object.  Returns the fractional
 Julian Day (resolution 1 second).
 
-if calendar='standard' or 'gregorian' (default), Julian day follows Julian 
+if calendar='standard' or 'gregorian' (default), Julian day follows Julian
 Calendar on and before 1582-10-5, Gregorian calendar after 1582-10-15.
 
 if calendar='proleptic_gregorian', Julian Day follows gregorian calendar.
@@ -75,7 +74,7 @@ Meeus, Jean (1998) Astronomical Algorithms (2nd Edition). Willmann-Bell,
 Virginia. p. 63
 
     """
-    
+
     # based on redate.py by David Finlayson.
 
     year=date.year; month=date.month; day=date.day
@@ -87,47 +86,48 @@ Virginia. p. 63
     if (month < 3):
         month = month + 12
         year = year - 1
-        
-    A = int(year//100)
+
+    A = int(year/100)
 
     # MC
     # jd = int(365.25 * (year + 4716)) + int(30.6001 * (month + 1)) + \
     #      day - 1524.5
-    jd = 365.*year + int(0.25 * year + 2000.) + int(30.6001 * (month + 1)) + day + 1718994.5
+    jd = 365.*year + int(0.25 * year + 2000.) + int(30.6001 * (month + 1)) + \
+         day + 1718994.5
 
-    # optionally adjust the jd for the switch from 
+    # optionally adjust the jd for the switch from
     # the Julian to Gregorian Calendar
     # here assumed to have occurred the day after 1582 October 4
     if calendar in ['standard','gregorian']:
         if jd >= 2299170.5:
             # 1582 October 15 (Gregorian Calendar)
-            B = 2 - A + int(A//4)
+            B = 2 - A + int(A/4)
         elif jd < 2299160.5:
             # 1582 October 5 (Julian Calendar)
             B = 0
         else:
             raise ValueError('impossible date (falls in gap between end of Julian calendar and beginning of Gregorian calendar')
     elif calendar == 'proleptic_gregorian':
-        B = 2 - A + int(A//4)
+        B = 2 - A + int(A/4)
     elif calendar == 'julian':
         B = 0
     else:
         raise ValueError('unknown calendar, must be one of julian,standard,gregorian,proleptic_gregorian, got %s' % calendar)
-    
+
     # adjust for Julian calendar if necessary
     jd = jd + B
-    
-    return jd 
+
+    return jd
 
 def _NoLeapDayFromDate(date):
 
     """
 
-creates a Julian Day for a calendar with no leap years from a datetime 
+creates a Julian Day for a calendar with no leap years from a datetime
 instance.  Returns the fractional Julian Day (resolution 1 second).
 
     """
-    
+
     year=date.year; month=date.month; day=date.day
     hour=date.hour; minute=date.minute; second=date.second
     # Convert time to fractions of a day
@@ -137,10 +137,11 @@ instance.  Returns the fractional Julian Day (resolution 1 second).
     if (month < 3):
         month = month + 12
         year = year - 1
-        
-    jd = int(365. * (year + 4716)) + int(30.6001 * (month + 1)) + day - 1524.5
-    
-    return jd 
+
+    jd = int(365. * (year + 4716)) + int(30.6001 * (month + 1)) + \
+         day - 1524.5
+
+    return jd
 
 def _AllLeapFromDate(date):
 
@@ -151,7 +152,7 @@ a 'datetime-like' object.
 Returns the fractional Julian Day (resolution 1 second).
 
     """
-    
+
     year=date.year; month=date.month; day=date.day
     hour=date.hour; minute=date.minute; second=date.second
     # Convert time to fractions of a day
@@ -161,10 +162,11 @@ Returns the fractional Julian Day (resolution 1 second).
     if (month < 3):
         month = month + 12
         year = year - 1
-        
-    jd = int(366. * (year + 4716)) + int(30.6001 * (month + 1)) + day - 1524.5
-    
-    return jd 
+
+    jd = int(366. * (year + 4716)) + int(30.6001 * (month + 1)) + \
+         day - 1524.5
+
+    return jd
 
 def _360DayFromDate(date):
 
@@ -175,23 +177,23 @@ a 'datetime-like' object.
 Returns the fractional Julian Day (resolution 1 second).
 
     """
-    
+
     year=date.year; month=date.month; day=date.day
     hour=date.hour; minute=date.minute; second=date.second
     # Convert time to fractions of a day
     day = day + hour/24.0 + minute/1440.0 + second/86400.0
 
     jd = int(360. * (year + 4716)) + int(30. * (month - 1)) + day
-    
-    return jd 
+
+    return jd
 
 def DateFromJulianDay(JD,calendar='standard'):
     """
 
-returns a 'datetime-like' object given Julian Day. Julian Day is a 
+returns a 'datetime-like' object given Julian Day. Julian Day is a
 fractional day with a resolution of 1 second.
 
-if calendar='standard' or 'gregorian' (default), Julian day follows Julian 
+if calendar='standard' or 'gregorian' (default), Julian day follows Julian
 Calendar on and before 1582-10-5, Gregorian calendar after  1582-10-15.
 
 if calendar='proleptic_gregorian', Julian Day follows gregorian calendar.
@@ -213,7 +215,7 @@ Virginia. p. 63
     """
 
     # based on redate.py by David Finlayson.
-    
+
     if JD < 0:
         raise ValueError('Julian Day must be positive')
 
@@ -276,13 +278,14 @@ Virginia. p. 63
     leap = 0
     if year % 4 == 0:
         leap = 1
-    if calendar == 'proleptic_gregorian' or (calendar in ['standard','gregorian'] and JD >= 2299160.5):
-        if year % 100 == 0 and year % 400 != 0: 
+    if calendar == 'proleptic_gregorian' or \
+       (calendar in ['standard','gregorian'] and JD >= 2299160.5):
+        if year % 100 == 0 and year % 400 != 0:
             leap = 0
     if leap and month > 2:
        dayofyr = dayofyr + leap
-    
-    # Convert fractions of a day to time    
+
+    # Convert fractions of a day to time
     (dfrac, days) = math.modf(day/1.0)
     (hfrac, hours) = math.modf(dfrac * 24.0)
     (mfrac, minutes) = math.modf(hfrac * 60.0)
@@ -301,15 +304,16 @@ Virginia. p. 63
     # if days exceeds number allowed in a month, flip to next month.
     # this fixes issue 75.
     daysinmonth = monthrange(year, month)[1]
-    if days > daysinmonth: 
+    if days > daysinmonth:
         days = 1
         month = month + 1
         if month > 12:
             month = 1
             year = year + 1
-    
+
     # return a 'real' datetime instance if calendar is gregorian.
-    if calendar == 'proleptic_gregorian' or (calendar in ['standard','gregorian'] and JD >= 2299160.5):
+    if calendar == 'proleptic_gregorian' or \
+            (calendar in ['standard','gregorian'] and JD >= 2299160.5):
         return real_datetime(year,month,int(days),int(hours),int(minutes),int(seconds))
     else:
     # or else, return a 'datetime-like' instance.
@@ -318,13 +322,13 @@ Virginia. p. 63
 def _DateFromNoLeapDay(JD):
     """
 
-returns a 'datetime-like' object given Julian Day for a calendar with no leap 
+returns a 'datetime-like' object given Julian Day for a calendar with no leap
 days. Julian Day is a fractional day with a resolution of 1 second.
 
     """
 
     # based on redate.py by David Finlayson.
-    
+
     if JD < 0:
         raise ValueError('Julian Day must be positive')
 
@@ -353,13 +357,13 @@ days. Julian Day is a fractional day with a resolution of 1 second.
         year = C - 4716
     else:
         year = C - 4715
-    
-    # Convert fractions of a day to time    
+
+    # Convert fractions of a day to time
     (dfrac, days) = math.modf(day/1.0)
     (hfrac, hours) = math.modf(dfrac * 24.0)
     (mfrac, minutes) = math.modf(hfrac * 60.0)
     seconds = round(mfrac * 60.0) # seconds are rounded
-    
+
     if seconds > 59:
         seconds = 0
         minutes = minutes + 1
@@ -369,7 +373,7 @@ days. Julian Day is a fractional day with a resolution of 1 second.
     if hours > 23:
         hours = 0
         days = days + 1
-    
+
     return datetime(year,month,int(days),int(hours),int(minutes),int(seconds), dayofwk, dayofyr)
 
 def _DateFromAllLeap(JD):
@@ -382,7 +386,7 @@ Julian Day is a fractional day with a resolution of 1 second.
     """
 
     # based on redate.py by David Finlayson.
-    
+
     if JD < 0:
         raise ValueError('Julian Day must be positive')
 
@@ -413,13 +417,13 @@ Julian Day is a fractional day with a resolution of 1 second.
         year = C - 4716
     else:
         year = C - 4715
-    
-    # Convert fractions of a day to time    
+
+    # Convert fractions of a day to time
     (dfrac, days) = math.modf(day/1.0)
     (hfrac, hours) = math.modf(dfrac * 24.0)
     (mfrac, minutes) = math.modf(hfrac * 60.0)
     seconds = round(mfrac * 60.0) # seconds are rounded
-    
+
     if seconds > 59:
         seconds = 0
         minutes = minutes + 1
@@ -429,7 +433,7 @@ Julian Day is a fractional day with a resolution of 1 second.
     if hours > 23:
         hours = 0
         days = days + 1
-    
+
     return datetime(year,month,int(days),int(hours),int(minutes),int(seconds), dayofwk, dayofyr)
 
 def _DateFrom360Day(JD):
@@ -447,16 +451,16 @@ Julian Day is a fractional day with a resolution of 1 second.
     #jd = int(360. * (year + 4716)) + int(30. * (month - 1)) + day
     (F, Z) = math.modf(JD)
     year = int((Z-0.5)/360.) - 4716
-    dayofyr =  Z - (year+4716)*360  
+    dayofyr =  Z - (year+4716)*360
     month = int((dayofyr-0.5)/30)+1
-    day = dayofyr - (month-1)*30 + F  
-    
-    # Convert fractions of a day to time    
+    day = dayofyr - (month-1)*30 + F
+
+    # Convert fractions of a day to time
     (dfrac, days) = math.modf(day/1.0)
     (hfrac, hours) = math.modf(dfrac * 24.0)
     (mfrac, minutes) = math.modf(hfrac * 60.0)
     seconds = round(mfrac * 60.0) # seconds are rounded
-    
+
     if seconds > 59:
         seconds = 0
         minutes = minutes + 1
@@ -466,7 +470,7 @@ Julian Day is a fractional day with a resolution of 1 second.
     if hours > 23:
         hours = 0
         days = days + 1
-    
+
     return datetime(year,month,int(days),int(hours),int(minutes),int(seconds),-1, int(dayofyr))
 
 def _dateparse(timestr):
@@ -490,20 +494,20 @@ data to/from datetime objects.
 
 To initialize: C{t = utime(unit_string,calendar='standard')}
 
-where 
+where
 
 B{C{unit_string}} is a string of the form
 C{'time-units since <time-origin>'} defining the time units.
 
-Valid time-units are days, hours, minutes and seconds (the singular forms 
-are also accepted). An example unit_string would be C{'hours 
+Valid time-units are days, hours, minutes and seconds (the singular forms
+are also accepted). An example unit_string would be C{'hours
 since 0001-01-01 00:00:00'}.
 
-The B{C{calendar}} keyword describes the calendar used in the time calculations. 
-All the values currently defined in the U{CF metadata convention 
-<http://cf-pcmdi.llnl.gov/documents/cf-conventions/1.1/cf-conventions.html#time-coordinate>}  
-are accepted. The default is C{'standard'}, which corresponds to the mixed 
-Gregorian/Julian calendar used by the C{udunits library}. Valid calendars 
+The B{C{calendar}} keyword describes the calendar used in the time calculations.
+All the values currently defined in the U{CF metadata convention
+<http://cf-pcmdi.llnl.gov/documents/cf-conventions/1.1/cf-conventions.html#time-coordinate>}
+are accepted. The default is C{'standard'}, which corresponds to the mixed
+Gregorian/Julian calendar used by the C{udunits library}. Valid calendars
 are:
 
 C{'gregorian'} or C{'standard'} (default):
@@ -512,35 +516,35 @@ Mixed Gregorian/Julian calendar as defined by udunits.
 
 C{'proleptic_gregorian'}:
 
-A Gregorian calendar extended to dates before 1582-10-15. That is, a year 
-is a leap year if either (i) it is divisible by 4 but not by 100 or (ii) 
+A Gregorian calendar extended to dates before 1582-10-15. That is, a year
+is a leap year if either (i) it is divisible by 4 but not by 100 or (ii)
 it is divisible by 400.
 
 C{'noleap'} or C{'365_day'}:
 
-Gregorian calendar without leap years, i.e., all years are 365 days long. 
-all_leap or 366_day Gregorian calendar with every year being a leap year, 
+Gregorian calendar without leap years, i.e., all years are 365 days long.
+all_leap or 366_day Gregorian calendar with every year being a leap year,
 i.e., all years are 366 days long.
 
 C{'360_day'}:
 
-All years are 360 days divided into 30 day months. 
+All years are 360 days divided into 30 day months.
 
 C{'julian'}:
 
-Proleptic Julian calendar, extended to dates after 1582-10-5. A year is a 
+Proleptic Julian calendar, extended to dates after 1582-10-5. A year is a
 leap year if it is divisible by 4.
 
-The C{L{num2date}} and C{L{date2num}} class methods can used to convert datetime 
+The C{L{num2date}} and C{L{date2num}} class methods can used to convert datetime
 instances to/from the specified time units using the specified calendar.
 
-The datetime instances returned by C{num2date} are 'real' python datetime 
-objects if the date falls in the Gregorian calendar (i.e. 
-C{calendar='proleptic_gregorian', 'standard'} or C{'gregorian'} and 
-the date is after 1582-10-15). Otherwise, they are 'phony' datetime 
-objects which are actually instances of C{L{netcdftime.datetime}}.  This is 
-because the python datetime module cannot handle the weird dates in some 
-calendars (such as C{'360_day'} and C{'all_leap'}) which don't exist in any real 
+The datetime instances returned by C{num2date} are 'real' python datetime
+objects if the date falls in the Gregorian calendar (i.e.
+C{calendar='proleptic_gregorian', 'standard'} or C{'gregorian'} and
+the date is after 1582-10-15). Otherwise, they are 'phony' datetime
+objects which are actually instances of C{L{netcdftime.datetime}}.  This is
+because the python datetime module cannot handle the weird dates in some
+calendars (such as C{'360_day'} and C{'all_leap'}) which don't exist in any real
 world calendar.
 
 
@@ -550,31 +554,31 @@ Example usage:
 >>> from datetime import  datetime
 >>> cdftime = utime('hours since 0001-01-01 00:00:00')
 >>> date = datetime.now()
->>> print(date)
+>>> print date
 2006-03-17 16:04:02.561678
 >>>
 >>> t = cdftime.date2num(date)
->>> print(t)
+>>> print t
 17577328.0672
 >>>
 >>> date = cdftime.num2date(t)
->>> print(date)
+>>> print date
 2006-03-17 16:04:02
 >>>
 
 The resolution of the transformation operation is 1 second.
-        
-Warning:  Dates between 1582-10-5 and 1582-10-15 do not exist in the 
-C{'standard'} or C{'gregorian'} calendars.  An exception will be raised if you pass 
+
+Warning:  Dates between 1582-10-5 and 1582-10-15 do not exist in the
+C{'standard'} or C{'gregorian'} calendars.  An exception will be raised if you pass
 a 'datetime-like' object in that range to the C{L{date2num}} class method.
 
 Words of Wisdom from the British MetOffice concerning reference dates:
 
-"udunits implements the mixed Gregorian/Julian calendar system, as 
-followed in England, in which dates prior to 1582-10-15 are assumed to use 
-the Julian calendar. Other software cannot be relied upon to handle the 
-change of calendar in the same way, so for robustness it is recommended 
-that the reference date be later than 1582. If earlier dates must be used, 
+"udunits implements the mixed Gregorian/Julian calendar system, as
+followed in England, in which dates prior to 1582-10-15 are assumed to use
+the Julian calendar. Other software cannot be relied upon to handle the
+change of calendar in the same way, so for robustness it is recommended
+that the reference date be later than 1582. If earlier dates must be used,
 it should be noted that udunits treats 0 AD as identical to 1 AD."
 
 @ivar origin: datetime instance defining the origin of the netCDF time variable.
@@ -587,31 +591,31 @@ it should be noted that udunits treats 0 AD as identical to 1 AD."
 @param unit_string: a string of the form
 C{'time-units since <time-origin>'} defining the time units.
 
-Valid time-units are days, hours, minutes and seconds (the singular forms 
-are also accepted). An example unit_string would be C{'hours 
+Valid time-units are days, hours, minutes and seconds (the singular forms
+are also accepted). An example unit_string would be C{'hours
 since 0001-01-01 00:00:00'}.
 
-@keyword calendar: describes the calendar used in the time calculations. 
-All the values currently defined in the U{CF metadata convention 
+@keyword calendar: describes the calendar used in the time calculations.
+All the values currently defined in the U{CF metadata convention
 <http://cf-pcmdi.llnl.gov/documents/cf-conventions/1.1/cf-conventions.html#time-coordinate>}
-are accepted. The default is C{'standard'}, which corresponds to the mixed 
-Gregorian/Julian calendar used by the C{udunits library}. Valid calendars 
+are accepted. The default is C{'standard'}, which corresponds to the mixed
+Gregorian/Julian calendar used by the C{udunits library}. Valid calendars
 are:
  - C{'gregorian'} or C{'standard'} (default):
  Mixed Gregorian/Julian calendar as defined by udunits.
  - C{'proleptic_gregorian'}:
- A Gregorian calendar extended to dates before 1582-10-15. That is, a year 
- is a leap year if either (i) it is divisible by 4 but not by 100 or (ii) 
+ A Gregorian calendar extended to dates before 1582-10-15. That is, a year
+ is a leap year if either (i) it is divisible by 4 but not by 100 or (ii)
  it is divisible by 400.
  - C{'noleap'} or C{'365_day'}:
- Gregorian calendar without leap years, i.e., all years are 365 days long. 
- - C{'all_leap'} or C{'366_day'}:  
+ Gregorian calendar without leap years, i.e., all years are 365 days long.
+ - C{'all_leap'} or C{'366_day'}:
  Gregorian calendar with every year being a leap year, i.e.,
  all years are 366 days long.
  -C{'360_day'}:
- All years are 360 days divided into 30 day months. 
+ All years are 360 days divided into 30 day months.
  -C{'julian'}:
- Proleptic Julian calendar, extended to dates after 1582-10-5. A year is a 
+ Proleptic Julian calendar, extended to dates after 1582-10-5. A year is a
  leap year if it is divisible by 4.
 
 @returns: A class instance which may be used for converting times from netCDF
@@ -679,7 +683,7 @@ Returns a scalar if input is a scalar, else returns a numpy array.
                 jdelta = []
                 for d in date.flat:
                     if d.month == 2 and d.day == 29:
-                        raise ValueError('there is no leap day in the noleap calendar') 
+                        raise ValueError('there is no leap day in the noleap calendar')
                     jdelta.append(_NoLeapDayFromDate(d)-self._jd0)
         elif self.calendar in ['all_leap','366_day']:
             if isscalar:
@@ -726,13 +730,13 @@ Resolution is 1 second.
 Works for scalars, sequences and numpy arrays.
 Returns a scalar if input is a scalar, else returns a numpy array.
 
-The datetime instances returned by C{num2date} are 'real' python datetime 
-objects if the date falls in the Gregorian calendar (i.e. 
-C{calendar='proleptic_gregorian'}, or C{calendar = 'standard'/'gregorian'} and 
-the date is after 1582-10-15). Otherwise, they are 'phony' datetime 
-objects which are actually instances of netcdftime.datetime.  This is 
-because the python datetime module cannot handle the weird dates in some 
-calendars (such as C{'360_day'} and C{'all_leap'}) which 
+The datetime instances returned by C{num2date} are 'real' python datetime
+objects if the date falls in the Gregorian calendar (i.e.
+C{calendar='proleptic_gregorian'}, or C{calendar = 'standard'/'gregorian'} and
+the date is after 1582-10-15). Otherwise, they are 'phony' datetime
+objects which are actually instances of netcdftime.datetime.  This is
+because the python datetime module cannot handle the weird dates in some
+calendars (such as C{'360_day'} and C{'all_leap'}) which
 do not exist in any real world calendar.
         """
         isscalar = False
@@ -820,7 +824,7 @@ def _parse_date(datestring):
 
     Adapted from pyiso8601 (http://code.google.com/p/pyiso8601/)
     """
-    if not isinstance(datestring, str) and not isinstance(datestring, str):
+    if not isinstance(datestring, str) and not isinstance(datestring, unicode):
         raise ValueError("Expecting a string %r" % datestring)
     m = ISO8601_REGEX.match(datestring.strip())
     if not m:
@@ -878,7 +882,7 @@ def _strftime(dt, fmt):
     timetuple = dt.timetuple()
     s1 = time.strftime(fmt, (year,) + timetuple[1:])
     sites1 = _findall(s1, str(year))
-    
+
     s2 = time.strftime(fmt, (year+28,) + timetuple[1:])
     sites2 = _findall(s2, str(year+28))
 
@@ -886,7 +890,7 @@ def _strftime(dt, fmt):
     for site in sites1:
         if site in sites2:
             sites.append(site)
-            
+
     s = s1
     syear = "%4d" % (dt.year,)
     for site in sites:
@@ -900,13 +904,13 @@ date2num(dates,units,calendar='standard')
 Return numeric time values given datetime objects. The units
 of the numeric time values are described by the L{units} argument
 and the L{calendar} keyword. The datetime objects must
-be in UTC with no time-zone offset.  If there is a 
+be in UTC with no time-zone offset.  If there is a
 time-zone offset in C{units}, it will be applied to the
 returned numeric values.
 
 Like the matplotlib C{date2num} function, except that it allows
 for different units and calendars.  Behaves the same if
-C{units = 'days since 0001-01-01 00:00:00'} and 
+C{units = 'days since 0001-01-01 00:00:00'} and
 C{calendar = 'proleptic_gregorian'}.
 
 @param dates: A datetime object or a sequence of datetime objects.
@@ -917,8 +921,8 @@ C{calendar = 'proleptic_gregorian'}.
  or seconds.  B{C{reference time}} is the time origin. A valid choice
  would be units=C{'hours since 1800-01-01 00:00:00 -6:00'}.
 
-@param calendar: describes the calendar used in the time calculations. 
- All the values currently defined in the U{CF metadata convention 
+@param calendar: describes the calendar used in the time calculations.
+ All the values currently defined in the U{CF metadata convention
  <http://cf-pcmdi.llnl.gov/documents/cf-conventions/>} are supported.
  Valid calendars C{'standard', 'gregorian', 'proleptic_gregorian'
  'noleap', '365_day', '360_day', 'julian', 'all_leap', '366_day'}.
@@ -937,13 +941,13 @@ num2date(times,units,calendar='standard')
 
 Return datetime objects given numeric time values. The units
 of the numeric time values are described by the C{units} argument
-and the C{calendar} keyword. The returned datetime objects represent 
-UTC with no time-zone offset, even if the specified 
+and the C{calendar} keyword. The returned datetime objects represent
+UTC with no time-zone offset, even if the specified
 C{units} contain a time-zone offset.
 
 Like the matplotlib C{num2date} function, except that it allows
 for different units and calendars.  Behaves the same if
-C{units = 'days since 001-01-01 00:00:00'} and 
+C{units = 'days since 001-01-01 00:00:00'} and
 C{calendar = 'proleptic_gregorian'}.
 
 @param times: numeric time values. Maximum resolution is 1 second.
@@ -953,8 +957,8 @@ describing the time units. B{C{time units}} can be days, hours, minutes
 or seconds.  B{C{reference time}} is the time origin. A valid choice
 would be units=C{'hours since 1800-01-01 00:00:00 -6:00'}.
 
-@param calendar: describes the calendar used in the time calculations. 
-All the values currently defined in the U{CF metadata convention 
+@param calendar: describes the calendar used in the time calculations.
+All the values currently defined in the U{CF metadata convention
 <http://cf-pcmdi.llnl.gov/documents/cf-conventions/>} are supported.
 Valid calendars C{'standard', 'gregorian', 'proleptic_gregorian'
 'noleap', '365_day', '360_day', 'julian', 'all_leap', '366_day'}.
@@ -962,10 +966,10 @@ Default is C{'standard'}, which is a mixed Julian/Gregorian calendar.
 
 @return: a datetime instance, or an array of datetime instances.
 
-The datetime instances returned are 'real' python datetime 
-objects if the date falls in the Gregorian calendar (i.e. 
+The datetime instances returned are 'real' python datetime
+objects if the date falls in the Gregorian calendar (i.e.
 C{calendar='proleptic_gregorian'}, or C{calendar = 'standard'} or C{'gregorian'}
-and the date is after 1582-10-15). Otherwise, they are 'phony' datetime 
+and the date is after 1582-10-15). Otherwise, they are 'phony' datetime
 objects which support some but not all the methods of 'real' python
 datetime objects.  This is because the python datetime module cannot
 the uses the C{'proleptic_gregorian'} calendar, even before the switch
@@ -976,17 +980,17 @@ contains one.
     cdftime = utime(units,calendar=calendar)
     return cdftime.num2date(times)
 
-def _check_index(indices, dates, nctime, calendar, select):
-    """Return True if the time indices given correspond to the given dates, 
+def _check_index(indices, times, nctime, calendar, select):
+    """Return True if the time indices given correspond to the given times,
     False otherwise.
-    
-    Parameters: 
+
+    Parameters:
 
     indices : sequence of integers
     Positive integers indexing the time variable.
 
-    dates : sequence of datetime objects
-    Reference dates.
+    times : sequence of times.
+    Reference times.
 
     nctime : netCDF Variable object
     NetCDF time object.
@@ -1000,72 +1004,101 @@ def _check_index(indices, dates, nctime, calendar, select):
     N = nctime.shape[0]
     if  (indices <0).any():
        return False
-       
+
     if (indices >= N).any():
         return False
-        
-    t = nctime[indices] 
+
+    t = nctime[indices]
 # if fancy indexing not available, fall back on this.
 #   t=[]
 #   for ind in indices:
 #       t.append(nctime[ind])
 
-    check = num2date(t, nctime.units, calendar)
     if select == 'exact':
-        return numpy.all(check == dates)
-        
+        return numpy.all(t == times)
+
     elif select == 'before':
         ta = nctime[numpy.clip(indices + 1, 0, N-1)]
-        check_after = num2date(ta, nctime.units, calendar)
-        return numpy.all(check <= dates) and numpy.all(check_after > dates)
-        
+        return numpy.all(t <= times) and numpy.all(ta > times)
+
     elif select == 'after':
         tb = nctime[numpy.clip(indices - 1, 0, N-1)]
-        check_before = num2date(tb, nctime.units, calendar)
-        return numpy.all(check >= dates) and numpy.all(check_before < dates)
-    
+        return numpy.all(t >= times) and numpy.all(tb < times)
+
     elif select == 'nearest':
         ta = nctime[numpy.clip(indices + 1, 0, N-1)]
         tb = nctime[numpy.clip(indices - 1, 0, N-1)]
-        delta_after = num2date(ta, nctime.units, calendar) - check
-        delta_before = check - num2date(tb, nctime.units, calendar) 
-        delta_check = numpy.abs(dates-check)
+        delta_after = ta - t
+        delta_before = t - tb
+        delta_check = numpy.abs(times-t)
         return numpy.all(delta_check <= delta_after) and numpy.all(delta_check <= delta_before)
 
 def date2index(dates, nctime, calendar=None, select='exact'):
     """
     date2index(dates, nctime, calendar=None, select='exact')
-    
+
     Return indices of a netCDF time variable corresponding to the given dates.
-    
+
     @param dates: A datetime object or a sequence of datetime objects.
     The datetime objects should not include a time-zone offset.
-    
+
     @param nctime: A netCDF time variable object. The nctime object must have a
-    C{units} attribute. The entries are assumed to be stored in increasing 
+    C{units} attribute. The entries are assumed to be stored in increasing
     order.
-    
+
     @param calendar: Describes the calendar used in the time calculation.
     Valid calendars C{'standard', 'gregorian', 'proleptic_gregorian'
     'noleap', '365_day', '360_day', 'julian', 'all_leap', '366_day'}.
     Default is C{'standard'}, which is a mixed Julian/Gregorian calendar
     If C{calendar} is None, its value is given by C{nctime.calendar} or
     C{standard} if no such attribute exists.
-    
+
     @param select: C{'exact', 'before', 'after', 'nearest'}
-    The index selection method. C{exact} will return the indices perfectly 
-    matching the dates given. C{before} and C{after} will return the indices 
-    corresponding to the dates just before or just after the given dates if 
-    an exact match cannot be found. C{nearest} will return the indices that 
-    correpond to the closest dates. 
+    The index selection method. C{exact} will return the indices perfectly
+    matching the dates given. C{before} and C{after} will return the indices
+    corresponding to the dates just before or just after the given dates if
+    an exact match cannot be found. C{nearest} will return the indices that
+    correpond to the closest dates.
     """
     # Setting the calendar.
     if calendar == None:
         calendar = getattr(nctime, 'calendar', 'standard')
-   
-    num = numpy.atleast_1d(date2num(dates, nctime.units, calendar))
+    times = date2num(dates,nctime.units,calendar=calendar)
+    return time2index(times, nctime, calendar=calendar, select=select)
+
+def time2index(times, nctime, calendar=None, select='exact'):
+    """
+    time2index(times, nctime, calendar=None, select='exact')
+
+    Return indices of a netCDF time variable corresponding to the given times.
+
+    @param times: A numeric time or a sequence of numeric times.
+
+    @param nctime: A netCDF time variable object. The nctime object must have a
+    C{units} attribute. The entries are assumed to be stored in increasing
+    order.
+
+    @param calendar: Describes the calendar used in the time calculation.
+    Valid calendars C{'standard', 'gregorian', 'proleptic_gregorian'
+    'noleap', '365_day', '360_day', 'julian', 'all_leap', '366_day'}.
+    Default is C{'standard'}, which is a mixed Julian/Gregorian calendar
+    If C{calendar} is None, its value is given by C{nctime.calendar} or
+    C{standard} if no such attribute exists.
+
+    @param select: C{'exact', 'before', 'after', 'nearest'}
+    The index selection method. C{exact} will return the indices perfectly
+    matching the times given. C{before} and C{after} will return the indices
+    corresponding to the times just before or just after the given times if
+    an exact match cannot be found. C{nearest} will return the indices that
+    correpond to the closest times.
+    """
+    # Setting the calendar.
+    if calendar == None:
+        calendar = getattr(nctime, 'calendar', 'standard')
+
+    num = numpy.atleast_1d(times)
     N = len(nctime)
-    
+
     # Trying to infer the correct index from the starting time and the stride.
     # This assumes that the times are increasing uniformly.
     t0, t1 = nctime[:2]
@@ -1077,55 +1110,55 @@ def date2index(dates, nctime, calendar=None, select='exact'):
     else:
         index = numpy.array(numpy.around( (num-t0)/dt ), int)
 
-    # Checking that the index really corresponds to the given date.
+    # Checking that the index really corresponds to the given time.
     # If the times do not correspond, then it means that the times
     # are not increasing uniformly and we try the bisection method.
-    if not _check_index(index, dates, nctime, calendar, select):
-        
+    if not _check_index(index, times, nctime, calendar, select):
+
         # Use the bisection method. Assumes nctime is ordered.
         import bisect
         index = numpy.array([bisect.bisect_right(nctime, n) for n in num], int)
         before = index == 0
-        
+
         index = numpy.array([bisect.bisect_left(nctime, n) for n in num], int)
         after = index == N
-        
+
         if select in ['before', 'exact'] and numpy.any(before):
-            raise ValueError('At least one of the dates given is before the first date in `nctime`.')
-        
+            raise ValueError('Some of the times given are before the first time in `nctime`.')
+
         if select in ['after', 'exact'] and numpy.any(after):
-            raise ValueError('At least one of the dates given is after the last date in `nctime`.')
-            
-        
-        # Find the dates for which the match is not perfect.
+            raise ValueError('Some of the times given are after the last time in `nctime`.')
+
+
+        # Find the times for which the match is not perfect.
         # Use list comprehension instead of the simpler `nctime[index]` since
         # not all time objects support numpy integer indexing (eg dap).
         index[after] = N-1
         ncnum = numpy.squeeze([nctime[i] for i in index])
         mismatch = numpy.nonzero(ncnum != num)[0]
-                   
+
         if select == 'exact':
             if len(mismatch) > 0:
-                raise ValueError('Some of the dates specified were not found in the `nctime` variable.')
-   
+                raise ValueError('Some of the times specified were not found in the `nctime` variable.')
+
         elif select == 'before':
             index[after] = N
             index[mismatch] -= 1
-               
+
         elif select == 'after':
             pass
-       
+
         elif select == 'nearest':
             nearest_to_left = num[mismatch] < numpy.array( [nctime[i-1] + nctime[i] for i in index[mismatch]]) / 2.
             index[mismatch] = index[mismatch] - 1 * nearest_to_left
-       
+
         else:
             raise ValueError("%s is not an option for the `select` argument."%select)
-   
+
 
         # Correct for indices equal to -1
         index[before] = 0
-        
+
     # convert numpy scalars or single element arrays to python ints.
     return _toscalar(index)
 
@@ -1135,4 +1168,3 @@ def _toscalar(a):
         return a.item()
     else:
         return a
-

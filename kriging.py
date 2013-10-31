@@ -593,10 +593,10 @@ def kriging(x, y, z, semi_mod, semi_popt, xnew=None, ynew=None, plot=False,
     else:
         return xnew, ynew, znew, varnew, eopz, eopvar
 
-# DOCTEST:
+
 if __name__ == '__main__':
     import doctest
-    doctest.testmod()
+    doctest.testmod(optionflags=doctest.NORMALIZE_WHITESPACE)
 
     # x = np.array([652225.,652175.,652205.,652235.,652265.,652165.,
     #               652195.,652225.,652255.,652285.,652175.,652205.,

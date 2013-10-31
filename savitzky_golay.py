@@ -134,6 +134,23 @@ def sg(y, window, order, deriv=0, rate=1):
     """
         Wrapper function for savitzky_golay
         def sg(y, window, order, deriv=0, rate=1):
+
+
+       Examples
+       --------
+       >>> import numpy as np
+       >>> np.random.seed(1)
+       >>> t = np.linspace(-4, 4, 10)
+       >>> y = np.exp( -t**2 ) + np.random.normal(0, 0.05, t.shape)
+       >>> from autostring import astr
+       >>> print(astr(sg(y, window=3, order=1),3,pp=True))
+       [' 0.007' ' 0.010' ' 0.022' ' 0.320' ' 0.562' ' 0.609' ' 0.310' ' 0.080' '-0.009' ' 0.007']
+
+       >>> print(astr(sg(y, 3, 1, deriv=1),3,pp=True))
+       [' 0.000' '-0.050' ' 0.073' ' 0.442' ' 0.295' '-0.304' '-0.368' '-0.120' ' 0.009' ' 0.000']
+
+       >>> print(astr(sg(y, 3, 1, deriv=1, rate=10),3,pp=True))
+       [' 0.000' '-0.502' ' 0.729' ' 4.416' ' 2.952' '-3.039' '-3.683' '-1.201' ' 0.092' ' 0.000']
     """
     return savitzky_golay(y, window, order, deriv=deriv, rate=rate)
 
@@ -216,28 +233,28 @@ def savitzky_golay2d(z, window, order, deriv=None):
        >>> Z = np.exp( -(X**2+Y**2))
        >>> Zn = Z + np.random.normal(0, 0.2, Z.shape)
        >>> from autostring import astr
-       >>> print(astr(sg2d(Zn, window=3, order=2),3,pp=True))
+       >>> print(astr(savitzky_golay2d(Zn, window=3, order=2),3,pp=True))
        [[' 0.080' ' 0.052' '-0.106' '-0.165' ' 0.161']
         ['-0.204' ' 0.170' ' 0.664' ' 0.181' ' 0.048']
         [' 0.111' '-0.230' ' 0.094' '-0.170' ' 0.240']]
 
-       >>> s2 = sg2d( Zn, 3, 2, deriv=1)
+       >>> s2 = savitzky_golay2d( Zn, 3, 2, deriv=1)
        >>> print(astr(s2[0],3,pp=True))
        [[' 0.156' ' 0.046' '-0.046' ' 0.065' ' 0.257']
         [' 0.305' ' 0.087' '-0.007' '-0.055' ' 0.230']
         [' 0.305' ' 0.126' '-0.039' '-0.158' ' 0.120']]
 
-       >>> s3 = sg2d( Zn, 3, 2, deriv='both')
+       >>> s3 = savitzky_golay2d( Zn, 3, 2, deriv='both')
        >>> if np.any(s2[0]!=s3[0]): print('Error 01')
        >>> if np.any(s2[1]!=s3[1]): print('Error 02')
 
-       >>> s2 = sg2d( Zn, 3, 2, deriv=2)
+       >>> s2 = savitzky_golay2d( Zn, 3, 2, deriv=2)
        >>> print(astr(s2,3,pp=True))
        [['-0.069' ' 0.510' ' 0.638' ' 0.446' ' 0.128']
         ['-0.102' '-0.047' '-0.018' ' 0.039' ' 0.027']
         [' 0.556' ' 0.251' ' 0.000' ' 0.092' ' 0.111']]
 
-       >>> s3 = sg2d( Zn, 3, 2, deriv='col')
+       >>> s3 = savitzky_golay2d( Zn, 3, 2, deriv='col')
        >>> if np.any(s2!=s3): print('Error 03')
 
 
@@ -276,9 +293,9 @@ def savitzky_golay2d(z, window, order, deriv=None):
         raise ValueError('order is too high for the window size')
     half_size = window // 2
     #
-    # exponents of the polynomial. 
-    # p(x,y) = a0 + a1*x + a2*y + a3*x^2 + a4*y^2 + a5*x*y + ... 
-    # this line gives a list of two item tuple. Each tuple contains 
+    # exponents of the polynomial.
+    # p(x,y) = a0 + a1*x + a2*y + a3*x^2 + a4*y^2 + a5*x*y + ...
+    # this line gives a list of two item tuple. Each tuple contains
     # the exponents of the k-th term. First element of tuple is for x
     # second element for y.
     # Ex. exps = [(0,0), (1,0), (0,1), (2,0), (1,1), (0,2), ...]
@@ -346,18 +363,53 @@ def savitzky_golay2d(z, window, order, deriv=None):
         #return sps.fftconvolve(Z, -r, mode='valid')
         return sps.convolve(Z, -r, mode='valid')
 
-    
-def sg2d(z, window, order, deriv=None):
+
+def sg2d(*args, **kwargs):
     """
         Wrapper function for savitzky_golay2d
-        def sg2d(z, window, order, deriv=None):
-    """
-    return savitzky_golay2d(z, window, order, deriv=deriv)
+        def savitzky_golay2d(z, window, order, deriv=None):
 
-  
+
+       Examples
+       --------
+       >>> import numpy as np
+       >>> np.random.seed(1)
+       >>> x = np.linspace(-3,3,5)
+       >>> y = np.linspace(-3,3,3)
+       >>> X, Y = np.meshgrid(x,y)
+       >>> Z = np.exp( -(X**2+Y**2))
+       >>> Zn = Z + np.random.normal(0, 0.2, Z.shape)
+       >>> from autostring import astr
+       >>> print(astr(sg2d(Zn, window=3, order=2),3,pp=True))
+       [[' 0.080' ' 0.052' '-0.106' '-0.165' ' 0.161']
+        ['-0.204' ' 0.170' ' 0.664' ' 0.181' ' 0.048']
+        [' 0.111' '-0.230' ' 0.094' '-0.170' ' 0.240']]
+
+       >>> s2 = sg2d( Zn, 3, 2, deriv=1)
+       >>> print(astr(s2[0],3,pp=True))
+       [[' 0.156' ' 0.046' '-0.046' ' 0.065' ' 0.257']
+        [' 0.305' ' 0.087' '-0.007' '-0.055' ' 0.230']
+        [' 0.305' ' 0.126' '-0.039' '-0.158' ' 0.120']]
+
+       >>> s3 = sg2d( Zn, 3, 2, deriv='both')
+       >>> if np.any(s2[0]!=s3[0]): print('Error 01')
+       >>> if np.any(s2[1]!=s3[1]): print('Error 02')
+
+       >>> s2 = sg2d( Zn, 3, 2, deriv=2)
+       >>> print(astr(s2,3,pp=True))
+       [['-0.069' ' 0.510' ' 0.638' ' 0.446' ' 0.128']
+        ['-0.102' '-0.047' '-0.018' ' 0.039' ' 0.027']
+        [' 0.556' ' 0.251' ' 0.000' ' 0.092' ' 0.111']]
+
+       >>> s3 = sg2d( Zn, 3, 2, deriv='col')
+       >>> if np.any(s2!=s3): print('Error 03')
+    """
+    return savitzky_golay2d(*args, **kwargs)
+
+
 if __name__ == '__main__':
     import doctest
-    doctest.testmod()
+    doctest.testmod(optionflags=doctest.NORMALIZE_WHITESPACE)
 
     # import matplotlib.pyplot as plt
     # #
@@ -365,7 +417,7 @@ if __name__ == '__main__':
     # t = np.linspace(-4, 4, 500)
     # y = np.exp( -t**2 ) + np.random.normal(0, 0.05, t.shape)
     # ysg = sg(y, window=31, order=4)
-    
+
     # plt.figure(1)
     # plt.plot(t, y, label='Noisy signal')
     # plt.plot(t, np.exp(-t**2), 'k', lw=1.5, label='Original signal')
@@ -380,7 +432,7 @@ if __name__ == '__main__':
     # Z = np.exp( -(X**2+Y**2))
     # Zn = Z + np.random.normal(0, 0.2, Z.shape)
     # Zf = sg2d(Zn, window=29, order=4)
-   
+
     # plt.matshow(Z)
     # plt.matshow(Zn)
     # plt.matshow(Zf)
@@ -406,8 +458,8 @@ if __name__ == '__main__':
     # #  2.95156495e+00  -3.03885643e+00  -3.68285622e+00  -1.20119683e+00
     # #  9.21248188e-02  -1.38777878e-17]
 
-    
-    
+
+
     # np.random.seed(1)
     # x = np.linspace(-3,3,5)
     # y = np.linspace(-3,3,3)

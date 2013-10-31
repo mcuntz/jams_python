@@ -192,7 +192,7 @@ def gapfill(date, data, rg, tair, vpd,
         (vpd.size != ndata) | (data_flg.size != ndata) | (rg_flg.size != ndata) |
         (tair_flg.size != ndata) | (vpd_flg.size != ndata)):
         raise ValueError('inputs must have the same size.')
-        
+
     # -------------------------------------------------------------
     # Parameters
 
@@ -448,7 +448,7 @@ def gapfill(date, data, rg, tair, vpd,
 
 if __name__ == '__main__':
     import doctest
-    doctest.testmod()
+    doctest.testmod(optionflags=doctest.NORMALIZE_WHITESPACE)
 
     # print 'Read data'
     # from fread import *
