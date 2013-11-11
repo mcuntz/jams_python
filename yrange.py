@@ -4,7 +4,7 @@ import numpy as np
 from around import * # from ufz
 import const         # from ufz
 
-def yrange(arr, symmetric=False):
+def yrange(*args, **kwargs):
     """
         Calculates plot range from input array
 
@@ -47,6 +47,23 @@ def yrange(arr, symmetric=False):
         >>> print(yrange(np.arange(102)-10., symmetric=True))
         [-91.0, 91.0]
 
+        >>> print(yrange(np.arange(102), np.arange(1002), np.arange(10002)))
+        [0.0, 10001.0]
+
+        >>> print(yrange(-np.arange(102), np.arange(1002), np.arange(10002)))
+        [-101.0, 10001.0]
+
+        >>> print(yrange(-np.arange(102), np.arange(1002), np.arange(10002), symmetric=True))
+        [-10001.0, 10001.0]
+
+        >>> print(yrange(-np.arange(102), np.arange(1002), np.arange(10002), symmetric=False))
+        [-101.0, 10001.0]
+
+        >>> a = np.ma.arange(102)
+        >>> a[-1] = np.ma.masked
+        >>> print(yrange(a))
+        [0.0, 100.0]
+
 
         License
         -------
@@ -72,37 +89,55 @@ def yrange(arr, symmetric=False):
         -------
         Written,  MC, Jan 2012
         Modified, MC, Feb 2013 - ported to Python 3
+                  MC, Nov 2013 - accept more than 1 array as input
+                  MC, Nov 2013 - masked arrays
     """
     #
     #eps = tiny
     eps = const.tiny
     # Check input
-    if len(arr) == 1:
-        return [arr[0],arr[0]]
-    maxarr = np.amax(arr)
-    minarr = np.amin(arr)
-    if maxarr == minarr:
-        return [maxarr,maxarr]
-    #
-    # Round to max difference between adjacent values
-    sarr    = np.sort(arr)
-    #maxdiff = np.amax(np.abs((sarr-np.roll(sarr,1))[1:]))
-    maxdiff = np.amax(np.diff(sarr))
-    expom   = np.log10(maxdiff)
-    if expom > 0:
-        expom = np.int(np.floor(expom+10.*eps*10.))
-    else:
-        expom = np.int(np.floor(expom-10.*eps))
-    mini = around(minarr, expom, floor=True)
-    #mini = np.around(minarr, expom)
-    maxi = around(maxarr, expom, ceil=True)
-    #maxi = np.around(maxarr, expom)
-    if symmetric:
-        if (mini*maxi < 0.):
-            maxmax =  np.amax(np.abs([mini,maxi]))
-            maxi   =  maxmax
-            mini   = -maxmax
-    #
+    if len(args) == 0:
+        raise ValueError('no input argument given.')
+    counter = 0
+    for i in args:
+        arr    = np.ma.array(i)
+        minarr = np.ma.amin(arr)
+        maxarr = np.ma.amax(arr)
+        # Round to max difference between adjacent values
+        if arr.size == 1:
+            expom = 0
+        else:
+            sarr    = np.ma.sort(arr)
+            maxdiff = np.ma.amax(np.diff(sarr))
+            expom   = np.ma.log10(maxdiff)
+            if expom > 0:
+                expom = np.int(np.floor(expom+10.*eps*10.))
+            else:
+                expom = np.int(np.floor(expom-10.*eps))
+        if counter == 0:
+            minall   = minarr
+            maxall   = maxarr
+            expomall = expom
+        else:
+            minall   = np.minimum(minall, minarr)
+            maxall   = np.maximum(maxall, maxarr)
+            if expomall > 0:
+                expomall = np.maximum(expomall, expom)
+            else:
+                expomall = np.minimum(expomall, expom)
+        counter += 1
+        
+    # Round range
+    mini = around(minall, expomall, floor=True)
+    maxi = around(maxall, expomall, ceil=True)
+
+    if 'symmetric' in kwargs:
+        if kwargs['symmetric']:
+            if (mini*maxi < 0.):
+                maxmax =  np.maximum(np.abs(mini),np.abs(maxi))
+                maxi   =  maxmax
+                mini   = -maxmax
+
     # Return range
     return [mini,maxi]
 
@@ -111,3 +146,30 @@ if __name__ == '__main__':
     import doctest
     doctest.testmod(optionflags=doctest.NORMALIZE_WHITESPACE)
 
+    # import numpy as np
+    
+    # print(yrange(np.arange(102)))
+    # #[0.0, 101.0]
+
+    # print(yrange(np.arange(102)-10.))
+    # #[-10.0, 91.0]
+
+    # print(yrange(np.arange(102)-10., symmetric=True))
+    # #[-91.0, 91.0]
+
+    # print(yrange(np.arange(102), np.arange(1002), np.arange(10002)))
+    # #[0.0, 10001.0]
+
+    # print(yrange(-np.arange(102), np.arange(1002), np.arange(10002)))
+    # #[-101.0, 10001.0]
+
+    # print(yrange(-np.arange(102), np.arange(1002), np.arange(10002), symmetric=True))
+    # #[-10001.0, 10001.0]
+
+    # print(yrange(-np.arange(102), np.arange(1002), np.arange(10002), symmetric=False))
+    # #[-101.0, 10001.0]
+    
+    # a = np.ma.arange(102)
+    # a[-1] = np.ma.masked
+    # print(yrange(a))
+    # #[0.0, 100.0]
