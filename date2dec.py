@@ -277,6 +277,7 @@ def date2dec(calendar = 'standard', units=None,
                  MC, Jul 2013 - ascii/eng without time defaults to 00:00:00
                  MC, Oct 2013 - Excel starts at 1 not at 0
                  MC, Oct 2013 - units bugs, e.g. 01.01.0001 was substracted if Julian calendar even with units
+                 MC, Nov 2013 - removed remnant of time treatment before time check in eng keyword
     """
 
     #
@@ -308,7 +309,7 @@ def date2dec(calendar = 'standard', units=None,
         outshape = ascii.shape
         asciifl  = ascii.flatten()
         timeobj  = np.zeros(insize, dtype=object)
-        # slicing of ascii strings to implement in datetime object. missing seconds
+        # slicing of ascii strings to implement in datetime object. missing times
         # will be set to 00.
         yr = np.zeros(insize, dtype=np.int)
         mo = np.zeros(insize, dtype=np.int)
@@ -353,7 +354,7 @@ def date2dec(calendar = 'standard', units=None,
         outshape = eng.shape
         engfl    = eng.flatten()
         timeobj  = np.zeros(insize, dtype=object)
-        # slicing of eng strings to implement in datetime object. missing seconds
+        # slicing of eng strings to implement in datetime object. missing times
         # will be set to 00.
         yr = np.zeros(insize, dtype=np.int)
         mo = np.zeros(insize, dtype=np.int)
@@ -367,7 +368,6 @@ def date2dec(calendar = 'standard', units=None,
             mo[i]   = int(ee[1])
             tail    = ee[2].split()
             dy[i]   = int(tail[0])
-            tim     = tail[1].split(':')
             if len(tail) > 1:
                 tim     = tail[1].split(':')
                 hr[i]   = int(tim[0])
