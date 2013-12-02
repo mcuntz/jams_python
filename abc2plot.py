@@ -5,7 +5,7 @@ from romanliterals import int2roman
 def abc2plot(handle, dx, dy, iplot, integer=False, roman=False, lower=False,
              small=False, medium=None, large=False, bold=False,
              parenthesis=None, brackets=None, braces=None,
-             usetex=False, mathrm=False):
+             usetex=False, mathrm=False, string=False):
     """
         Write a, b, c, ...
               A, B, C, ...
@@ -58,6 +58,8 @@ def abc2plot(handle, dx, dy, iplot, integer=False, roman=False, lower=False,
                     False:   No LaTeX math mode
         mathrm      True:    If usetex=True, surround by \mathrm{} or \mathbf{} if bold=True
                     False:   If usetex=True, standard math font.
+        string      True:    Treat iplot as literal string and not as number. integer, roman and lower are disabled.
+                    False:   iplot is integer (default)
 
 
         Output
@@ -103,30 +105,36 @@ def abc2plot(handle, dx, dy, iplot, integer=False, roman=False, lower=False,
                   MC, Feb 2013 - opening and closing parenthesis, brackets and braces
                   MC, Feb 2013 - usetex, mathrm
                   MC, Oct 2013 - \mathbf, large, default medium
+                  MC, Nov 2013 - string, corrected medium default
+                               - usetex works with fontsize keyword of axis.text() now (matplotlib v1.1.0)
     """
     # Check input
     if (roman & integer):
         raise ValueError('either roman literals or integers can be chosen.')
     if medium is None:
-        medium = True
-        if (small & large):
-            raise ValueError('only one of small, medium or large font size can be chosen.')
-        if small: medium = False
-        if large: medium = False
+        if (small+large) > 1:
+            raise ValueError('only one of small, medium or large font size can be chosen (1).')
+        elif (small+large) == 1:
+            medium = False
+        else:
+            medium = True
     else:
-        if (small | large):
-            raise ValueError('only one of small, medium or large font size can be chosen.')
+        if (small+medium+large) > 1:
+            raise ValueError('only one of small, medium or large font size can be chosen (2).')
 
     # Number or letter
-    if roman:
-        t = int2roman(iplot, lower=lower)
-    elif integer:
+    if string:
         t = str(iplot)
     else:
-        if lower:
-            t = chr(96+iplot)
+        if roman:
+            t = int2roman(iplot, lower=lower)
+        elif integer:
+            t = str(iplot)
         else:
-            t = chr(64+iplot)
+            if lower:
+                t = chr(96+iplot)
+            else:
+                t = chr(64+iplot)
 
     # Size
     if small:  fs='small'
@@ -197,9 +205,10 @@ def abc2plot(handle, dx, dy, iplot, integer=False, roman=False, lower=False,
                 t = '\mathbf{' + t + '}'
             else:
                 t = '\mathrm{' + t + '}'
-        if small:  t = '\small ' + t
-        if large:  t = '\large ' + t
-        t = '$' + t + '$'
+        # Works with fontsize keyword now (matplotlib v1.1.0)
+        # if small:  t = '\small ' + t
+        # if large:  t = '\large ' + t
+        t = r'$' + t + r'$'
 
     xmin, xmax = handle.get_xlim()
     ymin, ymax = handle.get_ylim()
@@ -249,7 +258,9 @@ if __name__ == '__main__':
     # abc2plot(sub,0.3,0.3,2,roman=True,parenthesis='both')
     # abc2plot(sub,0.4,0.4,2,roman=True,lower=True,parenthesis='none')
     # abc2plot(sub,0.5,0.5,2,integer=True,parenthesis='both',usetex=usetex)
-    # abc2plot(sub,0.6,0.6,2,small=True,parenthesis='both',usetex=usetex,mathrm=False)
+    # abc2plot(sub,0.5,0.6,2,small=True,medium=False,large=False,parenthesis='both',usetex=usetex,mathrm=False)
+    # abc2plot(sub,0.6,0.6,2,small=False,medium=True,large=False,parenthesis='both',usetex=usetex,mathrm=False)
+    # abc2plot(sub,0.7,0.6,2,small=False,medium=False,large=True,parenthesis='both',usetex=usetex,mathrm=False)
     # abc2plot(sub,0.7,0.7,2,medium=True,brackets='both',usetex=usetex,mathrm=True)
     # abc2plot(sub,0.8,0.8,2,medium=True,bold=True,braces='both',usetex=usetex,mathrm=True)
 
