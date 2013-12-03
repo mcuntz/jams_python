@@ -100,6 +100,7 @@ pdffile = args.pdffile
 usetex  = args.usetex
 del parser, args
 
+# import packages after help so that help with command line -h is fast
 import numpy as np
 import ufz
 import scipy.optimize as opt
