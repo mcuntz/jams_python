@@ -1,12 +1,12 @@
 #!/usr/bin/env python
 from __future__ import print_function
 """
-usage: mc_plot_template.py [-h] [-p pdffile] [-t]
+usage: mc_plot_template.py [-h] [-f flag] [-g pngbase] [-p pdffile] [-t]
                            [additional_args [additional_args ...]]
 
 description:
   This is the python plot template of Matthias Cuntz.
-  It provides quick view on screen or PDF output.
+  It provides quick view on screen or PDF or PNG output.
   It is designed for publication-ready PDF output so screen output is not optimal.
 
   The template also serves as a lookup of Python tips and tricks as well as a gallery
@@ -17,6 +17,10 @@ positional arguments:
 
 optional arguments:
   -h, --help            show this help message and exit
+  -f flag, --flag flag  Bit flag (default: 3): 1: do this; 2: do that.
+  -g pngbase, --pngbase pngbase
+                        Name basis for png output files (default: open screen
+                        window).
   -p pdffile, --pdffile pdffile
                         Name of pdf output file (default: open screen window).
   -t, --usetex          Use LaTeX to render text in pdf.
@@ -47,6 +51,7 @@ History
 Written,  MC, Jul 2012
 Modified, MC, Jul 2013 - optparse->argparse
           MC, Jul 2013 - extended to be lookup and gallery
+          MC, Dec 2013 - add png support
 """
 
 # Hardcoded switches for plot gallery
@@ -67,6 +72,7 @@ import textwrap
 
 addargs = []
 doflag  = 3
+pngbase = ''
 pdffile = ''
 usetex  = False
 parser  = argparse.ArgumentParser(
@@ -74,7 +80,7 @@ parser  = argparse.ArgumentParser(
                                   description=textwrap.dedent('''\
           description:
             This is the python plot template of Matthias Cuntz.
-            It provides quick view on screen or PDF output.
+            It provides quick view on screen or PDF or PNG output.
             It is designed for publication-ready PDF output so screen output is not optimal.
 
             The template also serves as a lookup of Python tips and tricks as well as a gallery
@@ -85,6 +91,9 @@ parser.add_argument('-f', '--flag', action='store',
                     help="Bit flag (default: 3):"
                          " 1: do this;"
                          " 2: do that.")
+parser.add_argument('-g', '--pngbase', action='store',
+                    default=pngbase, dest='pngbase', metavar='pngbase',
+                    help='Name basis for png output files (default: open screen window).')
 parser.add_argument('-p', '--pdffile', action='store',
                     default=pdffile, dest='pdffile', metavar='pdffile',
                     help='Name of pdf output file (default: open screen window).')
@@ -97,8 +106,12 @@ args    = parser.parse_args()
 addargs = args.further
 doflag  = args.doflag
 pdffile = args.pdffile
+pngbase = args.pngbase
 usetex  = args.usetex
 del parser, args
+
+if (pdffile != '') & (pngbase != ''):
+    raise ValueError('PDF and PNG are mutually exclusive. Only either -p or -g possible.')
 
 # import packages after help so that help with command line -h is fast
 import numpy as np
@@ -112,7 +125,10 @@ t1 = time.time()
 #
 
 if (pdffile == ''):
-    outtype = 'x'
+    if (pngbase == ''):
+        outtype = 'x'
+    else:
+        outtype = 'png'
 else:
     outtype = 'pdf'
 
@@ -155,25 +171,41 @@ llhtextpad  = 0.4         # the pad between the legend handle and text
 llhlength   = 1.5         # the length of the legend handles
 frameon     = False       # if True, draw a frame around the legend. If None, use rc
 
+# PNG
+dpi         = 300
+transparent = False
+bbox_inches = 'tight'
+pad_inches  = 0
+
 import matplotlib as mpl
 if (outtype == 'pdf'):
-  mpl.use('PDF') # set directly after import matplotlib
-  import matplotlib.pyplot as plt
-  from matplotlib.backends.backend_pdf import PdfPages
-  # Customize: http://matplotlib.sourceforge.net/users/customizing.html
-  mpl.rc('ps', papersize='a4', usedistiller='xpdf') # ps2pdf
-  mpl.rc('figure', figsize=(8.27,11.69)) # a4 portrait
-  if usetex:
-    mpl.rc('text', usetex=True)
-  else:
-    #mpl.rc('font',**{'family':'sans-serif','sans-serif':['Helvetica']})
-    mpl.rc('font',**{'family':'serif','serif':['times']})
-  mpl.rc('text.latex', unicode=True)
-  mpl.rc('font', size=textsize)
+    mpl.use('PDF') # set directly after import matplotlib
+    import matplotlib.pyplot as plt
+    from matplotlib.backends.backend_pdf import PdfPages
+    # Customize: http://matplotlib.sourceforge.net/users/customizing.html
+    mpl.rc('ps', papersize='a4', usedistiller='xpdf') # ps2pdf
+    mpl.rc('figure', figsize=(8.27,11.69)) # a4 portrait
+    if usetex:
+        mpl.rc('text', usetex=True)
+    else:
+        #mpl.rc('font',**{'family':'sans-serif','sans-serif':['Helvetica']})
+        mpl.rc('font',**{'family':'serif','serif':['times']})
+    mpl.rc('text.latex', unicode=True)
+elif (outtype == 'png'):
+    mpl.use('Agg') # set directly after import matplotlib
+    import matplotlib.pyplot as plt
+    mpl.rc('figure', figsize=(8.27,11.69)) # a4 portrait
+    if usetex:
+        mpl.rc('text', usetex=True)
+    else:
+        #mpl.rc('font',**{'family':'sans-serif','sans-serif':['Helvetica']})
+        mpl.rc('font',**{'family':'serif','serif':['times']})
+    mpl.rc('text.latex', unicode=True)
+    mpl.rc('savefig', dpi=dpi, format='png')
 else:
-  import matplotlib.pyplot as plt
-  mpl.rc('figure', figsize=(4./5.*8.27,4./5.*11.69)) # a4 portrait
-  mpl.rc('font', size=textsize)
+    import matplotlib.pyplot as plt
+    mpl.rc('figure', figsize=(4./5.*8.27,4./5.*11.69)) # a4 portrait
+mpl.rc('font', size=textsize)
 mpl.rc('lines', linewidth=lwidth, color='black')
 mpl.rc('axes', linewidth=alwidth, labelcolor='black')
 mpl.rc('path', simplify=False) # do not remove
@@ -250,7 +282,7 @@ if dorandom:
   p = open(ofile, 'wb')
   savearg = 'p'
   for j in allvars: savearg = savearg + ', '+j+'='+j
-  exec("np.savez("+savearg+")")
+  exec("np.savez_compressed("+savearg+")")
   p.close()
 
   # Read numpy zipped file
@@ -334,6 +366,8 @@ if dobasemap | docartopy:
 if (outtype == 'pdf'):
     print('Plot PDF ', pdffile)
     pdf_pages = PdfPages(pdffile)
+elif (outtype == 'png'):
+    print('Plot PNG ', pngbase)
 else:
     print('Plot X')
 # figsize = mpl.rcParams['figure.figsize']
@@ -553,8 +587,12 @@ if dorandom:
 
 
   if (outtype == 'pdf'):
-    pdf_pages.savefig(fig)
-    plt.close()
+      pdf_pages.savefig(fig)
+      plt.close(fig)
+  elif (outtype == 'png'):
+      pngfile = pngbase+"{0:04d}".format(ifig)+".png"
+      fig.savefig(pngfile, transparent=transparent, bbox_inches=bbox_inches, pad_inches=pad_inches)
+      plt.close(fig)
 
 
 if dobasemap:
@@ -673,8 +711,12 @@ if dobasemap:
   m.drawmeridians(meridians, labels=[0,0,0,1], fontsize=xsize, linewidth=0)
 
   if (outtype == 'pdf'):
-    pdf_pages.savefig(fig)
-    plt.close()
+      pdf_pages.savefig(fig)
+      plt.close(fig)
+  elif (outtype == 'png'):
+      pngfile = pngbase+"{0:04d}".format(ifig)+".png"
+      fig.savefig(pngfile, transparent=transparent, bbox_inches=bbox_inches, pad_inches=pad_inches)
+      plt.close(fig)
 
 
 if docartopy:
@@ -810,14 +852,20 @@ if docartopy:
 
 
   if (outtype == 'pdf'):
-    pdf_pages.savefig(fig)
-    plt.close()
+      pdf_pages.savefig(fig)
+      plt.close(fig)
+  elif (outtype == 'png'):
+      pngfile = pngbase+"{0:04d}".format(ifig)+".png"
+      fig.savefig(pngfile, transparent=transparent, bbox_inches=bbox_inches, pad_inches=pad_inches)
+      plt.close(fig)
 
 
 if (outtype == 'pdf'):
-  pdf_pages.close()
+    pdf_pages.close()
+elif (outtype == 'png'):
+    pass
 else:
-  plt.show()
+    plt.show()
 
 t2    = time.time()
 strin = '[m]: '+ufz.astr((t2-t1)/60.,1) if (t2-t1)>60. else '[s]: '+ufz.astr(t2-t1,0)
