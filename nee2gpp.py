@@ -299,7 +299,7 @@ def nee2gpp_falge(dates, nee, t, isday, undef=np.nan,
     	if np.ma.any(t==undef):     t[t==undef]         = np.ma.masked
     	if np.ma.any(isday==undef): isday[isday==undef] = np.ma.masked
 
-    # Partition - Global relationship as in Reichstein et al. (2005)
+    # Partition - Global relationship as in Falge et al. (2001)
 
     # Select valid nighttime
     mask = isday | nee.mask | t.mask | isday.mask
@@ -452,7 +452,6 @@ def nee2gpp_reichstein(dates, nee, t, isday, rg=False, vpd=False, undef=np.nan,
                  MC, Nov 2012 - individual routine
                  MC, Feb 2013 - ported to Python 3
     """
-
     # Checks
 
     # remember shape if any
@@ -506,15 +505,13 @@ def nee2gpp_reichstein(dates, nee, t, isday, rg=False, vpd=False, undef=np.nan,
             net1 = net[iii]
             mm   = ~mad(net1, z=7) # make fit more robust by removing outlier
             if ((np.amax(tt[iii])-np.amin(tt[iii])) >= 5.) & (np.sum(mm) > 5):
-                # if i == 2455964: pdb.set_trace()                
-                p, c  = opt.curve_fit(functions.lloyd_fix, tt1[mm], net1[mm], p0=[2.,200.]) # params, covariance
+                # if i == 2454118: pdb.set_trace()
+                p, c  = opt.curve_fit(functions.lloyd_fix, tt1[mm], net1[mm], p0=[2.,200.], maxfev=10000) # params, covariance
                 # p     = opt.fmin(functions.cost_lloyd_fix, [2.,200.], args=(tt1[mm], net1[mm]), disp=False) # robust params
-                # res   = np.sum((net[iii]-functions.lloyd_fix(tt[iii],p[0],p[1]))**2) # residuals
-                # s     = np.sqrt(np.diag(c * res)/np.float(niii-2))                   # std err
-                # # s    = np.sqrt(np.diag(c * res))                                     # std dev
                 s     = np.sqrt(np.diag(c))
                 locp += [p]
                 locs += [s]
+                # if ((s[1]/p[1])<0.5) & (p[1] > 0.): pdb.set_trace()
                 # locc += [c]
     if len(locp) == 0:
         raise ValueError('Error nee2gpp_reichstein: No local relationship found.')
@@ -523,10 +520,21 @@ def nee2gpp_reichstein(dates, nee, t, isday, rg=False, vpd=False, undef=np.nan,
     # locc   = np.squeeze(np.array(locc).astype(np.float))
 
     # 2. E0 = avg of best 3
+    # Reichstein et al. (2005), p. 1430, 1st paragraph.
     iii  = np.squeeze(np.where((locp[:,1] > 0.) & (locp[:,1] < 450.) & (np.abs(locs[:,1]/locp[:,1]) < 0.5)))
     niii = iii.size
     if niii==0:
-        raise ValueError('Error nee2gpp_reichstein: No good local relationship found.')
+        # raise ValueError('Error nee2gpp_reichstein: No good local relationship found.')
+        # loosen the criteria: take the best three estimates anyway
+        iii   = np.where((locp[:,1] > 0.))[0]
+        niii = iii.size
+        if niii<3:
+            raise ValueError('Error nee2gpp_reichstein: No 3 E0>0 found.')
+        lp    = locp[iii,:]
+        ls    = locs[iii,:]
+        iis   = np.argsort(ls[:,1])
+        bestp = np.mean(lp[iis[0:3],:],axis=0)
+        bests = np.mean(ls[iis[0:3],:],axis=0)
     elif niii==1:
         bestp = locp[iii,:]
         bests = locs[iii,:]
@@ -559,7 +567,7 @@ def nee2gpp_reichstein(dates, nee, t, isday, rg=False, vpd=False, undef=np.nan,
             # p = np.sum(net[iii]*et[iii])/np.sum(et[iii]**2)
             # p, c = opt.curve_fit(functions.lloyd_only_rref, et[iii], net[iii], p0=[2.])
             #p      = opt.fmin(functions.cost_lloyd_only_rref, [2.], args=(et[iii], net[iii]), disp=False)
-            p      = opt.fmin(functions.cost_abs, [2.], args=(functions.lloyd_only_rref_p, et[iii], net[iii]), disp=False)
+            p = opt.fmin(functions.cost_abs, [2.], args=(functions.lloyd_only_rref_p, et[iii], net[iii]), disp=False)
             refp  += [p]
             refii += [np.int((iii[0]+iii[-1])//2)]
     if len(refp) == 0:
