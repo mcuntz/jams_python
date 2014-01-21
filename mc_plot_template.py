@@ -59,9 +59,9 @@ dorandom  = True  # Scatter and histogram
 dobasemap = True  # map with basemap
 docartopy = True  # map with cartopy
 
-# python debugger
+# # python debugger
 # import pdb
-# pdb.set_trace()
+# pdb.set_trace() # set breakpoint
 
 # -------------------------------------------------------------------------
 # Command line arguments
@@ -450,7 +450,7 @@ if dorandom:
   if xlim != None: plt.setp(sub, xlim=xlim) # set axis limit if wanted
   if ylim != None: plt.setp(sub, ylim=ylim)
 
-  ll = sub.legend(mark1, [r'$\mathrm{Uniform \; vs. \; Gauss}$'], frameon=frameon, ncol=1,
+  ll = sub.legend(mark1, [r'$\mathrm{\ddot{U}niform \; vs. \; G\ddot{a}uss}$'], frameon=frameon, ncol=1,
                   labelspacing=llrspace, handletextpad=llhtextpad, handlelength=llhlength,
                   loc='upper right', bbox_to_anchor=(1+llxbbox,1+llybbox), scatterpoints=1, numpoints=1)
   plt.setp(ll.get_texts(), fontsize='small')
@@ -466,7 +466,7 @@ if dorandom:
   # Gauss curve
   iplot += 1
   xlab   = r'$N('+ufz.astr(mu)+','+ufz.astr(sigma,1)+')$'
-  ylab   = r'$\mathrm{Normed \; \#/bin}$'
+  ylab   = r'$\mathrm{Rel. \; frequency}$'
   sub    = fig.add_axes(ufz.position(nrow,ncol,iplot,hspace=hspace,vspace=vspace))
 
   nbins  = ndata/30

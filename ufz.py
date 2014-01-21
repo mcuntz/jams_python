@@ -57,7 +57,7 @@
     morris_sampling        Sampling of optimised trajectories for Morris measures / elementary effects
     ncread                 Wrapper for readnetcdf.
     nee2gpp                Photosynthesis and ecosystem respiration from NEE Eddy flux data.
-    nee2gpp_global         nee2gpp using one fit for whole time period
+    nee2gpp_falge          nee2gpp using one fit for whole time period
     nee2gpp_lasslop        nee2gpp using the daytime method of Lasslop et al. (2010)
     nee2gpp_reichstein     nee2gpp using several fits as in Reichstein et al. (2005)
     netcdfread             Wrapper for readnetcdf.
@@ -139,7 +139,7 @@
     mad                    Median absolute deviation test.
     means                  Calculate daily, monthly, yearly, etc. means of data depending on date stamp.
     nee2gpp                Photosynthesis and ecosystem respiration from NEE Eddy flux data.
-    nee2gpp_global         nee2gpp using one fit for whole time period
+    nee2gpp_falge          nee2gpp using one fit for whole time period
     nee2gpp_lasslop        nee2gpp using the daytime method of Lasslop et al. (2010)
     nee2gpp_reichstein     nee2gpp using several fits as in Reichstein et al. (2005)
     outlier                Rossner''s extreme standardized deviate outlier test.
@@ -288,7 +288,7 @@
               MC, Oct 2012 - savitzky_golay
               MC, Nov 2012 - added netcdftime but no import so that available w/o netcdf
               AP, Nov 2012 - convex_hull, in_poly, kriging, semivariogram update, srrasa, srrasa_trans
-              MC, Nov 2012 - nee2gpp, nee2gpp_global, nee2gpp_lasslop, nee2gpp_reichstein
+              MC, Nov 2012 - nee2gpp, nee2gpp_falge, nee2gpp_lasslop, nee2gpp_reichstein
               MC, Dec 2012 - functions
                            - gap_filling obsolete
               MC, Feb 2013 - area_poly
@@ -343,7 +343,7 @@ from jab               import *
 from mad               import *
 from means             import *
 from morris            import morris_sampling, elementary_effects
-from nee2gpp           import nee2gpp, nee2gpp_global, nee2gpp_lasslop, nee2gpp_reichstein
+from nee2gpp           import nee2gpp, nee2gpp_falge, nee2gpp_lasslop, nee2gpp_reichstein
 try:
     from outlier       import outlier, rossner
 except:

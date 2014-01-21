@@ -3,24 +3,27 @@ from __future__ import print_function
 import numpy as np
 import scipy.optimize as opt # curve_fit, fmin, fmin_tnc
 import functions # from ufz
+from mad import * # from ufz
+# import pdb
 
 # ----------------------------------------------------------------------
 def nee2gpp(dates, nee, t, isday, rg=False, vpd=False, undef=np.nan,
-            method='local', shape=False, masked=False):
+            method='reichstein', shape=False, masked=False):
     """
         Calculate photosynthesis (GPP) and ecosystem respiration (Reco) from original
         Eddy flux data.
 
-        It uses either a fit of Reco vs. temperature to all nighttime data,
-        or several fits over the season of Reco vs. temperature as in Reichstein et al. (2005),
-        or the daytime method of Lasslop et al. (2010),
+        It uses either
+          1. a fit of Reco vs. temperature to all nighttime data, or
+          2. several fits over the season of Reco vs. temperature as in Reichstein et al. (2005), or
+          3. the daytime method of Lasslop et al. (2010),
         in order to calculate Reco and then GPP = Reco - NEE.
 
 
         Definition
         ----------
         def nee2gpp(dates, nee, t, isday, rg=False, vpd=False, undef=np.nan,
-                    method='local', shape=False, masked=False):
+                    method='reichstein', shape=False, masked=False):
 
 
         Input
@@ -42,9 +45,9 @@ def nee2gpp(dates, nee, t, isday, rg=False, vpd=False, undef=np.nan,
         ----------
         undef        undefined values in data  (default: np.nan)
                      Input arrays will be masked at undef, keeping the original mask
-        method       if 'global':                fit of Reco vs. temperature to all nighttime data
-                     if 'local' | 'reichstein':  method of Reichstein et al. (2005)
-                     if 'day'   | 'lasslop':     method of Lasslop et al. (2010)
+        method       if 'global' | 'falge':      fit of Reco vs. temperature to all nighttime data
+                     if 'local'  | 'reichstein': method of Reichstein et al. (2005)
+                     if 'day'    | 'lasslop':    method of Lasslop et al. (2010)
         shape        if False then outputs are 1D arrays;
                      if True, output have the same shape as datain
                      if a shape tuple is given, then this tuple is used to reshape
@@ -64,15 +67,19 @@ def nee2gpp(dates, nee, t, isday, rg=False, vpd=False, undef=np.nan,
 
         Literature
         ----------
-        Reichstein et al. (2005)
-            On the separation of net ecosystem exchange into assimilation and ecosystem
-            respiration: review and improved algorithm.
-            Global Change Biology 11, 1424-1439
+        Falge et al. (2001)
+            Gap filling strategies for defensible annual sums of net ecosystem exchange
+            Acricultural and Forest Meteorology 107, 43-69
 
         Lasslop et al. (2010)
             Separation of net ecosystem exchange into assimilation and respiration using
             a light response curve approach: critical issues and global evaluation
             Global Change Biology 16, 187-208
+
+        Reichstein et al. (2005)
+            On the separation of net ecosystem exchange into assimilation and ecosystem
+            respiration: review and improved algorithm.
+            Global Change Biology 11, 1424-1439
 
 
         Examples
@@ -96,9 +103,9 @@ def nee2gpp(dates, nee, t, isday, rg=False, vpd=False, undef=np.nan,
         >>> GPP, Reco = nee2gpp(dates, NEE, tt, isday, undef=undef, method='local')
         >>> print(astr(GPP[1120:1128],3,pp=True))
         ['-9999.000' '-9999.000' '-9999.000' '    4.491' '    8.396' '   10.688' '    8.542' '   11.271']
-        >>> GPP, Reco = nee2gpp(dates, NEE, tt, isday, undef=undef, method='global')
+        >>> GPP, Reco = nee2gpp(dates, NEE, tt, isday, undef=undef, method='reichstein')
         >>> print(astr(GPP[1120:1128],3,pp=True))
-        ['-9999.000' '-9999.000' '-9999.000' '    4.332' '    8.182' '   10.409' '    8.194' '   10.843']
+        ['-9999.000' '-9999.000' '-9999.000' '    4.491' '    8.396' '   10.688' '    8.542' '   11.271']
         >>> GPP, Reco = nee2gpp(dates, NEE, tt, isday, undef=undef, method='local', masked=True)
         >>> print(astr(GPP[1120:1128],3,pp=True))
         ['--    ' '--    ' '--    ' ' 4.491' ' 8.396' '10.688' ' 8.542' '11.271']
@@ -151,8 +158,8 @@ def nee2gpp(dates, nee, t, isday, rg=False, vpd=False, undef=np.nan,
     """
 
     # Global relationship in Reichstein et al. (2005)
-    if method.lower() == 'global':
-        return nee2gpp_global(dates, nee, t, isday, undef=undef, shape=shape, masked=masked)
+    if ((method.lower() == 'global') | (method.lower() == 'falge')):
+        return nee2gpp_falge(dates, nee, t, isday, undef=undef, shape=shape, masked=masked)
     # Local relationship = Reichstein et al. (2005)
     elif ((method.lower() == 'local') | (method.lower() == 'reichstein')):
         return nee2gpp_reichstein(dates, nee, t, isday, undef=undef, shape=shape, masked=masked)
@@ -166,7 +173,7 @@ def nee2gpp(dates, nee, t, isday, rg=False, vpd=False, undef=np.nan,
 
 
 # ----------------------------------------------------------------------
-def nee2gpp_global(dates, nee, t, isday, undef=np.nan,
+def nee2gpp_falge(dates, nee, t, isday, undef=np.nan,
             shape=False, masked=False):
     """
         Calculate photosynthesis (GPP) and ecosystem respiration (Reco) from original
@@ -176,7 +183,7 @@ def nee2gpp_global(dates, nee, t, isday, undef=np.nan,
 
         Definition
         ----------
-        def nee2gpp_global(dates, nee, t, isday, undef=np.nan, shape=False, masked=False):
+        def nee2gpp_falge(dates, nee, t, isday, undef=np.nan, shape=False, masked=False):
 
 
         Input
@@ -210,10 +217,9 @@ def nee2gpp_global(dates, nee, t, isday, undef=np.nan,
 
         Literature
         ----------
-        Reichstein et al. (2005)
-            On the separation of net ecosystem exchange into assimilation and ecosystem
-            respiration: review and improved algorithm.
-            Global Change Biology 11, 1424-1439
+        Falge et al. (2001)
+            Gap filling strategies for defensible annual sums of net ecosystem exchange
+            Acricultural and Forest Meteorology 107, 43-69
 
 
         Examples
@@ -271,13 +277,13 @@ def nee2gpp_global(dates, nee, t, isday, undef=np.nan,
     t       = np.squeeze(t)
     isday   = np.squeeze(isday)
     # Check squeezed shape
-    if dates.ndim != 1: raise Error('Error nee2gpp_global: squeezed dates must be 1D array.')
-    if nee.ndim   != 1: raise Error('Error nee2gpp_global: squeezed nee must be 1D array.')
-    if t.ndim     != 1: raise Error('Error nee2gpp_global: squeezed t must be 1D array.')
-    if isday.ndim != 1: raise Error('Error nee2gpp_global: squeezed isday must be 1D array.')
+    if dates.ndim != 1: raise Error('Error nee2gpp_falge: squeezed dates must be 1D array.')
+    if nee.ndim   != 1: raise Error('Error nee2gpp_falge: squeezed nee must be 1D array.')
+    if t.ndim     != 1: raise Error('Error nee2gpp_falge: squeezed t must be 1D array.')
+    if isday.ndim != 1: raise Error('Error nee2gpp_falge: squeezed isday must be 1D array.')
     ndata = dates.size
     if ((nee.size != ndata) | (t.size != ndata) | (isday.size != ndata)):
-        raise Error('Error nee2gpp_global: inputs must have the same size.')
+        raise Error('Error nee2gpp_falge: inputs must have the same size.')
 
     # Transform to masked array with 1D mask
     nee   = np.ma.array(nee, mask=False)
@@ -496,20 +502,25 @@ def nee2gpp_reichstein(dates, nee, t, isday, rg=False, vpd=False, undef=np.nan,
         iii  = np.squeeze(np.where((jul>=i) & (jul<(i+14))))
         niii = iii.size
         if niii > 6:
-            if (np.amax(tt[iii])-np.amin(tt[iii])) >= 5.:
-                p, c  = opt.curve_fit(functions.lloyd_fix, tt[iii], net[iii], p0=[2.,200.]) # params, covariance
-                # p     = opt.fmin(functions.cost_lloyd_fix, [2.,200.], args=(tt[iii], net[iii]), disp=False)
-                res   = np.sum((net[iii]-functions.lloyd_fix(tt[iii],p[0],p[1]))**2)        # residuals
-                s     = np.sqrt(np.diag(c * res)/np.float(niii-2))            # std err
-                # s    = np.sqrt(np.diag(c * res))                           # std dev
+            tt1  = tt[iii]
+            net1 = net[iii]
+            mm   = ~mad(net1, z=7) # make fit more robust by removing outlier
+            if ((np.amax(tt[iii])-np.amin(tt[iii])) >= 5.) & (np.sum(mm) > 5):
+                # if i == 2455964: pdb.set_trace()                
+                p, c  = opt.curve_fit(functions.lloyd_fix, tt1[mm], net1[mm], p0=[2.,200.]) # params, covariance
+                # p     = opt.fmin(functions.cost_lloyd_fix, [2.,200.], args=(tt1[mm], net1[mm]), disp=False) # robust params
+                # res   = np.sum((net[iii]-functions.lloyd_fix(tt[iii],p[0],p[1]))**2) # residuals
+                # s     = np.sqrt(np.diag(c * res)/np.float(niii-2))                   # std err
+                # # s    = np.sqrt(np.diag(c * res))                                     # std dev
+                s     = np.sqrt(np.diag(c))
                 locp += [p]
                 locs += [s]
                 # locc += [c]
     if len(locp) == 0:
         raise ValueError('Error nee2gpp_reichstein: No local relationship found.')
-    locp   = np.squeeze(np.array(locp))
-    locs   = np.squeeze(np.array(locs))
-    # locc   = np.squeeze(np.array(locc))
+    locp   = np.squeeze(np.array(locp).astype(np.float))
+    locs   = np.squeeze(np.array(locs).astype(np.float))
+    # locc   = np.squeeze(np.array(locc).astype(np.float))
 
     # 2. E0 = avg of best 3
     iii  = np.squeeze(np.where((locp[:,1] > 0.) & (locp[:,1] < 450.) & (np.abs(locs[:,1]/locp[:,1]) < 0.5)))
