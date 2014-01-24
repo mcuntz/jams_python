@@ -349,7 +349,7 @@ def nee2gpp_reichstein(dates, nee, t, isday, rg=False, vpd=False, undef=np.nan,
 
         Definition
         ----------
-        def nee2gpp_reichstein(dates, nee, t, isday, undef=np.nan, shape=False, masked=False):
+        def nee2gpp_reichstein(dates, nee, t, isday, undef=np.nan, shape=None, masked=False):
 
 
         Input
@@ -364,10 +364,10 @@ def nee2gpp_reichstein(dates, nee, t, isday, rg=False, vpd=False, undef=np.nan,
         ----------
         undef        undefined values in data  (default: np.nan)
                      Input arrays will be masked at undef, keeping the original mask
-        shape        if False then outputs are 1D arrays;
+        shape        if False then outputs are 1D arrays (default)
                      if True, output have the same shape as datain
                      if a shape tuple is given, then this tuple is used to reshape
-        masked       if False: outputs are undef where nee and t are masked or undef
+        masked       if False: outputs are undef where nee and t are masked or undef (default)
                      if True:  return masked arrays where outputs would be undef
 
 
@@ -455,11 +455,16 @@ def nee2gpp_reichstein(dates, nee, t, isday, rg=False, vpd=False, undef=np.nan,
     # Checks
 
     # remember shape if any
-    inshape = nee.shape
+    if shape != False:
+        if shape != True:
+            inshape = shape
+        else:
+            inshape = nee.shape
     dates   = np.squeeze(dates)
     nee     = np.squeeze(nee)
     t       = np.squeeze(t)
     isday   = np.squeeze(isday)
+    if shape == False: inshape = nee.shape
     # Check squeezed shape
     if dates.ndim != 1: raise ValueError('Error nee2gpp_reichstein: squeezed dates must be 1D array.')
     if nee.ndim   != 1: raise ValueError('Error nee2gpp_reichstein: squeezed nee must be 1D array.')
@@ -487,14 +492,22 @@ def nee2gpp_reichstein(dates, nee, t, isday, rg=False, vpd=False, undef=np.nan,
 
     # Select valid nighttime
     mask = isday | nee.mask | t.mask | isday.mask
-    ii   = np.squeeze(np.where(~mask))
+    ii   = np.where(~mask)[0]
+    if (ii.size==0):
+        print('Warning nee2gpp_reichstein: no valid nighttime data.')
+        if masked:
+            GPP  = np.ma.array(np.reshape(nee,inshape), mask=np.ones(inshape, dtype=np.bool))
+            Reco = np.ma.array(np.reshape(nee,inshape), mask=np.ones(inshape, dtype=np.bool))
+        else:
+            GPP  = np.ones(np.reshape(nee,inshape))*undef
+            Reco = np.ones(np.reshape(nee,inshape))*undef
+        return GPP, Reco
     jul  = dates[ii]
     tt   = np.ma.compressed(t[ii])
     net  = np.ma.compressed(nee[ii])
     # 1. each 5 days, in 15 day period, fit if range of T > 5
     locp = [] # local param
     locs = [] # local err
-    #locc = [] # local cov
     dmin = np.int(np.floor(np.amin(jul))) # be aware that julian days starts at noon, i.e. 1.0 is 12h
     dmax = np.int(np.ceil(np.amax(jul)))  # so the search will be from noon to noon and thus includes all nights
     for i in range(dmin,dmax,5):
@@ -503,22 +516,34 @@ def nee2gpp_reichstein(dates, nee, t, isday, rg=False, vpd=False, undef=np.nan,
         if niii > 6:
             tt1  = tt[iii]
             net1 = net[iii]
-            mm   = ~mad(net1, z=7) # make fit more robust by removing outlier
-            if ((np.amax(tt[iii])-np.amin(tt[iii])) >= 5.) & (np.sum(mm) > 5):
-                # if i == 2454118: pdb.set_trace()
-                p, c  = opt.curve_fit(functions.lloyd_fix, tt1[mm], net1[mm], p0=[2.,200.], maxfev=10000) # params, covariance
-                # p     = opt.fmin(functions.cost_lloyd_fix, [2.,200.], args=(tt1[mm], net1[mm]), disp=False) # robust params
-                s     = np.sqrt(np.diag(c))
+            mm   = ~mad(net1, z=4.5) # make fit more robust by removing outliers
+            if (np.ptp(tt[iii]) >= 5.) & (np.sum(mm) > 6):
+                # print(i)
+                p     = opt.fmin(functions.cost_lloyd_fix, [2.,200.], args=(tt1[mm], net1[mm]), disp=False) # robust params
+                # if i == 2451921: pdb.set_trace()
+                try:
+                    p1, c = opt.curve_fit(functions.lloyd_fix, tt1[mm], net1[mm], p0=p, maxfev=10000) # params, covariance
+                    if np.all(np.isfinite(c)): # possible return of curvefit: c=inf
+                        s = np.sqrt(np.diag(c))
+                    else:
+                        s = 10.*p
+                except:
+                    s = 10.*p
                 locp += [p]
                 locs += [s]
                 # if ((s[1]/p[1])<0.5) & (p[1] > 0.): pdb.set_trace()
-                # locc += [c]
     if len(locp) == 0:
-        raise ValueError('Error nee2gpp_reichstein: No local relationship found.')
+        ValueError('Error nee2gpp_reichstein: No local relationship found.')
+        print('Warning nee2gpp_reichstein: No local relationship found.')
+        if masked:
+            GPP  = np.ma.array(np.reshape(nee,inshape), mask=np.ones(inshape, dtype=np.bool))
+            Reco = np.ma.array(np.reshape(nee,inshape), mask=np.ones(inshape, dtype=np.bool))
+        else:
+            GPP  = np.ones(np.reshape(nee,inshape))*undef
+            Reco = np.ones(np.reshape(nee,inshape))*undef
+        return GPP, Reco
     locp   = np.squeeze(np.array(locp).astype(np.float))
     locs   = np.squeeze(np.array(locs).astype(np.float))
-    # locc   = np.squeeze(np.array(locc).astype(np.float))
-
     # 2. E0 = avg of best 3
     # Reichstein et al. (2005), p. 1430, 1st paragraph.
     iii  = np.squeeze(np.where((locp[:,1] > 0.) & (locp[:,1] < 450.) & (np.abs(locs[:,1]/locp[:,1]) < 0.5)))
@@ -528,31 +553,35 @@ def nee2gpp_reichstein(dates, nee, t, isday, rg=False, vpd=False, undef=np.nan,
         # loosen the criteria: take the best three estimates anyway
         iii   = np.where((locp[:,1] > 0.))[0]
         niii = iii.size
-        if niii<3:
-            raise ValueError('Error nee2gpp_reichstein: No 3 E0>0 found.')
+        if niii<1:
+            ValueError('Error nee2gpp_reichstein: No E0>0 found.')
+            print('Warning nee2gpp_reichstein: No E0>0 found.')
+            if masked:
+                GPP  = np.ma.array(np.reshape(nee,inshape), mask=np.ones(inshape, dtype=np.bool))
+                Reco = np.ma.array(np.reshape(nee,inshape), mask=np.ones(inshape, dtype=np.bool))
+            else:
+                GPP  = np.ones(np.reshape(nee,inshape))*undef
+                Reco = np.ones(np.reshape(nee,inshape))*undef
+            return GPP, Reco
         lp    = locp[iii,:]
         ls    = locs[iii,:]
         iis   = np.argsort(ls[:,1])
-        bestp = np.mean(lp[iis[0:3],:],axis=0)
-        bests = np.mean(ls[iis[0:3],:],axis=0)
+        bestp = np.mean(lp[iis[0:np.minimum(3,niii)],:],axis=0)
+        bests = np.mean(ls[iis[0:np.minimum(3,niii)],:],axis=0)
     elif niii==1:
         bestp = locp[iii,:]
         bests = locs[iii,:]
-        # cc    = locc[iii,:]
     elif niii==2:
         bestp = np.mean(locp[iii,:],axis=0)
         bests = np.mean(locs[iii,:],axis=0)
         # ls    = locs[iii,:]
         # iis   = np.argsort(ls[:,1])
-        # cc    = locc[iii[iis[0]],:]
     else:
         lp    = locp[iii,:]
         ls    = locs[iii,:]
         iis   = np.argsort(ls[:,1])
         bestp = np.mean(lp[iis[0:3],:],axis=0)
         bests = np.mean(ls[iis[0:3],:],axis=0)
-        # cc = locc[iii[iis[0]],:]
-    # corr = cc[0,1]/np.sqrt(cc[0,0]*cc[1,1])
 
     # 3. Refit Rref with fixed E0, each 4 days
     refp  = [] # Rref param
@@ -571,7 +600,15 @@ def nee2gpp_reichstein(dates, nee, t, isday, rg=False, vpd=False, undef=np.nan,
             refp  += [p]
             refii += [np.int((iii[0]+iii[-1])//2)]
     if len(refp) == 0:
-        raise ValueError('Error nee2gpp_reichstein: No ref relationship found.')
+        ValueError('Error nee2gpp_reichstein: No ref relationship found.')
+        print('Warning nee2gpp_reichstein: No ref relationship found.')
+        if masked:
+            GPP  = np.ma.array(np.reshape(nee,inshape), mask=np.ones(inshape, dtype=np.bool))
+            Reco = np.ma.array(np.reshape(nee,inshape), mask=np.ones(inshape, dtype=np.bool))
+        else:
+            GPP  = np.ones(np.reshape(nee,inshape))*undef
+            Reco = np.ones(np.reshape(nee,inshape))*undef
+        return GPP, Reco
     refp  = np.squeeze(np.array(refp))
     refii = np.squeeze(np.array(refii))
 
@@ -593,17 +630,11 @@ def nee2gpp_reichstein(dates, nee, t, isday, rg=False, vpd=False, undef=np.nan,
             GPP  = np.ma.array(GPP,  mask=np.isnan(GPP))
             Reco = np.ma.array(Reco, mask=np.isnan(Reco))
         else:
-            GPP  = np.ma.array(GPP,  mask=(GPP == undef))
-            Reco = np.ma.array(Reco, mask=(Reco == undef))
+            GPP  = np.ma.array(GPP,  mask=(GPP==undef))
+            Reco = np.ma.array(Reco, mask=(Reco==undef))
 
-    if shape != False:
-        if shape != True:
-            return np.reshape(GPP,shape), np.reshape(Reco,shape)
-        else:
-            return np.reshape(GPP,inshape), np.reshape(Reco,inshape)
-    else:
-        return GPP, Reco
-
+    
+    return GPP.reshape(inshape), Reco.reshape(inshape)
 
 
 # ----------------------------------------------------------------------

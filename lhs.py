@@ -42,7 +42,7 @@ def lhs(dist, param, nsample):
         >>> import scipy.stats as stats
         >>> # seed for reproducible results in doctest
         >>> np.random.seed(1)
-        >>> dist = [stats.norm, stats.uniform]
+        >>> dist = [stats.norm, stats.uniform] # for uniform (min, max-min)
         >>> pars = [(50,2),(1,5)]
         >>> c    = lhs(dist, pars, 20)
         >>> from autostring import astr
@@ -104,6 +104,7 @@ def lhs(dist, param, nsample):
 if __name__ == '__main__':
     import doctest
     doctest.testmod(optionflags=doctest.NORMALIZE_WHITESPACE)
+
     # import matplotlib.pyplot as plt
     # dist = [stats.norm, stats.uniform]
     # pars = [(50,2),(1,5)]
