@@ -8,7 +8,7 @@ from mad import * # from ufz
 
 # ----------------------------------------------------------------------
 def nee2gpp(dates, nee, t, isday, rg=False, vpd=False, undef=np.nan,
-            method='reichstein', shape=False, masked=False):
+            method='reichstein', shape=False, masked=False, nogppnight=False):
     """
         Calculate photosynthesis (GPP) and ecosystem respiration (Reco) from original
         Eddy flux data.
@@ -53,6 +53,10 @@ def nee2gpp(dates, nee, t, isday, rg=False, vpd=False, undef=np.nan,
                      if a shape tuple is given, then this tuple is used to reshape
         masked       if False: outputs are undef where nee and t are masked or undef
                      if True:  return masked arrays where outputs would be undef
+
+        If method = 'night' | 'reichstein', extra parameters are
+        nogppnight   if True:  Resp=NEE, GPP=0 at night
+                     if False: Resp=lloyd_taylor, GPP=Resp-NEE at night (default)
 
 
         Ouput
@@ -162,7 +166,7 @@ def nee2gpp(dates, nee, t, isday, rg=False, vpd=False, undef=np.nan,
         return nee2gpp_falge(dates, nee, t, isday, undef=undef, shape=shape, masked=masked)
     # Local relationship = Reichstein et al. (2005)
     elif ((method.lower() == 'local') | (method.lower() == 'reichstein')):
-        return nee2gpp_reichstein(dates, nee, t, isday, undef=undef, shape=shape, masked=masked)
+        return nee2gpp_reichstein(dates, nee, t, isday, undef=undef, shape=shape, masked=masked, nogppnight=nogppnight)
     # Lasslop et al. (2010) method
     elif ((method.lower() == 'day') | (method.lower() == 'lasslop')):
         return nee2gpp_lasslop(dates, nee, t, isday, rg, vpd, undef=undef, shape=shape, masked=masked)
@@ -303,19 +307,19 @@ def nee2gpp_falge(dates, nee, t, isday, undef=np.nan,
 
     # Select valid nighttime
     mask = isday | nee.mask | t.mask | isday.mask
-    ii   = np.squeeze(np.where(~mask))
+    ii   = np.where(~mask)[0]
     tt   = np.ma.compressed(t[ii])
     net  = np.ma.compressed(nee[ii])
     # p, c     = opt.curve_fit(functions.lloyd_fix, tt, net, p0=[2.,200.]) # global parameter, global cov matrix
     #p        = opt.fmin(functions.cost_lloyd_fix, [2.,200.], args=(tt, net), disp=False)
     p        = opt.fmin(functions.cost_abs, [2.,200.], args=(functions.lloyd_fix_p, tt, net), disp=False)
     Reco     = np.ones(ndata)*undef
-    ii       = np.squeeze(np.where(~t.mask))
+    ii       = np.where(~t.mask)[0]
     Reco[ii] = functions.lloyd_fix(t[ii], p[0], p[1])
 
     # GPP
     GPP     = np.ones(ndata)*undef
-    ii      = np.squeeze(np.where(~(t.mask | nee.mask)))
+    ii      = np.where(~(t.mask | nee.mask))[0]
     GPP[ii] = Reco[ii] - nee[ii]
 
     # Return
@@ -339,7 +343,7 @@ def nee2gpp_falge(dates, nee, t, isday, undef=np.nan,
 
 # ----------------------------------------------------------------------
 def nee2gpp_reichstein(dates, nee, t, isday, rg=False, vpd=False, undef=np.nan,
-            shape=False, masked=False):
+            shape=False, masked=False, nogppnight=False):
     """
         Calculate photosynthesis (GPP) and ecosystem respiration (Reco) from original
         Eddy flux data, using several fits of Reco vs. temperature of nighttime data
@@ -369,6 +373,8 @@ def nee2gpp_reichstein(dates, nee, t, isday, rg=False, vpd=False, undef=np.nan,
                      if a shape tuple is given, then this tuple is used to reshape
         masked       if False: outputs are undef where nee and t are masked or undef (default)
                      if True:  return masked arrays where outputs would be undef
+        nogppnight   if True:  Resp=NEE, GPP=0 at night
+                     if False: Resp=lloyd_taylor, GPP=Resp-NEE at night (default)
 
 
         Ouput
@@ -511,7 +517,7 @@ def nee2gpp_reichstein(dates, nee, t, isday, rg=False, vpd=False, undef=np.nan,
     dmin = np.int(np.floor(np.amin(jul))) # be aware that julian days starts at noon, i.e. 1.0 is 12h
     dmax = np.int(np.ceil(np.amax(jul)))  # so the search will be from noon to noon and thus includes all nights
     for i in range(dmin,dmax,5):
-        iii  = np.squeeze(np.where((jul>=i) & (jul<(i+14))))
+        iii  = np.where((jul>=i) & (jul<(i+14)))[0]
         niii = iii.size
         if niii > 6:
             tt1  = tt[iii]
@@ -526,9 +532,9 @@ def nee2gpp_reichstein(dates, nee, t, isday, rg=False, vpd=False, undef=np.nan,
                     if np.all(np.isfinite(c)): # possible return of curvefit: c=inf
                         s = np.sqrt(np.diag(c))
                     else:
-                        s = 10.*p
+                        s = 10.*np.abs(p)
                 except:
-                    s = 10.*p
+                    s = 10.*np.abs(p)
                 locp += [p]
                 locs += [s]
                 # if ((s[1]/p[1])<0.5) & (p[1] > 0.): pdb.set_trace()
@@ -546,7 +552,7 @@ def nee2gpp_reichstein(dates, nee, t, isday, rg=False, vpd=False, undef=np.nan,
     locs   = np.squeeze(np.array(locs).astype(np.float))
     # 2. E0 = avg of best 3
     # Reichstein et al. (2005), p. 1430, 1st paragraph.
-    iii  = np.squeeze(np.where((locp[:,1] > 0.) & (locp[:,1] < 450.) & (np.abs(locs[:,1]/locp[:,1]) < 0.5)))
+    iii  = np.where((locp[:,1] > 0.) & (locp[:,1] < 450.) & (np.abs(locs[:,1]/locp[:,1]) < 0.5))[0]
     niii = iii.size
     if niii==0:
         # raise ValueError('Error nee2gpp_reichstein: No good local relationship found.')
@@ -589,7 +595,7 @@ def nee2gpp_reichstein(dates, nee, t, isday, rg=False, vpd=False, undef=np.nan,
     E0    = bestp[1]
     et    = functions.lloyd_fix(tt, 1., E0)
     for i in range(dmin,dmax,4):
-        iii  = np.squeeze(np.where((jul>=i) & (jul<(i+4))))
+        iii  = np.where((jul>=i) & (jul<(i+4)))[0]
         niii = iii.size
         if niii > 3:
             # Calc directly minisation of (nee-p*et)**2
@@ -617,13 +623,20 @@ def nee2gpp_reichstein(dates, nee, t, isday, rg=False, vpd=False, undef=np.nan,
 
     # 5. Calc Reco
     Reco     = np.ones(ndata)*undef
-    ii       = np.squeeze(np.where(~t.mask))
+    ii       = np.where(~t.mask)[0]
     Reco[ii] = functions.lloyd_fix(t[ii], Rref[ii], E0)
 
-    # GPP
+    # 6. Calc GPP
     GPP     = np.ones(ndata)*undef
-    ii      = np.squeeze(np.where(~(t.mask | nee.mask)))
+    ii      = np.where(~(t.mask | nee.mask))[0]
     GPP[ii] = Reco[ii] - nee[ii]
+
+    # 7. Set GPP=0 at night, if wanted
+    if nogppnight:
+        mask = isday | nee.mask | t.mask | isday.mask # night
+        ii   = np.where(~mask)[0]
+        Reco[ii] = nee[ii]
+        GPP[ii]  = 0.
 
     if masked:
         if np.isnan(undef):
