@@ -82,6 +82,7 @@
     semivariogram          Calculates semivariogram from spatial data.
     sg                     Wrapper savitzky_golay.
     sg2d                   Wrapper savitzky_golay2d.
+    small_kickout1d        Masks elements in a 1d array gathered in small groups.
     sobol_index            Calculates the first-order and total variance-based sensitivity indices.
     sread                  Reads in string array from ascii file.
     srrasa                 Generates stratified random 2D points within a given rectangular area.
@@ -117,6 +118,7 @@
     ------------------
     closest                Get the array index of the element that is closest to a given number.
     pack                   Similar to Fortran pack function with mask.
+    small_kickout1d        Masks elements in a 1d array gathered in small groups.
     unpack                 Similar to Fortran unpack function with mask.
 
 
@@ -299,6 +301,7 @@
               MC, Jun 2013 - colours
               MC, Jul 2013 - fill_nonfinite, means
               MC, Oct 2013 - morris, sce, inpoly, rossner, netcdfread, ncread, readnc, hdfread, hdf4read, hdf5read
+              AP, Feb 201f - small_kickout1d
 """
 from __future__ import print_function
 
@@ -361,6 +364,7 @@ from saltelli          import *
 from savitzky_golay    import *
 from sce               import sce
 from semivariogram     import semivariogram
+from small_kickout1d   import small_kickout1d
 from sobol_index       import *
 from sread             import *
 from srrasa            import srrasa, srrasa_trans
