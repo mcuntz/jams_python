@@ -83,7 +83,7 @@
     semivariogram          Calculates semivariogram from spatial data.
     sg                     Wrapper savitzky_golay.
     sg2d                   Wrapper savitzky_golay2d.
-    small_kickout1d        Masks elements in a 1d array gathered in small groups.
+    maskgroup              Masks elements in a 1d array gathered in small groups.
     sobol_index            Calculates the first-order and total variance-based sensitivity indices.
     sread                  Reads in string array from ascii file.
     srrasa                 Generates stratified random 2D points within a given rectangular area.
@@ -119,7 +119,7 @@
     ------------------
     closest                Get the array index of the element that is closest to a given number.
     pack                   Similar to Fortran pack function with mask.
-    small_kickout1d        Masks elements in a 1d array gathered in small groups.
+    maskgroup              Masks elements in a 1d array gathered in small groups.
     unpack                 Similar to Fortran unpack function with mask.
 
 
@@ -303,7 +303,7 @@
               MC, Jun 2013 - colours
               MC, Jul 2013 - fill_nonfinite, means
               MC, Oct 2013 - morris, sce, inpoly, rossner, netcdfread, ncread, readnc, hdfread, hdf4read, hdf5read
-              AP, Feb 2014 - small_kickout1d
+              AP, Feb 2014 - maskgroup
               AP, Feb 2014 - line_dev_mask
 """
 from __future__ import print_function
@@ -345,9 +345,10 @@ from kernel_regression import kernel_regression, kernel_regression_h
 from kriging           import kriging
 from lhs               import *
 from lif               import *
-from line_dev_mask     import line_dev_mask  
+from line_dev_mask     import *
 from jab               import *
 from mad               import *
+from maskgroup         import *
 from means             import *
 from morris            import morris_sampling, elementary_effects
 from nee2gpp           import nee2gpp, nee2gpp_falge, nee2gpp_lasslop, nee2gpp_reichstein
@@ -368,7 +369,6 @@ from saltelli          import *
 from savitzky_golay    import *
 from sce               import sce
 from semivariogram     import semivariogram
-from small_kickout1d   import small_kickout1d
 from sobol_index       import *
 from sread             import *
 from srrasa            import srrasa, srrasa_trans
