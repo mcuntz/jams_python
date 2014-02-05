@@ -52,6 +52,7 @@
     kriging                Krig a surface from a set of 2D points.
     lhs                    Latin Hypercube Sampling of any distribution without correlations.
     lif                    Count number of lines in file.
+    line_dev_mask          Maskes elements of an array deviating from a line fit.
     mad                    Median absolute deviation test.
     means                  Calculate daily, monthly, yearly, etc. means of data depending on date stamp.
     morris_sampling        Sampling of optimised trajectories for Morris measures / elementary effects
@@ -138,6 +139,7 @@
     kriging                Krig a surface from a set of 2D points.
     kernel_regression      Multi-dimensional non-parametric regression.
     kernel_regression_h    Optimal bandwidth for kernel regression.
+    line_dev_mask          Maskes elements of an array deviating from a line fit.
     mad                    Median absolute deviation test.
     means                  Calculate daily, monthly, yearly, etc. means of data depending on date stamp.
     nee2gpp                Photosynthesis and ecosystem respiration from NEE Eddy flux data.
@@ -301,7 +303,8 @@
               MC, Jun 2013 - colours
               MC, Jul 2013 - fill_nonfinite, means
               MC, Oct 2013 - morris, sce, inpoly, rossner, netcdfread, ncread, readnc, hdfread, hdf4read, hdf5read
-              AP, Feb 201f - small_kickout1d
+              AP, Feb 2014 - small_kickout1d
+              AP, Feb 2014 - line_dev_mask
 """
 from __future__ import print_function
 
@@ -342,6 +345,7 @@ from kernel_regression import kernel_regression, kernel_regression_h
 from kriging           import kriging
 from lhs               import *
 from lif               import *
+from line_dev_mask     import line_dev_mask  
 from jab               import *
 from mad               import *
 from means             import *
