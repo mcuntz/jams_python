@@ -88,7 +88,7 @@ def gapfill(date, data, rg, tair, vpd,
         >>> from fread import *
         >>> from date2dec import *
         >>> from autostring import astr
-        >>> ifile = 'gapfill_test.csv' # Tharandt 1998 = Online tool example file
+        >>> ifile = 'test_gapfill.csv' # Tharandt 1998 = Online tool example file
         >>> undef = -9999.
         >>> dat   = fread(ifile, skip=2, transpose=True)
         >>> ndat  = dat.shape[1]
@@ -453,7 +453,7 @@ if __name__ == '__main__':
     # print 'Read data'
     # from fread import *
     # from date2dec import *
-    # ifile = 'nee2gpp_test.csv'
+    # ifile = 'test_nee2gpp.csv'
     # undef = -9999.
     # dat  = fread(ifile, skip=2, transpose=True)
     # ndat = dat.shape[1]
