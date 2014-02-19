@@ -345,7 +345,7 @@ from kernel_regression import kernel_regression, kernel_regression_h
 from kriging           import kriging
 from lhs               import *
 from lif               import *
-from line_dev_mask     import *
+#from line_dev_mask     import *
 from jab               import *
 from mad               import *
 from maskgroup         import *
