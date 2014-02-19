@@ -17,9 +17,9 @@ def abc2plot(handle, dx, dy, iplot, integer=False, roman=False, lower=False,
         Definition
         ----------
         def abc2plot(handle, dx, dy, iplot, integer=False, roman=False, lower=False,
-                     small=False, medium=True, large=False, bold=False,
+                     small=False, medium=None, large=False, bold=False,
                      parenthesis=None, brackets=None, braces=None,
-                     usetex=False, mathrm=False):
+                     usetex=False, mathrm=False, string=False):
 
 
         Input
@@ -121,6 +121,8 @@ def abc2plot(handle, dx, dy, iplot, integer=False, roman=False, lower=False,
     else:
         if (small+medium+large) > 1:
             raise ValueError('only one of small, medium or large font size can be chosen (2).')
+        if (small+medium+large) == 0:
+            raise ValueError('If medium=false then another size has to be chosen explicitly: small or large.')
 
     # Number or letter
     if string:
