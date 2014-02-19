@@ -107,6 +107,7 @@ def abc2plot(handle, dx, dy, iplot, integer=False, roman=False, lower=False,
                   MC, Oct 2013 - \mathbf, large, default medium
                   MC, Nov 2013 - string, corrected medium default
                                - usetex works with fontsize keyword of axis.text() now (matplotlib v1.1.0)
+                  MC, Feb 2014 - if medium is not None then small or large must be set
     """
     # Check input
     if (roman & integer):
