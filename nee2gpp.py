@@ -3,7 +3,7 @@ from __future__ import print_function
 import numpy as np
 import scipy.optimize as opt # curve_fit, fmin, fmin_tnc
 import functions # from ufz
-from mad import * # from ufz
+from mad import mad # from ufz
 # import pdb
 
 # ----------------------------------------------------------------------
@@ -88,8 +88,8 @@ def nee2gpp(dates, nee, t, isday, rg=False, vpd=False, undef=np.nan,
 
         Examples
         --------
-        >>> from fread import * # from ufz
-        >>> from date2dec import * # from ufz
+        >>> from fread import fread # from ufz
+        >>> from date2dec import date2dec # from ufz
         >>> dat   = fread('test_nee2gpp.csv', skip=2, transpose=True)
         >>> dates = date2dec(dy=dat[0,:], mo=dat[1,:], yr=dat[2,:], hr=dat[3,:], mi=dat[4,:])
         >>> NEE   = np.squeeze(dat[5,:])
@@ -228,8 +228,8 @@ def nee2gpp_falge(dates, nee, t, isday, undef=np.nan,
 
         Examples
         --------
-        >>> from fread import * # from ufz
-        >>> from date2dec import * # from ufz
+        >>> from fread import fread # from ufz
+        >>> from date2dec import date2dec # from ufz
         >>> dat   = fread('test_nee2gpp.csv', skip=2, transpose=True)
         >>> dates = date2dec(dy=dat[0,:], mo=dat[1,:], yr=dat[2,:], hr=dat[3,:], mi=dat[4,:])
         >>> NEE   = np.squeeze(dat[5,:])
@@ -397,8 +397,8 @@ def nee2gpp_reichstein(dates, nee, t, isday, rg=False, vpd=False, undef=np.nan,
 
         Examples
         --------
-        >>> from fread import * # from ufz
-        >>> from date2dec import * # from ufz
+        >>> from fread import fread # from ufz
+        >>> from date2dec import date2dec # from ufz
         >>> dat   = fread('test_nee2gpp.csv', skip=2, transpose=True)
         >>> dates = date2dec(dy=dat[0,:], mo=dat[1,:], yr=dat[2,:], hr=dat[3,:], mi=dat[4,:])
         >>> NEE   = np.squeeze(dat[5,:])
@@ -706,8 +706,8 @@ def nee2gpp_lasslop(dates, nee, t, isday, rg, vpd, undef=np.nan,
 
         Examples
         --------
-        >>> from fread import * # from ufz
-        >>> from date2dec import * # from ufz
+        >>> from fread import fread # from ufz
+        >>> from date2dec import date2dec # from ufz
         >>> dat   = fread('test_nee2gpp.csv', skip=2, transpose=True)
         >>> dates = date2dec(dy=dat[0,:], mo=dat[1,:], yr=dat[2,:], hr=dat[3,:], mi=dat[4,:])
         >>> NEE   = np.squeeze(dat[5,:])
@@ -956,8 +956,8 @@ if __name__ == '__main__':
     import doctest
     doctest.testmod(optionflags=doctest.NORMALIZE_WHITESPACE)
 
-    # from fread import * # from ufz
-    # from date2dec import * # from ufz
+    # from fread import fread # from ufz
+    # from date2dec import date2dec # from ufz
     # dat   = fread('test_nee2gpp.csv', skip=2, transpose=True)
     # dates = date2dec(dy=dat[0,:], mo=dat[1,:], yr=dat[2,:], hr=dat[3,:], mi=dat[4,:])
     # NEE   = np.squeeze(dat[5,:])

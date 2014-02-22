@@ -47,6 +47,7 @@
         lasslop           6 params: Lasslop et al. (2010) a rectangular, hyperbolic light-response GPP
                                     with Lloyd & Taylor (1994) respiration and the maximum canopy uptake
                                     rate at light saturation decreases exponentially with VPD as in Koerner (1995)
+        line0             1 params: Straight line: a*x
         line              2 params: Straight line: a + b*x
         lloyd_fix         2 params: Lloyd & Taylor (1994) Arrhenius type with T0=-46.02 degC and Tref=10 degC
         lloyd_only_rref   1 param:  Lloyd & Taylor (1994) Arrhenius type with fixed exponential term
@@ -118,6 +119,7 @@
     Modified, MC, Feb 2013 - ported to Python 3
               MC, May 2013 - general cost function cost_abs, cost_square
               MC, Oct 2013 - test functions such as Rosenbrock, Griewank, etc.
+              MC, Feb 2014 - line0
 """
 from __future__ import print_function
 import numpy as np
@@ -317,6 +319,39 @@ def cost2_lasslop(p, Rg, et, VPD, NEE):
 
 
 # -----------------------------------------------------------
+# a*x
+def line0(x,a):
+  ''' Straight line through origin: a*x
+        x    independent variable
+        a    1. const
+  '''
+  return a*x
+
+def line0_p(x,p):
+  ''' Straight line through origin: a*x
+        x    independent variable
+        p    array of size 1, parameters
+  '''
+  return p[0]*x
+
+def cost_line0(p,x,y):
+  ''' Sum of absolut errors between obs and straight line through origin: a*x
+        p    array of size 1, parameters
+        x    independent variable
+        y    dependent variable to optimise
+  '''
+  return np.sum(np.abs(y-line0_p(x,p)))
+
+def cost2_line0(p,x,y):
+  ''' Sum of squared errors between obs and straight line through origin: a*x
+        p    array of size 1, parameters
+        x    independent variable
+        y    dependent variable to optimise
+  '''
+  return np.sum((y-line0_p(x,p))**2)
+
+
+# -----------------------------------------------------------
 # a+b*x
 def line(x,a,b):
   ''' Straight line: a + b*x
@@ -408,6 +443,17 @@ def cost_lloyd_only_rref(p, et, resp):
 def cost2_lloyd_only_rref(p, et, resp):
     """ Cost function for rref  with sum of squared deviations """
     return np.sum((resp-lloyd_only_rref_p(et,p))**2)
+
+
+# -----------------------------------------------------------
+# c0*x[0] + c1*x[1] + c2*x[2] + ... + cn*x[n]
+def multiline_p(p,*args):
+  ''' Multiple linear regression line: c0*x[0] + c1*x[1] + c2*x[2] + ... + cn*x[n]
+        p      constants
+        *args  independent variables
+  '''
+  return np.polynomial.polynomial.polyval(x, list(args))
+
 
 # -----------------------------------------------------------
 # sqrt(a + b/x) - theoretical form of Jackknife-after-bootstrap

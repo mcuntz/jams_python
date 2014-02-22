@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 from __future__ import print_function
 import numpy as np
-from around import * # from ufz
-import const         # from ufz
+from around import around # from ufz
+import const              # from ufz
 
 def yrange(*args, **kwargs):
     """

@@ -292,8 +292,8 @@ def cuntz_gleixner(idecdate, iGPP, iRd, iCa, iRa, igtot, sunrise, Vcyt=None,
        ['0.010949' '0.010960' '0.010915' '0.010884' '0.010884' '0.010904']
        >>> print(astr(Rphloem[0:6],6,pp=True))
        ['0.010917' '0.010893' '0.010891' '0.010869' '0.010852' '0.010850']
-       >>> from dec2date import *
-       >>> from date2dec import *
+       >>> from dec2date import dec2date
+       >>> from date2dec import date2dec
        >>> aa = dec2date(adecdate, ascii=True, calendar='decimal')
        >>> jadecdate = date2dec(ascii=aa)
        >>> ndecdate = 2008.918772768670806

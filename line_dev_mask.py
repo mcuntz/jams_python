@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 import numpy as np
-from scipy.optimize import fmin
-from plotngo import plotngo
+import scipy.optimize as opt
+import functions # from ufz
 
 def line_dev_mask(x, y, z, p_guess=[1.,0.], plot=False):
     
@@ -44,7 +44,7 @@ def line_dev_mask(x, y, z, p_guess=[1.,0.], plot=False):
         >>> y = np.ma.array([1.,1.5,2.,2.5,3.,100.,8.,4.5,5.,5.5], mask=[0,1,0,0,0,0,0,0,0,0])
         
         >>> # detect outliers
-        >>> new_mask = line_dev_mask(x,y,0.5)
+        >>> new_mask = line_dev_mask(x,y,0.5,plot=False)
         >>> # apply new mask to x
         >>> np.ma.array(y.data, mask=new_mask)
         masked_array(data = [1.0 -- 2.0 2.5 3.0 -- -- 4.5 5.0 5.5],
@@ -70,12 +70,13 @@ def line_dev_mask(x, y, z, p_guess=[1.,0.], plot=False):
         You should have received a copy of the GNU Lesser General Public License
         along with The UFZ Python library.  If not, see <http://www.gnu.org/licenses/>.
 
-        Copyright 2009-2012 Matthias Cuntz
+        Copyright 2014 Arndt Piayda, Matthias Cuntz
 
 
         History
         -------
-        Written, AP, Feb 2014
+        Written,  AP, Feb 2014
+        Modified, MC, Feb 2014 - use ufz.functions
     """
     
     if plot:
@@ -88,17 +89,17 @@ def line_dev_mask(x, y, z, p_guess=[1.,0.], plot=False):
     go_on = True
     while go_on:
         # fit line to data
-        p_opt = fmin(absdif, p_guess, args=(x, y_new), disp=0)
+        p_opt = opt.fmin(functions.cost_abs, p_guess, args=(functions.line_p,x,y_new), disp=False)
         
         # calculate maximum and minimum deviation limit depending on std
-        max_dev = line(x,[p_opt[0],p_opt[1]+np.ma.std(y_new)*z])
-        min_dev = line(x,[p_opt[0],p_opt[1]-np.ma.std(y_new)*z])
+        max_dev = functions.line_p(x,[p_opt[0]+np.ma.std(y_new)*z,p_opt[1]])
+        min_dev = functions.line_p(x,[p_opt[0]-np.ma.std(y_new)*z,p_opt[1]])
         
         if plot:
             fig = plt.figure('line_dev_mask')
             sub = fig.add_subplot(111)
             sub.plot(x,y_new,'ko')
-            sub.plot(x,line(x,p_opt),'k-')
+            sub.plot(x,functions.line_p(x,p_opt),'k-')
             sub.plot(x,min_dev,'r-')
             sub.plot(x,max_dev,'r-')
             plt.show()
@@ -112,13 +113,6 @@ def line_dev_mask(x, y, z, p_guess=[1.,0.], plot=False):
     
     # return mask where outliers are masked
     return y_new.mask
-    
-def line(x, p):
-    
-    return p[0] * x + p[1]
-
-def absdif(p,x,y):
-    return np.ma.sum(np.ma.abs(y-line(x, p)))
 
 if __name__ == '__main__':
     import doctest

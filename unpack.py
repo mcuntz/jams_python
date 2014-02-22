@@ -54,7 +54,7 @@ def unpack(array, mask, value=0.):
 
         # Pack array to  keep only the island elements
         # Mask
-        >>> from pack import *
+        >>> from pack import pack
         >>> mask = a == 1.0
         >>> b = pack(a, mask)
         >>> b3 = pack(a3, mask)

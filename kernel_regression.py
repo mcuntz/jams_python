@@ -2,7 +2,7 @@
 from __future__ import print_function
 import numpy as np
 import scipy.optimize as opt # fmin_tnc
-from division import *
+from division import division
 
 def kernel_regression(x, y, h=None, silverman=False, xout=None):
     """
@@ -194,7 +194,7 @@ def kernel_regression_h(x, y, silverman=False):
         >>> x[:,0] = np.arange(10,dtype=np.float)/9.
         >>> x[:,1] = 1./(np.arange(10,dtype=np.float)/9.+0.1)
         >>> y      = 1. + x[:,0]**2 - np.sin(x[:,1])**2
-        >>> from autostring import *
+        >>> from autostring import astr
         >>> print(astr(kernel_regression_h(x,y),6))
         ['0.172680' '9.516907']
 

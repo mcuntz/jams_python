@@ -83,6 +83,7 @@
     semivariogram          Calculates semivariogram from spatial data.
     sg                     Wrapper savitzky_golay.
     sg2d                   Wrapper savitzky_golay2d.
+    sigma_filter           Mask values deviating more than z standard deviations from a given function.
     maskgroup              Masks elements in a 1d array gathered in small groups.
     sobol_index            Calculates the first-order and total variance-based sensitivity indices.
     sread                  Reads in string array from ascii file.
@@ -150,9 +151,10 @@
     rossner                Wrapper for outlier.
     savitzky_golay         Smooth (and optionally differentiate) 1D data with a Savitzky-Golay filter.
     savitzky_golay2d       Smooth (and optionally differentiate) 2D data with a Savitzky-Golay filter.
+    semivariogram          Calculates semivariogram from spatial data.
     sg                     Wrapper savitzky_golay.
     sg2d                   Wrapper savitzky_golay2d.
-    semivariogram          Calculates semivariogram from spatial data.
+    sigma_filter           Mask values deviating more than z standard deviations from a given function.
     srrasa                 Generates stratified random 2D points within a given rectangular area.
     srrasa_trans           Generates stratified random 2D transects within a given rectangular area.
 
@@ -305,93 +307,94 @@
               MC, Oct 2013 - morris, sce, inpoly, rossner, netcdfread, ncread, readnc, hdfread, hdf4read, hdf5read
               AP, Feb 2014 - maskgroup
               AP, Feb 2014 - line_dev_mask
+              MC, Feb 2014 - removed all import *
+              MC, Feb 2014 - sigma_filter
 """
 from __future__ import print_function
 
 # Routines provided
-from abc2plot          import *
+from abc2plot          import abc2plot
 from area_poly         import area_poly
-from around            import *
-from autostring        import *
+from around            import around
+from autostring        import autostring, astr
 from brewer            import define_brewer, get_brewer, plot_brewer, print_brewer
 try:
-    from calcvpd       import *
+    from calcvpd       import calcvpd
 except ImportError:
     pass # obsolete
-from cellarea          import *
-from closest           import *
+from cellarea          import cellarea
+from closest           import closest
 from colours           import colours, colors
 import const
 from convex_hull       import convex_hull
-from cuntz_gleixner    import *
-from date2dec          import *
-from dec2date          import *
-from dewpoint          import *
-from division          import *
-from esat              import *
+from cuntz_gleixner    import cuntz_gleixner
+from date2dec          import date2dec
+from dec2date          import dec2date
+from dewpoint          import dewpoint
+from division          import division, div
+from esat              import esat
 from fill_nonfinite    import fill_nonfinite
-from find_in_path      import *
-from fread             import *
+from find_in_path      import find_in_path
+from fread             import fread
 import functions
-from gapfill           import *
+from gapfill           import gapfill
 try:
-    from gap_filling   import *
+    from gap_filling   import gap_filling
 except ImportError:
     pass # obsolete
-from heaviside         import *
+from heaviside         import heaviside
 from in_poly           import in_poly, inpoly
-from interpol          import *
+from interpol          import interpol
 from kernel_regression import kernel_regression, kernel_regression_h
 from kriging           import kriging
-from lhs               import *
-from lif               import *
-#from line_dev_mask     import *
-from jab               import *
-from mad               import *
-from maskgroup         import *
-from means             import *
+from lhs               import lhs
+from lif               import lif
+#from line_dev_mask     import line_dev_mask
+from jab               import jab
+from mad               import mad
+from maskgroup         import maskgroup
+from means             import means
 from morris            import morris_sampling, elementary_effects
 from nee2gpp           import nee2gpp, nee2gpp_falge, nee2gpp_lasslop, nee2gpp_reichstein
 try:
     from outlier       import outlier, rossner
 except:
     print("No extra statistics in scipy, i.e. in UFZ library. Disabled functions: outlier, rossner.")
-from pack              import *
-from pi                import *
-from position          import *
+from pack              import pack
+from pi                import pi
+from position          import position
 from readhdf           import readhdf, hdfread
 from readhdf4          import readhdf4, hdf4read
 from readhdf5          import readhdf5, hdf5read
 from readnetcdf        import readnetcdf, netcdfread, ncread, readnc
 from rgb               import rgb_blend, rgb_range, rgb_gradient
 from romanliterals     import int2roman, roman2int
-from saltelli          import *
-from savitzky_golay    import *
+from saltelli          import saltelli
+from savitzky_golay    import savitzky_golay, sg, savitzky_golay2d, sg2d
 from sce               import sce
 from semivariogram     import semivariogram
-from sobol_index       import *
-from sread             import *
+from sigma_filter      import sigma_filter
+from sobol_index       import sobol_index
+from sread             import sread
 from srrasa            import srrasa, srrasa_trans
-from tcherkez          import *
-from tsym              import *
-from unpack            import *
+from tcherkez          import tcherkez
+from tsym              import tsym
+from unpack            import unpack
 from volume_poly       import volume_poly
-from writenetcdf       import *
+from writenetcdf       import writenetcdf
 from xkcd              import xkcd
-from yrange            import *
-from zacharias         import *
+from yrange            import yrange
+from zacharias         import zacharias, zacharias_check
 
 # Information
-version = '2.2'
-date    = '31.10.2013'
+version = '2.2.1'
+date    = '22.02.2014'
 
 # Main
 if __name__ == '__main__':
     print('\nUFZ Computational Hydrosystems Python Library.')
-    print("Version %s from %s." % (version,date))
-    print('\nThis is the README file. See als the license file gpl.txt.')
-    import io
-    f = io.open('README','r')
-    for line in f:
-        print(line,end='')
+    print("Version {:s} from {:s}.".format(version,date))
+    print('\nThis is the README file. See als the license file gpl.txt.\n\n')
+    f = open('README','r')
+    for line in f: print(line,end='')
     f.close()

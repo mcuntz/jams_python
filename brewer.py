@@ -525,7 +525,7 @@ def get_brewer(cname=None, names=False, rgb=False, rgb256=False, reverse=False, 
         Examples
         --------
         >>> import numpy as np
-        >>> from autostring import *
+        >>> from autostring import astr
         >>> cc = get_brewer('Blues4',rgb=True)
         >>> print(astr(np.array(cc[0]), 4))
         ['0.9373' '0.9529' '1.0000']

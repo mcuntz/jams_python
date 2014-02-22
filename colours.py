@@ -102,7 +102,7 @@ def get_colour_tuple(name, rgb256=False):
         (0, 62, 110)
 
         >>> import numpy as np
-        >>> from autostring import *
+        >>> from autostring import astr
         >>> cc = get_colour_tuple('UFZDARKBLUE')
         >>> print(astr(np.array(cc), 4))
         ['0.0000' '0.2431' '0.4314']
@@ -168,7 +168,7 @@ def colours(name=False, rgb=True, rgb256=False, names=False):
         ['ufzdarkblue', 'ufzblue', 'ufzlightblue']
 
         >>> import numpy as np
-        >>> from autostring import *
+        >>> from autostring import astr
         >>> cc = colours('UFZDARKBLUE')
         >>> print(astr(np.array(cc), 4))
         ['0.0000' '0.2431' '0.4314']
@@ -243,7 +243,7 @@ def colors(*args, **kwargs):
         ['ufzdarkblue', 'ufzblue', 'ufzlightblue']
 
         >>> import numpy as np
-        >>> from autostring import *
+        >>> from autostring import astr
         >>> cc = colors('UFZDARKBLUE')
         >>> print(astr(np.array(cc), 4))
         ['0.0000' '0.2431' '0.4314']
@@ -267,7 +267,7 @@ if __name__ == '__main__':
     # print(colours(names=True)[0:3])
     # # ['ufzdarkblue', 'ufzblue', 'ufzlightblue']
     # import numpy as np
-    # from autostring import *
+    # from autostring import astr
     # cc = colours('UFZDARKBLUE')
     # print(astr(np.array(cc), 4))
     # # ['0.0000' '0.2431' '0.4314']

@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 from __future__ import print_function
 import numpy as np
-from division import * # from ufz
-import const           # from ufz
+from division import division # from ufz
+import const                  # from ufz
 
 def interpol(xout, xin, yin):
     """

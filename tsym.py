@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 from __future__ import print_function
+
 def tsym(name):
     """
         Returns unicodes for common symbols.
@@ -120,6 +121,7 @@ def tsym(name):
         return None
 
     return out
+
 
 if __name__ == '__main__':
     import doctest

@@ -114,7 +114,7 @@ def writenetcdf(fhandle, vhandle=None, var=None, time=None, isdim=False, name=No
         ...     handle  = writenetcdf(fhandle, vhand, time=i, var=np.array(dat,dtype=np.int)*(i+1))
 
         # check file
-        >>> from readnetcdf import *
+        >>> from readnetcdf import readnetcdf
         >>> print([str(i) for i in readnetcdf('writenetcdf_test.nc', variables=True)])
         ['time', 'lon', 'lat', 'TESTING', 'TESTING2']
         >>> readdata = readnetcdf('writenetcdf_test.nc', var='TESTING')

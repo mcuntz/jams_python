@@ -142,7 +142,7 @@ def dec2date(indata, calendar='standard', refdate=None, units=None,
         >>> hour   = np.array([12,16,10,14,19,11,12])
         >>> minute = np.array([30,15,20,35,41,8,0])
         >>> second = np.array([15,10,40,50,34,37,0])
-        >>> from date2dec import *
+        >>> from date2dec import date2dec
         >>> decimal = date2dec(calendar='standard',yr=year,mo=month,dy=day,hr=hour,mi=minute,sc=second)
         >>> year, month, day, hour, minute, second = dec2date(decimal, calendar= 'standard', fulldate = True)
         >>> print(year)

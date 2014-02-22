@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 from __future__ import print_function
 import numpy as np
-from dec2date import *
+from dec2date import dec2date
 
 def gapfill(date, data, rg, tair, vpd,
             data_flag=None, rg_flag=None, tair_flag=None, vpd_flag=None,
@@ -85,8 +85,8 @@ def gapfill(date, data, rg, tair, vpd,
         Examples
         --------
         >>> import numpy as np
-        >>> from fread import *
-        >>> from date2dec import *
+        >>> from fread import fread
+        >>> from date2dec import date2dec
         >>> from autostring import astr
         >>> ifile = 'test_gapfill.csv' # Tharandt 1998 = Online tool example file
         >>> undef = -9999.
@@ -451,8 +451,8 @@ if __name__ == '__main__':
     doctest.testmod(optionflags=doctest.NORMALIZE_WHITESPACE)
 
     # print 'Read data'
-    # from fread import *
-    # from date2dec import *
+    # from fread import fread
+    # from date2dec import date2dec
     # ifile = 'test_nee2gpp.csv'
     # undef = -9999.
     # dat  = fread(ifile, skip=2, transpose=True)
