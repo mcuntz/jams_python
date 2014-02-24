@@ -39,6 +39,7 @@
     ----------
     Current functions are (there is always the second form with the name appended by _p;
     these are used in the cost functions).
+
         arrhenius         1 param:  Arrhenius temperature dependence of biochemical rates:
                                     exp((T-TC25)*E/(T25*R*(T+T0))), parameter: E
         f1x               2 params: General 1/x function: a + b/x
@@ -52,8 +53,10 @@
         lloyd_fix         2 params: Lloyd & Taylor (1994) Arrhenius type with T0=-46.02 degC and Tref=10 degC
         lloyd_only_rref   1 param:  Lloyd & Taylor (1994) Arrhenius type with fixed exponential term
         poly              n params: General polynomial: c0 + c1*x + c2*x**2 + ... + cn*x**n
+        sabx              2 params: sqrt(f1x), i.e. general sqrt(1/x) function: sqrt(a + b/x)
 
     Current test functions are
+    ackley                >=2 params:     Ackley function, global optimum: 0.0 at origin
     goldstein_price       2 params:       Goldstein-Price function, global optimum: 3.0 (0.0,-1.0)
     griewank              2 or 10 params: Griewank function, global optimum: 0 at origin
     rastrigin             2 params:       Rastrigin function, global optimum: -2 (0,0)
@@ -166,8 +169,8 @@ def cost2_arrhenius(p, T, rate):
 def f1x(x,a,b):
   ''' General 1/x function: a + b/x
         x    independent variable
-        a    1. const
-        b    2. const
+        a    1. parameter
+        b    2. parameter
   '''
   return a+b/x
 
@@ -200,9 +203,9 @@ def cost2_f1x(p,x,y):
 def fexp(x,a,b,c):
   ''' General exponential function: a + b * exp(c*x)
         x    independent variable in exp
-        a    1. const
-        b    2. const
-        c    3. const
+        a    1. parameter
+        b    2. parameter
+        c    3. parameter
   '''
   return a+b*np.exp(c*x)
 
@@ -319,45 +322,12 @@ def cost2_lasslop(p, Rg, et, VPD, NEE):
 
 
 # -----------------------------------------------------------
-# a*x
-def line0(x,a):
-  ''' Straight line through origin: a*x
-        x    independent variable
-        a    1. const
-  '''
-  return a*x
-
-def line0_p(x,p):
-  ''' Straight line through origin: a*x
-        x    independent variable
-        p    array of size 1, parameters
-  '''
-  return p[0]*x
-
-def cost_line0(p,x,y):
-  ''' Sum of absolut errors between obs and straight line through origin: a*x
-        p    array of size 1, parameters
-        x    independent variable
-        y    dependent variable to optimise
-  '''
-  return np.sum(np.abs(y-line0_p(x,p)))
-
-def cost2_line0(p,x,y):
-  ''' Sum of squared errors between obs and straight line through origin: a*x
-        p    array of size 1, parameters
-        x    independent variable
-        y    dependent variable to optimise
-  '''
-  return np.sum((y-line0_p(x,p))**2)
-
-
-# -----------------------------------------------------------
 # a+b*x
 def line(x,a,b):
   ''' Straight line: a + b*x
         x    independent variable
-        a    1. const
-        b    2. const
+        a    1. parameter
+        b    2. parameter
   '''
   return a+b*x
 
@@ -383,6 +353,39 @@ def cost2_line(p,x,y):
         y    dependent variable to optimise
   '''
   return np.sum((y-line_p(x,p))**2)
+
+
+# -----------------------------------------------------------
+# b*x
+def line0(x,a):
+  ''' Straight line through origin: a*x
+        x    independent variable
+        a    parameter
+  '''
+  return a*x
+
+def line0_p(x,p):
+  ''' Straight line through origin: a*x
+        x    independent variable
+        a    parameter
+  '''
+  return p*x
+
+def cost_line0(p,x,y):
+  ''' Sum of absolut errors between obs and straight line though origin: a*x
+        p    parameter
+        x    independent variable
+        y    dependent variable to optimise
+  '''
+  return np.sum(np.abs(y-line0_p(x,p)))
+
+def cost2_line0(p,x,y):
+  ''' Sum of squared errors between obs and straight line through origin: a*x
+        p    parameter
+        x    independent variable
+        y    dependent variable to optimise
+  '''
+  return np.sum((y-line0_p(x,p))**2)
 
 
 # -----------------------------------------------------------
@@ -494,8 +497,9 @@ def cost2_sabx(p,x,y):
 def poly(x,*args):
   ''' General polynomial: c0 + c1*x + c2*x**2 + ... + cn*x**n
         x    independent variable
-        a    1. const
-        b    2. const
+        a    1. parameter
+        b    2. parameter
+        ...
   '''
   return np.polynomial.polynomial.polyval(x, list(args))
 
