@@ -108,10 +108,14 @@ doflag  = args.doflag
 pdffile = args.pdffile
 pngbase = args.pngbase
 usetex  = args.usetex
-del parser, args
 
 if (pdffile != '') & (pngbase != ''):
-    raise ValueError('PDF and PNG are mutually exclusive. Only either -p or -g possible.')
+    print('\nError: PDF and PNG are mutually exclusive. Only either -p or -g possible.\n')
+    parser.print_usage()
+    import sys
+    sys.exit()
+
+del parser, args
 
 # import packages after help so that help with command line -h is fast
 import numpy as np
