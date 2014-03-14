@@ -24,7 +24,7 @@
     const                  Provides physical, mathematical, computational, and isotope constants.
     convex_hull            Calculate subset of points that make a convex hull around a set of 2D points.
     cuntz_gleixner         Cuntz-Gleixner model of 13C discrimination.
-    define_brewer          Defines and registers Brewer colormap.
+    register_brewer        Registers and registers Brewer colormap.
     dewpoint               Calculates the dew point from ambient humidity.
     date2dec               Converts arrays with calendar date to decimal date.
     dec2date               Converts arrays with decimal date to calendar date.
@@ -37,7 +37,7 @@
     fread                  Reads in float array from ascii file.
     functions              Common functions that are used in curve_fit or fmin parameter estimations.
     gapfill                Gapfill Eddy flux data.
-    get_brewer             Defines and returns Brewer colormap.
+    get_brewer             Registers and returns Brewer colormap.
     hdfread                Wrapper for readhdf.
     hdf4read               Wrapper for readhdf4.
     hdf5read               Wrapper for readhdf5.
@@ -220,8 +220,8 @@
     abc2plot               Write a, b, c, ... on plots.
     colors                 Wrapper for colour.
     colours                Define UFZ colours.
-    define_brewer          Defines and registers Brewer colormap.
-    get_brewer             Defines and returns Brewer colormap.
+    register_brewer        Registers and registers Brewer colormap.
+    get_brewer             Registers and returns Brewer colormap.
     plot_brewer            Plots available Brewer color maps in pdf file.
     position               Position arrays of subplots to be used with add_axes.
     print_brewer           Prints available Brewer colormap names.
@@ -317,7 +317,7 @@ from abc2plot          import abc2plot
 from area_poly         import area_poly
 from around            import around
 from autostring        import autostring, astr
-from brewer            import define_brewer, get_brewer, plot_brewer, print_brewer
+from brewer            import register_brewer, get_brewer, plot_brewer, print_brewer
 try:
     from calcvpd       import calcvpd
 except ImportError:

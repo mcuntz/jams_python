@@ -4,7 +4,7 @@ import numpy as np
 
 def readnetcdf(file, var='', code=-1, reform=False, squeeze=False,
                variables=False, codes=False, units=False, longnames=False,
-               attributes=False, sort=False):
+               attributes=False, sort=False, pointer=False):
     """
         Gets variables or prints information of netcdf file.
 
@@ -13,7 +13,7 @@ def readnetcdf(file, var='', code=-1, reform=False, squeeze=False,
         ----------
         def readnetcdf(file, var='', code=-1, reform=False, squeeze=False,
                        variables=False, codes=False, units=False,
-                       longnames=False, attributes=False, sort=False):
+                       longnames=False, attributes=False, sort=False, pointer=False):
 
 
         Input
@@ -41,6 +41,7 @@ def readnetcdf(file, var='', code=-1, reform=False, squeeze=False,
         attributes   get dictionary of all attributes of specific variable
         sort         sort variable names. Codes, units and longnames will be
                      sorted accoringly so that indeces still match.
+        pointer      if True, return file pointer, variable pointer
 
 
         Output
@@ -89,6 +90,12 @@ def readnetcdf(file, var='', code=-1, reform=False, squeeze=False,
         >>> print(readnetcdf('test_readnetcdf.nc',codes=True,sort=True))
         [128.0, 129.0, -1.0, -1.0]
 
+        >>> fh, var = readnetcdf('test_readnetcdf.nc',var='is1', pointer=True)
+        >>> print( var.shape )
+        (2, 4)
+        >>> print( var[:] )
+        [[ 1.  1.  1.  1.]
+         [ 1.  1.  1.  1.]]
 
         License
         -------
@@ -219,13 +226,17 @@ def readnetcdf(file, var='', code=-1, reform=False, squeeze=False,
         if var not in vars:
             f.close()
             raise ValueError('Variable '+var+' not in file '+file)
-        arr = f.variables[var][:]
-        if reform or squeeze:
-            f.close()
-            return arr.squeeze()
+        if pointer:
+            arr = f.variables[var]
+            return f, arr
         else:
-            f.close()
-            return arr
+            arr = f.variables[var][:]
+            if reform or squeeze:
+                f.close()
+                return arr.squeeze()
+            else:
+                f.close()
+                return arr
     if code != -1:
         if code not in cods:
             f.close()
