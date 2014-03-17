@@ -539,7 +539,7 @@ def nee2gpp_reichstein(dates, nee, t, isday, rg=False, vpd=False, undef=np.nan,
                 locs += [s]
                 # if ((s[1]/p[1])<0.5) & (p[1] > 0.): pdb.set_trace()
     if len(locp) == 0:
-        ValueError('Error nee2gpp_reichstein: No local relationship found.')
+        raise ValueError('Error nee2gpp_reichstein: No local relationship found.')
         print('Warning nee2gpp_reichstein: No local relationship found.')
         if masked:
             GPP  = np.ma.array(np.reshape(nee,inshape), mask=np.ones(inshape, dtype=np.bool))
@@ -560,7 +560,7 @@ def nee2gpp_reichstein(dates, nee, t, isday, rg=False, vpd=False, undef=np.nan,
         iii   = np.where((locp[:,1] > 0.))[0]
         niii = iii.size
         if niii<1:
-            ValueError('Error nee2gpp_reichstein: No E0>0 found.')
+            raise ValueError('Error nee2gpp_reichstein: No E0>0 found.')
             print('Warning nee2gpp_reichstein: No E0>0 found.')
             if masked:
                 GPP  = np.ma.array(np.reshape(nee,inshape), mask=np.ones(inshape, dtype=np.bool))
@@ -606,7 +606,7 @@ def nee2gpp_reichstein(dates, nee, t, isday, rg=False, vpd=False, undef=np.nan,
             refp  += [p]
             refii += [np.int((iii[0]+iii[-1])//2)]
     if len(refp) == 0:
-        ValueError('Error nee2gpp_reichstein: No ref relationship found.')
+        raise ValueError('Error nee2gpp_reichstein: No ref relationship found.')
         print('Warning nee2gpp_reichstein: No ref relationship found.')
         if masked:
             GPP  = np.ma.array(np.reshape(nee,inshape), mask=np.ones(inshape, dtype=np.bool))
