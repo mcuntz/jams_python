@@ -96,6 +96,8 @@ def readnetcdf(file, var='', code=-1, reform=False, squeeze=False,
         >>> print( var[:] )
         [[ 1.  1.  1.  1.]
          [ 1.  1.  1.  1.]]
+        >>> fh.close()
+
 
         License
         -------
