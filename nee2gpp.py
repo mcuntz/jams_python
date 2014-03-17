@@ -575,8 +575,8 @@ def nee2gpp_reichstein(dates, nee, t, isday, rg=False, vpd=False, undef=np.nan,
         bestp = np.mean(lp[iis[0:np.minimum(3,niii)],:],axis=0)
         bests = np.mean(ls[iis[0:np.minimum(3,niii)],:],axis=0)
     elif niii==1:
-        bestp = locp[iii,:]
-        bests = locs[iii,:]
+        bestp = np.squeeze(locp[iii,:])
+        bests = np.squeeze(locs[iii,:])
     elif niii==2:
         bestp = np.mean(locp[iii,:],axis=0)
         bests = np.mean(locs[iii,:],axis=0)
