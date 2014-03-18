@@ -77,6 +77,7 @@ import numpy as np
     -------
     Written,  MC, Jan 2012
     Modified, MC, Feb 2013 - ported to Python 3
+    Modified, AP, Mar 2014 - add: dielectric constant H2O
 """
 # Mathematical
 Pi    = 3.141592653589793238462643383279502884197    # Pi
@@ -96,6 +97,16 @@ REarth  = 6371009.      # Radius of Earth [m]
 M_CO2   = 44.01         # Molar mass CO2 [g*mol^-1]
 M_WV    = 18.01528      # Molar mass water vapour [g*mol^-1]
 M_DAIR  = 28.9644       # Molar mass of dry air [g*mol^-1]
+def dielH2O(T):         # dielectric constant of water [F/m]
+    '''
+    in:     temperature T [K]
+    out:    dielectric constant of H2O [F/m]
+    source: Kaatze, U.: Reference liquids for the calibration of dielectric
+            sensors and measurement instruments,
+            Measurement Science and Technology, 2007, 18
+            valid for 0 - 60 degC
+    '''
+    return 78.35*np.ma.exp(-4.55e-3*(T-298.15))
 
 # Isotope
 RPDB = 0.0112372 # Isotope ratio of VPDB-CO2
