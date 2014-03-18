@@ -85,7 +85,7 @@
     # cc = get_brewer('RdYlBu11')
     # plt.pcolormesh(np.outer(np.arange(cc.N),np.ones(cc.N)),cmap=cc)
 
-    # cc = get_brewer('Blues4',rgb=True)
+    # cc = get_brewer('blues4',rgb=True)
     # mark1 = sub.plot(x, y)
     # plt.setp(mark1, linestyle='None', marker='o', markeredgecolor=cc[0], markerfacecolor='None')
 
@@ -119,12 +119,8 @@
 from __future__ import print_function
 
 # Define colormaps
-import os
-cmapfile = 'brewer.cmaps'
-if not os.path.isfile(cmapfile):
-  print("brwer: No colormap file {0:s} found".format(cmapfile))
-  import sys
-  sys.exit(1)
+from find_in_path import find_in_path
+cmapfile = find_in_path('brewer.cmaps')
 exec(compile(open(cmapfile).read(), cmapfile, 'exec'))
 
 sequential_maps = ['ylgn3','ylgn4','ylgn5','ylgn6','ylgn7','ylgn8','ylgn9','ylgnbu3','ylgnbu4',
@@ -178,13 +174,28 @@ ncl_large_maps = [ 'BkBlAqGrYeOrReViWh200', 'BlAqGrYeOrRe', 'BlAqGrYeOrReVi200',
                    'WhiteBlue', 'WhiteBlueGreenYellowRed', 'WhiteGreen', 
                    'WhiteYellowOrangeRed', 'wxpEnIR', 'gauss', 'saw' ]
 
+all_maps = sequential_maps + diverging_maps + qualitative_maps + osu_maps + ncl_large_maps
+
+def capitalise(cname):
+    ''' Search for colour map if not the right capitalisation is given.'''
+    if cname in all_maps:
+        return cname
+    else:
+        lcmaps = [ c.lower() for c in all_maps ]
+        if cname.lower() in lcmaps:
+            return all_maps[lcmaps.index(cname.lower())]
+        else:
+            raise ValueError('Color map name not known: '+cname)            
+
 def register_brewer(cname='all', reverse=False, grey=False, gray=False):
+    '''Register colourmap with Matplotlib'''
     import matplotlib.colors as col
     import matplotlib.cm as cm
     if cname.lower() == 'all':
-        cmaps = sequential_maps + diverging_maps + qualitative_maps + osu_maps + ncl_large_maps
+        cmaps = all_maps
     else:
         cmaps = [cname]
+    cmaps = [ capitalise(cc) for cc in cmaps ]
     for i in cmaps:
         d = {}
         if i in ncl_large_maps:
@@ -204,10 +215,12 @@ def register_brewer(cname='all', reverse=False, grey=False, gray=False):
 
 def print_brewer(names='all'):
     """
+        Print names of known colour maps.
+
         Examples
         --------
         >>> print_brewer('qualitative')
-        ['set33', 'set34', 'set35', 'set36', 'set37', 'set38', 'set39', 'set310', 'set311', 'set312', 'pastel13', 'pastel14', 'pastel15', 'pastel16', 'pastel17', 'pastel18', 'pastel19', 'set13', 'set14', 'set15', 'set16', 'set17', 'set18', 'set19', 'pastel23', 'pastel24', 'pastel25', 'pastel26', 'pastel27', 'pastel28', 'set23', 'set24', 'set25', 'set26', 'set27', 'set28', 'dark23', 'dark24', 'dark25', 'dark26', 'dark27', 'dark28', 'paired3', 'paired4', 'paired5', 'paired6', 'paired7', 'paired8', 'paired9', 'paired10', 'paired11', 'paired12', 'accent3', 'accent4', 'accent5', 'accent6', 'accent7', 'accent8', 'cat12']
+        ['set33', 'set34', 'set35', 'set36', 'set37', 'set38', 'set39', 'set310', 'set311', 'set312', 'pastel13', 'pastel14', 'pastel15', 'pastel16', 'pastel17', 'pastel18', 'pastel19', 'set13', 'set14', 'set15', 'set16', 'set17', 'set18', 'set19', 'pastel23', 'pastel24', 'pastel25', 'pastel26', 'pastel27', 'pastel28', 'set23', 'set24', 'set25', 'set26', 'set27', 'set28', 'dark23', 'dark24', 'dark25', 'dark26', 'dark27', 'dark28', 'paired3', 'paired4', 'paired5', 'paired6', 'paired7', 'paired8', 'paired9', 'paired10', 'paired11', 'paired12', 'accent3', 'accent4', 'accent5', 'accent6', 'accent7', 'accent8']
     """
     if names.lower() == 'sequential':
         print(sequential_maps)
@@ -237,11 +250,13 @@ def print_brewer(names='all'):
 
 def get_brewer(cname=None, names=False, rgb=False, rgb256=False, reverse=False, grey=False, gray=False):
     """
+        Get colour map either as registered handle or as RGB values (0-255 or 0-1).
+
         Examples
         --------
         >>> import numpy as np
         >>> from autostring import astr
-        >>> cc = get_brewer('Blues4',rgb=True)
+        >>> cc = get_brewer('blues4',rgb=True)
         >>> print(astr(np.array(cc[0]), 4))
         ['0.9373' '0.9529' '1.0000']
 
@@ -249,72 +264,70 @@ def get_brewer(cname=None, names=False, rgb=False, rgb256=False, reverse=False, 
         >>> print(cc[0])
         (239, 243, 255)
 
-        >>> cc = get_brewer('Blues4',rgb256=True,reverse=True)
+        >>> cc = get_brewer('bLuEs4',rgb256=True,reverse=True)
         >>> print(cc[-1])
         (239, 243, 255)
         >>> print(cc[0])
         (33, 113, 181)
 
-        >>> cc = get_brewer('Blues4',rgb256=True,grey=True)
+        >>> cc = get_brewer('blues4',rgb256=True,grey=True)
         >>> print(astr(np.array(cc[0]), 4))
         ['242.9897' '242.9897' '242.9897']
     """
     if names:
-         if names.lower() == 'sequential':
-             return sequential_maps
-         elif names.lower() == 'diverging':
-             return diverging_maps
-         elif names.lower() == 'qualitative':
-             return qualitative_maps
-         elif names.lower() == 'osu':
-             return osu_maps
-         elif names.lower() == 'ncl_large':
-             return ncl_large_maps
-         else:
-             cmaps = sequential_maps + diverging_maps + qualitative_maps + osu_maps + ncl_large_maps
-             return cmaps
+        if names.lower() == 'sequential':
+            return sequential_maps
+        elif names.lower() == 'diverging':
+            return diverging_maps
+        elif names.lower() == 'qualitative':
+            return qualitative_maps
+        elif names.lower() == 'osu':
+            return osu_maps
+        elif names.lower() == 'ncl_large':
+            return ncl_large_maps
+        else:
+            cmaps = all_maps
+            return cmaps
     else:
-         if (cname in sequential_maps) | (cname in diverging_maps) | (cname in qualitative_maps) | (cname in osu_maps) | (cname in ncl_large_maps):
-             # get colour tuple in 0-255
-             if rgb256:
-                 d = {}
-                 if cname in ncl_large_maps:
-                     exec('cpool = [ tuple([k*255. for k in j]) for j in '+cname+' ]', globals(), d)
-                 else:
-                     exec('cpool = '+cname, globals(), d)
-                 cpool = d['cpool']
-                 if reverse:
-                     cpool = cpool[::-1]
-                 if grey | gray:
-                     for j in range(len(cpool)):
-                         isgray = 0.2125 * cpool[j][0] + 0.7154 * cpool[j][1] + 0.072* cpool[j][2]
-                         cpool[j] = (isgray,isgray,isgray)
-                 return cpool
-             # get colour tuple in 0-1
-             elif rgb:
-                 d = {}
-                 if cname in ncl_large_maps:
-                     exec('cpool = '+cname, globals(), d)
-                 else:
-                     exec('cpool = [ tuple([k/255. for k in j]) for j in '+cname+' ]', globals(), d)
-                 cpool = d['cpool']
-                 if reverse:
-                     cpool = cpool[::-1]
-                 if grey | gray:
-                     for j in range(len(cpool)):
-                         isgray = 0.2125 * cpool[j][0] + 0.7154 * cpool[j][1] + 0.072* cpool[j][2]
-                         cpool[j] = (isgray,isgray,isgray)
-                 return cpool
-             # register colour map with matplotlib
-             else:
-                 import matplotlib.cm as cm
-                 register_brewer(cname,reverse=reverse, grey=grey, gray=gray)
-                 return cm.get_cmap(cname)
-         else:
-             raise ValueError('Color map name not known: '+cname)
+        cname = capitalise(cname)
+        if rgb256:
+            d = {}
+            if cname in ncl_large_maps:
+                exec('cpool = [ tuple([k*255. for k in j]) for j in '+cname+' ]', globals(), d)
+            else:
+                exec('cpool = '+cname, globals(), d)
+            cpool = d['cpool']
+            if reverse:
+                cpool = cpool[::-1]
+            if grey | gray:
+                for j in range(len(cpool)):
+                    isgray = 0.2125 * cpool[j][0] + 0.7154 * cpool[j][1] + 0.072* cpool[j][2]
+                    cpool[j] = (isgray,isgray,isgray)
+            return cpool
+        # get colour tuple in 0-1
+        elif rgb:
+            d = {}
+            if cname in ncl_large_maps:
+                exec('cpool = '+cname, globals(), d)
+            else:
+                exec('cpool = [ tuple([k/255. for k in j]) for j in '+cname+' ]', globals(), d)
+            cpool = d['cpool']
+            if reverse:
+                cpool = cpool[::-1]
+            if grey | gray:
+                for j in range(len(cpool)):
+                    isgray = 0.2125 * cpool[j][0] + 0.7154 * cpool[j][1] + 0.072* cpool[j][2]
+                    cpool[j] = (isgray,isgray,isgray)
+            return cpool
+        # register colour map with matplotlib
+        else:
+            import matplotlib.cm as cm
+            register_brewer(cname,reverse=reverse, grey=grey, gray=gray)
+            return cm.get_cmap(cname)
 
 
 def plot_brewer(pngbase='brewer_colors',reverse=False, grey=False, gray=False):
+    '''Plot all colour bars in PNG files.'''
     import numpy as np
     from position import position
     outtype = 'pdf'
@@ -484,14 +497,12 @@ def plot_brewer(pngbase='brewer_colors',reverse=False, grey=False, gray=False):
 
 
 if __name__ == '__main__':
-    # import doctest
-    # doctest.testmod(optionflags=doctest.NORMALIZE_WHITESPACE)
+    import doctest
+    doctest.testmod(optionflags=doctest.NORMALIZE_WHITESPACE)
 
-    import ufz
-    ufz.plot_brewer('with_ncl')
     # import numpy as np
     # from autostring import astr
-    # cc = get_brewer('Blues4',rgb=True)
+    # cc = get_brewer('blues4',rgb=True)
     # print(astr(np.array(cc[0]), 4))
     # #    ['0.9373' '0.9529' '1.0000']
 
@@ -499,16 +510,15 @@ if __name__ == '__main__':
     # print(cc[0])
     # #    (239, 243, 255)
 
-    # cc = get_brewer('Blues4',rgb256=True,reverse=True)
+    # cc = get_brewer('blues4',rgb256=True,reverse=True)
     # print(cc[-1])
     # #    (239, 243, 255)
     # print(cc[0])
     # #    (33, 113, 181)
 
-    # cc = get_brewer('Blues4',rgb256=True,grey=True)
+    # cc = get_brewer('blues4',rgb256=True,grey=True)
     # print(astr(np.array(cc[0]), 4))
     # #    ['242.9897' '242.9897' '242.9897']
 
-    # plot_brewer('test.pdf', reverse=True)
-    # plot_brewer('test_gray.pdf', gray=True)
-
+    # plot_brewer('test_', reverse=True)
+    # plot_brewer('test_gray_', gray=True)
