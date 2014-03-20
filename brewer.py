@@ -32,7 +32,8 @@
                    if 'qualitative': return qualitative colormap names
                    if 'osu': return Oregon State University colormap names
                    if 'ncl_large': return ncl large colormap names with more than 50 colors
-                   else: return sequential+diverging+qualitative+osu+ncl_large colormap names
+                   if 'ncl_small': return ncl small colormap names with more than 50 colors
+                   else: return sequential+diverging+qualitative+osu+ncl_large+ncl_small colormap names
         rgb        if True: return RGB value tuple between 0 and 1
         rgb256     if True: return RGB value tuple between 0 and 255
         reverse    if True: reverse colormaps
@@ -40,7 +41,7 @@
         gray       Same as grey
     register_brewer
         cname      Colormap to register colormaps (default: 'all')
-                   if 'all': registers all sequential+diverging+qualitative+osu+ncl_large colormaps
+                   if 'all': registers all sequential+diverging+qualitative+osu+ncl_large+ncl_small colormaps
         reverse    if True: reverse colormaps
         grey       if True: return grey equivalent
         gray       Same as grey
@@ -51,7 +52,8 @@
                    if 'qualitative': print qualitative colormap names
                    if 'osu': print Oregon State University colormap names
                    if 'ncl_large': print ncl colormap names with more than 50 colors
-                   else: print sequential+diverging+qualitative+osu+ncl_large colormap names
+                   if 'ncl_small': print ncl colormap names with less than 50 colors
+                   else: print sequential+diverging+qualitative+osu+ncl_large+ncl_small colormap names
     plot_brewer
         pdffile    Name of pdf file  (default: 'brewer_colors.pdf')
         reverse    if True: reverse colormaps
@@ -72,7 +74,9 @@
       http://www.personal.psu.edu/cab38/ColorBrewer/ColorBrewer_all_schemes_RGBonly4_withPalette_and_Macro.xls
     Also included colour maps from Geography, University of Oregon
       http://geography.uoregon.edu/datagraphics/color_scales.htm
-
+    Also included color maps from PyNGL, the Python interface to NCL (NCAR COMMAND LANGUAGE)
+      http://www.pyngl.ucar.edu/Graphics/color_table_gallery.shtml
+    
 
     Examples
     --------
@@ -88,8 +92,7 @@
     # cc = get_brewer('blues4',rgb=True)
     # mark1 = sub.plot(x, y)
     # plt.setp(mark1, linestyle='None', marker='o', markeredgecolor=cc[0], markerfacecolor='None')
-
-
+    
     License
     -------
     This file is part of the UFZ Python library.
@@ -115,6 +118,7 @@
     Written,  MC, Sep 2012
     Modified, MC, Feb 2013 - ported to Python 3
               MC, Jun 2013 - include Uni Oregon colours
+              ST, Mar 2014 - include NCL color maps
 """
 from __future__ import print_function
 
@@ -158,9 +162,9 @@ qualitative_maps = ['set33','set34','set35','set36','set37','set38','set39','set
                     'accent4','accent5','accent6','accent7','accent8']
 
 osu_maps = ['bu7', 'bu10', 'step5',
-	    'brbu10', 'brbu12', 'budor12', 'budor18', 'drdbu12', 'drdbu18', 'bugn14', 'bugr8',
-	    'buor8', 'buor10', 'buor12', 'buor14', 'rdylbu11b', 'gnmg16',
-	    'cat12']
+        'brbu10', 'brbu12', 'budor12', 'budor18', 'drdbu12', 'drdbu18', 'bugn14', 'bugr8',
+        'buor8', 'buor10', 'buor12', 'buor14', 'rdylbu11b', 'gnmg16',
+        'cat12']
 
 ncl_large_maps = [ 'BkBlAqGrYeOrReViWh200', 'BlAqGrYeOrRe', 'BlAqGrYeOrReVi200', 
                    'BlGrYeOrReVi200', 'BlRe', 'BlueRed', 'BlueRedGray', 'BlueWhiteOrangeRed',
@@ -174,7 +178,29 @@ ncl_large_maps = [ 'BkBlAqGrYeOrReViWh200', 'BlAqGrYeOrRe', 'BlAqGrYeOrReVi200',
                    'WhiteBlue', 'WhiteBlueGreenYellowRed', 'WhiteGreen', 
                    'WhiteYellowOrangeRed', 'wxpEnIR', 'gauss', 'saw' ]
 
-all_maps = sequential_maps + diverging_maps + qualitative_maps + osu_maps + ncl_large_maps
+ncl_small_maps = [ 'amwg', 'amwg_blueyellowred', 'BlueDarkRed18', 
+          'BlueDarkOrange18', 'BlueGreen14', 'BrownBlue12', 
+          'Cat12', 'cosam12', 'cosam', 'cyclic', 'default',
+          'GreenMagenta16', 'gscyclic', 'gsdtol', 'gsltod',
+          'gui_default', 'hlu_default', 'hotcold_18lev',
+          'hotcolr_19lev', 'mch_default', 'nrl_sirkes', 
+          'perc2_9lev', 'percent_11lev', 'posneg_1', 'posneg_2',
+          'prcp_1', 'prcp_2', 'prcp_3', 'precip_11lev',
+          'precip_diff_12lev', 'precip_diff_1lev', 'precip2_15lev',
+          'precip2_17lev', 'precip3_16lev', 'precip4_11lev',
+          'precip4_diff_19lev', 'radar', 'radar_1', 'rh_19lev',
+          'so4_21', 'so4_23', 'spread_15lev', 'StepSeq25', 'sunshine_9lev',
+          'sunshine_diff_12lev', 'temp_19lev', 'temp_diff_18lev',
+          'temp_diff_1lev', 'topo_15lev', 'wgne15', 'wind_17lev' ]
+
+ncl_meteo_swiss_maps = [ 'hotcold_18lev', 'hotcolr_19lev', 'mch_default', 'perc2_9lev',
+          'percent_11lev', 'precip2_15lev', 'precip2_17lev', 'precip3_16lev',
+          'precip4_11lev', 'precip4_diff_19lev', 'precip_11lev', 'precip_diff_12lev',
+          'precip_diff_1lev', 'rh_19lev', 'spread_15lev', 'sunshine_9lev', 'sunshine_diff_12lev',
+          't2m_29lev', 'temp_19lev', 'temp_diff_18lev', 'temp_diff_1lev', 'topo_15lev',
+          'wind_17lev' ]
+
+all_maps = sequential_maps + diverging_maps + qualitative_maps + osu_maps + ncl_large_maps + ncl_small_maps + ncl_meteo_swiss_maps
 
 def capitalise(cname):
     ''' Search for colour map if not the right capitalisation is given.'''
@@ -198,7 +224,7 @@ def register_brewer(cname='all', reverse=False, grey=False, gray=False):
     cmaps = [ capitalise(cc) for cc in cmaps ]
     for i in cmaps:
         d = {}
-        if i in ncl_large_maps:
+        if i in ncl_large_maps + ncl_small_maps + ncl_meteo_swiss_maps:
             exec('cpool = '+i, globals(), d)
         else:
             exec('cpool = [ tuple([k/255. for k in j]) for j in '+i+' ]', globals(), d)
@@ -232,6 +258,10 @@ def print_brewer(names='all'):
         print(osu_maps)
     elif names.lower() == 'ncl_large':
         print(ncl_large_maps)
+    elif names.lower() == 'ncl_small':
+        print(ncl_small_maps)
+    elif names.lower() == 'ncl_meteo_swiss':
+        print(ncl_meteo_swiss_maps)
     else:
         print('Sequential color maps')
         print(sequential_maps)
@@ -247,6 +277,12 @@ def print_brewer(names='all'):
         print('')
         print('NCL large color maps')
         print(ncl_large_maps)
+        print('')
+        print('NCL small color maps')
+        print(ncl_small_maps)
+        print('')
+        print('NCL meteo swiss color maps')
+        print(ncl_meteo_swiss_maps)
 
 def get_brewer(cname=None, names=False, rgb=False, rgb256=False, reverse=False, grey=False, gray=False):
     """
@@ -285,6 +321,10 @@ def get_brewer(cname=None, names=False, rgb=False, rgb256=False, reverse=False, 
             return osu_maps
         elif names.lower() == 'ncl_large':
             return ncl_large_maps
+        elif names.lower() == 'ncl_small':
+            return ncl_small_maps
+        elif names.lower() == 'ncl_meteo_swiss':
+            return ncl_meteo_swiss_maps
         else:
             cmaps = all_maps
             return cmaps
@@ -292,7 +332,7 @@ def get_brewer(cname=None, names=False, rgb=False, rgb256=False, reverse=False, 
         cname = capitalise(cname)
         if rgb256:
             d = {}
-            if cname in ncl_large_maps:
+            if cname in ncl_large_maps + ncl_small_maps + ncl_meteo_swiss_maps:
                 exec('cpool = [ tuple([k*255. for k in j]) for j in '+cname+' ]', globals(), d)
             else:
                 exec('cpool = '+cname, globals(), d)
@@ -307,7 +347,7 @@ def get_brewer(cname=None, names=False, rgb=False, rgb256=False, reverse=False, 
         # get colour tuple in 0-1
         elif rgb:
             d = {}
-            if cname in ncl_large_maps:
+            if cname in ncl_large_maps + ncl_small_maps + ncl_meteo_swiss_maps:
                 exec('cpool = '+cname, globals(), d)
             else:
                 exec('cpool = [ tuple([k/255. for k in j]) for j in '+cname+' ]', globals(), d)
@@ -494,8 +534,63 @@ def plot_brewer(pngbase='brewer_colors',reverse=False, grey=False, gray=False):
     pngfile = pngbase+"{0:04d}".format(ifig)+".png"
     fig.savefig(pngfile, transparent=transparent, bbox_inches=bbox_inches, pad_inches=pad_inches)
     plt.close(fig)
-
-
+    
+    nrow       = 2 # set to two for ncl small maps
+    ncol       = 14
+    nmaps = len(ncl_small_maps)
+    npage = nrow*ncol
+    zaehl = 0
+    for kk in ncl_small_maps:
+        if zaehl % npage == 0:
+            if zaehl != 0:
+                pngfile = pngbase+"{0:04d}".format(ifig)+".png"
+                fig.savefig(pngfile, transparent=transparent, bbox_inches=bbox_inches, pad_inches=pad_inches)
+                plt.close(fig)
+            ifig += 1
+            iplot = 0
+            print('Page ', ifig)
+            fig = plt.figure(ifig)
+        iplot += 1
+        sub = fig.add_axes(position(nrow,ncol,iplot,hspace=hspace,wspace=wspace,top=0.85))
+        sub.axis('off')
+        if iplot == 1:
+            fig.text(0.5, 0.97, "ncl_small_maps", ha="center", size=12)
+        cc = get_brewer(kk,reverse=reverse, grey=grey, gray=gray)
+        plt.pcolor(np.outer(np.arange(cc.N),np.ones(cc.N)),cmap=cc,linewidth=0,edgecolor='None')
+        plt.setp(sub, title=kk)
+        plt.setp(sub.title,fontsize=10, rotation=90, verticalalignment='bottom')
+        zaehl += 1
+    pngfile = pngbase+"{0:04d}".format(ifig)+".png"
+    fig.savefig(pngfile, transparent=transparent, bbox_inches=bbox_inches, pad_inches=pad_inches)
+    plt.close(fig)
+    
+    nmaps = len(ncl_meteo_swiss_maps)
+    npage = nrow*ncol
+    zaehl = 0
+    for kk in ncl_meteo_swiss_maps:
+        if zaehl % npage == 0:
+            if zaehl != 0:
+                pngfile = pngbase+"{0:04d}".format(ifig)+".png"
+                fig.savefig(pngfile, transparent=transparent, bbox_inches=bbox_inches, pad_inches=pad_inches)
+                plt.close(fig)
+            ifig += 1
+            iplot = 0
+            print('Page ', ifig)
+            fig = plt.figure(ifig)
+        iplot += 1
+        sub = fig.add_axes(position(nrow,ncol,iplot,hspace=hspace,wspace=wspace,top=0.85))
+        sub.axis('off')
+        if iplot == 1:
+            fig.text(0.5, 0.97, "ncl_meteo_swiss_maps", ha="center", size=12)
+        cc = get_brewer(kk,reverse=reverse, grey=grey, gray=gray)
+        plt.pcolor(np.outer(np.arange(cc.N),np.ones(cc.N)),cmap=cc,linewidth=0,edgecolor='None')
+        plt.setp(sub, title=kk)
+        plt.setp(sub.title,fontsize=10, rotation=90, verticalalignment='bottom')
+        zaehl += 1
+    pngfile = pngbase+"{0:04d}".format(ifig)+".png"
+    fig.savefig(pngfile, transparent=transparent, bbox_inches=bbox_inches, pad_inches=pad_inches)
+    plt.close(fig)
+    
 if __name__ == '__main__':
     import doctest
     doctest.testmod(optionflags=doctest.NORMALIZE_WHITESPACE)
