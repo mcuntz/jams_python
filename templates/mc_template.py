@@ -233,7 +233,7 @@ sub.grid(False)
 if xlim != None: plt.setp(sub, xlim=xlim)
 if ylim != None: plt.setp(sub, ylim=ylim)
 
-ll = sub.legend(mark1, [r'$\mathrm{Sin \; Nothing}$'], frameon=frameon, ncol=1,
+ll = sub.legend(mark1, [r'$\mathrm{sin \; Nothing}$'], frameon=frameon, ncol=1,
                 labelspacing=llrspace, handletextpad=llhtextpad, handlelength=llhlength,
                 loc='upper left', bbox_to_anchor=(llxbbox,llybbox), scatterpoints=1, numpoints=1)
 plt.setp(ll.get_texts(), fontsize='small')
@@ -279,7 +279,7 @@ sub.grid(False)
 if xlim != None: plt.setp(sub, xlim=xlim) # set axis limit if wanted
 if ylim != None: plt.setp(sub, ylim=ylim)
 
-ll = sub.legend(line1, [r'$\mathrm{Sin \; Nothing}$'], frameon=frameon, ncol=1,
+ll = sub.legend(line1, [r'$\mathrm{sin \; Nothing}$'], frameon=frameon, ncol=1,
                 labelspacing=llrspace, handletextpad=llhtextpad, handlelength=llhlength,
                 loc='upper left', bbox_to_anchor=(llxbbox,llybbox), scatterpoints=1, numpoints=1)
 plt.setp(ll.get_texts(), fontsize='small')
