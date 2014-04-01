@@ -50,6 +50,7 @@
     kernel_regression      Multi-dimensional non-parametric regression.
     kernel_regression_h    Optimal bandwidth for kernel regression.
     kriging                Krig a surface from a set of 2D points.
+    lagcorr                Calculate time lag of maximum or minimum correlation of two arrays.
     lhs                    Latin Hypercube Sampling of any distribution without correlations.
     lif                    Count number of lines in file.
     line_dev_mask          Maskes elements of an array deviating from a line fit.
@@ -189,6 +190,7 @@
     functions              Common functions that are used in curve_fit or fmin parameter estimations.
     heaviside              Heaviside (or unit step) operator.
     jab                    Jackknife-after-Bootstrap error.
+    lagcorr                Calculate time lag of maximum or minimum correlation of two arrays.
     lhs                    Latin Hypercube Sampling of any distribution without correlations.
     morris_sampling        Sampling of optimised trajectories for Morris measures / elementary effects
     pi                     Parameter importance index PI or alternatively B index calculation.
@@ -309,6 +311,7 @@
               AP, Feb 2014 - line_dev_mask
               MC, Feb 2014 - removed all import *
               MC, Feb 2014 - sigma_filter
+              AP, Mar 2014 - lagcorr
 """
 from __future__ import print_function
 
@@ -347,6 +350,7 @@ from in_poly           import in_poly, inpoly
 from interpol          import interpol
 from kernel_regression import kernel_regression, kernel_regression_h
 from kriging           import kriging
+from lagcorr           import lagcorr
 from lhs               import lhs
 from lif               import lif
 #from line_dev_mask     import line_dev_mask
