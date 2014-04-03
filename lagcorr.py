@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+from __future__ import print_function
 import numpy as np
 
 def lagcorr(y1, y2, lagmin, lagmax, max=True, plot=False):
@@ -125,6 +126,88 @@ def lagcorr(y1, y2, lagmin, lagmax, max=True, plot=False):
     # return lag of maximum or minimum correlation
     return span[index]
 
+# http://www.mail-archive.com/matplotlib-users@lists.sourceforge.net/msg01487.html
+def ccf(x, y, axis=None):    
+    """Computes the cross-correlation function of two series `x` and `y`.
+Note that the computations are performed on anomalies (deviations from 
+average).
+Returns the values of the cross-correlation at different lags.
+Lags are given as [0,1,2,...,n,n-1,n-2,...,-2,-1].
+ 
+:Parameters:
+    `x` : 1D MaskedArray
+        Time series.
+    `y` : 1D MaskedArray
+        Time series.
+    `axis` : integer *[None]*
+        Axis along which to compute (0 for rows, 1 for cols).
+        If `None`, the array is flattened first.
+    """
+    assert x.ndim == y.ndim, "Inconsistent shape !"
+#    assert(x.shape == y.shape, "Inconsistent shape !")   
+    if axis is None:    
+        if x.ndim > 1:
+            x = x.ravel()
+            y = y.ravel()
+        npad = x.size + y.size
+        xanom = (x - x.mean(axis=None))
+        yanom = (y - y.mean(axis=None))
+        Fx = np.fft.fft(xanom, npad, )
+        Fy = np.fft.fft(yanom, npad, )
+        iFxy = np.fft.ifft(Fx.conj()*Fy).real
+        varxy = np.sqrt(np.inner(xanom,xanom) * np.inner(yanom,yanom))
+    else:
+        npad = x.shape[axis] + y.shape[axis]
+        if axis == 1:
+            if x.shape[0] != y.shape[0]:
+                raise ValueError, "Arrays should have the same length!"
+            xanom = (x - x.mean(axis=1)[:,None])
+            yanom = (y - y.mean(axis=1)[:,None])
+            varxy = np.sqrt((xanom*xanom).sum(1) * (yanom*yanom).sum(1))[:,None]
+        else:
+            if x.shape[1] != y.shape[1]:
+                raise ValueError, "Arrays should have the same width!"
+            xanom = (x - x.mean(axis=0))
+            yanom = (y - y.mean(axis=0))
+            varxy = np.sqrt((xanom*xanom).sum(0) * (yanom*yanom).sum(0))
+        Fx = np.fft.fft(xanom, npad, axis=axis)
+        Fy = np.fft.fft(yanom, npad, axis=axis)
+        iFxy = np.fft.ifft(Fx.conj()*Fy,n=npad,axis=axis).real
+    #    
+    return iFxy/varxy
+
+
+def ccf1d(x,y):
+    """Computes the crosscorrelation of two flat arrays `x` and `y`, with the
+numpy.correlate function.
+Note that the computations are performed on anomalies (deviations from 
+average).
+    """
+    if x.ndim > 1:
+        x = x.ravel()
+    if y.ndim > 1:
+        y = y.ravel()
+    (xanom, yanom) = (x-x.mean(), y-y.mean())
+    corxy = np.correlate(xanom, yanom, 'full')
+    n = min(x.size, y.size)
+    #    return np.r_[ xc[len(yf)-1:], 0, xc[:len(yf)-1] ]
+    corxy = np.r_[ corxy[:n][::-1], 0, corxy[n:][::-1] ]
+    varxy = np.sqrt(np.inner(xanom,xanom) * np.inner(yanom,yanom))
+    return corxy/varxy
+
 if __name__ == '__main__':
     import doctest
     doctest.testmod()
+
+    '''
+    # %paste in iPython
+    from lagcorr import lagcorr, ccf, ccf1d
+    x = np.sin(np.random.random(10000)) # some data
+    y = np.roll(x, 100)                 # shift by 100
+    %timeit ccf(x,y)                    # with FFT
+    %timeit ccf1d(x,y)                  # with correlate 'full'
+    %timeit lagcorr(x, y, 50, 200)      # with correlate 'valid'
+    print(lagcorr(x, y, 50, 200))          # should be 100
+    print(np.argmax(ccf(x,y)))                 # should be 100
+    '''
+
