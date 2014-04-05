@@ -23,6 +23,7 @@
     colours                Define UFZ colours.
     const                  Provides physical, mathematical, computational, and isotope constants.
     convex_hull            Calculate subset of points that make a convex hull around a set of 2D points.
+    correlate              Computes the cross-correlation function of two series x and y.
     cuntz_gleixner         Cuntz-Gleixner model of 13C discrimination.
     register_brewer        Registers and registers Brewer colormap.
     dewpoint               Calculates the dew point from ambient humidity.
@@ -184,6 +185,7 @@
     Math
     ----
     around                 Round to the passed power of ten.
+    correlate              Computes the cross-correlation function of two series x and y.
     div                    Wrapper for division.
     division               Divide two arrays, return 'otherwise' if division by 0.
     elementary_effects     Morris measures mu, stddev and mu*
@@ -312,6 +314,7 @@
               MC, Feb 2014 - removed all import *
               MC, Feb 2014 - sigma_filter
               AP, Mar 2014 - lagcorr
+              MC, Apr 2014 - correlate
 """
 from __future__ import print_function
 
@@ -330,6 +333,7 @@ from closest           import closest
 from colours           import colours, colors
 import const
 from convex_hull       import convex_hull
+from correlate         import correlate
 from cuntz_gleixner    import cuntz_gleixner
 from date2dec          import date2dec
 from dec2date          import dec2date
@@ -353,7 +357,7 @@ from kriging           import kriging
 from lagcorr           import lagcorr
 from lhs               import lhs
 from lif               import lif
-#from line_dev_mask     import line_dev_mask
+from line_dev_mask     import line_dev_mask
 from jab               import jab
 from mad               import mad
 from maskgroup         import maskgroup
