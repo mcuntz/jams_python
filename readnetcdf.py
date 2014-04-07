@@ -4,7 +4,7 @@ import numpy as np
 
 def readnetcdf(file, var='', code=-1, reform=False, squeeze=False,
                variables=False, codes=False, units=False, longnames=False,
-               attributes=False, sort=False, pointer=False):
+               attributes=False, sort=False, pointer=False, overwrite=False):
     """
         Gets variables or prints information of netcdf file.
 
@@ -12,8 +12,8 @@ def readnetcdf(file, var='', code=-1, reform=False, squeeze=False,
         Definition
         ----------
         def readnetcdf(file, var='', code=-1, reform=False, squeeze=False,
-                       variables=False, codes=False, units=False,
-                       longnames=False, attributes=False, sort=False, pointer=False):
+                       variables=False, codes=False, units=False, longnames=False, 
+                       attributes=False, sort=False, pointer=False, overwrite=False):
 
 
         Input
@@ -42,6 +42,8 @@ def readnetcdf(file, var='', code=-1, reform=False, squeeze=False,
         sort         sort variable names. Codes, units and longnames will be
                      sorted accoringly so that indeces still match.
         pointer      if True, return file pointer, variable pointer
+        overwrite    if True, file and variable pointer are returned and allow
+                     modification of file
 
 
         Output
@@ -97,7 +99,16 @@ def readnetcdf(file, var='', code=-1, reform=False, squeeze=False,
         [[ 1.  1.  1.  1.]
          [ 1.  1.  1.  1.]]
         >>> fh.close()
-
+        
+        >>> fh, var = readnetcdf('test_readnetcdf.nc',var='is1', overwrite=True)
+        >>> print( var.shape )
+        (2, 4)
+        >>> arr = var[:] * 1
+        >>> print( arr[:] )
+        [[ 1.  1.  1.  1.]
+         [ 1.  1.  1.  1.]]
+        >>> var[:] = arr
+        >>> fh.close()
 
         License
         -------
@@ -125,6 +136,7 @@ def readnetcdf(file, var='', code=-1, reform=False, squeeze=False,
         Modified, MC, Jun 2012 - removed quiet
                   MC, Feb 2013 - ported to Python 3
                   MC, Oct 2013 - netcdfread, ncread, readnc
+                  ST, Apr 2014 - added overwrite flag
     """
     try:
         import netCDF4 as nc
@@ -132,7 +144,10 @@ def readnetcdf(file, var='', code=-1, reform=False, squeeze=False,
         raise IOError('No NetCDF4 support available.')
     # Open netcdf file
     try:
-        f = nc.Dataset(file, 'r')
+        if overwrite:
+            f = nc.Dataset(file, 'a')
+        else:
+            f = nc.Dataset(file, 'r')
     except IOError:
         raise IOError('Cannot open file for reading.'+file)
     # Variables
@@ -228,7 +243,7 @@ def readnetcdf(file, var='', code=-1, reform=False, squeeze=False,
         if var not in vars:
             f.close()
             raise ValueError('Variable '+var+' not in file '+file)
-        if pointer:
+        if pointer or overwrite:
             arr = f.variables[var]
             return f, arr
         else:
