@@ -41,9 +41,8 @@ def readnetcdf(file, var='', code=-1, reform=False, squeeze=False,
         attributes   get dictionary of all attributes of specific variable
         sort         sort variable names. Codes, units and longnames will be
                      sorted accoringly so that indeces still match.
-        pointer      if True, return file pointer, variable pointer
-        overwrite    if True, file and variable pointer are returned and allow
-                     modification of file
+        pointer      if True, (return file pointer, variable pointer); only for reading
+        overwrite    if True, (return file pointer, variable pointer); modification of file/variable possible
 
 
         Output
@@ -61,16 +60,29 @@ def readnetcdf(file, var='', code=-1, reform=False, squeeze=False,
 
         Examples
         --------
+        # Read varibale or code
         >>> print(readnetcdf('test_readnetcdf.nc',var='is1'))
         [[ 1.  1.  1.  1.]
          [ 1.  1.  1.  1.]]
         >>> print(readnetcdf('test_readnetcdf.nc',code=129))
         [[ 2.  2.  2.  2.]
          [ 2.  2.  2.  2.]]
+
+        # Get variable names
         >>> print([str(i) for i in readnetcdf('test_readnetcdf.nc',variables=True)])
         ['x', 'y', 'is1', 'is2']
         >>> print([str(i) for i in readnetcdf('test_readnetcdf.nc',variables=True,sort=True)])
         ['is1', 'is2', 'x', 'y']
+
+        # Get codes
+        >>> print(readnetcdf('test_readnetcdf.nc',codes=True))
+        [  -1.   -1.  128.  129.]
+        >>> print(readnetcdf('test_readnetcdf.nc',codes=True,reform=True))
+        [ 128.  129.]
+        >>> print(readnetcdf('test_readnetcdf.nc',codes=True,sort=True))
+        [128.0, 129.0, -1.0, -1.0]
+
+        # Get special attributes units and longnames
         >>> print([str(i) for i in readnetcdf('test_readnetcdf.nc',units=True)])
         ['xx', 'yy', 'arbitrary', 'arbitrary']
         >>> print([str(i) for i in readnetcdf('test_readnetcdf.nc',units=True,sort=True)])
@@ -80,18 +92,15 @@ def readnetcdf(file, var='', code=-1, reform=False, squeeze=False,
         >>> print([str(i) for i in readnetcdf('test_readnetcdf.nc',longnames=True,sort=True)])
         ['all ones', 'all twos', 'x-axis', 'y-axis']
 
+        # Get attributes
         # old: {'units': 'arbitrary', 'long_name': 'all ones', 'code': 128}
         # new: {u'units': u'arbitrary', u'long_name': u'all ones', u'code': 128}
         >>> t1 = readnetcdf('test_readnetcdf.nc',var='is1',attributes=True)
         >>> print([ str(i) for i in sorted(t1)])
         ['code', 'long_name', 'units']
-        >>> print(readnetcdf('test_readnetcdf.nc',codes=True))
-        [  -1.   -1.  128.  129.]
-        >>> print(readnetcdf('test_readnetcdf.nc',codes=True,reform=True))
-        [ 128.  129.]
-        >>> print(readnetcdf('test_readnetcdf.nc',codes=True,sort=True))
-        [128.0, 129.0, -1.0, -1.0]
 
+        # Just get file handle so that read is done later at indexing
+        # useful for example to inquire remote netcdf files first
         >>> fh, var = readnetcdf('test_readnetcdf.nc',var='is1', pointer=True)
         >>> print( var.shape )
         (2, 4)
@@ -100,15 +109,20 @@ def readnetcdf(file, var='', code=-1, reform=False, squeeze=False,
          [ 1.  1.  1.  1.]]
         >>> fh.close()
         
-        >>> fh, var = readnetcdf('test_readnetcdf.nc',var='is1', overwrite=True)
-        >>> print( var.shape )
-        (2, 4)
-        >>> arr = var[:] * 1
-        >>> print( arr[:] )
+        # Change a variable in a file
+        >>> print(readnetcdf('test_readnetcdf.nc',var='is1'))
         [[ 1.  1.  1.  1.]
          [ 1.  1.  1.  1.]]
-        >>> var[:] = arr
+        >>> fh, var = readnetcdf('test_readnetcdf.nc',var='is1', overwrite=True)
+        >>> var[:] *= 2.
         >>> fh.close()
+        >>> print(readnetcdf('test_readnetcdf.nc',var='is1'))
+        [[ 2.  2.  2.  2.]
+         [ 2.  2.  2.  2.]]
+        >>> fh, var = readnetcdf('test_readnetcdf.nc',var='is1', overwrite=True)
+        >>> var[:] *= 0.5
+        >>> fh.close()
+
 
         License
         -------
