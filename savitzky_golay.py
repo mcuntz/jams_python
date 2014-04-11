@@ -6,102 +6,103 @@ import scipy.signal as sps
 
 def savitzky_golay(y, window, order, deriv=0, rate=1):
     """
-       Smooth (and optionally differentiate) data with a Savitzky-Golay filter.
-       The Savitzky-Golay filter removes high frequency noise from data.
-       It has the advantage of preserving the original shape and
-       features of the signal better than other types of filtering
-       approaches, such as moving averages techniques.
+        Smooth (and optionally differentiate) data with a Savitzky-Golay filter.
+        The Savitzky-Golay filter removes high frequency noise from data.
+        It has the advantage of preserving the original shape and
+        features of the signal better than other types of filtering
+        approaches, such as moving averages techniques.
 
 
-       Definition
-       ----------
-       def savitzky_golay(y, window, order, deriv=0, rate=1):
+        Definition
+        ----------
+        def savitzky_golay(y, window, order, deriv=0, rate=1):
 
 
-       Input
-       -----
-       y         array_like, shape (N,)
-                 the values of the time history of the signal.
-       window    int
-                 the length of the window. Must be an odd integer number.
-       order     int
-                 the order of the polynomial used in the filtering.
-                 Must be less then `window` - 1.
+        Input
+        -----
+        y         array_like, shape (N,)
+                  the values of the time history of the signal.
+        window    int
+                  the length of the window. Must be an odd integer number.
+        order     int
+                  the order of the polynomial used in the filtering.
+                  Must be less then `window` - 1.
 
 
-       Optional Input
-       --------------
-       deriv     int
-                 the order of the derivative to compute (default = 0 means only smoothing)
-       rate      int
-                 ??? output will be multiplied by rate**deriv
+        Optional Input
+        --------------
+        deriv     int
+                  the order of the derivative to compute (default = 0 means only smoothing)
+        rate      int
+                  ??? output will be multiplied by rate**deriv
 
-       Output
-       ------
-       ndarray: shape(N,)
-       the smoothed signal (or it's n-th derivative).
-
-
-       Notes
-       -----
-       The Savitzky-Golay is a type of low-pass filter, particularly
-       suited for smoothing noisy data. The main idea behind this
-       approach is to make for each point a least-square fit with a
-       polynomial of high order over a odd-sized window centered at
-       the point.
+        Output
+        ------
+        ndarray: shape(N,)
+        the smoothed signal (or it's n-th derivative).
 
 
-       References
-       ----------
-       [1] A. Savitzky, M. J. E. Golay
-           Smoothing and Differentiation of Data by Simplified Least Squares Procedures.
-           Analytical Chemistry, 1964, 36 (8), pp 1627-1639.
-       [2] W.H. Press, S.A. Teukolsky, W.T. Vetterling, B.P. Flannery
-           Numerical Recipes 3rd Edition: The Art of Scientific Computing
-           Cambridge University Press ISBN-13: 9780521880688
+        Notes
+        -----
+        The Savitzky-Golay is a type of low-pass filter, particularly
+        suited for smoothing noisy data. The main idea behind this
+        approach is to make for each point a least-square fit with a
+        polynomial of high order over a odd-sized window centered at
+        the point.
 
 
-       Examples
-       --------
-       >>> import numpy as np
-       >>> np.random.seed(1)
-       >>> t = np.linspace(-4, 4, 10)
-       >>> y = np.exp( -t**2 ) + np.random.normal(0, 0.05, t.shape)
-       >>> from autostring import astr
-       >>> print(astr(savitzky_golay(y, window=3, order=1),3,pp=True))
-       [' 0.007' ' 0.010' ' 0.022' ' 0.320' ' 0.562' ' 0.609' ' 0.310' ' 0.080' '-0.009' ' 0.007']
-
-       >>> print(astr(savitzky_golay(y, 3, 1, deriv=1),3,pp=True))
-       [' 0.000' '-0.050' ' 0.073' ' 0.442' ' 0.295' '-0.304' '-0.368' '-0.120' ' 0.009' ' 0.000']
-
-       >>> print(astr(savitzky_golay(y, 3, 1, deriv=1, rate=10),3,pp=True))
-       [' 0.000' '-0.502' ' 0.729' ' 4.416' ' 2.952' '-3.039' '-3.683' '-1.201' ' 0.092' ' 0.000']
+        References
+        ----------
+        [1] A. Savitzky, M. J. E. Golay
+            Smoothing and Differentiation of Data by Simplified Least Squares Procedures.
+            Analytical Chemistry, 1964, 36 (8), pp 1627-1639.
+        [2] W.H. Press, S.A. Teukolsky, W.T. Vetterling, B.P. Flannery
+            Numerical Recipes 3rd Edition: The Art of Scientific Computing
+            Cambridge University Press ISBN-13: 9780521880688
 
 
-       License
-       -------
-       This file is part of the UFZ Python library.
+        Examples
+        --------
+        >>> import numpy as np
+        >>> np.random.seed(1)
+        >>> t = np.linspace(-4, 4, 10)
+        >>> y = np.exp( -t**2 ) + np.random.normal(0, 0.05, t.shape)
+        >>> from autostring import astr
+        >>> print(astr(savitzky_golay(y, window=3, order=1),3,pp=True))
+        [' 0.007' ' 0.010' ' 0.022' ' 0.320' ' 0.562' ' 0.609' ' 0.310' ' 0.080' '-0.009' ' 0.007']
 
-       The UFZ Python library is free software: you can redistribute it and/or modify
-       it under the terms of the GNU Lesser General Public License as published by
-       the Free Software Foundation, either version 3 of the License, or
-       (at your option) any later version.
+        >>> print(astr(savitzky_golay(y, 3, 1, deriv=1),3,pp=True))
+        [' 0.000' '-0.050' ' 0.073' ' 0.442' ' 0.295' '-0.304' '-0.368' '-0.120' ' 0.009' ' 0.000']
 
-       The UFZ Python library is distributed in the hope that it will be useful,
-       but WITHOUT ANY WARRANTY; without even the implied warranty of
-       MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-       GNU Lesser General Public License for more details.
-
-       You should have received a copy of the GNU Lesser General Public License
-       along with The UFZ Python library.  If not, see <http://www.gnu.org/licenses/>.
-
-       Copyright 2012-2013 Matthias Cuntz
+        >>> print(astr(savitzky_golay(y, 3, 1, deriv=1, rate=10),3,pp=True))
+        [' 0.000' '-0.502' ' 0.729' ' 4.416' ' 2.952' '-3.039' '-3.683' '-1.201' ' 0.092' ' 0.000']
 
 
-       History
-       -------
-       Written,  MC, Oct 2012 - from SciPy cookbook: http://www.scipy.org/Cookbook/SavitzkyGolay
-       Modified, MC, Feb 2013 - ported to Python 3
+        License
+        -------
+        This file is part of the UFZ Python library.
+
+        The UFZ Python library is free software: you can redistribute it and/or modify
+        it under the terms of the GNU Lesser General Public License as published by
+        the Free Software Foundation, either version 3 of the License, or
+        (at your option) any later version.
+
+        The UFZ Python library is distributed in the hope that it will be useful,
+        but WITHOUT ANY WARRANTY; without even the implied warranty of
+        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+        GNU Lesser General Public License for more details.
+
+        You should have received a copy of the GNU Lesser General Public License
+        along with The UFZ Python library.  If not, see <http://www.gnu.org/licenses/>.
+
+        Copyright 2012-2013 Matthias Cuntz
+
+
+        History
+        -------
+        Written,  MC, Oct 2012 - from SciPy cookbook: http://www.scipy.org/Cookbook/SavitzkyGolay
+        Modified, MC, Feb 2013 - ported to Python 3
+                  MC, Apr 2014 - assert
     """
     #
     # Check input
@@ -109,11 +110,9 @@ def savitzky_golay(y, window, order, deriv=0, rate=1):
         window = np.abs(np.int(window))
         order  = np.abs(np.int(order))
     except ValueError as msg:
-        raise ValueError("window and order have to be of type int")
-    if window % 2 != 1 or window < 1:
-        raise TypeError("window size must be a positive odd number")
-    if window < order + 2:
-        raise TypeError("window is too small for the polynomials order")
+        raise ValueError("window and order have to be of type int.")
+    assert ((window % 2 == 1) and (window >= 1)), "window size must be a positive odd number."
+    assert window >= (order + 2), "window is too small for polynomial order."
     order_range = list(range(order+1))
     half_window = (window-1) // 2
     #
@@ -157,140 +156,139 @@ def sg(y, window, order, deriv=0, rate=1):
 
 def savitzky_golay2d(z, window, order, deriv=None):
     """
-       Smooth (and optionally differentiate) 2D data with a Savitzky-Golay filter.
-       The Savitzky-Golay filter removes high frequency noise from data.
-       It has the advantage of preserving the original shape and
-       features of the signal better than other types of filtering
-       approaches, such as moving averages techniques.
+        Smooth (and optionally differentiate) 2D data with a Savitzky-Golay filter.
+        The Savitzky-Golay filter removes high frequency noise from data.
+        It has the advantage of preserving the original shape and
+        features of the signal better than other types of filtering
+        approaches, such as moving averages techniques.
 
 
-       Definition
-       ----------
-       def savitzky_golay2d(z, window, order, deriv=None)
+        Definition
+        ----------
+        def savitzky_golay2d(z, window, order, deriv=None)
 
 
-       Input
-       -----
-       z         array_like, shape (N,M)
-                 the value array.
-       window    int
-                 the length of the window. Must be an odd integer number.
-       order     int
-                 the order of the polynomial used in the filtering.
-                 Must be less then `window` - 1.
+        Input
+        -----
+        z         array_like, shape (N,M)
+                  the value array.
+        window    int
+                  the length of the window. Must be an odd integer number.
+        order     int
+                  the order of the polynomial used in the filtering.
+                  Must be less then `window` - 1.
 
 
-       Optional Input
-       --------------
-       deriv     None=0, 'both=1, 'col'=2, 'row'=3
-                 None or 0: normal smoothing
-                 'both' or 1: returns the gradient (first derivatives)
-                 'col' or 2, or 'row' or 3: indicates the direction of the derivative
+        Optional Input
+        --------------
+        deriv     None=0, 'both=1, 'col'=2, 'row'=3
+                  None or 0: normal smoothing
+                  'both' or 1: returns the gradient (first derivatives)
+                  'col' or 2, or 'row' or 3: indicates the direction of the derivative
 
-       Output
-       ------
-       ndarray: shape(N,M) if deriv=0,2 or 3; tuple(shape(N,M),shape(N,M)) if deriv=1
-       the smoothed signal, or it's 1st derivative in one direction or both.
-
-
-       Notes
-       -----
-       The Savitzky-Golay is a type of low-pass filter, particularly
-       suited for smoothing noisy data. The main idea behind this
-       approach is to make for each point a least-square fit with a
-       polynomial of high order over a odd-sized window centered at
-       the point.
-
-       Savitsky-Golay filters can also be used to smooth two dimensional
-       data affected by noise. The algorithm is exactly the same as for
-       the one dimensional case, only the math is a bit more tricky. The
-       basic algorithm is as follow:
-       1. for each point of the two dimensional matrix extract a sub-matrix,
-          centered at that point and with a size equal to an odd number "window_size".
-       2. for this sub-matrix compute a least-square fit of a polynomial surface, defined as
-            p(x,y) = a0 + a1*x + a2*y + a3*x2 + a4*y2 + a5*x*y + ... .
-          Note that x and y are equal to zero at the central point.
-       3. replace the initial central point with the value computed with the fit.
+        Output
+        ------
+        ndarray: shape(N,M) if deriv=0,2 or 3; tuple(shape(N,M),shape(N,M)) if deriv=1
+        the smoothed signal, or it's 1st derivative in one direction or both.
 
 
-       References
-       ----------
-       [1] A. Savitzky, M. J. E. Golay
-           Smoothing and Differentiation of Data by Simplified Least Squares Procedures.
-           Analytical Chemistry, 1964, 36 (8), pp 1627-1639.
-       [2] W.H. Press, S.A. Teukolsky, W.T. Vetterling, B.P. Flannery
-           Numerical Recipes 3rd Edition: The Art of Scientific Computing
-           Cambridge University Press ISBN-13: 9780521880688
+        Notes
+        -----
+        The Savitzky-Golay is a type of low-pass filter, particularly
+        suited for smoothing noisy data. The main idea behind this
+        approach is to make for each point a least-square fit with a
+        polynomial of high order over a odd-sized window centered at
+        the point.
+
+        Savitsky-Golay filters can also be used to smooth two dimensional
+        data affected by noise. The algorithm is exactly the same as for
+        the one dimensional case, only the math is a bit more tricky. The
+        basic algorithm is as follow:
+        1. for each point of the two dimensional matrix extract a sub-matrix,
+           centered at that point and with a size equal to an odd number "window_size".
+        2. for this sub-matrix compute a least-square fit of a polynomial surface, defined as
+             p(x,y) = a0 + a1*x + a2*y + a3*x2 + a4*y2 + a5*x*y + ... .
+           Note that x and y are equal to zero at the central point.
+        3. replace the initial central point with the value computed with the fit.
 
 
-       Examples
-       --------
-       >>> import numpy as np
-       >>> np.random.seed(1)
-       >>> x = np.linspace(-3,3,5)
-       >>> y = np.linspace(-3,3,3)
-       >>> X, Y = np.meshgrid(x,y)
-       >>> Z = np.exp( -(X**2+Y**2))
-       >>> Zn = Z + np.random.normal(0, 0.2, Z.shape)
-       >>> from autostring import astr
-       >>> print(astr(savitzky_golay2d(Zn, window=3, order=2),3,pp=True))
-       [[' 0.080' ' 0.052' '-0.106' '-0.165' ' 0.161']
-        ['-0.204' ' 0.170' ' 0.664' ' 0.181' ' 0.048']
-        [' 0.111' '-0.230' ' 0.094' '-0.170' ' 0.240']]
-
-       >>> s2 = savitzky_golay2d( Zn, 3, 2, deriv=1)
-       >>> print(astr(s2[0],3,pp=True))
-       [[' 0.156' ' 0.046' '-0.046' ' 0.065' ' 0.257']
-        [' 0.305' ' 0.087' '-0.007' '-0.055' ' 0.230']
-        [' 0.305' ' 0.126' '-0.039' '-0.158' ' 0.120']]
-
-       >>> s3 = savitzky_golay2d( Zn, 3, 2, deriv='both')
-       >>> if np.any(s2[0]!=s3[0]): print('Error 01')
-       >>> if np.any(s2[1]!=s3[1]): print('Error 02')
-
-       >>> s2 = savitzky_golay2d( Zn, 3, 2, deriv=2)
-       >>> print(astr(s2,3,pp=True))
-       [['-0.069' ' 0.510' ' 0.638' ' 0.446' ' 0.128']
-        ['-0.102' '-0.047' '-0.018' ' 0.039' ' 0.027']
-        [' 0.556' ' 0.251' ' 0.000' ' 0.092' ' 0.111']]
-
-       >>> s3 = savitzky_golay2d( Zn, 3, 2, deriv='col')
-       >>> if np.any(s2!=s3): print('Error 03')
+        References
+        ----------
+        [1] A. Savitzky, M. J. E. Golay
+            Smoothing and Differentiation of Data by Simplified Least Squares Procedures.
+            Analytical Chemistry, 1964, 36 (8), pp 1627-1639.
+        [2] W.H. Press, S.A. Teukolsky, W.T. Vetterling, B.P. Flannery
+            Numerical Recipes 3rd Edition: The Art of Scientific Computing
+            Cambridge University Press ISBN-13: 9780521880688
 
 
-       License
-       -------
-       This file is part of the UFZ Python library.
+        Examples
+        --------
+        >>> import numpy as np
+        >>> np.random.seed(1)
+        >>> x = np.linspace(-3,3,5)
+        >>> y = np.linspace(-3,3,3)
+        >>> X, Y = np.meshgrid(x,y)
+        >>> Z = np.exp( -(X**2+Y**2))
+        >>> Zn = Z + np.random.normal(0, 0.2, Z.shape)
+        >>> from autostring import astr
+        >>> print(astr(savitzky_golay2d(Zn, window=3, order=2),3,pp=True))
+        [[' 0.080' ' 0.052' '-0.106' '-0.165' ' 0.161']
+         ['-0.204' ' 0.170' ' 0.664' ' 0.181' ' 0.048']
+         [' 0.111' '-0.230' ' 0.094' '-0.170' ' 0.240']]
 
-       The UFZ Python library is free software: you can redistribute it and/or modify
-       it under the terms of the GNU Lesser General Public License as published by
-       the Free Software Foundation, either version 3 of the License, or
-       (at your option) any later version.
+        >>> s2 = savitzky_golay2d( Zn, 3, 2, deriv=1)
+        >>> print(astr(s2[0],3,pp=True))
+        [[' 0.156' ' 0.046' '-0.046' ' 0.065' ' 0.257']
+         [' 0.305' ' 0.087' '-0.007' '-0.055' ' 0.230']
+         [' 0.305' ' 0.126' '-0.039' '-0.158' ' 0.120']]
 
-       The UFZ Python library is distributed in the hope that it will be useful,
-       but WITHOUT ANY WARRANTY; without even the implied warranty of
-       MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-       GNU Lesser General Public License for more details.
+        >>> s3 = savitzky_golay2d( Zn, 3, 2, deriv='both')
+        >>> if np.any(s2[0]!=s3[0]): print('Error 01')
+        >>> if np.any(s2[1]!=s3[1]): print('Error 02')
 
-       You should have received a copy of the GNU Lesser General Public License
-       along with The UFZ Python library.  If not, see <http://www.gnu.org/licenses/>.
+        >>> s2 = savitzky_golay2d( Zn, 3, 2, deriv=2)
+        >>> print(astr(s2,3,pp=True))
+        [['-0.069' ' 0.510' ' 0.638' ' 0.446' ' 0.128']
+         ['-0.102' '-0.047' '-0.018' ' 0.039' ' 0.027']
+         [' 0.556' ' 0.251' ' 0.000' ' 0.092' ' 0.111']]
 
-       Copyright 2012-2013 Matthias Cuntz
+        >>> s3 = savitzky_golay2d( Zn, 3, 2, deriv='col')
+        >>> if np.any(s2!=s3): print('Error 03')
 
 
-       History
-       -------
-       Written,  MC, Oct 2012 - from SciPy cookbook: http://www.scipy.org/Cookbook/SavitzkyGolay
-       Modified, MC, Nov 2012 - replaced fftconvolve by convolve because of crash on Mac
-                 MC, Feb 2013 - ported to Python 3
+        License
+        -------
+        This file is part of the UFZ Python library.
+
+        The UFZ Python library is free software: you can redistribute it and/or modify
+        it under the terms of the GNU Lesser General Public License as published by
+        the Free Software Foundation, either version 3 of the License, or
+        (at your option) any later version.
+
+        The UFZ Python library is distributed in the hope that it will be useful,
+        but WITHOUT ANY WARRANTY; without even the implied warranty of
+        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+        GNU Lesser General Public License for more details.
+
+        You should have received a copy of the GNU Lesser General Public License
+        along with The UFZ Python library.  If not, see <http://www.gnu.org/licenses/>.
+
+        Copyright 2012-2013 Matthias Cuntz
+
+
+        History
+        -------
+        Written,  MC, Oct 2012 - from SciPy cookbook: http://www.scipy.org/Cookbook/SavitzkyGolay
+        Modified, MC, Nov 2012 - replaced fftconvolve by convolve because of crash on Mac
+                  MC, Feb 2013 - ported to Python 3
+                  MC, Apr 2014 - assert
     """
     #
     # number of terms in the polynomial expression
     n_terms = ( order + 1 ) * ( order + 2)  / 2.0
-    if  window % 2 == 0:
-        raise ValueError('window must be odd')
-    if window**2 < n_terms:
-        raise ValueError('order is too high for the window size')
+    assert window % 2 == 1, 'window must be odd.'
+    assert window**2 >= n_terms, 'order is too high for the window size.'
     half_size = window // 2
     #
     # exponents of the polynomial.

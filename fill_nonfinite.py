@@ -42,11 +42,11 @@ def nan_helper(y, nan=False, inf=False, undef=None):
 
         History
         -------
-        Written,  MC, Jul2013 - modified from
-                                http://stackoverflow.com/questions/6518811/interpolate-nan-values-in-a-numpy-array
+        Written,  MC, Jul 2013 - modified from
+                                 http://stackoverflow.com/questions/6518811/interpolate-nan-values-in-a-numpy-array
+                  MC, Apr 2014 - assert
     """
-    if ((~nan) & (~inf) & (undef==None)):
-        raise ValueError('at least one of nan, inf or undef has to be given.')
+    assert not ((not nan) & (not inf) & (undef is None)), 'at least one of nan, inf or undef has to be given.'
 
     out = np.zeros(y.shape, dtype=np.bool)
     if nan:

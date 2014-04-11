@@ -102,13 +102,13 @@ def kernel_regression(x, y, h=None, silverman=False, xout=None):
         Written,  MC, Jun 2012 - inspired by Matlab routines
                                  of Yingying Dong, Boston College and Yi Cao, Cranfield University
         Modified, MC, Feb 2013 - ported to Python 3
+                  MC, Apr 2014 - assert
     """
     #
     # Check input
     ss = np.shape(x)
     n  = ss[0]
-    if n != np.size(y):
-        raise ValueError('size(x,0) != size(y): '+str(n)+' != '+str(np.size(y)))
+    assert n == np.size(y), 'size(x,0) != size(y): '+str(n)+' != '+str(np.size(y))
     if np.size(ss) == 1: # to deal with 1d-arrays
         xx = x[:,np.newaxis]
     else:
@@ -124,8 +124,7 @@ def kernel_regression(x, y, h=None, silverman=False, xout=None):
             hh = np.repeat(h,d)
         else:
             hh = np.array(h)
-        if (np.size(hh)!=d):
-            raise ValueError('size(h) must be 1 or size(x,1): ')
+        assert np.size(hh) == d, 'size(h) must be 1 or size(x,1): '
     #
     # Calc regression
     if xout == None:
@@ -138,8 +137,7 @@ def kernel_regression(x, y, h=None, silverman=False, xout=None):
     ssout = np.shape(xxout)
     nout  = ssout[0]
     dout  = ssout[1]
-    if d != dout:
-        raise ValueError('size(x,1) != size(xout,1): '+str(d)+' != '+str(dout))
+    assert d == dout, 'size(x,1) != size(xout,1): '+str(d)+' != '+str(dout)
     # allocate output
     out = np.empty(nout)
     # Loop through each regression point
@@ -227,13 +225,13 @@ def kernel_regression_h(x, y, silverman=False):
         Written,  MC, Jun 2012 - inspired by Matlab routines
                                  of Yingying Dong, Boston College and Yi Cao, Cranfield University
         Modified, MC, Feb 2013 - ported to Python 3
+                  MC, Apr 2014 - assert
     """
     #
     # Check input
     ss = np.shape(x)
     n  = ss[0]
-    if x.shape[0] != np.size(y):
-        raise ValueError('size(x,0) != size(y): '+str(n)+' != '+str(np.size(y)))
+    assert x.shape[0] == np.size(y), 'size(x,0) != size(y): '+str(n)+' != '+str(np.size(y))
     if np.ndim(x) == 1: # to deal with 1d-arrays
         xx = x[:,np.newaxis]
     else:

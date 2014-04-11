@@ -301,24 +301,20 @@ def semivariogram(x, y, v, nL, di, td, stype='omnidirectional', negscat=False,
                                  "Using the backtracking step"
                                  even with iprint=-1, disp=0.
                   MC, Feb 2013 - ported to Python 3
+                  MC, Apr 2014 - assert
     """
 
     # check input data
-    if (np.shape(x)!=np.shape(y)) | (np.shape(y)!=np.shape(v)):
-        raise TypeError('SemivariogramError: x, y and v must have'
-                        ' the same dimensions!')
+    assert (np.shape(x) == np.shape(y)) & (np.shape(y) == np.shape(v)), 'SemivariogramError: x, y and v must have the same dimensions.'
 
     di = np.array(di)
     if (stype == 'directional') & np.any(di<0.):
         raise TypeError('SemivariogramError: if you choose stype=directional,'
                         ' no negative directions in di are allowed')
 
-    if np.any(di>180.) | np.any(di<(-180.)):
-        raise TypeError('SemivariogramError: elements of di > 180 or < -180'
-                        ' are not allowed.')
+    assert not (np.any(di>180.) | np.any(di<(-180.))), 'SemivariogramError: elements of di > 180 or < -180 are not allowed.'
 
-    if td > 180:
-        raise TypeError('SemivariogramError: td > 180 is not allowed.')
+    assert td <= 180, 'SemivariogramError: td > 180 is not allowed.'
 
     if model != 'nomodel':
         try:

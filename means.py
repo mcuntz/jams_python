@@ -5,7 +5,7 @@ from date2dec import date2dec
 from dec2date import dec2date
 
 def means(date, dat, year=False, month=False, day=False, hour=False, minute=False,
-          meanday=False, sum=False):
+          meanday=False, sum=False, max=False, min=False):
     """
         Calculate daily, monthly, yearly, etc. means of data depending on date stamp.
 
@@ -23,7 +23,7 @@ def means(date, dat, year=False, month=False, day=False, hour=False, minute=Fals
         Definition
         ----------
         def means(date, dat, year=False, month=False, day=False, hour=False, minute=False,
-                  meanday=False, sum=False):
+                  meanday=False, sum=False, max=False, min=False):
 
 
         Input
@@ -41,6 +41,8 @@ def means(date, dat, year=False, month=False, day=False, hour=False, minute=Fals
         minute    if True, minutely means.
         meanday   if True, mean daily cycle.
         sum       if True, calculate sums instead of means.
+        max       if True, calculate maxima instead of means.
+        min       if True, calculate minima instead of means.
 
 
         Output
@@ -98,7 +100,6 @@ def means(date, dat, year=False, month=False, day=False, hour=False, minute=Fals
         >>> print(astr(xout, 3, pp=True))
         ['5.000' '2.000' '3.000']
 
-
         # sum
         >>> odates, xout = means(jdates, x, sum=True)
         >>> print(astr(odates, 3, pp=True), astr(xout, 3, pp=True))
@@ -112,6 +113,34 @@ def means(date, dat, year=False, month=False, day=False, hour=False, minute=Fals
         >>> odates, xout = means(jdates, x, day=True, sum=True)
         >>> print(astr(xout, 3, pp=True))
         ['15.000' ' 2.000' ' 3.000']
+
+        # max
+        >>> odates, xout = means(jdates, x, max=True)
+        >>> print(astr(odates, 3, pp=True), astr(xout, 3, pp=True))
+        2.448e+06 6.000
+        >>> odates, xout = means(jdates, x, year=True, max=True)
+        >>> print(astr(xout, 3, pp=True))
+        ['6.000']
+        >>> odates, xout = means(jdates, x, month=True, max=True)
+        >>> print(astr(xout, 3, pp=True))
+        ['6.000' '2.000' '3.000']
+        >>> odates, xout = means(jdates, x, day=True, max=True)
+        >>> print(astr(xout, 3, pp=True))
+        ['6.000' '2.000' '3.000']
+
+        # min
+        >>> odates, xout = means(jdates, x, min=True)
+        >>> print(astr(odates, 3, pp=True), astr(xout, 3, pp=True))
+        2.448e+06 2.000
+        >>> odates, xout = means(jdates, x, year=True, min=True)
+        >>> print(astr(xout, 3, pp=True))
+        ['2.000']
+        >>> odates, xout = means(jdates, x, month=True, min=True)
+        >>> print(astr(xout, 3, pp=True))
+        ['4.000' '2.000' '3.000']
+        >>> odates, xout = means(jdates, x, day=True, min=True)
+        >>> print(astr(xout, 3, pp=True))
+        ['4.000' '2.000' '3.000']
 
         # 2D and masked arrays
         >>> x  = np.repeat(x,2).reshape((x.size,2))
@@ -153,45 +182,52 @@ def means(date, dat, year=False, month=False, day=False, hour=False, minute=Fals
         You should have received a copy of the GNU Lesser General Public License
         along with The UFZ Python library.  If not, see <http://www.gnu.org/licenses/>.
 
-        Copyright 2013 Matthias Cuntz
+        Copyright 2013-2014 Matthias Cuntz
 
 
         History
         -------
         Written,  MC, Jul 2013
         Modified, MC, Jul 2013 - meanday
+                  MC, Apr 2014 - max, min
     """
-    #
+    # Constants
     myundef  = 9e33
     ismasked = type(dat) == np.ma.core.MaskedArray
-    #
+
     # Assure array
     if not ismasked: dat = np.array(dat)
-    #
+
     # Assure ND-array
     isone = False
     if dat.ndim == 1:
         isone = True
         dat = dat[:,np.newaxis]
-    #
+
     # Check options
     allopts = day+month+year+hour+minute+meanday
-    if allopts > 1:
-        raise ValueError("only one averaging option possible")
+    assert allopts <= 1, "only one averaging option day, month, year, etc. possible"
+
+    # Check aggregation
+    allaggs = sum+max+min
+    assert allaggs <= 1, "only one aggregation option sum, min, max possible"
 
     # average 1st dim
     if allopts == 0:
         dout = 0.5*(date[-1]+date[0])
         if sum:
-            out  = np.ma.sum(dat, 0)
+            out = np.ma.sum(dat, 0)
+        elif max:
+            out = np.ma.amax(dat, 0)
+        elif min:
+            out = np.ma.amin(dat, 0)
         else:
-            out  = np.ma.mean(dat, 0)
+            out = np.ma.mean(dat, 0)
         if isone:
             return dout, out[0]
         else:
             return dout, out
     else:
-
         yr, mo, dy, hr, mn, sc = dec2date(date)
 
         # year
@@ -210,6 +246,10 @@ def means(date, dat, year=False, month=False, day=False, hour=False, minute=Fals
                     dout[zahl] = date2dec(yr=i, mo=6, dy=15, hr=12)
                     if sum:
                         out[zahl,:] = np.ma.sum(dat[ii,:],0)
+                    elif max:
+                        out[zahl,:] = np.ma.amax(dat[ii,:],0)
+                    elif min:
+                        out[zahl,:] = np.ma.amin(dat[ii,:],0)
                     else:
                         out[zahl,:] = np.ma.mean(dat[ii,:],0)
                     zahl += 1
@@ -232,6 +272,10 @@ def means(date, dat, year=False, month=False, day=False, hour=False, minute=Fals
                         dout[zahl]  = date2dec(yr=i, mo=j, dy=15, hr=12)
                         if sum:
                             out[zahl,:] = np.ma.sum(dat[ii,:],0)
+                        elif max:
+                            out[zahl,:] = np.ma.amax(dat[ii,:],0)
+                        elif min:
+                            out[zahl,:] = np.ma.amin(dat[ii,:],0)
                         else:
                             out[zahl,:] = np.ma.mean(dat[ii,:],0)
                         zahl += 1
@@ -256,6 +300,10 @@ def means(date, dat, year=False, month=False, day=False, hour=False, minute=Fals
                             dout[zahl]  = date2dec(yr=i, mo=j, dy=k, hr=12)
                             if sum:
                                 out[zahl,:] = np.ma.sum(dat[ii,:],0)
+                            elif max:
+                                out[zahl,:] = np.ma.amax(dat[ii,:],0)
+                            elif min:
+                                out[zahl,:] = np.ma.amin(dat[ii,:],0)
                             else:
                                 out[zahl,:] = np.ma.mean(dat[ii,:],0)
                             zahl += 1
@@ -282,6 +330,10 @@ def means(date, dat, year=False, month=False, day=False, hour=False, minute=Fals
                                 dout[zahl]  = date2dec(yr=i, mo=j, dy=k, hr=l, mi=30)
                                 if sum:
                                     out[zahl,:] = np.ma.sum(dat[ii,:],0)
+                                elif max:
+                                    out[zahl,:] = np.ma.amax(dat[ii,:],0)
+                                elif min:
+                                    out[zahl,:] = np.ma.amin(dat[ii,:],0)
                                 else:
                                     out[zahl,:] = np.ma.mean(dat[ii,:],0)
                                 zahl += 1
@@ -310,6 +362,10 @@ def means(date, dat, year=False, month=False, day=False, hour=False, minute=Fals
                                     dout[zahl]  = date2dec(yr=i, mo=j, dy=k, hr=l, mi=m, sc=30)
                                     if sum:
                                         out[zahl,:] = np.ma.sum(dat[ii,:],0)
+                                    elif max:
+                                        out[zahl,:] = np.ma.amax(dat[ii,:],0)
+                                    elif min:
+                                        out[zahl,:] = np.ma.amin(dat[ii,:],0)
                                     else:
                                         out[zahl,:] = np.ma.mean(dat[ii,:],0)
                                     zahl += 1
@@ -330,6 +386,10 @@ def means(date, dat, year=False, month=False, day=False, hour=False, minute=Fals
                 if np.size(ii) > 0:
                     if sum:
                         out[zahl,:] = np.ma.sum(dat[ii,:],0)
+                    elif max:
+                        out[zahl,:] = np.ma.amax(dat[ii,:],0)
+                    elif min:
+                        out[zahl,:] = np.ma.amin(dat[ii,:],0)
                     else:
                         out[zahl,:] = np.ma.mean(dat[ii,:],0)
                 zahl += 1
@@ -408,6 +468,34 @@ if __name__ == '__main__':
     # odates, xout = means(jdates, x, day=True, sum=True)
     # print(astr(xout, 3, pp=True))
     # #['15.000' ' 2.000' ' 3.000']
+
+    # # max
+    # odates, xout = means(jdates, x, max=True)
+    # print(astr(odates, 3, pp=True), astr(xout, 3, pp=True))
+    # #2.448e+06 6.000
+    # odates, xout = means(jdates, x, year=True, max=True)
+    # print(astr(xout, 3, pp=True))
+    # #['6.000']
+    # odates, xout = means(jdates, x, month=True, max=True)
+    # print(astr(xout, 3, pp=True))
+    # #['6.000' ' 2.000' ' 3.000']
+    # odates, xout = means(jdates, x, day=True, max=True)
+    # print(astr(xout, 3, pp=True))
+    # #['6.000' ' 2.000' ' 3.000']
+
+    # # min
+    # odates, xout = means(jdates, x, min=True)
+    # print(astr(odates, 3, pp=True), astr(xout, 3, pp=True))
+    # #2.448e+06 2.000
+    # odates, xout = means(jdates, x, year=True, min=True)
+    # print(astr(xout, 3, pp=True))
+    # #['2.000']
+    # odates, xout = means(jdates, x, month=True, min=True)
+    # print(astr(xout, 3, pp=True))
+    # #['4.000' ' 2.000' ' 3.000']
+    # odates, xout = means(jdates, x, day=True, min=True)
+    # print(astr(xout, 3, pp=True))
+    # #['4.000' ' 2.000' ' 3.000']
 
     # # 2D & mask
     # x  = np.repeat(x,2).reshape((x.size,2))

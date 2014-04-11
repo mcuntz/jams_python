@@ -135,6 +135,7 @@ def esat(T, liquid=False, formula='GoffGratch'):
         Written,  MC, Jan 2012
         Modified, MC, Feb 2013 - ported to Python 3
                   MC, Oct 2013 - changed masked array handling
+                  MC, Apr 2014 - assert
     """
     #
     # Constants
@@ -145,8 +146,7 @@ def esat(T, liquid=False, formula='GoffGratch'):
     #
     # Check input
     T = np.ma.array(T)
-    if np.ma.any(T <= 0.):
-        raise ValueError('T<0 - T probably given in Celsius instead of Kelvin.')
+    assert not np.ma.any(T <= 0.), 'T<0 - T probably given in Celsius instead of Kelvin.'
     if np.ma.any(T < 100.):
         print("esat.py: UserWarning: T<100 - T probably given in Celsius instead of Kelvin.")
     if np.ma.any(T > (const.T0+100.)):

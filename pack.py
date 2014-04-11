@@ -92,6 +92,7 @@ def pack(array, mask):
         -------
         Written,  MC, Jul 2009
         Modified, MC, Feb 2013 - ported to Python 3
+                  MC, Apr 2014 - assert
     """
     dmask   = mask.shape
     ndmask  = np.ndim(mask)
@@ -101,13 +102,11 @@ def pack(array, mask):
     narray  = array.size
     #
     # Check array and mask
-    if ndarray < ndmask:
-        raise ValueError('Input array has less dimensions '+str(ndarray)+' then mask '+str(ndmask))
+    assert ndarray >= ndmask, 'Input array has less dimensions '+str(ndarray)+' then mask '+str(ndmask)
     k = 0
     while k > -ndmask:
         k -= 1
-        if dmask[k] != darray[k]:
-            raise ValueError('Input array and mask have the same last dimensions. Array: '+str(darray)+' Mask: '+str(dmask))
+        assert dmask[k] == darray[k], 'Input array and mask must have the same last dimensions. Array: '+str(darray)+' Mask: '+str(dmask)
     #
     # Make array and mask 1d
     farray = array.ravel() # flat in Fortran=column-major mode

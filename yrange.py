@@ -91,13 +91,13 @@ def yrange(*args, **kwargs):
         Modified, MC, Feb 2013 - ported to Python 3
                   MC, Nov 2013 - accept more than 1 array as input
                   MC, Nov 2013 - masked arrays
+                  MC, Apr 2014 - assert
     """
     #
     #eps = tiny
     eps = const.tiny
     # Check input
-    if len(args) == 0:
-        raise ValueError('no input argument given.')
+    assert len(args) > 0, 'no input argument given.'
     counter = 0
     for i in args:
         arr    = np.ma.array(i)

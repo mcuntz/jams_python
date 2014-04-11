@@ -104,6 +104,7 @@ def unpack(array, mask, value=0.):
         -------
         Written,  MC, Jul. 2009
         Modified, MC, Feb 2013 - ported to Python 3
+                  MC, Apr 2014 - assert
     """
     dmask   = np.shape(mask)
     ndmask  = len(dmask)
@@ -114,9 +115,7 @@ def unpack(array, mask, value=0.):
     #
     # Check array and mask
     ntmask = mask.sum()
-    if darray[-1] < ntmask:
-        print('UNPACK: Last dimension of input array %s must have same size as true values in mask %s.' % (darray[-1], ntmask))
-        return None
+    assert darray[-1] == ntmask, 'Last dimension of input array %s must have same size as true values in mask %s.' % (darray[-1], ntmask)
     #
     # Make multi mask array array
     icount = nmask
@@ -131,8 +130,7 @@ def unpack(array, mask, value=0.):
     index = np.arange(icount)
     ii = index[masknd]
     if len(ii) != narray:
-        print('UNPACK: Indes creation failed. Index %s Array %s.' % (len(ii), narray))
-        return None
+        raise ValueError('Index creation failed. Index %s Array %s.' % (len(ii), narray))
     #
     # Flat output array
     array1d = np.ravel(array)

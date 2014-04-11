@@ -72,13 +72,12 @@ def cellarea(lat, lon, globe=False):
         -------
         Written,  MC, Jul 2009
         Modified, MC, Feb 2013 - ported to Python 3
+                  MC, Apr 2014 - assert
     """
     nlat = len(lat)
-    if nlat < 2:
-        raise ValueError('at least 2 latitudes must be given')
+    assert nlat >= 2, 'at least 2 latitudes must be given'
     nlon = len(lon)
-    if nlon < 2:
-        raise ValueError('at least 2 longitudes must be given')
+    assert nlon >= 2, 'at least 2 longitudes must be given'
     #
     # cell sizes in degrees # still + or -
     dlat = lat-np.roll(lat,1)

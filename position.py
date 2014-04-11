@@ -133,16 +133,14 @@ def position(row=1, col=1, num=1,
         Written,  MC, Aug 2009
         Modified, MC, Feb 2013 - ported to Python 3
                   MC, Jul 2013 - vspace, wspace obsolete
+                  MC, Apr 2014 - assert
     """
     #
     # Check
     nplots = row*col
-    if num > nplots:
-        raise ValueError('num > number of plots: '+str(num)+' > '+str(nplots))
-    if right-left <= 0.:
-        raise ValueError('right > left: '+str(right)+' > '+str(left))
-    if top-bottom <= 0.:
-        raise ValueError('top < bottom: '+str(top)+' < '+str(bottom))
+    assert num <= nplots, 'num > number of plots: '+str(num)+' > '+str(nplots)
+    assert right-left > 0., 'right > left: '+str(right)+' > '+str(left)
+    assert top-bottom > 0., 'top < bottom: '+str(top)+' < '+str(bottom)
     if vspace != None:
         ivspace = vspace
     elif wspace != None:

@@ -132,12 +132,11 @@ def pi(s=None, m=None, norm=None, b=False, evalues=False, ematrix=False):
         -------
         Written,  MC, May 2012
         Modified, MC, Feb 2013 - ported to Python 3
+                  MC, Apr 2014 - assert
     """
     # Check input
-    if (s==None) & (m==None):
-        raise ValueError('No input matrix given.')
-    if (s!=None) & (m!=None):
-        raise ValueError('Only s or m matrix possible.')
+    assert not ((s==None) & (m==None)), 'No input matrix given.'
+    assert not ((s!=None) & (m!=None)), 'Only s or m matrix possible.'
     if (norm!=None):
         if norm.lower() not in ['sum','ev','evsum']:
             raise ValueError("norm must be None, 'sum', 'ev', or 'evsum'.")
@@ -149,8 +148,7 @@ def pi(s=None, m=None, norm=None, b=False, evalues=False, ematrix=False):
       else:
          m  = np.ma.dot(s,np.transpose(s))
     mm  = m.shape
-    if (mm[0] != mm[1]):
-        raise ValueError('m matrix not NxN.')
+    assert mm[0] == mm[1], 'm matrix not NxN.'
     inn = mm[0]
     #
     ind = np.empty(inn)

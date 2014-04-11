@@ -213,6 +213,7 @@ def kriging(x, y, z, semi_mod, semi_popt, xnew=None, ynew=None, plot=False,
                                     - quadruple integral of block variance
                                       calculated by Monte-Carlo
                   MC,      Feb 2013 - ported to Python 3
+                  MC,      Apr 2014 - assert
     """
 
     if not silent:
@@ -229,10 +230,8 @@ def kriging(x, y, z, semi_mod, semi_popt, xnew=None, ynew=None, plot=False,
     ###########################################################################
     # orignal x + y data
     # reshape and calculate lags and gammas
-    if np.size(x)!=np.size(y):
-            raise ValueError('kriging: x and y must have same dimensions')
-    if np.size(x)!=np.size(z):
-            raise ValueError('kriging: x and z must have same dimensions')
+    assert np.size(x) == np.size(y), 'kriging: x and y must have same dimensions'
+    assert np.size(x) == np.size(z), 'kriging: x and z must have same dimensions'
 
     xy  = np.vstack((x,y)).transpose()
     lag = squareform(pdist(xy, 'euclidean'))

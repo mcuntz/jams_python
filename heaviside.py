@@ -83,9 +83,9 @@ def heaviside(x, value=1., unitstep=False, zero=False):
         -------
         Written,  MC, Jan 2012
         Modified, MC, Feb 2013 - ported to Python 3
+                  MC, Apr 2014 - assert
     """
-    if zero and unitstep:
-        raise ValueError('unitstep and zero mutually exclusive.')
+    assert (zero+unitstep) < 2, 'unitstep and zero mutually exclusive.'
 
     if zero:
         out = np.where(np.ma.array(x) > 0., 1., 0.)

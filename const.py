@@ -97,6 +97,7 @@ REarth  = 6371009.      # Radius of Earth [m]
 M_CO2   = 44.01         # Molar mass CO2 [g*mol^-1]
 M_WV    = 18.01528      # Molar mass water vapour [g*mol^-1]
 M_DAIR  = 28.9644       # Molar mass of dry air [g*mol^-1]
+
 def dielH2O(T):         # dielectric constant of water [F/m]
     '''
     in:     temperature T [K]

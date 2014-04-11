@@ -136,6 +136,7 @@ def jab(arr, ind=None, nind=None, mask=None, weight=False, nsteps=1):
         Modified, MC, Nov 2012 - rewrite
                   MC, Dec 2012 - mask
                   MC, Feb 2013 - ported to Python 3
+                  MC, Apr 2014 - assert
     """
 
     # Shapes: make nboot bootstraps with nind samples per bootstrap for nout parameters
@@ -149,17 +150,13 @@ def jab(arr, ind=None, nind=None, mask=None, weight=False, nsteps=1):
         arr     = arr[:,np.newaxis]
         onlyone = True
     if mask != None:
-        if len(mask.shape) != 2:
-            raise ValueError('Mask array must have 2 dimensions.')
-        if mask.shape[0] != arr.shape[0]:
-            raise ValueError('First dimension of boostrap standard error array and mask array have to match.')
+        assert len(mask.shape) == 2, 'Mask array must have 2 dimensions.'
+        assert mask.shape[0] == arr.shape[0], 'First dimension of boostrap standard error array and mask array have to match.'
         nboot = mask.shape[0]
         nind  = mask.shape[1]
     else:
-        if len(ind.shape) != 2:
-            raise ValueError('Index array must have 2 dimensions.')
-        if ind.shape[0] != arr.shape[0]:
-            raise ValueError('First dimension of boostrap standard error array and index array have to match.')
+        assert len(ind.shape) == 2, 'Index array must have 2 dimensions.'
+        assert ind.shape[0] == arr.shape[0], 'First dimension of boostrap standard error array and index array have to match.'
         nboot = ind.shape[0]
         if nind != None:
             if nind < ind.shape[1]:

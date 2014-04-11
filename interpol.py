@@ -82,6 +82,7 @@ def interpol(xout, xin, yin):
         -------
         Written,  MC, Jun 2012
         Modified, MC, Feb 2013 - ported to Python 3
+                  MC, Apr 2014 - assert
     """
     #
     # If yin 1D-array then call immediately np.interp without check
@@ -94,8 +95,8 @@ def interpol(xout, xin, yin):
         # yin = yin[:,np.newaxis]
     #
     # Check input
-    if np.ndim(xin) != 1: raise ValueError("x input values not 1D array")
-    if np.ndim(xout) > 1: raise ValueError("x output values not scalar or 1D array")
+    assert np.ndim(xin)  == 1, "x input values not 1D array"
+    assert np.ndim(xout) <= 1, "x output values not scalar or 1D array"
     #
     # Subscripts
     #tiny = np.finfo(np.float).eps

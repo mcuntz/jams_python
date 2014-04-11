@@ -72,6 +72,7 @@ def maskgroup(x, n):
         -------
         Written,  AP, Feb 2014
         Modified, MC, Feb 2014 - call it maskgroup instead of small_kickout1d, mask <=n instead of <n
+                  MC, Apr 2014 - removed enumearte and zip for simplification
     """
     # create running lists
     index  = []
@@ -79,7 +80,7 @@ def maskgroup(x, n):
     count  = 0
 
     # count indices and lengths of unmasked data groups
-    for i, item in enumerate(x.mask):
+    for i in range(x.mask.size):
         if i==0:
             if not x.mask[i]:
                 index += [i]
@@ -100,9 +101,9 @@ def maskgroup(x, n):
 
     # create new mask
     new_mask = np.copy(x.mask)
-    for item in zip(index,length):
-        if item[1]<=n:
-            new_mask[item[0]:item[0]+item[1]] = True
+    for i in range(len(index)):
+        if length[i]<=n:
+            new_mask[index[i]:index[i]+length[i]] = True
 
     return new_mask
 

@@ -403,10 +403,10 @@ def sobol_index(s=None, ns=None, ya=None, yb=None, yc=None,
                   JM, Sep 2013 - changes of Mai et al. (2014), theoretical example in docstring
                   MC, Sep 2013 - saltelli
                   MC, Sep 2013 - method, removed saltelli
+                  MC, Apr 2014 - assert
     """
     # Check input
-    if (si==False) & (sti==False):
-        raise ValueError('No output chosen: si=False and sti=False.')
+    assert (si+sti) > 0, 'No output chosen: si=False and sti=False.'
     # s, ns or ya, yb, yc
     isone = False
     if ((s != None) & (ns != None) & (ya == None)):
@@ -421,8 +421,7 @@ def sobol_index(s=None, ns=None, ya=None, yb=None, yc=None,
         iyB   = s[:,nsa:2*nsa]
         iyC   = np.reshape(s[:,2*nsa:],(ntime,nn,nsa))
     else:
-        if not (((s != None) & (ns != None) & (ya != None)) | ((ya != None) & (yb !=None) & (yc !=None))):
-            raise ValueError('Either s and ns has to be given or ya, yb and yc.')
+        assert (((s != None) & (ns != None) & (ya != None)) | ((ya != None) & (yb !=None) & (yc !=None))), 'Either s and ns has to be given or ya, yb and yc.'
         if ((s != None) & (ns != None) & (ya != None)):
             if s.ndim == 1:
                 isone = True

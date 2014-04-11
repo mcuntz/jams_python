@@ -6,7 +6,7 @@ from dec2date import dec2date
 def gapfill(date, data, rg, tair, vpd,
             data_flag=None, rg_flag=None, tair_flag=None, vpd_flag=None,
             rg_dev=50., tair_dev=2.5, vpd_dev=5.,
-            longestmarginalgap=60, undef=np.nan, ddof=1,
+            longgap=60, fullday=False, undef=np.nan, ddof=1,
             err=False, shape=False):
     """
         Fills gaps of flux data from Eddy covariance measurements according to
@@ -23,15 +23,15 @@ def gapfill(date, data, rg, tair, vpd,
         ----------
         def gapfill(date, data, rg, tair, vpd,
                     data_flag=None, rg_flag=None, tair_flag=None, vpd_flag=None,
-                    rg_dev=50., tair_dev=2.5, vpd_dev=5,
-                    longestmarginalgap=60, undef=np.nan, ddof=1,
+                    rg_dev=50., tair_dev=2.5, vpd_dev=5.,
+                    longgap=60, fullday=False, undef=np.nan, ddof=1,
                     err=False, shape=False):
 
 
         Input
         -----
         date        1D-array of julian days
-        data        1D-array of fluxes to fill
+        data        ND-array of fluxes to fill
         rg          1D-array of global radiation [W m-2]
         tair        1D-array of air Temperature [deg C]
         vpd         1D-array of vapour pressure deficit [hPa]
@@ -50,14 +50,16 @@ def gapfill(date, data, rg, tair, vpd,
         rg_dev               threshold for maximum deviation of global radiation (default: 50)
         tair_dev             threshold for maximum deviation of air Temperature (default: 2.5)
         vpd_dev              threshold for maximum deviation of vpd (default: 5)
-        longestmarginalgap   avoid extraploation into a gap longer than longestmarginalgap days (default: 60)
+        longgap   avoid extraploation into a gap longer than longgap days (default: 60)
+        fullday              If True, extent end of large gap until end of day
+                                      move start of large margin to beginning of next day (default: False)
         undef                undefined values in data  (default: np.nan)
         ddof                 Degrees of freedom to use in calculation of standard deviation
                              for error estimate (default: 1)
         err                  if True, fill every data point, i.e. used for error generation (default: False)
         shape                if False then outputs are 1D arrays;
                              if True, output have the same shape as input data;
-                             if a tuple is given, then this tuple is used to reshape.
+                             if a tuple is given, then this tuple is used to reshape. (default: False)
 
 
         Ouput
@@ -102,12 +104,14 @@ def gapfill(date, data, rg, tair, vpd,
         >>> y0    = date2dec(yr=year[0], mo=1, dy=1, hr=hh, mi=mn)
         >>> jdate = y0 + day
 
+        # 1D fill
         >>> nee_f, nee_qc = gapfill(jdate, nee, rg, tair, vpd, data_flag=(qcnee>1), undef=undef, shape=True)
         >>> print(astr(nee_qc[11006:11012],0,pp=True))
         ['1' '1' '1' '2' '2' '2']
         >>> print(astr(nee_f[11006:11012],3,pp=True))
         ['-18.678' '-15.633' '-19.610' '-15.536' '-12.402' '-15.329']
 
+        # 1D err
         >>> nee_std = gapfill(jdate, nee, rg, tair, vpd, data_flag=(qcnee>1), undef=undef, shape=True, err=True)
         >>> print(astr(nee_std[11006:11012],3,pp=True))
         ['    5.372' '   13.118' '    6.477' '-9999.000' '-9999.000' '-9999.000']
@@ -117,6 +121,26 @@ def gapfill(date, data, rg, tair, vpd,
         >>> nee_err[kk] = np.abs(nee_std[kk]/nee_f[kk]*100.).astype(np.int)
         >>> print(astr(nee_err[11006:11012],pp=True))
         [' 28' ' 83' ' 33' ' -1' ' -1' ' -1']
+    
+        # 2D fill
+        >>> nee2 = np.dstack([nee,nee,nee])
+        >>> print(nee2.shape)
+        (1, 17520, 3)
+        >>> nee_f2, nee_qc2 = gapfill(jdate, nee2, rg, tair, vpd, data_flag=(qcnee>1), undef=undef, shape=True)
+        >>> print(nee_f2.shape, nee_qc2.shape)
+        (1, 17520, 3) (17520,)
+        >>> nee_f, nee_qc   = gapfill(jdate, nee,  rg, tair, vpd, data_flag=(qcnee>1), undef=undef)
+        >>> nee_f2, nee_qc2 = gapfill(jdate, nee2, rg, tair, vpd, data_flag=(qcnee>1), undef=undef)
+        >>> print(nee_f2.shape, nee_qc2.shape)
+        (17520, 3) (17520,)
+        >>> print(np.all(nee_f==nee_f2[:,0]), np.all(nee_f==nee_f2[:,1]), np.all(nee_f==nee_f2[:,2]))
+        True True True
+
+        # 2D err
+        >>> nee_std  = gapfill(jdate, nee,  rg, tair, vpd, data_flag=(qcnee>1), undef=undef, err=True)
+        >>> nee_std2 = gapfill(jdate, nee2, rg, tair, vpd, data_flag=(qcnee>1), undef=undef, err=True)
+        >>> print(np.all(nee_std==nee_std2[:,0]), np.all(nee_std==nee_std2[:,1]), np.all(nee_std==nee_std2[:,2]))
+        True True True
 
 
         License
@@ -143,14 +167,19 @@ def gapfill(date, data, rg, tair, vpd,
         -------
         Written,  MC, Mar 2012 - modified gap_filling.py
         Modified, MC, Feb 2013 - ported to Python 3
+                  MC, Apr 2014 - assert
+                               - data ND-array
+                               - longestmarginalgap was only working at beginning and end of time series
+                                 renamed to longgap
+                               - fullday
     """
 
     # -------------------------------------------------------------
     # Checks
 
     # check input types
-    tma = type(np.ma.array((1)))
-    if type(date) == tma: raise Error('dates cannot be masked array.')
+    tma = np.ma.core.MaskedArray
+    assert type(date) != tma, 'dates cannot be masked array.'
     if type(data) == tma: data = data.filled(undef)
     if type(rg)   == tma: rg   = rg.filled(undef)
     if type(tair) == tma: tair = tair.filled(undef)
@@ -158,35 +187,43 @@ def gapfill(date, data, rg, tair, vpd,
 
     # remember shape if any
     inshape = data.shape
-    date = np.squeeze(date)
-    data = np.squeeze(data)
-    rg   = np.squeeze(rg)
-    tair = np.squeeze(tair)
-    vpd  = np.squeeze(vpd)
-    if np.ndim(date) != 1: raise Error('squeezed dates must be 1D array.')
-    if np.ndim(data) != 1: raise Error('squeezed data must be 1D array.')
-    if np.ndim(rg)   != 1: raise Error('squeezed rg must be 1D array.')
-    if np.ndim(tair) != 1: raise Error('squeezed tair must be 1D array.')
-    if np.ndim(vpd)  != 1: raise Error('squeezed vpd must be 1D array.')
+    date = date.squeeze()
+    data = data.squeeze()
+    rg   = rg.squeeze()
+    tair = tair.squeeze()
+    vpd  = vpd.squeeze()
+    assert date.ndim == 1, 'squeezed dates must be 1D array.'
+    assert rg.ndim   == 1, 'squeezed rg must be 1D array.'
+    assert tair.ndim == 1, 'squeezed tair must be 1D array.'
+    assert vpd.ndim  == 1, 'squeezed vpd must be 1D array.'
+    assert data.ndim <= 2, 'squeezed data must be 1D or 2D array.'
+    
+    # make 2D array
+    if data.ndim == 1:
+        is2d = False
+        data = data[:,np.newaxis]
+    else:
+        is2d = True
 
     # check flags
-    ndata = data.size
+    ndata  = data.shape[0]
+    ndata2 = data.shape[1]
     if (data_flag != None):
-        data_flg = np.squeeze(data_flag)
+        data_flg = data_flag.squeeze()
     else:
-        data_flg = np.where(np.squeeze(data) == undef, True, False)
+        data_flg = np.where(data[:,0] == undef, True, False)
     if (rg_flag != None):
-        rg_flg = np.squeeze(rg_flag)
+        rg_flg = rg_flag.squeeze()
     else:
-        rg_flg = np.where(np.squeeze(rg) == undef, True, False)
+        rg_flg = np.where(rg == undef, True, False)
     if (tair_flag != None):
-        tair_flg = np.squeeze(tair_flag)
+        tair_flg = tair_flag.squeeze()
     else:
-        tair_flg = np.where(np.squeeze(tair) == undef, True, False)
+        tair_flg = np.where(tair == undef, True, False)
     if (vpd_flag != None):
-        vpd_flg = np.squeeze(vpd_flag)
+        vpd_flg = vpd_flag.squeeze()
     else:
-        vpd_flg = np.where(np.squeeze(vpd) == undef, True, False)
+        vpd_flg = np.where(vpd == undef, True, False)
 
     if ((date.size != ndata) | (rg.size != ndata) | (tair.size != ndata) |
         (vpd.size != ndata) | (data_flg.size != ndata) | (rg_flg.size != ndata) |
@@ -204,18 +241,67 @@ def gapfill(date, data, rg, tair, vpd,
     week    = np.int(np.around(7./ddate[0]))
     nperday = week // 7
     #hour    = (np.array(np.floor((date-np.trunc(date))*24.), dtype=np.int) + 12) % 24
-    hour, mi = dec2date(date, hr=True, mi=True)
-    hour     = hour + mi/60.
+    day, hour, mi = dec2date(date, dy=True, hr=True, mi=True)
+    hour    = hour + mi/60.
 
-    ndata = data.size
     if err:
         # error estimate
-        data_std  = np.ones(ndata)*undef
+        data_std  = np.ones(data.shape)*undef
     else:
         # array for filled values
-        data_fill = np.where(~data_flg, data, undef)
+        data_fill = data.copy()
+        ii = np.where(data_flg)[0]
+        if ii.size > 0: data_fill[ii,:] = undef
         # gap quality classes
-        quality   = np.zeros(ndata)
+        quality = np.zeros(ndata)
+
+    #------------------------------------------------------------------
+    # Large margins
+
+    # Check for large margins at beginning
+    largegap    = np.zeros(ndata, dtype=np.bool)
+    firstvalid  = np.amin(np.where(~data_flg)[0])
+    lastvalid   = np.amax(np.where(~data_flg)[0])
+    nn          = np.int(nperday*longgap)
+    if firstvalid > nn:        largegap[0:(firstvalid-nn)] = True
+    if lastvalid < (ndata-nn): largegap[(lastvalid+nn):]   = True
+
+    # search largegap - code from maskgroup.py
+    index  = []
+    length = []
+    count  = 0
+    for i in range(ndata):
+        if i==0:
+            if not data_flg[i]:
+                index += [i]
+                count  = 1
+        if i>0:
+            if not data_flg[i] and data_flg[i-1]:
+                index += [i]
+                count  = 1
+            elif not data_flg[i]:
+                count += 1
+            elif data_flg[i] and not data_flg[i-1]:
+                length += [count]
+                count = 0
+            else:
+                pass
+    if count>0:
+        length += [count]
+    # set largegap
+    for i in range(len(index)):
+        if length[i] > nn:
+            largegap[index[i]:index[i]+length[i]] = True
+
+    # set or unset rest of days in large gaps
+    if fullday:
+        for i in range(ndata-1):
+            if largegap[i] and not largegap[i+1]:   # end of large margin
+                largegap[np.where(day[i:] == day[i])[0]] = True
+            elif not largegap[i] and largegap[i+1]: # beginning of large margin
+                largegap[np.where(day[i:] == day[i])[0]] = False
+            else:
+                continue
 
     #------------------------------------------------------------------
     # Gap filling
@@ -225,19 +311,11 @@ def gapfill(date, data, rg, tair, vpd,
     # flag for all meteorological conditions and data
     total_flag = meteo_flg & (~data_flg)
 
-    # Check for large margins at beginning
-    largemargin = np.zeros(ndata)
-    firstvalid  = np.amin(np.squeeze(np.where(~data_flg)))
-    lastvalid   = np.amax(np.squeeze(np.where(~data_flg)))
-    nn          = nperday*longestmarginalgap
-    if firstvalid > nn:        largemargin[0:(firstvalid-nn)] = 1
-    if lastvalid < (ndata-nn): largemargin[(lastvalid+nn):]   = 1
-
     # Fill loop over all data points
     for j in range(ndata):
         if not err:
             # no reason to go further, no gap -> continue
-            if (~(data_flg[j])) | (largemargin[j] == 1): continue
+            if (~(data_flg[j])) | largegap[j]: continue
         # 3 Methods
         #   1. tair, vpd and global radiation;
         #   2. just global radiation;
@@ -264,13 +342,14 @@ def gapfill(date, data, rg, tair, vpd,
             num4avg = np.sum(conditions)
             # we need at least two samples with similar conditions
             if num4avg >= 2:
-                dat = np.ma.array(data[win], mask=(~conditions))
+                nconditions = np.repeat(~conditions,ndata2).reshape(conditions.size,ndata2)
+                dat = np.ma.array(data[win,:], mask=nconditions)
                 if err:
-                    data_std[j] = np.ma.std(dat, ddof=ddof)
+                    data_std[j,:]  = np.ma.std(dat, axis=0, ddof=ddof)
                 else:
-                    data_fill[j] = np.ma.mean(dat)
+                    data_fill[j,:] = np.ma.mean(dat, axis=0)
                     # assign also quality category of gap filling
-                    quality[j]   = 1
+                    quality[j]     = 1
                 continue
             else: # --> extend time window to two weeks
                 j1  = j - np.arange(1,2*week+1) + 1
@@ -283,12 +362,13 @@ def gapfill(date, data, rg, tair, vpd,
                                total_flag[win] )
                 num4avg = np.sum(conditions)
                 if num4avg >= 2:
-                    dat = np.ma.array(data[win], mask=(~conditions))
+                    nconditions = np.repeat(~conditions,ndata2).reshape(conditions.size,ndata2)
+                    dat = np.ma.array(data[win,:], mask=nconditions)
                     if err:
-                        data_std[j] = np.ma.std(dat, ddof=ddof)
+                        data_std[j,:]  = np.ma.std(dat, axis=0, ddof=ddof)
                     else:
-                        data_fill[j] = np.ma.mean(dat)
-                        quality[j]   = 1
+                        data_fill[j,:] = np.ma.mean(dat, axis=0)
+                        quality[j]     = 1
                     continue
 
         # if you come here, no error estimate
@@ -309,12 +389,13 @@ def gapfill(date, data, rg, tair, vpd,
             num4avg = np.sum(conditions)
             # we need at least two samples with similar conditions
             if num4avg >= 2:
-                dat = np.ma.array(data[win], mask=(~conditions))
+                nconditions = np.repeat(~conditions,ndata2).reshape(conditions.size,ndata2)
+                dat = np.ma.array(data[win,:], mask=nconditions)
                 if err:
-                    data_std[j] = np.ma.std(dat, ddof=ddof)
+                    data_std[j,:]  = np.ma.std(dat, axis=0, ddof=ddof)
                 else:
-                    data_fill[j] = np.ma.mean(dat)
-                    quality[j]   = 1
+                    data_fill[j,:] = np.ma.mean(dat, axis=0)
+                    quality[j]     = 1
                 continue
 
         # If still nothing is found under similar rg within one week,
@@ -331,11 +412,12 @@ def gapfill(date, data, rg, tair, vpd,
             conditions = (np.abs(hour[win]-hour[j]) < 1.1) & (~(data_flg[win]))
             num4avg = np.sum(conditions)
             if num4avg >= 2:
-                dat = np.ma.array(data[win], mask=(~conditions))
+                nconditions = np.repeat(~conditions,ndata2).reshape(conditions.size,ndata2)
+                dat = np.ma.array(data[win,:], mask=nconditions)
                 if err:
-                    data_std[j] = np.ma.std(dat, ddof=ddof)
+                    data_std[j,:]  = np.ma.std(dat, axis=0, ddof=ddof)
                 else:
-                    data_fill[j] = np.ma.mean(dat)
+                    data_fill[j,:] = np.ma.mean(dat, axis=0)
                     if i == 0:
                         quality[j] = 1
                     else:
@@ -344,9 +426,9 @@ def gapfill(date, data, rg, tair, vpd,
 
         # sanity check
         if err:
-            if data_std[j]  != undef: continue
+            if data_std[j,0]  != undef: continue
         else:
-            if data_fill[j] != undef: continue
+            if data_fill[j,0] != undef: continue
 
         # If still nothing is found, start a new cycle with increased window size
         # Method 4: same as 1 but for 3-12 weeks
@@ -363,11 +445,12 @@ def gapfill(date, data, rg, tair, vpd,
                 num4avg = np.sum(conditions)
                 # we need at least two samples with similar conditions
                 if num4avg >= 2:
-                    dat = np.ma.array(data[win], mask=(~conditions))
+                    nconditions = np.repeat(~conditions,ndata2).reshape(conditions.size,ndata2)
+                    dat = np.ma.array(data[win,:], mask=nconditions)
                     if err:
-                        data_std[j] = np.ma.std(dat, ddof=ddof)
+                        data_std[j,:]  = np.ma.std(dat, axis=0, ddof=ddof)
                     else:
-                        data_fill[j] = np.ma.mean(dat)
+                        data_fill[j,:] = np.ma.mean(dat, axis=0)
                         # assign also quality category of gap filling
                         if multi <= 2:
                             quality[j] = 1
@@ -378,9 +461,9 @@ def gapfill(date, data, rg, tair, vpd,
                     break
             # Check because continue does not support to jump out of two loops
             if err:
-                if data_std[j]  != undef: continue
+                if data_std[j,0]  != undef: continue
             else:
-                if data_fill[j] != undef: continue
+                if data_fill[j,0] != undef: continue
 
         # Method 5: same as 2 but for 2-12 weeks
         if (~(rg_flg[j])):
@@ -395,11 +478,12 @@ def gapfill(date, data, rg, tair, vpd,
                 num4avg = np.sum(conditions)
                 # we need at least two samples with similar conditions
                 if num4avg >= 2:
-                    dat = np.ma.array(data[win], mask=(~conditions))
+                    nconditions = np.repeat(~conditions,ndata2).reshape(conditions.size,ndata2)
+                    dat = np.ma.array(data[win,:], mask=nconditions)
                     if err:
-                        data_std[j] = np.ma.std(dat, ddof=ddof)
+                        data_std[j,:] = np.ma.std(dat, axis=0, ddof=ddof)
                     else:
-                        data_fill[j] = np.ma.mean(dat)
+                        data_fill[j,:] = np.ma.mean(dat, axis=0)
                         if multi ==0:
                             quality[j] = 1
                         elif multi <= 2:
@@ -408,9 +492,9 @@ def gapfill(date, data, rg, tair, vpd,
                             quality[j] = 3
                     break
             if err:
-                if data_std[j]  != undef: continue
+                if data_std[j,0]  != undef: continue
             else:
-                if data_fill[j] != undef: continue
+                if data_fill[j,0] != undef: continue
 
         # Method 6: same as 3 but for 3-120 days
         for i in range(3,120):
@@ -422,11 +506,12 @@ def gapfill(date, data, rg, tair, vpd,
             conditions = (np.abs(hour[win]-hour[j]) < 1.1) & (~(data_flg[win]))
             num4avg = np.sum(conditions)
             if num4avg >= 2:
-                dat = np.ma.array(data[win], mask=(~conditions))
+                nconditions = np.repeat(~conditions,ndata2).reshape(conditions.size,ndata2)
+                dat = np.ma.array(data[win,:], mask=nconditions)
                 if err:
-                    data_std[j] = np.ma.std(dat, ddof=ddof)
+                    data_std[j,:] = np.ma.std(dat, axis=0, ddof=ddof)
                 else:
-                    data_fill[j] = np.ma.mean(dat)
+                    data_fill[j,:] = np.ma.mean(dat, axis=0)
                     quality[j] = 3
                 break
 
@@ -438,11 +523,16 @@ def gapfill(date, data, rg, tair, vpd,
         if err:
             return np.reshape(data_std,ishape)
         else:
-            return np.reshape(data_fill,ishape), np.reshape(quality,ishape)
+            if np.prod(ishape) == quality.size: # 1D input with dimensions of 1
+                return np.reshape(data_fill,ishape), np.reshape(quality,ishape)
+            else:                               # 2D data but only 1D fill quality flags
+                return np.reshape(data_fill,ishape), quality
     else:
         if err:
+            if not is2d: data_std = data_std.squeeze()
             return data_std
         else:
+            if not is2d: data_fill = data_fill.squeeze()
             return data_fill, quality
 
 
@@ -450,48 +540,59 @@ if __name__ == '__main__':
     import doctest
     doctest.testmod(optionflags=doctest.NORMALIZE_WHITESPACE)
 
-    # print 'Read data'
+    # print('Read data')
+    # import numpy as np
     # from fread import fread
     # from date2dec import date2dec
-    # ifile = 'test_nee2gpp.csv'
+    # from autostring import astr
+    # ifile = 'test_gapfill.csv' # Tharandt 1998 = Online tool example file
     # undef = -9999.
-    # dat  = fread(ifile, skip=2, transpose=True)
-    # ndat = dat.shape[1]
-    # # Create variables with names from the header
+    # dat   = fread(ifile, skip=2, transpose=True)
+    # ndat  = dat.shape[1]
     # head  = fread(ifile, skip=2, header=True)
     # head1 = head[0]
-    # ihead = dict(zip(head1, range(len(head1))))
-    # for ii in range(len(head1)):
-    #     exec(head1[ii].lower() + ' = ' + 'dat[ihead["'+head1[ii]+'"],:]')
-    # # Date
+    # ihead = dict(list(zip(head1, list(range(len(head1))))))
+    # for ii in range(len(head1)): exec(head1[ii].lower() + ' = ' + 'dat[ihead["'+head1[ii]+'"],:]')
     # year  = np.ones(day.shape, dtype=day.dtype) * 1998.
     # hh    = hour.astype(np.int)
     # mn    = np.round((hour-hh)*60.)
     # y0    = date2dec(yr=year[0], mo=1, dy=1, hr=hh, mi=mn)
     # jdate = y0 + day
-    # print 'Fill data'
-    # nee_f, nee_qc = gapfill(jdate, nee, rg, tair, vpd, data_flag=(qcnee>1), undef=undef, shape=True)
-    # print nee_qc[11000:11020]
-    # #[ 1.  1.  1.  1.  1.  1.  1.  1.  1.  2.  2.  2.  2.  2.  2.  2.  2.  2.
-    # #  2.  2.]
-    # print nee_f[11000:11020]
-    # #[  2.14         2.76333333   1.87666667  -2.765       -6.59        -8.63454545
-    # # -18.6775     -15.63333333 -19.61       -15.536      -12.4025     -15.32857143
-    # # -14.255      -14.52333333 -13.95       -14.155      -12.90666667
-    # # -12.90666667 -12.725      -16.3       ]
 
+    # # 1D fill
+    # nee_f, nee_qc = gapfill(jdate, nee, rg, tair, vpd, data_flag=(qcnee>1), undef=undef, shape=True)
+    # print(astr(nee_qc[11006:11012],0,pp=True))
+    # # ['1' '1' '1' '2' '2' '2']
+    # print(astr(nee_f[11006:11012],3,pp=True))
+    # # ['-18.678' '-15.633' '-19.610' '-15.536' '-12.402' '-15.329']
+
+    # # 1D err
     # nee_std = gapfill(jdate, nee, rg, tair, vpd, data_flag=(qcnee>1), undef=undef, shape=True, err=True)
-    # print nee_std[11000:11020]
-    # #[  1.64647097e+00   1.31720664e+00   1.86345110e+00   4.14701901e+00
-    # #   2.23898638e+00   3.29813997e+00   5.37231406e+00   1.31184234e+01
-    # #   6.47709812e+00  -9.99900000e+03  -9.99900000e+03  -9.99900000e+03
-    # #  -9.99900000e+03  -9.99900000e+03  -9.99900000e+03  -9.99900000e+03
-    # #  -9.99900000e+03  -9.99900000e+03  -9.99900000e+03  -9.99900000e+03]
+    # print(astr(nee_std[11006:11012],3,pp=True))
+    # # ['    5.372' '   13.118' '    6.477' '-9999.000' '-9999.000' '-9999.000']
 
     # nee_err     = np.ones(nee_std.shape, dtype=np.int)*(-1)
     # kk          = np.where((nee_std!=undef) & (nee_f!=0.))[0]
     # nee_err[kk] = np.abs(nee_std[kk]/nee_f[kk]*100.).astype(np.int)
-    # print nee_err[11000:11020]
-    # #[ 76  47  99 149  33  38  28  83  33  -1  -1  -1  -1  -1  -1  -1  -1  -1
-    # #  -1  -1]
+    # print(astr(nee_err[11006:11012],pp=True))
+    # # [' 28' ' 83' ' 33' ' -1' ' -1' ' -1']
+    
+    # # 2D fill
+    # nee2 = np.dstack([nee,nee,nee])
+    # print(nee2.shape)
+    # # (1, 17520, 3)
+    # nee_f2, nee_qc2 = gapfill(jdate, nee2, rg, tair, vpd, data_flag=(qcnee>1), undef=undef, shape=True)
+    # print(nee_f2.shape, nee_qc2.shape)
+    # # (1, 17520, 3) (17520,)
+    # nee_f, nee_qc   = gapfill(jdate, nee,  rg, tair, vpd, data_flag=(qcnee>1), undef=undef)
+    # nee_f2, nee_qc2 = gapfill(jdate, nee2, rg, tair, vpd, data_flag=(qcnee>1), undef=undef)
+    # print(nee_f2.shape, nee_qc2.shape)
+    # # (17520, 3) (17520,)
+    # print(np.all(nee_f==nee_f2[:,0]), np.all(nee_f==nee_f2[:,1]), np.all(nee_f==nee_f2[:,2]))
+    # # True True True
 
+    # # 2D err
+    # nee_std  = gapfill(jdate, nee,  rg, tair, vpd, data_flag=(qcnee>1), undef=undef, err=True)
+    # nee_std2 = gapfill(jdate, nee2, rg, tair, vpd, data_flag=(qcnee>1), undef=undef, err=True)
+    # print(np.all(nee_std==nee_std2[:,0]), np.all(nee_std==nee_std2[:,1]), np.all(nee_std==nee_std2[:,2]))
+    # # True True True

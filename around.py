@@ -89,19 +89,18 @@ def around(num, powten, ceil=False, floor=False):
         -------
         Written,  MC, Jun 2011
         Modified, MC, Feb 2013 - ported to Python 3
+                  MC, Apr 2014 - assert
     """
     #
     # Check input
-    if (ceil and floor):
-        raise ValueError('ceil and floor keywords given.')
+    assert (ceil+floor) < 2, 'ceil and floor keywords given.'
     if (powten == None):
         ipowten = 0
     else:
         ipowten = np.array(powten)
     nnum = np.size(num)
     npowten = np.size(ipowten)
-    if ((npowten != nnum) and (npowten != 1)):
-        raise ValueError('powten must be scalar or have array size of input numbers.')
+    assert not ((npowten != nnum) and (npowten != 1)), 'powten must be scalar or have array size of input numbers.'
     #
     # Shift decimal point
     # Does not work, too imprecise: out = num * np.exp(-ipowten*np.log(10.))

@@ -90,14 +90,14 @@ def in_poly(P, coord_x, coord_y):
         Modified, MC, Nov 2012 - documentation change, return 0 immediately
                   MC, Feb 2013 - ported to Python 3
                   MC, Oct 2013 - inpoly
+                  MC, Apr 2014 - assert
     """
 
     # ironing :-)
     coord_x, coord_y = coord_x.flatten(), coord_y.flatten()
 
     # test input sizes
-    if np.size(coord_x) != np.size(coord_y):
-        raise ValueError('in_poly: coord_x and coord_y must have same size.')
+    assert np.size(coord_x) == np.size(coord_y), 'in_poly: coord_x and coord_y must have same size.'
 
     n = coord_x.size
     # result is outside as long as no other test works

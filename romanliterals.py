@@ -40,6 +40,7 @@ import numpy as np
         -------
         Written,  MC, May 2012
         Modified, MC, Feb 2013 - ported to Python 3
+                  MC, Apr 2014 - assert
 """
 numeral_map = list(zip((1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1),
                   ('M', 'CM', 'D', 'CD', 'C', 'XC', 'L', 'XL', 'X', 'IX', 'V', 'IV', 'I')))
@@ -120,9 +121,9 @@ def int2roman(i, lower=False):
                                  http://code.activestate.com/recipes/81611-roman-numerals
         Modified, MC, May 2012 - added lower in int2roman
                   MC, Feb 2013 - ported to Python 3
+                  MC, Apr 2014 - assert
     """
-    if i < 1:
-        raise ValueError('integer must be > 0.')
+    assert i >= 1, 'integer must be > 0.'
     result = []
     for integer, numeral in numeral_map:
         count = int(i // integer)

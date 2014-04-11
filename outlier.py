@@ -122,10 +122,10 @@ def outlier(y, alpha=0.01, k=-1, quiet=True):
                MC & MG, Oct 2011 - break loop if new variance < 0 in iteration
                MC,      Feb 2013 - ported to Python 3
                MC,      Oct 2013 - rossner
+               MC,      Apr 2014 - assert
     """
     # check user input
-    if ((alpha<=0) or (alpha>1)):
-        raise ValueError('alpha must between 0 and 1.')
+    assert ((alpha>0) and (alpha<=1)), 'alpha must between 0 and 1.'
 
     # Student''s t-distribution
     nn    = np.ma.count(y)

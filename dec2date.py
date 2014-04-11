@@ -317,13 +317,11 @@ def dec2date(indata, calendar='standard', refdate=None, units=None,
                  MC, Oct 2013 - Excel starts at 1 not at 0
                  MC, Oct 2013 - units bugs, e.g. 01.01.0001 was substracted if Julian calendar even with units
     """
-
     #
     # Constants
     calendars = ['standard', 'gregorian', 'julian', 'proleptic_gregorian',
                  'excel1900', 'excel1904', '365_day', 'noleap', '366_day',
                  'all_leap', '360_day', 'decimal', 'decimal360']
-
     #
     # Checks
     if ((nt.__version__ <= '0.9.2') & (calendar == '360_day')):
@@ -357,7 +355,6 @@ def dec2date(indata, calendar='standard', refdate=None, units=None,
         raise ValueError("dec2date error: Only one of ascii, fulldate, or eng can be chosen.")
     if np.sum(np.array([ascii,eng,ii])) > 1:
         raise ValueError("dec2date error: If ascii, fulldate or eng then no special selection yr,mo,dy,hr,mi,sc possible.")
-
     #
     # Input size and shape
     islist = type(indata) != type(np.array(indata))
@@ -369,7 +366,6 @@ def dec2date(indata, calendar='standard', refdate=None, units=None,
     insize  = indata.size
     inshape = indata.shape
     indata  = indata.flatten()
-
     #
     # depending on chosen calendar and optional set of the time refdate
     # calendar date is calculated
@@ -544,7 +540,7 @@ def dec2date(indata, calendar='standard', refdate=None, units=None,
                 if np.size(ii) > 0:
                     month[ii] = 2
                     day[ii]   = 29
-
+    #
     # Ascii output
     if ascii:
         output = ( ['%02d.%02d.%04d %02d:%02d:%02d' %

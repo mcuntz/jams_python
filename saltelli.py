@@ -96,11 +96,11 @@ def saltelli(params, nbase, lhs=False, nskip=1):
         -------
         Written,  MC, May 2012
         Modified, MC, Feb 2013 - ported to Python 3
+                  MC, Apr 2014 - assert
     """
     #
     # Check input
-    if np.size(params[0,:]) != 2:
-        raise ValueError('parameter ranges must be given in form (nparams,2).')
+    assert np.size(params[0,:]) == 2, 'parameter ranges must be given in form (nparams,2).'
     nparams = np.size(params[:,0])
     #
     nso = nbase*(nparams+2)
