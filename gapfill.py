@@ -51,8 +51,8 @@ def gapfill(date, data, rg, tair, vpd,
         tair_dev             threshold for maximum deviation of air Temperature (default: 2.5)
         vpd_dev              threshold for maximum deviation of vpd (default: 5)
         longgap   avoid extraploation into a gap longer than longgap days (default: 60)
-        fullday              If True, extent end of large gap until end of day
-                                      move start of large margin to beginning of next day (default: False)
+        fullday              If True, move beginning of large gap to start of next day
+                                      and move end of large gap to end of last day (default: False)
         undef                undefined values in data  (default: np.nan)
         ddof                 Degrees of freedom to use in calculation of standard deviation
                              for error estimate (default: 1)
@@ -241,8 +241,9 @@ def gapfill(date, data, rg, tair, vpd,
     week    = np.int(np.around(7./ddate[0]))
     nperday = week // 7
     #hour    = (np.array(np.floor((date-np.trunc(date))*24.), dtype=np.int) + 12) % 24
-    day, hour, mi = dec2date(date, dy=True, hr=True, mi=True)
+    hour, mi = dec2date(date, hr=True, mi=True)
     hour    = hour + mi/60.
+    day     = np.floor(date-0.5).astype(np.int)
 
     if err:
         # error estimate
@@ -272,16 +273,16 @@ def gapfill(date, data, rg, tair, vpd,
     count  = 0
     for i in range(ndata):
         if i==0:
-            if not data_flg[i]:
+            if data_flg[i]:
                 index += [i]
                 count  = 1
         if i>0:
-            if not data_flg[i] and data_flg[i-1]:
+            if data_flg[i] and not data_flg[i-1]:
                 index += [i]
                 count  = 1
-            elif not data_flg[i]:
+            elif data_flg[i]:
                 count += 1
-            elif data_flg[i] and not data_flg[i-1]:
+            elif not data_flg[i] and data_flg[i-1]:
                 length += [count]
                 count = 0
             else:
@@ -297,9 +298,9 @@ def gapfill(date, data, rg, tair, vpd,
     if fullday:
         for i in range(ndata-1):
             if largegap[i] and not largegap[i+1]:   # end of large margin
-                largegap[np.where(day[i:] == day[i])[0]] = True
+                largegap[np.where(day == day[i])[0]] = False
             elif not largegap[i] and largegap[i+1]: # beginning of large margin
-                largegap[np.where(day[i:] == day[i])[0]] = False
+                largegap[np.where(day == day[i])[0]] = False
             else:
                 continue
 
