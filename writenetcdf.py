@@ -17,21 +17,21 @@ def writenetcdf(fhandle, vhandle=None, var=None, time=None, isdim=False, name=No
                         attributes=None, fileattributes=None, comp=False):
 
 
-        Input           Format                 Description
-        -----           -----                  -----------
-        fhandle         string                 file handle of nc.Dataset(FileName, 'w')
-        vhandle         string                 variable handle of the particular variable
-        var             array like             data (assumed to be netcdf float4)
-        time            integer or array like  particular time step of the data
-        isdim           boolean                defines if current var is a dimension
-        name            string                 name of the variable
-        dims            1D list                variable dependencies (e.g. [time, x, y])
-        attributes      2D list                variable attributes
-        fileattributes  2D list                global attributes of NetCDF file (history, description, ...)
-        comp            boolean                compress data on the fly using zlib
-        vartype         string                 netcdf variable type
-                                               default: 'f4' for normal variables
-                                                        'f8' for variable with isdim=True and dims=None (=unlimited)
+        Input           Format                  Description
+        -----           -----                   -----------
+        fhandle         string                  file handle of nc.Dataset(FileName, 'w')
+        vhandle         string                  variable handle of the particular variable
+        var             array like              data (assumed to be netcdf float4)
+        time            integer or array like   particular time step of the data
+        isdim           boolean                 defines if current var is a dimension
+        name            string                  name of the variable
+        dims            1D list                 variable dependencies (e.g. [time, x, y])
+        attributes      2D list or dictionary   variable attributes
+        fileattributes  2D list or dictionary   global attributes of NetCDF file (history, description, ...)
+        comp            boolean                 compress data on the fly using zlib
+        vartype         string                  netcdf variable type
+                                                default: 'f4' for normal variables
+                                                         'f8' for variable with isdim=True and dims=None (=unlimited)
 
 
         Description
@@ -93,9 +93,9 @@ def writenetcdf(fhandle, vhandle=None, var=None, time=None, isdim=False, name=No
         >>> handle  = writenetcdf(fhandle, thand, time=list(range(np.size(times))), var=times)
 
         >>> varName = 'TESTING'
-        >>> varAtt  = ([['units'        , 'm'                              ],
-        ...             ['long_name'     ,'Does this writing routine work?'],
-        ...             ['missing_value' , -9.]])
+        >>> varAtt  = {'units': 'm',
+        ...            'long_name': 'Does this writing routine work?',
+        ...            'missing_value': -9.}
         >>> dims    = ['time','lon','lat']
         >>> vhand   = writenetcdf(fhandle, name=varName, dims=dims, attributes=varAtt, comp=True)
         >>> for i in range(2):
@@ -112,6 +112,8 @@ def writenetcdf(fhandle, vhandle=None, var=None, time=None, isdim=False, name=No
         >>> vhand   = writenetcdf(fhandle, name=varName, dims=dims, attributes=varAtt, comp=True, vartype=typ)
         >>> for i in range(2):
         ...     handle  = writenetcdf(fhandle, vhand, time=i, var=np.array(dat,dtype=np.int)*(i+1))
+        >>> fhandle.close()
+
 
         # check file
         >>> from readnetcdf import readnetcdf
@@ -158,11 +160,16 @@ def writenetcdf(fhandle, vhandle=None, var=None, time=None, isdim=False, name=No
         Modified, ST,      May 2012 - type 'f8' for time dimension
                   MC,      Jun 2012 - vartype
                   MC,      Feb 2013 - ported to Python 3
+                  MC,      Apr 2014 - attributes can be given as dictionary e.g. from readnetcdf with attributes=True
     """
     # create File attributes
     if fileattributes != None:
-        for i in range(len(fileattributes)):
-            fhandle.setncattr(fileattributes[i][0], fileattributes[i][1])
+        if type(fileattributes) is dict:
+            for k in fileattributes:
+                fhandle.setncattr(k, fileattributes[k])
+        else:
+            for i in range(len(fileattributes)):
+                fhandle.setncattr(fileattributes[i][0], fileattributes[i][1])
         return None
 
     # create dimensions
@@ -191,8 +198,12 @@ def writenetcdf(fhandle, vhandle=None, var=None, time=None, isdim=False, name=No
             hand = fhandle.createVariable(name, typ, (dims), zlib=comp)
 
     if attributes != None:
-        for i in range(len(attributes)):
-            hand.setncattr(attributes[i][0], attributes[i][1])
+        if type(attributes) is dict:
+            for k in attributes:
+                hand.setncattr(k, attributes[k])
+        else:
+            for i in range(len(attributes)):
+                hand.setncattr(attributes[i][0], attributes[i][1])
 
     if var != None:
         shand = hand.shape
