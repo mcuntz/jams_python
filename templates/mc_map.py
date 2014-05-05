@@ -151,7 +151,7 @@ frameon     = False       # if True, draw a frame around the legend. If None, us
 dpi         = 300
 transparent = False
 bbox_inches = 'tight'
-pad_inches  = 0
+pad_inches  = 0.035
 
 import matplotlib as mpl
 if (outtype == 'pdf'):
