@@ -86,6 +86,7 @@
     sg                     Wrapper savitzky_golay.
     sg2d                   Wrapper savitzky_golay2d.
     sigma_filter           Mask values deviating more than z standard deviations from a given function.
+    signature2plot         Write a copyright notice on a plot.
     maskgroup              Masks elements in a 1d array gathered in small groups.
     sobol_index            Calculates the first-order and total variance-based sensitivity indices.
     sread                  Reads in string array from ascii file.
@@ -230,6 +231,7 @@
     position               Position arrays of subplots to be used with add_axes.
     print_brewer           Prints available Brewer colormap names.
     rgb                    Interpolate between colours; make continuous colour maps.
+    signature2plot         Write a copyright notice on a plot.
     tsym                   Raw unicodes for common symbols.
     xkcd                   Make plot look handdrawn.
     yrange                 Calculates plot range from input array.
@@ -315,6 +317,8 @@
               MC, Feb 2014 - sigma_filter
               AP, Mar 2014 - lagcorr
               MC, Apr 2014 - correlate
+              MC, May 2014 - signature2plot
+
 """
 from __future__ import print_function
 
@@ -382,6 +386,7 @@ from savitzky_golay    import savitzky_golay, sg, savitzky_golay2d, sg2d
 from sce               import sce
 from semivariogram     import semivariogram
 from sigma_filter      import sigma_filter
+from signature2plot    import signature2plot
 from sobol_index       import sobol_index
 from sread             import sread
 from srrasa            import srrasa, srrasa_trans
@@ -395,8 +400,8 @@ from yrange            import yrange
 from zacharias         import zacharias, zacharias_check
 
 # Information
-version = '2.2.1'
-date    = '22.02.2014'
+version = '2.2.2'
+date    = '15.05.2014'
 
 # Main
 if __name__ == '__main__':
