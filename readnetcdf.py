@@ -3,7 +3,7 @@ from __future__ import print_function
 import numpy as np
 
 def readnetcdf(file, var='', code=-1, reform=False, squeeze=False,
-               variables=False, codes=False, units=False, longnames=False,
+               variables=False, codes=False, dims=False, units=False, longnames=False,
                attributes=False, sort=False, pointer=False, overwrite=False):
     """
         Gets variables or prints information of netcdf file.
@@ -12,7 +12,7 @@ def readnetcdf(file, var='', code=-1, reform=False, squeeze=False,
         Definition
         ----------
         def readnetcdf(file, var='', code=-1, reform=False, squeeze=False,
-                       variables=False, codes=False, units=False, longnames=False, 
+                       variables=False, codes=False, dims=False, units=False, longnames=False, 
                        attributes=False, sort=False, pointer=False, overwrite=False):
 
 
@@ -35,6 +35,7 @@ def readnetcdf(file, var='', code=-1, reform=False, squeeze=False,
         squeeze      same as reform
         variables    get list of variables in netcdf file
         codes        get list of codes attribute code
+        dims         get list of dimensions a variable is depending on
         units        get list of units of variables from attribute units
         longnames    get list of long names of variables from
                      attribute long_name
@@ -91,6 +92,10 @@ def readnetcdf(file, var='', code=-1, reform=False, squeeze=False,
         ['x-axis', 'y-axis', 'all ones', 'all twos']
         >>> print([str(i) for i in readnetcdf('test_readnetcdf.nc',longnames=True,sort=True)])
         ['all ones', 'all twos', 'x-axis', 'y-axis']
+
+        # Get dims
+        >>> print(readnetcdf('test_readnetcdf.nc',var='is1', dims=True))
+        (u'y', u'x')
 
         # Get attributes
         # old: {'units': 'arbitrary', 'long_name': 'all ones', 'code': 128}
@@ -151,6 +156,7 @@ def readnetcdf(file, var='', code=-1, reform=False, squeeze=False,
                   MC, Feb 2013 - ported to Python 3
                   MC, Oct 2013 - netcdfread, ncread, readnc
                   ST, Apr 2014 - added overwrite flag
+                  ST, May 2014 - added dims flag
     """
     try:
         import netCDF4 as nc
@@ -198,6 +204,14 @@ def readnetcdf(file, var='', code=-1, reform=False, squeeze=False,
             scods = np.compress(scods!=-1, scods)
         f.close()
         return scods
+    # Get dimensions
+    if dims:
+        if var not in vars:
+            f.close()
+            raise ValueError('Variable '+var+' not in file '+file)
+        dimensions = f.variables[ var ].dimensions
+        f.close()
+        return dimensions        
     # Get units
     if units:
         unis = list()
