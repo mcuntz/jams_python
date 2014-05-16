@@ -93,9 +93,9 @@ def readnetcdf(file, var='', code=-1, reform=False, squeeze=False,
         >>> print([str(i) for i in readnetcdf('test_readnetcdf.nc',longnames=True,sort=True)])
         ['all ones', 'all twos', 'x-axis', 'y-axis']
 
-        # Get dims
-        >>> print(readnetcdf('test_readnetcdf.nc',var='is1', dims=True))
-        (u'y', u'x')
+        # Get dims (change from unicode to string)
+        >>> print([ str(i) for i in readnetcdf('test_readnetcdf.nc',var='is1', dims=True) ])
+        ['y', 'x']
 
         # Get attributes
         # old: {'units': 'arbitrary', 'long_name': 'all ones', 'code': 128}
