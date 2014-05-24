@@ -254,22 +254,47 @@
 
     License
     -------
+
     This file is part of the UFZ Python library.
 
-    The UFZ Python library is free software: you can redistribute it and/or modify
-    it under the terms of the GNU Lesser General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+    Not all files in the library are free software. The license is given in the 'License' section
+    of the docstring of each routine.
 
-    The UFZ Python library is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-    GNU Lesser General Public License for more details.
+    There are 3 possibilities:
+    1. The routine is not yet released under the GNU Lesser General Public License.
+       This is marked by a text such as
+            This file is part of the UFZ Python library.
 
-    You should have received a copy of the GNU Lesser General Public License
-    along with The UFZ Python library.  If not, see <http://www.gnu.org/licenses/>.
+            It is NOT released under the GNU Lesser General Public License, yet.
 
-    Copyright 2009-2013 Matthias Cuntz, Arndt Piayda, Matthias Zink, Tino Rau, Maren Goehler,
+            If you use this routine, please contact Matthias Cuntz.
+
+            Copyright 2012-2013 Matthias Cuntz
+       If you want to use this routine for publication or similar, please contact the author for possible co-authorship.
+
+    2. The routine is already released under the GNU Lesser General Public License
+       but if you use the routine in a publication or similar, you have to cite the respective publication, e.g.
+            If you use this routine in your work, you should cite the following reference
+            Goehler M, J Mai, and M Cuntz (2013)
+                Use of eigendecomposition in a parameter sensitivity analysis of the Community Land Model,
+                J Geophys Res 188, 904-921, doi:10.1002/jgrg.20072
+
+    3. The routine is released under the GNU Lesser General Public License. The following applies:
+       The UFZ Python library is free software: you can redistribute it and/or modify
+       it under the terms of the GNU Lesser General Public License as published by
+       the Free Software Foundation, either version 3 of the License, or
+       (at your option) any later version.
+
+       The UFZ Python library is distributed in the hope that it will be useful,
+       but WITHOUT ANY WARRANTY; without even the implied warranty of
+       MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+       GNU Lesser General Public License for more details.
+
+       You should have received a copy of the GNU Lesser General Public License
+       along with the UFZ makefile project (cf. gpl.txt and lgpl.txt).
+       If not, see <http://www.gnu.org/licenses/>.
+
+    Copyright 2009-2014 Matthias Cuntz, Arndt Piayda, Matthias Zink, Tino Rau, Maren Goehler,
                         Stephan Thober, Juliane Mai
 
 
@@ -318,7 +343,7 @@
               AP, Mar 2014 - lagcorr
               MC, Apr 2014 - correlate
               MC, May 2014 - signature2plot
-
+              MC, May 2014 - adapted new CHS license scheme
 """
 from __future__ import print_function
 
@@ -401,13 +426,13 @@ from zacharias         import zacharias, zacharias_check
 
 # Information
 version = '2.2.2'
-date    = '15.05.2014'
+date    = '24.05.2014'
 
 # Main
 if __name__ == '__main__':
     print('\nUFZ Computational Hydrosystems Python Library.')
     print("Version {:s} from {:s}.".format(version,date))
-    print('\nThis is the README file. See als the license file gpl.txt.\n\n')
+    print('\nThis is the README file. See als the license file LICENSE.\n\n')
     f = open('README','r')
     for line in f: print(line,end='')
     f.close()

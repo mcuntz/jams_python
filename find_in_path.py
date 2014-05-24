@@ -5,66 +5,67 @@ import sys
 
 def find_in_path(filename):
     """
-       Find the file named filename in the sys.path.
-       Returns the full path name if found, None if not found.
+        Find the file named filename in the sys.path.
+        Returns the full path name if found, None if not found.
 
 
-       Definition
-       ----------
-       def find_in_path(filename):
+        Definition
+        ----------
+        def find_in_path(filename):
 
 
-       Input
-       -----
-       filename    str; name of searched file
+        Input
+        -----
+        filename    str; name of searched file
 
-       Output
-       ------
-       Full path of file. None if not found.
-
-
-       Examples
-       --------
-       >>> datei = 'Humor-Sans.ttf'
-       >>> isdatei = find_in_path(datei)
-       >>> if isdatei is None:
-       ...     print('No')
-       ... else:
-       ...     print('Yes')
-       Yes
-
-       >>> datei = 'Humor_Sans.ttf'
-       >>> isdatei = find_in_path(datei)
-       >>> if isdatei is None:
-       ...     print('No')
-       ... else:
-       ...     print('Yes')
-       No
+        Output
+        ------
+        Full path of file. None if not found.
 
 
-       License
-       -------
-       This file is part of the UFZ Python library.
+        Examples
+        --------
+        >>> datei = 'Humor-Sans.ttf'
+        >>> isdatei = find_in_path(datei)
+        >>> if isdatei is None:
+        ...     print('No')
+        ... else:
+        ...     print('Yes')
+        Yes
 
-       The UFZ Python library is free software: you can redistribute it and/or modify
-       it under the terms of the GNU Lesser General Public License as published by
-       the Free Software Foundation, either version 3 of the License, or
-       (at your option) any later version.
-
-       The UFZ Python library is distributed in the hope that it will be useful,
-       but WITHOUT ANY WARRANTY; without even the implied warranty of
-       MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-       GNU Lesser General Public License for more details.
-
-       You should have received a copy of the GNU Lesser General Public License
-       along with The UFZ Python library.  If not, see <http://www.gnu.org/licenses/>.
-
-       Copyright 2013 Matthias Cuntz
+        >>> datei = 'Humor_Sans.ttf'
+        >>> isdatei = find_in_path(datei)
+        >>> if isdatei is None:
+        ...     print('No')
+        ... else:
+        ...     print('Yes')
+        No
 
 
-       History
-       -------
-       Written,  MC, Mar 2013
+        License
+        -------
+        This file is part of the UFZ Python library.
+
+        The UFZ Python library is free software: you can redistribute it and/or modify
+        it under the terms of the GNU Lesser General Public License as published by
+        the Free Software Foundation, either version 3 of the License, or
+        (at your option) any later version.
+
+        The UFZ Python library is distributed in the hope that it will be useful,
+        but WITHOUT ANY WARRANTY; without even the implied warranty of
+        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+        GNU Lesser General Public License for more details.
+
+        You should have received a copy of the GNU Lesser General Public License
+        along with the UFZ makefile project (cf. gpl.txt and lgpl.txt).
+        If not, see <http://www.gnu.org/licenses/>.
+
+        Copyright 2013 Matthias Cuntz
+
+
+        History
+        -------
+        Written,  MC, Mar 2013
     """
     for dirname in sys.path:
         possible = os.path.join(dirname, filename)

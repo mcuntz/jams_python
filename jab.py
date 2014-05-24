@@ -114,26 +114,17 @@ def jab(arr, ind=None, nind=None, mask=None, weight=False, nsteps=1):
         -------
         This file is part of the UFZ Python library.
 
-        The UFZ Python library is free software: you can redistribute it and/or modify
-        it under the terms of the GNU Lesser General Public License as published by
-        the Free Software Foundation, either version 3 of the License, or
-        (at your option) any later version.
+        It is NOT released under the GNU Lesser General Public License, yet.
 
-        The UFZ Python library is distributed in the hope that it will be useful,
-        but WITHOUT ANY WARRANTY; without even the implied warranty of
-        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-        GNU Lesser General Public License for more details.
+        If you use this routine, please contact Matthias Cuntz.
 
-        You should have received a copy of the GNU Lesser General Public License
-        along with The UFZ Python library.  If not, see <http://www.gnu.org/licenses/>.
-
-        Copyright 2012-2013 Maren Goehler, Matthias Cuntz
+        Copyright 2012-2014 Maren Goehler, Matthias Cuntz
 
 
         History
         -------
         Written,  MG, Aug 2012
-        Modified, MC, Nov 2012 - rewrite
+        Modified, MC, Nov 2012 - full rewrite
                   MC, Dec 2012 - mask
                   MC, Feb 2013 - ported to Python 3
                   MC, Apr 2014 - assert

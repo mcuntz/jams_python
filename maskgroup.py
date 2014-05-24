@@ -63,7 +63,8 @@ def maskgroup(x, n):
         GNU Lesser General Public License for more details.
 
         You should have received a copy of the GNU Lesser General Public License
-        along with The UFZ Python library.  If not, see <http://www.gnu.org/licenses/>.
+        along with the UFZ makefile project (cf. gpl.txt and lgpl.txt).
+        If not, see <http://www.gnu.org/licenses/>.
 
         Copyright 2014 Arndt Piayda
 
@@ -72,7 +73,7 @@ def maskgroup(x, n):
         -------
         Written,  AP, Feb 2014
         Modified, MC, Feb 2014 - call it maskgroup instead of small_kickout1d, mask <=n instead of <n
-                  MC, Apr 2014 - removed enumearte and zip for simplification
+                  MC, Apr 2014 - removed enumerate and zip for simplification
     """
     # create running lists
     index  = []

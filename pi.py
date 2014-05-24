@@ -20,7 +20,7 @@ def pi(s=None, m=None, norm=None, b=False, evalues=False, ematrix=False):
           s       sensitivity matrix[nparams,n]
         or
           m       transpose(s).s matrix[nparams,nparams]
-        norm     normalise incides; also output normalisation
+        norm     normalised indexes; also output normalisation
                  'sum':   index /= sum(index)
                  'ev':    index /= sum(eigenvectors)
                  'evsum': both index /= sum(eigenvectors) then index /= sum(index)
@@ -43,8 +43,9 @@ def pi(s=None, m=None, norm=None, b=False, evalues=False, ematrix=False):
 
         References
         ----------
-        Goehler et al. (2013). Use of eigendecomposition in sensitivity analsyis of a land surface model,
-            J Geophys Res.
+        Goehler M, J Mai, and M Cuntz (2013)
+            Use of eigendecomposition in a parameter sensitivity analysis of the Community Land Model,
+            J Geophys Res 188, 904-921, doi:10.1002/jgrg.20072
 
 
         Examples
@@ -112,6 +113,11 @@ def pi(s=None, m=None, norm=None, b=False, evalues=False, ematrix=False):
         -------
         This file is part of the UFZ Python library.
 
+        If you use this routine in your work, you should cite the following reference
+        Goehler M, J Mai, and M Cuntz (2013)
+            Use of eigendecomposition in a parameter sensitivity analysis of the Community Land Model,
+            J Geophys Res 188, 904-921, doi:10.1002/jgrg.20072
+
         The UFZ Python library is free software: you can redistribute it and/or modify
         it under the terms of the GNU Lesser General Public License as published by
         the Free Software Foundation, either version 3 of the License, or
@@ -123,7 +129,8 @@ def pi(s=None, m=None, norm=None, b=False, evalues=False, ematrix=False):
         GNU Lesser General Public License for more details.
 
         You should have received a copy of the GNU Lesser General Public License
-        along with The UFZ Python library.  If not, see <http://www.gnu.org/licenses/>.
+        along with the UFZ makefile project (cf. gpl.txt and lgpl.txt).
+        If not, see <http://www.gnu.org/licenses/>.
 
         Copyright 2012-2013 Matthias Cuntz
 

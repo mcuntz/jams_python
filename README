@@ -1,3 +1,4 @@
+
 This is the PYTHON library of the
 
 Department Computational Hydrosystems
@@ -5,7 +6,7 @@ Helmholtz Centre for Environmental Research - UFZ
 Permoserstr. 15
 04318 Leipzig, Germany
 
-Created June 2009, Copyright 2009-2013 UFZ CHS
+Created June 2009, Copyright 2009-2014 UFZ CHS
 Contact Matthias Cuntz - mc (at) macu.de
 
 
@@ -15,7 +16,8 @@ It can also be installed with the usual setup.py commands using distutils:
     python setup.py install
 If one wants to use the development capabilities of setuptools, you can use something like
     python -c "import setuptools; execfile('setup.py')" develop
-This basically creates an .egg-link file and updates an easy-install.pth file so that the project is on sys.path by default.
+This basically creates an .egg-link file and updates an easy-install.pth file so that the project
+is on sys.path by default.
 Distutils also allows to make Windows installers with
     python setup.py bdist_wininst
 
@@ -29,7 +31,6 @@ The individual functions also provide their help as doctrings.
 Getting, for example, help on fread for reading floats from ascii files:
 >>> import ufz
 >>> help(ufz.fread)
-
 
 One can produce html versions of the documentation in a directory html by calling the script: ./makehtml
 
@@ -45,8 +46,8 @@ The above wiki will be printed to a PDF file from time to time, which is provide
 Be aware that the current PDF is not always up to date.
 
 
-The Library is compatible with Python 2 and 3 (> 2.6).
-Note that not all packages but one used by the library are already Python 3 ready (except pyhdf).
+The Library is compatible with Python 2 (> 2.6) and 3 (> 3.2).
+Note that all packages but one used by the library are already Python 3 ready (except pyhdf).
 Reading HDF4 files is thus disabled in python 3.
 
 Essential third-party libraries are numpy and scipy.
@@ -56,22 +57,45 @@ mad.py uses bottleneck, if available.
 mc_plot_template.py shows some matplotlib capabilities. It uses basemap and cartopy for maps, if available.
 
 
-UFZ routines are free software and come with ABSOLUTELY NO WARRANTY.
-
-
 License
 -------
 This file is part of the UFZ Python library.
 
-The UFZ Python library is free software: you can redistribute it and/or modify
-it under the terms of the GNU Lesser General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
+Not all files in the library are free software. The license is given in the 'License' section
+of the docstring of each routine.
 
-The UFZ Python library is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-GNU Lesser General Public License for more details.
+There are 3 possibilities:
+1. The routine is not yet released under the GNU Lesser General Public License.
+   This is marked by a text such as
+        This file is part of the UFZ Python library.
 
-You should have received a copy of the GNU Lesser General Public License
-along with The UFZ Python library. If not, see <http://www.gnu.org/licenses/>.
+        It is NOT released under the GNU Lesser General Public License, yet.
+
+        If you use this routine, please contact Matthias Cuntz.
+
+        Copyright 2012-2013 Matthias Cuntz
+   If you want to use this routine for publication or similar, please contact the author for possible co-authorship.
+
+2. The routine is already released under the GNU Lesser General Public License
+   but if you use the routine in a publication or similar, you have to cite the respective publication, e.g.
+        If you use this routine in your work, you should cite the following reference
+        Goehler M, J Mai, and M Cuntz (2013)
+            Use of eigendecomposition in a parameter sensitivity analysis of the Community Land Model,
+            J Geophys Res 188, 904-921, doi:10.1002/jgrg.20072
+
+3. The routine is released under the GNU Lesser General Public License. The following applies:
+   The UFZ Python library is free software: you can redistribute it and/or modify
+   it under the terms of the GNU Lesser General Public License as published by
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
+
+   The UFZ Python library is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+   GNU Lesser General Public License for more details.
+
+   You should have received a copy of the GNU Lesser General Public License
+   along with the UFZ makefile project (cf. gpl.txt and lgpl.txt).
+   If not, see <http://www.gnu.org/licenses/>.
+
+   Copyright 2009-2014 Matthias Cuntz

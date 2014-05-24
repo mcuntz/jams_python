@@ -4,65 +4,66 @@ import numpy as np
 
 def SampleInputMatrix(nrows, npars, bl, bu, distname='randomUniform'):
     '''
-       Create input parameter matrix (nrows,npars) for
-       nrows simulations and npars parameters with bounds bl and bu
+        Create input parameter matrix (nrows,npars) for
+        nrows simulations and npars parameters with bounds bl and bu
 
 
-       Definition
-       ----------
-       def SampleInputMatrix(nrows, npars, bl, bu, distname='randomUniform'):
+        Definition
+        ----------
+        def SampleInputMatrix(nrows, npars, bl, bu, distname='randomUniform'):
 
 
-       Input
-       -----
-       nrows             # of simulations
-       npars             # of parameters
-       bl                (npars) lower bounds of parameters
-       bu                (npars) upper bounds of parameters
+        Input
+        -----
+        nrows             # of simulations
+        npars             # of parameters
+        bl                (npars) lower bounds of parameters
+        bu                (npars) upper bounds of parameters
 
 
-       Optional Input
-       --------------
-       distname          initial sampling ditribution (not implemented yet, takes uniform distribution)
+        Optional Input
+        --------------
+        distname          initial sampling ditribution (not implemented yet, takes uniform distribution)
 
 
-       Output
-       ------
-       parameter matrix (nrows, npars) with new parameter samples
+        Output
+        ------
+        parameter matrix (nrows, npars) with new parameter samples
 
 
-       References
-       ----------
-       Duan, Q., S. Sorooshian, and V. Gupta,
-           Effective and efficient global optimization for conceptual rainfall-runoff models,
-           Water Resour. Res., 28, 1015-1031, 1992.
+        References
+        ----------
+        Duan, Q., S. Sorooshian, and V. Gupta,
+            Effective and efficient global optimization for conceptual rainfall-runoff models,
+            Water Resour. Res., 28, 1015-1031, 1992.
 
 
-       License
-       -------
-       This file is part of the UFZ Python library.
+        License
+        -------
+        This file is part of the UFZ Python library.
 
-       The UFZ Python library is free software: you can redistribute it and/or modify
-       it under the terms of the GNU Lesser General Public License as published by
-       the Free Software Foundation, either version 3 of the License, or
-       (at your option) any later version.
+        The UFZ Python library is free software: you can redistribute it and/or modify
+        it under the terms of the GNU Lesser General Public License as published by
+        the Free Software Foundation, either version 3 of the License, or
+        (at your option) any later version.
 
-       The UFZ Python library is distributed in the hope that it will be useful,
-       but WITHOUT ANY WARRANTY; without even the implied warranty of
-       MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-       GNU Lesser General Public License for more details.
+        The UFZ Python library is distributed in the hope that it will be useful,
+        but WITHOUT ANY WARRANTY; without even the implied warranty of
+        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+        GNU Lesser General Public License for more details.
 
-       You should have received a copy of the GNU Lesser General Public License
-       along with The UFZ Python library.  If not, see <http://www.gnu.org/licenses/>.
+        You should have received a copy of the GNU Lesser General Public License
+        along with the UFZ makefile project (cf. gpl.txt and lgpl.txt).
+        If not, see <http://www.gnu.org/licenses/>.
 
-       Copyright 2013 Matthias Cuntz
+        Copyright 2013 Matthias Cuntz
 
 
-       History
-       -------
-       Written,  Q. Duan, Sep 2004
-       Modified, S. Van Hoey 2011 - ported to Python
-                 MC, Oct 2013 - adapted to UFZ library and sync with UFZ Fortran version
+        History
+        -------
+        Written,  Q. Duan, Sep 2004
+        Modified, S. Van Hoey 2011 - ported to Python
+                  MC, Oct 2013     - adapted to UFZ library and sync with UFZ Fortran version
     '''
     x = np.zeros((nrows,npars))
     bound = bu-bl
@@ -74,71 +75,72 @@ def SampleInputMatrix(nrows, npars, bl, bu, distname='randomUniform'):
 
 def cce(functn, s, sf, bl, bu, icall, maxn, alpha, beta, maxit, printit):
     '''
-       Generate a new point in a simplex
+        Generate a new point in a simplex
 
 
-       Definition
-       ----------
-       def cce(functn, s, sf, bl, bu, icall, maxn, alpha, beta, maxit, printit):
+        Definition
+        ----------
+        def cce(functn, s, sf, bl, bu, icall, maxn, alpha, beta, maxit, printit):
 
 
-       Input
-       -----
-       functn            function to minimise
-       s                 2D-array, the sorted simplex in order of increasing function values
-       sf                1D-array, function values in increasing order
-       bl                (npars) lower bounds of parameters
-       bu                (npars) upper bounds of parameters
-       icall             counter of function calls
-       maxn              maximum number of function evaluations allowed during optimization
-       alpha             parameter for reflection  of points in complex
-       beta              parameter for contraction of points in complex
-       maxit             if True: maximise instead of minimise functn
-       printit           if ==1: print each function evaluation
+        Input
+        -----
+        functn            function to minimise
+        s                 2D-array, the sorted simplex in order of increasing function values
+        sf                1D-array, function values in increasing order
+        bl                (npars) lower bounds of parameters
+        bu                (npars) upper bounds of parameters
+        icall             counter of function calls
+        maxn              maximum number of function evaluations allowed during optimization
+        alpha             parameter for reflection  of points in complex
+        beta              parameter for contraction of points in complex
+        maxit             if True: maximise instead of minimise functn
+        printit           if ==1: print each function evaluation
 
 
-       Optional Input
-       --------------
-       None
+        Optional Input
+        --------------
+        None
 
 
-       Output
-       ------
-       new parameter set, function value of new set, number of function calls
+        Output
+        ------
+        new parameter set, function value of new set, number of function calls
 
 
-       References
-       ----------
-       Duan, Q., S. Sorooshian, and V. Gupta,
-           Effective and efficient global optimization for conceptual rainfall-runoff models,
-           Water Resour. Res., 28, 1015-1031, 1992.
+        References
+        ----------
+        Duan, Q., S. Sorooshian, and V. Gupta,
+            Effective and efficient global optimization for conceptual rainfall-runoff models,
+            Water Resour. Res., 28, 1015-1031, 1992.
 
 
-       License
-       -------
-       This file is part of the UFZ Python library.
+        License
+        -------
+        This file is part of the UFZ Python library.
 
-       The UFZ Python library is free software: you can redistribute it and/or modify
-       it under the terms of the GNU Lesser General Public License as published by
-       the Free Software Foundation, either version 3 of the License, or
-       (at your option) any later version.
+        The UFZ Python library is free software: you can redistribute it and/or modify
+        it under the terms of the GNU Lesser General Public License as published by
+        the Free Software Foundation, either version 3 of the License, or
+        (at your option) any later version.
 
-       The UFZ Python library is distributed in the hope that it will be useful,
-       but WITHOUT ANY WARRANTY; without even the implied warranty of
-       MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-       GNU Lesser General Public License for more details.
+        The UFZ Python library is distributed in the hope that it will be useful,
+        but WITHOUT ANY WARRANTY; without even the implied warranty of
+        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+        GNU Lesser General Public License for more details.
 
-       You should have received a copy of the GNU Lesser General Public License
-       along with The UFZ Python library.  If not, see <http://www.gnu.org/licenses/>.
+        You should have received a copy of the GNU Lesser General Public License
+        along with the UFZ makefile project (cf. gpl.txt and lgpl.txt).
+        If not, see <http://www.gnu.org/licenses/>.
 
-       Copyright 2013 Matthias Cuntz
+        Copyright 2013 Matthias Cuntz
 
 
-       History
-       -------
-       Written,  Q. Duan, Sep 2004
-       Modified, S. Van Hoey 2011 - ported to Python
-                 MC, Oct 2013 - adapted to UFZ library and sync with UFZ Fortran version
+        History
+        -------
+        Written,  Q. Duan, Sep 2004
+        Modified, S. Van Hoey 2011 - ported to Python
+                  MC, Oct 2013 - adapted to UFZ library and sync with UFZ Fortran version
     '''
 
     '''
@@ -220,124 +222,125 @@ def sce(functn, x0, bl, bu,
           alpha=0.8, beta=0.45, maxit=False, printit=0,
           outf=False, outhist=False, outcall=False):
     '''
-       Shuffled-Complex-Evolution algorithm for function minimalisation
+        Shuffled-Complex-Evolution algorithm for function minimalisation
 
 
-       Definition
-       ----------
-       def sce(functn, x0, bl, bu,
-                 maxn=1000, kstop=10, pcento=0.0001,
-                 ngs=2, npg=None, nps=None, nspl=None, mings=None,
-                 peps=0.001, seed=0, iniflg=True,
-                 alpha=0.8, beta=0.45, maxit=False, printit=0,
-                 outf=False, outhist=False, outcall=False):
+        Definition
+        ----------
+        def sce(functn, x0, bl, bu,
+                  maxn=1000, kstop=10, pcento=0.0001,
+                  ngs=2, npg=None, nps=None, nspl=None, mings=None,
+                  peps=0.001, seed=0, iniflg=True,
+                  alpha=0.8, beta=0.45, maxit=False, printit=0,
+                  outf=False, outhist=False, outcall=False):
 
 
-       Input
-       -----
-       functn            function to minimise
-       x0                1D-array of size nopt, initial parameter set
-       bl                (npars) lower bounds of parameters
-       bu                (npars) upper bounds of parameters
+        Input
+        -----
+        functn            function to minimise
+        x0                1D-array of size nopt, initial parameter set
+        bl                (npars) lower bounds of parameters
+        bu                (npars) upper bounds of parameters
 
 
-       Optional Input
-       --------------
-       maxn              maximum number of function evaluations allowed during optimization (default: 1000)
-       kstop             maximum number of evolution loops before convergency (default: 10)
-       pcento            the percentage change allowed in kstop loops before convergency (default: 0.0001)
-       peps              value of normalised geometric range needed for convergence (default: 0.001)
-       ngs               number of complexes (default: 2)
-       npg               number of points in each complex (default: 2*nopt+1)
-       nps               number of points in each sub-complex (default: nopt+1)
-       mings             minimum number of complexes required if the number of complexes is allowed to reduce as the
-                         optimization proceeds (default: ngs)
-       nspl              number of evolution steps allowed for each complex before complex shuffling (default: 2*nopt+1)
-       seed              if >0, the random number seed (default: 0)
-       iniflg            if True: include initial parameter in initial population (default: True)
-       alpha             parameter for reflection  of points in complex (default: 0.8)
-       beta              parameter for contraction of points in complex (default: 0.45)
-       maxit             if True: maximise instead of minimise functn (default: false)
-       printit           controlling print-out (default: 2)
-                         0: print information on the best point of the population
-                         1: print information on each function evaluation
-                         2: no printing
-       outf              if True: return best function value (default: False)
-       outhist           if True: return parameters and function values of each evolution loop (default: False)
-       outcall           if True: return number of function evaluations (default: False)
+        Optional Input
+        --------------
+        maxn              maximum number of function evaluations allowed during optimization (default: 1000)
+        kstop             maximum number of evolution loops before convergency (default: 10)
+        pcento            the percentage change allowed in kstop loops before convergency (default: 0.0001)
+        peps              value of normalised geometric range needed for convergence (default: 0.001)
+        ngs               number of complexes (default: 2)
+        npg               number of points in each complex (default: 2*nopt+1)
+        nps               number of points in each sub-complex (default: nopt+1)
+        mings             minimum number of complexes required if the number of complexes is allowed to reduce as the
+                          optimization proceeds (default: ngs)
+        nspl              number of evolution steps allowed for each complex before complex shuffling (default: 2*nopt+1)
+        seed              if >0, the random number seed (default: 0)
+        iniflg            if True: include initial parameter in initial population (default: True)
+        alpha             parameter for reflection  of points in complex (default: 0.8)
+        beta              parameter for contraction of points in complex (default: 0.45)
+        maxit             if True: maximise instead of minimise functn (default: false)
+        printit           controlling print-out (default: 2)
+                          0: print information on the best point of the population
+                          1: print information on each function evaluation
+                          2: no printing
+        outf              if True: return best function value (default: False)
+        outhist           if True: return parameters and function values of each evolution loop (default: False)
+        outcall           if True: return number of function evaluations (default: False)
 
 
-       Output
-       ------
-       best parameter set
-       depending on outf, outhist and outcall also
-           function value at best parameter set
-           vector of best parameters sets per evolution, function values of the best parameter vector
-           number of function evaluations
+        Output
+        ------
+        best parameter set
+        depending on outf, outhist and outcall also
+            function value at best parameter set
+            vector of best parameters sets per evolution, function values of the best parameter vector
+            number of function evaluations
 
 
-       References
-       ----------
-       Duan, Q., S. Sorooshian, and V. Gupta,
-           Effective and efficient global optimization for conceptual rainfall-runoff models,
-           Water Resour. Res., 28, 1015-1031, 1992.
+        References
+        ----------
+        Duan, Q., S. Sorooshian, and V. Gupta,
+            Effective and efficient global optimization for conceptual rainfall-runoff models,
+            Water Resour. Res., 28, 1015-1031, 1992.
 
 
-       Example
-       -------
-       >>> import numpy as np
-       >>> from functions import ackley, rosenbrock
-       >>> from autostring import astr
+        Example
+        -------
+        >>> import numpy as np
+        >>> from functions import ackley, rosenbrock
+        >>> from autostring import astr
 
-       >>> bl = np.array([-5.,-2.])
-       >>> bu = np.array([5.,8.])
-       >>> x0 = np.array([-2.,7.])
-       >>> bestx, bestf, icall = sce(rosenbrock, x0, bl, bu, seed=1, maxn=1000, outf=True, outcall=True, printit=2)
-       >>> print(astr(icall))
-       298
-       >>> print(astr(bestf,3))
-       0.001
+        >>> bl = np.array([-5.,-2.])
+        >>> bu = np.array([5.,8.])
+        >>> x0 = np.array([-2.,7.])
+        >>> bestx, bestf, icall = sce(rosenbrock, x0, bl, bu, seed=1, maxn=1000, outf=True, outcall=True, printit=2)
+        >>> print(astr(icall))
+        298
+        >>> print(astr(bestf,3))
+        0.001
 
-       >>> nopt = 30
-       >>> bl = np.ones((30))*(-10.)
-       >>> bu = np.ones((30))*(10.)
-       >>> x0 = np.ones((30))*(0.5)
-       >>> bestx, bestf, icall = sce(ackley, x0, bl, bu,
-       ...                           maxn=30000, kstop=10, pcento=0.0001, seed=10987,
-       ...                           ngs=2, npg=2*nopt+1, nps=nopt+1, nspl=2*nopt+1, mings=2,
-       ...                           iniflg=True, printit=2, alpha=0.8, beta=0.45,
-       ...                           outf=True, outcall=True)
-       >>> print(astr(icall))
-       4608
-       >>> print(astr(bestf,3))
-       0.014
-
-
-       License
-       -------
-       This file is part of the UFZ Python library.
-
-       The UFZ Python library is free software: you can redistribute it and/or modify
-       it under the terms of the GNU Lesser General Public License as published by
-       the Free Software Foundation, either version 3 of the License, or
-       (at your option) any later version.
-
-       The UFZ Python library is distributed in the hope that it will be useful,
-       but WITHOUT ANY WARRANTY; without even the implied warranty of
-       MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-       GNU Lesser General Public License for more details.
-
-       You should have received a copy of the GNU Lesser General Public License
-       along with The UFZ Python library.  If not, see <http://www.gnu.org/licenses/>.
-
-       Copyright 2013 Matthias Cuntz
+        >>> nopt = 30
+        >>> bl = np.ones((30))*(-10.)
+        >>> bu = np.ones((30))*(10.)
+        >>> x0 = np.ones((30))*(0.5)
+        >>> bestx, bestf, icall = sce(ackley, x0, bl, bu,
+        ...                           maxn=30000, kstop=10, pcento=0.0001, seed=10987,
+        ...                           ngs=2, npg=2*nopt+1, nps=nopt+1, nspl=2*nopt+1, mings=2,
+        ...                           iniflg=True, printit=2, alpha=0.8, beta=0.45,
+        ...                           outf=True, outcall=True)
+        >>> print(astr(icall))
+        4608
+        >>> print(astr(bestf,3))
+        0.014
 
 
-       History
-       -------
-       Written,  Q. Duan, Sep 2004
-       Modified, S. Van Hoey 2011 - ported to Python
-                 MC, Oct 2013 - adapted to UFZ library and sync with UFZ Fortran version
+        License
+        -------
+        This file is part of the UFZ Python library.
+
+        The UFZ Python library is free software: you can redistribute it and/or modify
+        it under the terms of the GNU Lesser General Public License as published by
+        the Free Software Foundation, either version 3 of the License, or
+        (at your option) any later version.
+
+        The UFZ Python library is distributed in the hope that it will be useful,
+        but WITHOUT ANY WARRANTY; without even the implied warranty of
+        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+        GNU Lesser General Public License for more details.
+
+        You should have received a copy of the GNU Lesser General Public License
+        along with the UFZ makefile project (cf. gpl.txt and lgpl.txt).
+        If not, see <http://www.gnu.org/licenses/>.
+
+        Copyright 2013 Matthias Cuntz
+
+
+        History
+        -------
+        Written,  Q. Duan, Sep 2004
+        Modified, S. Van Hoey 2011 - ported to Python
+                  MC, Oct 2013 - adapted to UFZ library and sync with UFZ Fortran version
     '''
 
     '''

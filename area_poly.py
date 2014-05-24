@@ -28,10 +28,10 @@ def area_poly(x, y):
         ----------
         Code from http://stackoverflow.com/questions/451426/how-do-i-calculate-the-surface-area-of-a-2d-polygon
         From the website:
-        It is an application of Green's theorem (http://en.wikipedia.org/wiki/Green%27s_theorem#Area_Calculation)
-        for the functions -y and x; exactly in the way a planimeter works.
-        More specifically:
-        Formula above = integral_permieter(-y dx + x dy) = integral_area((-(-dy)/dy+dx/dx)dydyx = 2 Area
+          It is an application of Green's theorem (http://en.wikipedia.org/wiki/Green%27s_theorem#Area_Calculation)
+          for the functions -y and x; exactly in the way a planimeter works.
+          More specifically:
+            Formula above = integral_perimeter(-y dx + x dy) = integral_area((-(-dy)/dy+dx/dx)dydyx = 2*Area
 
 
         Example
@@ -58,7 +58,8 @@ def area_poly(x, y):
         GNU Lesser General Public License for more details.
 
         You should have received a copy of the GNU Lesser General Public License
-        along with The UFZ Python library.  If not, see <http://www.gnu.org/licenses/>.
+        along with the UFZ makefile project (cf. gpl.txt and lgpl.txt).
+        If not, see <http://www.gnu.org/licenses/>.
 
         Copyright 2012-2013 Matthias Cuntz
 

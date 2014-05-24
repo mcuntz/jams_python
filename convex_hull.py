@@ -36,7 +36,7 @@ def convex_hull(points, graphic=False, smidgen=0.0075):
         This routine (with additional subroutines) was coded originally by
         Angus McMorland, 2007.
         It is a copy from the scipy cookbook page:
-        http://www.scipy.org/Cookbook/Finding_Convex_Hull
+            http://www.scipy.org/Cookbook/Finding_Convex_Hull
 
 
         Examples
@@ -68,8 +68,8 @@ def convex_hull(points, graphic=False, smidgen=0.0075):
         GNU Lesser General Public License for more details.
 
         You should have received a copy of the GNU Lesser General Public License
-        along with The UFZ Python library.  If not,
-        see <http://www.gnu.org/licenses/>.
+        along with the UFZ makefile project (cf. gpl.txt and lgpl.txt).
+        If not, see <http://www.gnu.org/licenses/>.
 
         Copyright 2009-2013 Arndt Piayda, Matthias Cuntz
 

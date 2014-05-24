@@ -32,7 +32,8 @@ def correlate(x, y, axis=None):
         Output
         ------
         Returns the values of the cross-correlation at different lags.
-        Lags are given as [0,1,2,...,n,n-1,n-2,...,-2,-1].
+        Lags are given as [0,1,2,...,n,n-1,n-2,...,-2,-1],
+        so that the output has a kind of u-shape.
 
 
         References
@@ -74,7 +75,8 @@ def correlate(x, y, axis=None):
         GNU Lesser General Public License for more details.
 
         You should have received a copy of the GNU Lesser General Public License
-        along with The UFZ Python library.  If not, see <http://www.gnu.org/licenses/>.
+        along with the UFZ makefile project (cf. gpl.txt and lgpl.txt).
+        If not, see <http://www.gnu.org/licenses/>.
 
         Copyright 2014 Matthias Cuntz
 

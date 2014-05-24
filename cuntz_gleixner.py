@@ -24,332 +24,323 @@ def cuntz_gleixner(idecdate, iGPP, iRd, iCa, iRa, igtot, sunrise, Vcyt=None,
                    fullmodel=True, julian=True, nocheck=False,
                    starch_mol2g=None, V0starchg=const.tiny):
     """
-       Calculates the Cuntz-Gleixner steady state and non-steady state models
-       of 13C discrimiantion in the Calvin cycle.
+        Calculates the Cuntz-Gleixner steady state and non-steady state models
+        of 13C discrimiantion in the Calvin cycle.
 
 
-       Definition
-       ----------
-       def cuntz_gleixner(idecdate, iGPP, iRd, iCa, iRa, igtot, sunrise, Vcyt=None,
-                          date0=False,
-                          V0starch=const.tiny, R0starch=const.RPDB,
-                          R0cyt=const.RPDB,
-                          daynight=None, daylength=57600,
-                          Phi=0.3, s_resid=const.tiny,
-                          betas=None, betap=0.75,
-                          epsa=4.4e-3, epsb=29.5e-3,
-                          epsg=20.0e-3, epst=-4.4e-3,
-                          epss=10.0e-3, epsp=1.0e-3,
-                          steady=False,
-                          Rass=False, Rm=False, Rchl=False,
-                          Rcyt=False, Rstarch=False,
-                          Rpyr=False, Rbio=False,
-                          Rphloem=False,
-                          Vstarch=False, ass13=False, disc=False,
-                          Rnew_starch=False, Rnew_cyt=False,
-                          fullmodel=True, julian=True, nocheck=False,
-                          starch_mol2g=None, V0starchg=const.tiny):
+        Definition
+        ----------
+        def cuntz_gleixner(idecdate, iGPP, iRd, iCa, iRa, igtot, sunrise, Vcyt=None,
+                           date0=False,
+                           V0starch=const.tiny, R0starch=const.RPDB,
+                           R0cyt=const.RPDB,
+                           daynight=None, daylength=57600,
+                           Phi=0.3, s_resid=const.tiny,
+                           betas=None, betap=0.75,
+                           epsa=4.4e-3, epsb=29.5e-3,
+                           epsg=20.0e-3, epst=-4.4e-3,
+                           epss=10.0e-3, epsp=1.0e-3,
+                           steady=False,
+                           Rass=False, Rm=False, Rchl=False,
+                           Rcyt=False, Rstarch=False,
+                           Rpyr=False, Rbio=False,
+                           Rphloem=False,
+                           Vstarch=False, ass13=False, disc=False,
+                           Rnew_starch=False, Rnew_cyt=False,
+                           fullmodel=True, julian=True, nocheck=False,
+                           starch_mol2g=None, V0starchg=const.tiny):
 
 
-       Input
-       -----
-       idecdate         decimal date
-       iGPP             Gross Photosynthesis: GPP = A + Rd [umol(CO2)/m2s]
-       iRd              Leaf respiration: GPP - A [umol(CO2)/m2s]
-       iCa              Outside CO2 concentration [ppm=umol(CO2)/umol(air)]
-       iRa              13C/12C ratio of outside CO2 concentration
-       igtot            Total conductance for CO2 from outside air to chloroplast [mol(CO2)/m2s]
-       sunrise         decial date of first sunrise in data set
+        Input
+        -----
+        idecdate         decimal date
+        iGPP             Gross Photosynthesis: GPP = A + Rd [umol(CO2)/m2s]
+        iRd              Leaf respiration: GPP - A [umol(CO2)/m2s]
+        iCa              Outside CO2 concentration [ppm=umol(CO2)/umol(air)]
+        iRa              13C/12C ratio of outside CO2 concentration
+        igtot            Total conductance for CO2 from outside air to chloroplast [mol(CO2)/m2s]
+        sunrise         decial date of first sunrise in data set
 
 
-       Input (only nss model)
-       -----
-       Vcyt            C-concentration of sucrose pool in cytoplasm [umol(C)/m2(leaf)]
+        Input (only nss model)
+        -----
+        Vcyt            C-concentration of sucrose pool in cytoplasm [umol(C)/m2(leaf)]
 
 
-       Optional Input
-       --------------
-       date0           Start date of 1st time step (default: False)
-                       If False, take same time step as first time step in idecdate
-       V0starch        Initial C-concentration in Starch [umol(C)/m2(leaf)] (default: 1e-6)
-       V0starchg       Initial C-concentration in Starch [g(C)/gDW] (default: 1e-6)
-       starch_mol2g    Conversion factor from [umol(C)/m2(leaf)] to [g(C)/gDW] used for starch (default: None)
-                       If given and Vstarch==True then Vstarchg will be returned as well
-       R0starch        Initial 13C/12C ratio of starch pool (default: PDB)
-       R0cyt           Initial 13C/12C ratio of C in cytoplasm (default: PDB)
-       daynight        1/0 array of day or night (default: False)
-                       If False, day is when gpp>0
-       daylength       length of daylight [s] (default: 57600 = 16h)
-       Phi             Vc/Vo, ratio of carboxylation to oxygenation of Rudisco (default: 0.3)
-       s_resid         Residual starch concentration at end of night [umol(C)/m2(leaf)] (default: 1e-6)
-       betas           factor of leaf respiration transferred to biosynthesis (default: False)
-                       If False, betas is 3*gpp/max(gpp)
-                       Note: betas*(1-betap) <= 1: if betap=2/3 -> betas<3: if betap=5/6 -> betas < 6
-       betap           fraction of respiration occuring during biosynthesis: min=2/3; max=4/5 (default: 3/4)
-       epsa            effective fractionation along gtot (default: 4.4e-3)
-       epsb            fractionation of Rubisco (default: 29.5e-3)
-       epsg            fractionation of photorespiration (default: 20e-3)
-       epst            equilibrium fractionation value for starch synthesis (default: -4.4e-3)
-       epss            fractionation of biosynthesis production (default: 10e-3)
-       epsp            fractionation of biosynthesis bifurcation (default: 1e-3)
+        Optional Input
+        --------------
+        date0           Start date of 1st time step (default: False)
+                        If False, take same time step as first time step in idecdate
+        V0starch        Initial C-concentration in Starch [umol(C)/m2(leaf)] (default: 1e-6)
+        V0starchg       Initial C-concentration in Starch [g(C)/gDW] (default: 1e-6)
+        starch_mol2g    Conversion factor from [umol(C)/m2(leaf)] to [g(C)/gDW] used for starch (default: None)
+                        If given and Vstarch==True then Vstarchg will be returned as well
+        R0starch        Initial 13C/12C ratio of starch pool (default: PDB)
+        R0cyt           Initial 13C/12C ratio of C in cytoplasm (default: PDB)
+        daynight        1/0 array of day or night (default: False)
+                        If False, day is when gpp>0
+        daylength       length of daylight [s] (default: 57600 = 16h)
+        Phi             Vc/Vo, ratio of carboxylation to oxygenation of Rudisco (default: 0.3)
+        s_resid         Residual starch concentration at end of night [umol(C)/m2(leaf)] (default: 1e-6)
+        betas           factor of leaf respiration transferred to biosynthesis (default: False)
+                        If False, betas is 3*gpp/max(gpp)
+                        Note: betas*(1-betap) <= 1: if betap=2/3 -> betas<3: if betap=5/6 -> betas < 6
+        betap           fraction of respiration occuring during biosynthesis: min=2/3; max=4/5 (default: 3/4)
+        epsa            effective fractionation along gtot (default: 4.4e-3)
+        epsb            fractionation of Rubisco (default: 29.5e-3)
+        epsg            fractionation of photorespiration (default: 20e-3)
+        epst            equilibrium fractionation value for starch synthesis (default: -4.4e-3)
+        epss            fractionation of biosynthesis production (default: 10e-3)
+        epsp            fractionation of biosynthesis bifurcation (default: 1e-3)
 
 
-       Parameter
-       ---------
-       steady        If True, steady-state instead of non-steady-state model (default: False)
-       Rass          If True, output 13C/12C ratio of assimilated carbon (default: False)
-       Rm            If True, output 13C/12C ratio of chloroplast CO2 (default: False)
-       Rchl          If True, output 13C/12C ratio of sugars in chloroplast (default: False)
-       Rcyt          If True, output 13C/12C ratio of sugars in cytoplasm (default: False)
-       Rstarch       If True, output 13C/12C ratio of starch (default: False)
-       Rpyr          If True, output 13C/12C ratio of sugars at pyruvate pathway (default: False)
-       Rbio          If True, output 13C/12C ratio of biosynthesis products before bifurcation (default: False)
-       Rphloem       If True, output 13C/12C ratio of new phloem products (sugars & biosynthesis products) (default: False)
-       Vstarch       If True, output C-concentration in Starch [umol(C)/m2(leaf)] (default: False)
-       ass13         If True, output 13C assimilation rate  [umol(13C)/m2s] (default: False)
-       disc          If True, output Discrimination 1-Rass/Ra (default: False)
-       Rnew_starch   If True, output 13C/12C ratio of newly produced starch (default: False)
-       Rnew_cyt      If True, output 13C/12C ratio of newly produced sugars in cytoplasm (default: False)
-       fullmodel     If True, output all in the above order (default: True)
-       julian        If True, dates are given as Julian days, otherwise as decimal year (default: True)
-       nocheck       If True, do not check betap and betas ranges (default: False)
+        Parameter
+        ---------
+        steady        If True, steady-state instead of non-steady-state model (default: False)
+        Rass          If True, output 13C/12C ratio of assimilated carbon (default: False)
+        Rm            If True, output 13C/12C ratio of chloroplast CO2 (default: False)
+        Rchl          If True, output 13C/12C ratio of sugars in chloroplast (default: False)
+        Rcyt          If True, output 13C/12C ratio of sugars in cytoplasm (default: False)
+        Rstarch       If True, output 13C/12C ratio of starch (default: False)
+        Rpyr          If True, output 13C/12C ratio of sugars at pyruvate pathway (default: False)
+        Rbio          If True, output 13C/12C ratio of biosynthesis products before bifurcation (default: False)
+        Rphloem       If True, output 13C/12C ratio of new phloem products (sugars & biosynthesis products) (default: False)
+        Vstarch       If True, output C-concentration in Starch [umol(C)/m2(leaf)] (default: False)
+        ass13         If True, output 13C assimilation rate  [umol(13C)/m2s] (default: False)
+        disc          If True, output Discrimination 1-Rass/Ra (default: False)
+        Rnew_starch   If True, output 13C/12C ratio of newly produced starch (default: False)
+        Rnew_cyt      If True, output 13C/12C ratio of newly produced sugars in cytoplasm (default: False)
+        fullmodel     If True, output all in the above order (default: True)
+        julian        If True, dates are given as Julian days, otherwise as decimal year (default: True)
+        nocheck       If True, do not check betap and betas ranges (default: False)
 
 
-       Output
-       ------
-       if fullmodel=True
-         Rass, Rm, Rchl, Rcyt, Rstarch, Rpyr, Rbio, Rphloem, Vstarch, ass13, disc, Rnew_starch, Rnew_cyt
-       and if Vstarch=True and starch_mol2g!=None
-         Vstarchg
+        Output
+        ------
+        if fullmodel=True
+          Rass, Rm, Rchl, Rcyt, Rstarch, Rpyr, Rbio, Rphloem, Vstarch, ass13, disc, Rnew_starch, Rnew_cyt
+        and if Vstarch=True and starch_mol2g!=None
+          Vstarchg
 
 
-       Restrictions
-       ------------
-       If at least one individual output parameter is True then fullmode=False.
+        Restrictions
+        ------------
+        If at least one individual output parameter is True then fullmode=False.
 
 
-       References
-       ----------
-       Tcherkez G, Farquhar GD, Badeck F & Ghashghaie J, Theoretical considerations about carbon isotope
-          distribution in glucose of C3 plants, Functional Plant Biology 31, 857-877, 2004
-       Gessler A, Tcherkez G, Peuke AD, Ghashghaie J & Farquhar GD, Experimental evidence for diel variations
-          of the carbon isotope composition in leaf, stem and phloem sap organic matter in Ricinus communis,
-          Plant, Cell and Environment 31, 941-953, 2004
+        References
+        ----------
+        Tcherkez G, Farquhar GD, Badeck F & Ghashghaie J, Theoretical considerations about carbon isotope
+           distribution in glucose of C3 plants, Functional Plant Biology 31, 857-877, 2004
+        Gessler A, Tcherkez G, Peuke AD, Ghashghaie J & Farquhar GD, Experimental evidence for diel variations
+           of the carbon isotope composition in leaf, stem and phloem sap organic matter in Ricinus communis,
+           Plant, Cell and Environment 31, 941-953, 2004
 
 
-       Examples
-       --------
-       # steady state
-       >>> adecdate = np.array([2008.918658925319050,2008.918772768671033,2008.918886612022106,
-       ...                      2008.919000455374089,2008.919114298724935,2008.919228142076918,
-       ...                      2008.919341985427991,2008.919455828779974,2008.919569672131956,
-       ...                      2008.919683515483030,2008.919797358835012,2008.919911202186086,
-       ...                      2008.920025045538068,2008.920138888888914,2008.920252732240897,
-       ...                      2008.920366575591970,2008.920480418943953,2008.920556314511941,
-       ...                      2008.920594262295026,2008.920708105647009,2008.920821948998992,
-       ...                      2008.920935792350065,2008.921049635702047,2008.921163479052893,
-       ...                      2008.921277322405103,2008.921391165755949,2008.921505009107932])
-       >>> gpp = np.array([0.000000000000,23.700827991217,22.449718259243,21.253578109071,20.222525197027,
-       ...                   19.503625355216,18.797132965271,18.102416224453,17.780887860470,17.491607940331,
-       ...                   17.207072197663,17.089915139494,17.995854647885,18.901914959729,19.681631460738,
-       ...                   19.681631460738,19.681631460738,0.000000000000,0.000000000000,0.000000000000,
-       ...                   0.000000000000,0.000000000000,0.000000000000,0.000000000000,0.000000000000,
-       ...                   0.000000000000] )
-       >>> Rd = np.array([0.511900000000,2.361686144687,2.743373026721,3.180029474251,3.476842651940,
-       ...                  3.259038512076,3.053641828083,2.860020793216,2.958750580931,3.083603451827,
-       ...                  3.213200496886,3.331826587704,3.352936200975,3.374166608865,3.392531460738,
-       ...                  3.392531460738,3.392531460738,1.025929405070,0.829676977143,0.633424549217,
-       ...                  0.437172122858,0.303515021488,0.547877741613,0.792240464668,1.036603184794,
-       ...                  1.280965907360] )
-       >>> CO2air = np.array([620.902600000000,537.510500000000,608.806500000000,671.251000000000,
-       ...                      652.204000000000,560.157800000000,427.130100000000,395.276000000000,
-       ...                      427.000400000000,410.953300000000,386.943500000000,500.417500000000,
-       ...                      552.776800000000,515.865800000000,542.450400000000,692.503500000000,
-       ...                      656.423500000000,588.844100000000,675.156500000000,725.101900000000,
-       ...                      664.837000000000,598.080600000000,610.713600000000,487.087000000000,
-       ...                      531.921300000000,675.177700000000] )
-       >>> Ra = np.array([0.011067265443,0.011083081802,0.011071245659,0.011060401761,0.011063313320,
-       ...                  0.011080216316,0.011111970396,0.011122420992,0.011111174802,0.011116914764,
-       ...                  0.011125605614,0.011097923896,0.011079382516,0.011087211473,0.011083896499,
-       ...                  0.011057329511,0.011062335683,0.011072518834,0.011061590657,0.011053508863,
-       ...                  0.011061281634,0.011071628848,0.011069690431,0.011093962783,0.011086022577,
-       ...                  0.011059558971] )
-       >>> gtot = np.array([0.064395001124,0.074054920058,0.078085762302,0.078484156864,0.078127160737,
-       ...                    0.085209848990,0.088685679784,0.089611189047,0.088528095110,0.086087621579,
-       ...                    0.081901616151,0.076984314568,0.080693530135,0.084173028182,0.087005780100,
-       ...                    0.087005780100,0.087005780100,0.046798889383,0.042324852911,0.037583815518,
-       ...                    0.032460459750,0.028193059760,0.031985237181,0.035564641600,0.038983725824,
-       ...                    0.042282334176] )
-       >>> ndecdate = 2008.918772768670806
-       >>> V0starch = 60498.901260546168
-       >>> R0starch = 0.010949362493
-       >>> daynight = np.array([0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0])
-       >>> daylength = 56400.
-       >>> Phi = np.array([0.081107124487,0.228537911761,0.178664767959,0.161131279216,0.173373369802,
-       ...                   0.195820137312,0.276226485398,0.291675965181,0.259480203313,0.285111049806,
-       ...                   0.331368464761,0.228636707479,0.199019858196,0.224041328002,0.209848472684,
-       ...                   0.147530335706,0.158874834596,0.090595209673,0.077545142771,0.070693599170,
-       ...                   0.075277039328,0.082213420279,0.081562178107,0.102842605886,0.095940191411,
-       ...                   0.077688517811] )
-       >>> s_resid = 40532.561476983901
-       >>> betas = np.array([0.000000000000,4.999999000000,4.736061020188,4.483719593421,4.266205481166,
-       ...                     4.114544146364,3.965500325995,3.818940732998,3.751110114569,3.690082727626,
-       ...                     3.630056187040,3.605340371581,3.796460173119,3.987605459727,4.152096865111,
-       ...                     4.152096865111,4.152096865111,0.000000000000,0.000000000000,0.000000000000,
-       ...                     0.000000000000,0.000000000000,0.000000000000,0.000000000000,0.000000000000,
-       ...                     0.000000000000] )
-       >>> betap = 0.8
-       >>> epsa = np.array([0.002995512907,0.003039740417,0.003192366495,0.003375544906,0.003479516543,
-       ...                    0.003318658489,0.003187204366,0.003078822327,0.003144673535,0.003235857882,
-       ...                    0.003343598868,0.003447509132,0.003408830551,0.003373557382,0.003345605523,
-       ...                    0.003345605523,0.003345605523,0.003500242606,0.003551923813,0.003615033761,
-       ...                    0.003693231875,0.003766948014,0.003706681514,0.003655727827,0.003612282052,
-       ...                    0.003574980671] )
-       >>> epsb = 0.029
-       >>> epsg = 0.0185
-       >>> epst = -0.004
-       >>> epss = 0.01
-       >>> epsp = 0.003
-       >>> [Vstarch] = cuntz_gleixner(adecdate[1:], gpp, Rd, CO2air, Ra, gtot, ndecdate,
-       ...                            date0=adecdate[0], V0starch=V0starch, R0starch=R0starch, daynight=daynight,
-       ...                            daylength=daylength, Phi=Phi, s_resid=s_resid,
-       ...                            betas=betas, betap=betap, epsa=epsa, epsb=epsb,
-       ...                            epsg=epsg, epst=epst, epss=epss, epsp=epsp,
-       ...                            steady=True, Vstarch=True, julian=False)
-       >>> from autostring import astr
-       >>> print(astr(Vstarch[0:6],6,pp=True))
-       [' 40532.561477' ' 70158.596466' ' 98220.744290' '124787.716926' '150065.873423' '174445.405117']
-       >>> [Rass,Rm,Rchl,Rcyt,Rstarch,Rpyr,Rbio,Rphloem,Vstarch,ass13,disc,Rnew_starch,Rnew_cyt,Vstarchg] = cuntz_gleixner(
-       ...                adecdate[1:], gpp, Rd, CO2air, Ra, gtot, ndecdate,
-       ...                date0=adecdate[0], V0starch=V0starch, R0starch=R0starch, daynight=daynight,
-       ...                daylength=daylength, Phi=Phi, s_resid=s_resid,
-       ...                betas=betas, betap=betap, epsa=epsa, epsb=epsb,
-       ...                epsg=epsg, epst=epst, epss=epss, epsp=epsp,
-       ...                steady=True, fullmodel=True, julian=False,
-       ...                starch_mol2g=1., V0starchg=V0starch)
-       >>> print(astr(Rass[0:6],6,pp=True))
-       ['0.010949' '0.010921' '0.010869' '0.010833' '0.010831' '0.010853']
-       >>> print(astr(Rm[0:6],6,pp=True))
-       ['0.011066' '0.011232' '0.011190' '0.011160' '0.011159' '0.011179']
-       >>> print(astr(Rchl[0:6],6,pp=True))
-       ['0.010949' '0.010916' '0.010870' '0.010838' '0.010839' '0.010861']
-       >>> print(astr(Rcyt[0:6],6,pp=True))
-       ['0.010949' '0.010916' '0.010870' '0.010838' '0.010839' '0.010861']
-       >>> print(astr(Rstarch[0:6],6,pp=True))
-       ['0.010949' '0.010954' '0.010942' '0.010929' '0.010921' '0.010919']
-       >>> print(astr(Rpyr[0:6],6,pp=True))
-       ['0.010949' '0.011026' '0.011000' '0.010967' '0.010966' '0.010987']
-       >>> print(astr(Rbio[0:6],6,pp=True))
-       ['0.010949' '0.010916' '0.010890' '0.010857' '0.010856' '0.010877']
-       >>> print(astr(Rphloem[0:6],6,pp=True))
-       ['0.010949' '0.010893' '0.010859' '0.010824' '0.010820' '0.010842']
-       >>> print(astr(Vstarch[0:6],6,pp=True))
-       [' 40532.561477' ' 70158.596466' ' 98220.744290' '124787.716926' '150065.873423' '174445.405117']
-       >>> print(astr(ass13[0:6],6,pp=True))
-       ['-0.005605' ' 0.233039' ' 0.214183' ' 0.195800' ' 0.181365' ' 0.176307']
-       >>> print(astr(Rnew_starch[0:6],6,pp=True))
-       ['0.010949' '0.010960' '0.010913' '0.010882' '0.010882' '0.010904']
-       >>> print(astr(Rnew_cyt[0:6],6,pp=True))
-       ['0.010949' '0.010916' '0.010870' '0.010838' '0.010839' '0.010861']
-       >>> print(astr(Vstarchg[0:6],6,pp=True))
-       [' 40532.561477' ' 70158.596466' ' 98220.744290' '124787.716926' '150065.873423' '174445.405117']
+        Examples
+        --------
+        # steady state
+        >>> adecdate = np.array([2008.918658925319050,2008.918772768671033,2008.918886612022106,
+        ...                      2008.919000455374089,2008.919114298724935,2008.919228142076918,
+        ...                      2008.919341985427991,2008.919455828779974,2008.919569672131956,
+        ...                      2008.919683515483030,2008.919797358835012,2008.919911202186086,
+        ...                      2008.920025045538068,2008.920138888888914,2008.920252732240897,
+        ...                      2008.920366575591970,2008.920480418943953,2008.920556314511941,
+        ...                      2008.920594262295026,2008.920708105647009,2008.920821948998992,
+        ...                      2008.920935792350065,2008.921049635702047,2008.921163479052893,
+        ...                      2008.921277322405103,2008.921391165755949,2008.921505009107932])
+        >>> gpp = np.array([0.000000000000,23.700827991217,22.449718259243,21.253578109071,20.222525197027,
+        ...                   19.503625355216,18.797132965271,18.102416224453,17.780887860470,17.491607940331,
+        ...                   17.207072197663,17.089915139494,17.995854647885,18.901914959729,19.681631460738,
+        ...                   19.681631460738,19.681631460738,0.000000000000,0.000000000000,0.000000000000,
+        ...                   0.000000000000,0.000000000000,0.000000000000,0.000000000000,0.000000000000,
+        ...                   0.000000000000] )
+        >>> Rd = np.array([0.511900000000,2.361686144687,2.743373026721,3.180029474251,3.476842651940,
+        ...                  3.259038512076,3.053641828083,2.860020793216,2.958750580931,3.083603451827,
+        ...                  3.213200496886,3.331826587704,3.352936200975,3.374166608865,3.392531460738,
+        ...                  3.392531460738,3.392531460738,1.025929405070,0.829676977143,0.633424549217,
+        ...                  0.437172122858,0.303515021488,0.547877741613,0.792240464668,1.036603184794,
+        ...                  1.280965907360] )
+        >>> CO2air = np.array([620.902600000000,537.510500000000,608.806500000000,671.251000000000,
+        ...                      652.204000000000,560.157800000000,427.130100000000,395.276000000000,
+        ...                      427.000400000000,410.953300000000,386.943500000000,500.417500000000,
+        ...                      552.776800000000,515.865800000000,542.450400000000,692.503500000000,
+        ...                      656.423500000000,588.844100000000,675.156500000000,725.101900000000,
+        ...                      664.837000000000,598.080600000000,610.713600000000,487.087000000000,
+        ...                      531.921300000000,675.177700000000] )
+        >>> Ra = np.array([0.011067265443,0.011083081802,0.011071245659,0.011060401761,0.011063313320,
+        ...                  0.011080216316,0.011111970396,0.011122420992,0.011111174802,0.011116914764,
+        ...                  0.011125605614,0.011097923896,0.011079382516,0.011087211473,0.011083896499,
+        ...                  0.011057329511,0.011062335683,0.011072518834,0.011061590657,0.011053508863,
+        ...                  0.011061281634,0.011071628848,0.011069690431,0.011093962783,0.011086022577,
+        ...                  0.011059558971] )
+        >>> gtot = np.array([0.064395001124,0.074054920058,0.078085762302,0.078484156864,0.078127160737,
+        ...                    0.085209848990,0.088685679784,0.089611189047,0.088528095110,0.086087621579,
+        ...                    0.081901616151,0.076984314568,0.080693530135,0.084173028182,0.087005780100,
+        ...                    0.087005780100,0.087005780100,0.046798889383,0.042324852911,0.037583815518,
+        ...                    0.032460459750,0.028193059760,0.031985237181,0.035564641600,0.038983725824,
+        ...                    0.042282334176] )
+        >>> ndecdate = 2008.918772768670806
+        >>> V0starch = 60498.901260546168
+        >>> R0starch = 0.010949362493
+        >>> daynight = np.array([0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0])
+        >>> daylength = 56400.
+        >>> Phi = np.array([0.081107124487,0.228537911761,0.178664767959,0.161131279216,0.173373369802,
+        ...                   0.195820137312,0.276226485398,0.291675965181,0.259480203313,0.285111049806,
+        ...                   0.331368464761,0.228636707479,0.199019858196,0.224041328002,0.209848472684,
+        ...                   0.147530335706,0.158874834596,0.090595209673,0.077545142771,0.070693599170,
+        ...                   0.075277039328,0.082213420279,0.081562178107,0.102842605886,0.095940191411,
+        ...                   0.077688517811] )
+        >>> s_resid = 40532.561476983901
+        >>> betas = np.array([0.000000000000,4.999999000000,4.736061020188,4.483719593421,4.266205481166,
+        ...                     4.114544146364,3.965500325995,3.818940732998,3.751110114569,3.690082727626,
+        ...                     3.630056187040,3.605340371581,3.796460173119,3.987605459727,4.152096865111,
+        ...                     4.152096865111,4.152096865111,0.000000000000,0.000000000000,0.000000000000,
+        ...                     0.000000000000,0.000000000000,0.000000000000,0.000000000000,0.000000000000,
+        ...                     0.000000000000] )
+        >>> betap = 0.8
+        >>> epsa = np.array([0.002995512907,0.003039740417,0.003192366495,0.003375544906,0.003479516543,
+        ...                    0.003318658489,0.003187204366,0.003078822327,0.003144673535,0.003235857882,
+        ...                    0.003343598868,0.003447509132,0.003408830551,0.003373557382,0.003345605523,
+        ...                    0.003345605523,0.003345605523,0.003500242606,0.003551923813,0.003615033761,
+        ...                    0.003693231875,0.003766948014,0.003706681514,0.003655727827,0.003612282052,
+        ...                    0.003574980671] )
+        >>> epsb = 0.029
+        >>> epsg = 0.0185
+        >>> epst = -0.004
+        >>> epss = 0.01
+        >>> epsp = 0.003
+        >>> [Vstarch] = cuntz_gleixner(adecdate[1:], gpp, Rd, CO2air, Ra, gtot, ndecdate,
+        ...                            date0=adecdate[0], V0starch=V0starch, R0starch=R0starch, daynight=daynight,
+        ...                            daylength=daylength, Phi=Phi, s_resid=s_resid,
+        ...                            betas=betas, betap=betap, epsa=epsa, epsb=epsb,
+        ...                            epsg=epsg, epst=epst, epss=epss, epsp=epsp,
+        ...                            steady=True, Vstarch=True, julian=False)
+        >>> from autostring import astr
+        >>> print(astr(Vstarch[0:6],6,pp=True))
+        [' 40532.561477' ' 70158.596466' ' 98220.744290' '124787.716926' '150065.873423' '174445.405117']
+        >>> [Rass,Rm,Rchl,Rcyt,Rstarch,Rpyr,Rbio,Rphloem,Vstarch,ass13,disc,Rnew_starch,Rnew_cyt,Vstarchg] = cuntz_gleixner(
+        ...                adecdate[1:], gpp, Rd, CO2air, Ra, gtot, ndecdate,
+        ...                date0=adecdate[0], V0starch=V0starch, R0starch=R0starch, daynight=daynight,
+        ...                daylength=daylength, Phi=Phi, s_resid=s_resid,
+        ...                betas=betas, betap=betap, epsa=epsa, epsb=epsb,
+        ...                epsg=epsg, epst=epst, epss=epss, epsp=epsp,
+        ...                steady=True, fullmodel=True, julian=False,
+        ...                starch_mol2g=1., V0starchg=V0starch)
+        >>> print(astr(Rass[0:6],6,pp=True))
+        ['0.010949' '0.010921' '0.010869' '0.010833' '0.010831' '0.010853']
+        >>> print(astr(Rm[0:6],6,pp=True))
+        ['0.011066' '0.011232' '0.011190' '0.011160' '0.011159' '0.011179']
+        >>> print(astr(Rchl[0:6],6,pp=True))
+        ['0.010949' '0.010916' '0.010870' '0.010838' '0.010839' '0.010861']
+        >>> print(astr(Rcyt[0:6],6,pp=True))
+        ['0.010949' '0.010916' '0.010870' '0.010838' '0.010839' '0.010861']
+        >>> print(astr(Rstarch[0:6],6,pp=True))
+        ['0.010949' '0.010954' '0.010942' '0.010929' '0.010921' '0.010919']
+        >>> print(astr(Rpyr[0:6],6,pp=True))
+        ['0.010949' '0.011026' '0.011000' '0.010967' '0.010966' '0.010987']
+        >>> print(astr(Rbio[0:6],6,pp=True))
+        ['0.010949' '0.010916' '0.010890' '0.010857' '0.010856' '0.010877']
+        >>> print(astr(Rphloem[0:6],6,pp=True))
+        ['0.010949' '0.010893' '0.010859' '0.010824' '0.010820' '0.010842']
+        >>> print(astr(Vstarch[0:6],6,pp=True))
+        [' 40532.561477' ' 70158.596466' ' 98220.744290' '124787.716926' '150065.873423' '174445.405117']
+        >>> print(astr(ass13[0:6],6,pp=True))
+        ['-0.005605' ' 0.233039' ' 0.214183' ' 0.195800' ' 0.181365' ' 0.176307']
+        >>> print(astr(Rnew_starch[0:6],6,pp=True))
+        ['0.010949' '0.010960' '0.010913' '0.010882' '0.010882' '0.010904']
+        >>> print(astr(Rnew_cyt[0:6],6,pp=True))
+        ['0.010949' '0.010916' '0.010870' '0.010838' '0.010839' '0.010861']
+        >>> print(astr(Vstarchg[0:6],6,pp=True))
+        [' 40532.561477' ' 70158.596466' ' 98220.744290' '124787.716926' '150065.873423' '174445.405117']
 
-       # non-steady state
-       >>> R0cyt = 0.010911449304
-       >>> Vcyt = np.array([135000.,135000.,135000.,135000.,135000.,135000.,135000.,
-       ...                   135000.,135000.,135000.,135000.,135000.,135000.,135000.,
-       ...                   135000.,135000.,135000.,135000.,135000.,135000.,135000.,
-       ...                   135000.,135000.,135000.,135000.,135000.])
-       >>> [Rass,Rm,Rchl,Rcyt,Rstarch,Rpyr,Rbio,Rphloem,Vstarch,ass13,disc,Rnew_starch,Rnew_cyt] = cuntz_gleixner(
-       ...                adecdate[1:], gpp, Rd, CO2air, Ra, gtot, ndecdate, Vcyt=Vcyt,
-       ...                date0=adecdate[0], V0starch=V0starch, R0starch=R0starch, R0cyt=R0cyt,
-       ...                daynight=daynight,
-       ...                daylength=daylength, Phi=Phi, s_resid=s_resid,
-       ...                betas=betas, betap=betap, epsa=epsa, epsb=epsb,
-       ...                epsg=epsg, epst=epst, epss=epss, epsp=epsp,
-       ...                steady=False, fullmodel=True, julian=False)
-       >>> print(astr(Vstarch[0:6],6,pp=True))
-       [' 40532.561477' ' 70158.596466' ' 98220.744290' '124787.716926' '150065.873423' '174445.405117']
-       >>> print(astr(ass13[0:6],6,pp=True))
-       ['-0.005588' ' 0.233039' ' 0.214133' ' 0.195709' ' 0.181293' ' 0.176292']
-       >>> print(astr(Rass[0:6],6,pp=True))
-       ['0.010917' '0.010921' '0.010866' '0.010828' '0.010826' '0.010852']
-       >>> print(astr(Rm[0:6],6,pp=True))
-       ['0.011066' '0.011232' '0.011192' '0.011162' '0.011161' '0.011179']
-       >>> print(astr(Rchl[0:6],6,pp=True))
-       ['0.010949' '0.010916' '0.010871' '0.010841' '0.010841' '0.010861']
-       >>> print(astr(Rstarch[0:6],6,pp=True))
-       ['0.010949' '0.010954' '0.010943' '0.010930' '0.010922' '0.010920']
-       >>> print(astr(Rcyt[0:6],6,pp=True))
-       ['0.010917' '0.010916' '0.010902' '0.010883' '0.010871' '0.010868']
-       >>> print(astr(Rpyr[0:6],6,pp=True))
-       ['0.010917' '0.011027' '0.011033' '0.011012' '0.010998' '0.010994']
-       >>> print(astr(Rbio[0:6],6,pp=True))
-       ['0.010917' '0.010916' '0.010923' '0.010902' '0.010888' '0.010885']
-       >>> print(astr(Rnew_cyt[0:6],6,pp=True))
-       ['0.010949' '0.010916' '0.010871' '0.010841' '0.010841' '0.010861']
-       >>> print(astr(Rnew_starch[0:6],6,pp=True))
-       ['0.010949' '0.010960' '0.010915' '0.010884' '0.010884' '0.010904']
-       >>> print(astr(Rphloem[0:6],6,pp=True))
-       ['0.010917' '0.010893' '0.010891' '0.010869' '0.010852' '0.010850']
-       >>> from dec2date import dec2date
-       >>> from date2dec import date2dec
-       >>> aa = dec2date(adecdate, ascii=True, calendar='decimal')
-       >>> jadecdate = date2dec(ascii=aa)
-       >>> ndecdate = 2008.918772768670806
-       >>> bb = dec2date(ndecdate, ascii=True, calendar='decimal')
-       >>> jndecdate = date2dec(ascii=bb)
-       >>> [Rass,Rm,Rchl,Rcyt,Rstarch,Rpyr,Rbio,Rphloem,Vstarch,ass13,disc,Rnew_starch,Rnew_cyt] = cuntz_gleixner(
-       ...                jadecdate[1:], gpp, Rd, CO2air, Ra, gtot, jndecdate, Vcyt=Vcyt,
-       ...                date0=jadecdate[0], V0starch=V0starch, R0starch=R0starch, R0cyt=R0cyt,
-       ...                daynight=daynight,
-       ...                daylength=daylength, Phi=Phi, s_resid=s_resid,
-       ...                betas=betas, betap=betap, epsa=epsa, epsb=epsb,
-       ...                epsg=epsg, epst=epst, epss=epss, epsp=epsp,
-       ...                steady=False, fullmodel=True, julian=True)
-       >>> # There are slight differences due to precision of dates
-       >>> print(astr(Rphloem[0:6],6,pp=True))
-       ['0.010917' '0.010893' '0.010891' '0.010869' '0.010852' '0.010850']
-       >>> [Rass,Rm,Rchl,Rcyt,Rstarch,Rpyr,Rbio,Rphloem,Vstarch,ass13,disc,Rnew_starch,Rnew_cyt] = cuntz_gleixner(
-       ...                jadecdate[1:], gpp, Rd, CO2air, Ra, gtot, jndecdate, Vcyt=Vcyt,
-       ...                date0=jadecdate[0], V0starch=V0starch, R0starch=R0starch, R0cyt=R0cyt,
-       ...                daynight=daynight,
-       ...                daylength=daylength, Phi=Phi, s_resid=s_resid,
-       ...                betas=betas, betap=2./3.-0.1, epsa=epsa, epsb=epsb,
-       ...                epsg=epsg, epst=epst, epss=epss, epsp=epsp,
-       ...                steady=False, fullmodel=True, julian=True, nocheck=True)
-       >>> print(astr(Rphloem[0:6],6,pp=True))
-       ['0.010917' '0.009561' '0.009323' '0.009055' '0.008889' '0.009088']
-
-
-       License
-       -------
-       This file is part of the UFZ Python library.
-
-       The UFZ Python library is free software: you can redistribute it and/or modify
-       it under the terms of the GNU Lesser General Public License as published by
-       the Free Software Foundation, either version 3 of the License, or
-       (at your option) any later version.
-
-       The UFZ Python library is distributed in the hope that it will be useful,
-       but WITHOUT ANY WARRANTY; without even the implied warranty of
-       MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-       GNU Lesser General Public License for more details.
-
-       You should have received a copy of the GNU Lesser General Public License
-       along with The UFZ Python library.  If not, see <http://www.gnu.org/licenses/>.
-
-       Copyright 2012-2013 Matthias Cuntz
+        # non-steady state
+        >>> R0cyt = 0.010911449304
+        >>> Vcyt = np.array([135000.,135000.,135000.,135000.,135000.,135000.,135000.,
+        ...                   135000.,135000.,135000.,135000.,135000.,135000.,135000.,
+        ...                   135000.,135000.,135000.,135000.,135000.,135000.,135000.,
+        ...                   135000.,135000.,135000.,135000.,135000.])
+        >>> [Rass,Rm,Rchl,Rcyt,Rstarch,Rpyr,Rbio,Rphloem,Vstarch,ass13,disc,Rnew_starch,Rnew_cyt] = cuntz_gleixner(
+        ...                adecdate[1:], gpp, Rd, CO2air, Ra, gtot, ndecdate, Vcyt=Vcyt,
+        ...                date0=adecdate[0], V0starch=V0starch, R0starch=R0starch, R0cyt=R0cyt,
+        ...                daynight=daynight,
+        ...                daylength=daylength, Phi=Phi, s_resid=s_resid,
+        ...                betas=betas, betap=betap, epsa=epsa, epsb=epsb,
+        ...                epsg=epsg, epst=epst, epss=epss, epsp=epsp,
+        ...                steady=False, fullmodel=True, julian=False)
+        >>> print(astr(Vstarch[0:6],6,pp=True))
+        [' 40532.561477' ' 70158.596466' ' 98220.744290' '124787.716926' '150065.873423' '174445.405117']
+        >>> print(astr(ass13[0:6],6,pp=True))
+        ['-0.005588' ' 0.233039' ' 0.214133' ' 0.195709' ' 0.181293' ' 0.176292']
+        >>> print(astr(Rass[0:6],6,pp=True))
+        ['0.010917' '0.010921' '0.010866' '0.010828' '0.010826' '0.010852']
+        >>> print(astr(Rm[0:6],6,pp=True))
+        ['0.011066' '0.011232' '0.011192' '0.011162' '0.011161' '0.011179']
+        >>> print(astr(Rchl[0:6],6,pp=True))
+        ['0.010949' '0.010916' '0.010871' '0.010841' '0.010841' '0.010861']
+        >>> print(astr(Rstarch[0:6],6,pp=True))
+        ['0.010949' '0.010954' '0.010943' '0.010930' '0.010922' '0.010920']
+        >>> print(astr(Rcyt[0:6],6,pp=True))
+        ['0.010917' '0.010916' '0.010902' '0.010883' '0.010871' '0.010868']
+        >>> print(astr(Rpyr[0:6],6,pp=True))
+        ['0.010917' '0.011027' '0.011033' '0.011012' '0.010998' '0.010994']
+        >>> print(astr(Rbio[0:6],6,pp=True))
+        ['0.010917' '0.010916' '0.010923' '0.010902' '0.010888' '0.010885']
+        >>> print(astr(Rnew_cyt[0:6],6,pp=True))
+        ['0.010949' '0.010916' '0.010871' '0.010841' '0.010841' '0.010861']
+        >>> print(astr(Rnew_starch[0:6],6,pp=True))
+        ['0.010949' '0.010960' '0.010915' '0.010884' '0.010884' '0.010904']
+        >>> print(astr(Rphloem[0:6],6,pp=True))
+        ['0.010917' '0.010893' '0.010891' '0.010869' '0.010852' '0.010850']
+        >>> from dec2date import dec2date
+        >>> from date2dec import date2dec
+        >>> aa = dec2date(adecdate, ascii=True, calendar='decimal')
+        >>> jadecdate = date2dec(ascii=aa)
+        >>> ndecdate = 2008.918772768670806
+        >>> bb = dec2date(ndecdate, ascii=True, calendar='decimal')
+        >>> jndecdate = date2dec(ascii=bb)
+        >>> [Rass,Rm,Rchl,Rcyt,Rstarch,Rpyr,Rbio,Rphloem,Vstarch,ass13,disc,Rnew_starch,Rnew_cyt] = cuntz_gleixner(
+        ...                jadecdate[1:], gpp, Rd, CO2air, Ra, gtot, jndecdate, Vcyt=Vcyt,
+        ...                date0=jadecdate[0], V0starch=V0starch, R0starch=R0starch, R0cyt=R0cyt,
+        ...                daynight=daynight,
+        ...                daylength=daylength, Phi=Phi, s_resid=s_resid,
+        ...                betas=betas, betap=betap, epsa=epsa, epsb=epsb,
+        ...                epsg=epsg, epst=epst, epss=epss, epsp=epsp,
+        ...                steady=False, fullmodel=True, julian=True)
+        >>> # There are slight differences due to precision of dates
+        >>> print(astr(Rphloem[0:6],6,pp=True))
+        ['0.010917' '0.010893' '0.010891' '0.010869' '0.010852' '0.010850']
+        >>> [Rass,Rm,Rchl,Rcyt,Rstarch,Rpyr,Rbio,Rphloem,Vstarch,ass13,disc,Rnew_starch,Rnew_cyt] = cuntz_gleixner(
+        ...                jadecdate[1:], gpp, Rd, CO2air, Ra, gtot, jndecdate, Vcyt=Vcyt,
+        ...                date0=jadecdate[0], V0starch=V0starch, R0starch=R0starch, R0cyt=R0cyt,
+        ...                daynight=daynight,
+        ...                daylength=daylength, Phi=Phi, s_resid=s_resid,
+        ...                betas=betas, betap=2./3.-0.1, epsa=epsa, epsb=epsb,
+        ...                epsg=epsg, epst=epst, epss=epss, epsp=epsp,
+        ...                steady=False, fullmodel=True, julian=True, nocheck=True)
+        >>> print(astr(Rphloem[0:6],6,pp=True))
+        ['0.010917' '0.009561' '0.009323' '0.009055' '0.008889' '0.009088']
 
 
-       History
-       -------
-       Written,  MC, Jan 2012
-       Modified, MC, Mar 2012 - julian
-                 MC, May 2012 - nocheck
-                 MC, May 2012 - Vcyt, daynight and betas=None default
-                 MC, Feb 2013 - starch_mol2g, V0starchg
-                 MC, Feb 2013 - ported to Python 3
+        License
+        -------
+        This file is part of the UFZ Python library.
+
+        It is NOT released under the GNU Lesser General Public License, yet.
+
+        If you use this routine, please contact Matthias Cuntz.
+
+        Copyright 2012-2013 Matthias Cuntz
+
+
+        History
+        -------
+        Written,  MC, Jan 2012
+        Modified, MC, Mar 2012 - julian
+                  MC, May 2012 - nocheck
+                  MC, May 2012 - Vcyt, daynight and betas=None default
+                  MC, Feb 2013 - starch_mol2g, V0starchg
+                  MC, Feb 2013 - ported to Python 3
     """
     #
     # Checks

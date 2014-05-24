@@ -69,6 +69,7 @@
     --------
     None
 
+
     License
     -------
     This file is part of the UFZ Python library.
@@ -84,7 +85,8 @@
     GNU Lesser General Public License for more details.
 
     You should have received a copy of the GNU Lesser General Public License
-    along with The UFZ Python library.  If not, see <http://www.gnu.org/licenses/>.
+    along with the UFZ makefile project (cf. gpl.txt and lgpl.txt).
+    If not, see <http://www.gnu.org/licenses/>.
 
     Copyright 2013 Matthias Cuntz
 
@@ -198,7 +200,8 @@ def  Sampling_Function_2(p, k, r, LB, UB, GroupMat=np.array([])):
         GNU Lesser General Public License for more details.
 
         You should have received a copy of the GNU Lesser General Public License
-        along with The UFZ Python library.  If not, see <http://www.gnu.org/licenses/>.
+        along with the UFZ makefile project (cf. gpl.txt and lgpl.txt).
+        If not, see <http://www.gnu.org/licenses/>.
 
         Copyright 2013 Matthias Cuntz
 
@@ -349,7 +352,8 @@ def Optimized_Groups(NumFact, LB, UB, N=500, p=4, r=10, GroupMat=np.array([]), D
         GNU Lesser General Public License for more details.
 
         You should have received a copy of the GNU Lesser General Public License
-        along with The UFZ Python library.  If not, see <http://www.gnu.org/licenses/>.
+        along with the UFZ makefile project (cf. gpl.txt and lgpl.txt).
+        If not, see <http://www.gnu.org/licenses/>.
 
         Copyright 2013 Matthias Cuntz
 
@@ -613,7 +617,8 @@ def Morris_Measure_Groups(NumFact, Sample, OutFact, Output, p=4, Group=[]):
         GNU Lesser General Public License for more details.
 
         You should have received a copy of the GNU Lesser General Public License
-        along with The UFZ Python library.  If not, see <http://www.gnu.org/licenses/>.
+        along with the UFZ makefile project (cf. gpl.txt and lgpl.txt).
+        If not, see <http://www.gnu.org/licenses/>.
 
         Copyright 2013 Matthias Cuntz
 
