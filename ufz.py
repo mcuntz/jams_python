@@ -39,6 +39,7 @@
     functions              Common functions that are used in curve_fit or fmin parameter estimations.
     gapfill                Gapfill Eddy flux data.
     get_brewer             Registers and returns Brewer colormap.
+    get_nearest            Returns a value z for each point in xy near to the xyz field.
     hdfread                Wrapper for readhdf.
     hdf4read               Wrapper for readhdf4.
     hdf5read               Wrapper for readhdf5.
@@ -175,6 +176,7 @@
     in_poly                Determines whether a 2D point falls in a polygon.
     inpoly                 Wrapper for in_poly.
     volume_poly            Volume of function above a polygon
+    get_nearest            Returns a value z for each point in xy near to the xyz field.
 
 
     Isotopes
@@ -344,6 +346,7 @@
               MC, Apr 2014 - correlate
               MC, May 2014 - signature2plot
               MC, May 2014 - adapted new CHS license scheme
+              AP, May 2014 - get_nearest
 """
 from __future__ import print_function
 
@@ -378,6 +381,7 @@ try:
     from gap_filling   import gap_filling
 except ImportError:
     pass # obsolete
+from get_nearest       import get_nearest 
 from heaviside         import heaviside
 from in_poly           import in_poly, inpoly
 from interpol          import interpol
