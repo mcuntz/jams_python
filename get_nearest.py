@@ -5,9 +5,9 @@ from scipy.spatial.distance import cdist
 
 def get_nearest(xy, xyz):
     """
-        Returns a value z for each point in xy which is equal to the nearest
-        point value in the xyz field.
-
+        Returns the z value for each point in an xy coordinate array 
+        which is equal to the z value at the nearest point in a given
+        xyz field.
 
         Definition
         ----------
@@ -70,6 +70,7 @@ def get_nearest(xy, xyz):
         History
         -------
         Written,  AP, May 2014
+        Modified, ST, Jun 2014 - minor change to documentation
     """
 
     dist   = cdist(xy, xyz[:,:2], metric='euclidean')
