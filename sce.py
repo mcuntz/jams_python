@@ -219,7 +219,7 @@ def sce(functn, x0, bl, bu,
           maxn=1000, kstop=10, pcento=0.0001,
           ngs=2, npg=None, nps=None, nspl=None, mings=None,
           peps=0.001, seed=0, iniflg=True,
-          alpha=0.8, beta=0.45, maxit=False, printit=0,
+          alpha=0.8, beta=0.45, maxit=False, printit=2,
           outf=False, outhist=False, outcall=False):
     '''
         Shuffled-Complex-Evolution algorithm for function minimalisation
@@ -562,6 +562,30 @@ def sce(functn, x0, bl, bu,
     return out
 
 
+def griewank(x):
+    '''
+    This is the Griewank Function (2-D or 10-D)
+    Bound: X(i)=[-600,600], for i=1,2,...,10
+    Global Optimum: 0, at origin
+    '''
+    nopt = np.size(x)
+    #if (nopt == 2) | (nopt == 10):
+    xx = x
+    if nopt==2:
+        d = 200.0
+    else:
+        d = 4000.0
+
+    u1 = 0.0
+    u2 = 1.0
+    for j in range(nopt):
+        u1 = u1 + xx[j]**2/d
+        u2 = u2 * np.cos(xx[j]/np.sqrt(float(j+1)))
+
+    f = u1 - u2 + 1
+    return f
+
+
 if __name__ == '__main__':
     import doctest
     doctest.testmod(optionflags=doctest.NORMALIZE_WHITESPACE)
@@ -725,3 +749,19 @@ if __name__ == '__main__':
     # # fig.colorbar(surf, shrink=0.5, aspect=5)
 
     # plt.show()
+
+
+
+    # from functions import goldstein_price, griewank, rastrigin, rosenbrock, six_hump_camelback
+    # '''
+    #     This is the Griewank Function (2-D or 10-D)
+    #     Bound: X(i)=[-600,600], for i=1,2,...,10  !for visualization only 2!
+    #        Global Optimum: 0, at origin
+    # '''
+    # maxn  = 30000 # maximum number of function evaluations allowed during optimization (default: 1000)
+    # kstop = 20    # maximum number of evolution loops before convergency (default: 10)
+    # bl = -600*np.ones(10)
+    # bu = 600*np.ones(10)
+    # x0 = np.random.rand(10)*600.
+    # bestx, bestf, numfunccalls = sce(griewank, x0, bl, bu, maxn=maxn, outf=True, outcall=True, kstop=kstop)
+    # print(bestx, bestf, numfunccalls)
