@@ -80,7 +80,7 @@
     rgb                    Interpolate between colours; make continuous colour maps.
     roman2int              Roman numeral to integer conversion.
     rossner                Wrapper for outlier.
-    sap_app                Conversion of temperature difference to sap flux density.
+    t2sap                  Conversion of temperature difference to sap flux density.
     savitzky_golay         Smooth (and optionally differentiate) 1D data with a Savitzky-Golay filter.
     savitzky_golay2d       Smooth (and optionally differentiate) 2D data with a Savitzky-Golay filter.
     saltelli               Parameter sampling for Sobol indices calculation.
@@ -155,7 +155,7 @@
     nee2gpp_reichstein     nee2gpp using several fits as in Reichstein et al. (2005)
     outlier                Rossner''s extreme standardized deviate outlier test.
     rossner                Wrapper for outlier.
-    sap_app                Conversion of temperature difference to sap flux density.
+    t2sap                  Conversion of temperature difference to sap flux density.
     savitzky_golay         Smooth (and optionally differentiate) 1D data with a Savitzky-Golay filter.
     savitzky_golay2d       Smooth (and optionally differentiate) 2D data with a Savitzky-Golay filter.
     semivariogram          Calculates semivariogram from spatial data.
@@ -352,7 +352,7 @@
               MC, May 2014 - adapted new CHS license scheme
               AP, May 2014 - get_nearest
               AP, Jun 2014 - get_angle
-              AW, Jun 2014 - sap_app
+              AW, Jun 2014 - t2sap
 """
 from __future__ import print_function
 
@@ -417,7 +417,7 @@ from readhdf5          import readhdf5, hdf5read
 from readnetcdf        import readnetcdf, netcdfread, ncread, readnc
 from rgb               import rgb_blend, rgb_range, rgb_gradient
 from romanliterals     import int2roman, roman2int
-from sap_app           import sap_app 
+from sap_app           import t2sap 
 from saltelli          import saltelli
 from savitzky_golay    import savitzky_golay, sg, savitzky_golay2d, sg2d
 from sce               import sce
