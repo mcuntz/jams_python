@@ -57,7 +57,7 @@ import numpy as np
     along with the UFZ makefile project (cf. gpl.txt and lgpl.txt).
     If not, see <http://www.gnu.org/licenses/>.
 
-    Copyright 2014 Arndt Piayda, Matthias Cuntz
+    Copyright 2014 Arndt Piayda
 
 
     History
