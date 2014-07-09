@@ -32,6 +32,7 @@
     div                    Wrapper for division.
     division               Divide two arrays, return 'otherwise' if division by 0.
     elementary_effects     Morris measures mu, stddev and mu*
+    errormeasures          Definition of different error measures.
     esat                   Calculates the saturation vapour pressure of water/ice.
     fill_nonfinite         Fill missing values by linear interpolation.
     find_in_path           Look for file in system path.
@@ -196,6 +197,7 @@
     div                    Wrapper for division.
     division               Divide two arrays, return 'otherwise' if division by 0.
     elementary_effects     Morris measures mu, stddev and mu*
+    errormeasures          Definition of different error measures.
     functions              Common functions that are used in curve_fit or fmin parameter estimations.
     heaviside              Heaviside (or unit step) operator.
     jab                    Jackknife-after-Bootstrap error.
@@ -353,6 +355,7 @@
               AP, May 2014 - get_nearest
               AP, Jun 2014 - get_angle
               AW, Jun 2014 - t2sap
+              AP, Jul 2014 - errormeasures
 """
 from __future__ import print_function
 
@@ -377,6 +380,7 @@ from date2dec          import date2dec
 from dec2date          import dec2date
 from dewpoint          import dewpoint
 from division          import division, div
+from errormeasures     import *
 from esat              import esat
 from fill_nonfinite    import fill_nonfinite
 from find_in_path      import find_in_path
