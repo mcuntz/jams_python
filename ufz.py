@@ -46,6 +46,7 @@
     hdf4read               Wrapper for readhdf4.
     hdf5read               Wrapper for readhdf5.
     heaviside              Heaviside (or unit step) operator.
+    homo_sampling          Generation of homogeneous, randomly distributed points in a given rectangular area.
     in_poly                Determines whether a 2D point falls in a polygon.
     inpoly                 Wrapper for in_poly.
     int2roman              Integer to roman numeral conversion.
@@ -177,6 +178,7 @@
     ----------------
     area_poly              Area of a polygon
     cellarea               Calc areas of grid cells in m^2.
+    homo_sampling          Generation of homogeneous, randomly distributed points in a given rectangular area.
     in_poly                Determines whether a 2D point falls in a polygon.
     inpoly                 Wrapper for in_poly.
     volume_poly            Volume of function above a polygon
@@ -356,6 +358,7 @@
               AP, Jun 2014 - get_angle
               AW, Jun 2014 - t2sap
               AP, Jul 2014 - errormeasures
+              AP, Jul 2014 - homo_sampling
 """
 from __future__ import print_function
 
@@ -394,6 +397,7 @@ except ImportError:
 from get_angle         import get_angle
 from get_nearest       import get_nearest 
 from heaviside         import heaviside
+from homo_sampling     import homo_sampling  
 from in_poly           import in_poly, inpoly
 from interpol          import interpol
 from kernel_regression import kernel_regression, kernel_regression_h
