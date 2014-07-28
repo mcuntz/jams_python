@@ -92,6 +92,7 @@
     sg2d                   Wrapper savitzky_golay2d.
     sigma_filter           Mask values deviating more than z standard deviations from a given function.
     signature2plot         Write a copyright notice on a plot.
+    sltclean               Moves *.slt files in a deleted folder to excludet from processing (EddySoft files)
     maskgroup              Masks elements in a 1d array gathered in small groups.
     sobol_index            Calculates the first-order and total variance-based sensitivity indices.
     sread                  Reads in string array from ascii file.
@@ -226,6 +227,7 @@
     find_in_path           Look for file in system path.
     int2roman              Integer to roman numeral conversion.
     roman2int              Roman numeral to integer conversion.
+    sltclean               Moves *.slt files in a deleted folder to excludet from processing (EddySoft files)
     zacharias              Soil water content with van Genuchten and Zacharias et al. (2007).
     zacharias_check        Checks validity of parameter set for Zacharias et al. (2007).
 
@@ -359,6 +361,7 @@
               AW, Jun 2014 - t2sap
               AP, Jul 2014 - errormeasures
               AP, Jul 2014 - homo_sampling
+              AP, Jul 2014 - sltclean
 """
 from __future__ import print_function
 
@@ -432,6 +435,7 @@ from sce               import sce
 from semivariogram     import semivariogram
 from sigma_filter      import sigma_filter
 from signature2plot    import signature2plot
+from sltclean          import sltclean
 from sobol_index       import sobol_index
 from sread             import sread
 from srrasa            import srrasa, srrasa_trans
