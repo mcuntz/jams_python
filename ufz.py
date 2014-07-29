@@ -61,6 +61,7 @@
     line_dev_mask          Maskes elements of an array deviating from a line fit.
     mad                    Median absolute deviation test.
     means                  Calculate daily, monthly, yearly, etc. means of data depending on date stamp.
+    meteo4slt              EddyFlux supply with meteorological data
     morris_sampling        Sampling of optimised trajectories for Morris measures / elementary effects
     ncread                 Wrapper for readnetcdf.
     nee2gpp                Photosynthesis and ecosystem respiration from NEE Eddy flux data.
@@ -226,6 +227,7 @@
     const                  Provides physical, mathematical, computational, and isotope constants.
     find_in_path           Look for file in system path.
     int2roman              Integer to roman numeral conversion.
+    meteo4slt              EddyFlux supply with meteorological data
     roman2int              Roman numeral to integer conversion.
     sltclean               Moves *.slt files in a deleted folder to excludet from processing (EddySoft files)
     zacharias              Soil water content with van Genuchten and Zacharias et al. (2007).
@@ -362,6 +364,7 @@
               AP, Jul 2014 - errormeasures
               AP, Jul 2014 - homo_sampling
               AP, Jul 2014 - sltclean
+              AP, Jul 2014 - meteo4slt
 """
 from __future__ import print_function
 
@@ -413,6 +416,7 @@ from jab               import jab
 from mad               import mad
 from maskgroup         import maskgroup
 from means             import means
+from meteo4slt         import meteo4slt
 from morris            import morris_sampling, elementary_effects
 from nee2gpp           import nee2gpp, nee2gpp_falge, nee2gpp_lasslop, nee2gpp_reichstein
 try:
