@@ -404,3 +404,7 @@ def calc(c, h, m, doys, histstep, indir):
         log.write('No fit between rH and maxlag_h[sam] could be performed.')
     
     return cout, hout
+
+if __name__ == '__main__':
+    import doctest
+    doctest.testmod()
