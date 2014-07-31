@@ -32,6 +32,7 @@
     div                    Wrapper for division.
     division               Divide two arrays, return 'otherwise' if division by 0.
     eddycorr               Calculate time lags between wind and concentrations for EddyFlux
+    eddyspec               Performs spectrum analysis with EddySpec and SpecMean and determines inductances
     elementary_effects     Morris measures mu, stddev and mu*
     errormeasures          Definition of different error measures.
     esat                   Calculates the saturation vapour pressure of water/ice.
@@ -226,7 +227,8 @@
     astr                   Wrapper for autostring.
     autostring             Format number (array) with given decimal precision.
     const                  Provides physical, mathematical, computational, and isotope constants.
-    eddycorr               Calculate time lags between wind and concentrations for EddyFlux    
+    eddycorr               Calculate time lags between wind and concentrations for EddyFlux
+    eddyspec               Performs spectrum analysis with EddySpec and SpecMean and determines inductances    
     find_in_path           Look for file in system path.
     int2roman              Integer to roman numeral conversion.
     meteo4slt              EddyFlux supply with meteorological data
@@ -368,6 +370,7 @@
               AP, Jul 2014 - sltclean
               AP, Jul 2014 - meteo4slt
               AP, Jul 2014 - eddycorr
+              AP, Jul 2014 - eddyspec
 """
 from __future__ import print_function
 
@@ -393,6 +396,7 @@ from dec2date          import dec2date
 from dewpoint          import dewpoint
 from division          import division, div
 from eddycorr          import eddycorr
+from eddyspec          import eddyspec 
 from errormeasures     import *
 from esat              import esat
 from fill_nonfinite    import fill_nonfinite
