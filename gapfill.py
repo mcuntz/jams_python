@@ -529,62 +529,62 @@ def gapfill(date, data, rg, tair, vpd,
 
 
 if __name__ == '__main__':
-    import doctest
-    doctest.testmod(optionflags=doctest.NORMALIZE_WHITESPACE)
+    # import doctest
+    # doctest.testmod(optionflags=doctest.NORMALIZE_WHITESPACE)
 
-    # print('Read data')
-    # import numpy as np
-    # from fread import fread
-    # from date2dec import date2dec
-    # from autostring import astr
-    # ifile = 'test_gapfill.csv' # Tharandt 1998 = Online tool example file
-    # undef = -9999.
-    # dat   = fread(ifile, skip=2, transpose=True)
-    # ndat  = dat.shape[1]
-    # head  = fread(ifile, skip=2, header=True)
-    # head1 = head[0]
-    # ihead = dict(list(zip(head1, list(range(len(head1))))))
-    # for ii in range(len(head1)): exec(head1[ii].lower() + ' = ' + 'dat[ihead["'+head1[ii]+'"],:]')
-    # year  = np.ones(day.shape, dtype=day.dtype) * 1998.
-    # hh    = hour.astype(np.int)
-    # mn    = np.round((hour-hh)*60.)
-    # y0    = date2dec(yr=year[0], mo=1, dy=1, hr=hh, mi=mn)
-    # jdate = y0 + day
+    print('Read data')
+    import numpy as np
+    from fread import fread
+    from date2dec import date2dec
+    from autostring import astr
+    ifile = 'test_gapfill.csv' # Tharandt 1998 = Online tool example file
+    undef = -9999.
+    dat   = fread(ifile, skip=2, transpose=True)
+    ndat  = dat.shape[1]
+    head  = fread(ifile, skip=2, header=True)
+    head1 = head[0]
+    ihead = dict(list(zip(head1, list(range(len(head1))))))
+    for ii in range(len(head1)): exec(head1[ii].lower() + ' = ' + 'dat[ihead["'+head1[ii]+'"],:]')
+    year  = np.ones(day.shape, dtype=day.dtype) * 1998.
+    hh    = hour.astype(np.int)
+    mn    = np.round((hour-hh)*60.)
+    y0    = date2dec(yr=year[0], mo=1, dy=1, hr=hh, mi=mn)
+    jdate = y0 + day
 
-    # # 1D fill
-    # nee_f, nee_qc = gapfill(jdate, nee, rg, tair, vpd, data_flag=(qcnee>1), undef=undef, shape=True)
-    # print(astr(nee_qc[11006:11012],0,pp=True))
-    # # ['1' '1' '1' '2' '2' '2']
-    # print(astr(nee_f[11006:11012],3,pp=True))
-    # # ['-18.678' '-15.633' '-19.610' '-15.536' '-12.402' '-15.329']
+    # 1D fill
+    nee_f, nee_qc = gapfill(jdate, nee, rg, tair, vpd, data_flag=(qcnee>1), undef=undef, shape=True)
+    print(astr(nee_qc[11006:11012],0,pp=True))
+    # ['1' '1' '1' '2' '2' '2']
+    print(astr(nee_f[11006:11012],3,pp=True))
+    # ['-18.678' '-15.633' '-19.610' '-15.536' '-12.402' '-15.329']
 
-    # # 1D err
-    # nee_std = gapfill(jdate, nee, rg, tair, vpd, data_flag=(qcnee>1), undef=undef, shape=True, err=True)
-    # print(astr(nee_std[11006:11012],3,pp=True))
-    # # ['    5.372' '   13.118' '    6.477' '-9999.000' '-9999.000' '-9999.000']
+    # 1D err
+    nee_std = gapfill(jdate, nee, rg, tair, vpd, data_flag=(qcnee>1), undef=undef, shape=True, err=True)
+    print(astr(nee_std[11006:11012],3,pp=True))
+    # ['    5.372' '   13.118' '    6.477' '-9999.000' '-9999.000' '-9999.000']
 
-    # nee_err     = np.ones(nee_std.shape, dtype=np.int)*(-1)
-    # kk          = np.where((nee_std!=undef) & (nee_f!=0.))[0]
-    # nee_err[kk] = np.abs(nee_std[kk]/nee_f[kk]*100.).astype(np.int)
-    # print(astr(nee_err[11006:11012],pp=True))
-    # # [' 28' ' 83' ' 33' ' -1' ' -1' ' -1']
+    nee_err     = np.ones(nee_std.shape, dtype=np.int)*(-1)
+    kk          = np.where((nee_std!=undef) & (nee_f!=0.))[0]
+    nee_err[kk] = np.abs(nee_std[kk]/nee_f[kk]*100.).astype(np.int)
+    print(astr(nee_err[11006:11012],pp=True))
+    # [' 28' ' 83' ' 33' ' -1' ' -1' ' -1']
     
-    # # 2D fill
-    # nee2 = np.dstack([nee,nee,nee])
-    # print(nee2.shape)
-    # # (1, 17520, 3)
-    # nee_f2, nee_qc2 = gapfill(jdate, nee2, rg, tair, vpd, data_flag=(qcnee>1), undef=undef, shape=True)
-    # print(nee_f2.shape, nee_qc2.shape)
-    # # (1, 17520, 3) (17520,)
-    # nee_f, nee_qc   = gapfill(jdate, nee,  rg, tair, vpd, data_flag=(qcnee>1), undef=undef)
-    # nee_f2, nee_qc2 = gapfill(jdate, nee2, rg, tair, vpd, data_flag=(qcnee>1), undef=undef)
-    # print(nee_f2.shape, nee_qc2.shape)
-    # # (17520, 3) (17520,)
-    # print(np.all(nee_f==nee_f2[:,0]), np.all(nee_f==nee_f2[:,1]), np.all(nee_f==nee_f2[:,2]))
-    # # True True True
+    # 2D fill
+    nee2 = np.dstack([nee,nee,nee])
+    print(nee2.shape)
+    # (1, 17520, 3)
+    nee_f2, nee_qc2 = gapfill(jdate, nee2, rg, tair, vpd, data_flag=(qcnee>1), undef=undef, shape=True)
+    print(nee_f2.shape, nee_qc2.shape)
+    # (1, 17520, 3) (17520,)
+    nee_f, nee_qc   = gapfill(jdate, nee,  rg, tair, vpd, data_flag=(qcnee>1), undef=undef)
+    nee_f2, nee_qc2 = gapfill(jdate, nee2, rg, tair, vpd, data_flag=(qcnee>1), undef=undef)
+    print(nee_f2.shape, nee_qc2.shape)
+    # (17520, 3) (17520,)
+    print(np.all(nee_f==nee_f2[:,0]), np.all(nee_f==nee_f2[:,1]), np.all(nee_f==nee_f2[:,2]))
+    # True True True
 
-    # # 2D err
-    # nee_std  = gapfill(jdate, nee,  rg, tair, vpd, data_flag=(qcnee>1), undef=undef, err=True)
-    # nee_std2 = gapfill(jdate, nee2, rg, tair, vpd, data_flag=(qcnee>1), undef=undef, err=True)
-    # print(np.all(nee_std==nee_std2[:,0]), np.all(nee_std==nee_std2[:,1]), np.all(nee_std==nee_std2[:,2]))
-    # # True True True
+    # 2D err
+    nee_std  = gapfill(jdate, nee,  rg, tair, vpd, data_flag=(qcnee>1), undef=undef, err=True)
+    nee_std2 = gapfill(jdate, nee2, rg, tair, vpd, data_flag=(qcnee>1), undef=undef, err=True)
+    print(np.all(nee_std==nee_std2[:,0]), np.all(nee_std==nee_std2[:,1]), np.all(nee_std==nee_std2[:,2]))
+    # True True True

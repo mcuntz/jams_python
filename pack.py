@@ -5,9 +5,11 @@ import numpy as np
 def pack(array, mask):
     """
         Mimics Fortran pack intrinsic (without optional vector).
+
         Packs the last dimensions of an arbitrary shaped array
-        into a one dimension under a mask.
-        The mask can have any dimensions up to teh array dimensions
+        into a one dimensional array under a mask.
+
+        The mask can have any dimensions up to the array dimensions
 
 
         Definition
@@ -17,8 +19,8 @@ def pack(array, mask):
 
         Input
         -----
-        array         input array
-        mask          boolean array with dimensions <= array dimensions
+        array         input ND-array
+        mask          boolean ND-array with dimensions <= array dimensions
 
 
         Output

@@ -31,8 +31,8 @@
     dec2date               Converts arrays with decimal date to calendar date.
     div                    Wrapper for division.
     division               Divide two arrays, return 'otherwise' if division by 0.
-    eddycorr               Calculate time lags between wind and concentrations for EddyFlux
-    eddyspec               Performs spectrum analysis with EddySpec and SpecMean and determines inductances
+    eddycorr               Calculate time lags between wind and concentrations for EddyFlux.
+    eddyspec               Performs spectrum analysis with EddySpec and SpecMean and determines inductances.
     elementary_effects     Morris measures mu, stddev and mu*
     errormeasures          Definition of different error measures.
     esat                   Calculates the saturation vapour pressure of water/ice.
@@ -63,7 +63,7 @@
     line_dev_mask          Maskes elements of an array deviating from a line fit.
     mad                    Median absolute deviation test.
     means                  Calculate daily, monthly, yearly, etc. means of data depending on date stamp.
-    meteo4slt              EddyFlux supply with meteorological data
+    meteo4slt              EddyFlux supply with meteorological data.
     morris_sampling        Sampling of optimised trajectories for Morris measures / elementary effects
     ncread                 Wrapper for readnetcdf.
     nee2gpp                Photosynthesis and ecosystem respiration from NEE Eddy flux data.
@@ -95,7 +95,7 @@
     sg2d                   Wrapper savitzky_golay2d.
     sigma_filter           Mask values deviating more than z standard deviations from a given function.
     signature2plot         Write a copyright notice on a plot.
-    sltclean               Moves *.slt files in a deleted folder to excludet from processing (EddySoft files)
+    sltclean               Moves *.slt files in a deleted folder to exclude from processing (EddySoft files).
     maskgroup              Masks elements in a 1d array gathered in small groups.
     sobol_index            Calculates the first-order and total variance-based sensitivity indices.
     sread                  Reads in string array from ascii file.
@@ -146,6 +146,8 @@
     Data processing
     ---------------
     convex_hull            Calculate subset of points that make a convex hull around a set of 2D points.
+    eddycorr               Calculate time lags between wind and concentrations for EddyFlux.
+    eddyspec               Performs spectrum analysis with EddySpec and SpecMean and determines inductances.
     fill_nonfinite         Fill missing values by linear interpolation.
     gapfill                Gapfill Eddy flux data.
     interpol               One-dimensional linear interpolation on first dimension.
@@ -155,6 +157,7 @@
     line_dev_mask          Maskes elements of an array deviating from a line fit.
     mad                    Median absolute deviation test.
     means                  Calculate daily, monthly, yearly, etc. means of data depending on date stamp.
+    meteo4slt              EddyFlux supply with meteorological data.
     nee2gpp                Photosynthesis and ecosystem respiration from NEE Eddy flux data.
     nee2gpp_falge          nee2gpp using one fit for whole time period
     nee2gpp_lasslop        nee2gpp using the daytime method of Lasslop et al. (2010)
@@ -168,6 +171,7 @@
     sg                     Wrapper savitzky_golay.
     sg2d                   Wrapper savitzky_golay2d.
     sigma_filter           Mask values deviating more than z standard deviations from a given function.
+    sltclean               Moves *.slt files in a deleted folder to exclude from processing (EddySoft files).
     srrasa                 Generates stratified random 2D points within a given rectangular area.
     srrasa_trans           Generates stratified random 2D transects within a given rectangular area.
 
@@ -227,13 +231,9 @@
     astr                   Wrapper for autostring.
     autostring             Format number (array) with given decimal precision.
     const                  Provides physical, mathematical, computational, and isotope constants.
-    eddycorr               Calculate time lags between wind and concentrations for EddyFlux
-    eddyspec               Performs spectrum analysis with EddySpec and SpecMean and determines inductances    
     find_in_path           Look for file in system path.
     int2roman              Integer to roman numeral conversion.
-    meteo4slt              EddyFlux supply with meteorological data
     roman2int              Roman numeral to integer conversion.
-    sltclean               Moves *.slt files in a deleted folder to excludet from processing (EddySoft files)
     zacharias              Soil water content with van Genuchten and Zacharias et al. (2007).
     zacharias_check        Checks validity of parameter set for Zacharias et al. (2007).
 

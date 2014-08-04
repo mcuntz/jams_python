@@ -1,25 +1,15 @@
+#!/usr/bin/env python
+from __future__ import print_function
 import numpy as np
-import sread, fread
+from sread import sread # ufz
+from fread import fread # ufz
+from date2dec import date2dec # ufz
 import matplotlib.pyplot as plt
-from date2dec import date2dec
-import pylab as pl 
-import matplotlib
-import matplotlib.ticker as ticker
 import matplotlib.backends.backend_pdf as pdf
-import netcdftime as nt
-import sys
-import math as ma
 import time as t
 import shutil as sh
 import re
 import os as os
-
-global missing_package
-missing_package = False
-try:
-    from scipy.optimize import curve_fit # requires at least scipy 0.8.0
-except ImportError:
-    missing_package = True
     
 ################################################################################
 def eddyspec(indir, cfile, hfile, rawfile, sltdir, tspfile='34_specmean.csv',
@@ -35,7 +25,7 @@ def eddyspec(indir, cfile, hfile, rawfile, sltdir, tspfile='34_specmean.csv',
     user is finished. Inductances for water and carbon are fitted and saved
     together with spectrum plots. It is recommended to repeat the spectrum
     analysis for different times within the year. 
-    
+
     
     Definition
     ----------
@@ -97,31 +87,27 @@ def eddyspec(indir, cfile, hfile, rawfile, sltdir, tspfile='34_specmean.csv',
     History
     -------
     Written,  AP, Jul 2014
+    Modified, MC, Aug 2014 - clean up and Python 3
     '''
-    ############################################################################
-    # missing package warning
-    if missing_package == True:
-        print 'eddyspec: scipy.optimize.curve_fit not found!'
-
     ############################################################################
     # reading input files
     #lags
-    lagdate   = np.array(sread.sread('%s' %(cfile), nc=1, skip=1), dtype='|S16')
+    lagdate   = np.array(sread('%s' %(cfile), nc=1, skip=1), dtype='|S16')
     day       = np.array([x[5:8] for x in lagdate.flatten()], dtype = '|S7').astype(float)
     hour      = np.array([x[8:10] for x in lagdate.flatten()], dtype = '|S2').astype(float)
     min       = np.array([x[10:12] for x in lagdate.flatten()], dtype = '|S2').astype(float)
     doysfloat = day + (hour + min/60.)/24.
-    cl        = np.array(fread.fread('%s' %(cfile), skip=1, cskip=1))
-    hl        = np.array(fread.fread('%s' %(hfile), skip=1, cskip=1))
+    cl        = np.array(fread('%s' %(cfile), skip=1, cskip=1))
+    hl        = np.array(fread('%s' %(hfile), skip=1, cskip=1))
     # fluxes    
-    fluxdate = date2dec(ascii = np.array(sread.sread('%s' %(rawfile), nc=1, skip=1), dtype='|S16'))
-    year     = np.array(sread.sread('%s' %(rawfile), nc=1, skip=1), dtype='|S16')
+    fluxdate = date2dec(ascii = np.array(sread('%s' %(rawfile), nc=1, skip=1), dtype='|S16'))
+    year     = np.array(sread('%s' %(rawfile), nc=1, skip=1), dtype='|S16')
     year     = np.array([x[6:10] for x in year.flatten()], dtype = '|S4').astype(int)
     fluxdate = fluxdate.flatten() - date2dec(yr = year, mo = 01, dy = 00, hr = 00, mi = 00, sc = 00)
-    cf       = np.array(fread.fread('%s' %(rawfile), skip=1, cskip=4, nc=1))
-    cf       = np.where(cf == novalue, pl.NaN, cf).flatten()
-    hf       = np.array(fread.fread('%s' %(rawfile), skip=1, cskip=1, nc=1))
-    hf       = np.where(hf == novalue, pl.NaN, hf).flatten()
+    cf       = np.array(fread('%s' %(rawfile), skip=1, cskip=4, nc=1))
+    cf       = np.where(cf == novalue, np.nan, cf).flatten()
+    hf       = np.array(fread('%s' %(rawfile), skip=1, cskip=1, nc=1))
+    hf       = np.where(hf == novalue, np.nan, hf).flatten()
     
     ############################################################################
     # plot lag c    
@@ -180,17 +166,18 @@ def eddyspec(indir, cfile, hfile, rawfile, sltdir, tspfile='34_specmean.csv',
             interval += [np.min(np.where(np.abs(doysfloat-float(inpto))<0.02083))]
             inp = False
         except (ValueError, IndexError):
-            print 'EddySpecWarning: type in floats(with . not ,), nothing else!'
+            print('EddySpecWarning: type in floats(with . not ,), nothing else!')
             inp = True
     inpclag = raw_input("C lag: ")
     inphlag = raw_input("H lag: ")
     
-    print lagdate[interval[0]:interval[1]+1]
-    print ('\nDO EDDYSPEC AND SPECMEAN NOW!\n')
+    print(lagdate[interval[0]:interval[1]+1])
+    print('\nDO EDDYSPEC AND SPECMEAN NOW!\n')
     inp = raw_input("Mean spectrums ready? [y/n]: ").lower()
     if inp == "y":
         pass
     else:
+        import sys
         sys.exit()
     
     ############################################################################
@@ -211,9 +198,9 @@ def eddyspec(indir, cfile, hfile, rawfile, sltdir, tspfile='34_specmean.csv',
     ############################################################################
     # conductance fitting
     # reading mean spec files  
-    tsp = np.array(fread.fread('%s/%s' %(indir,tspfile), skip=1, nc=2))
-    csp = np.array(fread.fread('%s/%s' %(indir,cspfile), skip=1, nc=2))
-    hsp = np.array(fread.fread('%s/%s' %(indir,hspfile), skip=1, nc=2))
+    tsp = np.array(fread('%s/%s' %(indir,tspfile), skip=1, nc=2))
+    csp = np.array(fread('%s/%s' %(indir,cspfile), skip=1, nc=2))
+    hsp = np.array(fread('%s/%s' %(indir,hspfile), skip=1, nc=2))
     
     # filter input specs for log10(input) != NaN
     global fcoc, fcoh
@@ -278,9 +265,9 @@ def eddyspec(indir, cfile, hfile, rawfile, sltdir, tspfile='34_specmean.csv',
     ################################################################################
     # writing log file
     log = open('%s/spec_%i_%02i_%02i_%02i_%02i_%02i.log' %(indir, 
-                                                    t.localtime()[0], t.localtime()[1], 
-                                                    t.localtime()[2], t.localtime()[3],
-                                                    t.localtime()[4], t.localtime()[5],)
+                                                    time.localtime()[0], time.localtime()[1], 
+                                                    time.localtime()[2], time.localtime()[3],
+                                                    time.localtime()[4], time.localtime()[5],)
                                                     , 'w')
     log.write('Inductence determination for the mean of:\n')
     for item in lagdate[interval[0]:interval[1]+1]:
@@ -291,19 +278,19 @@ def eddyspec(indir, cfile, hfile, rawfile, sltdir, tspfile='34_specmean.csv',
     log.write('H Inductence: %.2f\n' %(conh))
 
 # inductance fit functions for c
-def modc(fc,conc):
+def modc(fc, conc):
     '''
     part of eddyspec: inductance model for c
     '''
-    y = 1/(1 + 4 * ma.pi**2 * fc**2 * conc**2)
+    y = 1./(1. + 4. * np.pi**2 * fc**2 * conc**2)
     return np.log10(fcoc/y)
 
 # inductance fit functions for h
-def modh(fh,conh):
+def modh(fh, conh):
     '''
     part of eddyspec: inductance model for h
     '''
-    y = 1/(1 + 4 * ma.pi**2 * fh**2 * conh**2)
+    y = 1./(1. + 4. * np.pi**2 * fh**2 * conh**2)
     return np.log10(fcoh/y)
 
 if __name__ == '__main__':

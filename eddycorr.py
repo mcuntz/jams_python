@@ -1,13 +1,12 @@
+#!/usr/bin/env python
+from __future__ import print_function
 import numpy as np
-import sread, fread
+from sread import sread # ufz
+from fread import fread # ufz
 import matplotlib.pyplot as plt
 import matplotlib.backends.backend_pdf as pdf
-import pylab as pl
-from scipy import interpolate
 import csv
-import sys
-import time as t
-import math as m
+import time as time
 import shutil as sh
 
 global missing_package
@@ -22,10 +21,15 @@ def eddycorr(indir, sltdir, cfile, hfile, meteofile, outfile, novalue=-9999,
     '''
     Moves EddyCorr files (cfile=35_corr.csv and hfile=36_corr.csv) from sltdir
     to indir after they have been created by EddyCorr (Kolle & Rebmann, 2007).
+
     Time lags between wind and concentrations are plotted and user selects
-    thresholds. Water lag is correlated against rH from meteofile for missing
-    values. Plots and lags are saved to outfile in indir and attached to the
-    meteofile for being read by EddyFlux. 
+    thresholds.
+
+    Water lag is correlated against rH from meteofile for missing
+    values.
+
+    Plots and lags are saved to outfile in indir and attached to the
+    meteofile for being read by EddyFlux.
     
     
     Definition
@@ -85,6 +89,7 @@ def eddycorr(indir, sltdir, cfile, hfile, meteofile, outfile, novalue=-9999,
     History
     -------
     Written,  AP, Jul 2014
+    Modified, MC, Aug 2014 - clean up and Python 3
     '''
         
     ############################################################################
@@ -99,20 +104,20 @@ def eddycorr(indir, sltdir, cfile, hfile, meteofile, outfile, novalue=-9999,
     
     ############################################################################
     # reading input file
-    header = sread.sread('%s/%s' %(indir,cfile))[0]
-    doys   = np.array(sread.sread('%s/%s' %(indir,cfile), nc=1, skip=1), dtype='|S16')
+    header = sread('%s/%s' %(indir,cfile))[0]
+    doys   = np.array(sread('%s/%s' %(indir,cfile), nc=1, skip=1), dtype='|S16')
     #doys   = np.array([x[5:12] for x in doys.flatten()], dtype = '|S7')
     day    = np.array([x[5:8] for x in doys.flatten()], dtype = '|S7').astype(float)
     hour   = np.array([x[8:10] for x in doys.flatten()], dtype = '|S2').astype(float)
     min    = np.array([x[10:12] for x in doys.flatten()], dtype = '|S2').astype(float)
     doysfloat   = day + (hour + min/60.)/24.
-    c      = np.array(fread.fread('%s/%s' %(indir,cfile), skip=1, cskip=1))
-    h      = np.array(fread.fread('%s/%s' %(indir,hfile), skip=1, cskip=1))
+    c      = np.array(fread('%s/%s' %(indir,cfile), skip=1, cskip=1))
+    h      = np.array(fread('%s/%s' %(indir,hfile), skip=1, cskip=1))
     try:
-        m      = np.array(fread.fread(meteofile, cskip=1, nc=1))
-        m      = np.where(m.astype(int) == novalue, pl.NaN, m)
-    except TypeError: 
-        print 'EddyCorrWarning: No meteorology file found, no fitting with rH can be done!'
+        m      = np.array(fread(meteofile, cskip=1, nc=1))
+        m      = np.where(m.astype(int) == novalue, np.nan, m)
+    except TypeError:
+        print('EddyCorrWarning: No meteorology file found, no fitting with rH can be done!')
         m      = False
     cout   = np.empty((np.shape(c)[0],1))
     hout   = np.empty((np.shape(h)[0],1))
@@ -142,7 +147,7 @@ def eddycorr(indir, sltdir, cfile, hfile, meteofile, outfile, novalue=-9999,
             try:
                 breaks += [np.min(np.where(np.abs(doysfloat-float(inp))<0.02083))]
             except (ValueError, IndexError):
-                print 'EddyCorrWarning: type in floats(with . not ,), integers or n, nothing else!'
+                print('EddyCorrWarning: type in floats(with . not ,), integers or n, nothing else!')
             inp = True
     breaks += [np.shape(c)[0]]
 
@@ -295,7 +300,7 @@ def calc(c, h, m, doys, histstep, indir):
     plt.legend()
     plt.show()
     
-    print "! Only maxlag (sam) can be used for H2O !"
+    print("! Only maxlag (sam) can be used for H2O !")
     htop    = float(raw_input("Top of H2O lag range: "))
     hmedian = float(raw_input("Median of  H2O lag range: "))
     hbottom = float(raw_input("Bottom of H2O lag range: "))          
@@ -355,14 +360,16 @@ def calc(c, h, m, doys, histstep, indir):
             if tm == "y":
                 pass
             else:
+                import sys
                 sys.exit()
                 
     except (RuntimeError, TypeError):
-            print 'EddyCorrWarning: No sufficient fit can be done!'   
+            print('EddyCorrWarning: No sufficient fit can be done!')
             tm = raw_input("Use median instead? (Y/N): ").lower()
             if tm == "y":
                 pass
             else:
+                import sys
                 sys.exit()
     
     ############################################################################
@@ -386,9 +393,9 @@ def calc(c, h, m, doys, histstep, indir):
     ################################################################################
     # writing log file
     log = open('%s/lag_%i_%02i_%02i_%02i_%02i_%02i.log' %(indir, 
-                                                    t.localtime()[0], t.localtime()[1], 
-                                                    t.localtime()[2], t.localtime()[3],
-                                                    t.localtime()[4], t.localtime()[5],)
+                                                          time.localtime()[0], time.localtime()[1], 
+                                                    time.localtime()[2], time.localtime()[3],
+                                                    time.localtime()[4], time.localtime()[5],)
                                                     , 'w')
     log.write('From doy %s %s:%s to doy %s %s:%s: \n' %(doys.flatten()[0][5:8], doys.flatten()[0][8:10], doys.flatten()[0][10:12], doys.flatten()[-1][5:8], doys.flatten()[-1][8:10], doys.flatten()[-1][10:12]))
     log.write('Top of CO2 lag range: %i\n' %(int(ctop)))    

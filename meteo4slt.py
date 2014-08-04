@@ -1,8 +1,9 @@
+#!/usr/bin/env python
+import numpy as np
+from date2dec import date2dec # ufz
+from dec2date import dec2date # ufz
 import os as os
 import re as re
-from date2dec import date2dec
-from dec2date import dec2date
-import numpy as np
 
 def meteo4slt(sltdir, metfile, p_t_rh, outfile,
               pat='[a-zA-Z0-9]*.slt|[a-zA-Z0-9]*.SLT', delimiter=',',
@@ -79,12 +80,12 @@ def meteo4slt(sltdir, metfile, p_t_rh, outfile,
         History
         -------
         Written,  AP, Jul 2014
-        
+        Modified, MC, Aug 2014 - clean up and Python 3        
     """
     
     # half hour in jd
-    halfhjd  = date2dec(yr=-4712, mo=01, dy=1, hr=12, mi=30, sc=00)
-    
+    halfhjd = 1800./86400.
+
     ###########################################################################
     # reading slt directory
     dirlist = os.listdir(sltdir)
