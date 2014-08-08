@@ -1,35 +1,25 @@
-#!/usr/bin/env python
-from __future__ import print_function
 import numpy as np
-from sread import sread # ufz
-from fread import fread # ufz
+import sread, fread
 import matplotlib.pyplot as plt
 import matplotlib.backends.backend_pdf as pdf
+import pylab as pl
+from scipy import interpolate
 import csv
-import time as time
+import sys
+import time as t
+import math as m
 import shutil as sh
-
-global missing_package
-missing_package = False
-try:
-    from scipy.optimize import curve_fit # requires at least scipy 0.8.0
-except ImportError:
-    missing_package = True
+from scipy.optimize import fmin
     
 def eddycorr(indir, sltdir, cfile, hfile, meteofile, outfile, novalue=-9999,
              histstep=10, attach=True):
     '''
     Moves EddyCorr files (cfile=35_corr.csv and hfile=36_corr.csv) from sltdir
     to indir after they have been created by EddyCorr (Kolle & Rebmann, 2007).
-
     Time lags between wind and concentrations are plotted and user selects
-    thresholds.
-
-    Water lag is correlated against rH from meteofile for missing
-    values.
-
-    Plots and lags are saved to outfile in indir and attached to the
-    meteofile for being read by EddyFlux.
+    thresholds. Water lag is correlated against rH from meteofile for missing
+    values. Plots and lags are saved to outfile in indir and attached to the
+    meteofile for being read by EddyFlux. 
     
     
     Definition
@@ -46,7 +36,8 @@ def eddycorr(indir, sltdir, cfile, hfile, meteofile, outfile, novalue=-9999,
     cfile       str, name of the carbon lag file, e.g. 35_corr.csv (EddyCorr) 
     hfile       str, name of the water lag file, e.g. 36_corr.csv (EddyCorr)
     meteofile   str, path of the meteorological file for EddyFlux (in sync with
-                available *.slt files) where the lags will be attached
+                available *.slt files, e.g. made by meteo4slt) where the lags
+                will be attached
     outfile     str, name of the output file
         
     
@@ -89,13 +80,8 @@ def eddycorr(indir, sltdir, cfile, hfile, meteofile, outfile, novalue=-9999,
     History
     -------
     Written,  AP, Jul 2014
-    Modified, MC, Aug 2014 - clean up and Python 3
+    Modified, AP, Aug 2014 - major bug fix
     '''
-        
-    ############################################################################
-    # missing package warning
-    if missing_package == True:
-        raise ValueError('eddycorr: scipy.optimize.curve_fit can not be found!')
     
     ############################################################################
     # move correlation files from sltdir to indir
@@ -104,20 +90,20 @@ def eddycorr(indir, sltdir, cfile, hfile, meteofile, outfile, novalue=-9999,
     
     ############################################################################
     # reading input file
-    header = sread('%s/%s' %(indir,cfile))[0]
-    doys   = np.array(sread('%s/%s' %(indir,cfile), nc=1, skip=1), dtype='|S16')
+    header = sread.sread('%s/%s' %(indir,cfile))[0]
+    doys   = np.array(sread.sread('%s/%s' %(indir,cfile), nc=1, skip=1), dtype='|S16')
     #doys   = np.array([x[5:12] for x in doys.flatten()], dtype = '|S7')
     day    = np.array([x[5:8] for x in doys.flatten()], dtype = '|S7').astype(float)
     hour   = np.array([x[8:10] for x in doys.flatten()], dtype = '|S2').astype(float)
     min    = np.array([x[10:12] for x in doys.flatten()], dtype = '|S2').astype(float)
     doysfloat   = day + (hour + min/60.)/24.
-    c      = np.array(fread('%s/%s' %(indir,cfile), skip=1, cskip=1))
-    h      = np.array(fread('%s/%s' %(indir,hfile), skip=1, cskip=1))
+    c      = np.array(fread.fread('%s/%s' %(indir,cfile), skip=1, cskip=1))
+    h      = np.array(fread.fread('%s/%s' %(indir,hfile), skip=1, cskip=1))
     try:
-        m      = np.array(fread(meteofile, cskip=1, nc=1))
-        m      = np.where(m.astype(int) == novalue, np.nan, m)
-    except TypeError:
-        print('EddyCorrWarning: No meteorology file found, no fitting with rH can be done!')
+        m      = np.array(fread.fread(meteofile, cskip=2, nc=1))
+        m      = np.where(m.astype(int) == novalue, pl.NaN, m)
+    except TypeError: 
+        print 'EddyCorrWarning: No meteorology file found, no fitting with rH can be done!'
         m      = False
     cout   = np.empty((np.shape(c)[0],1))
     hout   = np.empty((np.shape(h)[0],1))
@@ -147,7 +133,7 @@ def eddycorr(indir, sltdir, cfile, hfile, meteofile, outfile, novalue=-9999,
             try:
                 breaks += [np.min(np.where(np.abs(doysfloat-float(inp))<0.02083))]
             except (ValueError, IndexError):
-                print('EddyCorrWarning: type in floats(with . not ,), integers or n, nothing else!')
+                print 'EddyCorrWarning: type in floats(with . not ,), integers or n, nothing else!'
             inp = True
     breaks += [np.shape(c)[0]]
 
@@ -215,14 +201,6 @@ def eddycorr(indir, sltdir, cfile, hfile, meteofile, outfile, novalue=-9999,
     fig2.savefig(pp2, format='pdf')
     pp1.close()
     pp2.close()
-
-############################################################################
-# h lag model
-def mod(h,ms,hs,ho):
-    '''
-    relates water time lag with relative humidity
-    '''
-    return hs*np.exp(-h*ho)+ms
 
 ############################################################################
 # calculations
@@ -300,7 +278,7 @@ def calc(c, h, m, doys, histstep, indir):
     plt.legend()
     plt.show()
     
-    print("! Only maxlag (sam) can be used for H2O !")
+    print "! Only maxlag (sam) can be used for H2O !"
     htop    = float(raw_input("Top of H2O lag range: "))
     hmedian = float(raw_input("Median of  H2O lag range: "))
     hbottom = float(raw_input("Bottom of H2O lag range: "))          
@@ -310,67 +288,34 @@ def calc(c, h, m, doys, histstep, indir):
     
     print("\nCHECKING lag-rH FIT:\n")        
     
-    try:
-        hsub = np.transpose(h[np.where((h[:,5]<=htop)&(h[:,5]>=hbottom)),5])
-        hsubreg = -hsub.flatten()+np.max(hsub)
-        msub = np.transpose(m[np.where((h[:,5]<=htop)&(h[:,5]>=hbottom)),0])
-        msubreg = msub.flatten()-np.min(msub)
-        
-        # curve fitting 
-        popti, pcovi = curve_fit(mod, hsubreg, msubreg, maxfev = 1000)
-        
-        # coefficient of determination
-        sstot=np.sum((msubreg-np.mean(msubreg))**2)
-        sserr=np.sum((msubreg-mod(hsubreg,popti[0],popti[1],popti[2]))**2)
-        rsquare=1-sserr/sstot
+    hsub = h[np.where((h[:,5]<=htop)&(h[:,5]>=hbottom))[0],5]
+    msub = m[np.where((h[:,5]<=htop)&(h[:,5]>=hbottom))[0],0]
     
-        ############################################################################
-        # plot rH
-        plt.figure(5)                                        
-        plt.plot(h[:,0], m[:,0], 'bo')                      
-        plt.xlabel('DOY')
-        plt.ylabel('rH [%]')                    
-        plt.title('rH')
-        plt.axis('auto')
-        plt.grid('on')                  
-              
-        # plot max lag vs. rH
-        fig3 = plt.figure(6)
-        sub = fig3.add_subplot(111)                                       
-        sub.plot(hsub, msub, 'ro', label='measurements')
-        sub.plot(-np.arange(0, np.max(hsubreg)+histstep, histstep)+np.max(hsub),
-                 mod(np.arange(0, np.max(hsubreg)+histstep, histstep),popti[0],popti[1],popti[2])+np.min(msub)
-                 ,'b-', label='exponential fit \n r^2 = %s' %(str(round(rsquare,2))))         
-        plt.xlabel('maxlag (sam)')                               
-        plt.ylabel('rH [%]')                    
-        sub.set_title('h maxlag (sam) - rH correlation')
-        sub.axis('auto')
-        sub.grid('on')                            
-        plt.legend()
-        plt.show()
-        
-        tm = "n"
-        decision = raw_input("Fit sufficient? (Y/N): ").lower()
-        if decision == "y":
-            pp3 = pdf.PdfPages('%s/h_fit%s.pdf' %(indir,outfile[4:-4]))
-            fig3.savefig(pp3, format='pdf')
-            pp3.close()
-        else:
-            tm = raw_input("Use median instead? (Y/N): ").lower()
-            if tm == "y":
-                pass
-            else:
-                import sys
-                sys.exit()
+    # plot max lag vs. rH
+    fig3 = plt.figure(6)
+    sub = fig3.add_subplot(111)                                       
+    sub.plot(msub, hsub, 'ro', label='measurements')
+    plt.xlabel('rH [%]')                    
+    plt.ylabel('maxlag (sam)')                               
+    sub.set_title('h maxlag (sam) - rH correlation')
+    sub.axis('auto')
+    sub.grid('on')                            
+    plt.legend()
+    plt.show()
+    
+    pbt = 't'
+    while pbt=='t':
+        mmax = float(raw_input("Top of rel. hum: "))
+        hmin = float(raw_input("Maximum of  H2O lag: "))
+        valid=(msub<mmax) & (hsub<hmin)
+        p_guess1 = float(raw_input("Initial guess - Lag offset: "))*-1.
+        p_guess2 = float(raw_input("Initial guess - rH multiplier: "))
                 
-    except (RuntimeError, TypeError):
-            print('EddyCorrWarning: No sufficient fit can be done!')
-            tm = raw_input("Use median instead? (Y/N): ").lower()
-            if tm == "y":
-                pass
-            else:
-                import sys
-                sys.exit()
+        p, ff = fit(-hsub[valid], msub[valid], func=f, p_guess=[p_guess1,p_guess2],plot=True)
+        print 'Offset=%f'%(p[0]*-1.), 'Multiplier=%f'%(p[1])
+        pbt = raw_input("(g)ood fit - proceed, (b)ad fit - proceed, (t)ry again: ")
+        if pbt not in ['g', 'b', 't']:
+            pbt = 't'
     
     ############################################################################
     # lags for c for output
@@ -379,13 +324,10 @@ def calc(c, h, m, doys, histstep, indir):
                              (ctop+cbottom)/2))
     
     # lags for h for output
-    if tm =="n":
-        hout = np.where((h[:,5]>htop)^(h[:,5]<hbottom), (np.log(( m[:,0].flatten()-np.min(msub) -popti[0])/popti[1])/popti[2])+np.max(hsub),
-                                                        h[:,5])
-        hout = np.where((np.isnan(hout)) & (m[:,0]>mod(-htop+np.max(hsub),popti[0],popti[1],popti[2])+np.min(msub)), htop, hout)
-        hout = np.where((np.isnan(hout)) & (m[:,0]<mod(-hbottom+np.max(hsub),popti[0],popti[1],popti[2])+np.min(msub)), hbottom, hout)
+    if pbt=="g":
+        hout = np.where((h[:,5]>htop)^(h[:,5]<hbottom), -f_inv(m[:,0], p), h[:,5])
+        hout = np.where((hout>htop)^(hout<hbottom), hmedian, hout)
         hout = np.where(np.isnan(hout), hmedian, hout)
-        hout = np.where(hout<hbottom, hbottom, hout)
     else:
         hout = np.where((h[:,5]>htop)^(h[:,5]<hbottom), hmedian, h[:,5])
         hout = np.where(np.isnan(hout), hmedian, hout)
@@ -393,9 +335,9 @@ def calc(c, h, m, doys, histstep, indir):
     ################################################################################
     # writing log file
     log = open('%s/lag_%i_%02i_%02i_%02i_%02i_%02i.log' %(indir, 
-                                                          time.localtime()[0], time.localtime()[1], 
-                                                    time.localtime()[2], time.localtime()[3],
-                                                    time.localtime()[4], time.localtime()[5],)
+                                                    t.localtime()[0], t.localtime()[1], 
+                                                    t.localtime()[2], t.localtime()[3],
+                                                    t.localtime()[4], t.localtime()[5],)
                                                     , 'w')
     log.write('From doy %s %s:%s to doy %s %s:%s: \n' %(doys.flatten()[0][5:8], doys.flatten()[0][8:10], doys.flatten()[0][10:12], doys.flatten()[-1][5:8], doys.flatten()[-1][8:10], doys.flatten()[-1][10:12]))
     log.write('Top of CO2 lag range: %i\n' %(int(ctop)))    
@@ -403,14 +345,64 @@ def calc(c, h, m, doys, histstep, indir):
     log.write('Top of H2O lag range: %i\n' %(int(htop)))
     log.write('Bottom of H2O lag range: %i\n' %(int(hbottom)))    
     log.write('Median of  H2O lag range: %i\n' %(int(hmedian)))
-    if tm != "y":
-        log.write('Fit equation: rH[%] = rH_scale * exp(-maxlag_h[sam] * maxlag_h_scale) + rH_offset\n')
-        log.write('rH_scale : %f\nmaxlag_h_scale : %f\nrH_offset : %f\n' %(popti[1], popti[2], popti[0]))
-        log.write('r^2 : %s' %(str(round(rsquare,2))))
+    if pbt=="g":
+        log.write('Moisture dependency:\n')
+        log.write('Top of rH used for fitting: %f\n'%mmax)
+        log.write('Maximum of  H2O lag used for fitting: %f\n'%hmin)
+        log.write('Initial guess - Lag offset: %f\n'%(p_guess1*-1.))
+        log.write('Initial guess - rH multiplier: %f\n'%p_guess2)
+        log.write('Moisture dependency: -maxlag_h[sam] = %f + exp(rH/%f)'%(p[0], p[1]))
     else:        
-        log.write('No fit between rH and maxlag_h[sam] could be performed.')
+        log.write('Median used instead of moisture dependency.')
     
     return cout, hout
+
+############################################################################
+# fitting
+def fit(x,y,func,p_guess,plot=False):  
+    '''
+    eddycorr: fitting procedure
+    '''
+    xfit=np.ma.array(x, mask=np.isnan(x))
+    yfit=np.ma.array(y, mask=np.isnan(y))
+    
+    if plot:
+        x_mod = np.arange(np.ma.min(xfit),np.ma.max(xfit),(np.ma.max(xfit)-np.ma.min(xfit))/50.)
+        plt.figure('pre-fit')                                        
+        plt.plot(xfit, yfit, 'bo')         
+        plt.plot(x_mod, func(x_mod,p_guess), 'k-')
+        plt.show()
+        
+    # fit
+    p_opt = fmin(absdif, p_guess, args=(xfit, yfit, func), disp=0)
+    
+    if plot:
+        plt.figure('post-fit')                                        
+        plt.plot(xfit, yfit, 'bo')         
+        plt.plot(x_mod, func(x_mod,p_opt), 'k-')
+        plt.show()
+        
+    return p_opt, func
+
+############################################################################
+# h lag model
+def f(x, p):
+    '''
+    eddycorr: model for relating relative humidity and -maxlag_h
+    '''
+    return p[1]*np.log(x-p[0])
+
+def f_inv(x, p):
+    '''
+    eddycorr: model for relating relative humidity and -maxlag_h
+    '''
+    return p[0]+np.exp(x/p[1])
+
+def absdif(p,x,y,func):
+    '''
+    eddycorr: objective function
+    '''
+    return np.sum(np.abs(y-func(x, p))) 
 
 if __name__ == '__main__':
     import doctest
