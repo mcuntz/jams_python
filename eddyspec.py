@@ -4,8 +4,6 @@ import numpy as np
 from sread import sread # ufz
 from fread import fread # ufz
 from date2dec import date2dec # ufz
-import matplotlib.pyplot as plt
-import matplotlib.backends.backend_pdf as pdf
 import time as t
 import shutil as sh
 import re
@@ -13,7 +11,8 @@ import os as os
     
 ################################################################################
 def eddyspec(indir, cfile, hfile, rawfile, sltdir, tspfile='34_specmean.csv',
-             cspfile='35_specmean.csv', hspfile='36_specmean.csv', novalue=-9999):
+             cspfile='35_specmean.csv', hspfile='36_specmean.csv',
+             novalue=-9999, plot=False):
     '''
     Provides plots with carbon and water fluxes from the rawfile together
     with the respective time lags in the cfile and hfile for the user to select
@@ -109,52 +108,55 @@ def eddyspec(indir, cfile, hfile, rawfile, sltdir, tspfile='34_specmean.csv',
     hf       = np.array(fread('%s' %(rawfile), skip=1, cskip=1, nc=1))
     hf       = np.where(hf == novalue, np.nan, hf).flatten()
     
-    ############################################################################
-    # plot lag c    
-    plt.figure(1)                                        
-    plt.plot(cl[:,0], cl[:,2], 'bo', label='minlag (sam)')         
-    plt.plot(cl[:,0], cl[:,5], 'ro', label='maxlag (sam)')                
-    plt.xlabel('DOY')
-    plt.ylabel('Lags [Samples]')                    
-    plt.title('c lags')
-    plt.axis('auto')
-    plt.grid('on')                            
-    plt.legend()
-    
-    ############################################################################
-    # plot flux c
-    plt.figure(2)                                        
-    plt.plot(fluxdate, cf, 'r-', label='cflux')                        
-    plt.xlabel('DOY')
-    plt.ylabel('cflux [?]')                    
-    plt.title('c fluxes')
-    plt.axis('auto')
-    plt.grid('on')                            
-    plt.legend()
-    
-    ############################################################################
-    # plot lag h
-    plt.figure(3)                                        
-    plt.plot(hl[:,0], hl[:,2], 'bo', label='minlag (sam)')         
-    plt.plot(hl[:,0], hl[:,5], 'ro', label='maxlag (sam)')                
-    plt.xlabel('DOY')
-    plt.ylabel('Lags [Samples]')                    
-    plt.title('h lags')
-    plt.axis('auto')
-    plt.grid('on')                            
-    plt.legend()
-    
-    ############################################################################
-    # plot flux h
-    plt.figure(4)                                        
-    plt.plot(fluxdate, hf, 'b-', label='hflux')                        
-    plt.xlabel('DOY')
-    plt.ylabel('hflux [?]')                    
-    plt.title('h fluxes')
-    plt.axis('auto')
-    plt.grid('on')                            
-    plt.legend()
-    plt.show()
+    if plot:
+        import matplotlib.pyplot as plt
+        import matplotlib.backends.backend_pdf as pdf
+        ############################################################################
+        # plot lag c    
+        plt.figure(1)                                        
+        plt.plot(cl[:,0], cl[:,2], 'bo', label='minlag (sam)')         
+        plt.plot(cl[:,0], cl[:,5], 'ro', label='maxlag (sam)')                
+        plt.xlabel('DOY')
+        plt.ylabel('Lags [Samples]')                    
+        plt.title('c lags')
+        plt.axis('auto')
+        plt.grid('on')                            
+        plt.legend()
+        
+        ############################################################################
+        # plot flux c
+        plt.figure(2)                                        
+        plt.plot(fluxdate, cf, 'r-', label='cflux')                        
+        plt.xlabel('DOY')
+        plt.ylabel('cflux [?]')                    
+        plt.title('c fluxes')
+        plt.axis('auto')
+        plt.grid('on')                            
+        plt.legend()
+        
+        ############################################################################
+        # plot lag h
+        plt.figure(3)                                        
+        plt.plot(hl[:,0], hl[:,2], 'bo', label='minlag (sam)')         
+        plt.plot(hl[:,0], hl[:,5], 'ro', label='maxlag (sam)')                
+        plt.xlabel('DOY')
+        plt.ylabel('Lags [Samples]')                    
+        plt.title('h lags')
+        plt.axis('auto')
+        plt.grid('on')                            
+        plt.legend()
+        
+        ############################################################################
+        # plot flux h
+        plt.figure(4)                                        
+        plt.plot(fluxdate, hf, 'b-', label='hflux')                        
+        plt.xlabel('DOY')
+        plt.ylabel('hflux [?]')                    
+        plt.title('h fluxes')
+        plt.axis('auto')
+        plt.grid('on')                            
+        plt.legend()
+        plt.show()
     
     interval = []
     inp = True
@@ -223,44 +225,45 @@ def eddyspec(indir, cfile, hfile, rawfile, sltdir, tspfile='34_specmean.csv',
     conc = con[np.argmin(np.abs(devc))]
     conh = con[np.argmin(np.abs(devh))]
     
-    ############################################################################
-    # plot c spec
-    fig1 = plt.figure(5)
-    sub = fig1.add_subplot(111)                                       
-    sub.plot(np.log10(tsp[:,0]), np.log10(tsp[:,1]), 'ro-', label='T Spec') 
-    sub.plot(np.log10(csp[:,0]), np.log10(csp[:,1]), 'bo-', label='C Spec') 
-    sub.plot(np.log10(xc), modc(xc,conc),'go-', label='C Spec with %.2f Induc.' %(conc)) 
-    plt.xlabel('F[Hz]')
-    plt.ylabel('F[Hz]*Co(w,X)')                    
-    sub.set_title('c Spectrum')
-    sub.axis('auto')
-    sub.grid('on')                            
-    sub.legend(loc='best')
-
-    ############################################################################
-    # plot h spec
-    fig2 = plt.figure(6) 
-    sub = fig2.add_subplot(111)
-    sub.plot(np.log10(tsp[:,0]), np.log10(tsp[:,1]), 'ro-', label='T Spec') 
-    sub.plot(np.log10(hsp[:,0]), np.log10(hsp[:,1]), 'bo-', label='H Spec')
-    sub.plot(np.log10(xh), modh(xh,conh),'go-', label='H Spec %.2f Induc.' %(conh)) 
-    plt.xlabel('F[Hz]')
-    plt.ylabel('F[Hz]*Co(w,X)')                    
-    sub.set_title('h Spectrum')
-    sub.axis('auto')
-    sub.grid('on')                            
-    sub.legend(loc='best')
+    if plot:
+        ############################################################################
+        # plot c spec
+        fig1 = plt.figure(5)
+        sub = fig1.add_subplot(111)                                       
+        sub.plot(np.log10(tsp[:,0]), np.log10(tsp[:,1]), 'ro-', label='T Spec') 
+        sub.plot(np.log10(csp[:,0]), np.log10(csp[:,1]), 'bo-', label='C Spec') 
+        sub.plot(np.log10(xc), modc(xc,conc),'go-', label='C Spec with %.2f Induc.' %(conc)) 
+        plt.xlabel('F[Hz]')
+        plt.ylabel('F[Hz]*Co(w,X)')                    
+        sub.set_title('c Spectrum')
+        sub.axis('auto')
+        sub.grid('on')                            
+        sub.legend(loc='best')
     
-    plt.show()
-    
-    ############################################################################
-    # save figures    
-    pp1 = pdf.PdfPages('%s/c_spec%s.pdf' %(indir,rawfile[6:-4]))
-    pp2 = pdf.PdfPages('%s/h_spec%s.pdf' %(indir,rawfile[6:-4]))
-    fig1.savefig(pp1, format='pdf')
-    fig2.savefig(pp2, format='pdf')
-    pp1.close()
-    pp2.close()
+        ############################################################################
+        # plot h spec
+        fig2 = plt.figure(6) 
+        sub = fig2.add_subplot(111)
+        sub.plot(np.log10(tsp[:,0]), np.log10(tsp[:,1]), 'ro-', label='T Spec') 
+        sub.plot(np.log10(hsp[:,0]), np.log10(hsp[:,1]), 'bo-', label='H Spec')
+        sub.plot(np.log10(xh), modh(xh,conh),'go-', label='H Spec %.2f Induc.' %(conh)) 
+        plt.xlabel('F[Hz]')
+        plt.ylabel('F[Hz]*Co(w,X)')                    
+        sub.set_title('h Spectrum')
+        sub.axis('auto')
+        sub.grid('on')                            
+        sub.legend(loc='best')
+        
+        plt.show()
+        
+        ############################################################################
+        # save figures    
+        pp1 = pdf.PdfPages('%s/c_spec%s.pdf' %(indir,rawfile[6:-4]))
+        pp2 = pdf.PdfPages('%s/h_spec%s.pdf' %(indir,rawfile[6:-4]))
+        fig1.savefig(pp1, format='pdf')
+        fig2.savefig(pp2, format='pdf')
+        pp1.close()
+        pp2.close()
     
     ################################################################################
     # writing log file
