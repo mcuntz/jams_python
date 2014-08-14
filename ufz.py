@@ -74,6 +74,7 @@
     outlier                Rossner''s extreme standardized deviate outlier test.
     pack                   Similar to Fortran pack function with mask.
     pi                     Parameter importance index PI or alternatively B index calculation.
+    planarfit              Planar fit of Eddy Covariance wind components
     plot_brewer            Plots available Brewer color maps in pdf file.
     position               Position arrays of subplots to be used with add_axes.
     print_brewer           Prints available Brewer colormap names.
@@ -163,6 +164,7 @@
     nee2gpp_lasslop        nee2gpp using the daytime method of Lasslop et al. (2010)
     nee2gpp_reichstein     nee2gpp using several fits as in Reichstein et al. (2005)
     outlier                Rossner''s extreme standardized deviate outlier test.
+    planarfit              Planar fit of Eddy Covariance wind components
     rossner                Wrapper for outlier.
     t2sap                  Conversion of temperature difference to sap flux density.
     savitzky_golay         Smooth (and optionally differentiate) 1D data with a Savitzky-Golay filter.
@@ -371,6 +373,7 @@
               AP, Jul 2014 - meteo4slt
               AP, Jul 2014 - eddycorr
               AP, Jul 2014 - eddyspec
+              AP, Aug 2014 - planarfit
 """
 from __future__ import print_function
 
@@ -433,6 +436,7 @@ except:
     print("No extra statistics in scipy, i.e. in UFZ library. Disabled functions: outlier, rossner.")
 from pack              import pack
 from pi                import pi
+from planarfit         import planarfit
 from position          import position
 from readhdf           import readhdf, hdfread
 from readhdf4          import readhdf4, hdf4read
