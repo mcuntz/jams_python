@@ -1,7 +1,5 @@
 import numpy as np
 import sread, fread
-import matplotlib.pyplot as plt
-import matplotlib.backends.backend_pdf as pdf
 import pylab as pl
 from scipy import interpolate
 import csv
@@ -12,7 +10,7 @@ import shutil as sh
 from scipy.optimize import fmin
     
 def eddycorr(indir, sltdir, cfile, hfile, meteofile, outfile, novalue=-9999,
-             histstep=10, attach=True):
+             histstep=10, attach=True, plot=False):
     '''
     Moves EddyCorr files (cfile=35_corr.csv and hfile=36_corr.csv) from sltdir
     to indir after they have been created by EddyCorr (Kolle & Rebmann, 2007).
@@ -111,17 +109,20 @@ def eddycorr(indir, sltdir, cfile, hfile, meteofile, outfile, novalue=-9999,
     ############################################################################
     # checking for breakpoints
     print("\nBREAKPOINT CHECK:\n")
-    # plot lag c
-    plt.figure(1)                                        
-    plt.plot(c[:,0], c[:,2], 'bo', label='minlag (sam)')         
-    plt.plot(c[:,0], c[:,5], 'ro', label='maxlag (sam)')                
-    plt.xlabel('DOY')
-    plt.ylabel('Lags [Samples]')                    
-    plt.title('c')
-    plt.axis('auto')
-    plt.grid('on')                            
-    plt.legend()
-    plt.show()
+    if plot:
+        import matplotlib.pyplot as plt
+        import matplotlib.backends.backend_pdf as pdf
+        # plot lag c
+        plt.figure(1)                                        
+        plt.plot(c[:,0], c[:,2], 'bo', label='minlag (sam)')         
+        plt.plot(c[:,0], c[:,5], 'ro', label='maxlag (sam)')                
+        plt.xlabel('DOY')
+        plt.ylabel('Lags [Samples]')                    
+        plt.title('c')
+        plt.axis('auto')
+        plt.grid('on')                            
+        plt.legend()
+        plt.show()
     
     breaks = [0]
     inp = True
@@ -172,35 +173,35 @@ def eddycorr(indir, sltdir, cfile, hfile, meteofile, outfile, novalue=-9999,
     # plot c lag output
     
     print("\nFINAL LAG OUTPUT:\n")
+    if plot:
+        fig1 = plt.figure(7)                                        
+        sub = fig1.add_subplot(111)
+        sub.plot(c[:,0], cout.astype(int), 'ro')
+        plt.xlabel('doy')                               
+        plt.ylabel('lag (sam)')                    
+        sub.set_title('c lag ouput')
+        sub.axis('auto')
+        sub.grid('on')
+        
+        # plot h lag output
+        fig2 = plt.figure(8)                                        
+        sub = fig2.add_subplot(111)
+        sub.plot(h[:,0], hout.astype(int), 'ro')
+        plt.xlabel('doy')                               
+        plt.ylabel('h lag (sam)')                    
+        sub.set_title('h lag ouput')
+        sub.axis('auto')
+        sub.grid('on')
+        plt.show()
     
-    fig1 = plt.figure(7)                                        
-    sub = fig1.add_subplot(111)
-    sub.plot(c[:,0], cout.astype(int), 'ro')
-    plt.xlabel('doy')                               
-    plt.ylabel('lag (sam)')                    
-    sub.set_title('c lag ouput')
-    sub.axis('auto')
-    sub.grid('on')
-    
-    # plot h lag output
-    fig2 = plt.figure(8)                                        
-    sub = fig2.add_subplot(111)
-    sub.plot(h[:,0], hout.astype(int), 'ro')
-    plt.xlabel('doy')                               
-    plt.ylabel('h lag (sam)')                    
-    sub.set_title('h lag ouput')
-    sub.axis('auto')
-    sub.grid('on')
-    plt.show()
-
-    ############################################################################
-    # save figures    
-    pp1 = pdf.PdfPages('%s/c_lags%s.pdf' %(indir,outfile[4:-4]))
-    pp2 = pdf.PdfPages('%s/h_lags%s.pdf' %(indir,outfile[4:-4]))
-    fig1.savefig(pp1, format='pdf')
-    fig2.savefig(pp2, format='pdf')
-    pp1.close()
-    pp2.close()
+        ############################################################################
+        # save figures    
+        pp1 = pdf.PdfPages('%s/c_lags%s.pdf' %(indir,outfile[4:-4]))
+        pp2 = pdf.PdfPages('%s/h_lags%s.pdf' %(indir,outfile[4:-4]))
+        fig1.savefig(pp1, format='pdf')
+        fig2.savefig(pp2, format='pdf')
+        pp1.close()
+        pp2.close()
 
 ############################################################################
 # calculations
@@ -228,27 +229,27 @@ def calc(c, h, m, doys, histstep, indir):
     ############################################################################
     # plot lag c
     print("\nCO2 LAGS:\n")
-    
-    plt.figure(1)                                        
-    plt.plot(c[:,0], c[:,2], 'bo', label='minlag (sam)')         
-    plt.plot(c[:,0], c[:,5], 'ro', label='maxlag (sam)')                
-    plt.xlabel('DOY')
-    plt.ylabel('Lags [Samples]')                    
-    plt.title('c')
-    plt.axis('auto')
-    plt.grid('on')                            
-    plt.legend()
-    
-    # plot histogram lag c
-    plt.figure(2)
-    plt.bar(bin_edgescmin[0:-1:1], histcmin, width=histstep/2-1, color='b', label='minlag (sam)') 
-    plt.bar(bin_edgescmax[0:-1:1]+histstep/2, histcmax, width=histstep/2-1, color='r', label='maxlag (sam)')   
-    plt.xlabel('Classes of lags [samples]')
-    plt.ylabel('count')
-    plt.title('c')
-    plt.grid('on')
-    plt.legend()
-    plt.show()
+    if plot:
+        plt.figure(1)                                        
+        plt.plot(c[:,0], c[:,2], 'bo', label='minlag (sam)')         
+        plt.plot(c[:,0], c[:,5], 'ro', label='maxlag (sam)')                
+        plt.xlabel('DOY')
+        plt.ylabel('Lags [Samples]')                    
+        plt.title('c')
+        plt.axis('auto')
+        plt.grid('on')                            
+        plt.legend()
+        
+        # plot histogram lag c
+        plt.figure(2)
+        plt.bar(bin_edgescmin[0:-1:1], histcmin, width=histstep/2-1, color='b', label='minlag (sam)') 
+        plt.bar(bin_edgescmax[0:-1:1]+histstep/2, histcmax, width=histstep/2-1, color='r', label='maxlag (sam)')   
+        plt.xlabel('Classes of lags [samples]')
+        plt.ylabel('count')
+        plt.title('c')
+        plt.grid('on')
+        plt.legend()
+        plt.show()
     
     ctop = float(raw_input("Top of CO2 lag range: "))
     cbottom = float(raw_input("Bottom of CO2 lag range: "))
@@ -256,27 +257,27 @@ def calc(c, h, m, doys, histstep, indir):
     ############################################################################
     # plot lag h
     print("\nH2O LAGS:\n")
-    
-    plt.figure(3)                                        
-    plt.plot(h[:,0], h[:,2], 'bo', label='minlag (sam)')         
-    plt.plot(h[:,0], h[:,5], 'ro', label='maxlag (sam)')                
-    plt.xlabel('DOY')
-    plt.ylabel('Lags [Samples]')                    
-    plt.title('h')
-    plt.axis('auto')
-    plt.grid('on')                            
-    plt.legend()
-    
-    # plot histogram lag h
-    plt.figure(4)
-    plt.bar(bin_edgeshmin[0:-1:1], histhmin, width=histstep/2-1, color='b', label='minlag (sam)') 
-    plt.bar(bin_edgeshmax[0:-1:1]+histstep/2, histhmax, width=histstep/2-1, color='r', label='maxlag (sam)')   
-    plt.xlabel('Classes of lags [samples]')
-    plt.ylabel('count')
-    plt.title('h')
-    plt.grid('on')
-    plt.legend()
-    plt.show()
+    if plot:
+        plt.figure(3)                                        
+        plt.plot(h[:,0], h[:,2], 'bo', label='minlag (sam)')         
+        plt.plot(h[:,0], h[:,5], 'ro', label='maxlag (sam)')                
+        plt.xlabel('DOY')
+        plt.ylabel('Lags [Samples]')                    
+        plt.title('h')
+        plt.axis('auto')
+        plt.grid('on')                            
+        plt.legend()
+        
+        # plot histogram lag h
+        plt.figure(4)
+        plt.bar(bin_edgeshmin[0:-1:1], histhmin, width=histstep/2-1, color='b', label='minlag (sam)') 
+        plt.bar(bin_edgeshmax[0:-1:1]+histstep/2, histhmax, width=histstep/2-1, color='r', label='maxlag (sam)')   
+        plt.xlabel('Classes of lags [samples]')
+        plt.ylabel('count')
+        plt.title('h')
+        plt.grid('on')
+        plt.legend()
+        plt.show()
     
     print "! Only maxlag (sam) can be used for H2O !"
     htop    = float(raw_input("Top of H2O lag range: "))
@@ -290,18 +291,18 @@ def calc(c, h, m, doys, histstep, indir):
     
     hsub = h[np.where((h[:,5]<=htop)&(h[:,5]>=hbottom))[0],5]
     msub = m[np.where((h[:,5]<=htop)&(h[:,5]>=hbottom))[0],0]
-    
-    # plot max lag vs. rH
-    fig3 = plt.figure(6)
-    sub = fig3.add_subplot(111)                                       
-    sub.plot(msub, hsub, 'ro', label='measurements')
-    plt.xlabel('rH [%]')                    
-    plt.ylabel('maxlag (sam)')                               
-    sub.set_title('h maxlag (sam) - rH correlation')
-    sub.axis('auto')
-    sub.grid('on')                            
-    plt.legend()
-    plt.show()
+    if plot:
+        # plot max lag vs. rH
+        fig3 = plt.figure(6)
+        sub = fig3.add_subplot(111)                                       
+        sub.plot(msub, hsub, 'ro', label='measurements')
+        plt.xlabel('rH [%]')                    
+        plt.ylabel('maxlag (sam)')                               
+        sub.set_title('h maxlag (sam) - rH correlation')
+        sub.axis('auto')
+        sub.grid('on')                            
+        plt.legend()
+        plt.show()
     
     pbt = 't'
     while pbt=='t':
@@ -311,7 +312,7 @@ def calc(c, h, m, doys, histstep, indir):
         p_guess1 = float(raw_input("Initial guess - Lag offset: "))*-1.
         p_guess2 = float(raw_input("Initial guess - rH multiplier: "))
                 
-        p, ff = fit(-hsub[valid], msub[valid], func=f, p_guess=[p_guess1,p_guess2],plot=True)
+        p, ff = fit(-hsub[valid], msub[valid], func=f, p_guess=[p_guess1,p_guess2],plot=plot)
         print 'Offset=%f'%(p[0]*-1.), 'Multiplier=%f'%(p[1])
         pbt = raw_input("(g)ood fit - proceed, (b)ad fit - proceed, (t)ry again: ")
         if pbt not in ['g', 'b', 't']:
