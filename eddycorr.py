@@ -1,6 +1,5 @@
 import numpy as np
 import sread, fread
-import pylab as pl
 from scipy import interpolate
 import csv
 import sys
@@ -99,7 +98,7 @@ def eddycorr(indir, sltdir, cfile, hfile, meteofile, outfile, novalue=-9999,
     h      = np.array(fread.fread('%s/%s' %(indir,hfile), skip=1, cskip=1))
     try:
         m      = np.array(fread.fread(meteofile, cskip=2, nc=1))
-        m      = np.where(m.astype(int) == novalue, pl.NaN, m)
+        m      = np.where(m.astype(int) == novalue, np.NaN, m)
     except TypeError: 
         print 'EddyCorrWarning: No meteorology file found, no fitting with rH can be done!'
         m      = False
