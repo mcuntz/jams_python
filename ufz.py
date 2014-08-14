@@ -103,6 +103,7 @@
     srrasa                 Generates stratified random 2D points within a given rectangular area.
     srrasa_trans           Generates stratified random 2D transects within a given rectangular area.
     tcherkez               Calculates the Tcherkez model of 13C-discrimiantion in the Calvin cycle.
+    timestepcheck          Fills missing time steps in ascii data files
     tsym                   Raw unicodes for common symbols.
     unpack                 Similar to Fortran unpack function with mask.
     volume_poly            Volume of function above a polygon
@@ -176,7 +177,7 @@
     sltclean               Moves *.slt files in a deleted folder to exclude from processing (EddySoft files).
     srrasa                 Generates stratified random 2D points within a given rectangular area.
     srrasa_trans           Generates stratified random 2D transects within a given rectangular area.
-
+    timestepcheck          Fills missing time steps in ascii data files
 
     Date & Time
     -----------
@@ -374,6 +375,7 @@
               AP, Jul 2014 - eddycorr
               AP, Jul 2014 - eddyspec
               AP, Aug 2014 - planarfit
+              AP, Aug 2014 - timestepcheck
 """
 from __future__ import print_function
 
@@ -456,6 +458,7 @@ from sobol_index       import sobol_index
 from sread             import sread
 from srrasa            import srrasa, srrasa_trans
 from tcherkez          import tcherkez
+from timestepcheck     import timestepcheck 
 from tsym              import tsym
 from unpack            import unpack
 from volume_poly       import volume_poly
