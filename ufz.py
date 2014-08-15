@@ -54,6 +54,7 @@
     inpoly                 Wrapper for in_poly.
     int2roman              Integer to roman numeral conversion.
     interpol               One-dimensional linear interpolation on first dimension.
+    itc                    Calculation of integral turbulence characteristics after Thomas & Foken (2002)
     jab                    Jackknife-after-Bootstrap error.
     kernel_regression      Multi-dimensional non-parametric regression.
     kernel_regression_h    Optimal bandwidth for kernel regression.
@@ -154,6 +155,7 @@
     fill_nonfinite         Fill missing values by linear interpolation.
     gapfill                Gapfill Eddy flux data.
     interpol               One-dimensional linear interpolation on first dimension.
+    itc                    Calculation of integral turbulence characteristics after Thomas & Foken (2002)    
     kriging                Krig a surface from a set of 2D points.
     kernel_regression      Multi-dimensional non-parametric regression.
     kernel_regression_h    Optimal bandwidth for kernel regression.
@@ -379,6 +381,7 @@
               AP, Aug 2014 - planarfit
               AP, Aug 2014 - timestepcheck
               AP, Aug 2014 - fluxplot
+              AP, Aug 2014 - itc
 """
 from __future__ import print_function
 
@@ -423,6 +426,7 @@ from heaviside         import heaviside
 from homo_sampling     import homo_sampling  
 from in_poly           import in_poly, inpoly
 from interpol          import interpol
+from itc               import itc
 from kernel_regression import kernel_regression, kernel_regression_h
 from kriging           import kriging
 from lagcorr           import lagcorr
