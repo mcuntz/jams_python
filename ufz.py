@@ -38,6 +38,7 @@
     esat                   Calculates the saturation vapour pressure of water/ice.
     fill_nonfinite         Fill missing values by linear interpolation.
     find_in_path           Look for file in system path.
+    fluxplot               Plotting routine for Eddy Covariance or other ascii data file
     fread                  Reads in float array from ascii file.
     functions              Common functions that are used in curve_fit or fmin parameter estimations.
     gapfill                Gapfill Eddy flux data.
@@ -246,11 +247,12 @@
     abc2plot               Write a, b, c, ... on plots.
     colors                 Wrapper for colour.
     colours                Define UFZ colours.
-    register_brewer        Registers and registers Brewer colormap.
     get_brewer             Registers and returns Brewer colormap.
+    fluxplot               Plotting routine for Eddy Covariance or other ascii data file
     plot_brewer            Plots available Brewer color maps in pdf file.
     position               Position arrays of subplots to be used with add_axes.
     print_brewer           Prints available Brewer colormap names.
+    register_brewer        Registers and registers Brewer colormap.
     rgb                    Interpolate between colours; make continuous colour maps.
     signature2plot         Write a copyright notice on a plot.
     tsym                   Raw unicodes for common symbols.
@@ -376,6 +378,7 @@
               AP, Jul 2014 - eddyspec
               AP, Aug 2014 - planarfit
               AP, Aug 2014 - timestepcheck
+              AP, Aug 2014 - fluxplot
 """
 from __future__ import print_function
 
@@ -406,6 +409,7 @@ from errormeasures     import *
 from esat              import esat
 from fill_nonfinite    import fill_nonfinite
 from find_in_path      import find_in_path
+from fluxplot          import fluxplot 
 from fread             import fread
 import functions
 from gapfill           import gapfill
