@@ -80,7 +80,7 @@ def spikeflag(date, data, inflag, isday, window=13, iter=1,
     Written,  AP, Aug 2014
     '''       
     rows, cols = np.shape(data)
-    flag       = np.zeros_like(inflag)
+    flag       = np.zeros_like(inflag).astype(np.int)
     
     # mad window length and flag window length 
     period   = np.int(window*t_int)/2
