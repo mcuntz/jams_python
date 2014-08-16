@@ -99,6 +99,7 @@
     sigma_filter           Mask values deviating more than z standard deviations from a given function.
     signature2plot         Write a copyright notice on a plot.
     sltclean               Moves *.slt files in a deleted folder to exclude from processing (EddySoft files).
+    spikeflag              Spike detection for Eddy Covariance data (and basically all other data)
     maskgroup              Masks elements in a 1d array gathered in small groups.
     sobol_index            Calculates the first-order and total variance-based sensitivity indices.
     sread                  Reads in string array from ascii file.
@@ -178,6 +179,7 @@
     sg2d                   Wrapper savitzky_golay2d.
     sigma_filter           Mask values deviating more than z standard deviations from a given function.
     sltclean               Moves *.slt files in a deleted folder to exclude from processing (EddySoft files).
+    spikeflag              Spike detection for Eddy Covariance data (and basically all other data)
     srrasa                 Generates stratified random 2D points within a given rectangular area.
     srrasa_trans           Generates stratified random 2D transects within a given rectangular area.
     timestepcheck          Fills missing time steps in ascii data files
@@ -382,6 +384,7 @@
               AP, Aug 2014 - timestepcheck
               AP, Aug 2014 - fluxplot
               AP, Aug 2014 - itc
+              AP, Aug 2014 - spikeflag
 """
 from __future__ import print_function
 
@@ -463,6 +466,7 @@ from sigma_filter      import sigma_filter
 from signature2plot    import signature2plot
 from sltclean          import sltclean
 from sobol_index       import sobol_index
+from spikeflag         import spikeflag 
 from sread             import sread
 from srrasa            import srrasa, srrasa_trans
 from tcherkez          import tcherkez
