@@ -2,7 +2,7 @@ import numpy as np
 from mad import mad
 
 def spikeflag(date, data, inflag, isday, window=13, iter=1,
-              fill_days=1, t_int=48, z=7, deriv=1, udef=-9999, spike_v=2,
+              fill_days=1, t_int=48, z=7, deriv=0, udef=-9999, spike_v=2,
               plot=False):
     '''
     Spike detection for Eddy Covariance data (and basically all other data)
@@ -13,7 +13,7 @@ def spikeflag(date, data, inflag, isday, window=13, iter=1,
     Definition
     ----------
     spikeflag(date, data, inflag, isday, window=13, iter=1,
-              fill_days=1, t_int=48, z=5.5, deriv=1, udef=-9999, spike_v=2,
+              fill_days=1, t_int=48, z=5.5, deriv=0, udef=-9999, spike_v=2,
               plot=False):
     
     
