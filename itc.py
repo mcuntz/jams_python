@@ -71,8 +71,7 @@ def itc(H, zeta, ustar, varu, varw, vart, rho, lat, limit, outdir, plot=False):
     -------
     Written,  AP, Aug 2014
     '''       
-    
-    
+        
     ############################################################################
     # itc models
     def itc_flag(meas, mod, limit):
@@ -253,3 +252,7 @@ def itc(H, zeta, ustar, varu, varw, vart, rho, lat, limit, outdir, plot=False):
         pp5.close()
 
     return itcu, itcw, itct
+
+if __name__ == '__main__':
+    import doctest
+    doctest.testmod()
