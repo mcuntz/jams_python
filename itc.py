@@ -252,4 +252,4 @@ def itc(H, zeta, ustar, varu, varw, vart, rho, lat, limit, outdir, plot=False):
         pp4.close()
         pp5.close()
 
-return itcu, itcw, itct
+    return itcu, itcw, itct
