@@ -275,8 +275,11 @@ def ustarflag(date, data, flags, isday, outdir, min_thresh=0.1, nboot=100,
             
             #print 'Year: %i, u_star thresh: %5.3f'%(y, med)
             
+            ####################################################################
+            # plot
             if plot:
                 import matplotlib.pyplot as plt
+                import matplotlib.backends.backend_pdf as pdf
                 fig1 = plt.figure(1)
                 sub1 = fig1.add_subplot(111)
                 sub1.plot(ustar[np.where(flag & (years==y).flatten())],\
@@ -286,6 +289,10 @@ def ustarflag(date, data, flags, isday, outdir, min_thresh=0.1, nboot=100,
                 plt.xlabel('u_star')
                 plt.title('u_star thresh: %5.3f'%med)
                 plt.show()
+
+                pp1 = pdf.PdfPages(outdir+'/ustar.pdf')
+                fig1.savefig(pp1, format='pdf')
+                pp1.close()
 
     ############################################################################
     # save output    
