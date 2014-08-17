@@ -109,6 +109,7 @@
     timestepcheck          Fills missing time steps in ascii data files
     tsym                   Raw unicodes for common symbols.
     unpack                 Similar to Fortran unpack function with mask.
+    ustarflag              Friction velocity flagging for Eddy Covariance data
     volume_poly            Volume of function above a polygon
     writenetcdf            Write netCDF4 file.
     xkcd                   Make plot look handdrawn.
@@ -183,7 +184,8 @@
     srrasa                 Generates stratified random 2D points within a given rectangular area.
     srrasa_trans           Generates stratified random 2D transects within a given rectangular area.
     timestepcheck          Fills missing time steps in ascii data files
-
+    ustarflag              Friction velocity flagging for Eddy Covariance data
+    
     Date & Time
     -----------
     date2dec               Converts arrays with calendar date to decimal date.
@@ -385,6 +387,7 @@
               AP, Aug 2014 - fluxplot
               AP, Aug 2014 - itc
               AP, Aug 2014 - spikeflag
+              AP, Aug 2014 - ustarflag
 """
 from __future__ import print_function
 
@@ -473,6 +476,7 @@ from tcherkez          import tcherkez
 from timestepcheck     import timestepcheck 
 from tsym              import tsym
 from unpack            import unpack
+from ustarflag         import ustarflag 
 from volume_poly       import volume_poly
 from writenetcdf       import writenetcdf
 from xkcd              import xkcd
