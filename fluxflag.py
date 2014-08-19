@@ -67,7 +67,7 @@ def fluxflag(fluxfile, metfile, outdir, swdr, T, lat, delimiter=[',',','],
     ------
     flags.csv     file containing all calculated flags
     fluxflags.csv file containing fluxes with the sum of all respective flags
-                  for each flux
+                  for each flux. Where flag>2, flag=2.
     flags.log     file containing statistics for each flag
     
     
@@ -236,24 +236,31 @@ def fluxflag(fluxfile, metfile, outdir, swdr, T, lat, delimiter=[',',','],
     flags_str = np.zeros_like(flags, dtype='|S100')
     for i, item in enumerate(maxlen):
         flags_str[:,i] = astr(flags[:,i], prec=item)
-
+    
     # save flag file
+    output = np.hstack((d[:,0:1], flags_str))
     np.savetxt('%s/flags.csv'%outdir,
-               np.vstack((header[np.newaxis,:],flags_str)), '%s', delimiter=',')
+               np.vstack((np.concatenate((['            date'], header))[np.newaxis,:],
+                          output)), '%s', delimiter=',')
 
     ###########################################################################
     # summing flags for each flux
     Hflag   = np.nansum(np.vstack((sttest2[:,6], itcw, texcr, wexvar, texvar,
                                    wvar0, spikef[:,0])).transpose(), 1).astype(int)
+    Hflag[Hflag>1]=2
     LEflag  = np.nansum(np.vstack((sttest2[:,5], itcw, h2oexli, h2oexcr, wexvar,
                                    h2oexvar3, wvar0, h2ovar0, spikef[:,1])).transpose(), 1).astype(int)
+    LEflag[LEflag>1]=2
     Eflag   = np.nansum(np.vstack((sttest2[:,5], itcw, h2oexli, h2oexcr, wexvar,
                                    h2oexvar3, wvar0, h2ovar0, spikef[:,2])).transpose(), 1).astype(int)
+    Eflag[Eflag>1]=2
     Cflag   = np.nansum(np.vstack((sttest2[:,4], itcw, c02exli, co2excr, wexvar,
                                    h2oexvar10, co2exvar3, wvar0, co2var0, spikef[:,3],
                                    ustarf)).transpose(), 1).astype(int) ### why h20exvar10
+    Cflag[Cflag>1]=2
     Tauflag = np.nansum(np.vstack((sttest2[:,3], itcu, itcw, tauexcr, wexvar,
                                    wvar0, spikef[:,4])).transpose(), 1).astype(int)
+    Tauflag[Tauflag>1]=2
     header2     = np.array(['          H', '   Hflag', '         LE', '  LEflag', '          E', '   Eflag', '          C',
                             '   Cflag', '        TAU', ' TAUflag'])
     fluxes[np.isnan(fluxes)] = novalue
@@ -265,11 +272,12 @@ def fluxflag(fluxfile, metfile, outdir, swdr, T, lat, delimiter=[',',','],
     Cflag_str   = astr(Cflag, prec=8)
     Tauflag_str = astr(Tauflag, prec=8)
     
-    output = fluxes_str.repeat(2, axis=1)    
-    output[:,1::2] = np.vstack((Hflag_str, LEflag_str, Eflag_str, Cflag_str,
+    output = np.hstack((d[:,0:1], fluxes_str.repeat(2, axis=1)))
+    output[:,2::2] = np.vstack((Hflag_str, LEflag_str, Eflag_str, Cflag_str,
                                Tauflag_str)).transpose()
     np.savetxt('%s/fluxflags.csv'%outdir,
-               np.vstack((header2[np.newaxis,:],output)), '%s', delimiter=',')
+               np.vstack((np.concatenate((['            date'], header2))[np.newaxis,:],
+                          output)), '%s', delimiter=',')
     
     ###########################################################################
     # write log file with stats
