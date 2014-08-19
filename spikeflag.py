@@ -1,7 +1,7 @@
 import numpy as np
 from mad import mad
 
-def spikeflag(date, data, inflag, isday, window=13, iter=1,
+def spikeflag(date, data, inflag, isday, outdir, window=13, iter=1,
               fill_days=1, t_int=48, z=7, deriv=0, udef=-9999, spike_v=2,
               plot=False):
     '''
@@ -26,6 +26,7 @@ def spikeflag(date, data, inflag, isday, window=13, iter=1,
                 is only applied where inflag=0, all other data is ignored
     isday       np.array(N), dtype=bool, True where it is day and False where
                 it is night
+    outdir      path where plots are saved
                   
                         
     Optional Input
@@ -81,7 +82,6 @@ def spikeflag(date, data, inflag, isday, window=13, iter=1,
     '''       
     rows, cols = np.shape(data)
     flag       = np.zeros_like(inflag).astype(np.int)
-    
     # mad window length and flag window length 
     period   = np.int(window*t_int)/2
     fill_win = np.int(fill_days*t_int)/2
@@ -103,12 +103,12 @@ def spikeflag(date, data, inflag, isday, window=13, iter=1,
     for col in xrange(cols):
         # iterate as much as iter
         for i in xrange(iter):
-            # get day and night data
+            # get day and night data#
             day_data   = np.where((isday | isddday) & (inflag[:,col]==0) &
-                                  (data[:,col]!=udef | ~np.isnan(data[:,col])),
+                                  ((data[:,col]!=udef) | (~np.isnan(data[:,col]))),
                                   data[:,col], np.nan)
-            night_data = np.where(((~isday) | isddnight) & (inflag[:,col]==0) &
-                                  (data[:,col]!=udef | ~np.isnan(data[:,col])),
+            night_data = np.where((~isday | isddnight) & (inflag[:,col]==0) &
+                                  ((data[:,col]!=udef) | (~np.isnan(data[:,col]))),
                                   data[:,col], np.nan)       
 
             # iterate over flag window
@@ -119,31 +119,34 @@ def spikeflag(date, data, inflag, isday, window=13, iter=1,
                 fill_start = np.max([ j - fill_win,1])
                 fill_end   = np.min([ j + fill_win,isday.size-1])
                 
-                day_flag = mad(np.ma.masked_array(data=day_data[j1:j2],\
-                               mask=(np.isnan(day_data[j1:j2]))), z=z,\
-                               deriv=deriv)
-                
-                flag[fill_start:fill_end,col] += np.where\
-                        (day_flag[fill_start-j1-1:fill_end-j1-1] == 1,\
-                         spike_v, 0)
-                
-                night_flag = mad(np.ma.masked_array(data=night_data[j1:j2],\
-                                 mask=(np.isnan(night_data[j1:j2]))), z=z,\
-                                 deriv=deriv)
-                
-                flag[fill_start:fill_end,col] += np.where\
-                        (night_flag[fill_start-j1-1:fill_end-j1-1] == 1,\
-                         spike_v, 0)
+                day_flag = mad(np.ma.masked_array(data=day_data[j1:j2],
+                                                  mask=(np.isnan(day_data[j1:j2]))),
+                               z=z, deriv=deriv)
+
+                flag[fill_start:fill_end,col] += np.where(day_flag[fill_start-j1-1:fill_end-j1-1],
+                                                          spike_v, 0)
+                                
+                night_flag = mad(np.ma.masked_array(data=night_data[j1:j2],
+                                                    mask=(np.isnan(night_data[j1:j2]))),
+                                 z=z, deriv=deriv)
+
+                flag[fill_start:fill_end,col] += np.where(night_flag[fill_start-j1-1:fill_end-j1-1],
+                                                          spike_v, 0)
                 
             if plot:
                 import matplotlib.pyplot as plt
+                import matplotlib.backends.backend_pdf as pdf
                 fig1 = plt.figure(1)
                 sub1 = fig1.add_subplot(111)
-                valid = (inflag[:,col]==0) &\
-                        (data[:,col]!=udef | ~np.isnan(data[:,col]))
-                l1 =sub1.plot(date, data[valid,col], '-b')
-                l2 =sub1.plot(date, data[flag!=0,col], 'or')
+                valid = (inflag[:,col]==0) & ((data[:,col]!=udef) |
+                                              (~np.isnan(data[:,col])))
+                l1 =sub1.plot(date[valid], data[valid,col], '-b')
+                l2 =sub1.plot(date[flag[:,col]!=0], data[flag[:,col]!=0,col], 'or')
                 plt.show()
+                
+                pp1 = pdf.PdfPages(outdir+'/spike_%i.pdf'%col)
+                fig1.savefig(pp1, format='pdf')
+                pp1.close()
     
     return flag
 
