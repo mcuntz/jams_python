@@ -38,6 +38,7 @@
     esat                   Calculates the saturation vapour pressure of water/ice.
     fill_nonfinite         Fill missing values by linear interpolation.
     find_in_path           Look for file in system path.
+    fluxfill               Wrapper function for gapfill with file management and plotting.
     fluxflag               Quality flag calculation for Eddy Covariance data
     fluxplot               Plotting routine for Eddy Covariance or other ascii data file
     fread                  Reads in float array from ascii file.
@@ -155,6 +156,7 @@
     convex_hull            Calculate subset of points that make a convex hull around a set of 2D points.
     eddycorr               Calculate time lags between wind and concentrations for EddyFlux.
     eddyspec               Performs spectrum analysis with EddySpec and SpecMean and determines inductances.
+    fluxfill               Wrapper function for gapfill with file management and plotting.
     fluxflag               Quality flag calculation for Eddy Covariance data
     fill_nonfinite         Fill missing values by linear interpolation.
     gapfill                Gapfill Eddy flux data.
@@ -391,6 +393,7 @@
               AP, Aug 2014 - spikeflag
               AP, Aug 2014 - ustarflag
               AP, Aug 2014 - fluxflag
+              AP, Aug 2014 - fluxfill
 """
 from __future__ import print_function
 
@@ -421,6 +424,7 @@ from errormeasures     import *
 from esat              import esat
 from fill_nonfinite    import fill_nonfinite
 from find_in_path      import find_in_path
+from fluxfill          import fluxfill
 from fluxflag          import fluxflag 
 from fluxplot          import fluxplot 
 from fread             import fread
