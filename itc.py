@@ -1,4 +1,5 @@
 import numpy as np
+import warnings
 
 def itc(H, zeta, ustar, varu, varw, vart, rho, lat, limit, outdir, plot=False):
     '''
@@ -110,11 +111,11 @@ def itc(H, zeta, ustar, varu, varw, vart, rho, lat, limit, outdir, plot=False):
     
     meas_u_pos      = np.sqrt(varu[zeta_pos])/ustar[zeta_pos]
     mod_u_pos       = u_pos(ustar[zeta_pos], f)
-    itcu[zeta_pos] = itc_flag(meas_u_pos, mod_u_pos)
+    itcu[zeta_pos] = itc_flag(meas_u_pos, mod_u_pos, limit)
     
     meas_u_neg      = np.sqrt(varu[zeta_neg])/ ustar[zeta_neg]
     mod_u_neg       = u_neg(zeta[zeta_neg])
-    itcu[zeta_neg] = itc_flag(meas_u_neg, mod_u_neg)
+    itcu[zeta_neg] = itc_flag(meas_u_neg, mod_u_neg, limit)
     
     itcu[(~np.isnan(itcu)) & (~zeta_neg) & (~zeta_pos)] = 2
     
@@ -124,11 +125,11 @@ def itc(H, zeta, ustar, varu, varw, vart, rho, lat, limit, outdir, plot=False):
     
     meas_w_pos      = np.sqrt(varw[zeta_pos])/ustar[zeta_pos]
     mod_w_pos       = w_pos(ustar[zeta_pos], f)
-    itcw[zeta_pos] = itc_flag(meas_w_pos, mod_w_pos)
+    itcw[zeta_pos] = itc_flag(meas_w_pos, mod_w_pos, limit)
     
     meas_w_neg      = np.sqrt(varw[zeta_neg])/ustar[zeta_neg]
     mod_w_neg       = w_neg(zeta[zeta_neg])
-    itcw[zeta_neg] = itc_flag(meas_w_neg, mod_w_neg)
+    itcw[zeta_neg] = itc_flag(meas_w_neg, mod_w_neg, limit)
     
     itcw[(~np.isnan(itcw)) & (~zeta_neg) & (~zeta_pos)] = 2
     
@@ -136,9 +137,11 @@ def itc(H, zeta, ustar, varu, varw, vart, rho, lat, limit, outdir, plot=False):
     # itct
     itct = np.where(np.isnan(vart), np.NaN, 0).astype(np.int)
     
-    meas_t = np.sqrt(vart) * 1004.67 * rho * ustar/np.abs(H)
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        meas_t = np.sqrt(vart) * 1004.67 * rho * ustar/np.abs(H)
     mod_t  = t_all(zeta)
-    itct  = itc_flag(meas_t, mod_t)
+    itct  = itc_flag(meas_t, mod_t, limit)
     
     ############################################################################
     # plots
@@ -220,7 +223,7 @@ def itc(H, zeta, ustar, varu, varw, vart, rho, lat, limit, outdir, plot=False):
         sub1 = fig5.add_subplot(111)
         x_mod = np.arange(-1,0.5,0.01)
         y_mod  = t_all(x_mod)
-        l1 = sub1.plot(val[:,26], meas_t, 'bo')
+        l1 = sub1.plot(zeta, meas_t, 'bo')
         l2 = sub1.plot(x_mod, y_mod, 'g-', label='x*|zeta|**(-1/y)')
         l3 = sub1.plot(x_mod, y_mod*1.3, 'r-', label='+30%')
         l4 = sub1.plot(x_mod, y_mod*0.7, 'r-', label='-30%')
