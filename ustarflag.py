@@ -100,7 +100,7 @@ def ustarflag(date, data, flags, isday, outdir, min_thresh=0.1, nboot=100,
     yrmin = np.min(years)
     yrmax = np.max(years)
     nyears = yrmax - yrmin ######## + 1 works only for one full year of data
-    if (nyears>1) | (np.unique(days).size<365):
+    if (nyears>1) | (np.unique(months).size<12):
         raise ValueError('ustarflag: only one full year of data can be processed')
     flag = (flag_Fco2==0)&(~isday)&(flag_T==0)&(flag_ustar==0)
     
