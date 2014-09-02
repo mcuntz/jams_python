@@ -4,6 +4,7 @@ import numpy as np
 import scipy.optimize as opt # curve_fit, fmin, fmin_tnc
 import functions # from ufz
 from mad import mad # from ufz
+import warnings
 # import pdb
 
 # ----------------------------------------------------------------------
@@ -55,7 +56,7 @@ def nee2gpp(dates, nee, t, isday, rg=False, vpd=False, undef=np.nan,
                      if True:  return masked arrays where outputs would be undef
 
         If method = 'night' | 'reichstein', extra parameters are
-        nogppnight   if True:  Resp=NEE, GPP=0 at night
+        nogppnight   if True:  Resp=NEE, GPP=0 at night, GPP always positive
                      if False: Resp=lloyd_taylor, GPP=Resp-NEE at night (default)
 
 
@@ -66,7 +67,7 @@ def nee2gpp(dates, nee, t, isday, rg=False, vpd=False, undef=np.nan,
 
         Restrictions
         ------------
-        None.
+        Negative respiration possible at night when gpp is forced to 0 with nogppnight=True
 
 
         Literature
@@ -150,6 +151,8 @@ def nee2gpp(dates, nee, t, isday, rg=False, vpd=False, undef=np.nan,
                  MC, Nov 2012 - wrapper for individual routines nee2gpp_reichstein etc.
                  MC, Feb 2013 - ported to Python 3
                  MC, May 2013 - replaced cost functions by generel cost function cost_abs if possible
+                 AP, Aug 2014 - replaced fmin with fmin_tnc to permit params<0,
+                                permit gpp<0 at any time if nogppnight=True 
     """
 
     # Global relationship in Reichstein et al. (2005)
@@ -160,7 +163,7 @@ def nee2gpp(dates, nee, t, isday, rg=False, vpd=False, undef=np.nan,
         return nee2gpp_reichstein(dates, nee, t, isday, undef=undef, shape=shape, masked=masked, nogppnight=nogppnight)
     # Lasslop et al. (2010) method
     elif ((method.lower() == 'day') | (method.lower() == 'lasslop')):
-        return nee2gpp_lasslop(dates, nee, t, isday, rg, vpd, undef=undef, shape=shape, masked=masked)
+        return nee2gpp_lasslop(dates, nee, t, isday, rg, vpd, undef=undef, shape=shape, masked=masked, nogppnight=nogppnight)
     # Include new methods here
     else:
         raise ValueError('Error nee2gpp: method not implemented yet.')
@@ -498,8 +501,12 @@ def nee2gpp_reichstein(dates, nee, t, isday, rg=False, vpd=False, undef=np.nan,
             mm   = ~mad(net1, z=4.5) # make fit more robust by removing outliers
             if (np.ptp(tt[iii]) >= 5.) & (np.sum(mm) > 6):
                 # print(i)
-                p     = opt.fmin(functions.cost_lloyd_fix, [2.,200.], args=(tt1[mm], net1[mm]), disp=False) # robust params
-                # if i == 2451921: pdb.set_trace()
+                #p     = opt.fmin(functions.cost_lloyd_fix, [2.,200.], args=(tt1[mm], net1[mm]), disp=False) # robust params
+                
+                p, temp1, temp2 = opt.fmin_tnc(functions.cost_lloyd_fix, [2.,200.], bounds=[[0.,None],[0.,None]],
+                                              args=(tt1[mm], net1[mm]),
+                                              approx_grad=True, disp=False)
+                
                 try:
                     p1, c = opt.curve_fit(functions.lloyd_fix, tt1[mm], net1[mm], p0=p, maxfev=10000) # params, covariance
                     if np.all(np.isfinite(c)): # possible return of curvefit: c=inf
@@ -525,7 +532,9 @@ def nee2gpp_reichstein(dates, nee, t, isday, rg=False, vpd=False, undef=np.nan,
     locs   = np.squeeze(np.array(locs).astype(np.float))
     # 2. E0 = avg of best 3
     # Reichstein et al. (2005), p. 1430, 1st paragraph.
-    iii  = np.where((locp[:,1] > 0.) & (locp[:,1] < 450.) & (np.abs(locs[:,1]/locp[:,1]) < 0.5))[0]
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        iii  = np.where((locp[:,1] > 0.) & (locp[:,1] < 450.) & (np.abs(locs[:,1]/locp[:,1]) < 0.5))[0]
     niii = iii.size
     if niii==0:
         # raise ValueError('Error nee2gpp_reichstein: No good local relationship found.')
@@ -575,7 +584,12 @@ def nee2gpp_reichstein(dates, nee, t, isday, rg=False, vpd=False, undef=np.nan,
             # p = np.sum(net[iii]*et[iii])/np.sum(et[iii]**2)
             # p, c = opt.curve_fit(functions.lloyd_only_rref, et[iii], net[iii], p0=[2.])
             #p      = opt.fmin(functions.cost_lloyd_only_rref, [2.], args=(et[iii], net[iii]), disp=False)
-            p = opt.fmin(functions.cost_abs, [2.], args=(functions.lloyd_only_rref_p, et[iii], net[iii]), disp=False)
+            #p = opt.fmin(functions.cost_abs, [2.], args=(functions.lloyd_only_rref_p, et[iii], net[iii]), disp=False)
+            
+            p, temp1, temp2 = opt.fmin_tnc(functions.cost_abs, [2.], bounds=[[0.,None]],
+                                              args=(functions.lloyd_only_rref_p, et[iii], net[iii]),
+                                              approx_grad=True, disp=False)
+                
             refp  += [p]
             refii += [np.int((iii[0]+iii[-1])//2)]
     if len(refp) == 0:
@@ -610,6 +624,11 @@ def nee2gpp_reichstein(dates, nee, t, isday, rg=False, vpd=False, undef=np.nan,
         ii   = np.where(~mask)[0]
         Reco[ii] = nee[ii]
         GPP[ii]  = 0.
+        # and prohibit negative gpp at any time
+        mask = nee.mask | t.mask | (GPP>0.)
+        ii   = np.where(~mask)[0]
+        Reco[ii] -= GPP[ii]
+        GPP[ii]  = 0.
 
     if masked:
         if np.isnan(undef):
@@ -619,13 +638,12 @@ def nee2gpp_reichstein(dates, nee, t, isday, rg=False, vpd=False, undef=np.nan,
             GPP  = np.ma.array(GPP,  mask=(GPP==undef))
             Reco = np.ma.array(Reco, mask=(Reco==undef))
 
-    
-    return GPP.reshape(inshape), Reco.reshape(inshape)
 
+    return GPP.reshape(inshape), Reco.reshape(inshape)
 
 # ----------------------------------------------------------------------
 def nee2gpp_lasslop(dates, nee, t, isday, rg, vpd, undef=np.nan,
-            shape=False, masked=False):
+                    shape=False, masked=False, nogppnight=False):
     """
         Calculate photosynthesis (GPP) and ecosystem respiration (Reco) from original
         Eddy flux data, using the daytime method of Lasslop et al. (2010),
@@ -657,6 +675,8 @@ def nee2gpp_lasslop(dates, nee, t, isday, rg, vpd, undef=np.nan,
                      if a shape tuple is given, then this tuple is used to reshape
         masked       if False: outputs are undef where nee and t are masked or undef
                      if True:  return masked arrays where outputs would be undef
+        nogppnight   if True:  Resp=NEE, GPP=0 at night
+                     if False: Resp=lloyd_taylor, GPP=Resp-NEE at night (default)
 
 
         Ouput
@@ -802,7 +822,11 @@ def nee2gpp_lasslop(dates, nee, t, isday, rg, vpd, undef=np.nan,
         if niii > 3:
             # p, c = opt.curve_fit(functions.lloyd_fix, ntt[iii], nnet[iii], p0=[aRref,100.])
             #p  = opt.fmin(functions.cost_lloyd_fix, [aRref,100.], args=(ntt[iii], nnet[iii]), disp=False)
-            p  = opt.fmin(functions.cost_abs, [aRref,100.], args=(functions.lloyd_fix_p, ntt[iii], nnet[iii]), disp=False)
+            #p  = opt.fmin(functions.cost_abs, [aRref,100.], args=(functions.lloyd_fix_p, ntt[iii], nnet[iii]), disp=False)
+            p, temp1, temp2 = opt.fmin_tnc(functions.cost_abs, [aRref,100.], bounds=[[0.,None],[0.,None]],
+                                              args=(functions.lloyd_fix_p, ntt[iii], nnet[iii]),
+                                              approx_grad=True, disp=False)
+            
             E0 = np.maximum(p[1], 50.)
         else:
             if zaehl >= 0:
@@ -827,6 +851,7 @@ def nee2gpp_lasslop(dates, nee, t, isday, rg, vpd, undef=np.nan,
                 p, nfeval, rc  = opt.fmin_tnc(functions.cost_lasslop, [ialpha,ibeta0,ik,iRref], bounds=bounds,
                                               args=(drg[iii], et, dvpd[iii], dnet[iii]),
                                               approx_grad=True, disp=False)
+                
                 # if parameters beyond some bounds, set params and redo the optim or skip
                 if ((p[0] < 0.) | (p[0] > 0.22)): # alpha
                     again = True
@@ -893,10 +918,23 @@ def nee2gpp_lasslop(dates, nee, t, isday, rg, vpd, undef=np.nan,
         lgpp     = np.zeros(ndata)
         lgpp[ii] = functions.lasslop(rg[ii], et[ii], vpd[ii], alpha[ii], beta0[ii], k[ii], Rref[ii]) - Reco[ii]
 
-    # GPP
+    # 6. GPP
     GPP     = np.ones(ndata)*undef
     ii      = np.squeeze(np.where(~(t.mask | nee.mask)))
     GPP[ii] = Reco[ii] - nee[ii]
+
+    # 7. Set GPP=0 at night, if wanted
+    if nogppnight:
+        mask = isday | nee.mask | t.mask | isday.mask # night
+        ii   = np.where(~mask)[0]
+        Reco[ii] = nee[ii]
+        GPP[ii]  = 0.
+        # and prohibit negative gpp at any time
+        mask = nee.mask | t.mask | (GPP>0.)
+        ii   = np.where(~mask)[0]
+        Reco[ii] -= GPP[ii]
+        GPP[ii]  = 0.
+
 
     if masked:
         if np.isnan(undef):
