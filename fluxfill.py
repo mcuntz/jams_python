@@ -39,8 +39,8 @@ def fluxfill(fluxfile, metfile, outdir, rg, tair, rh, delimiter=[',',','],
                 metfile, e.g. header lines (default: [1,1])
     format      list of str, time formats of fluxfile and metfile, 'ascii' and 
                 'eng' possible (default: ['ascii','ascii'])
-    indef       int/float, missing value of fluxfile and metfile
-                (default: -9999)
+    undef       int/float, missing value of fluxfile and metfile
+                (default: -9999, np.nan not possible)
     plot        bool, if True performs plotting (default: False)
     
     
@@ -48,7 +48,7 @@ def fluxfill(fluxfile, metfile, outdir, rg, tair, rh, delimiter=[',',','],
     ------
     fluxfilled.csv file containing fluxes with original flags and quality flags
                    of the gap filling. Fluxes are filled where flag>1. 
-    fluxfillX.pdf  plot of each gap filled flux.
+    fluxfilled.pdf  plot of each gap filled flux.
         
     
     License
@@ -83,41 +83,45 @@ def fluxfill(fluxfile, metfile, outdir, rg, tair, rh, delimiter=[',',','],
     m = np.loadtxt(metfile,  dtype='|S100', delimiter=delimiter[1], skiprows=skiprows[1])
     
     if d.shape[1]!=11:
-        raise InputError('fluxfill: fluxfile must be from fluxflag and have 11 cols')
+        raise ValueError('fluxfill: fluxfile must be from fluxflag and have 11 cols')
     
     if format[0]=='ascii':
         datev   = date2dec(ascii=d[:,0])
     elif format[0]=='eng':
         datev   = date2dec(eng=d[:,0])
     else:
-        raise ValueError('fluxflag: unknown format')    
+        raise ValueError('fluxfill: unknown format')    
     if format[1]=='ascii':
         datem   = date2dec(ascii=m[:,0])
     elif format[1]=='eng':
         datem   = date2dec(eng=m[:,0])
     else:
-        raise ValueError('fluxflag: unknown format')
+        raise ValueError('fluxfill: unknown format')
     
     val = np.where(d[:,1:]=='', str(undef), d[:,1:]).astype(np.float)
-    val = np.where(val==undef, np.NaN, val)
     met = np.where(m[:,1:]=='', str(undef), m[:,1:]).astype(np.float)
-    met = np.where(met==undef, np.NaN, met)
     
     ###########################################################################
     # assign variables
     data      = val[:,0::2] # corr. H, corr. LE, corr. E, corr. C, tau
     data_flag = val[:,1::2]>1
     rg        = met[:,rg]
-    rg_flag   = np.isnan(rg)
+    rg_flag   = rg==undef
     tair      = met[:,tair]
-    tair_flag = np.isnan(tair)
+    tair_flag = tair==undef
     rh        = met[:,rh]
     vpd       = (1.-rh/100.)*esat(tair+273.14)    
-    vpd_flag  = np.isnan(vpd)
+    vpd_flag  = vpd==undef
     
     flux = np.zeros_like(data)
     flag = np.zeros_like(data_flag, dtype=np.int)
     
+    ###########################################################################
+    if plot:
+        import matplotlib.pyplot as plt
+        import matplotlib.backends.backend_pdf as pdf
+        pp1 = pdf.PdfPages(outdir+'/fluxfilled.pdf')
+        
     ###########################################################################
     # do gapfill
     for i in range(data.shape[1]):
@@ -125,23 +129,21 @@ def fluxfill(fluxfile, metfile, outdir, rg, tair, rh, delimiter=[',',','],
                                        data_flag[:,i], rg_flag, tair_flag,
                                        vpd_flag, rg_dev=50., tair_dev=2.5,
                                        vpd_dev=5., longgap=60, fullday=False,
-                                       undef=np.NaN, ddof=1, err=False,
+                                       undef=undef, ddof=1, err=False,
                                        shape=False)
     
         #######################################################################
         # plot
         if plot:
-            import matplotlib.pyplot as plt
-            import matplotlib.backends.backend_pdf as pdf
             fig1 = plt.figure(1)
             sub1 = fig1.add_subplot(111)
             l1 =sub1.plot(datev, flux[:,i], '-g')
             l2 =sub1.plot(datev, np.ma.array(data[:,i],mask=data_flag[:,i]), '-b')
             plt.show()
-            
-            pp1 = pdf.PdfPages(outdir+'/gapfill/gapfill_%i.pdf'%i)
             fig1.savefig(pp1, format='pdf')
-            pp1.close()
+    
+    if plot:
+        pp1.close()
     
     ###########################################################################
     # prepare output and save file
