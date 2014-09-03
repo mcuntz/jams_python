@@ -80,6 +80,7 @@ import numpy as np
     Written,  MC, Jan 2012
     Modified, MC, Feb 2013 - ported to Python 3
     Modified, AP, Mar 2014 - add: dielectric constant H2O
+    Modified, AP, Sep 2014 - add: heat capacity of quartz, air and water
 """
 # Mathematical
 Pi    = 3.141592653589793238462643383279502884197    # Pi
@@ -99,6 +100,11 @@ REarth  = 6371009.      # Radius of Earth [m]
 M_CO2   = 44.01         # Molar mass CO2 [g*mol^-1]
 M_WV    = 18.01528      # Molar mass water vapour [g*mol^-1]
 M_DAIR  = 28.9644       # Molar mass of dry air [g*mol^-1]
+# from Cambell, G., Soil Physics with BASIC, Elsevier Science, 1985:
+rhoq    = 2.65          # density of quartz [g cm-3]
+cqua    = 0.80e3        # heat capacity of quartz [J kg-1 K-1]
+cwat    = 4.18e3        # heat capacity of water [J kg-3 K-1]
+cair    = 1.01e3        # heat capacity of air [J kg-3 K-1]
 
 def dielH2O(T):         # dielectric constant of water [F/m]
     '''
