@@ -80,7 +80,7 @@ import numpy as np
     Written,  MC, Jan 2012
     Modified, MC, Feb 2013 - ported to Python 3
     Modified, AP, Mar 2014 - add: dielectric constant H2O
-    Modified, AP, Sep 2014 - add: heat capacity of quartz, air and water
+    Modified, AP, Sep 2014 - add: heat capacity of quartz, air and water, density of quartz
 """
 # Mathematical
 Pi    = 3.141592653589793238462643383279502884197    # Pi
