@@ -37,7 +37,8 @@
                    if 'ncl_large': return ncl large colormap names with more than 50 colors
                    if 'ncl_small': return ncl small colormap names with more than 50 colors
                    if 'ncl_meteo_swiss': return ncl small colormap names from Meteo Swiss
-                   else: return sequential+diverging+qualitative+osu+ncl_large+ncl_small+ncl_meteo_swiss colormap names
+                   if 'mma': return Mathematica colour maps
+                   else: return sequential+diverging+qualitative+osu+ncl_large+ncl_small+ncl_meteo_swiss+mma colormap names
         rgb        if True: return RGB value tuple between 0 and 1
         rgb256     if True: return RGB value tuple between 0 and 255
         reverse    if True: reverse colormaps
@@ -58,10 +59,11 @@
                    if 'ncl_large': print ncl colormap names with more than 50 colors
                    if 'ncl_small': print ncl colormap names with less than 50 colors
                    if 'ncl_meteo_swiss': print ncl small colormap names from Meteo Swiss
-                   else: print sequential+diverging+qualitative+osu+ncl_large+ncl_small+ncl_meteo_swiss colormap names
+                   if 'mma': return Mathematica colour maps
+                   else: print sequential+diverging+qualitative+osu+ncl_large+ncl_small+ncl_meteo_swiss+mma colormap names
     register_brewer
         cname      Colormap to register colormaps (default: 'all')
-                   if 'all': registers all sequential+diverging+qualitative+osu+ncl_large+ncl_small+ncl_meteo_swiss colormaps
+                   if 'all': registers all sequential+diverging+qualitative+osu+ncl_large+ncl_small+ncl_meteo_swiss+mma colormaps
         reverse    if True: reverse colormaps
         grey       if True: return grey equivalent
         gray       Same as grey
@@ -142,6 +144,7 @@
               MC, Jun 2013 - include Uni Oregon colours
               ST, Mar 2014 - include NCL color maps; define_brewer -> register_brewer
               MC, MAr 2014 - colour maps in extra file brewer.cmaps
+              JM, Sep 2014 - color maps of Mathematica
 """
 from __future__ import print_function
 
@@ -223,7 +226,9 @@ ncl_meteo_swiss_maps = ['hotcold_18lev', 'hotcolr_19lev', 'mch_default', 'perc2_
                         't2m_29lev', 'temp_19lev', 'temp_diff_18lev', 'temp_diff_1lev', 'topo_15lev',
                         'wind_17lev']
 
-all_maps = sequential_maps + diverging_maps + qualitative_maps + osu_maps + ncl_large_maps + ncl_small_maps + ncl_meteo_swiss_maps
+mma_maps = ['dark_rainbow_8', 'dark_rainbow_16', 'dark_rainbow_256']
+
+all_maps = sequential_maps + diverging_maps + qualitative_maps + osu_maps + ncl_large_maps + ncl_small_maps + ncl_meteo_swiss_maps + mma_maps
 
 def capitalise(cname):
     ''' Search for colour map if not the right capitalisation is given.
@@ -260,12 +265,14 @@ def register_brewer(cname='all', reverse=False, grey=False, gray=False):
         cmaps = ncl_small_maps
     elif cname.lower() == 'ncl_meteo_swiss':
         cmaps = ncl_meteo_swiss_maps
+    elif cname.lower() == 'mma':
+        cmaps = mma_maps
     else:
         cmaps = [cname]
     cmaps = [ capitalise(cc) for cc in cmaps ]
     for i in cmaps:
         d = {}
-        if i in ncl_large_maps + ncl_small_maps + ncl_meteo_swiss_maps:
+        if i in ncl_large_maps + ncl_small_maps + ncl_meteo_swiss_maps + mma_maps:
             exec('cpool = '+i, globals(), d)
         else:
             exec('cpool = [ tuple([k/255. for k in j]) for j in '+i+' ]', globals(), d)
@@ -303,6 +310,8 @@ def print_brewer(names='all'):
         print(ncl_small_maps)
     elif names.lower() == 'ncl_meteo_swiss':
         print(ncl_meteo_swiss_maps)
+    elif names.lower() == 'mma':
+        print(mma_maps)
     else:
         print('Sequential color maps')
         print(sequential_maps)
@@ -324,6 +333,9 @@ def print_brewer(names='all'):
         print('')
         print('NCL meteo swiss color maps')
         print(ncl_meteo_swiss_maps)
+        print('')
+        print('Mathematica color maps')
+        print(mma_maps)
 
 def get_brewer(cname=None, names=False, rgb=False, rgb256=False, reverse=False, grey=False, gray=False):
     """
@@ -366,6 +378,8 @@ def get_brewer(cname=None, names=False, rgb=False, rgb256=False, reverse=False, 
             return ncl_small_maps
         elif names.lower() == 'ncl_meteo_swiss':
             return ncl_meteo_swiss_maps
+        elif names.lower() == 'mma':
+            return mma_maps
         else:
             cmaps = all_maps
             return cmaps
@@ -373,7 +387,7 @@ def get_brewer(cname=None, names=False, rgb=False, rgb256=False, reverse=False, 
         cname = capitalise(cname)
         if rgb256:
             d = {}
-            if cname in ncl_large_maps + ncl_small_maps + ncl_meteo_swiss_maps:
+            if cname in ncl_large_maps + ncl_small_maps + ncl_meteo_swiss_maps + mma_maps:
                 exec('cpool = [ tuple([k*255. for k in j]) for j in '+cname+' ]', globals(), d)
             else:
                 exec('cpool = '+cname, globals(), d)
@@ -388,7 +402,7 @@ def get_brewer(cname=None, names=False, rgb=False, rgb256=False, reverse=False, 
         # get colour tuple in 0-1
         elif rgb:
             d = {}
-            if cname in ncl_large_maps + ncl_small_maps + ncl_meteo_swiss_maps:
+            if cname in ncl_large_maps + ncl_small_maps + ncl_meteo_swiss_maps + mma_maps:
                 exec('cpool = '+cname, globals(), d)
             else:
                 exec('cpool = [ tuple([k/255. for k in j]) for j in '+cname+' ]', globals(), d)
@@ -633,6 +647,33 @@ def plot_brewer(pngbase='brewer_colors_',reverse=False, grey=False, gray=False):
     pngfile = pngbase+"{0:04d}".format(ifig)+".png"
     fig.savefig(pngfile, transparent=transparent, bbox_inches=bbox_inches, pad_inches=pad_inches)
     plt.close(fig)
+
+    nmaps = len(mma_maps)
+    npage = nrow*ncol
+    zaehl = 0
+    for kk in mma_maps:
+        if zaehl % npage == 0:
+            if zaehl != 0:
+                pngfile = pngbase+"{0:04d}".format(ifig)+".png"
+                fig.savefig(pngfile, transparent=transparent, bbox_inches=bbox_inches, pad_inches=pad_inches)
+                plt.close(fig)
+            ifig += 1
+            iplot = 0
+            print('Page ', ifig)
+            fig = plt.figure(ifig)
+        iplot += 1
+        sub = fig.add_axes(position(nrow,ncol,iplot,hspace=hspace,wspace=wspace,top=0.85))
+        sub.axis('off')
+        if iplot == 1:
+            fig.text(0.5, 0.97, "mma_maps", ha="center", size=12)
+        cc = get_brewer(kk,reverse=reverse, grey=grey, gray=gray)
+        plt.pcolor(np.outer(np.arange(cc.N),np.ones(cc.N)),cmap=cc,linewidth=0,edgecolor='None')
+        plt.setp(sub, title=kk)
+        plt.setp(sub.title,fontsize=10, rotation=90, verticalalignment='bottom')
+        zaehl += 1
+    pngfile = pngbase+"{0:04d}".format(ifig)+".png"
+    fig.savefig(pngfile, transparent=transparent, bbox_inches=bbox_inches, pad_inches=pad_inches)
+    plt.close(fig)
     
 if __name__ == '__main__':
     import doctest
@@ -671,4 +712,15 @@ if __name__ == '__main__':
     # imshow(lena, cmap=mpl.cm.get_cmap('hotcold_18lev'))
     # show()
     # imshow(lena, cmap=get_brewer('BlueRedGray'))
+    # show()
+
+    # # Register and use colour map
+    # from scipy import misc
+    # lena = misc.lena()
+    # from matplotlib.pylab import *
+    # imshow(lena, cmap=mpl.cm.rainbow)
+    # show()
+    # ufz.register_brewer('mma')
+    # # ufz.print_brewer('mma')
+    # imshow(lena, mpl.cm.get_cmap('dark_rainbow_16'))
     # show()
