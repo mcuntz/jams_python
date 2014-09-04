@@ -31,6 +31,7 @@
     dec2date               Converts arrays with decimal date to calendar date.
     div                    Wrapper for division.
     division               Divide two arrays, return 'otherwise' if division by 0.
+    dumpnetcdf             Convenience function for writenetcdf
     eddycorr               Calculate time lags between wind and concentrations for EddyFlux.
     eddyspec               Performs spectrum analysis with EddySpec and SpecMean and determines inductances.
     elementary_effects     Morris measures mu, stddev and mu*
@@ -276,6 +277,7 @@
 
     Special files
     -------------
+    dumpnetcdf             Convenience function for writenetcdf
     hdfread                Wrapper for readhdf.
     hdf4read               Wrapper for readhdf4.
     hdf5read               Wrapper for readhdf5.
@@ -400,6 +402,7 @@
               AP, Aug 2014 - fluxfill
               AP, Sep 2014 - energyclosure
               AP, Sep 2014 - fluxpart
+              ST, Sep 2014 - dumpnetcdf
 """
 from __future__ import print_function
 
@@ -494,7 +497,7 @@ from tsym              import tsym
 from unpack            import unpack
 from ustarflag         import ustarflag 
 from volume_poly       import volume_poly
-from writenetcdf       import writenetcdf
+from writenetcdf       import writenetcdf, dumpnetcdf
 from xkcd              import xkcd
 from yrange            import yrange
 from zacharias         import zacharias, zacharias_check

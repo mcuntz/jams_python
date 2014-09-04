@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 from __future__ import print_function
 import numpy as np                       # array manipulation
+import netCDF4 as nc
 
 def writenetcdf(fhandle, vhandle=None, var=None, time=None, isdim=False, name=None, dims=None,
                 attributes=None, fileattributes=None, comp=False, vartype=None):
@@ -250,6 +251,126 @@ def writenetcdf(fhandle, vhandle=None, var=None, time=None, isdim=False, name=No
             else:
                 raise ValueError('Number of dimensions not supported (>6): '+str(np.size(shand)))
     return hand
+
+# write to file
+def dumpnetcdf( fname, dims = None, fileattributes = None, **variables ):
+    """
+        Writes variables with the same dimension to a netcdf file (1D-5D).
+        It is a wrapper around writenetcdf.
+
+        Variables must be given as keyword arguments. The key becomes the name of the variable
+        in the netcdf file. The value becomes the array.
+
+
+        Definition
+        ----------
+        def writenetcdf( fname, dims = None, **variables )
+
+
+        Input           Format                  Description
+        -----           -----                   -----------
+        fname           string                  filename of netcdf file
+        dims            1D list of strings      dimension names (e.g., ['time', 'x', 'y']), 
+                                                default is [ 'x', 'y', 'z', 'u', 'v' ]
+        fileattributes  2D list or dictionary   global attributes of NetCDF file
+                                                (e.g., history, description, ...)
+        variables       keyword arguments       keys become variable names, values are either
+                                                numpy arrays to write or list/tuple of
+                                                [ numpy array, attributes ] where attributes 
+                                                must be a dictionary
+
+        Description
+        -----------
+        write netcdf file in one single line
+        dump_netcdf( 'test.nc', dims = [ 'time', 'northing', 'easting' ],
+                     fileattributes 
+                     sm = sm_array, smi = [ smi_array, [['long_name','soil moisture index']] ] )
+
+        Restrictions
+        ------------
+        all arrays must have the same dimensions and must be numpy arrays
+
+        Examples
+        --------
+        >>> import numpy as np
+        >>> dat    = np.array([[-9., 5., 5., -9. ,5.,-9.,5., -9. ,  5., 5.,  5.],
+        ...                     [ 5.,-9.,-9., -9. ,5.,-9.,5., -9. , -9.,-9.,  5.],
+        ...                     [ 5.,-9.,-9., -9. ,5., 5.,5., -9. ,  5., 5.,  5.],
+        ...                     [ 5.,-9.,-9., -9. ,5.,-9.,5., -9. ,  5.,-9., -9.],
+        ...                     [-9., 5., 5., -9. ,5.,-9.,5., -9. ,  5., 5.,  5.] ])
+        >>> dims    = [ 'xx', 'yy' ]
+        >>> FiAtt   = ([['description', 'test dump_netcdf'],
+        ...            ['history'    , 'Created by Stephan Thober']])
+        >>> dump_netcdf( 'test_dump.nc', dims = dims, fileattributes = FiAtt, data = dat )
+
+        # check file
+        >>> from readnetcdf import readnetcdf
+        >>> print([str(i) for i in readnetcdf('test_dump.nc', variables=True)])
+        ['xx', 'yy', 'data']
+        >>> readdata = readnetcdf('test_dump.nc', var='data')
+        >>> print(np.any((readdata[:,:] - dat) != 0.))
+        False
+        >>> if readdata.dtype == np.dtype('float32'): print('Toll')
+        Toll
+
+        >>> import os
+        >>> os.remove('test_dump.nc')
+
+
+        License
+        -------
+        This file is part of the UFZ Python library.
+
+        The UFZ Python library is free software: you can redistribute it and/or modify
+        it under the terms of the GNU Lesser General Public License as published by
+        the Free Software Foundation, either version 3 of the License, or
+        (at your option) any later version.
+
+        The UFZ Python library is distributed in the hope that it will be useful,
+        but WITHOUT ANY WARRANTY; without even the implied warranty of
+        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+        GNU Lesser General Public License for more details.
+
+        You should have received a copy of the GNU Lesser General Public License
+        along with the UFZ makefile project (cf. gpl.txt and lgpl.txt).
+        If not, see <http://www.gnu.org/licenses/>.
+
+        Copyright 2012-2013 Stephan Thober
+
+
+        History
+        -------
+        Written,  ST, Sep 2014
+        Modified
+    """
+    # check if dims are given
+    if dims == None:
+        dims = [ 'x', 'y', 'z', 'u', 'v' ]
+    # open netcdf file
+    fh = nc.Dataset( fname, 'w', 'NETCDF4' )
+    # write file attributes
+    if fileattributes != None:
+        writenetcdf(fh, fileattributes=fileattributes)
+    # create dimensions according to first variable
+    if ( type( variables.values()[0][1] ) != dict ):
+        arr_shape = variables.values()[ 0 ].shape
+    else:
+        arr_shape = variables.values()[ 0 ][0].shape
+    for dd in np.arange( len( arr_shape ) ):
+        writenetcdf( fh, name = dims[dd], dims = arr_shape[dd], 
+                     var = np.arange( arr_shape[dd] ), isdim = True ) 
+    # loop over variables
+    for key, value in variables.iteritems():
+        if type( value[1] ) != dict:
+            if  value.ndim > len( dims ):
+                raise ValueError( '***size mismatch: variable '+key )
+            writenetcdf( fh, name = key, dims = dims, var = value, comp = True )
+        else:
+            if  value[0].ndim > len( dims ):
+                raise ValueError( '***size mismatch: variable '+key )
+            writenetcdf( fh, name = key, dims = dims, var = value[0],
+                         attributes = value[1], comp = True )
+    fh.close()
 
 if __name__ == '__main__':
     import doctest
