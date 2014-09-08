@@ -145,14 +145,14 @@ def eddycorr(indir, sltdir, cfile, hfile, meteofile, outfile, novalue=-9999,
                                                                             h[breaks[i]:breaks[i+1]],
                                                                             m[breaks[i]:breaks[i+1]],
                                                                             doys[breaks[i]:breaks[i+1]],
-                                                                            histstep, indir)
+                                                                            histstep, indir, plot=plot)
     else:
         for i in range(len(breaks)-1):
             cout[breaks[i]:breaks[i+1],0], hout[breaks[i]:breaks[i+1],0] = calc(c[breaks[i]:breaks[i+1]],
                                                                             h[breaks[i]:breaks[i+1]],
                                                                             m,
                                                                             doys[breaks[i]:breaks[i+1]],
-                                                                            histstep, indir)
+                                                                            histstep, indir, plot=plot)
     
     ################################################################################
     # writing output file
@@ -204,7 +204,7 @@ def eddycorr(indir, sltdir, cfile, hfile, meteofile, outfile, novalue=-9999,
 
 ############################################################################
 # calculations
-def calc(c, h, m, doys, histstep, indir):
+def calc(c, h, m, doys, histstep, indir, plot=False):
     '''
     part of eddycorr: plotting and fitting of hlag to rH and witing log file
     '''
@@ -229,6 +229,8 @@ def calc(c, h, m, doys, histstep, indir):
     # plot lag c
     print("\nCO2 LAGS:\n")
     if plot:
+        import matplotlib.pyplot as plt
+        import matplotlib.backends.backend_pdf as pdf
         plt.figure(1)                                        
         plt.plot(c[:,0], c[:,2], 'bo', label='minlag (sam)')         
         plt.plot(c[:,0], c[:,5], 'ro', label='maxlag (sam)')                
@@ -367,6 +369,8 @@ def fit(x,y,func,p_guess,plot=False):
     yfit=np.ma.array(y, mask=np.isnan(y))
     
     if plot:
+        import matplotlib.pyplot as plt
+        import matplotlib.backends.backend_pdf as pdf
         x_mod = np.arange(np.ma.min(xfit),np.ma.max(xfit),(np.ma.max(xfit)-np.ma.min(xfit))/50.)
         plt.figure('pre-fit')                                        
         plt.plot(xfit, yfit, 'bo')         
