@@ -301,7 +301,8 @@ def dumpnetcdf( fname, dims = None, fileattributes = None, **variables ):
         >>> dims    = [ 'xx', 'yy' ]
         >>> FiAtt   = ([['description', 'test dump_netcdf'],
         ...            ['history'    , 'Created by Stephan Thober']])
-        >>> dumpnetcdf( 'test_dump.nc', dims = dims, fileattributes = FiAtt, data = dat )
+        >>> dumpnetcdf( 'test_dump.nc', dims = dims, fileattributes = FiAtt, 
+        ...            data = ( dat, {'long_name':'CHS'} ) )
 
         # check file
         >>> from readnetcdf import readnetcdf
