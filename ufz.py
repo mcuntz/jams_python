@@ -13,6 +13,8 @@
     Provided functions (alphabetic w/o obsolete)
     ------------------
     abc2plot               Write a, b, c, ... on plots.
+    alpha_equ_h2o          Equilibrium fractionation between liquid water and vapour
+    alpha_kin_h2o          Kinetic fractionation of molecular diffusion of water vapour
     area_poly              Area of a polygon
     around                 Round to the passed power of ten.
     astr                   Wrapper for autostring.
@@ -215,6 +217,8 @@
 
     Isotopes
     --------
+    alpha_equ_h2o          Equilibrium fractionation between liquid water and vapour
+    alpha_kin_h2o          Kinetic fractionation of molecular diffusion of water vapour
     cuntz_gleixner         Cuntz-Gleixner model of 13C discrimination.
     tcherkez               Calculates the Tcherkez model of 13C-discrimiantion in the Calvin cycle.
 
@@ -403,11 +407,14 @@
               AP, Sep 2014 - energyclosure
               AP, Sep 2014 - fluxpart
               ST, Sep 2014 - dumpnetcdf
+              MC, Sep 2014 - alpha_equ_h2o, alpha_kin_h2o
 """
 from __future__ import print_function
 
 # Routines provided
 from abc2plot          import abc2plot
+from alpha_equ_h2o     import alpha_equ_h2o
+from alpha_kin_h2o     import alpha_kin_h2o
 from area_poly         import area_poly
 from around            import around
 from autostring        import autostring, astr
@@ -430,7 +437,7 @@ from division          import division, div
 from eddycorr          import eddycorr
 from eddyspec          import eddyspec
 from energyclosure     import energyclosure
-from errormeasures     import *
+from errormeasures     import bias, mae, mse, rmse, nse, pear2
 from esat              import esat
 from fill_nonfinite    import fill_nonfinite
 from find_in_path      import find_in_path
