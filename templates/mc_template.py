@@ -163,6 +163,8 @@ if (outtype == 'pdf'):
     mpl.rc('figure', figsize=(8.27,11.69)) # a4 portrait
     if usetex:
         mpl.rc('text', usetex=True)
+        mpl.rc('text.latex', unicode=True)
+        mpl.rcParams['text.latex.preamble']=r'\usepackage{wasysym}'
     else:
         #mpl.rc('font',**{'family':'sans-serif','sans-serif':['Helvetica']})
         mpl.rc('font',**{'family':'serif','serif':['times']})
@@ -173,6 +175,8 @@ elif (outtype == 'png'):
     mpl.rc('figure', figsize=(8.27,11.69)) # a4 portrait
     if usetex:
         mpl.rc('text', usetex=True)
+        mpl.rc('text.latex', unicode=True)
+        mpl.rcParams['text.latex.preamble']=r'\usepackage{wasysym}'
     else:
         #mpl.rc('font',**{'family':'sans-serif','sans-serif':['Helvetica']})
         mpl.rc('font',**{'family':'serif','serif':['times']})
