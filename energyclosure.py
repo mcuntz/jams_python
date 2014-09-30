@@ -262,13 +262,13 @@ def soilheatflux(Ts, theta, depths, por, undef=-9999):
     csoil = cqua*(1.-por) + cwat*theta + cair*(1-theta)*por
     
     # calculate heat flux    
-    T_diff = (Ts[1:,:] - Ts[:-1,:])/1800. * rhos * csoil[:-1,:]
+    T_diff = (Ts[:-1,:] - Ts[1:,:])/1800. * rhos * csoil[:-1,:]
     G      = np.ma.masked_all_like(Ts[:,0])
     for i, item in enumerate(T_diff):
         if not item.mask.any():
             tck  = splrep(depths, item, k=1)
-            G[i] = splint(depths[0],depths[-1],tck)
-    G[-1]=G[-2]
+            G[i+1] = splint(depths[0],depths[-1],tck)
+    G[0]=G[1]
     
     return np.ma.filled(G, fill_value=undef)
 
