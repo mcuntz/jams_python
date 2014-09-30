@@ -67,6 +67,7 @@
     kernel_regression_h    Optimal bandwidth for kernel regression.
     kriging                Krig a surface from a set of 2D points.
     lagcorr                Calculate time lag of maximum or minimum correlation of two arrays.
+    leafmodel              Model to compute photosynthesis and stomatal conductance of canopies.
     lhs                    Latin Hypercube Sampling of any distribution without correlations.
     lif                    Count number of lines in file.
     line_dev_mask          Maskes elements of an array deviating from a line fit.
@@ -136,6 +137,7 @@
         Math
         Meteorology
         Miscellaneous
+        Models
         Plotting
         Special files
         Obsolete
@@ -261,6 +263,11 @@
     zacharias_check        Checks validity of parameter set for Zacharias et al. (2007).
 
 
+    Models
+    ------
+    leafmodel              Model to compute photosynthesis and stomatal conductance of canopies
+    
+    
     Plotting
     --------
     abc2plot               Write a, b, c, ... on plots.
@@ -408,6 +415,7 @@
               AP, Sep 2014 - fluxpart
               ST, Sep 2014 - dumpnetcdf
               MC, Sep 2014 - alpha_equ_h2o, alpha_kin_h2o
+              AP, Sep 2014 - leafmodel
 """
 from __future__ import print_function
 
@@ -462,6 +470,7 @@ from itc               import itc
 from kernel_regression import kernel_regression, kernel_regression_h
 from kriging           import kriging
 from lagcorr           import lagcorr
+import leafmodel       as     leafmodel
 from lhs               import lhs
 from lif               import lif
 from line_dev_mask     import line_dev_mask
