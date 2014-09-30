@@ -103,8 +103,9 @@ M_DAIR  = 28.9644       # Molar mass of dry air [g*mol^-1]
 # from Cambell, G., Soil Physics with BASIC, Elsevier Science, 1985:
 rhoq    = 2.65          # density of quartz [g cm-3]
 cqua    = 0.80e3        # heat capacity of quartz [J kg-1 K-1]
-cwat    = 4.18e3        # heat capacity of water [J kg-3 K-1]
-cair    = 1.01e3        # heat capacity of air [J kg-3 K-1]
+cwat    = 4.18e3        # heat capacity of water [J kg-1 K-1]
+cair    = 1.01e3        # heat capacity of air [J kg-1 K-1]
+lam     = 2.45e6        # specific heat of vaporization of water [J/kg]
 
 def dielH2O(T):         # dielectric constant of water [F/m]
     '''
