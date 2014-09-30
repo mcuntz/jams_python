@@ -34,21 +34,14 @@
     div                    Wrapper for division.
     division               Divide two arrays, return 'otherwise' if division by 0.
     dumpnetcdf             Convenience function for writenetcdf
-    eddycorr               Calculate time lags between wind and concentrations for EddyFlux.
-    eddyspec               Performs spectrum analysis with EddySpec and SpecMean and determines inductances.
+    eddybox                Module containing Eddy Covaraince utilities, see eddybox.py for details
     elementary_effects     Morris measures mu, stddev and mu*
-    energyclosure          Computes energy closure and correction for Eddy covaraince data
     errormeasures          Definition of different error measures.
     esat                   Calculates the saturation vapour pressure of water/ice.
     fill_nonfinite         Fill missing values by linear interpolation.
     find_in_path           Look for file in system path.
-    fluxfill               Wrapper function for gapfill with file management and plotting.
-    fluxflag               Quality flag calculation for Eddy Covariance data
-    fluxpart               Wrapper function for nee2gpp including file management and plotting
-    fluxplot               Plotting routine for Eddy Covariance or other ascii data file
     fread                  Reads in float array from ascii file.
     functions              Common functions that are used in curve_fit or fmin parameter estimations.
-    gapfill                Gapfill Eddy flux data.
     get_angle              Returns the angle in radiant from each point in xy1 to each point in xy2.
     get_brewer             Registers and returns Brewer colormap.
     get_nearest            Returns a value z for each point in xy near to the xyz field.
@@ -61,7 +54,6 @@
     inpoly                 Wrapper for in_poly.
     int2roman              Integer to roman numeral conversion.
     interpol               One-dimensional linear interpolation on first dimension.
-    itc                    Calculation of integral turbulence characteristics after Thomas & Foken (2002)
     jab                    Jackknife-after-Bootstrap error.
     kernel_regression      Multi-dimensional non-parametric regression.
     kernel_regression_h    Optimal bandwidth for kernel regression.
@@ -73,22 +65,15 @@
     line_dev_mask          Maskes elements of an array deviating from a line fit.
     mad                    Median absolute deviation test.
     means                  Calculate daily, monthly, yearly, etc. means of data depending on date stamp.
-    meteo4slt              EddyFlux supply with meteorological data.
     morris_sampling        Sampling of optimised trajectories for Morris measures / elementary effects
     ncread                 Wrapper for readnetcdf.
-    nee2gpp                Photosynthesis and ecosystem respiration from NEE Eddy flux data.
-    nee2gpp_falge          nee2gpp using one fit for whole time period
-    nee2gpp_lasslop        nee2gpp using the daytime method of Lasslop et al. (2010)
-    nee2gpp_reichstein     nee2gpp using several fits as in Reichstein et al. (2005)
     netcdfread             Wrapper for readnetcdf.
     outlier                Rossner''s extreme standardized deviate outlier test.
     pack                   Similar to Fortran pack function with mask.
     pi                     Parameter importance index PI or alternatively B index calculation.
-    planarfit              Planar fit of Eddy Covariance wind components
     plot_brewer            Plots available Brewer color maps in pdf file.
     position               Position arrays of subplots to be used with add_axes.
     print_brewer           Prints available Brewer colormap names.
-    profile2storage        Calculate storage fluxes from profile data to correct eddy data
     readhdf                Reads variables or information from hdf4 and hdf5 files.
     readhdf4               Reads variables or information from hdf4 files.
     readhdf5               Reads variables or information from hdf5 file.
@@ -107,8 +92,6 @@
     sg2d                   Wrapper savitzky_golay2d.
     sigma_filter           Mask values deviating more than z standard deviations from a given function.
     signature2plot         Write a copyright notice on a plot.
-    sltclean               Moves *.slt files in a deleted folder to exclude from processing (EddySoft files).
-    spikeflag              Spike detection for Eddy Covariance data (and basically all other data)
     maskgroup              Masks elements in a 1d array gathered in small groups.
     sobol_index            Calculates the first-order and total variance-based sensitivity indices.
     sread                  Reads in string array from ascii file.
@@ -118,7 +101,6 @@
     timestepcheck          Fills missing time steps in ascii data files
     tsym                   Raw unicodes for common symbols.
     unpack                 Similar to Fortran unpack function with mask.
-    ustarflag              Friction velocity flagging for Eddy Covariance data
     volume_poly            Volume of function above a polygon
     writenetcdf            Write netCDF4 file.
     xkcd                   Make plot look handdrawn.
@@ -133,6 +115,7 @@
         Ascii files
         Data processing
         Date & Time
+        Eddy Covariance
         Grids / Polygons
         Isotopes
         Math
@@ -162,30 +145,15 @@
     Data processing
     ---------------
     convex_hull            Calculate subset of points that make a convex hull around a set of 2D points.
-    eddycorr               Calculate time lags between wind and concentrations for EddyFlux.
-    eddyspec               Performs spectrum analysis with EddySpec and SpecMean and determines inductances.
-    energyclosure          Computes energy closure and correction for Eddy covaraince data
-    fluxfill               Wrapper function for gapfill with file management and plotting.
-    fluxflag               Quality flag calculation for Eddy Covariance data
-    fluxpart               Wrapper function for nee2gpp including file management and plotting
     fill_nonfinite         Fill missing values by linear interpolation.
-    gapfill                Gapfill Eddy flux data.
     interpol               One-dimensional linear interpolation on first dimension.
-    itc                    Calculation of integral turbulence characteristics after Thomas & Foken (2002)    
     kriging                Krig a surface from a set of 2D points.
     kernel_regression      Multi-dimensional non-parametric regression.
     kernel_regression_h    Optimal bandwidth for kernel regression.
     line_dev_mask          Maskes elements of an array deviating from a line fit.
     mad                    Median absolute deviation test.
     means                  Calculate daily, monthly, yearly, etc. means of data depending on date stamp.
-    meteo4slt              EddyFlux supply with meteorological data.
-    nee2gpp                Photosynthesis and ecosystem respiration from NEE Eddy flux data.
-    nee2gpp_falge          nee2gpp using one fit for whole time period
-    nee2gpp_lasslop        nee2gpp using the daytime method of Lasslop et al. (2010)
-    nee2gpp_reichstein     nee2gpp using several fits as in Reichstein et al. (2005)
     outlier                Rossner''s extreme standardized deviate outlier test.
-    planarfit              Planar fit of Eddy Covariance wind components
-    profile2storage        Calculate storage fluxes from profile data to correct eddy data
     rossner                Wrapper for outlier.
     t2sap                  Conversion of temperature difference to sap flux density.
     savitzky_golay         Smooth (and optionally differentiate) 1D data with a Savitzky-Golay filter.
@@ -194,18 +162,20 @@
     sg                     Wrapper savitzky_golay.
     sg2d                   Wrapper savitzky_golay2d.
     sigma_filter           Mask values deviating more than z standard deviations from a given function.
-    sltclean               Moves *.slt files in a deleted folder to exclude from processing (EddySoft files).
-    spikeflag              Spike detection for Eddy Covariance data (and basically all other data)
     srrasa                 Generates stratified random 2D points within a given rectangular area.
     srrasa_trans           Generates stratified random 2D transects within a given rectangular area.
     timestepcheck          Fills missing time steps in ascii data files
-    ustarflag              Friction velocity flagging for Eddy Covariance data
     
     Date & Time
     -----------
     date2dec               Converts arrays with calendar date to decimal date.
     dec2date               Converts arrays with decimal date to calendar date.
 
+
+    Eddy Covariance
+    ---------------
+    eddybox                Module containing Eddy Covaraince utilities, see eddybox folder for details                                       
+    
 
     Grids / Polygons
     ----------------
@@ -276,7 +246,6 @@
     colors                 Wrapper for colour.
     colours                Define UFZ colours.
     get_brewer             Registers and returns Brewer colormap.
-    fluxplot               Plotting routine for Eddy Covariance or other ascii data file
     plot_brewer            Plots available Brewer color maps in pdf file.
     position               Position arrays of subplots to be used with add_axes.
     print_brewer           Prints available Brewer colormap names.
@@ -419,6 +388,14 @@
               MC, Sep 2014 - alpha_equ_h2o, alpha_kin_h2o
               AP, Sep 2014 - leafmodel
               AP, Sep 2014 - profile2storage
+              AP, Sep 2014 - eddybox -> moved eddycorr, eddyspec, energyclosure,
+                                              fluxfill, fluxflag, fluxpart,
+                                              fluxplot, gapfill, itc, meteo4slt,
+                                              nee2gpp, nee2gpp_falge,
+                                              nee2gpp_lasslop, nee2gpp_reichstein,
+                                              planarfit, profile2storage,
+                                              sltclean, spikeflag, ustarflag into
+                                              eddybox module
 """
 from __future__ import print_function
 
@@ -445,20 +422,13 @@ from date2dec          import date2dec
 from dec2date          import dec2date
 from dewpoint          import dewpoint
 from division          import division, div
-from eddycorr          import eddycorr
-from eddyspec          import eddyspec
-from energyclosure     import energyclosure
+import eddybox         as     eddybox
 from errormeasures     import bias, mae, mse, rmse, nse, pear2
 from esat              import esat
 from fill_nonfinite    import fill_nonfinite
 from find_in_path      import find_in_path
-from fluxfill          import fluxfill
-from fluxflag          import fluxflag
-from fluxpart          import fluxpart
-from fluxplot          import fluxplot 
 from fread             import fread
 import functions
-from gapfill           import gapfill
 try:
     from gap_filling   import gap_filling
 except ImportError:
@@ -469,7 +439,6 @@ from heaviside         import heaviside
 from homo_sampling     import homo_sampling  
 from in_poly           import in_poly, inpoly
 from interpol          import interpol
-from itc               import itc
 from kernel_regression import kernel_regression, kernel_regression_h
 from kriging           import kriging
 from lagcorr           import lagcorr
@@ -481,18 +450,14 @@ from jab               import jab
 from mad               import mad
 from maskgroup         import maskgroup
 from means             import means
-from meteo4slt         import meteo4slt
 from morris            import morris_sampling, elementary_effects
-from nee2gpp           import nee2gpp, nee2gpp_falge, nee2gpp_lasslop, nee2gpp_reichstein
 try:
     from outlier       import outlier, rossner
 except:
     print("No extra statistics in scipy, i.e. in UFZ library. Disabled functions: outlier, rossner.")
 from pack              import pack
 from pi                import pi
-from planarfit         import planarfit
 from position          import position
-from profile2storage   import profile2storage 
 from readhdf           import readhdf, hdfread
 from readhdf4          import readhdf4, hdf4read
 from readhdf5          import readhdf5, hdf5read
@@ -506,16 +471,13 @@ from sce               import sce
 from semivariogram     import semivariogram
 from sigma_filter      import sigma_filter
 from signature2plot    import signature2plot
-from sltclean          import sltclean
 from sobol_index       import sobol_index
-from spikeflag         import spikeflag 
 from sread             import sread
 from srrasa            import srrasa, srrasa_trans
 from tcherkez          import tcherkez
 from timestepcheck     import timestepcheck 
 from tsym              import tsym
 from unpack            import unpack
-from ustarflag         import ustarflag 
 from volume_poly       import volume_poly
 from writenetcdf       import writenetcdf, dumpnetcdf
 from xkcd              import xkcd
