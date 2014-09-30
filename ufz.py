@@ -88,6 +88,7 @@
     plot_brewer            Plots available Brewer color maps in pdf file.
     position               Position arrays of subplots to be used with add_axes.
     print_brewer           Prints available Brewer colormap names.
+    profile2storage        Calculate storage fluxes from profile data to correct eddy data
     readhdf                Reads variables or information from hdf4 and hdf5 files.
     readhdf4               Reads variables or information from hdf4 files.
     readhdf5               Reads variables or information from hdf5 file.
@@ -184,6 +185,7 @@
     nee2gpp_reichstein     nee2gpp using several fits as in Reichstein et al. (2005)
     outlier                Rossner''s extreme standardized deviate outlier test.
     planarfit              Planar fit of Eddy Covariance wind components
+    profile2storage        Calculate storage fluxes from profile data to correct eddy data
     rossner                Wrapper for outlier.
     t2sap                  Conversion of temperature difference to sap flux density.
     savitzky_golay         Smooth (and optionally differentiate) 1D data with a Savitzky-Golay filter.
@@ -416,6 +418,7 @@
               ST, Sep 2014 - dumpnetcdf
               MC, Sep 2014 - alpha_equ_h2o, alpha_kin_h2o
               AP, Sep 2014 - leafmodel
+              AP, Sep 2014 - profile2storage
 """
 from __future__ import print_function
 
@@ -489,6 +492,7 @@ from pack              import pack
 from pi                import pi
 from planarfit         import planarfit
 from position          import position
+from profile2storage   import profile2storage 
 from readhdf           import readhdf, hdfread
 from readhdf4          import readhdf4, hdf4read
 from readhdf5          import readhdf5, hdf5read
