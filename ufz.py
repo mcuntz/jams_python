@@ -35,6 +35,7 @@
     division               Divide two arrays, return 'otherwise' if division by 0.
     dumpnetcdf             Convenience function for writenetcdf
     eddybox                Module containing Eddy Covaraince utilities, see eddybox.py for details
+    eddysuite              Example file for processing Eddy data with eddybox and EddySoft
     elementary_effects     Morris measures mu, stddev and mu*
     errormeasures          Definition of different error measures.
     esat                   Calculates the saturation vapour pressure of water/ice.
@@ -175,6 +176,7 @@
     Eddy Covariance
     ---------------
     eddybox                Module containing Eddy Covaraince utilities, see eddybox folder for details                                       
+    eddysuite              Example file for processing Eddy data with eddybox and EddySoft
     
 
     Grids / Polygons
@@ -396,6 +398,7 @@
                                               planarfit, profile2storage,
                                               sltclean, spikeflag, ustarflag into
                                               eddybox module
+              AP, Sep 2014 - eddysuite
 """
 from __future__ import print_function
 
