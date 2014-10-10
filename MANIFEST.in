@@ -1,0 +1,14 @@
+include MANIFEST.in
+include README
+include LICENSE
+include *.txt
+include setupegg.py
+include ufz/Humor-Sans.ttf
+include ufz/brewer.cmaps
+include ufz/test_*
+include ufz/bin/*
+include ufz/dist/*
+include ufz/eddybox/test_*
+include ufz/templates/*
+
+global-exclude *.pyc *.pyo *.pyd
