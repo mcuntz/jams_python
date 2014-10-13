@@ -28,6 +28,7 @@ def abc2plot(handle, dx, dy, iplot,
 
         Input
         -----
+        handle   axes handle
         dx       % of xlim from min(xlim)
         dy       % of ylim from min(ylim)
         iplot    1=a, 2=b, ...

@@ -13,13 +13,14 @@
     Provided functions (alphabetic w/o obsolete)
     ------------------
     abc2plot               Write a, b, c, ... on plots.
-    alpha_equ_h2o          Equilibrium fractionation between liquid water and vapour
-    alpha_kin_h2o          Kinetic fractionation of molecular diffusion of water vapour
-    area_poly              Area of a polygon
+    alpha_equ_h2o          Equilibrium fractionation between liquid water and vapour.
+    alpha_kin_h2o          Kinetic fractionation of molecular diffusion of water vapour.
+    area_poly              Area of a polygon.
     around                 Round to the passed power of ten.
     astr                   Wrapper for autostring.
     autostring             Format number (array) with given decimal precision.
     cellarea               Calc areas of grid cells in m^2.
+    clockplot              The clockplot of mHM.
     closest                Get the array index of the element that is closest to a given number.
     colors                 Wrapper for colour.
     colours                Define UFZ colours.
@@ -245,6 +246,7 @@
     Plotting
     --------
     abc2plot               Write a, b, c, ... on plots.
+    clockplot              The clockplot of mHM.
     colors                 Wrapper for colour.
     colours                Define UFZ colours.
     get_brewer             Registers and returns Brewer colormap.
@@ -400,6 +402,7 @@
                                               eddybox module
               AP, Sep 2014 - eddysuite
               MC, Oct 2014 - module -> package
+              MC, Oct 2014 - clockplot
 """
 from __future__ import print_function
 
@@ -420,6 +423,7 @@ try:
 except ImportError:
     pass # obsolete
 from .cellarea          import cellarea
+from .clockplot         import clockplot
 from .closest           import closest
 from .colours           import colours, colors
 from .convex_hull       import convex_hull
