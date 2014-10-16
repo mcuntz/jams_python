@@ -1,18 +1,14 @@
 #!/usr/bin/env python
 from __future__ import print_function
 import numpy as np
-from ufz.brewer         import get_brewer
-from ufz.signature2plot import signature2plot
-from ufz.abc2plot       import abc2plot
-from ufz.colours        import colours
-from ufz.position       import position
 
-def clockplot(sub, si, sti, stierr=None,
+def clockplot(sub, si, sti=None, stierr=None,
+              iplot       = None,           # plot number for abc2plot
               usetex      = False,
-              dxabc       = 2,              # % of (max-min) shift to the right from left y-axis for a,b,c,... labels
-              dyabc       = 0.5,            # % of (max-min) shift up from lower x-axis for a,b,c,... labels
-              dxsig       = 1.23,           # % of (max-min) shift to the right from left y-axis for a,b,c,... labels
-              dysig       = -0.05,          # % of (max-min) shift up from lower x-axis for a,b,c,... labels
+              dxabc       = 2,              # factor to half the plot size for a,b,c,... labels
+              dyabc       = 0.5,            # factor to 0.1 time the plot height for a,b,c,... labels
+              dxsig       = 1.23,           # factor to half the plot size for signature
+              dysig       = -0.05,          # factor to 0.1 time the plot height for signature
               elwidth     = 1.0,            # errorbar line width
               alwidth     = 1.0,            # axis line width
               glwidth     = 0.5,            # grid line width
@@ -20,29 +16,28 @@ def clockplot(sub, si, sti, stierr=None,
               mcols       = ['0.0', '0.4', '0.4', '0.7', '0.7', '1.0'],      # stack colors
               lcols       = ['None', 'None', 'None', 'None', 'None', '0.0'], # stack bourder colours
               hatches     = [None, None, None, None, None, '//'],            # stack hatching
-              llxbbox     =  0.0,           # x-anchor legend bounding box
+              llxbbox     = 0.0,            # x-anchor legend bounding box
               llybbox     = 1.15,           # y-anchor legend bounding box
               ymax        = 0.8,            # maximum of y-axis
-              ntextsize   = 'medium',       # normal textsize
+              ntextsize   = 'medium',       # normal textsize (relative to mpl.rcParams['font.size'])
               bmod        = 0.5,            # fraction of ymax from center to start module colours
               alphamod    = 0.7,            # alpha channel for modules
               fwm         = 0.05,           # module width to remove at sides
               ylabel1     = 1.15,           # position of module names
               ylabel2     = 1.35,           # position of class names
-              mtextsize   = 'large',        # 1.3*textsize # textsize of module labels
+              mtextsize   = 'large',        # textsize of module labels (relative to mpl.rcParams['font.size'])
               bpar        = 0.4,            # fraction of ymax from center to start with parameter bars
               fwb         = [0.7,0.4,0.3],  # fractional width of bars
               plwidth     = 0.5,            # stack border line width
               bplabel     = 0.1,            # fractional distance of ymax of param numbers in centre from 0-line
-              ptextsize   = 'medium',       # 'small' # 0.8*textsize # textsize of param numbers in centre
+              ptextsize   = 'medium',       # textsize of param numbers in centre (relative to mpl.rcParams['font.size'])
               space4yaxis = 2,              # space for y-axis (integer)
-              ytextsize   = 'medium',       # 'small' # 0.8*textsize # textsize of y-axis
+              ytextsize   = 'medium',       # textsize of y-axis (relative to mpl.rcParams['font.size'])
               dobw        = False,          # True: black & white
               docomp      = True,           # True: Print classification on top of modules
               dosig       = False,          # True: add signature to plot
               dolegend    = False,          # True: add legend to each subplot
               doabc       = False,          # True: add subpanel numbering
-              do1legend   = False,          # True: add one legend in next subplot
               mod         = ['Interception',    'Snow',             'Soil moisture', 'Soil moisture',
                              'Direct\n runoff', 'Evapo-\n transp.', 'Interflow',     'Percolation',
                              'Routing',         'Geology'],      # module names
@@ -53,6 +48,12 @@ def clockplot(sub, si, sti, stierr=None,
                               1,                 3,                  5,               3,
                               5,                 9],             # # of parameters per class
               saname      = ['Sobol', 'weighted Sobol', 'RMSE'], # stack names
+              indexname   = ['$S_i$', '$S_{Ti}-S_i$'],           # index legend name
+              star        = None,                                # star symbols
+              dystar      = 0.95,                                # % of ymax for stars
+              scol        = '1.0',                               # star colour
+              ssize       = 3.0,                                 # star size
+              swidth      = 1.0,                                 # star edge width
               sig         = 'J Mai & M Cuntz'):                  # signature
     """
         The clock plot with modules and up to three index stacks.
@@ -62,7 +63,7 @@ def clockplot(sub, si, sti, stierr=None,
 
         Definition
         ----------
-        def clockplot(sub, si, sti, stierr=None,
+        def clockplot(sub, si, sti=None, stierr=None,
                       usetex=False,
                       dxabc       = 2,
                       dyabc       = 0.5,
@@ -97,7 +98,6 @@ def clockplot(sub, si, sti, stierr=None,
                       dosig     = False,
                       dolegend  = False,
                       doabc     = False,
-                      do1legend = False,
                       mod   = ['Interception',    'Snow',             'Soil moisture', 'Soil moisture',
                                'Direct\n runoff', 'Evapo-\n transp.', 'Interflow',     'Percolation',
                                'Routing',         'Geology'],
@@ -108,6 +108,12 @@ def clockplot(sub, si, sti, stierr=None,
                                 1,                 3,                  5,               3,
                                 5,                 9],
                       saname = ['Sobol', 'weighted Sobol', 'RMSE'],
+                      indexname = ['$S_i$', '$S_{Ti}-S_i$'],
+                      star = None,
+                      dystar = 0.95,
+                      scol = '1.0',
+                      ssize = 3.0,
+                      swidth = 1.0,
                       sig = 'J Mai & M Cuntz'):
 
 
@@ -115,16 +121,16 @@ def clockplot(sub, si, sti, stierr=None,
         -----
         sub                          axes handle from for example
                                      sub = fig.add_axes(ufz.position(nrow,ncol,iplot), polar=True)
-        si                           list, list of arrays, 1D-, or 2D-array si[nstacks, nparameters] of
-                                     first-order Sobol' indexes
-        sti                          list, list of arrays, 1D-, or 2D-array si[nstacks, nparameters] of
-                                     total-order Sobol' indexes
+        si                           list, list of arrays, 1D-, or 2D-array si[nstacks, nparameters] of, e.g.,
+                                     first-order Sobol' indexes or other indexes
 
 
         Optional Input
         --------------
+        sti = None                   list, list of arrays, 1D-, or 2D-array sti[nstacks, nparameters] of, e.g.,
+                                     total-order Sobol' indexes or upper stack values
         stierr = None                list, list of arrays, 1D-, or 2D-array si[nstacks, nparameters] of
-                                     error bars of total-order Sobol' indexes
+                                     error bars of upper stack indexes
         usetex = False               True: use LaTeX rendering
         dxabc = 2                    % of (max-min) shift to the right from left y-axis for a,b,c,... labels
         dyabc = 0.5                  % of (max-min) shift up from lower x-axis for a,b,c,... labels
@@ -159,7 +165,6 @@ def clockplot(sub, si, sti, stierr=None,
         dosig = False                True: add signature (sig) to plot
         dolegend = False             True: add legend to each subplot
         doabc = False                True: add subpanel numbering
-        do1legend = False            True: add one legend in next subplot
         mod  = ['Interception',    'Snow',             'Soil moisture', 'Soil moisture',
                 'Direct\n runoff', 'Evapo-\n transp.', 'Interflow',     'Percolation',
                 'Routing',         'Geology'],                                           module names
@@ -170,6 +175,12 @@ def clockplot(sub, si, sti, stierr=None,
                  1,                 3,                  5,               3,
                  5,                 9],                                                  number of parameters per class
         saname = ['Sobol', 'weighted Sobol', 'RMSE'],                                    stack names
+        indexname = ['$S_i$', '$S_{Ti}-S_i$'],                                           index legend name
+        star = None,                                                                     star symbols
+        dystar = 0.95,                                                                   % of ymax for stars
+        scol = '1.0',                                                                    star colour
+        ssize = 3.0,                                                                     star size
+        swidth = 1.0,                                                                    star edge width
         sig = 'J Mai & M Cuntz'                                                          signature
 
 
@@ -214,16 +225,18 @@ def clockplot(sub, si, sti, stierr=None,
         Written,  MC, JM, AP, Oct 2014
     """
     # Check si[nstacks, nparams]
-    assert np.shape(si) == np.shape(sti), 'Si and STi must have same dimensions.'
+    if sti is not None:
+        assert np.shape(si) == np.shape(sti), 'Lower and upper stacks must have same dimensions.'
     if stierr is not None:
-        assert np.shape(sti) == np.shape(stierr), 'STi their errors stierr must have same dimensions.'
+        assert np.shape(si) == np.shape(stierr), 'Error bars must have must have same dimensions as upper indexes.'
     si_shape = np.shape(si)
     if np.size(si_shape) == 1:
         nsi = 1
         isi  = np.array(si)
-        isti = np.array(sti)
         isi  = isi[np.newaxis,:]
-        isti = isti[np.newaxis,:]
+        if sti is not None:
+            isti = np.array(sti)
+            isti = isti[np.newaxis,:]
         if stierr is not None:
             istierr = np.array(stierr)
             istierr = istierr[np.newaxis,:]
@@ -232,19 +245,28 @@ def clockplot(sub, si, sti, stierr=None,
         if nsi > 3:
             raise ValueError('first data dimension must be <= 3, i.e. at most 3 stacks per parameter supported.')
         isi  = np.array(si)
-        isti = np.array(sti)
+        if sti is not None:
+            isti = np.array(sti)
         if stierr is not None:
             istierr = np.array(stierr)
     else:
         raise ValueError('input data must be 1D or 2D.')
     npar = isi.shape[1]
-    idsi = isti-isi
+    if sti is not None:
+        idsi = isti-isi
 
-    isaname = saname[:]
+    if type(saname) is list:
+        isaname = saname[:]
+    else:
+        isaname = [saname]
+    if type(mod) is list:
+        ismod = mod[:]
+    else:
+        ismod = [mod]
     # Prepare annotations
     if usetex:
         imod = []
-        for i in mod:
+        for i in ismod:
             if '\n' in i:
                 ss = i.split('\n')
             else:
@@ -257,7 +279,7 @@ def clockplot(sub, si, sti, stierr=None,
                 if ' ' in ss[j]:
                     ss[j] = ss[j].replace(' ', '\ ')
             imod.append(ss)
-        mod = imod
+        ismod = imod
         comp = [ r'$\mathbf{'+i+'}$' for i in comp ]
         for j, s in enumerate(isaname):
             isaname[j] = r'$\mathrm{'+s+'}$'
@@ -267,20 +289,22 @@ def clockplot(sub, si, sti, stierr=None,
                 isaname[j] = isaname[j].replace(' ', '\ ')
     else:
         imod = []
-        for i in mod:
+        for i in ismod:
             if '\n' in i:
                 ss = i.split('\n')
             else:
                 ss = [i]
             ss = [ r''+j.strip() for j in ss ]
             imod.append(ss)
-        mod = imod
+        ismod = imod
 
     # numbers
-    nmod   = len(mod)  # number modules
+    nmod   = len(ismod)  # number modules
     nparam = sum(pmod) # number of parameters
     param  = np.arange(nparam) + 1
     assert nparam == npar, 'si.shape[1] must be sum(pmod).'
+    if star is not None:
+        assert nparam == np.size(star), 'There must be the same number of star indications as parameters.'
 
     # colours
     if dobw:
@@ -298,6 +322,7 @@ def clockplot(sub, si, sti, stierr=None,
         #      (116./255.,173./255.,209./255.), # percolation
         #      ( 69./255.,117./255.,180./255.), # routing
         #      ( 49./255., 54./255.,149./255.)] # geology
+        from ufz.brewer import get_brewer
         c = get_brewer('rdylbu11', rgb=True)
         tmp = c.pop(5)   # rm yellow
         c.insert(2,c[2]) # same colour for both soil moistures
@@ -329,9 +354,9 @@ def clockplot(sub, si, sti, stierr=None,
     xm = mleft+0.5*mwidth
     for i in range(nmod):
         # module
-        for j, m in enumerate(mod[i]):
+        for j, m in enumerate(ismod[i]):
             mlabel12 = (ylabel2-ylabel1)*0.3
-            if len(mod[i]) > 1:
+            if len(ismod[i]) > 1:
                 ylab = ylabel1 + (2*j-1)*mlabel12
             else:
                 ylab = ylabel1
@@ -395,7 +420,7 @@ def clockplot(sub, si, sti, stierr=None,
     if usetex:
         xticknames = [ r'$\mathrm{'+i+'}$' for i in xticknames ]
     shiftx  = np.floor(1./(nsi+1)*10.)/10.
-    pleft   = (param+(space4yaxis-1)+shiftx-0.5*fwb[nsi-1])*n2rad # center at 0.5 from param number
+    pleft   = (param+(space4yaxis-1)+shiftx-0.5*fwb[nsi-1]+(nsi-1)/2.*fwb[nsi-1])*n2rad # center at middle of all stacks
     pwidth  = np.ones(nparam)*fwb[nsi-1]*n2rad
     tx = pleft[1::4]+0.5*pwidth[1::4]
     ty = -np.ones(tx.size)*bplabel*ymax
@@ -415,16 +440,20 @@ def clockplot(sub, si, sti, stierr=None,
         bar2    = sub.bar(pleft, pheight, pwidth, bottom=0.,
                           facecolor=mcols[2*n], hatch=hatches[2*n], edgecolor=lcols[2*n],
                           linewidth=plwidth)
-        # params on top
-        pheight = idsi[n,:]
-        pbottom = isi[n,:]
-        bar2    = sub.bar(pleft, pheight, pwidth, bottom=pbottom,
-                          facecolor=mcols[2*n+1], hatch=hatches[2*n+1], edgecolor=lcols[2*n+1],
-                          linewidth=plwidth)
+        if sti is not None:
+            # params on top
+            pheight = idsi[n,:]
+            pbottom = isi[n,:]
+            bar2    = sub.bar(pleft, pheight, pwidth, bottom=pbottom,
+                              facecolor=mcols[2*n+1], hatch=hatches[2*n+1], edgecolor=lcols[2*n+1],
+                              linewidth=plwidth)
         if stierr is not None:
             # error bars
             xx      = pleft+0.5*pwidth
-            yy      = isti[n,:]
+            if sti is not None:
+                yy      = isti[n,:]
+            else:
+                yy      = isi[n,:]
             perr    = istierr[n,:]
             pewidth = 0.1*n2rad
             for i in range(xx.size):
@@ -435,7 +464,18 @@ def clockplot(sub, si, sti, stierr=None,
                 yerru = sub.plot([xx[i]-pewidth,xx[i]+pewidth], [yy[i]+perr[i],yy[i]+perr[i]], # upper bar
                                  linestyle='-', linewidth=elwidth, color='k')
 
+    # Stars
+    if star is not None:
+        pleft = (param+(space4yaxis-1)+shiftx-0.5*fwb[nsi-1]+(nsi-1)/2.*fwb[nsi-1])*n2rad # same as xticklabels
+        xstar = (pleft+0.5*pwidth)[star.astype(np.bool)]
+        ystar = np.ones(xstar.shape[0]) * ymax * dystar
+        star_mucm = sub.plot(xstar, ystar, linestyle='none',
+                             marker='*', markeredgecolor=scol, markerfacecolor='None',
+                             markersize=ssize, markeredgewidth=swidth)
+
+    # Signature
     if dosig:
+        from ufz.signature2plot import signature2plot
         signature2plot(sub, dxsig, dysig, sig, transform=sub.transAxes,
                        italic=True, small=True, mathrm=True, usetex=usetex)
 
@@ -451,33 +491,63 @@ def clockplot(sub, si, sti, stierr=None,
 
     # Fake subplot for legend and numbering
     spos = sub.get_position()
+    fig  = sub.get_figure()
     lsub = fig.add_axes([spos.x0+llxbbox*spos.width, spos.y0+llybbox*spos.height, 0.5*spos.width, 0.1*spos.height])
 
     if dolegend:
         x1, y1 = lsub.transData.transform_affine(np.array([0,0]))
         x2, y2 = lsub.transData.transform_affine(np.array([1,1]))
         dpi = lsub.figure.dpi                         # pixels per inch
+        import matplotlib as mpl
         ss  = mpl.rcParams['font.size']               # text size in points: 1 pt = 1/72 inch
         shifty = 1.0 * ss/72.*float(dpi)/float(y2-y1) # shift by 1.0 of textsize
         for n in range(nsi):
-            dy1 = nsi*shifty - (n+1.)   * shifty
-            dy2 = nsi*shifty - (n+0.01) * shifty
-            lsub.fill_between([0,0.3],   [dy1,dy1], [dy2,dy2], linewidth=plwidth,
+            dy1 = 1. - (n+1.)   * shifty
+            dy2 = 1. - (n+0.01) * shifty
+            # colour bar
+            lsub.fill_between([0,0.3],   [dy1,dy1], [dy2,dy2], linewidth=plwidth, clip_on=False,
                               facecolor=mcols[2*n],   edgecolor=lcols[2*n], hatch=hatches[2*n])
-            lsub.fill_between([0.3,0.6], [dy1,dy1], [dy2,dy2], linewidth=plwidth,
-                              facecolor=mcols[2*n+1], edgecolor=lcols[2*n+1], hatch=hatches[2*n+1])
-            lsub.text(0.65, 0.5*(dy1+dy2), isaname[n], fontsize=ntextsize, horizontalalignment='left', verticalalignment='center')
-            if n == 0:
-                t = r'$S_i$'
-                lsub.text(0.15, dy2+0.05, t, fontsize=ntextsize, horizontalalignment='center', verticalalignment='bottom')
-                t = r'$S_{Ti}-S_i$'
-                lsub.text(0.45, dy2+0.05, t, fontsize=ntextsize, horizontalalignment='center', verticalalignment='bottom')
+            dx1 = 0.35
+            if sti is not None:
+                lsub.fill_between([0.3,0.6], [dy1,dy1], [dy2,dy2], linewidth=plwidth, clip_on=False,
+                                  facecolor=mcols[2*n+1], edgecolor=lcols[2*n+1], hatch=hatches[2*n+1])
+                dx1 = 0.65
+            # Annotation to the right
+            lsub.text(dx1, 0.5*(dy1+dy2), isaname[n], fontsize=ntextsize,
+                      horizontalalignment='left', verticalalignment='center')
+        # Annotation on top
+        if type(indexname) is list:
+            iindexname = indexname[:]
+        else:
+            iindexname = [indexname]
+        t = r''+iindexname[0]
+        dy2 = 1. - 0.01 * shifty
+        lsub.text(0.15, dy2+0.05, r''+iindexname[0], fontsize=ntextsize,
+                  horizontalalignment='center', verticalalignment='bottom')
+        if sti is not None:
+            t = r''+iindexname[1]
+            lsub.text(0.45, dy2+0.05, r''+iindexname[1], fontsize=ntextsize,
+                      horizontalalignment='center', verticalalignment='bottom')
+        # Star
+        if star is not None:
+            if sti is not None:
+                dxstar1 = 0.3
+            else:
+                dxstar1 = 0.15
+            dystar1 = 1. - (2.*nsi+1.01)/2. * shifty
+            lsub.plot([dxstar1], [dystar1], linestyle='none', clip_on=False,
+                      marker='*', markeredgecolor=scol, markerfacecolor='None',
+                      markersize=ssize, markeredgewidth=swidth)
+            print(isaname[nsi-1])
+            lsub.text(dx1, dystar1, isaname[nsi], fontsize=ntextsize,
+                      horizontalalignment='left', verticalalignment='center')
 
     lsub.set_xlim([0,1])
     lsub.set_ylim([0,1])
 
     # subplot numbering
-    if doabc:
+    if doabc and iplot is not None:
+        from ufz.abc2plot import abc2plot
         abc2plot(lsub, dxabc, dyabc, iplot, lower=True, parenthesis='close',
                  bold=True, large=True,
                  mathrm=True, usetex=usetex,
