@@ -96,6 +96,8 @@
     sigma_filter           Mask values deviating more than z standard deviations from a given function.
     signature2plot         Write a copyright notice on a plot.
     maskgroup              Masks elements in a 1d array gathered in small groups.
+    savez                  Save several numpy arrays into a single file in uncompressed ``.npz`` format.
+    savez_compressed       Save several arrays into a single file in compressed ``.npz`` format.
     sobol_index            Calculates the first-order and total variance-based sensitivity indices.
     sread                  Reads in string array from ascii file.
     srrasa                 Generates stratified random 2D points within a given rectangular area.
@@ -168,7 +170,8 @@
     srrasa                 Generates stratified random 2D points within a given rectangular area.
     srrasa_trans           Generates stratified random 2D transects within a given rectangular area.
     timestepcheck          Fills missing time steps in ascii data files
-    
+
+
     Date & Time
     -----------
     date2dec               Converts arrays with calendar date to decimal date.
@@ -177,9 +180,9 @@
 
     Eddy Covariance
     ---------------
-    eddybox                Module containing Eddy Covaraince utilities, see eddybox folder for details                                       
+    eddybox                Module containing Eddy Covaraince utilities, see eddybox folder for details
     eddysuite              Example file for processing Eddy data with eddybox and EddySoft
-    
+
 
     Grids / Polygons
     ----------------
@@ -243,8 +246,8 @@
     Models
     ------
     leafmodel              Model to compute photosynthesis and stomatal conductance of canopies
-    
-    
+
+
     Plotting
     --------
     abc2plot               Write a, b, c, ... on plots.
@@ -276,6 +279,8 @@
     readhdf5               Reads variables or information from hdf5 file.
     readnc                 Wrapper for readnetcdf.
     readnetcdf             Reads variables or information from netcdf file.
+    savez                  Save several numpy arrays into a single file in uncompressed ``.npz`` format.
+    savez_compressed       Save several arrays into a single file in compressed ``.npz`` format.
     writenetcdf            Write netCDF4 file.
 
 
@@ -404,7 +409,7 @@
                                               eddybox module
               AP, Sep 2014 - eddysuite
               MC, Oct 2014 - module -> package
-              MC, Oct 2014 - clockplot, ellipse_area
+              MC, Oct 2014 - clockplot, ellipse_area, savez, savez_compressed
 """
 from __future__ import print_function
 
@@ -446,9 +451,9 @@ try:
 except ImportError:
     pass # obsolete
 from .get_angle         import get_angle
-from .get_nearest       import get_nearest 
+from .get_nearest       import get_nearest
 from .heaviside         import heaviside
-from .homo_sampling     import homo_sampling  
+from .homo_sampling     import homo_sampling
 from .in_poly           import in_poly, inpoly
 from .interpol          import interpol
 from .kernel_regression import kernel_regression, kernel_regression_h
@@ -462,6 +467,7 @@ from .mad               import mad
 from .maskgroup         import maskgroup
 from .means             import means
 from .morris            import morris_sampling, elementary_effects
+from .npyio             import savez, savez_compressed
 try:
     from .outlier       import outlier, rossner
 except:
@@ -475,7 +481,7 @@ from .readhdf5          import readhdf5, hdf5read
 from .readnetcdf        import readnetcdf, netcdfread, ncread, readnc
 from .rgb               import rgb_blend, rgb_range, rgb_gradient
 from .romanliterals     import int2roman, roman2int
-from .sap_app           import t2sap 
+from .sap_app           import t2sap
 from .saltelli          import saltelli
 from .savitzky_golay    import savitzky_golay, sg, savitzky_golay2d, sg2d
 from .sce               import sce
@@ -486,7 +492,7 @@ from .sobol_index       import sobol_index
 from .sread             import sread
 from .srrasa            import srrasa, srrasa_trans
 from .tcherkez          import tcherkez
-from .timestepcheck     import timestepcheck 
+from .timestepcheck     import timestepcheck
 from .tsym              import tsym
 from .unpack            import unpack
 from .volume_poly       import volume_poly
