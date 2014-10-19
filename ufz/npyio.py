@@ -6,14 +6,7 @@ import numpy.lib.format as format
 from numpy.compat import basestring
 import os
 
-__all__ = ['save', 'savez', 'savez_compressed']
-
-
-def zipfile_factory(*args, **kwargs):
-    import zipfile
-    kwargs['allowZip64'] = True
-    return zipfile.ZipFile(*args, **kwargs)
-
+__all__ = ['savez', 'savez_compressed']
 
 def savez(file, *args, **kwds):
     """
@@ -24,11 +17,13 @@ def savez(file, *args, **kwds):
     arguments are given, the corresponding variable names, in the ``.npz``
     file will match the keyword names.
 
-    This is a copy of numpy.savez but with a possible keyword argument ``append``,
-    which appends arrays in an already existing npz-file. Also the keyword ``append``,
-    which produces compressed instead of uncompressed npz files (same as savez+compressed).
-    With this mechanism, compressed and uncompressed arrays can be stored in a then
-    mixed npz file.
+    This is an extension of numpy.savez with a possible keyword arguments ``append``,
+    which appends arrays in an already existing npz-file, ``update``, which also updates
+    existing members of the zip archive, and ``compress`` which produces compressed npz
+    files and is the same as savez_compressed.
+
+    Note that ``update`` copies existing archive members to a new zip (just as the zip utility).
+    It therefore needs doubel disk space temporarily.
 
     Parameters
     ----------
@@ -46,7 +41,10 @@ def savez(file, *args, **kwds):
         keyword names.
     append : Keyword argument, optional
         True = append to existing ``.npz`` file
-        False = overwrite possible existing ``.npz`` file (default).
+        False = overwrite possibly existing ``.npz`` file (default).
+    update : Keyword argument, optional
+        True = update existing members of a zip archive, i.e. ``.npz`` file.
+        False = raises ValueError if archive member already exists in ``.npz`` file (default).
     compress : Keyword argument, optional
         True = produce compressed ``.npz`` file; same as savez_compressed.
         False = produce uncompressed ``.npz``  (default).
@@ -73,54 +71,62 @@ def savez(file, *args, **kwds):
 
     Examples
     --------
-    >>> from tempfile import TemporaryFile, mkstemp
-    >>> outfile = TemporaryFile()
+    >>> import numpy as np
+    >>> from tempfile import mkstemp
+    >>> fd, outfile = mkstemp('')
+    >>> os.close(fd)
+    >>> outfile = outfile + '.npz'
     >>> x = np.arange(10)
     >>> y = np.sin(x)
 
     Using `savez` with \\*args, the arrays are saved with default names.
 
     >>> savez(outfile, x, y)
-    >>> outfile.seek(0) # Only needed here to simulate closing & reopening file
     >>> npzfile = np.load(outfile)
-    >>> npzfile.files
-    ['arr_1', 'arr_0']
+    >>> list(np.sort(npzfile.files))
+    ['arr_0', 'arr_1']
     >>> npzfile['arr_0']
     array([0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
+    >>> npzfile.close()
 
     Using `savez` with \\**kwds, the arrays are saved with the keyword names.
 
-    >>> outfile = TemporaryFile()
     >>> savez(outfile, x=x, y=y)
-    >>> outfile.seek(0)
     >>> npzfile = np.load(outfile)
-    >>> npzfile.files
-    ['y', 'x']
+    >>> list(np.sort(npzfile.files))
+    ['x', 'y']
     >>> npzfile['x']
     array([0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
+    >>> npzfile.close()
 
-    Using `savez` with append keyword
+    Using `savez` with compress, append, and update keywords.
 
-    >>> outfile, noutfile = mkstemp()
-    >>> noutfile = noutfile + '.npz'
-    >>> savez(noutfile, x=x, y=y, compress=True)
-    >>> npzfile = np.load(noutfile)
-    >>> npzfile.files
-    ['y', 'x']
+    >>> savez(outfile, x=x, y=y, compress=True)
+    >>> npzfile = np.load(outfile)
+    >>> list(np.sort(npzfile.files))
+    ['x', 'y']
     >>> npzfile['x']
     array([0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
     >>> npzfile.close()
     >>> x2 = 2*x
     >>> y2 = 2*y
-    >>> savez(noutfile, x2=x2, y2=y2, append=True)
-    >>> npzfile = np.load(noutfile)
-    >>> npzfile.files
-    ['y', 'x', 'x2', 'y2']
+    >>> savez(outfile, x2=x2, y2=y2, append=True)
+    >>> npzfile = np.load(outfile)
+    >>> list(np.sort(npzfile.files))
+    ['x', 'x2', 'y', 'y2']
     >>> npzfile['x2']
     array([ 0,  2,  4,  6,  8, 10, 12, 14, 16, 18])
     >>> npzfile.close()
+    >>> savez(outfile, x=x2, update=True)
+    >>> npzfile = np.load(outfile)
+    >>> list(np.sort(npzfile.files))
+    ['x', 'x2', 'y', 'y2']
+    >>> npzfile['x']
+    array([ 0,  2,  4,  6,  8, 10, 12, 14, 16, 18])
+    >>> npzfile.close()
+
     >>> import os
-    >>> os.remove(noutfile)
+    >>> os.remove(outfile)
     
     """
     _savez(file, args, kwds, False)
@@ -159,8 +165,8 @@ def _savez(file, args, kwds, compress):
     # Import is postponed to here since zipfile depends on gzip, an optional
     # component of the so-called standard library.
     import zipfile
-    # Import deferred for startup time improvement
     import tempfile
+    import shutil
 
     if isinstance(file, basestring):
         if not file.endswith('.npz'):
@@ -170,8 +176,7 @@ def _savez(file, args, kwds, compress):
     for i, val in enumerate(args):
         key = 'arr_%d' % i
         if key in namedict.keys():
-            raise ValueError(
-                "Cannot use un-named variables and keyword %s" % key)
+            raise ValueError("Cannot use un-named variables and keyword %s" % key)
         namedict[key] = val
 
     if compress:
@@ -185,41 +190,104 @@ def _savez(file, args, kwds, compress):
 	    compression = zipfile.ZIP_DEFLATED
 	del namedict['compress']
 
-    # append if keyword is True
-    mode = "w"
-    if 'append' in namedict.keys():
-	if namedict['append']:
-	    mode = "a"
+    # append or update
+    if 'append' in namedict.keys(): 
+        appendit = namedict['append']
 	del namedict['append']
-    zipf = zipfile_factory(file, mode=mode, compression=compression)
+    else:
+        appendit = False
+    if 'update' in namedict.keys():
+        updateit = namedict['update']
+	del namedict['update']
+    else:
+        updateit = False
+    if appendit and updateit:
+        raise KeyError("append and update mutually exclusive.")
 
-    # check if new arrays already exist in file in append mode
-    inzipf = zipf.namelist()
-    if len(inzipf) != 0:
-	for key in namedict:
-	    fname = key + '.npy'
-	    if fname in inzipf:
-		raise ValueError("array name already in npz-file: %s" % key)
+    # check if file exists, otherwise it will be a simple write
+    if not os.path.isfile(file):
+        appendit = False
+        updateit = False
+        inzipf   = []
+    else:
+        zipf   = zipfile.ZipFile(file, mode="r")
+        inzipf = zipf.namelist()
+        inzipf = [ i[:-4] for i in inzipf ]
+        zipf.close()
+    allkeys = set(namedict.keys())
+    allkeys.update(inzipf)
+    
+    # append if keyword is True
+    if appendit:
+        mode = "a"
+        # check if new arrays already exist in zip file
+        if len(inzipf) != 0:
+            for key in namedict:
+                if key in inzipf:
+                    raise ValueError("array name already in npz-file: %s" % key)
+    else:
+        mode = "w"
 
-    # Stage arrays in a temporary file on disk, before writing to zip.
-    fd, tmpfile = tempfile.mkstemp(suffix='-numpy.npy')
-    os.close(fd)
-    try:
-        for key, val in namedict.items():
-            fname = key + '.npy'
-            fid = open(tmpfile, 'wb')
-            try:
-                format.write_array(fid, np.asanyarray(val))
-                fid.close()
-                fid = None
-                zipf.write(tmpfile, arcname=fname)
-            finally:
-                if fid:
+    if not updateit:
+        # Just add arrays to existing or non-existing file; duplicates were checked before
+        zipf = zipfile.ZipFile(file, mode=mode, compression=compression, allowZip64=True)
+        # Stage arrays in a temporary file on disk, before writing to zip.
+        fd, tmpfile = tempfile.mkstemp(suffix='-numpy.npy')
+        os.close(fd)
+        try:
+            for key, val in namedict.items():
+                fname = key + '.npy'
+                fid = open(tmpfile, 'wb')
+                try:
+                    format.write_array(fid, np.asanyarray(val))
                     fid.close()
-    finally:
-        os.remove(tmpfile)
-
-    zipf.close()
+                    fid = None
+                    zipf.write(tmpfile, arcname=fname)
+                finally:
+                    if fid:
+                        fid.close()
+        finally:
+            os.remove(tmpfile)
+        zipf.close()
+    else:
+        # open existing zip file in read mode
+        zipr = zipfile.ZipFile(file, mode="r")
+        # open temporary zip file in write mode
+        tempdir = tempfile.mkdtemp()
+        try:
+            tempname = os.path.join(tempdir, 'new.zip')
+            zipw = zipfile.ZipFile(tempname, mode="w", compression=compression, allowZip64=True)
+            for key in allkeys:
+                # if in namedict then write new, else extract it from zipfile
+                if key in namedict.keys():
+                    # Stage arrays in a temporary file on disk, before writing to zip.
+                    fd, tmpfile = tempfile.mkstemp(suffix='-numpy.npy')
+                    os.close(fd)
+                    try:
+                        fname = key + '.npy'
+                        fid = open(tmpfile, 'wb')
+                        try:
+                            format.write_array(fid, np.asanyarray(namedict[key]))
+                            fid.close()
+                            fid = None
+                            zipw.write(tmpfile, arcname=fname)
+                        finally:
+                            if fid:
+                                fid.close()
+                    finally:
+                        os.remove(tmpfile)
+                else:
+                    fname = key + '.npy'
+                    zipr.extract(fname, tempdir)
+                    tmpfile = os.path.join(tempdir, fname)
+                    zipw.write(tmpfile, arcname=fname)
+                    os.remove(tmpfile)
+            # close both files and move new to old
+            zipr.close()
+            zipw.close()
+            shutil.move(tempname, file)
+        finally:
+            shutil.rmtree(tempdir)
 
 
 if __name__ == '__main__':
