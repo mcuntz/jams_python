@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 # from __future__ import absolute_import
-
 import numpy as np
 import numpy.lib.format as format
 from numpy.compat import basestring
@@ -140,8 +139,12 @@ def savez_compressed(file, *args, **kwds):
     If arguments are passed in with no keywords, then stored file names are
     arr_0, arr_1, etc.
 
-    This is a copy of numpy.savez_compressed but with a possible keyword argument ``append``,
-    which appends arrays in an already existing npz-file.
+    This is an extension of numpy.savez_compressed with a possible keyword arguments ``append``,
+    which appends arrays in an already existing npz-file, and ``update``, which also updates
+    existing members of the zip archive.
+
+    Note that ``update`` copies existing archive members to a new zip (just as the zip utility).
+    It therefore needs doubel disk space temporarily.
 
     Parameters
     ----------
@@ -151,12 +154,87 @@ def savez_compressed(file, *args, **kwds):
         Function arguments.
     kwds : Keyword arguments
         Keywords.
-    append : True = append to existing ``.npz`` file; False = overwrite possible existing ``.npz`` file.
+    append : Keyword argument, optional
+        True = append to existing ``.npz`` file
+        False = overwrite possibly existing ``.npz`` file (default).
+    update : Keyword argument, optional
+        True = update existing members of a zip archive, i.e. ``.npz`` file.
+        False = raises ValueError if archive member already exists in ``.npz`` file (default).
 
     See Also
     --------
     savez : Save several arrays into an uncompressed ``.npz`` file format
 
+    Notes
+    -----
+    The ``.npz`` file format is a zipped archive of files named after the
+    variables they contain. The archive is compressed and each file
+    in the archive contains one variable in ``.npy`` format. For a
+    description of the ``.npy`` format, see `format`.
+
+    When opening the saved ``.npz`` file with `load` a `NpzFile` object is
+    returned. This is a dictionary-like object which can be queried for
+    its list of arrays (with the ``.files`` attribute), and for the arrays
+    themselves.
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> from tempfile import mkstemp
+    >>> fd, outfile = mkstemp('')
+    >>> os.close(fd)
+    >>> outfile = outfile + '.npz'
+    >>> x = np.arange(10)
+    >>> y = np.sin(x)
+
+    Using `savez` with \\*args, the arrays are saved with default names.
+
+    >>> savez_compressed(outfile, x, y)
+    >>> npzfile = np.load(outfile)
+    >>> list(np.sort(npzfile.files))
+    ['arr_0', 'arr_1']
+    >>> npzfile['arr_0']
+    array([0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
+    >>> npzfile.close()
+
+    Using `savez` with \\**kwds, the arrays are saved with the keyword names.
+
+    >>> savez_compressed(outfile, x=x, y=y)
+    >>> npzfile = np.load(outfile)
+    >>> list(np.sort(npzfile.files))
+    ['x', 'y']
+    >>> npzfile['x']
+    array([0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
+    >>> npzfile.close()
+
+    Using `savez` with append and update keywords.
+
+    >>> savez_compressed(outfile, x=x, y=y)
+    >>> npzfile = np.load(outfile)
+    >>> list(np.sort(npzfile.files))
+    ['x', 'y']
+    >>> npzfile['x']
+    array([0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
+    >>> npzfile.close()
+    >>> x2 = 2*x
+    >>> y2 = 2*y
+    >>> savez_compressed(outfile, x2=x2, y2=y2, append=True)
+    >>> npzfile = np.load(outfile)
+    >>> list(np.sort(npzfile.files))
+    ['x', 'x2', 'y', 'y2']
+    >>> npzfile['x2']
+    array([ 0,  2,  4,  6,  8, 10, 12, 14, 16, 18])
+    >>> npzfile.close()
+    >>> savez_compressed(outfile, x=x2, update=True)
+    >>> npzfile = np.load(outfile)
+    >>> list(np.sort(npzfile.files))
+    ['x', 'x2', 'y', 'y2']
+    >>> npzfile['x']
+    array([ 0,  2,  4,  6,  8, 10, 12, 14, 16, 18])
+    >>> npzfile.close()
+
+    >>> import os
+    >>> os.remove(outfile)
     """
     _savez(file, args, kwds, True)
 
