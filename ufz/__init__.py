@@ -21,7 +21,7 @@
     autostring             Format number (array) with given decimal precision.
     cellarea               Calc areas of grid cells in m^2.
     clockplot              The clockplot of mHM.
-    closest                Get the array index of the element that is closest to a given number.
+    closest                Index in array which entry is closest to a given number.
     colors                 Wrapper for colour.
     colours                Define UFZ colours.
     const                  Provides physical, mathematical, computational, and isotope constants.
@@ -134,7 +134,7 @@
 
     Array manipulation
     ------------------
-    closest                Get the array index of the element that is closest to a given number.
+    closest                Index in array which entry is closest to a given number.
     pack                   Similar to Fortran pack function with mask.
     maskgroup              Masks elements in a 1d array gathered in small groups.
     unpack                 Similar to Fortran unpack function with mask.

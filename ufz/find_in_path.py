@@ -25,7 +25,7 @@ def find_in_path(filename):
 
         Examples
         --------
-        >>> datei = 'Humor-Sans.ttf'
+        >>> datei = 'wiki.pdf'
         >>> isdatei = find_in_path(datei)
         >>> if isdatei is None:
         ...     print('No')
@@ -33,7 +33,7 @@ def find_in_path(filename):
         ...     print('Yes')
         Yes
 
-        >>> datei = 'Humor_Sans.ttf'
+        >>> datei = 'Humor-Sans.ttf'
         >>> isdatei = find_in_path(datei)
         >>> if isdatei is None:
         ...     print('No')
@@ -77,7 +77,7 @@ if __name__ == '__main__':
     import doctest
     doctest.testmod(optionflags=doctest.NORMALIZE_WHITESPACE)
 
-    # datei = 'Humor-Sans.ttf'
+    # datei = 'wiki.pdf'
     # isdatei = find_in_path(datei)
     # if isdatei is None:
     #     print('No')
@@ -85,7 +85,7 @@ if __name__ == '__main__':
     #     print('Yes')
     # # Yes
 
-    # datei = 'Humor_Sans.ttf'
+    # datei = 'Humor-Sans.ttf'
     # isdatei = find_in_path(datei)
     # if isdatei is None:
     #     print('No')

@@ -4,7 +4,7 @@ import numpy as np
 
 def closest(vec, num, value=False):
     """
-        Determine the array index in a vector of the element that is closest in value to a given number.
+        Index in array which entry is closest to a given number.
 
 
         Definition

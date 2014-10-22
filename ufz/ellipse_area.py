@@ -4,27 +4,27 @@ import numpy as np
 
 def ellipse_area(a, b=None):
     """
-        Area of ellipse with two axes a and b.
+        Area of ellipse with major and minor axes a and b.
 
 
         Definition
         ----------
-        def ellipse_area(a, b):
+        def ellipse_area(a, b=None):
 
 
         Input
         -----
-        a          main axis
+        a          semi-major axis
 
 
         Optional Input
         --------------
-        b          secondary axis
+        b          semi-minor axis
 
 
         Output
         ------
-        area of ellipse or circle if secondary axis not given
+        area of ellipse or circle if semi-minor axis not given
 
 
         Restrictions
@@ -62,12 +62,12 @@ def ellipse_area(a, b=None):
         along with the UFZ makefile project (cf. gpl.txt and lgpl.txt).
         If not, see <http://www.gnu.org/licenses/>.
 
-        Copyright 2011-2013 Matthias Cuntz
+        Copyright 2014 Matthias Cuntz
 
 
         History
         -------
-        Written,  MC, Oct 2014
+        Written,  MC, Oct 2014 - in Python seminar
     """
     if b is None:
         return np.pi*a*a

@@ -82,7 +82,7 @@ def abc2plot(handle, dx, dy, iplot,
 
         Examples
         --------
-        >>> None
+        abc2plot(sub,0.7,0.6,2,large=True,parenthesis='both',usetex=usetex,mathrm=False)
 
 
         License
