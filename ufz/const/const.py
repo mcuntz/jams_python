@@ -13,11 +13,13 @@ import numpy as np
         Mathematical
             Pi, Pi2, TwoPi, Sqrt2
         Physical
-            Gravity, T0, P0, T25, sigma, R, Na, REarth
+            Gravity, T0, P0, T25, sigma, R, Na, REarth, dielH2O
         Isotope
             RPDB
         Computational
             tiny
+        Material
+            cqua, cwat, cair, lam, rhoq
 
 
     Examples
@@ -52,6 +54,24 @@ import numpy as np
 
     >>> print(astr(M_DAIR,3,pp=True))
     28.964
+    
+    >>> print(astr(dielH2O(300.),3,pp=True))
+    77.693
+    
+    >>> print(astr(cqua,3,pp=True))
+    800.000
+    
+    >>> print(astr(cwat,3,pp=True))
+    4180.000
+    
+    >>> print(astr(cair,3,pp=True))
+    1010.000
+
+    >>> print(astr(lam,3,pp=True))
+    2.450e+06
+
+    >>> print(astr(rhoq,3,pp=True))
+    2.650
 
 
     License
