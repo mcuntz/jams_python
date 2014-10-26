@@ -48,6 +48,7 @@
     get_angle              Returns the angle in radiant from each point in xy1 to each point in xy2.
     get_brewer             Registers and returns Brewer colormap.
     get_nearest            Returns a value z for each point in xy near to the xyz field.
+    grid_mid2edge          Longitude and latitude grid edges from grid midpoints.
     hdfread                Wrapper for readhdf.
     hdf4read               Wrapper for readhdf4.
     hdf5read               Wrapper for readhdf5.
@@ -188,6 +189,7 @@
     ----------------
     area_poly              Area of a polygon
     cellarea               Calc areas of grid cells in m^2.
+    grid_mid2edge          Longitude and latitude grid edges from grid midpoints.
     homo_sampling          Generation of homogeneous, randomly distributed points in a given rectangular area.
     in_poly                Determines whether a 2D point falls in a polygon.
     inpoly                 Wrapper for in_poly.
@@ -409,7 +411,7 @@
                                               eddybox module
               AP, Sep 2014 - eddysuite
               MC, Oct 2014 - module -> package
-              MC, Oct 2014 - clockplot, ellipse_area, savez, savez_compressed
+              MC, Oct 2014 - clockplot, ellipse_area, savez, savez_compressed, grid_mid2edge
 """
 from __future__ import print_function
 
@@ -452,6 +454,7 @@ except ImportError:
     pass # obsolete
 from .get_angle         import get_angle
 from .get_nearest       import get_nearest
+from .grid_mid2edge     import grid_mid2edge
 from .heaviside         import heaviside
 from .homo_sampling     import homo_sampling
 from .in_poly           import in_poly, inpoly

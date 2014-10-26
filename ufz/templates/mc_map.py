@@ -200,6 +200,7 @@ foster_lat  = ufz.readnetcdf(infile,'Y')
 foster_lon  = ufz.readnetcdf(infile,'X')
 foster_snow = ufz.readnetcdf(infile,'snow_depth') * 1e-3 # mm -> m
 
+foster_lonh, foster_lath = ufz.grid_mid2edge(foster_lon, foster_lat)
 foster_snow_max = np.ma.amax(foster_snow, axis=0)
 
 # -------------------------------------------------------------------------
@@ -226,7 +227,6 @@ if True:
     iplot = 0
     print('Plot - Fig ', ifig)
     fig = plt.figure(ifig)
-    lon_0=0
     iplot += 1
 
     sub = fig.add_axes(ufz.position(nrow,ncol,iplot,hspace=hspace,vspace=vspace))
@@ -234,10 +234,7 @@ if True:
 
     clab = r'$\mathrm{Maximum \; Snow \; Depth \; [m]}$'
 
-    lon   = foster_lon
-    lat   = foster_lat
-    lon2, lat2 = np.meshgrid(lon,lat)
-    xx, yy = m(lon2,lat2)
+    xx, yy = m(foster_lonh,foster_lath)
     zz     = foster_snow_max
 
     ncolor  = 8  # of colors in plot
@@ -307,10 +304,7 @@ if True:
 
     clab = r'$\mathrm{Maximum \; Snow \; Depth \; [m]}$'
 
-    lon   = foster_lon
-    lat   = foster_lat
-    lon2, lat2 = np.meshgrid(lon,lat)
-    xx, yy = m(lon2,lat2)
+    xx, yy = m(foster_lonh,foster_lath)
     zz     = foster_snow_max
 
     ncolor  = 8  # of colors in plot
@@ -375,10 +369,7 @@ if True:
 
     clab = r'$\mathrm{Maximum \; Snow \; Depth \; [m]}$'
 
-    lon   = foster_lon
-    lat   = foster_lat
-    lon2, lat2 = np.meshgrid(lon,lat)
-    xx, yy = m(lon2,lat2)
+    xx, yy = m(foster_lonh,foster_lath)
     zz     = foster_snow_max
 
     ncolor  = 8  # of colors in plot

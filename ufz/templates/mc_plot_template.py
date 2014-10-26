@@ -58,7 +58,7 @@ Modified, MC, Jul 2013 - optparse->argparse
 # Hardcoded switches for plot gallery
 dorandom  = True  # Scatter and histogram
 dobasemap = True  # map with basemap
-docartopy = True  # map with cartopy
+docartopy = False  # map with cartopy
 
 # # python debugger
 # import pdb
@@ -317,52 +317,14 @@ if dobasemap | docartopy:
   temp       = (np.cos(np.deg2rad(lat2)) + np.sin(np.deg2rad(lon2*10)))*20.
 
   # grid cell edges
-  lonh = np.empty((nlat+1,nlon+1), dtype=np.float)
-  lath = np.empty((nlat+1,nlon+1), dtype=np.float)
-  dlon = np.diff(lon2,axis=1)
-  dlat = np.diff(lat2,axis=0)
-  lonh[0:nlat,0]      = lon2[:,0]        - 0.5*dlon[:,0]          # 0
-  lonh[0:nlat,1:nlon] = lonh[0:nlat,0:1] + np.cumsum(dlon,axis=1) # 1:nlon+1
-  lonh[0:nlat,-1]     = lon2[:,-1]       + 0.5*dlon[:,-1]         # nlon
-  lonh[nlat,0:nlon+1] = lonh[nlat-1,0:nlon+1]                    # lower corner of box: assign last upper boundary
-  lath[0,0:nlon]      = lat2[0,:]        - 0.5*dlat[0,:]
-  lath[1:nlat,0:nlon] = lath[0:1,0:nlon] + np.cumsum(dlat,axis=0)
-  lath[-1,0:nlon]     = lat2[-1,:]       + 0.5*dlat[-1,:]
-  lath[0:nlat+1,nlon] = lath[0:nlat+1,nlon-1]
-
-  slon         = np.roll(lon,nlon//2) # np.where(lon>180, lon-360., lon)
-  slat         = lat
-  stemp        = np.roll(temp,nlon//2,1)
-  slon2, slat2 = np.meshgrid(slon,slat)
-  slonh = np.empty((nlat+1,nlon+1), dtype=np.float)
-  slath = np.empty((nlat+1,nlon+1), dtype=np.float)
-  dlon = np.diff(slon2,axis=1)
-  dlat = np.diff(slat2,axis=0)
-  slonh[0:nlat,0]      = slon2[:,0]        - 0.5*dlon[:,0]          # 0
-  slonh[0:nlat,1:nlon] = slonh[0:nlat,0:1] + np.cumsum(dlon,axis=1) # 1:nlon+1
-  slonh[0:nlat,-1]     = slon2[:,-1]       + 0.5*dlon[:,-1]         # nlon
-  slonh[nlat,0:nlon+1] = slonh[nlat-1,0:nlon+1]                    # lower corner of box: assign last upper boundary
-  slath[0,0:nlon]      = slat2[0,:]        - 0.5*dlat[0,:]
-  slath[1:nlat,0:nlon] = slath[0:1,0:nlon] + np.cumsum(dlat,axis=0)
-  slath[-1,0:nlon]     = slat2[-1,:]       + 0.5*dlat[-1,:]
-  slath[0:nlat+1,nlon] = slath[0:nlat+1,nlon-1]
-
-  mlon         = np.roll(np.where(lon>180, lon-360., lon),nlon//2)
+  lonh, lath   = ufz.grid_mid2edge(lon, lat)
+  # if lon_0=0 (@Mollweide) then need -180 t0 180
+  # if lon_0=180 then need 0-360, i.e. no image wrapping. Have to do yourself
+  mlon         = np.roll(lon,nlon//2)
+  mlon         = np.where(mlon>180., mlon-360., mlon) 
   mlat         = lat
   mtemp        = np.roll(temp,nlon//2,1)
-  mlon2, mlat2 = np.meshgrid(mlon,mlat)
-  mlonh = np.empty((nlat+1,nlon+1), dtype=np.float)
-  mlath = np.empty((nlat+1,nlon+1), dtype=np.float)
-  dlon = np.diff(mlon2,axis=1)
-  dlat = np.diff(mlat2,axis=0)
-  mlonh[0:nlat,0]      = mlon2[:,0]        - 0.5*dlon[:,0]          # 0
-  mlonh[0:nlat,1:nlon] = mlonh[0:nlat,0:1] + np.cumsum(dlon,axis=1) # 1:nlon+1
-  mlonh[0:nlat,-1]     = mlon2[:,-1]       + 0.5*dlon[:,-1]         # nlon
-  mlonh[nlat,0:nlon+1] = mlonh[nlat-1,0:nlon+1]                    # lower corner of box: assign last upper boundary
-  mlath[0,0:nlon]      = mlat2[0,:]        - 0.5*dlat[0,:]
-  mlath[1:nlat,0:nlon] = mlath[0:1,0:nlon] + np.cumsum(dlat,axis=0)
-  mlath[-1,0:nlon]     = mlat2[-1,:]       + 0.5*dlat[-1,:]
-  mlath[0:nlat+1,nlon] = mlath[0:nlat+1,nlon-1]
+  mlonh, mlath = ufz.grid_mid2edge(mlon, mlat)
 
 # -------------------------------------------------------------------------
 # Plot
@@ -622,15 +584,14 @@ if dobasemap:
   sub  = fig.add_axes(ufz.position(nrow,ncol,iplot,hspace=hspace,vspace=vspace))
   m    = Basemap(projection='moll',lon_0=0,resolution='c')
 
-  mx, my = m(mlon2,mlat2)
-  sx, sy = m(slon2,slat2)
+  mx, my = m(mlonh,mlath)
 
   cvals  = np.amin(temp) + np.arange(ncolor+1)/np.float(ncolor)*(np.amax(temp)-np.amin(temp))
   norm   = mpl.colors.BoundaryNorm(cvals, cm.N)
   if nlon > 100:
-      c = m.contourf(mx, my, temp, norm=norm, cmap=cm)
+      c = m.contourf(mx, my, mtemp, norm=norm, cmap=cm)
   else:
-      c = m.pcolormesh(sx, sy, stemp, norm=norm, cmap=cm)
+      c = m.pcolor(mx, my, mtemp, norm=norm, cmap=cm)
   cbar   = plt.colorbar(c, orientation='vertical')
   cnames = [r"${0:.0f}$".format(i) for i in cvals]
   cbar.set_ticks(cvals)
@@ -653,7 +614,7 @@ if dobasemap:
   sub  = fig.add_axes(ufz.position(nrow,ncol,iplot,hspace=hspace,vspace=vspace))
   m    = Basemap(projection='cyl', lon_0=0, resolution='c')
 
-  mx, my = m(mlon2,mlat2)
+  mx, my = m(mlonh,mlath)
 
   cvals  = np.amin(temp) + np.arange(ncolor+1)/np.float(ncolor)*(np.amax(temp)-np.amin(temp))
   norm   = mpl.colors.BoundaryNorm(cvals, cm.N)
@@ -691,7 +652,7 @@ if dobasemap:
   m    = Basemap(projection='cyl', lon_0=0, resolution='c',
                  llcrnrlon=xlim[0], llcrnrlat=ylim[0], urcrnrlon=xlim[1], urcrnrlat=ylim[1])
 
-  mx, my = m(mlon2,mlat2)
+  mx, my = m(mlonh,mlath)
 
   cvals  = np.amin(temp) + np.arange(ncolor+1)/np.float(ncolor)*(np.amax(temp)-np.amin(temp))
   norm   = mpl.colors.BoundaryNorm(cvals, cm.N)
@@ -753,7 +714,7 @@ if docartopy:
       c = sub.contourf(lon2, lat2, temp,
                        norm=norm, cmap=cm, transform=ccrs.PlateCarree())
   else:
-      c = sub.pcolormesh(np.roll(lon2,nlon//2,1), np.roll(lat2,nlon//2,1), np.roll(temp,nlon//2,1),
+      c = sub.pcolormesh(np.roll(lonh,nlon//2,1), np.roll(lath,nlon//2,1), np.roll(temp,nlon//2,1),
                          norm=norm, cmap=cm, transform=ccrs.PlateCarree())
   cbar   = plt.colorbar(c, orientation='vertical')
   cnames = [r"${0:.0f}$".format(i) for i in cvals]
@@ -781,7 +742,7 @@ if docartopy:
       c = sub.contourf(lon2, lat2, temp,
                        norm=norm, cmap=cm, transform=ccrs.PlateCarree())
   else:
-      c = sub.pcolormesh(np.roll(lon2,nlon//2,1), np.roll(lat2,nlon//2,1), np.roll(temp,nlon//2,1),
+      c = sub.pcolormesh(np.roll(lonh,nlon//2,1), np.roll(lath,nlon//2,1), np.roll(temp,nlon//2,1),
                          norm=norm, cmap=cm, transform=ccrs.PlateCarree())
   cbar   = plt.colorbar(c, orientation='vertical')
   cnames = [r"${0:.0f}$".format(i) for i in cvals]
@@ -828,7 +789,7 @@ if docartopy:
       c = sub.contourf(lon2, lat2, temp,
                        norm=norm, cmap=cm, transform=ccrs.PlateCarree())
   else:
-      c = sub.pcolormesh(np.roll(lon2,nlon//2,1), np.roll(lat2,nlon//2,1), np.roll(temp,nlon//2,1),
+      c = sub.pcolormesh(np.roll(lonh,nlon//2,1), np.roll(lath,nlon//2,1), np.roll(temp,nlon//2,1),
                          norm=norm, cmap=cm, transform=ccrs.PlateCarree())
   cbar   = plt.colorbar(c, orientation='vertical')
   cnames = [r"${0:.0f}$".format(i) for i in cvals]
