@@ -8,7 +8,7 @@ import time as t
 import shutil as sh
 import re
 import os as os
-    
+
 ################################################################################
 def eddyspec(indir, cfile, hfile, rawfile, sltdir, tspfile='34_specmean.csv',
              cspfile='35_specmean.csv', hspfile='36_specmean.csv',
@@ -23,25 +23,25 @@ def eddyspec(indir, cfile, hfile, rawfile, sltdir, tspfile='34_specmean.csv',
     use EddySpec and SpecMean with these files and the script continues after
     user is finished. Inductances for water and carbon are fitted and saved
     together with spectrum plots. It is recommended to repeat the spectrum
-    analysis for different times within the year. 
+    analysis for different times within the year.
 
-    
+
     Definition
     ----------
     eddyspec(indir, cfile, hfile, rawfile, sltdir, tspfile='34_specmean.csv',
              cspfile='35_specmean.csv', hspfile='36_specmean.csv', novalue=-9999):
-    
-    
+
+
     Input
-    ----- 
+    -----
     indir       str, path of the folder where results will be saved
     cfile       str, path of the carbon lag file
     hfile       str, path of the water lag file
     rawfile     str, path of the raw flux file
     sltdir      str, path of the folder containing the *.slt files (will contain
                 EddySpec and SpecMean files after use)
-        
-    
+
+
     Optional Input
     --------------
     tspfile     str, name of the average temperature spectrum file
@@ -51,8 +51,8 @@ def eddyspec(indir, cfile, hfile, rawfile, sltdir, tspfile='34_specmean.csv',
     hspfile     str, name of the average water spectrum file
                 (default: '36_specmean.csv')
     novalue     int, novalue in rawfile (default=-9999)
-                
-    
+
+
     Output
     ------
     (for each run in the year, a new folder is created in indir and EddySpec and
@@ -60,16 +60,16 @@ def eddyspec(indir, cfile, hfile, rawfile, sltdir, tspfile='34_specmean.csv',
     c_specw.pdf    plot of the carbon spectrum
     h_specw.pdf    plot of the water spectrum
     spec_X_X.log   log file containing used *.slt files and inductances
-    
-    
+
+
     License
     -------
     This file is part of the UFZ Python package.
-    
+
     It is NOT released under the GNU Lesser General Public License, yet.
-    
+
     If you use this routine, please contact Arndt Piayda.
-    
+
     Copyright 2014 Arndt Piayda
 
 
@@ -88,7 +88,7 @@ def eddyspec(indir, cfile, hfile, rawfile, sltdir, tspfile='34_specmean.csv',
     doysfloat = day + (hour + min/60.)/24.
     cl        = np.array(fread('%s' %(cfile), skip=1, cskip=1))
     hl        = np.array(fread('%s' %(hfile), skip=1, cskip=1))
-    # fluxes    
+    # fluxes
     fluxdate = date2dec(ascii = np.array(sread('%s' %(rawfile), nc=1, skip=1), dtype='|S16'))
     year     = np.array(sread('%s' %(rawfile), nc=1, skip=1), dtype='|S16')
     year     = np.array([x[6:10] for x in year.flatten()], dtype = '|S4').astype(int)
@@ -97,60 +97,60 @@ def eddyspec(indir, cfile, hfile, rawfile, sltdir, tspfile='34_specmean.csv',
     cf       = np.where(cf == novalue, np.nan, cf).flatten()
     hf       = np.array(fread('%s' %(rawfile), skip=1, cskip=1, nc=1))
     hf       = np.where(hf == novalue, np.nan, hf).flatten()
-    
+
     if plot:
         import matplotlib.pyplot as plt
         import matplotlib.backends.backend_pdf as pdf
         ############################################################################
-        # plot lag c    
-        plt.figure(1)                                        
-        plt.plot(cl[:,0], cl[:,2], 'bo', label='minlag (sam)')         
-        plt.plot(cl[:,0], cl[:,5], 'ro', label='maxlag (sam)')                
+        # plot lag c
+        plt.figure(1)
+        plt.plot(cl[:,0], cl[:,2], 'bo', label='minlag (sam)')
+        plt.plot(cl[:,0], cl[:,5], 'ro', label='maxlag (sam)')
         plt.xlabel('DOY')
-        plt.ylabel('Lags [Samples]')                    
+        plt.ylabel('Lags [Samples]')
         plt.title('c lags')
         plt.axis('auto')
-        plt.grid('on')                            
+        plt.grid('on')
         plt.legend()
-        
+
         ############################################################################
         # plot flux c
-        plt.figure(2)                                        
-        plt.plot(fluxdate, cf, 'r-', label='cflux')                        
+        plt.figure(2)
+        plt.plot(fluxdate, cf, 'r-', label='cflux')
         plt.xlabel('DOY')
-        plt.ylabel('cflux [?]')                    
+        plt.ylabel('cflux [?]')
         plt.title('c fluxes')
         plt.axis('auto')
-        plt.grid('on')                            
+        plt.grid('on')
         plt.legend()
-        
+
         ############################################################################
         # plot lag h
-        plt.figure(3)                                        
-        plt.plot(hl[:,0], hl[:,2], 'bo', label='minlag (sam)')         
-        plt.plot(hl[:,0], hl[:,5], 'ro', label='maxlag (sam)')                
+        plt.figure(3)
+        plt.plot(hl[:,0], hl[:,2], 'bo', label='minlag (sam)')
+        plt.plot(hl[:,0], hl[:,5], 'ro', label='maxlag (sam)')
         plt.xlabel('DOY')
-        plt.ylabel('Lags [Samples]')                    
+        plt.ylabel('Lags [Samples]')
         plt.title('h lags')
         plt.axis('auto')
-        plt.grid('on')                            
+        plt.grid('on')
         plt.legend()
-        
+
         ############################################################################
         # plot flux h
-        plt.figure(4)                                        
-        plt.plot(fluxdate, hf, 'b-', label='hflux')                        
+        plt.figure(4)
+        plt.plot(fluxdate, hf, 'b-', label='hflux')
         plt.xlabel('DOY')
-        plt.ylabel('hflux [?]')                    
+        plt.ylabel('hflux [?]')
         plt.title('h fluxes')
         plt.axis('auto')
-        plt.grid('on')                            
+        plt.grid('on')
         plt.legend()
         plt.show()
-    
+
     interval = []
     inp = True
-    while inp: 
+    while inp:
         inpfrom = raw_input("From doy [ddd.ddd]: ")
         inpto = raw_input("To doy [ddd.ddd]: ")
         try:
@@ -162,7 +162,7 @@ def eddyspec(indir, cfile, hfile, rawfile, sltdir, tspfile='34_specmean.csv',
             inp = True
     inpclag = raw_input("C lag: ")
     inphlag = raw_input("H lag: ")
-    
+
     print(lagdate[interval[0]:interval[1]+1])
     print('\nDO EDDYSPEC AND SPECMEAN NOW!\n')
     inp = raw_input("Mean spectrums ready? [y/n]: ").lower()
@@ -171,7 +171,7 @@ def eddyspec(indir, cfile, hfile, rawfile, sltdir, tspfile='34_specmean.csv',
     else:
         import sys
         sys.exit()
-    
+
     ############################################################################
     # move spectrum files from slt folder to spec folder
     if len(os.listdir(indir))==0:
@@ -183,17 +183,17 @@ def eddyspec(indir, cfile, hfile, rawfile, sltdir, tspfile='34_specmean.csv',
     specpat  = re.compile('[0-9]*_specmean.csv')
     specpat2  = re.compile('[a-zA-Z0-9]*_[0-9]*_spec.csv')
     sltdirlist = os.listdir(sltdir)
-    for file in sltdirlist: 
+    for file in sltdirlist:
         if bool(re.search(specpat, file)) | bool(re.search(specpat2, file)):
             sh.move('%s/%s' %(sltdir, file), indir)
-    
+
     ############################################################################
     # conductance fitting
-    # reading mean spec files  
+    # reading mean spec files
     tsp = np.array(fread('%s/%s' %(indir,tspfile), skip=1, nc=2))
     csp = np.array(fread('%s/%s' %(indir,cspfile), skip=1, nc=2))
     hsp = np.array(fread('%s/%s' %(indir,hspfile), skip=1, nc=2))
-    
+
     # filter input specs for log10(input) != NaN
     global fcoc, fcoh
     fcoc = csp[np.where((np.invert(np.isnan(np.log10(tsp[:,1])))) & (np.invert(np.isnan(np.log10(csp[:,1])))))[0],1]
@@ -202,65 +202,65 @@ def eddyspec(indir, cfile, hfile, rawfile, sltdir, tspfile='34_specmean.csv',
     yc = tsp[np.where((np.invert(np.isnan(np.log10(tsp[:,1])))) & (np.invert(np.isnan(np.log10(csp[:,1])))))[0],1]
     xh = tsp[np.where((np.invert(np.isnan(np.log10(tsp[:,1])))) & (np.invert(np.isnan(np.log10(hsp[:,1])))))[0],0]
     yh = tsp[np.where((np.invert(np.isnan(np.log10(tsp[:,1])))) & (np.invert(np.isnan(np.log10(hsp[:,1])))))[0],1]
-    
+
     # calculate deviations from t spec for different inductences and select the one with the smallest residual
     con = np.arange(0,5,0.01)
     devc = np.empty_like(con)
     devh = np.empty_like(con)
-    
+
     for i in xrange(np.shape(con)[0]):
         devc[i] = np.nansum(np.log10(yc)-modc(xc,con[i]))
         devh[i] = np.nansum(np.log10(yh)-modh(xh,con[i]))
-    
+
     conc = con[np.argmin(np.abs(devc))]
     conh = con[np.argmin(np.abs(devh))]
-    
+
     if plot:
         ############################################################################
         # plot c spec
         fig1 = plt.figure(5)
-        sub = fig1.add_subplot(111)                                       
-        sub.plot(np.log10(tsp[:,0]), np.log10(tsp[:,1]), 'ro-', label='T Spec') 
-        sub.plot(np.log10(csp[:,0]), np.log10(csp[:,1]), 'bo-', label='C Spec') 
-        sub.plot(np.log10(xc), modc(xc,conc),'go-', label='C Spec with %.2f Induc.' %(conc)) 
+        sub = fig1.add_subplot(111)
+        sub.plot(np.log10(tsp[:,0]), np.log10(tsp[:,1]), 'ro-', label='T Spec')
+        sub.plot(np.log10(csp[:,0]), np.log10(csp[:,1]), 'bo-', label='C Spec')
+        sub.plot(np.log10(xc), modc(xc,conc),'go-', label='C Spec with %.2f Induc.' %(conc))
         plt.xlabel('F[Hz]')
-        plt.ylabel('F[Hz]*Co(w,X)')                    
+        plt.ylabel('F[Hz]*Co(w,X)')
         sub.set_title('c Spectrum')
         sub.axis('auto')
-        sub.grid('on')                            
+        sub.grid('on')
         sub.legend(loc='best')
-    
+
         ############################################################################
         # plot h spec
-        fig2 = plt.figure(6) 
+        fig2 = plt.figure(6)
         sub = fig2.add_subplot(111)
-        sub.plot(np.log10(tsp[:,0]), np.log10(tsp[:,1]), 'ro-', label='T Spec') 
+        sub.plot(np.log10(tsp[:,0]), np.log10(tsp[:,1]), 'ro-', label='T Spec')
         sub.plot(np.log10(hsp[:,0]), np.log10(hsp[:,1]), 'bo-', label='H Spec')
-        sub.plot(np.log10(xh), modh(xh,conh),'go-', label='H Spec %.2f Induc.' %(conh)) 
+        sub.plot(np.log10(xh), modh(xh,conh),'go-', label='H Spec %.2f Induc.' %(conh))
         plt.xlabel('F[Hz]')
-        plt.ylabel('F[Hz]*Co(w,X)')                    
+        plt.ylabel('F[Hz]*Co(w,X)')
         sub.set_title('h Spectrum')
         sub.axis('auto')
-        sub.grid('on')                            
+        sub.grid('on')
         sub.legend(loc='best')
-        
+
         plt.show()
-        
+
         ############################################################################
-        # save figures    
+        # save figures
         pp1 = pdf.PdfPages('%s/c_spec%s.pdf' %(indir,rawfile[6:-4]))
         pp2 = pdf.PdfPages('%s/h_spec%s.pdf' %(indir,rawfile[6:-4]))
         fig1.savefig(pp1, format='pdf')
         fig2.savefig(pp2, format='pdf')
         pp1.close()
         pp2.close()
-    
+
     ################################################################################
     # writing log file
-    log = open('%s/spec_%i_%02i_%02i_%02i_%02i_%02i.log' %(indir, 
-                                                    time.localtime()[0], time.localtime()[1], 
-                                                    time.localtime()[2], time.localtime()[3],
-                                                    time.localtime()[4], time.localtime()[5],)
+    log = open('%s/spec_%i_%02i_%02i_%02i_%02i_%02i.log' %(indir,
+                                                    t.localtime()[0], t.localtime()[1],
+                                                    t.localtime()[2], t.localtime()[3],
+                                                    t.localtime()[4], t.localtime()[5],)
                                                     , 'w')
     log.write('Inductence determination for the mean of:\n')
     for item in lagdate[interval[0]:interval[1]+1]:
