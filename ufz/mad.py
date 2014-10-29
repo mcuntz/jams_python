@@ -170,6 +170,7 @@ def mad(datin, z=7, deriv=0, nozero=False):
                   MC, Jul 2013 - (re-)allow masked arrays and NaNs in arrays
                   MC, Oct 2013 - nozero, bug in NaN treatment with dim=1
     """
+
     if nozero:
         idatin = datin.copy()
         ii = np.where(idatin == 0.)[0]
@@ -209,6 +210,8 @@ def mad(datin, z=7, deriv=0, nozero=False):
             return np.ones(d.shape, dtype=np.bool)
 
     # Median
+    oldsettings = np.geterr()
+    np.seterr(invalid='ignore')
     if d.ndim == 1:
         try:
             import bottleneck as bn
@@ -256,8 +259,10 @@ def mad(datin, z=7, deriv=0, nozero=False):
                 # True where outside z-range
                 res[:,i] = (d[:,i]<(md-thresh)) | (d[:,i]>(md+thresh))
     else:
+        np.seterr(**oldsettings)
         raise ValueError('datin.ndim must be <= 2')
 
+    np.seterr(**oldsettings)
     if ismasked:
         return res
     else:

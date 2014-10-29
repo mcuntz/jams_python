@@ -80,12 +80,14 @@ def grid_mid2edge(lon, lat):
         [' 90' '-90']
 
         2D input
+        >>> lon = np.arange(nlon)*(360./nlon) - 175. # -180 - +180
+        >>> lat = np.arange(nlat)*(180./nlat) - 85.  # S-N
         >>> lon2, lat2 = np.meshgrid(lon,lat)
         >>> lonh, lath = grid_mid2edge(lon2, lat2)
         >>> print(astr([lonh[0,0],lonh[-1,-1]]))
-        ['  0' '360']
+        ['-180' ' 180']
         >>> print(astr([lath[0,0],lath[-1,-1]]))
-        [' 90' '-90']
+        ['-90' ' 90']
 
 
         License
@@ -175,11 +177,14 @@ def grid_mid2edge(lon, lat):
     lath[-1,-1] = lat2[-1,-1] - (lath[-2,-2] - lat2[-1,-1])
 
     # lon can be > 360
-    lon %= 360
+    # this makes 360=0 and 180=-180: stay with 360 and 180
+    #    lonh %= 360
+    if np.any(lonh > 360.):
+        lonh = np.where(lonh > 360., lonh % 360., lonh)
     
     # return to -180-+180
     if not is360:
-        lonh  -= 180.
+        lonh -= 180.
 
     return lonh, lath
 
@@ -217,16 +222,23 @@ if __name__ == '__main__':
     # print(astr([lath[0,0],lath[-1,-1]]))
     # #    [' 90' '-90']
     # lon  = np.roll(lon, nlon//3)             # 245-235
-    # print(lon)
     # lonh, lath = grid_mid2edge(lon, lat)
     # print(astr([lonh[0,0],lonh[-1,-1]]))
     # #    ['240' '240']
     # print(astr([lath[0,0],lath[-1,-1]]))
     # #    [' 90' '-90']
     # lon -= 180.                              # 65 - 55
-    # print(lon)
     # lonh, lath = grid_mid2edge(lon, lat)
     # print(astr([lonh[0,0],lonh[-1,-1]]))
     # #    ['60' '60']
     # print(astr([lath[0,0],lath[-1,-1]]))
     # #    [' 90' '-90']
+    # # 2D
+    # lon = np.arange(nlon)*(360./nlon) - 175. # -180 - +180
+    # lat = np.arange(nlat)*(180./nlat) - 85.  # S-N
+    # lon2, lat2 = np.meshgrid(lon,lat)
+    # lonh, lath = grid_mid2edge(lon2, lat2)
+    # print(astr([lonh[0,0],lonh[-1,-1]]))
+    # # ['-180' ' 180']
+    # print(astr([lath[0,0],lath[-1,-1]]))
+    # # ['-90' ' 90']

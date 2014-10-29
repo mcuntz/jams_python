@@ -400,7 +400,7 @@ def sobol_index(s=None, ns=None, ya=None, yb=None, yc=None,
     assert (si+sti) > 0, 'No output chosen: si=False and sti=False.'
     # s, ns or ya, yb, yc
     isone = False
-    if ((s != None) & (ns != None) & (ya == None)):
+    if ((s is not None) and (ns is not None) and (ya is None)):
         if s.ndim == 1:
             isone = True
             s = s[np.newaxis,:]
@@ -412,8 +412,8 @@ def sobol_index(s=None, ns=None, ya=None, yb=None, yc=None,
         iyB   = s[:,nsa:2*nsa]
         iyC   = np.reshape(s[:,2*nsa:],(ntime,nn,nsa))
     else:
-        assert (((s != None) & (ns != None) & (ya != None)) | ((ya != None) & (yb !=None) & (yc !=None))), 'Either s and ns has to be given or ya, yb and yc.'
-        if ((s != None) & (ns != None) & (ya != None)):
+        assert (((s is not None) and (ns is not None) and (ya is not None)) or ((ya is not None) and (yb is not None) and (yc is not None))), 'Either s and ns has to be given or ya, yb and yc.'
+        if ((s is not None) and (ns is not None) and (ya is not None)):
             if s.ndim == 1:
                 isone = True
                 s  = s[np.newaxis,:]

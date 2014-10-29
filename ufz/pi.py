@@ -142,13 +142,13 @@ def pi(s=None, m=None, norm=None, b=False, evalues=False, ematrix=False):
                   MC, Apr 2014 - assert
     """
     # Check input
-    assert not ((s==None) & (m==None)), 'No input matrix given.'
-    assert not ((s!=None) & (m!=None)), 'Only s or m matrix possible.'
-    if (norm!=None):
+    assert not ((s is None) and (m is None)), 'No input matrix given.'
+    assert not ((s is not None) and (m is not None)), 'Only s or m matrix possible.'
+    if (norm is not None):
         if norm.lower() not in ['sum','ev','evsum']:
             raise ValueError("norm must be None, 'sum', 'ev', or 'evsum'.")
     #
-    if (s!=None):
+    if (s is not None):
       # check if s is masked array
       if type(s) == type(np.ones(1)):
          m  = np.dot(s,np.transpose(s))
@@ -169,7 +169,7 @@ def pi(s=None, m=None, norm=None, b=False, evalues=False, ematrix=False):
         for i in range(inn):
             ind[i] = np.sum(np.abs(ev[:]) * np.abs(em[i,:]))
 
-    if norm != None:
+    if norm is not None:
         if norm.lower() == 'sum':
             inorm = np.sum(ind)
             ind *= 1./inorm

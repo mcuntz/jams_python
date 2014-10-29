@@ -158,17 +158,17 @@ def opt_leafmodel(params, Eobs, GPPobs, ci_ini, Tl, PAR, ea, ca, ga, gb, P,
     opt_leafmodel(params, Eobs, GPPobs, ci_ini, Tl, PAR, ea, ca, ga, gb, P,\
     PARdiff, fsun, dooptim=True)
     >>> # print GPP [mumol(m2s] and E [mmol/m2s]
-    >>> print np.ma.round(GPPmod*1.e6, 3)
+    >>> print(np.ma.round(GPPmod*1.e6, 3))
     [12.877 13.29 13.384 13.273 13.013]
-    >>> print np.ma.round(Emod*1.e3, 3)
+    >>> print(np.ma.round(Emod*1.e3, 3))
     [3.546 4.442 4.306 4.31 4.157]
     >>> # print optimized parameters
     >>> m, d0, Vcmax25 = opt_params
-    >>> print np.round(m, 3)
+    >>> print(np.round(m, 3))
     48.346
-    >>> print np.round(d0/100., 3) #[hPa]
+    >>> print(np.round(d0/100., 3)) #[hPa]
     4.343
-    >>> print np.round(Vcmax25*1.e6, 3) #[mumol/m2s]
+    >>> print(np.round(Vcmax25*1.e6, 3)) #[mumol/m2s]
     65.763
     
     
@@ -264,11 +264,11 @@ def opt_leafmodel(params, Eobs, GPPobs, ci_ini, Tl, PAR, ea, ca, ga, gb, P,
     par1, par2 = dist_params(opt_params, fix, gs_method, temp_method)
     
     # calculate output
-    if (PARdiff==None) and (fsun==None):
+    if (PARdiff is None) and (fsun is None):
         ci, gcmol_c, gcmol_h, gsmol_c, gsmol_h, no_conv, Jc, Je, Rd, GPPmod, Emod =\
             leafmodel(ci_ini, Tl, PAR, ea, ca, ga, gb, P, par1, par2,
                       gs_method=gs_method, temp_method=temp_method, n=n, eta=eta)
-    elif (PARdiff!=None) and (fsun!=None):
+    elif (PARdiff is not None) and (fsun is not None):
         ci, gcmol_c, gcmol_h, gsmol_c, gsmol_h, no_conv, Jc, Je, Rd, GPPmod, Emod =\
             twoleafmodel(ci_ini, Tl, PAR, ea, ca, ga, gb, P, PARdiff, fsun, par1, par2,
                          gs_method=gs_method, temp_method=temp_method, n=n, eta=eta)
@@ -290,13 +290,13 @@ def cost_leafmodel(params, Eobs, GPPobs, ci_ini, Tl, PAR, ea, ca, ga, gb, P,
     # distribute parameters
     par1, par2 = dist_params(params, fix, gs_method, temp_method)
     
-    if (PARdiff==None) and (fsun==None):
+    if (PARdiff is None) and (fsun is None):
         # run the model with current parameters
         ci, gc_c, gc_h, gs_c, gs_h, no_conv, Jc, Je, Rd, GPPmod, Emod =\
             leafmodel(ci_ini, Tl, PAR, ea, ca, ga, gb, P, par1, par2,
                       gs_method=gs_method, temp_method=temp_method, n=n,
                       eta=eta)
-    elif (PARdiff!=None) and (fsun!=None):
+    elif (PARdiff is not None) and (fsun is not None):
         ci, gc_c, gc_h, gs_c, gs_h, no_conv, Jc, Je, Rd, GPPmod, Emod =\
             twoleafmodel(ci_ini, Tl, PAR, ea, ca, ga, gb, P, PARdiff, fsun,
                          par1, par2, gs_method=gs_method,
@@ -467,9 +467,9 @@ def leafmodel(ci_ini, Tl, PAR, ea, ca, ga, gb, P, par1, par2,
     >>> ci, gc_c, gc_h, gs_c, gs_h, no_conv, Jc, Je, Rd, GPPmod, Emod = \
     leafmodel(ci_ini, Tl, PAR, ea, ca, ga, gb, P, par1, par2)
     >>> # print GPP [mumol(m2s] and E [mmol/m2s]
-    >>> print np.ma.round(GPPmod*1.e6, 3)
+    >>> print(np.ma.round(GPPmod*1.e6, 3))
     [12.333 12.685 12.696 12.462 12.157]
-    >>> print np.ma.round(Emod*1.e3, 3)
+    >>> print(np.ma.round(Emod*1.e3, 3))
     [3.339 4.338 4.287 4.02 3.845]
     
     >>> # use methods Ball&Berry + Medlyn
@@ -479,9 +479,9 @@ def leafmodel(ci_ini, Tl, PAR, ea, ca, ga, gb, P, par1, par2,
     leafmodel(ci_ini, Tl, PAR, ea, ca, ga, gb, P, par1, par2,\
     gs_method='BB', temp_method='Medlyn')
     >>> # print GPP [mumol(m2s] and E [mmol/m2s]
-    >>> print np.ma.round(GPPmod*1.e6, 3)
+    >>> print(np.ma.round(GPPmod*1.e6, 3))
     [14.286 14.496 14.499 14.526 14.287]
-    >>> print np.ma.round(Emod*1.e3, 3)
+    >>> print(np.ma.round(Emod*1.e3, 3))
     [2.718 3.326 3.22 3.167 2.994]
     
     
@@ -613,9 +613,9 @@ def twoleafmodel(ci_ini, Tl, PAR, ea, ca, ga, gb, P, PARdiff, fsun, par1, par2,
     >>> ci, gc_c, gc_h, gs_c, gs_h, no_conv, Jc, Je, Rd, GPPmod, Emod = \
     twoleafmodel(ci_ini, Tl, PAR, ea, ca, ga, gb, P, PARdiff, fsun, par1, par2)
     >>> # print GPP [mumol(m2s] and E [mmol/m2s]
-    >>> print np.ma.round(GPPmod*1.e6, 3)
+    >>> print(np.ma.round(GPPmod*1.e6, 3))
     [11.861 12.255 12.344 12.176 11.924]
-    >>> print np.ma.round(Emod*1.e3, 3)
+    >>> print(np.ma.round(Emod*1.e3, 3))
     [3.253 4.232 4.205 3.952 3.792]
     
     >>> # use methods Ball&Berry + Medlyn
@@ -625,9 +625,9 @@ def twoleafmodel(ci_ini, Tl, PAR, ea, ca, ga, gb, P, PARdiff, fsun, par1, par2,
     twoleafmodel(ci_ini, Tl, PAR, ea, ca, ga, gb, P, PARdiff, fsun, par1, par2,\
     gs_method='BB', temp_method='Medlyn')
     >>> # print GPP [mumol(m2s] and E [mmol/m2s]
-    >>> print np.ma.round(GPPmod*1.e6, 3)
+    >>> print(np.ma.round(GPPmod*1.e6, 3))
     [13.482 13.785 13.904 14.002 13.839]
-    >>> print np.ma.round(Emod*1.e3, 3)
+    >>> print(np.ma.round(Emod*1.e3, 3))
     [2.612 3.206 3.127 3.083 2.926]
     
     

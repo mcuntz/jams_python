@@ -138,16 +138,16 @@ def kriging(x, y, z, semi_mod, semi_popt, xnew=None, ynew=None, plot=False,
         ...                                    xnew=xnew,ynew=ynew,silent=True,
         ...                                    plot=False,masked=False,eop=None)
         >>> from autostring import astr
-        >>> print(astr(znew[0][0:8],3,pp=True))
-        ['2.769' '3.385' '3.922' '4.215' '4.276' '4.192' '4.031' '3.842']
+        >>> print(astr(znew[0][0:8],2,pp=True))
+        ['2.77' '3.39' '3.92' '4.22' '4.28' '4.19' '4.03' '3.84']
         >>> print(astr(np.mean(znew),2))
         3.71
 
         # block krig the surface
         >>> bave, bvar = kriging(x, y, z, semi_mod, semi_popt,xnew=xnew, ynew=ynew,
         ...                      silent=True,plot=False,masked=False,eop=None,block=True)
-        >>> print(astr(bave,3,pp=True))
-        3.544
+        >>> print(astr(bave,1,pp=True))
+        3.5
         >>> print(astr(np.sqrt(bvar),3,pp=True))
         3.096
 
@@ -165,8 +165,8 @@ def kriging(x, y, z, semi_mod, semi_popt, xnew=None, ynew=None, plot=False,
         >>> eopz, eopvar = kriging(x,y,z,semi_mod,semi_popt,xnew=None,
         ...                        ynew=None,plot=False,masked=False,
         ...                        silent=True,eop=poi)
-        >>> print(astr(eopz[0:8],3,pp=True))
-        ['7.781' '0.712' '3.092' '1.180' '7.380' '6.743' '2.138' '1.133']
+        >>> print(astr(eopz[0:8],2,pp=True))
+        ['7.78' '0.71' '3.09' '1.18' '7.38' '6.74' '2.14' '1.13']
 
         # krig both, whole surface and on points of interest
         >>> xnew = np.arange(np.min(x),np.max(x),5.)
@@ -176,10 +176,10 @@ def kriging(x, y, z, semi_mod, semi_popt, xnew=None, ynew=None, plot=False,
         ...                                          ynew=ynew,plot=False,
         ...                                          masked=False,silent=True,
         ...                                          eop=poi)
-        >>> print(astr(znew[0][0:8],3,pp=True))
-        ['2.769' '3.385' '3.922' '4.215' '4.276' '4.192' '4.031' '3.842']
-        >>> print(astr(eopz[0:8],3,pp=True))
-        ['7.781' '0.712' '3.092' '1.180' '7.380' '6.743' '2.138' '1.133']
+        >>> print(astr(znew[0][0:8],2,pp=True))
+        ['2.77' '3.39' '3.92' '4.22' '4.28' '4.19' '4.03' '3.84']
+        >>> print(astr(eopz[0:8],2,pp=True))
+        ['7.78' '0.71' '3.09' '1.18' '7.38' '6.74' '2.14' '1.13']
 
 
         License

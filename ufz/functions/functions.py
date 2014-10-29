@@ -76,7 +76,7 @@
     >>> E0   = 126.
     >>> T    = 293.15
     >>> resp = 2.0
-    >>> from autostring import astr
+    >>> from ufz.autostring import astr
     >>> print(astr(lloyd_fix(T, Rref, E0),3,pp=True))
     1.406
     >>> print(astr(lloyd_fix_p(T, [Rref, E0]),3,pp=True))

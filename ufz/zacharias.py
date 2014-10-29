@@ -113,7 +113,7 @@ def zacharias(h, clay, sand, db, params=None, thetar=False, thetas=False, lnalph
     nn = np.size(isand)
     if (np.size(iclay) != nn) | (np.size(idb) != nn) | (np.size(ih) != nn):
         raise ValueError('h, sand, clay, and db must have the same sizes.')
-    if params != None:
+    if params is not None:
         if np.size(params) != 15:
             raise ValueError('size(params) must be 15.')
     # save output shape
@@ -137,7 +137,7 @@ def zacharias(h, clay, sand, db, params=None, thetar=False, thetas=False, lnalph
     par12 = np.empty(nn)
     par13 = np.empty(nn)
     par14 = np.empty(nn)
-    if params != None:
+    if params is not None:
         # Either params given
         par0[:]  = params[0]
         par1[:]  = params[1]
@@ -300,7 +300,7 @@ def zacharias_check(params, sand=None, clay=None):
     # Check input
     #tiny = np.finfo(np.float).eps
     tiny = const.tiny
-    if params != None:
+    if params is not None:
         if np.size(params) != 15: raise ValueError('size(params) must be 15.')
     # Check ranges
     isgood = True
@@ -321,10 +321,10 @@ def zacharias_check(params, sand=None, clay=None):
     if (params[14] <  -5.)   |  (params[14] >  5.):   isgood = False
     # Soil ranges
     h    = [1., 1e6]
-    if clay != None:
+    if clay is not None:
         rclay = [98., 1.,   99.-clay]
         rsand = [1.,  clay, clay]
-    elif sand != None:
+    elif sand is not None:
         rclay = [1.,  1.,   99.-sand]
         rsand = [98., sand, sand]
     else:

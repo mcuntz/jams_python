@@ -234,10 +234,10 @@ def semivariogram(x, y, v, nL, di, td, stype='omnidirectional', negscat=False,
         ...      x,y,v,nL,di,td,stype='omnidirectional',
         ...      negscat=False,model='exponential',graph=False,lunit='m',
         ...      p0=(0.5,0.5,1./100.), runtimediag=False)
-        >>> print(astr(nugget, 2))
-        ['0.52']
-        >>> print(astr(sill, 2))
-        ['1.08']
+        >>> print(astr(nugget, 1))
+        ['0.5']
+        >>> print(astr(sill, 1))
+        ['1.1']
         >>> print(astr(irange, 0))
         ['80']
 
@@ -249,10 +249,10 @@ def semivariogram(x, y, v, nL, di, td, stype='omnidirectional', negscat=False,
         ...     x,y,v,nL,di,td,stype='directional',negscat=False,
         ...     model='spherical',graph=False,lunit='m',p0=(0.5,0.5,100),
         ...     runtimediag=False)
-        >>> print(astr(nugget, 2))
-        ['0.49' '0.49']
-        >>> print(astr(sill, 2))
-        ['1.08' '1.06']
+        >>> print(astr(nugget, 1))
+        ['0.5' '0.5']
+        >>> print(astr(sill, 1))
+        ['1.1' '1.1']
 
         # directional+orientational semivariogram with gaussian model and
         # fifty lags

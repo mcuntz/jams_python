@@ -89,8 +89,8 @@ def nee2gpp(dates, nee, t, isday, rg=False, vpd=False, undef=np.nan,
 
         Examples
         --------
-        >>> from fread import fread # from ufz
-        >>> from date2dec import date2dec # from ufz
+        >>> from ufz.fread import fread # from ufz
+        >>> from ufz.date2dec import date2dec # from ufz
         >>> dat   = fread('test_nee2gpp.csv', skip=2, transpose=True)
         >>> dates = date2dec(dy=dat[0,:], mo=dat[1,:], yr=dat[2,:], hr=dat[3,:], mi=dat[4,:])
         >>> NEE   = np.squeeze(dat[5,:])
@@ -100,7 +100,7 @@ def nee2gpp(dates, nee, t, isday, rg=False, vpd=False, undef=np.nan,
         >>> isday = np.where(rg > 10., True, False)
         >>> tt    = np.where(tair == undef, undef, tair+273.15)
         >>> GPP, Reco = nee2gpp(dates, NEE, tt, isday, undef=undef, method='local')
-        >>> from autostring import astr
+        >>> from ufz.autostring import astr
         >>> print(astr(GPP[1120:1128],3,pp=True))
         ['-9999.000' '-9999.000' '-9999.000' '    4.491' '    8.396' '   10.688' '    8.542' '   11.271']
         >>> print(astr(Reco[1120:1128],3,pp=True))
@@ -222,8 +222,8 @@ def nee2gpp_falge(dates, nee, t, isday, undef=np.nan,
 
         Examples
         --------
-        >>> from fread import fread # from ufz
-        >>> from date2dec import date2dec # from ufz
+        >>> from ufz.fread import fread # from ufz
+        >>> from ufz.date2dec import date2dec # from ufz
         >>> dat   = fread('test_nee2gpp.csv', skip=2, transpose=True)
         >>> dates = date2dec(dy=dat[0,:], mo=dat[1,:], yr=dat[2,:], hr=dat[3,:], mi=dat[4,:])
         >>> NEE   = np.squeeze(dat[5,:])
@@ -233,7 +233,7 @@ def nee2gpp_falge(dates, nee, t, isday, undef=np.nan,
         >>> isday = np.where(rg > 10., True, False)
         >>> tt    = np.where(tair == undef, undef, tair+273.15)
         >>> GPP, Reco = nee2gpp(dates, NEE, tt, isday, undef=undef, method='global')
-        >>> from autostring import astr
+        >>> from ufz.autostring import astr
         >>> print(astr(GPP[1120:1128],3,pp=True))
         ['-9999.000' '-9999.000' '-9999.000' '    4.332' '    8.182' '   10.409' '    8.194' '   10.843']
 
@@ -382,8 +382,8 @@ def nee2gpp_reichstein(dates, nee, t, isday, rg=False, vpd=False, undef=np.nan,
 
         Examples
         --------
-        >>> from fread import fread # from ufz
-        >>> from date2dec import date2dec # from ufz
+        >>> from ufz.fread import fread # from ufz
+        >>> from ufz.date2dec import date2dec # from ufz
         >>> dat   = fread('test_nee2gpp.csv', skip=2, transpose=True)
         >>> dates = date2dec(dy=dat[0,:], mo=dat[1,:], yr=dat[2,:], hr=dat[3,:], mi=dat[4,:])
         >>> NEE   = np.squeeze(dat[5,:])
@@ -393,7 +393,7 @@ def nee2gpp_reichstein(dates, nee, t, isday, rg=False, vpd=False, undef=np.nan,
         >>> isday = np.where(rg > 10., True, False)
         >>> tt    = np.where(tair == undef, undef, tair+273.15)
         >>> GPP, Reco = nee2gpp(dates, NEE, tt, isday, undef=undef, method='local')
-        >>> from autostring import astr
+        >>> from ufz.autostring import astr
         >>> print(astr(GPP[1120:1128],3,pp=True))
         ['-9999.000' '-9999.000' '-9999.000' '    4.491' '    8.396' '   10.688' '    8.542' '   11.271']
         >>> print(astr(Reco[1120:1128],3,pp=True))
@@ -699,8 +699,8 @@ def nee2gpp_lasslop(dates, nee, t, isday, rg, vpd, undef=np.nan,
 
         Examples
         --------
-        >>> from fread import fread # from ufz
-        >>> from date2dec import date2dec # from ufz
+        >>> from ufz.fread import fread # from ufz
+        >>> from ufz.date2dec import date2dec # from ufz
         >>> dat   = fread('test_nee2gpp.csv', skip=2, transpose=True)
         >>> dates = date2dec(dy=dat[0,:], mo=dat[1,:], yr=dat[2,:], hr=dat[3,:], mi=dat[4,:])
         >>> NEE   = np.squeeze(dat[5,:])
@@ -712,7 +712,7 @@ def nee2gpp_lasslop(dates, nee, t, isday, rg, vpd, undef=np.nan,
         >>> VPD = np.squeeze(dat[8,:])
         >>> vpd = np.where(VPD == undef, undef, VPD*100.)
         >>> GPP, Reco = nee2gpp(dates, NEE, tt, isday, rg, vpd, undef=undef, method='day')
-        >>> from autostring import astr
+        >>> from ufz.autostring import astr
         >>> print(astr(GPP[1120:1128],3,pp=True))
         ['-9999.000' '-9999.000' '-9999.000' '    2.897' '    6.771' '    9.064' '    6.957' '    9.778']
         >>> print(astr(Reco[1120:1128],3,pp=True))

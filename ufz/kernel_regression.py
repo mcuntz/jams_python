@@ -108,7 +108,7 @@ def kernel_regression(x, y, h=None, silverman=False, xout=None):
     d  = ss[1]
     #
     # determine h
-    if h == None:
+    if h is None:
         hh = kernel_regression_h(xx,y,silverman=silverman)
     else:
         if np.size(np.shape(h))==0:
@@ -118,7 +118,7 @@ def kernel_regression(x, y, h=None, silverman=False, xout=None):
         assert np.size(hh) == d, 'size(h) must be 1 or size(x,1): '
     #
     # Calc regression
-    if xout == None:
+    if xout is None:
         xxout = xx
     else:
         if np.size(np.shape(xout)) == 1:

@@ -88,9 +88,9 @@ def gapfill(date, data, rg, tair, vpd,
         Examples
         --------
         >>> import numpy as np
-        >>> from fread import fread
-        >>> from date2dec import date2dec
-        >>> from autostring import astr
+        >>> from ufz.fread import fread
+        >>> from ufz.date2dec import date2dec
+        >>> from ufz.autostring import astr
         >>> ifile = 'test_gapfill.csv' # Tharandt 1998 = Online tool example file
         >>> undef = -9999.
         >>> dat   = fread(ifile, skip=2, transpose=True)
@@ -109,8 +109,8 @@ def gapfill(date, data, rg, tair, vpd,
         >>> nee_f, nee_qc = gapfill(jdate, nee, rg, tair, vpd, data_flag=(qcnee>1), undef=undef, shape=True)
         >>> print(astr(nee_qc[11006:11012],0,pp=True))
         ['1' '1' '1' '2' '2' '2']
-        >>> print(astr(nee_f[11006:11012],3,pp=True))
-        ['-18.678' '-15.633' '-19.610' '-15.536' '-12.402' '-15.329']
+        >>> print(astr(nee_f[11006:11012],2,pp=True))
+        ['-18.68' '-15.63' '-19.61' '-15.54' '-12.40' '-15.33']
 
         # 1D err
         >>> nee_std = gapfill(jdate, nee, rg, tair, vpd, data_flag=(qcnee>1), undef=undef, shape=True, err=True)
@@ -200,19 +200,19 @@ def gapfill(date, data, rg, tair, vpd,
     # check flags
     ndata  = data.shape[0]
     ndata2 = data.shape[1]
-    if (data_flag != None):
+    if (data_flag is not None):
         data_flg = data_flag.squeeze()
     else:
         data_flg = np.where(data[:,0] == undef, True, False)
-    if (rg_flag != None):
+    if (rg_flag is not None):
         rg_flg = rg_flag.squeeze()
     else:
         rg_flg = np.where(rg == undef, True, False)
-    if (tair_flag != None):
+    if (tair_flag is not None):
         tair_flg = tair_flag.squeeze()
     else:
         tair_flg = np.where(tair == undef, True, False)
-    if (vpd_flag != None):
+    if (vpd_flag is not None):
         vpd_flg = vpd_flag.squeeze()
     else:
         vpd_flg = np.where(vpd == undef, True, False)

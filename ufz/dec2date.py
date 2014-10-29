@@ -332,7 +332,7 @@ def dec2date(indata, calendar='standard', refdate=None, units=None,
     calendar = calendar.lower()
     if (calendar not in calendars):
         raise ValueError("Wrong calendar! Choose: "+''.join([i+' ' for i in calendars]))
-    if (refdate!= None) & (units!=None):
+    if (refdate is not None) & (units is not None):
         raise ValueError("either refdate or units can be given.")
     #
     # Default
@@ -340,9 +340,9 @@ def dec2date(indata, calendar='standard', refdate=None, units=None,
         ii = True
     else:
         ii = False
-    if ((ascii | eng | ii) & (fulldate == None)):
+    if ((ascii | eng | ii) & (fulldate is None)):
         fulldate = False
-    if ((not (ascii | eng | ii)) & (fulldate == None)):
+    if ((not (ascii | eng | ii)) & (fulldate is None)):
         fulldate = True
     if fulldate == True:
         yr = True
@@ -387,9 +387,9 @@ def dec2date(indata, calendar='standard', refdate=None, units=None,
     else:
         if (calendar == 'standard') or (calendar == 'gregorian'):
             dec0 = 0
-            if units != None:
+            if units is not None:
                 unit = units
-            elif refdate != None:
+            elif refdate is not None:
                 #unit = 'days since %s' % (refdate)
                 unit = 'days since {0:s}'.format(refdate)
             else:
@@ -398,27 +398,27 @@ def dec2date(indata, calendar='standard', refdate=None, units=None,
             timeobj = nt.num2date(indata-dec0, unit, calendar='gregorian')
         elif calendar == 'julian':
             dec0 = 0
-            if units != None:
+            if units is not None:
                 unit = units
-            elif refdate != None:
+            elif refdate is not None:
                 unit = 'days since {0:s}'.format(refdate)
             else:
                 unit = 'days since 0001-01-01 12:00:00'
                 dec0 = 1721424
             timeobj = nt.num2date(indata-dec0, unit, calendar='julian')
         elif calendar == 'proleptic_gregorian':
-            if units != None:
+            if units is not None:
                 unit = units
-            elif refdate != None:
+            elif refdate is not None:
                 unit = 'days since {0:s}'.format(refdate)
             else:
                 unit = 'days since 0001-01-01 00:00:00'
             timeobj = nt.num2date(indata, unit, calendar = 'proleptic_gregorian')
         elif calendar == 'excel1900':
             doerr = False
-            if units != None:
+            if units is not None:
                 unit = units
-            elif refdate != None:
+            elif refdate is not None:
                 unit = 'days since {0:s}'.format(refdate)
             else:
                 unit = 'days since 1900-01-00 00:00:00'
@@ -429,33 +429,33 @@ def dec2date(indata, calendar='standard', refdate=None, units=None,
             else:
                 timeobj = nt.num2date(indata, unit, calendar = 'gregorian')
         elif calendar == 'excel1904':
-            if units != None:
+            if units is not None:
                 unit = units
-            elif refdate != None:
+            elif refdate is not None:
                 unit = 'days since {0:s}'.format(refdate)
             else:
                 unit = 'days since 1904-01-00 00:00:00'
             timeobj = nt.num2date(indata, unit, calendar = 'gregorian')
         elif (calendar == '365_day') or (calendar == 'noleap'):
-            if units != None:
+            if units is not None:
                 unit = units
-            elif refdate != None:
+            elif refdate is not None:
                 unit = 'days since {0:s}'.format(refdate)
             else:
                 unit = 'days since 0001-01-01 00:00:00'
             timeobj = nt.num2date(indata, unit, calendar = '365_day')
         elif (calendar == '366_day') or (calendar == 'all_leap'):
-            if units != None:
+            if units is not None:
                 unit = units
-            elif refdate != None:
+            elif refdate is not None:
                 unit = 'days since {0:s}'.format(refdate)
             else:
                 unit = 'days since 0001-01-01 00:00:00'
             timeobj = nt.num2date(indata, unit, calendar = '366_day')
         elif calendar == '360_day':
-            if units != None:
+            if units is not None:
                 unit = units
-            elif refdate != None:
+            elif refdate is not None:
                 unit = 'days since {0:s}'.format(refdate)
             else:
                 unit = 'days since 0001-01-01 00:00:00'

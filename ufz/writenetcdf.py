@@ -165,7 +165,7 @@ def writenetcdf(fhandle, vhandle=None, var=None, time=None, isdim=False, name=No
                   MC,      Apr 2014 - attributes can be given as dictionary e.g. from readnetcdf with attributes=True
     """
     # create File attributes
-    if fileattributes != None:
+    if fileattributes is not None:
         if type(fileattributes) is dict:
             for k in fileattributes:
                 fhandle.setncattr(k, fileattributes[k])
@@ -175,20 +175,20 @@ def writenetcdf(fhandle, vhandle=None, var=None, time=None, isdim=False, name=No
         return None
 
     # create dimensions
-    if vhandle != None:
+    if vhandle is not None:
         hand = vhandle
     else:
-        if vartype == None:
+        if vartype is None:
             typ = 'f4'
             if isdim:
-                if dims == None:
+                if dims is None:
                     typ = 'f8'
         else:
             typ = vartype
         if isdim:
             idim = fhandle.createDimension(name, dims)
             # create variable for the dimension
-            if dims == None:
+            if dims is None:
                 hand = fhandle.createVariable(name, typ, (name,))
             else:
                 hand = fhandle.createVariable(name, typ, (name,))
@@ -199,7 +199,7 @@ def writenetcdf(fhandle, vhandle=None, var=None, time=None, isdim=False, name=No
                     raise ValueError('Dimension '+str(dims[i])+' not in file dimensions: '+''.join([i+' ' for i in keys]))
             hand = fhandle.createVariable(name, typ, (dims), zlib=comp)
 
-    if attributes != None:
+    if attributes is not None:
         if type(attributes) is dict:
             for k in attributes:
                 hand.setncattr(k, attributes[k])
@@ -207,9 +207,9 @@ def writenetcdf(fhandle, vhandle=None, var=None, time=None, isdim=False, name=No
             for i in range(len(attributes)):
                 hand.setncattr(attributes[i][0], attributes[i][1])
 
-    if var != None:
+    if var is not None:
         shand = hand.shape
-        if time != None:
+        if time is not None:
             svar = np.shape(var)
             if np.size(np.shape(time)) == 0:
                 if np.size(svar) != (np.size(shand)-1):
@@ -253,7 +253,7 @@ def writenetcdf(fhandle, vhandle=None, var=None, time=None, isdim=False, name=No
     return hand
 
 # write to file
-def dumpnetcdf( fname, dims = None, fileattributes = None, **variables ):
+def dumpnetcdf( fname, dims=None, fileattributes=None, **variables ):
     """
         Writes variables with the same dimension to a netcdf file (1D-5D).
         It is a wrapper around writenetcdf.
@@ -264,7 +264,7 @@ def dumpnetcdf( fname, dims = None, fileattributes = None, **variables ):
 
         Definition
         ----------
-        def writenetcdf( fname, dims = None, **variables )
+        def writenetcdf( fname, dims=None, **variables )
 
 
         Input           Format                  Description
@@ -345,12 +345,12 @@ def dumpnetcdf( fname, dims = None, fileattributes = None, **variables ):
         Modified
     """
     # check if dims are given
-    if dims == None:
+    if dims is None:
         dims = [ 'x', 'y', 'z', 'u', 'v' ]
     # open netcdf file
     fh = nc.Dataset( fname, 'w', 'NETCDF4' )
     # write file attributes
-    if fileattributes != None:
+    if fileattributes is not None:
         writenetcdf(fh, fileattributes=fileattributes)
     # create dimensions according to first variable
     if ( type( variables.values()[0][1] ) != dict ):

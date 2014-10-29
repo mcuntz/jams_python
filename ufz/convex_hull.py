@@ -52,7 +52,7 @@ def convex_hull(points, graphic=False, smidgen=0.0075):
          ['2' '4']
          ['2' '1']]
 
-        >>> hull_xy = convex_hull(points, graphic=True, smidgen=0.075)
+        >>> hull_xy = convex_hull(points, graphic=False, smidgen=0.075)
         >>> print(astr(hull_xy,pp=True))
         [['5' '1']
          ['7' '3']

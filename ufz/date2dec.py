@@ -296,9 +296,9 @@ def date2dec(calendar = 'standard', units=None,
                     " Choose: "+''.join([i+' ' for i in calendars]))
     # if ascii input is given by user, other input will be neglected
     # calculation of input size and shape
-    if (ascii != None) and (eng != None):
+    if (ascii is not None) and (eng is not None):
         raise ValueError("date2dec error: 'ascii' and 'eng' mutually exclusive")
-    if ascii != None:
+    if ascii is not None:
         islist = type(ascii) != type(np.array(ascii))
         isarr = np.ndim(ascii)
         if (islist & (isarr > 2)):
@@ -340,7 +340,7 @@ def date2dec(calendar = 'standard', units=None,
                 mi[i] = 00
                 sc[i] = 00
             timeobj[i] = nt.datetime(yr[i], mo[i], dy[i], hr[i], mi[i], sc[i])
-    if eng != None:
+    if eng is not None:
         islist = type(eng) != type(np.array(eng))
         isarr = np.ndim(eng)
         if isarr == 0:
@@ -387,7 +387,7 @@ def date2dec(calendar = 'standard', units=None,
             timeobj[i] = nt.datetime(yr[i], mo[i], dy[i], hr[i], mi[i], sc[i])
     # if no ascii input, other inputs will be concidered
     # calculation of input sizes, shapes and number of axis
-    if ((ascii == None) & (eng == None)):
+    if ((ascii is None) and (eng is None)):
         isnlist1 = type(yr) == type(np.array(yr))
         isarr1   = np.ndim(yr)
         if isarr1 == 0: yr = np.array([yr])

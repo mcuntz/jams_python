@@ -144,10 +144,11 @@ def autostring(num, prec=0, zero=False, set_printoptions=False, pp=False, join=F
                   MC, Dec 2012 - special treatment of -0.0 on output
                   MC, Feb 2013 - nan, inf and masked arrays
                   MC, Feb 2013 - ported to Python 3
+                  MC, Oct 2014 - isinstance
     """
     #
     # Check input
-    if type(num) == type([]): num = np.array(num)
+    if isinstance(num, list): num = np.array(num)
     isarr = np.ndim(num)
     if (isarr > 2):
         print("AUTOSTRING WARNING: autostring only works with scalars, 1D- and 2D arrays: return original array.")
@@ -193,7 +194,10 @@ def autostring(num, prec=0, zero=False, set_printoptions=False, pp=False, join=F
         if (num == 0):
             num = np.abs(num)
     else:
-        num = np.where(num == 0, 0, num)
+        if isinstance(num, np.ma.masked_array):
+            num = np.ma.where(num == 0, 0, num)
+        else:
+            num = np.where(num == 0, 0, num)
     # Zero padding
     if zero:
         nix = '0'
@@ -214,7 +218,7 @@ def autostring(num, prec=0, zero=False, set_printoptions=False, pp=False, join=F
         else:
             num_sign_chars = 0
     else:
-        if type(num) == type(np.ma.ones(1)):
+        if isinstance(num, np.ma.masked_array):
             if np.sum(num.mask) > 0: hasmask = True
             if num.count() > np.ma.sum(np.isfinite(num)): hasnan = True
         else:

@@ -372,7 +372,7 @@ def cuntz_gleixner(idecdate, iGPP, iRd, iCa, iRa, igtot, sunrise, Vcyt=None,
         Rnew_cyt    = True
     # Defaults
     # Day (1) or night (0)
-    if not np.any(daynight != None): daynight = np.where(iGPP > 0., 1, 0)
+    if not np.any(daynight is not None): daynight = np.where(iGPP > 0., 1, 0)
     isarr = np.ndim(daynight)
     if (isarr==0):
         idaynight = np.ones(nd, dtype=np.int) * daynight
@@ -415,7 +415,7 @@ def cuntz_gleixner(idecdate, iGPP, iRd, iCa, iRa, igtot, sunrise, Vcyt=None,
             raise ValueError('betap must be: 2/3 < betap < 4/5')
     # betas the factor of leaf respiration that is transferred to biosynthesis (default: 3*gpp/max(gpp))
     # betas*(1-betap) <= 1: if betap=2/3 -> betas<3: if betap=5/6 -> betas < 6
-    if not np.any(betas != None): betas = np.maximum((1./(1.-ibetap) * iGPP/np.amax(iGPP)) - const.tiny, 0.)
+    if not np.any(betas is not None): betas = np.maximum((1./(1.-ibetap) * iGPP/np.amax(iGPP)) - const.tiny, 0.)
     isarr = np.ndim(betas)
     if (isarr==0):
         ibetas = np.ones(nd) * betas
@@ -434,7 +434,7 @@ def cuntz_gleixner(idecdate, iGPP, iRd, iCa, iRa, igtot, sunrise, Vcyt=None,
         if (nn != nd):
             raise ValueError('epsa must be size 1 or size(idecdate)')
     # Vcyt
-    if (nss & (~np.any(Vcyt != None))):
+    if (nss & (~np.any(Vcyt is not None))):
         raise ValueError('Vcyt must be given if non-steady state')
     if nss:
         isarr = np.ndim(Vcyt)
@@ -446,7 +446,7 @@ def cuntz_gleixner(idecdate, iGPP, iRd, iCa, iRa, igtot, sunrise, Vcyt=None,
             if (nn != nd):
                 raise ValueError('Vcyt must be size 1 or size(idecdate)')
     # starch_mol2g
-    if np.any(starch_mol2g != None):
+    if np.any(starch_mol2g is not None):
         isarr = np.ndim(starch_mol2g)
         if (isarr==0):
             istarch_mol2g = np.ones(nd, dtype=np.float) * starch_mol2g
@@ -638,7 +638,7 @@ def cuntz_gleixner(idecdate, iGPP, iRd, iCa, iRa, igtot, sunrise, Vcyt=None,
     if disc:        out += [idisc]
     if Rnew_starch: out += [iRnew_starch]
     if Rnew_cyt:    out += [iRnew_cyt]
-    if Vstarch & np.any(starch_mol2g != None): out += [iVstarchg]
+    if Vstarch & np.any(starch_mol2g is not None): out += [iVstarchg]
 
     return out
 

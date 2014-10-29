@@ -140,7 +140,7 @@ def jab(arr, ind=None, nind=None, mask=None, weight=False, nsteps=1):
     if len(arr.shape) != 2:
         arr     = arr[:,np.newaxis]
         onlyone = True
-    if mask != None:
+    if mask is not None:
         assert len(mask.shape) == 2, 'Mask array must have 2 dimensions.'
         assert mask.shape[0] == arr.shape[0], 'First dimension of boostrap standard error array and mask array have to match.'
         nboot = mask.shape[0]
@@ -149,14 +149,14 @@ def jab(arr, ind=None, nind=None, mask=None, weight=False, nsteps=1):
         assert len(ind.shape) == 2, 'Index array must have 2 dimensions.'
         assert ind.shape[0] == arr.shape[0], 'First dimension of boostrap standard error array and index array have to match.'
         nboot = ind.shape[0]
-        if nind != None:
+        if nind is not None:
             if nind < ind.shape[1]:
                 print("Warning: nind < ind.shape[1]")
         else:
             nind = ind.shape[1]
     nout = arr.shape[1]
 
-    if mask == None:
+    if mask is None:
         # Produce mask with True where data point was used in bootstrap
         mask = np.zeros((nboot,nind), dtype=np.bool)
         for i in range(nboot):

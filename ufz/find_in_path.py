@@ -33,7 +33,7 @@ def find_in_path(filename):
         ...     print('Yes')
         Yes
 
-        >>> datei = 'Humor-Sans.ttf'
+        >>> datei = 'gapfill.py'
         >>> isdatei = find_in_path(datei)
         >>> if isdatei is None:
         ...     print('No')
