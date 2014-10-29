@@ -12,7 +12,7 @@ def heaviside(x, value=1., unitstep=False, zero=False):
             H =  0  for x <  0
             H =  1  for x >= 0
           if zero
-            H =  0  for x =< 0
+            H =  0  for x <= 0
             H =  1  for x >  0
 
 
