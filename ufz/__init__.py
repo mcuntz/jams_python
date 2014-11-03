@@ -104,6 +104,7 @@
     srrasa                 Generates stratified random 2D points within a given rectangular area.
     srrasa_trans           Generates stratified random 2D transects within a given rectangular area.
     tcherkez               Calculates the Tcherkez model of 13C-discrimiantion in the Calvin cycle.
+    tee                    Prints arguments on screen and in file.
     timestepcheck          Fills missing time steps in ascii data files
     tsym                   Raw unicodes for common symbols.
     unpack                 Similar to Fortran unpack function with mask.
@@ -241,6 +242,7 @@
     find_in_path           Look for file in system path.
     int2roman              Integer to roman numeral conversion.
     roman2int              Roman numeral to integer conversion.
+    tee                    Prints arguments on screen and in file.
     zacharias              Soil water content with van Genuchten and Zacharias et al. (2007).
     zacharias_check        Checks validity of parameter set for Zacharias et al. (2007).
 
@@ -411,7 +413,7 @@
                                               eddybox module
               AP, Sep 2014 - eddysuite
               MC, Oct 2014 - module -> package
-              MC, Oct 2014 - clockplot, ellipse_area, savez, savez_compressed, grid_mid2edge
+              MC, Oct 2014 - clockplot, ellipse_area, savez, savez_compressed, grid_mid2edge, tee
 """
 from __future__ import print_function
 
@@ -495,6 +497,7 @@ from .sobol_index       import sobol_index
 from .sread             import sread
 from .srrasa            import srrasa, srrasa_trans
 from .tcherkez          import tcherkez
+from .tee               import tee
 from .timestepcheck     import timestepcheck
 from .tsym              import tsym
 from .unpack            import unpack

@@ -7,6 +7,7 @@ import os
 
 __all__ = ['savez', 'savez_compressed']
 
+
 def savez(file, *args, **kwds):
     """
     Save several arrays into a single file in uncompressed ``.npz`` format.
@@ -24,11 +25,12 @@ def savez(file, *args, **kwds):
     Note that ``update`` copies existing archive members to a new zip (just as the zip utility).
     It therefore needs doubel disk space temporarily.
 
+    Also note that file must be a filename and no file handle, contrary to numpy.savez.
+
     Parameters
     ----------
-    file : str or file
-        Either the file name (string) or an open file (file-like object)
-        where the data will be saved. If file is a string, the ``.npz``
+    file : str
+        File name (string) where the data will be saved. The ``.npz``
         extension will be appended to the file name if it is not already there.
     args : Arguments, optional
         Arrays to save to the file. Since it is not possible for Python to
@@ -146,14 +148,21 @@ def savez_compressed(file, *args, **kwds):
     Note that ``update`` copies existing archive members to a new zip (just as the zip utility).
     It therefore needs doubel disk space temporarily.
 
+    Also note that file must be a filename and no file handle, contrary to numpy.savez.
+
     Parameters
     ----------
     file : str
-        File name of ``.npz`` file.
-    args : Arguments
-        Function arguments.
-    kwds : Keyword arguments
-        Keywords.
+        File name (string) where the data will be saved. The ``.npz``
+        extension will be appended to the file name if it is not already there.
+    args : Arguments, optional
+        Arrays to save to the file. Since it is not possible for Python to
+        know the names of the arrays outside `savez`, the arrays will be saved
+        with names "arr_0", "arr_1", and so on. These arguments can be any
+        expression.
+    kwds : Keyword arguments, optional
+        Arrays to save to the file. Arrays will be saved in the file with the
+        keyword names.
     append : Keyword argument, optional
         True = append to existing ``.npz`` file
         False = overwrite possibly existing ``.npz`` file (default).
