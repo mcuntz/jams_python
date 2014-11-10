@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 import numpy as np
-from ufz.eddybox import gapfill
+from eddybox import gapfill
 from ufz.esat import esat
 from ufz.date2dec import date2dec
 from ufz.autostring import astr
@@ -72,9 +72,8 @@ def fluxfill(fluxfile, metfile, outdir, rg, tair, rh, delimiter=[',',','],
     # reading input files
     d = np.loadtxt(fluxfile, dtype='|S100', delimiter=delimiter[0], skiprows=skiprows[0])
     m = np.loadtxt(metfile,  dtype='|S100', delimiter=delimiter[1], skiprows=skiprows[1])
-    
-    if d.shape[1]!=11:
-        raise ValueError('fluxfill: fluxfile must be from fluxflag and have 11 cols')
+
+    assert (d.shape[1]==11) | (d.shape[1]==19), 'fluxfill: fluxfile must be from fluxflag or profile2storage and have 11 or 19 cols'
     
     if format[0]=='ascii':
         datev   = date2dec(ascii=d[:,0])
@@ -94,8 +93,12 @@ def fluxfill(fluxfile, metfile, outdir, rg, tair, rh, delimiter=[',',','],
     
     ###########################################################################
     # assign variables
-    data      = val[:,0::2] # corr. H, corr. LE, corr. E, corr. C, tau
-    data_flag = val[:,1::2]>1
+    if (d.shape[1]==11):
+        data      = val[:,0::2] # corr. H, corr. LE, corr. E, corr. C, tau
+        data_flag = val[:,1::2]>1
+    else:
+        data      = val[:,[0,1, 3,4, 6,7, 9,10, 12]] # corr. H, corr. H+s, corr. LE, corr. LE+s, corr. E, corr. E+s, corr. C, corr. C+s, tau
+        data_flag = np.repeat(val[:,[2,5,8,11,13]]>1, 2, axis=1)[:,:-1]
     rg        = met[:,rg]
     rg_flag   = rg==undef
     tair      = met[:,tair]
@@ -138,15 +141,28 @@ def fluxfill(fluxfile, metfile, outdir, rg, tair, rh, delimiter=[',',','],
     
     ###########################################################################
     # prepare output and save file
-    header         = np.array(['          H', '   Hflag', '     Hgf',
-                               '         LE', '  LEflag', '    LEfg',
-                               '          E', '   Eflag', '     Efg',
-                               '          C', '   Cflag', '     Cfg',
-                               '        TAU', ' TAUflag', '   TAUfg'])
     flux_str       = np.array([['%11.5f'%x for x in y] for y in flux])
-    output         = np.hstack((d[:,0:1], flux_str.repeat(3, axis=1)))
-    output[:,2::3] = astr(val[:,1::2].astype(int), prec=8)
-    output[:,3::3] = astr(flag, prec=8)    
+
+    if (d.shape[1]==11):
+        header         = np.array(['          H', '   Hflag', '     Hgf',
+                                   '         LE', '  LEflag', '    LEfg',
+                                   '          E', '   Eflag', '     Efg',
+                                   '          C', '   Cflag', '     Cfg',
+                                   '        TAU', ' TAUflag', '   TAUfg'])
+        output         = np.hstack((d[:,0:1], flux_str.repeat(3, axis=1)))
+        output[:,2::3] = astr(val[:,1::2].astype(int), prec=8)
+        output[:,3::3] = astr(flag, prec=8)
+    else:
+        header         = np.array(['          H', '       H+sT', '   Hflag', '     Hgf',
+                                   '         LE', '     LE+sLE', '  LEflag', '    LEfg',
+                                   '          E', '       E+sE', '   Eflag', '     Efg',
+                                   '          C', '       C+sC', '   Cflag', '     Cfg',
+                                   '        TAU',    ' TAUflag', '   TAUfg',
+                                   '         sT', '        sLE', '         sE', '         sC'])    
+    output                   = np.hstack((d[:,0:1], np.insert(flux_str, [2,2,4,4,6,6,8,8], flux_str[:,:-1], axis=1),
+                                          flux_str[:,-1:].repeat(2, axis=1), d[:,-4:]))
+    output[:,[3,7,11,15,18]] = astr(val[:,[2,5,8,11,13]].astype(int), prec=8)
+    output[:,[4,8,12,16,19]] = astr(flag[:,[0,2,4,6,8]], prec=8)
     
     np.savetxt('%s/fluxfilled.csv'%outdir,
                np.vstack((np.concatenate((['            date'], header))[np.newaxis,:],
