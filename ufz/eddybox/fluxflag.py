@@ -4,9 +4,9 @@ import numpy as np
 from ufz.date2dec import date2dec
 from ufz.dec2date import dec2date
 from ufz.autostring import astr
-from ufz.eddybox import itc
-from ufz.eddybox import spikeflag
-from ufz.eddybox import ustarflag
+from eddybox import itc
+from eddybox import spikeflag
+from eddybox import ustarflag
 
 def fluxflag(fluxfile, metfile, outdir, swdr, T, lat, delimiter=[',',','],
              skiprows=[1,1], format=['ascii','ascii'], limit=0.3,
@@ -189,20 +189,42 @@ def fluxflag(fluxfile, metfile, outdir, swdr, T, lat, delimiter=[',',','],
         itct = np.zeros_like(H, dtype=np.int)
     
     ###########################################################################
+    # summing flags for each flux
+    Hflag   = np.nansum(np.vstack((sttest2[:,6], itcw, texcr, wexvar, texvar,
+                                   wvar0)).transpose(), 1).astype(int)
+    Hflag[Hflag>1]=2
+    LEflag  = np.nansum(np.vstack((sttest2[:,5], itcw, h2oexli, h2oexcr, wexvar,
+                                   h2oexvar3, wvar0, h2ovar0)).transpose(), 1).astype(int)
+    LEflag[LEflag>1]=2
+    Eflag   = np.nansum(np.vstack((sttest2[:,5], itcw, h2oexli, h2oexcr, wexvar,
+                                   h2oexvar3, wvar0, h2ovar0)).transpose(), 1).astype(int)
+    Eflag[Eflag>1]=2
+    Cflag   = np.nansum(np.vstack((sttest2[:,4], itcw, c02exli, co2excr, wexvar,
+                                   h2oexvar10, co2exvar3, wvar0, co2var0)).transpose(), 1).astype(int)
+    Cflag[Cflag>1]=2
+    Tauflag = np.nansum(np.vstack((sttest2[:,3], itcu, itcw, tauexcr, wexvar,
+                                   wvar0)).transpose(), 1).astype(int)
+    Tauflag[Tauflag>1]=2
+        
+    ###########################################################################
     # spike detection
-    inflag = np.zeros_like(fluxes, dtype=np.int)
+    #inflag = np.zeros_like(fluxes, dtype=np.int)
+    inflag = np.vstack((Hflag, LEflag, Eflag, Cflag, Tauflag)).transpose()
     if spike_f:
         spikef = spikeflag(datev, fluxes, inflag, isday, '%s/spike'%outdir, z=7,
                            deriv=1, udef=np.NaN, spike_v=2, plot=plot)
         print('SPIKE DETECTION COMPLETED')
     else:
-        spikef = np.zeros_like(inflag)
+        spikef = np.zeros_like(inflag, dtype=np.int)
 
+    inflag += spikef
+    
     ###########################################################################
     # ustar flagging
     if ustar_f:
-        C_ustar_T       = np.vstack((fluxes[:,3], ustar, T)).transpose()
-        C_ustar_T_flags = np.isnan(C_ustar_T).astype(np.int)
+        C_ustar_T             = np.vstack((fluxes[:,3], ustar, T)).transpose()
+        C_ustar_T_flags       = np.isnan(C_ustar_T).astype(np.int)
+        C_ustar_T_flags[:,0] += inflag[:,3]
         ustarf = ustarflag(datev, C_ustar_T, C_ustar_T_flags, isday,
                            '%s/ustar'%outdir, ustar_v=2, plot=plot)
         print('USTAR FLAGGING COMPLETED')
