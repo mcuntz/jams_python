@@ -112,6 +112,7 @@ def fluxfill(fluxfile, metfile, outdir, rg, tair, rh, delimiter=[',',','],
     
     ###########################################################################
     if plot:
+        import matplotlib as mpl
         import matplotlib.pyplot as plt
         import matplotlib.backends.backend_pdf as pdf
         pp1 = pdf.PdfPages(outdir+'/fluxfilled.pdf')
@@ -129,10 +130,20 @@ def fluxfill(fluxfile, metfile, outdir, rg, tair, rh, delimiter=[',',','],
         #######################################################################
         # plot
         if plot:
+            majticks = mpl.dates.MonthLocator(bymonthday=1)
+            format_str='%d %m %Y %H:%M'
+            date01 = date2dec(yr=1, mo=1, dy=2, hr=0, mi=0, sc=0)
+            
             fig1 = plt.figure(1)
             sub1 = fig1.add_subplot(111)
-            l1 =sub1.plot(datev, flux[:,i], '-g')
-            l2 =sub1.plot(datev, np.ma.array(data[:,i],mask=data_flag[:,i]), '-b')
+            l1 =sub1.plot(datev-date01, flux[:,i], '-g')
+            l2 =sub1.plot(datev-date01, np.ma.array(data[:,i],mask=data_flag[:,i]), '-b')
+            
+            sub1.set_xlim(datev[0]-date01,datev[-1]-date01)
+            sub1.xaxis.set_major_locator(majticks)
+            sub1.xaxis.set_major_formatter(mpl.dates.DateFormatter(format_str))
+            fig1.autofmt_xdate()
+            
             plt.show()
             fig1.savefig(pp1, format='pdf')
     
