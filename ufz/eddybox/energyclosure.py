@@ -83,6 +83,9 @@ def energyclosure(fluxfile, metfile, outdir, Rn, G, swdr, Ts=None, theta=None,
     fluxclosed.pdf if method='year', plot of whole year daytime flag=0 data
                    Rn-G vs. H+Le
         
+    fluxclosed_stor.pdf if method='year', plot of whole year daytime flag=0 data
+                   Rn-G vs. H+Le including storages
+        
     
     Restrictions
     ------------
@@ -109,9 +112,8 @@ def energyclosure(fluxfile, metfile, outdir, Rn, G, swdr, Ts=None, theta=None,
     d = np.loadtxt(fluxfile, dtype='|S100', delimiter=delimiter[0])
     m = np.loadtxt(metfile,  dtype='|S100', delimiter=delimiter[1])
     
-    if d.shape[1]!=22:
-        raise ValueError('energyclosure: fluxfile must be from fluxpart and have 22 cols')
-    
+    assert (d.shape[1]==22) | (d.shape[1]==32), 'energyclosure: fluxfile must be from fluxpart and have 22 or 32 cols'
+        
     if format[0]=='ascii':
         datev   = date2dec(ascii=d[skiprows[0]:,0])
     elif format[0]=='eng':
@@ -130,12 +132,26 @@ def energyclosure(fluxfile, metfile, outdir, Rn, G, swdr, Ts=None, theta=None,
     
     ###########################################################################
     # assign variables
-    H         = val[:,0]
-    Hflag     = val[:,1]
-    Le        = val[:,3]
-    Leflag    = val[:,4]
-    E         = val[:,6]
-    Eflag     = val[:,7]
+    if (d.shape[1]==22):
+        H         = val[:,0]
+        Hflag     = val[:,1]
+        Le        = val[:,3]
+        Leflag    = val[:,4]
+        E         = val[:,6]
+        Eflag     = val[:,7]
+    else:
+        H         = val[:,0]
+        Hflag     = val[:,2]
+        Le        = val[:,4]
+        Leflag    = val[:,6]
+        E         = val[:,8]
+        Eflag     = val[:,10]    
+        H_stor      = val[:,1]
+        Hflag_stor  = val[:,2]
+        Le_stor     = val[:,5]
+        Leflag_stor = val[:,6]
+        E_stor      = val[:,9]
+        Eflag_stor  = val[:,10]    
     Rn        = met[:,Rn]
     Ts        = met[:,Ts]
     swdr      = met[:,swdr]
@@ -156,11 +172,20 @@ def energyclosure(fluxfile, metfile, outdir, Rn, G, swdr, Ts=None, theta=None,
     # yearly approach
     if (method.lower() == 'year'):
         closure = energyclosure_year(H, Hflag, Le, Leflag, Rn, G, isday, outdir,
-                                     force0=force0, undef=undef, plot=plot)
+                                     force0=force0, undef=undef, plot='energyclosure.pdf')
         if force0:
             H_closed, Le_closed, E_closed = H/closure, Le/closure, E/closure
         else:
             H_closed, Le_closed, E_closed = H/closure[0], Le/closure[0], E/closure[0]
+
+        if (d.shape[1]==32):
+            closure_stor = energyclosure_year(H_stor, Hflag_stor, Le_stor, Leflag_stor,#
+                                              Rn, G, isday, outdir, force0=force0,
+                                              undef=undef, plot='energyclosure_stor.pdf')
+            if force0:
+                H_stor_closed, Le_stor_closed, E_stor_closed = H_stor/closure, Le_stor/closure, E_stor/closure
+            else:
+                H_stor_closed, Le_stor_closed, E_stor_closed = H_stor/closure[0], Le_stor/closure[0], E_stor/closure[0]
             
     # Include new methods here
     # Include new methods here
@@ -171,13 +196,26 @@ def energyclosure(fluxfile, metfile, outdir, Rn, G, swdr, Ts=None, theta=None,
     H_closed[H==undef]   = undef
     Le_closed[Le==undef] = undef
     E_closed[E==undef]   = undef
+    if (d.shape[1]==32):
+        H_stor_closed[H_stor==undef]   = undef
+        Le_stor_closed[Le_stor==undef] = undef
+        E_stor_closed[E_stor==undef]   = undef
     
     ###########################################################################
     # prepare and write output
-    flux     = np.vstack((H_closed,Le_closed, E_closed)).transpose()
+    if (d.shape[1]==22):    
+        flux = np.vstack((H_closed,Le_closed,E_closed)).transpose()
+    else:
+        flux = np.vstack((H_closed,H_stor_closed,Le_closed,Le_stor_closed,E_closed,E_stor_closed)).transpose()        
+    
     flux_str = np.array([['%11.5f'%x for x in y] for y in flux])
     flux_str = np.where(flux_str=='%11.5f'%undef, ' '*(11-len(str(undef)))+str(undef), flux_str)
-    d[skiprows[0]:,[1,4,7]] = flux_str
+    
+    if (d.shape[1]==22):    
+        d[skiprows[0]:,[1,4,7]] = flux_str
+    else:
+        d[skiprows[0]:,[1,2,5,6,9,10]] = flux_str
+    
     np.savetxt('%s/fluxclosed.csv'%outdir, d, '%s', delimiter=',')
 
 def soilheatflux(Ts, theta, depths, por, undef=-9999):
@@ -296,8 +334,8 @@ def energyclosure_year(H, Hflag, Le, Leflag, Rn, G, isday, outdir, force0=True,
                 output is then (fraction, intercept), (default: True)
     undef       int/float, missing value of input (default: -9999, np.nan is
                 not possible)
-    plot        bool, if True the fitting plot is made and saved to outdir
-                (default: False)
+    plot        bool, if False, no fitting plot is made and saved to outdir
+                (default: False), otherwise give file name like 'energyclosure.pdf'
     
     
     Output
@@ -383,7 +421,7 @@ def energyclosure_year(H, Hflag, Le, Leflag, Rn, G, isday, outdir, force0=True,
         plt.legend(loc='best')
         plt.show()
         
-        pp1 = pdf.PdfPages('%s/energyclosure.pdf' %(outdir))
+        pp1 = pdf.PdfPages('%s/'%(outdir)+plot)
         fig1.savefig(pp1, format='pdf')
         pp1.close()
 
