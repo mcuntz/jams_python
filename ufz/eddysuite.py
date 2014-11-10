@@ -44,13 +44,13 @@ e.g. |-2013				:containing everything
 '''
 1. clean slt files
 '''
-#eb.sltclean('')
+#eb.sltclean('slt')
 
 '''
 2. calculate raw fluxes
 Use EddyFlux to calculate raw, uncorrected fluxes
 - no meteo files, no time lag, no filter, no inductances, no coord rotation
-- no extra output, no spike detection, p=1000
+- no extra output, no spike detection, p=1000, set sonic direction correctly
 - save results in raw/raw.csv
 - save settings in raw/raw.cal
 '''
