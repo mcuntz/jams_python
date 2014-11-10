@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import numpy as np
 from ufz.mad import mad
+from ufz.date2dec import date2dec
 
 def spikeflag(date, data, inflag, isday, outdir, window=13, iter=1,
               fill_days=1, t_int=48, z=7, deriv=0, udef=-9999, spike_v=2,
@@ -125,14 +126,22 @@ def spikeflag(date, data, inflag, isday, outdir, window=13, iter=1,
                                                           spike_v, 0)
                 
             if plot:
+                import matplotlib as mpl
                 import matplotlib.pyplot as plt
                 import matplotlib.backends.backend_pdf as pdf
+                majticks = mpl.dates.MonthLocator(bymonthday=1)
+                format_str='%d %m %Y %H:%M'
+                date01 = date2dec(yr=1, mo=1, dy=2, hr=0, mi=0, sc=0)
+                                
                 fig1 = plt.figure(1)
                 sub1 = fig1.add_subplot(111)
                 valid = (inflag[:,col]==0) & ((data[:,col]!=udef) |
                                               (~np.isnan(data[:,col])))
-                l1 =sub1.plot(date[valid], data[valid,col], '-b')
-                l2 =sub1.plot(date[flag[:,col]!=0], data[flag[:,col]!=0,col], 'or')
+                l1 =sub1.plot(date[valid]-date01, data[valid,col], '-b')
+                l2 =sub1.plot(date[flag[:,col]!=0]-date01, data[flag[:,col]!=0,col], 'or')
+                sub1.xaxis.set_major_locator(majticks)
+                sub1.xaxis.set_major_formatter(mpl.dates.DateFormatter(format_str))
+                fig1.autofmt_xdate()
                 plt.show()
                 
                 pp1 = pdf.PdfPages(outdir+'/spike_%i.pdf'%col)
