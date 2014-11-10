@@ -74,7 +74,8 @@ def profile2storage(fluxfile, fluxfile2, profilefile, outdir, heights, CO2=None,
     Output
     ------
     flux+stor.csv file containing fluxes and flags where storage fluxes are
-                  added
+                  added in an additional column and storage fluxes are appended
+                  to the end of the file
         
     
     Restrictions
@@ -116,7 +117,7 @@ def profile2storage(fluxfile, fluxfile2, profilefile, outdir, heights, CO2=None,
     # file containing profile data (can be meteo file if no profile available)
     d3 = np.loadtxt(profilefile, dtype='|S100', delimiter=delimiter[2])
     
-    assert d1.shape[1]==11, 'profile2storage: fluxfile must be from fluxflag and have 11 cols'
+    assert (d1.shape[1]==11) | (d1.shape[1]==19), 'profile2storage: fluxfile must be from fluxflag or profiletostorage and have 11 or 19 cols'
     assert d2.shape[1]==68, 'profile2storage: fluxfile2 must be from EddyFlux and have 68 cols'
     assert d1.shape[0]==d2.shape[0], 'profile2storage: fluxfile and fluxfile2 must be in sync'
     assert d1.shape[0]==d3.shape[0], 'profile2storage: fluxfile and profilefile must be in sync'
@@ -145,12 +146,30 @@ def profile2storage(fluxfile, fluxfile2, profilefile, outdir, heights, CO2=None,
     
     ###########################################################################
     # assign variables
-    H, Hflag   = flux1[:,0], flux1[:,1]
-    Le, Leflag = flux1[:,2], flux1[:,3]
-    E, Eflag   = flux1[:,4], flux1[:,5]
-    C, Cflag   = flux1[:,6], flux1[:,7]
+    if d1.shape[1]==11:
+        H, Hflag   = flux1[:,0], flux1[:,1]
+        Le, Leflag = flux1[:,2], flux1[:,3]
+        E, Eflag   = flux1[:,4], flux1[:,5]
+        C, Cflag   = flux1[:,6], flux1[:,7]
+    else:
+        H, Hflag   = flux1[:,0], flux1[:,2]
+        Le, Leflag = flux1[:,3], flux1[:,5]
+        E, Eflag   = flux1[:,6], flux1[:,8]
+        C, Cflag   = flux1[:,9], flux1[:,11]
     p          = flux2[:,58] # [hPa]
     rho        = flux2[:,62] # [kg/m3]
+    
+    ###########################################################################
+    # prepare output array
+    d4 = np.copy(d1)
+    if d1.shape[1]==11:
+        temp = np.empty((d1.shape[0],4), dtype='|S100')
+        temp[:] = ' '*(11-len(str(undef)))+str(undef)
+        temp[0,:] = ['       H+sT','     LE+sLE','       E+sE','       C+sC']
+        d4 = np.insert(d4, [2,4,6,8], temp, axis=1)
+        
+        temp[0,:] = ['         sT','        sLE','         sE','         sC']
+        d4 = np.append(d4, temp, axis=1)
     
     ###########################################################################
     # calls
@@ -165,8 +184,11 @@ def profile2storage(fluxfile, fluxfile2, profilefile, outdir, heights, CO2=None,
         # format and write into output array
         newC_str  = np.array(['%11.5f'%x for x in np.ma.filled(newC, undef)])
         newC_str  = np.where(newC_str=='%11.5f'%undef, ' '*(11-len(str(undef)))+str(undef), newC_str)
-        d1[skiprows[0]:,7] = newC_str
-        #d1[skiprows[0]:,8] = flag??? what to do with flag
+        sfCO2_str = np.array(['%11.5f'%x for x in np.ma.filled(sfCO2, undef)])
+        sfCO2_str = np.where(sfCO2_str=='%11.5f'%undef, ' '*(11-len(str(undef)))+str(undef), sfCO2_str)
+        d4[skiprows[0]:,11] = newC_str
+        d4[skiprows[0]:,18] = sfCO2_str
+
         if plot:
             storplot(CO2, datev, heights, C, sfCO2, newC, 'storageCO2.pdf', pdf, plt, mpl, outdir)
     
@@ -181,14 +203,19 @@ def profile2storage(fluxfile, fluxfile2, profilefile, outdir, heights, CO2=None,
         newE      = E + np.ma.filled(sfH2O, 0)
         newLe     = Le + np.ma.filled(sfH2O_Wm2, 0)
         # format and write into output array
-        newE_str  = np.array(['%11.5f'%x for x in np.ma.filled(newE, undef)])
-        newLe_str = np.array(['%11.5f'%x for x in np.ma.filled(newLe, undef)])
-        newE_str  = np.where(newE_str=='%11.5f'%undef, ' '*(11-len(str(undef)))+str(undef), newE_str)
-        newLe_str = np.where(newLe_str=='%11.5f'%undef, ' '*(11-len(str(undef)))+str(undef), newLe_str)
-        d1[skiprows[0]:,5] = newE_str
-        #d1[skiprows[0]:,6] = flag??? what to do with flag
-        d1[skiprows[0]:,3] = newLe_str
-        #d1[skiprows[0]:,4] = flag??? what to do with flag
+        newE_str      = np.array(['%11.5f'%x for x in np.ma.filled(newE, undef)])
+        newLe_str     = np.array(['%11.5f'%x for x in np.ma.filled(newLe, undef)])
+        sfH2O_str     = np.array(['%11.5f'%x for x in np.ma.filled(sfH2O, undef)])
+        sfH2O_Wm2_str = np.array(['%11.5f'%x for x in np.ma.filled(sfH2O_Wm2, undef)])
+        newE_str      = np.where(newE_str=='%11.5f'%undef, ' '*(11-len(str(undef)))+str(undef), newE_str)
+        newLe_str     = np.where(newLe_str=='%11.5f'%undef, ' '*(11-len(str(undef)))+str(undef), newLe_str)
+        sfH2O_str     = np.where(sfH2O_str=='%11.5f'%undef, ' '*(11-len(str(undef)))+str(undef), sfH2O_str)
+        sfH2O_Wm2_str = np.where(sfH2O_Wm2_str=='%11.5f'%undef, ' '*(11-len(str(undef)))+str(undef), sfH2O_Wm2_str)
+        d4[skiprows[0]:,8]  = newE_str
+        d4[skiprows[0]:,17] = sfH2O_str
+        d4[skiprows[0]:,5]  = newLe_str
+        d4[skiprows[0]:,16] = sfH2O_Wm2_str
+
         if plot:
             storplot(H2O, datev, heights, E, sfH2O, newE, 'storageH2O.pdf', pdf, plt, mpl, outdir)
 
@@ -203,8 +230,11 @@ def profile2storage(fluxfile, fluxfile2, profilefile, outdir, heights, CO2=None,
         # format and write into output array
         newH_str  = np.array(['%11.5f'%x for x in np.ma.filled(newH, undef)])
         newH_str  = np.where(newH_str=='%11.5f'%undef, ' '*(11-len(str(undef)))+str(undef), newH_str)
-        d1[skiprows[0]:,1] = newH_str
-        #d1[skiprows[0]:,2] = flag??? what to do with flag
+        sfT_str   = np.array(['%11.5f'%x for x in np.ma.filled(sfT, undef)])
+        sfT_str   = np.where(sfT_str=='%11.5f'%undef, ' '*(11-len(str(undef)))+str(undef), sfT_str)
+        d4[skiprows[0]:,2]  = newH_str
+        d4[skiprows[0]:,15] = sfT_str
+
         if plot:
             storplot(T, datev, heights, H, sfT, newH, 'storageT.pdf', pdf, plt, mpl, outdir)
             
@@ -222,20 +252,25 @@ def profile2storage(fluxfile, fluxfile2, profilefile, outdir, heights, CO2=None,
         newE      = E + np.ma.filled(sfrH, 0)
         newLe     = Le + np.ma.filled(sfrH_Wm2, 0)
         # format and write into output array
-        newE_str  = np.array(['%11.5f'%x for x in np.ma.filled(newE, undef)])
-        newLe_str = np.array(['%11.5f'%x for x in np.ma.filled(newLe, undef)])
-        newE_str  = np.where(newE_str=='%11.5f'%undef, ' '*(11-len(str(undef)))+str(undef), newE_str)
-        newLe_str = np.where(newLe_str=='%11.5f'%undef, ' '*(11-len(str(undef)))+str(undef), newLe_str)
-        d1[skiprows[0]:,5] = newE_str
-        #d1[skiprows[0]:,6] = flag??? what to do with flag
-        d1[skiprows[0]:,3] = newLe_str
-        #d1[skiprows[0]:,4] = flag??? what to do with flag
+        newE_str     = np.array(['%11.5f'%x for x in np.ma.filled(newE, undef)])
+        newLe_str    = np.array(['%11.5f'%x for x in np.ma.filled(newLe, undef)])
+        sfrH_str     = np.array(['%11.5f'%x for x in np.ma.filled(sfrH, undef)])
+        sfrH_Wm2_str = np.array(['%11.5f'%x for x in np.ma.filled(sfrH_Wm2, undef)])
+        newE_str     = np.where(newE_str=='%11.5f'%undef, ' '*(11-len(str(undef)))+str(undef), newE_str)
+        newLe_str    = np.where(newLe_str=='%11.5f'%undef, ' '*(11-len(str(undef)))+str(undef), newLe_str)
+        sfrH_str     = np.where(sfrH_str=='%11.5f'%undef, ' '*(11-len(str(undef)))+str(undef), sfrH_str)
+        sfrH_Wm2_str = np.where(sfrH_Wm2_str=='%11.5f'%undef, ' '*(11-len(str(undef)))+str(undef), sfrH_Wm2_str)
+        d4[skiprows[0]:,8]  = newE_str
+        d4[skiprows[0]:,17] = sfrH_str
+        d4[skiprows[0]:,5]  = newLe_str
+        d4[skiprows[0]:,16] = sfrH_Wm2_str
+        
         if plot:
             storplot(rH, datev, heights, E, sfH2O, newE, 'storagerH.pdf', pdf, plt, mpl, outdir)
     
     ###########################################################################
     # write output
-    np.savetxt('%s/flux+stor.csv'%outdir, d1, '%s', delimiter=',')
+    np.savetxt('%s/flux+stor.csv'%outdir, d4, '%s', delimiter=',')
 
 def stor2flux(concentrations, rho, heights, dt, constituent='CO2'):
     '''
