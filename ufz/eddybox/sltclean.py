@@ -4,6 +4,7 @@ import os as os
 import re
 import shutil
 from time import localtime
+from scipy.stats import mode
                                     
 def sltclean(indir, pat = '[a-zA-Z0-9]*.slt|[a-zA-Z0-9]*.SLT'):
     """       
