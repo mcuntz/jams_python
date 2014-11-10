@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 import numpy as np
-from eddybox import gapfill
+from ufz.eddybox import gapfill
 from ufz.esat import esat
 from ufz.date2dec import date2dec
 from ufz.autostring import astr

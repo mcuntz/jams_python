@@ -1,12 +1,12 @@
 #!/usr/bin/env python
 from __future__ import print_function
 import numpy as np
-from ufz.date2dec import date2dec
-from ufz.dec2date import dec2date
+from ufz.date2dec   import date2dec
+from ufz.dec2date   import dec2date
 from ufz.autostring import astr
-from eddybox import itc
-from eddybox import spikeflag
-from eddybox import ustarflag
+from ufz.eddybox    import itc
+from ufz.eddybox    import spikeflag
+from ufz.eddybox    import ustarflag
 
 def fluxflag(fluxfile, metfile, outdir, swdr, T, lat, delimiter=[',',','],
              skiprows=[1,1], format=['ascii','ascii'], limit=0.3,

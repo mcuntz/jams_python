@@ -9,9 +9,12 @@ def semivariogram(x, y, v, nL, di, td, stype='omnidirectional', negscat=False,
         Calculates single or multiple experimental semivariogram(s) for
         spatial distributed data. X and Y coordinates and corresponding
         values are required in separate numpy arrays. Different theoretical
-        semivariograms can be fitted. Results are plotted in various graphs
-        and the fitted model parameters are given to the output.
-        (small code parts based on Alghalandis.com)
+        semivariograms can be fitted or the best fitting is chosen.
+
+        Results can be plotted in various graphs and the fitted model parameters
+        are given to the output.
+
+        Small code parts are based on Alghalandis.com
 
 
         Definition
@@ -57,7 +60,7 @@ def semivariogram(x, y, v, nL, di, td, stype='omnidirectional', negscat=False,
 
         negscat   It is common in geostatistics to neglect large lags which
                   tend to scatter and contain outliers. By setting negscat to
-                  a value between 0 and 1 (both excludet) you can cut off the
+                  a value between 0 and 1 (both excluded) you can cut off the
                   tail of the experimental semivariogram and the fitting will
                   be done only to the remaining part. If it's set to False, the
                   hole semivariogram is calculated. (default=False)

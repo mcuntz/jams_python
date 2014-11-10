@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 import numpy as np
-from eddybox import nee2gpp
+from ufz.eddybox import nee2gpp
 from ufz.esat import esat
 from ufz.date2dec import date2dec
 
