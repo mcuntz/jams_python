@@ -156,19 +156,19 @@ def fluxfill(fluxfile, metfile, outdir, rg, tair, rh, delimiter=[',',','],
 
     if (d.shape[1]==11):
         header         = np.array(['          H', '   Hflag', '     Hgf',
-                                   '         LE', '  LEflag', '    LEfg',
-                                   '          E', '   Eflag', '     Efg',
-                                   '          C', '   Cflag', '     Cfg',
-                                   '        TAU', ' TAUflag', '   TAUfg'])
+                                   '         LE', '  LEflag', '    LEgf',
+                                   '          E', '   Eflag', '     Egf',
+                                   '          C', '   Cflag', '     Cgf',
+                                   '        TAU', ' TAUflag', '   TAUgf'])
         output         = np.hstack((d[:,0:1], flux_str.repeat(3, axis=1)))
         output[:,2::3] = astr(val[:,1::2].astype(int), prec=8)
         output[:,3::3] = astr(flag, prec=8)
     else:
         header         = np.array(['          H', '       H+sT', '   Hflag', '     Hgf',
-                                   '         LE', '     LE+sLE', '  LEflag', '    LEfg',
-                                   '          E', '       E+sE', '   Eflag', '     Efg',
-                                   '          C', '       C+sC', '   Cflag', '     Cfg',
-                                   '        TAU',    ' TAUflag', '   TAUfg',
+                                   '         LE', '     LE+sLE', '  LEflag', '    LEgf',
+                                   '          E', '       E+sE', '   Eflag', '     Egf',
+                                   '          C', '       C+sC', '   Cflag', '     Cgf',
+                                   '        TAU',    ' TAUflag',             '   TAUgf',
                                    '         sT', '        sLE', '         sE', '         sC'])    
     output                   = np.hstack((d[:,0:1], np.insert(flux_str, [2,2,4,4,6,6,8,8], flux_str[:,:-1], axis=1),
                                           flux_str[:,-1:].repeat(2, axis=1), d[:,-4:]))
