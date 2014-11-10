@@ -3,11 +3,11 @@ from ufz import timestepcheck
 
 '''
 	Example file for processing Eddy Covariance data with eddybox and EddySoft.
-	This file is tested with the Wetzstein data set of 2013.
+
 
     License
     -------
-    This file is part of the UFZ Python package.
+    This file is part of the UFZ Python library.
 
     It is NOT released under the GNU Lesser General Public License, yet.
 
@@ -121,7 +121,7 @@ lat  = 50.450127 # latitude of tower position in decimal degrees
 10. Calculation of storage fluxes
 '''
 #eb.profile2storage('flux/fluxflags.csv', 'flux/flux_checked.csv', 'profile/profile.csv', 'flux', heights=[0.1,0.3,1.0,2.0,5.0,9.0,15.0,23.8,30.0],
-#                CO2=[0,1,2,3,4,5,6,7,8], H2O=[9,10,11,12,13,14,15,16,17], delimiter=[',', ',', ';'], plot=True)
+#                   CO2=[0,1,2,3,4,5,6,7,8], H2O=[9,10,11,12,13,14,15,16,17], delimiter=[',', ',', ';'], plot=True)
 #eb.profile2storage('flux/flux+stor.csv', 'flux/flux_checked.csv', 'meteo/meteo.csv', 'flux', heights=[2.0,30.0], T=[2,1], plot=True)
 
 '''
