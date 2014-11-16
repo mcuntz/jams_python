@@ -1,21 +1,22 @@
 #!/usr/bin/env python
 from __future__ import print_function
 """
-usage: mc_template.py [-h] [-g pngbase] [-p pdffile] [-t] [Input file]
+usage: mc_template.py [-h] [-f filename] [-l] [-t output_type] [input_file]
 
 This is the Python template for any new program of Matthias Cuntz.
 
 positional arguments:
-  Input file            Mandatory input file.
+  input_file            Mandatory input file.
 
 optional arguments:
   -h, --help            show this help message and exit
-  -g pngbase, --pngbase pngbase
-                        Name basis for png output files (default: open screen
-                        window).
-  -p pdffile, --pdffile pdffile
-                        Name of pdf output file (default: open screen window).
-  -t, --usetex          Use LaTeX to render text in pdf.
+  -f filename, --filename filename
+                        Name of output file if type is pdf, html or d3, and
+                        name basis if type is png (default: mc_template).
+  -l, --latex           Use LaTeX to render text in pdf.
+  -t output_type, --type output_type
+                        Output type is pdf, png, html, or d3 (default: open
+                        screen windows).
 
 
 License
@@ -45,18 +46,32 @@ Modified, MC, Jul 2013 - optparse->argparse
           MC, Jul 2013 - extended to be lookup and gallery
           MC, Dec 2013 - add png support
           MC, Mar 2014 - split into individual templates
-          MC, Nov 2014 - d3
-                       - script -> function
+          MC, Nov 2014 - script -> function
+                       - pdf, png, html, or d3
 """
-def mc_template(infile=None, pngbase='', pdffile='', usetex=False):
+def mc_template(infile=None, filename='', usetex=False, outtype=''):
+    """
+    This is the Python template for any new program of Matthias Cuntz.
+
+    positional arguments:
+      input_file            Mandatory input file.
+
+    optional arguments:
+      filename              Name of output file if type is pdf, html or d3, and
+                            name basis if type is png (default: mc_template).
+      usetex                True: Use LaTeX to render text in pdf (default: False)
+      outputtype            Output type is pdf, png, html, or d3 (default: open screen windows).
+    """
     # Check input
     if (infile is None):
         print('\nError: Input file must be given.\n')
         import sys
         sys.exit()
 
-    if (pdffile != '') and (pngbase != ''):
-        print('\nError: PDF and PNG are mutually exclusive. Only either -p or -g possible.\n')
+    outtype = outtype.lower()
+    outtypes = ['', 'pdf', 'png', 'html', 'd3']
+    if outtype not in outtypes:
+        print('\nError: output type must be in ', outtypes)
         import sys
         sys.exit()
 
@@ -65,17 +80,16 @@ def mc_template(infile=None, pngbase='', pdffile='', usetex=False):
     import time
     t1 = time.time()
 
+    if (outtype == 'd3'):
+        try:
+            import mpld3
+        except:
+            print("No mpld3 found. Use output type html instead of d3.")
+            outtype = 'html'
+
     # -------------------------------------------------------------------------
     # Customize plots
     #
-
-    if (pdffile == ''):
-        if (pngbase == ''):
-            outtype = 'x'
-        else:
-            outtype = 'png'
-    else:
-        outtype = 'pdf'
 
     # Main plot
     nrow        = 3           # # of rows of subplots per figure
@@ -139,7 +153,7 @@ def mc_template(infile=None, pngbase='', pdffile='', usetex=False):
             #mpl.rc('font',**{'family':'sans-serif','sans-serif':['Helvetica']})
             mpl.rc('font',**{'family':'serif','serif':['times']})
         mpl.rc('text.latex', unicode=True)
-    elif (outtype == 'png'):
+    elif (outtype == 'png') or (outtype == 'html') or (outtype == 'd3'):
         mpl.use('Agg') # set directly after import matplotlib
         import matplotlib.pyplot as plt
         mpl.rc('figure', figsize=(8.27,11.69)) # a4 portrait
@@ -166,13 +180,43 @@ def mc_template(infile=None, pngbase='', pdffile='', usetex=False):
     #
 
     if (outtype == 'pdf'):
+        if filename == '':
+            pdffile = __file__[0:__file__.rfind(".")] + '.pdf'
+        else:
+            pdffile = filename
         print('Plot PDF ', pdffile)
         pdf_pages = PdfPages(pdffile)
     elif (outtype == 'png'):
+        if filename == '':
+            pngbase = __file__[0:__file__.rfind(".")] + '_'
+        else:
+            pngbase = filename
         print('Plot PNG ', pngbase)
+    elif (outtype == 'd3'):
+        if filename == '':
+            htmlfile = __file__[0:__file__.rfind(".")] + '.html'
+        else:
+            htmlfile = filename
+        print('Plot D3 ', htmlfile)
+    elif (outtype == 'html'):
+        if filename == '':
+            htmlfile = __file__[0:__file__.rfind(".")] + '.html'
+        else:
+            htmlfile = filename
+        print('Plot HTML ', htmlfile)
     else:
         print('Plot X')
     # figsize = mpl.rcParams['figure.figsize']
+
+    if (outtype == 'html') or (outtype == 'd3'):
+        print('Write html file ', htmlfile)
+        fhtml = open(htmlfile,'w')
+        print('<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">', file=fhtml)
+        print("<html>", file=fhtml)
+        print("<head>", file=fhtml)
+        print("<title>"+__file__[0:__file__.rfind(".")]+"</title>", file=fhtml)
+        print("</head>", file=fhtml)
+        print("<body>", file=fhtml)
 
     ifig = 0
 
@@ -194,6 +238,12 @@ def mc_template(infile=None, pngbase='', pdffile='', usetex=False):
     iplot += 1
     xlab   = r'$(0,100)$'
     ylab   = r'$\sin(x)$'
+    # if (iplot == 0) | (outtype != 'pdf') | (outtype == 'png') | (outtype == 'html'):
+    #     sub  = fig.add_axes(ufz.position(nrow,ncol,iplot,hspace=hspace,vspace=vspace))
+    #     sub1 = sub
+    # else:
+    #     # special if windows or d3: zoom one panel zooms all panels
+    #     sub = fig.add_axes(ufz.position(nrow,ncol,iplot,hspace=hspace,vspace=vspace), sharex=sub1)
     sub    = fig.add_axes(ufz.position(nrow,ncol,iplot,hspace=hspace,vspace=vspace))
 
     mark1  = sub.plot(np.sin(np.arange(100)))
@@ -214,6 +264,7 @@ def mc_template(infile=None, pngbase='', pdffile='', usetex=False):
 
     ufz.abc2plot(sub, dxabc, dyabc, iplot, lower=True, bold=True, usetex=usetex, mathrm=True, parenthesis='close')
 
+    # save pages
     if (outtype == 'pdf'):
         pdf_pages.savefig(fig)
         plt.close(fig)
@@ -221,6 +272,16 @@ def mc_template(infile=None, pngbase='', pdffile='', usetex=False):
         pngfile = pngbase+"{0:04d}".format(ifig)+".png"
         fig.savefig(pngfile, transparent=transparent, bbox_inches=bbox_inches, pad_inches=pad_inches)
         plt.close(fig)
+    elif (outtype == 'html'):
+        pngfile = htmlfile[0:htmlfile.rfind(".")] + "_" + "{0:04d}".format(ifig)+".png"
+        fig.savefig(pngfile, transparent=transparent, bbox_inches=bbox_inches, pad_inches=pad_inches)
+        plt.close(fig)
+        print('<p><img src='+pngfile+'/></p>', file=fhtml)
+    elif (outtype == 'd3'):
+        #Does not work: mpld3.plugins.connect(fig, mpld3.plugins.LinkedBrush(line1))
+        d3str = mpld3.fig_to_html(fig)
+        plt.close(fig)
+        print(d3str, file=fhtml)
 
     # -------------------------------------------------------------------------
     # Fig 2
@@ -260,6 +321,7 @@ def mc_template(infile=None, pngbase='', pdffile='', usetex=False):
 
     ufz.abc2plot(sub, dxabc, dyabc, iplot, lower=True, bold=True, usetex=usetex, mathrm=True, parenthesis='close')
 
+    # save pages
     if (outtype == 'pdf'):
         pdf_pages.savefig(fig)
         plt.close(fig)
@@ -267,15 +329,30 @@ def mc_template(infile=None, pngbase='', pdffile='', usetex=False):
         pngfile = pngbase+"{0:04d}".format(ifig)+".png"
         fig.savefig(pngfile, transparent=transparent, bbox_inches=bbox_inches, pad_inches=pad_inches)
         plt.close(fig)
+    elif (outtype == 'html'):
+        pngfile = htmlfile[0:htmlfile.rfind(".")] + "_" + "{0:04d}".format(ifig)+".png"
+        fig.savefig(pngfile, transparent=transparent, bbox_inches=bbox_inches, pad_inches=pad_inches)
+        plt.close(fig)
+        print('<p><img src='+pngfile+'/></p>', file=fhtml)
+    elif (outtype == 'd3'):
+        #Does not work mpld3.plugins.connect(fig, mpld3.plugins.LinkedBrush(line1))
+        #mpld3.save_html(fig, d3file)
+        d3str = mpld3.fig_to_html(fig)
+        plt.close(fig)
+        print(d3str, file=fhtml)
 
     # -------------------------------------------------------------------------
     # Finished
     #
 
+    # close files or show windows
     if (outtype == 'pdf'):
         pdf_pages.close()
     elif (outtype == 'png'):
         pass
+    elif (outtype == 'html') or (outtype == 'd3'):
+        print("</body>\n</html>", file=fhtml)
+        fhtml.close()
     else:
         plt.show()
 
@@ -290,31 +367,32 @@ if __name__ == '__main__':
     #
 
     import argparse
-
-    pngbase = ''
-    pdffile = ''
-    usetex  = False
+    
+    filename = ''
+    usetex   = False
+    outtype  = ''
     parser  = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter,
                                       description='''This is the Python template for any new program of Matthias Cuntz.''')
-    parser.add_argument('-g', '--pngbase', action='store',
-                        default=pngbase, dest='pngbase', metavar='pngbase',
-                        help='Name basis for png output files (default: open screen window).')
-    parser.add_argument('-p', '--pdffile', action='store',
-                        default=pdffile, dest='pdffile', metavar='pdffile',
-                        help='Name of pdf output file (default: open screen window).')
-    parser.add_argument('-t', '--usetex', action='store_true', default=usetex, dest="usetex",
+    parser.add_argument('-f', '--filename', action='store',
+                        default=filename, dest='filename', metavar='filename',
+                        help='Name of output file if type is pdf, html or d3, '
+                        'and name basis if type is png (default: '+__file__[0:__file__.rfind(".")]+').')
+    parser.add_argument('-l', '--latex', action='store_true', default=usetex, dest="usetex",
                         help="Use LaTeX to render text in pdf.")
-    parser.add_argument('file', nargs='?', default=None, metavar='Input file',
+    parser.add_argument('-t', '--type', action='store',
+                        default=outtype, dest='outtype', metavar='output_type',
+                        help='Output type is pdf, png, html, or d3 (default: open screen windows).')
+    parser.add_argument('file', nargs='?', default=None, metavar='input_file',
                        help='Mandatory input file.')
 
-    args    = parser.parse_args()
-    pngbase = args.pngbase
-    pdffile = args.pdffile
-    usetex  = args.usetex
-    infile  = args.file
+    args     = parser.parse_args()
+    infile   = args.file
+    filename = args.filename
+    usetex   = args.usetex
+    outtype  = args.outtype
 
     del parser, args
 
     # Call routine
-    mc_template(infile, pngbase=pngbase, pdffile=pdffile, usetex=usetex)
-    
+    mc_template(infile, filename=filename, usetex=usetex, outtype=outtype)
+
