@@ -1,22 +1,22 @@
 #!/usr/bin/env python
 from __future__ import print_function
 """
-usage: mc_template.py [-h] [-f filename] [-l] [-t output_type] [input_file]
+usage: mc_template.py [-h] [-u] [-p plotname] [-t outtype] [infile]
 
 This is the Python template for any new program of Matthias Cuntz.
 
 positional arguments:
-  input_file            Mandatory input file.
+  infile                Mandatory input file.
 
 optional arguments:
   -h, --help            show this help message and exit
-  -f filename, --filename filename
-                        Name of output file if type is pdf, html or d3, and
-                        name basis if type is png (default: mc_template).
-  -l, --latex           Use LaTeX to render text in pdf.
-  -t output_type, --type output_type
+  -p plotname, --plotname plotname
+                        Name of plot output file for types pdf, html or d3,
+                        and name basis for type png (default: mc_template).
+  -t outtype, --type outtype
                         Output type is pdf, png, html, or d3 (default: open
                         screen windows).
+  -u, --usetex          Use LaTeX to render text in pdf, png and html.
 
 
 License
@@ -49,18 +49,18 @@ Modified, MC, Jul 2013 - optparse->argparse
           MC, Nov 2014 - script -> function
                        - pdf, png, html, or d3
 """
-def mc_template(infile=None, filename='', usetex=False, outtype=''):
+def mc_template(infile=None, plotname='', outtype='', usetex=False):
     """
     This is the Python template for any new program of Matthias Cuntz.
 
     positional arguments:
-      input_file            Mandatory input file.
+      infile                Mandatory input file.
 
     optional arguments:
-      filename              Name of output file if type is pdf, html or d3, and
+      plotname              Name of plot output file if type is pdf, html or d3, and
                             name basis if type is png (default: mc_template).
-      usetex                True: Use LaTeX to render text in pdf (default: False)
-      outputtype            Output type is pdf, png, html, or d3 (default: open screen windows).
+      outtype               Output type is pdf, png, html, or d3 (default: open screen windows).
+      usetex                True: Use LaTeX to render text in pdf, png, and html (default: False)
     """
     # Check input
     if (infile is None):
@@ -180,29 +180,29 @@ def mc_template(infile=None, filename='', usetex=False, outtype=''):
     #
 
     if (outtype == 'pdf'):
-        if filename == '':
+        if plotname == '':
             pdffile = __file__[0:__file__.rfind(".")] + '.pdf'
         else:
-            pdffile = filename
+            pdffile = plotname
         print('Plot PDF ', pdffile)
         pdf_pages = PdfPages(pdffile)
     elif (outtype == 'png'):
-        if filename == '':
+        if plotname == '':
             pngbase = __file__[0:__file__.rfind(".")] + '_'
         else:
-            pngbase = filename
+            pngbase = plotname
         print('Plot PNG ', pngbase)
     elif (outtype == 'd3'):
-        if filename == '':
+        if plotname == '':
             htmlfile = __file__[0:__file__.rfind(".")] + '.html'
         else:
-            htmlfile = filename
+            htmlfile = plotname
         print('Plot D3 ', htmlfile)
     elif (outtype == 'html'):
-        if filename == '':
+        if plotname == '':
             htmlfile = __file__[0:__file__.rfind(".")] + '.html'
         else:
-            htmlfile = filename
+            htmlfile = plotname
         print('Plot HTML ', htmlfile)
     else:
         print('Plot X')
@@ -368,31 +368,30 @@ if __name__ == '__main__':
 
     import argparse
     
-    filename = ''
-    usetex   = False
+    plotname = ''
     outtype  = ''
+    usetex   = False
     parser  = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter,
                                       description='''This is the Python template for any new program of Matthias Cuntz.''')
-    parser.add_argument('-f', '--filename', action='store',
-                        default=filename, dest='filename', metavar='filename',
-                        help='Name of output file if type is pdf, html or d3, '
-                        'and name basis if type is png (default: '+__file__[0:__file__.rfind(".")]+').')
-    parser.add_argument('-l', '--latex', action='store_true', default=usetex, dest="usetex",
-                        help="Use LaTeX to render text in pdf.")
+    parser.add_argument('-p', '--plotname', action='store',
+                        default=plotname, dest='plotname', metavar='plotname',
+                        help='Name of plot output file for types pdf, html or d3, '
+                        'and name basis for type png (default: '+__file__[0:__file__.rfind(".")]+').')
     parser.add_argument('-t', '--type', action='store',
-                        default=outtype, dest='outtype', metavar='output_type',
+                        default=outtype, dest='outtype', metavar='outtype',
                         help='Output type is pdf, png, html, or d3 (default: open screen windows).')
-    parser.add_argument('file', nargs='?', default=None, metavar='input_file',
+    parser.add_argument('-u', '--usetex', action='store_true', default=usetex, dest="usetex",
+                        help="Use LaTeX to render text in pdf, png and html.")
+    parser.add_argument('file', nargs='?', default=None, metavar='infile',
                        help='Mandatory input file.')
 
     args     = parser.parse_args()
     infile   = args.file
-    filename = args.filename
-    usetex   = args.usetex
+    plotname = args.plotname
     outtype  = args.outtype
+    usetex   = args.usetex
 
     del parser, args
 
     # Call routine
-    mc_template(infile, filename=filename, usetex=usetex, outtype=outtype)
-
+    mc_template(infile, plotname=plotname, outtype=outtype, usetex=usetex)
