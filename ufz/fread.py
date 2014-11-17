@@ -277,6 +277,7 @@ def fread(file, nc=0, skip=0, cskip=0, separator='',
                   MC, Oct 2012 - treat NaN and Inf
                   MC, Feb 2013 - ported to Python 3
                   MC, Oct 2013 - fill_value in empty cells
+                  MC, Nov 2014 - bug when nc was list and contained 0
     """
     #
     # Determine number of lines in file.
@@ -335,16 +336,16 @@ def fread(file, nc=0, skip=0, cskip=0, separator='',
     count += 1
     #
     # Determine indices
-    if nc == 0:
-        nnc = nres-cskip
-        iinc = np.arange(nnc, dtype='int') + cskip
+    if isinstance(nc, (list, np.ndarray)):
+        nnc = len(nc)
+        iinc = nc
     else:
-        if type(nc) == type(0):
-            nnc = nc
+        if nc == 0:
+            nnc = nres-cskip
             iinc = np.arange(nnc, dtype='int') + cskip
         else:
-            nnc = len(nc)
-            iinc = nc
+            nnc = nc
+            iinc = np.arange(nnc, dtype='int') + cskip
     miinc = max(iinc)
     #
     # Header
