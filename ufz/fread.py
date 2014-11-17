@@ -277,7 +277,7 @@ def fread(file, nc=0, skip=0, cskip=0, separator='',
                   MC, Oct 2012 - treat NaN and Inf
                   MC, Feb 2013 - ported to Python 3
                   MC, Oct 2013 - fill_value in empty cells
-                  MC, Nov 2014 - bug when nc was list and contained 0
+                  MC, Nov 2014 - bug when nc is list and contains 0
     """
     #
     # Determine number of lines in file.
