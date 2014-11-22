@@ -3,7 +3,7 @@ from __future__ import print_function
 import numpy as np
 from ufz.lif import lif
 
-def sread(file, nc=0, skip=0, cskip=0, separator='',
+def sread(file, nc=0, skip=0, cskip=0, hskip=0, separator='',
           squeeze=False, reform=False, skip_blank=False, comment='',
           fill=False, fill_value='', strip=None,
           header=False, full_header=False,
@@ -21,7 +21,7 @@ def sread(file, nc=0, skip=0, cskip=0, separator='',
 
         Definition
         ----------
-        def sread(file, nc=0, skip=0, cskip=0, separator='',
+        def sread(file, nc=0, skip=0, cskip=0, hskip=0, separator='',
                   squeeze=False, reform=False, skip_blank=False, comment='',
                   fill=False, fill_value='', strip=None,
                   header=False, full_header=False,
@@ -45,6 +45,7 @@ def sread(file, nc=0, skip=0, cskip=0, separator='',
                        the file (default 0)
         cskip        number of columns to skip at the beginning of
                        each line (default 0)
+        hskip        number of lines in skip that do not belong to header (default 0)
         comment      line gets excluded if first character of line is
                       in comment sequence
                      sequence can be e.g. string, list or tuple
@@ -100,7 +101,7 @@ def sread(file, nc=0, skip=0, cskip=0, separator='',
         --------
         >>> # Create some data
         >>> filename = 'test.dat'
-        >>> file = open(filename,'w')
+        >>> file = open(filename, 'w')
         >>> file.writelines('head1 head2 head3 head4\\n')
         >>> file.writelines('1.1 1.2 1.3 1.4\\n')
         >>> file.writelines('2.1 2.2 2.3 2.4\\n')
@@ -108,95 +109,112 @@ def sread(file, nc=0, skip=0, cskip=0, separator='',
 
         >>> # Read sample file in different ways
         >>> # data
-        >>> print(sread(filename,skip=1))
+        >>> print(sread(filename, skip=1))
         [['1.1', '1.2', '1.3', '1.4'], ['2.1', '2.2', '2.3', '2.4']]
-        >>> print(sread(filename,skip=2))
+        >>> print(sread(filename, skip=2))
         ['2.1', '2.2', '2.3', '2.4']
-        >>> print(sread(filename,skip=1,cskip=1))
+        >>> print(sread(filename, skip=1, cskip=1))
         [['1.2', '1.3', '1.4'], ['2.2', '2.3', '2.4']]
-        >>> print(sread(filename,nc=2,skip=1,cskip=1))
+        >>> print(sread(filename, nc=2, skip=1, cskip=1))
         [['1.2', '1.3'], ['2.2', '2.3']]
-        >>> print(sread(filename,nc=[1,3],skip=1))
+        >>> print(sread(filename, nc=[1,3], skip=1))
         [['1.2', '1.4'], ['2.2', '2.4']]
-        >>> print(sread(filename,nc=1,skip=1))
+        >>> print(sread(filename, nc=1, skip=1))
         [['1.1'], ['2.1']]
-        >>> print(sread(filename,nc=1,skip=1,reform=True))
+        >>> print(sread(filename, nc=1, skip=1, reform=True))
         ['1.1', '2.1']
 
         >>> # header
-        >>> print(sread(filename,nc=2,skip=1,header=True))
+        >>> print(sread(filename, nc=2, skip=1, header=True))
         ['head1', 'head2']
-        >>> print(sread(filename,nc=2,skip=1,header=True,full_header=True))
+        >>> print(sread(filename, nc=2, skip=1, header=True, full_header=True))
         ['head1 head2 head3 head4']
-        >>> print(sread(filename,nc=1,skip=2,header=True))
+        >>> print(sread(filename, nc=1, skip=2, header=True))
         [['head1'], ['1.1']]
-        >>> print(sread(filename,nc=1,skip=2,header=True,squeeze=True))
+        >>> print(sread(filename, nc=1, skip=2, header=True, squeeze=True))
         ['head1', '1.1']
-        >>> print(sread(filename,nc=1,skip=2,header=True,squeeze=True,strarr=True))
+        >>> print(sread(filename, nc=1, skip=2, header=True, squeeze=True, strarr=True))
         ['head1' '1.1']
-        >>> print(sread(filename,nc=1,skip=2,header=True,squeeze=True,transpose=True))
+        >>> print(sread(filename, nc=1, skip=2, header=True, squeeze=True, transpose=True))
         ['head1', '1.1']
 
         >>> # skip blank lines
-        >>> file = open(filename,'a')
+        >>> file = open(filename, 'a')
         >>> file.writelines('\\n')
         >>> file.writelines('3.1 3.2 3.3 3.4\\n')
         >>> file.close()
-        >>> print(sread(filename,skip=1))
+        >>> print(sread(filename, skip=1))
         [['1.1', '1.2', '1.3', '1.4'], ['2.1', '2.2', '2.3', '2.4']]
-        >>> print(sread(filename,skip=1,skip_blank=True))
+        >>> print(sread(filename, skip=1, skip_blank=True))
         [['1.1', '1.2', '1.3', '1.4'], ['2.1', '2.2', '2.3', '2.4'], ['3.1', '3.2', '3.3', '3.4']]
-        >>> print(sread(filename,skip=1,strarr=True))
+        >>> print(sread(filename, skip=1, strarr=True))
         [['1.1' '1.2' '1.3' '1.4']
          ['2.1' '2.2' '2.3' '2.4']]
 
-        >>> print(sread(filename,skip=1,strarr=True,transpose=True))
+        >>> print(sread(filename, skip=1, strarr=True, transpose=True))
         [['1.1' '2.1']
          ['1.2' '2.2']
          ['1.3' '2.3']
          ['1.4' '2.4']]
-        >>> print(sread(filename,skip=1,transpose=True))
+        >>> print(sread(filename, skip=1, transpose=True))
         [['1.1', '2.1'], ['1.2', '2.2'], ['1.3', '2.3'], ['1.4', '2.4']]
 
         >>> # skip comment lines
-        >>> file = open(filename,'a')
+        >>> file = open(filename, 'a')
         >>> file.writelines('# First\\n')
         >>> file.writelines('! Second second comment\\n')
         >>> file.writelines('4.1 4.2 4.3 4.4\\n')
         >>> file.close()
-        >>> print(sread(filename,skip=1))
+        >>> print(sread(filename, skip=1))
         [['1.1', '1.2', '1.3', '1.4'], ['2.1', '2.2', '2.3', '2.4']]
-        >>> sread(filename,skip=1,skip_blank=True)
+        >>> sread(filename, skip=1, skip_blank=True)
         SREAD: Line has not enough columns to be indexed: # First
-        >>> sread(filename,skip=1,skip_blank=True,quiet=True)
-        >>> print(sread(filename,skip=1,skip_blank=True,fill=True,fill_value='M'))
+        >>> sread(filename, skip=1, skip_blank=True, quiet=True)
+        >>> print(sread(filename, skip=1, skip_blank=True, fill=True, fill_value='M'))
         [['1.1', '1.2', '1.3', '1.4'], ['2.1', '2.2', '2.3', '2.4'], ['3.1', '3.2', '3.3', '3.4'], ['#', 'First', 'M', 'M'], ['!', 'Second', 'second', 'comment'], ['4.1', '4.2', '4.3', '4.4']]
-        >>> print(sread(filename,skip=1,skip_blank=True,comment='#'))
+        >>> print(sread(filename, skip=1, skip_blank=True, comment='#'))
         [['1.1', '1.2', '1.3', '1.4'], ['2.1', '2.2', '2.3', '2.4'], ['3.1', '3.2', '3.3', '3.4'], ['!', 'Second', 'second', 'comment'], ['4.1', '4.2', '4.3', '4.4']]
-        >>> print(sread(filename,skip=1,skip_blank=True,comment='#!'))
+        >>> print(sread(filename, skip=1, skip_blank=True, comment='#!'))
         [['1.1', '1.2', '1.3', '1.4'], ['2.1', '2.2', '2.3', '2.4'], ['3.1', '3.2', '3.3', '3.4'], ['4.1', '4.2', '4.3', '4.4']]
-        >>> print(sread(filename,skip=1,skip_blank=True,comment=('#','!')))
+        >>> print(sread(filename, skip=1, skip_blank=True, comment=('#','!')))
         [['1.1', '1.2', '1.3', '1.4'], ['2.1', '2.2', '2.3', '2.4'], ['3.1', '3.2', '3.3', '3.4'], ['4.1', '4.2', '4.3', '4.4']]
-        >>> print(sread(filename,skip=1,skip_blank=True,comment=['#','!']))
+        >>> print(sread(filename, skip=1, skip_blank=True, comment=['#','!']))
         [['1.1', '1.2', '1.3', '1.4'], ['2.1', '2.2', '2.3', '2.4'], ['3.1', '3.2', '3.3', '3.4'], ['4.1', '4.2', '4.3', '4.4']]
 
         >>> # Create some more data with escaped numbers
         >>> filename2 = 'test2.dat'
-        >>> file = open(filename2,'w')
+        >>> file = open(filename2, 'w')
         >>> file.writelines('"head1" "head2" "head3" "head4"\\n')
         >>> file.writelines('"1.1" "1.2" "1.3" "1.4"\\n')
         >>> file.writelines('2.1 nan Inf "NaN"\\n')
         >>> file.close()
-        >>> print(sread(filename2,skip=1,strarr=True,transpose=True,strip='"'))
+        >>> print(sread(filename2, skip=1, strarr=True, transpose=True, strip='"'))
         [['1.1' '2.1']
          ['1.2' 'nan']
          ['1.3' 'Inf']
          ['1.4' 'NaN']]
 
+        >>> # Create some more data with an extra (shorter) header line
+        >>> filename3 = 'test3.dat'
+        >>> file = open(filename3, 'w')
+        >>> file.writelines('Extra header\\n')
+        >>> file.writelines('head1 head2 head3 head4\\n')
+        >>> file.writelines('1.1 1.2 1.3 1.4\\n')
+        >>> file.writelines('2.1 2.2 2.3 2.4\\n')
+        >>> file.close()
+
+        >>> print(sread(filename3, skip=2))
+        [['1.1', '1.2', '1.3', '1.4'], ['2.1', '2.2', '2.3', '2.4']]
+        >>> print(sread(filename3, skip=2, hskip=1))
+        [['1.1', '1.2', '1.3', '1.4'], ['2.1', '2.2', '2.3', '2.4']]
+        >>> print(sread(filename3, nc=2, skip=2, hskip=1, header=True))
+        ['head1', 'head2']
+
         >>> # Clean up doctest
         >>> import os
         >>> os.remove(filename)
         >>> os.remove(filename2)
+        >>> os.remove(filename3)
 
 
         License
@@ -225,6 +243,8 @@ def sread(file, nc=0, skip=0, cskip=0, separator='',
         Written,  MC, Jul 2009
         Modified, MC, Feb 2012 - transpose
                   MC, Feb 2013 - ported to Python 3
+                  MC, Nov 2014 - bug when nc is list and contains 0
+                  MC, Nov 2014 - hskip
     """
     #
     # Determine number of lines in file.
@@ -244,10 +264,15 @@ def sread(file, nc=0, skip=0, cskip=0, separator='',
     #
     # Read header and Skip lines
     count = 0
+    if hskip > 0:
+        ihskip = 0
+        while ihskip < hskip:
+            tmp = f.readline().rstrip()
+            ihskip += 1
     if skip > 0:
-        head = ['']*skip
+        head = ['']*(skip-hskip)
         iskip = 0
-        while iskip < skip:
+        while iskip < (skip-hskip):
             head[iskip] = f.readline().rstrip()
             iskip += 1
     #
@@ -285,28 +310,28 @@ def sread(file, nc=0, skip=0, cskip=0, separator='',
         nres = len(res)
     count += 1
     #
-    # Determine indeces
-    if nc == 0:
-        nnc = nres-cskip
-        iinc = np.arange(nnc, dtype='int') + cskip
+    # Determine indices
+    if isinstance(nc, (list, np.ndarray)):
+        nnc = len(nc)
+        iinc = nc
     else:
-        if type(nc) == type(0):
-            nnc = nc
+        if nc == 0:
+            nnc = nres-cskip
             iinc = np.arange(nnc, dtype='int') + cskip
         else:
-            nnc = len(nc)
-            iinc = nc
+            nnc = nc
+            iinc = np.arange(nnc, dtype='int') + cskip
     miinc = max(iinc)
     #
     # Header
     if header:
         # Split header
         var = None
-        if skip > 0:
+        if (skip-hskip) > 0:
             if full_header:
                 var = head
             else:
-                if skip == 1:
+                if (skip-hskip) == 1:
                     hres = head[0].split(sep)
                     nhres = len(hres)
                     if miinc >= nhres:
@@ -335,7 +360,7 @@ def sread(file, nc=0, skip=0, cskip=0, separator='',
                 else:
                     var = ['']
                     k = 0
-                    while k < skip:
+                    while k < (skip-hskip):
                         hres = head[k].split(sep)
                         nhres = len(hres)
                         if miinc >= nhres:

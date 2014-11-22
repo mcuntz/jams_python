@@ -3,22 +3,25 @@ from __future__ import print_function
 import numpy as np
 from ufz.lif import lif
 
-def fread(file, nc=0, skip=0, cskip=0, separator='',
+def fread(file, nc=0, skip=0, cskip=0, hskip=0, separator='',
           squeeze=False, reform=False, skip_blank=False, comment='',
           fill=False, fill_value=0, strip=None,
           header=False, full_header=False,
           transpose=False, strarr=False):
     """
         Read numbers into float array from a file.
+        
         Lines or columns can be skipped.
         Columns can also be picked specifically.
+        
         Blank (only whitespace) and comment lines can be excluded.
+        
         The header of the file can be read separately.
 
 
         Definition
         ----------
-        def fread(file, nc=0, skip=0, cskip=0, separator='',
+        def fread(file, nc=0, skip=0, cskip=0, hskip=0, separator='',
                   squeeze=False, reform=False, skip_blank=False, comment='',
                   fill=False, fill_value=0, strip=None,
                   header=False, full_header=False,
@@ -42,6 +45,7 @@ def fread(file, nc=0, skip=0, cskip=0, separator='',
                      the file (default 0)
         cskip        number of columns to skip at the beginning of
                      each line (default 0)
+        hskip        number of lines in skip that do not belong to header (default 0)
         comment      line gets excluded if first character of line is
                      in comment sequence
                      sequence can be e.g. string, list or tuple
@@ -104,97 +108,97 @@ def fread(file, nc=0, skip=0, cskip=0, separator='',
         >>> # Read sample file in different ways
         >>> # data
         >>> from autostring import astr
-        >>> print(astr(fread(filename,skip=1),1,pp=True))
+        >>> print(astr(fread(filename, skip=1), 1, pp=True))
         [['1.1' '1.2' '1.3' '1.4']
          ['2.1' '2.2' '2.3' '2.4']]
-        >>> print(astr(fread(filename,skip=2),1,pp=True))
+        >>> print(astr(fread(filename, skip=2), 1, pp=True))
         [['2.1' '2.2' '2.3' '2.4']]
-        >>> print(astr(fread(filename,skip=1,cskip=1),1,pp=True))
+        >>> print(astr(fread(filename, skip=1, cskip=1), 1, pp=True))
         [['1.2' '1.3' '1.4']
          ['2.2' '2.3' '2.4']]
-        >>> print(astr(fread(filename,nc=2,skip=1,cskip=1),1,pp=True))
+        >>> print(astr(fread(filename, nc=2, skip=1, cskip=1), 1, pp=True))
         [['1.2' '1.3']
          ['2.2' '2.3']]
-        >>> print(astr(fread(filename,nc=[1,3],skip=1),1,pp=True))
+        >>> print(astr(fread(filename, nc=[1,3], skip=1), 1, pp=True))
         [['1.2' '1.4']
          ['2.2' '2.4']]
-        >>> print(astr(fread(filename,nc=1,skip=1),1,pp=True))
+        >>> print(astr(fread(filename, nc=1, skip=1), 1, pp=True))
         [['1.1']
          ['2.1']]
-        >>> print(astr(fread(filename,nc=1,skip=1,reform=True),1,pp=True))
+        >>> print(astr(fread(filename, nc=1, skip=1, reform=True), 1, pp=True))
         ['1.1' '2.1']
 
         >>> # header
-        >>> print(fread(filename,nc=2,skip=1,header=True))
+        >>> print(fread(filename, nc=2, skip=1, header=True))
         ['head1', 'head2']
-        >>> print(fread(filename,nc=2,skip=1,header=True,full_header=True))
+        >>> print(fread(filename, nc=2, skip=1, header=True, full_header=True))
         ['head1 head2 head3 head4']
-        >>> print(fread(filename,nc=1,skip=2,header=True))
+        >>> print(fread(filename, nc=1, skip=2, header=True))
         [['head1'], ['1.1']]
-        >>> print(fread(filename,nc=1,skip=2,header=True,squeeze=True))
+        >>> print(fread(filename, nc=1, skip=2, header=True, squeeze=True))
         ['head1', '1.1']
-        >>> print(fread(filename,nc=1,skip=2,header=True,strarr=True))
+        >>> print(fread(filename, nc=1, skip=2, header=True, strarr=True))
         [['head1']
          ['1.1']]
 
         >>> # skip blank lines
-        >>> file = open(filename,'a')
+        >>> file = open(filename, 'a')
         >>> file.writelines('\\n')
         >>> file.writelines('3.1 3.2 3.3 3.4\\n')
         >>> file.close()
-        >>> print(astr(fread(filename,skip=1),1,pp=True))
+        >>> print(astr(fread(filename, skip=1), 1, pp=True))
         [['1.1' '1.2' '1.3' '1.4']
          ['2.1' '2.2' '2.3' '2.4']]
-        >>> print(astr(fread(filename,skip=1,skip_blank=True),1,pp=True))
+        >>> print(astr(fread(filename, skip=1, skip_blank=True), 1, pp=True))
         [['1.1' '1.2' '1.3' '1.4']
          ['2.1' '2.2' '2.3' '2.4']
          ['3.1' '3.2' '3.3' '3.4']]
 
         >>> # skip comment lines
-        >>> file = open(filename,'a')
+        >>> file = open(filename, 'a')
         >>> file.writelines('# First comment\\n')
         >>> file.writelines('! Second 2 comment\\n')
         >>> file.writelines('4.1 4.2 4.3 4.4\\n')
         >>> file.close()
-        >>> print(astr(fread(filename,skip=1),1,pp=True))
+        >>> print(astr(fread(filename, skip=1), 1, pp=True))
         [['1.1' '1.2' '1.3' '1.4']
          ['2.1' '2.2' '2.3' '2.4']]
-        >>> fread(filename,skip=1,skip_blank=True)
+        >>> fread(filename, skip=1, skip_blank=True)
         FREAD: Line has not enough columns to be indexed: # First comment
-        >>> fread(filename,skip=1,skip_blank=True,comment='#')
+        >>> fread(filename, skip=1, skip_blank=True, comment='#')
         FREAD: Requested elements not all numbers: ['!', 'Second', '2', 'comment']
-        >>> print(astr(fread(filename,skip=1,nc=[2],skip_blank=True,comment='#'),1,pp=True))
+        >>> print(astr(fread(filename, skip=1, nc=[2], skip_blank=True, comment='#'), 1, pp=True))
         [['1.3']
          ['2.3']
          ['3.3']
          ['2.0']
          ['4.3']]
-        >>> print(astr(fread(filename,skip=1,skip_blank=True,comment='#!'),1,pp=True))
+        >>> print(astr(fread(filename, skip=1, skip_blank=True, comment='#!'), 1, pp=True))
         [['1.1' '1.2' '1.3' '1.4']
          ['2.1' '2.2' '2.3' '2.4']
          ['3.1' '3.2' '3.3' '3.4']
          ['4.1' '4.2' '4.3' '4.4']]
-        >>> print(astr(fread(filename,skip=1,skip_blank=True,comment=('#','!')),1,pp=True))
+        >>> print(astr(fread(filename, skip=1, skip_blank=True, comment=('#','!')), 1, pp=True))
         [['1.1' '1.2' '1.3' '1.4']
          ['2.1' '2.2' '2.3' '2.4']
          ['3.1' '3.2' '3.3' '3.4']
          ['4.1' '4.2' '4.3' '4.4']]
-        >>> print(astr(fread(filename,skip=1,skip_blank=True,comment=['#','!']),1,pp=True))
+        >>> print(astr(fread(filename, skip=1, skip_blank=True, comment=['#','!']), 1, pp=True))
         [['1.1' '1.2' '1.3' '1.4']
          ['2.1' '2.2' '2.3' '2.4']
          ['3.1' '3.2' '3.3' '3.4']
          ['4.1' '4.2' '4.3' '4.4']]
 
         >>> # fill missing columns
-        >>> file = open(filename,'a')
+        >>> file = open(filename, 'a')
         >>> file.writelines('5.1 5.2\\n')
         >>> file.close()
-        >>> print(astr(fread(filename,skip=1),1,pp=True))
+        >>> print(astr(fread(filename, skip=1), 1, pp=True))
         [['1.1' '1.2' '1.3' '1.4']
          ['2.1' '2.2' '2.3' '2.4']]
-        >>> fread(filename,skip=1,skip_blank=True,comment='#!')
+        >>> fread(filename, skip=1, skip_blank=True, comment='#!')
         FREAD: Line has not enough columns to be indexed: 5.1 5.2
-        >>> print(astr(fread(filename,skip=1,skip_blank=True,comment='#!',fill=True,fill_value=-1),1,pp=True))
+        >>> print(astr(fread(filename, skip=1, skip_blank=True, comment='#!', fill=True, fill_value=-1), 1, pp=True))
         [[' 1.1' ' 1.2' ' 1.3' ' 1.4']
          [' 2.1' ' 2.2' ' 2.3' ' 2.4']
          [' 3.1' ' 3.2' ' 3.3' ' 3.4']
@@ -202,10 +206,10 @@ def fread(file, nc=0, skip=0, cskip=0, separator='',
          [' 5.1' ' 5.2' '-1.0' '-1.0']]
 
         >>> # transpose
-        >>> print(astr(fread(filename,skip=1),1,pp=True))
+        >>> print(astr(fread(filename, skip=1), 1, pp=True))
         [['1.1' '1.2' '1.3' '1.4']
          ['2.1' '2.2' '2.3' '2.4']]
-        >>> print(astr(fread(filename,skip=1,transpose=True),1,pp=True))
+        >>> print(astr(fread(filename, skip=1, transpose=True), 1, pp=True))
         [['1.1' '2.1']
          ['1.2' '2.2']
          ['1.3' '2.3']
@@ -213,14 +217,14 @@ def fread(file, nc=0, skip=0, cskip=0, separator='',
 
         >>> # Create some more data with Nan and Inf
         >>> filename1 = 'test1.dat'
-        >>> file = open(filename1,'w')
+        >>> file = open(filename1, 'w')
         >>> file.writelines('head1 head2 head3 head4\\n')
         >>> file.writelines('1.1 1.2 1.3 1.4\\n')
         >>> file.writelines('2.1 nan Inf "NaN"\\n')
         >>> file.close()
 
         >>> # Treat Nan and Inf with automatic strip of " and '
-        >>> print(astr(fread(filename1,skip=1,transpose=True),1,pp=True))
+        >>> print(astr(fread(filename1, skip=1, transpose=True), 1, pp=True))
         [['1.1' '2.1']
          ['1.2' 'nan']
          ['1.3' 'inf']
@@ -228,24 +232,40 @@ def fread(file, nc=0, skip=0, cskip=0, separator='',
 
         >>> # Create some more data with escaped numbers
         >>> filename2 = 'test2.dat'
-        >>> file = open(filename2,'w')
+        >>> file = open(filename2, 'w')
         >>> file.writelines('head1 head2 head3 head4\\n')
         >>> file.writelines('"1.1" "1.2" "1.3" "1.4"\\n')
         >>> file.writelines('2.1 nan Inf "NaN"\\n')
         >>> file.close()
 
         >>> # Strip
-        >>> print(astr(fread(filename2, skip=1, transpose=True, strip='"'),1,pp=True))
+        >>> print(astr(fread(filename2,  skip=1,  transpose=True,  strip='"'), 1, pp=True))
         [['1.1' '2.1']
          ['1.2' 'nan']
          ['1.3' 'inf']
          ['1.4' 'nan']]
+
+        >>> # Create some more data with an extra (shorter) header line
+        >>> filename3 = 'test3.dat'
+        >>> file = open(filename3, 'w')
+        >>> file.writelines('Extra header\\n')
+        >>> file.writelines('head1 head2 head3 head4\\n')
+        >>> file.writelines('1.1 1.2 1.3 1.4\\n')
+        >>> file.writelines('2.1 2.2 2.3 2.4\\n')
+        >>> file.close()
+
+        >>> print(astr(fread(filename3, skip=2, hskip=1), 1, pp=True))
+        [['1.1' '1.2' '1.3' '1.4']
+         ['2.1' '2.2' '2.3' '2.4']]
+        >>> print(fread(filename3, nc=2, skip=2, hskip=1, header=True))
+        ['head1', 'head2']
 
         >>> # Clean up doctest
         >>> import os
         >>> os.remove(filename)
         >>> os.remove(filename1)
         >>> os.remove(filename2)
+        >>> os.remove(filename3)
 
 
         License
@@ -278,6 +298,7 @@ def fread(file, nc=0, skip=0, cskip=0, separator='',
                   MC, Feb 2013 - ported to Python 3
                   MC, Oct 2013 - fill_value in empty cells
                   MC, Nov 2014 - bug when nc is list and contains 0
+                  MC, Nov 2014 - hskip
     """
     #
     # Determine number of lines in file.
@@ -292,12 +313,17 @@ def fread(file, nc=0, skip=0, cskip=0, separator='',
     except IOError:
         raise IOError('Cannot open file '+file)
     #
-    # Read header and Skip lines
+    # Skip lines and read header
     count = 0
+    if hskip > 0:
+        ihskip = 0
+        while ihskip < hskip:
+            tmp = f.readline().rstrip()
+            ihskip += 1
     if skip > 0:
-        head = ['']*skip
+        head = ['']*(skip-hskip)
         iskip = 0
-        while iskip < skip:
+        while iskip < (skip-hskip):
             head[iskip] = f.readline().rstrip()
             iskip += 1
     #
@@ -356,11 +382,11 @@ def fread(file, nc=0, skip=0, cskip=0, separator='',
         else:
             fillit = fill_value
         var = None
-        if skip > 0:
+        if (skip-hskip) > 0:
             if full_header:
                 var = head
             else:
-                if skip == 1:
+                if (skip-hskip) == 1:
                     hres = head[0].split(sep)
                     nhres = len(hres)
                     if miinc >= nhres:
@@ -386,7 +412,7 @@ def fread(file, nc=0, skip=0, cskip=0, separator='',
                 else:
                     var = ['']
                     k = 0
-                    while k < skip:
+                    while k < (skip-hskip):
                         hres = head[k].split(sep)
                         nhres = len(hres)
                         if miinc >= nhres:
