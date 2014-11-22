@@ -52,6 +52,7 @@
     hdfread                Wrapper for readhdf.
     hdf4read               Wrapper for readhdf4.
     hdf5read               Wrapper for readhdf5.
+    head                   Return list with first n lines of file.
     heaviside              Heaviside (or unit step) operator.
     homo_sampling          Generation of homogeneous, randomly distributed points in a given rectangular area.
     in_poly                Determines whether a 2D point falls in a polygon.
@@ -74,6 +75,7 @@
     netcdfread             Wrapper for readnetcdf.
     outlier                Rossner''s extreme standardized deviate outlier test.
     pack                   Similar to Fortran pack function with mask.
+    pca                    Principal component analysis (PCA) upon the first dimension of an 2D-array.
     pi                     Parameter importance index PI or alternatively B index calculation.
     plot_brewer            Plots available Brewer color maps in pdf file.
     position               Position arrays of subplots to be used with add_axes.
@@ -145,6 +147,7 @@
     Ascii files
     -----------
     fread                  Reads in float array from ascii file.
+    head                   Return list with first n lines of file.
     lif                    Count number of lines in file.
     sread                  Reads in string array from ascii file.
 
@@ -161,6 +164,7 @@
     mad                    Median absolute deviation test.
     means                  Calculate daily, monthly, yearly, etc. means of data depending on date stamp.
     outlier                Rossner''s extreme standardized deviate outlier test.
+    pca                    Principal component analysis (PCA) upon the first dimension of an 2D-array.
     rossner                Wrapper for outlier.
     t2sap                  Conversion of temperature difference to sap flux density.
     savitzky_golay         Smooth (and optionally differentiate) 1D data with a Savitzky-Golay filter.
@@ -414,6 +418,7 @@
               AP, Sep 2014 - eddysuite
               MC, Oct 2014 - module -> package
               MC, Oct 2014 - clockplot, ellipse_area, savez, savez_compressed, grid_mid2edge, tee
+              MC, Nov 2014 - pca, head
 """
 from __future__ import print_function
 
@@ -457,6 +462,7 @@ except ImportError:
 from .get_angle         import get_angle
 from .get_nearest       import get_nearest
 from .grid_mid2edge     import grid_mid2edge
+from .head              import head
 from .heaviside         import heaviside
 from .homo_sampling     import homo_sampling
 from .in_poly           import in_poly, inpoly
@@ -478,6 +484,7 @@ try:
 except:
     print("No extra statistics in scipy, i.e. in UFZ package. Disabled functions: outlier, rossner.")
 from .pack              import pack
+from .pca               import pca, check_pca
 from .pi                import pi
 from .position          import position
 from .readhdf           import readhdf, hdfread

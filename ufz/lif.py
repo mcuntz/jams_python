@@ -4,7 +4,8 @@ import string
 
 def lif(file, noblank=False, comment='', skip=0, maxcol=False):
     """
-        Counts the numer of lines in a file.
+        Count number of lines in a file.
+        
         Blank (only whitespace) and comment lines can be excluded.
 
 
@@ -21,16 +22,16 @@ def lif(file, noblank=False, comment='', skip=0, maxcol=False):
         Optional input parameters
         -------------------------
         comment      line gets excluded if first character of line is
-                      in comment sequence
-                     sequence can be e.g. string, list or tuple
+                     in comment sequence.
+                     Sequence can be string, list or tuple
         skip         number of lines to skip at the beginning of
-                       the file (default 0)
+                     the file (default 0)
 
 
         Options
         -------
-        noblank      excludes all lines that consists only of
-                       whitespace characters
+        noblank      if True, exclude all lines that consists only of
+                     whitespace characters
         maxcol       if True, return also maximum amount of characters in one line
 
 
@@ -104,7 +105,7 @@ def lif(file, noblank=False, comment='', skip=0, maxcol=False):
         along with the UFZ makefile project (cf. gpl.txt and lgpl.txt).
         If not, see <http://www.gnu.org/licenses/>.
 
-        Copyright 2009-2013 Matthias Cuntz
+        Copyright 2009-2014 Matthias Cuntz
 
 
         History
@@ -129,20 +130,20 @@ def lif(file, noblank=False, comment='', skip=0, maxcol=False):
     if noblank and (comment != ''):        # exclude blank, exclude comment
         for line in f:
             ll    = line
-            imax += [len(ll)]
+            imax.append(len(ll))
             l     = ll.strip(string.whitespace)
             if (l != ''):
                 if (l[0] not in comment): count += 1
     elif noblank and (comment == ''):      # exclude blank, include comment
         for line in f:
             ll    = line
-            imax += [len(ll)]
+            imax.append(len(ll))
             l     = ll.strip(string.whitespace)
             if (l != ''): count += 1
     elif (not noblank) and (comment != ''):# include blank, exclude comment
         for line in f:
             ll    = line
-            imax += [len(ll)]
+            imax.append(len(ll))
             l     = ll.strip(string.whitespace)
             if (l == ''):
                 count += 1
@@ -150,7 +151,7 @@ def lif(file, noblank=False, comment='', skip=0, maxcol=False):
                 if (l[0] not in comment): count += 1
     else:                                  # include blank, include comment
         for line in f:
-            imax += [len(line)]
+            imax.append(len(line))
         count = len(imax)
     f.close()
 
