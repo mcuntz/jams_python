@@ -45,6 +45,7 @@
     find_in_path           Look for file in system path.
     fread                  Reads in float array from ascii file.
     functions              Common functions that are used in curve_fit or fmin parameter estimations.
+    gap2lai                Calculation of leaf area index from gap probability observations.
     get_angle              Returns the angle in radiant from each point in xy1 to each point in xy2.
     get_brewer             Registers and returns Brewer colormap.
     get_nearest            Returns a value z for each point in xy near to the xyz field.
@@ -65,6 +66,7 @@
     kriging                Krig a surface from a set of 2D points.
     lagcorr                Calculate time lag of maximum or minimum correlation of two arrays.
     leafmodel              Model to compute photosynthesis and stomatal conductance of canopies.
+    leafprojection         Calculation of leaf projection from leaf angle observations.
     lhs                    Latin Hypercube Sampling of any distribution without correlations.
     lif                    Count number of lines in file.
     line_dev_mask          Maskes elements of an array deviating from a line fit.
@@ -156,10 +158,12 @@
     ---------------
     convex_hull            Calculate subset of points that make a convex hull around a set of 2D points.
     fill_nonfinite         Fill missing values by linear interpolation.
+    gap2lai                Calculation of leaf projection and leaf area index from gap probability observations.
     interpol               One-dimensional linear interpolation on first dimension.
     kriging                Krig a surface from a set of 2D points.
     kernel_regression      Multi-dimensional non-parametric regression.
     kernel_regression_h    Optimal bandwidth for kernel regression.
+    leafprojection         Calculation of leaf projection from leaf angle observations.
     line_dev_mask          Maskes elements of an array deviating from a line fit.
     mad                    Median absolute deviation test.
     means                  Calculate daily, monthly, yearly, etc. means of data depending on date stamp.
@@ -419,6 +423,7 @@
               MC, Oct 2014 - module -> package
               MC, Oct 2014 - clockplot, ellipse_area, savez, savez_compressed, grid_mid2edge, tee
               MC, Nov 2014 - pca, head
+              AP, Nov 2014 - gap2lai, leafprojection
 """
 from __future__ import print_function
 
@@ -459,6 +464,7 @@ try:
     from .gap_filling   import gap_filling
 except ImportError:
     pass # obsolete
+from .gap2lai           import gap2lai, leafprojection 
 from .get_angle         import get_angle
 from .get_nearest       import get_nearest
 from .grid_mid2edge     import grid_mid2edge
@@ -478,7 +484,7 @@ from .mad               import mad
 from .maskgroup         import maskgroup
 from .means             import means
 from .morris            import morris_sampling, elementary_effects
-from .npyio             import savez, savez_compressed
+#from .npyio             import savez, savez_compressed
 try:
     from .outlier       import outlier, rossner
 except:
