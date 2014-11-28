@@ -262,7 +262,13 @@ def  Sampling_Function_2(p, k, r, LB, UB, GroupMat=np.array([])):
 
         # a --> Define the random vector x0 for the factors. Note that x0 takes value in the hypercube
         # [0,...,1-Delta]*[0,...,1-Delta]*[0,...,1-Delta]*[0,...,1-Delta]
-        xset=np.arange(0.0,1.0-Delta,1.0/(p-1))
+        # Original in Stijn Van Hoey's version
+        #   xset=np.arange(0.0,1.0-Delta,1.0/(p-1))
+        # Jule's version from The Primer
+        #   xset=np.arange(0.0,1.0-1.0/(p-1),1.0/(p-1))
+        # Matthias thinks that the difference between Python and Matlab is that Python is not taking
+        # the last element; therefore the following version
+        xset=np.arange(0.0,1.00000001-Delta,1.0/(p-1))
         x0 = np.matrix(xset.take(list(np.ceil(np.random.random(k)*np.floor(p/2))-1)))  #.transpose()
 
         # b --> Compute the matrix B*, here indicated as B0. Each row in B0 is a
