@@ -2,6 +2,8 @@
 from __future__ import print_function
 import string
 
+__all__ = ['head']
+
 def head(ifile, n=10, noblank=False, comment='', skip=0, keepnewline=False):
     """
         Return list with first n lines of file.

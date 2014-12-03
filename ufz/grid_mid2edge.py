@@ -2,6 +2,8 @@
 from __future__ import print_function
 import numpy as np
 
+__all__ = ['grid_mid2edge']
+
 def grid_mid2edge(lon, lat):
     """
         2D arrays of longitude and latitude grid edges from grid midpoints.

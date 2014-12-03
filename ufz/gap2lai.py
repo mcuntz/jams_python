@@ -5,6 +5,8 @@ from scipy import integrate as ig
 from scipy.stats import beta
 from ufz.kernel_regression import kernel_regression, kernel_regression_h
 
+__all__ = ['gap2lai', 'leafprojection']
+
 def gap2lai(tgap, lgap, G, alpha, boot=False):
     """
         Computes effective leaf area index Le, total leaf area index Lt and

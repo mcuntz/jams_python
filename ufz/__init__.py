@@ -28,19 +28,21 @@
     convex_hull            Calculate subset of points that make a convex hull around a set of 2D points.
     correlate              Computes the cross-correlation function of two series x and y.
     cuntz_gleixner         Cuntz-Gleixner model of 13C discrimination.
-    register_brewer        Registers and registers Brewer colormap.
+    directory_from_gui     Open directory selection dialog, returns selected directory
     dewpoint               Calculates the dew point from ambient humidity.
     date2dec               Converts arrays with calendar date to decimal date.
     dec2date               Converts arrays with decimal date to calendar date.
     div                    Wrapper for division.
     division               Divide two arrays, return 'otherwise' if division by 0.
     dumpnetcdf             Convenience function for writenetcdf
-    eddybox                Module containing Eddy Covaraince utilities, see eddybox.py for details
+    eddybox                Module containing Eddy Covaraince utilities, see eddysuite.py for details
     eddysuite              Example file for processing Eddy data with eddybox and EddySoft
     elementary_effects     Morris measures mu, stddev and mu*
     ellipse_area           Area of ellipse (or circle)
     errormeasures          Definition of different error measures.
     esat                   Calculates the saturation vapour pressure of water/ice.
+    file_from_gui          Open file selection dialog for one single file, returns selected files
+    files_from_gui         Open file selection dialog, returns selected files
     fill_nonfinite         Fill missing values by linear interpolation.
     find_in_path           Look for file in system path.
     fread                  Reads in float array from ascii file.
@@ -70,6 +72,7 @@
     lhs                    Latin Hypercube Sampling of any distribution without correlations.
     lif                    Count number of lines in file.
     line_dev_mask          Maskes elements of an array deviating from a line fit.
+    logtools               Control file functions of Logtools, the Logger Tools Software of Olaf Kolle.
     mad                    Median absolute deviation test.
     means                  Calculate daily, monthly, yearly, etc. means of data depending on date stamp.
     morris_sampling        Sampling of optimised trajectories for Morris measures / elementary effects
@@ -87,6 +90,7 @@
     readhdf5               Reads variables or information from hdf5 file.
     readnc                 Wrapper for readnetcdf.
     readnetcdf             Reads variables or information from netcdf file.
+    register_brewer        Registers and registers Brewer colormap.
     rgb                    Interpolate between colours; make continuous colour maps.
     roman2int              Roman numeral to integer conversion.
     rossner                Wrapper for outlier.
@@ -126,7 +130,6 @@
         Ascii files
         Data processing
         Date & Time
-        Eddy Covariance
         Grids / Polygons
         Isotopes
         Math
@@ -157,6 +160,8 @@
     Data processing
     ---------------
     convex_hull            Calculate subset of points that make a convex hull around a set of 2D points.
+    eddybox                Module containing Eddy Covaraince utilities, see eddybox folder for details
+    eddysuite              Example file for processing Eddy data with eddybox and EddySoft
     fill_nonfinite         Fill missing values by linear interpolation.
     gap2lai                Calculation of leaf projection and leaf area index from gap probability observations.
     interpol               One-dimensional linear interpolation on first dimension.
@@ -165,6 +170,7 @@
     kernel_regression_h    Optimal bandwidth for kernel regression.
     leafprojection         Calculation of leaf projection from leaf angle observations.
     line_dev_mask          Maskes elements of an array deviating from a line fit.
+    logtools               Control file functions of Logtools, the Logger Tools Software of Olaf Kolle.
     mad                    Median absolute deviation test.
     means                  Calculate daily, monthly, yearly, etc. means of data depending on date stamp.
     outlier                Rossner''s extreme standardized deviate outlier test.
@@ -186,12 +192,6 @@
     -----------
     date2dec               Converts arrays with calendar date to decimal date.
     dec2date               Converts arrays with decimal date to calendar date.
-
-
-    Eddy Covariance
-    ---------------
-    eddybox                Module containing Eddy Covaraince utilities, see eddybox folder for details
-    eddysuite              Example file for processing Eddy data with eddybox and EddySoft
 
 
     Grids / Polygons
@@ -247,6 +247,9 @@
     astr                   Wrapper for autostring.
     autostring             Format number (array) with given decimal precision.
     const                  Provides physical, mathematical, computational, and isotope constants.
+    directory_from_gui     Open directory selection dialog, returns selected directory
+    file_from_gui          Open file selection dialog for one single file, returns selected files
+    files_from_gui         Open file selection dialog, returns selected files
     find_in_path           Look for file in system path.
     int2roman              Integer to roman numeral conversion.
     roman2int              Roman numeral to integer conversion.
@@ -424,11 +427,13 @@
               MC, Oct 2014 - clockplot, ellipse_area, savez, savez_compressed, grid_mid2edge, tee
               MC, Nov 2014 - pca, head
               AP, Nov 2014 - gap2lai, leafprojection
+              MC, Dec 2014 - directory_from_gui, file_from_gui, files_from_gui
+              MC, Dec 2014 - logtools
 """
 from __future__ import print_function
 
 # sub-packages without dependencies
-from ufz.const import const
+from ufz.const     import const
 from ufz.functions import functions
 
 # Routines
@@ -457,6 +462,7 @@ from .division          import division, div
 from .ellipse_area      import ellipse_area
 from .errormeasures     import bias, mae, mse, rmse, nse, pear2
 from .esat              import esat
+from .fgui              import directory_from_gui, file_from_gui, files_from_gui
 from .fill_nonfinite    import fill_nonfinite
 from .find_in_path      import find_in_path
 from .fread             import fread
@@ -484,7 +490,7 @@ from .mad               import mad
 from .maskgroup         import maskgroup
 from .means             import means
 from .morris            import morris_sampling, elementary_effects
-#from .npyio             import savez, savez_compressed
+from .npyio             import savez, savez_compressed
 try:
     from .outlier       import outlier, rossner
 except:
@@ -521,8 +527,9 @@ from .yrange            import yrange
 from .zacharias         import zacharias, zacharias_check
 
 # sub-packages with dependencies have to be loaded separately as in scipy
-from .        import eddybox
-from .        import leafmodel
+from . import eddybox
+from . import leafmodel
+from . import logtools
 
 # Information
 __author__   = "Matthias Cuntz"

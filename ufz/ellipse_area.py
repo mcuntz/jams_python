@@ -2,6 +2,8 @@
 from __future__ import print_function
 import numpy as np
 
+__all__ = ['ellipse_area']
+
 def ellipse_area(a, b=None):
     """
         Area of ellipse with major and minor axes a and b.

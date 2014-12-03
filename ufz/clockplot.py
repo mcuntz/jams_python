@@ -2,6 +2,8 @@
 from __future__ import print_function
 import numpy as np
 
+__all__ = ['clockplot']
+
 def clockplot(sub, si, sti=None, stierr=None,
               iplot       = None,           # plot number for abc2plot
               usetex      = False,

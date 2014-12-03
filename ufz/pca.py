@@ -2,6 +2,8 @@
 from __future__ import print_function
 import numpy as np
 
+__all__ = ['pca']
+
 def pca(mat, corr=False, ndim=None, rvar=None):
     """
         Principal component analysis (PCA) upon the first dimension of an 2D-array.

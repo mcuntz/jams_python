@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 from __future__ import print_function
 
+__all__ = ['tee']
+
 def tee(*args, **kwargs):
     """
         Prints arguments on screen and in file.
