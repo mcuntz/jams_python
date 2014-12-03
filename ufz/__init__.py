@@ -529,7 +529,7 @@ from .zacharias         import zacharias, zacharias_check
 # sub-packages with dependencies have to be loaded separately as in scipy
 from . import eddybox
 from . import leafmodel
-# from . import logtools
+from . import logtools
 
 # Information
 __author__   = "Matthias Cuntz"
