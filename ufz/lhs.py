@@ -110,14 +110,18 @@ if __name__ == '__main__':
     # dist = [stats.norm, stats.uniform]
     # pars = [(50,2),(1,5)]
     # c    = lhs(dist, pars, 20000)
+
     # plt.figure()
     # plt.hist(c[0,:])
+
     # plt.figure()
     # plt.hist(c[1,:])
 
+    
     # dist = [stats.uniform, stats.uniform]
     # pars = [(50,2),(1,5)]
     # c    = lhs(dist, pars, 20000)
+
     # plt.figure()
     # plt.plot(c[0,:],c[1,:],'ko',markersize=1.0)
     # plt.show()

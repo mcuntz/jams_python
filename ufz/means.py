@@ -13,11 +13,12 @@ def means(date, dat, year=False, month=False, day=False, hour=False, minute=Fals
         If no option is given, the mean will be over the whole first column.
 
         Returns centred dates, averages.
-            Yearly  dates are centred at June 15, 12:00h
-            Monthly dates are centred at 15th, 12:00h
-            Daily   dates are centred at 12:00h
-            Hourly  dates are centred at 30 min.
-            Mean daily dates centred on 30 min of 01. January of first year
+            Yearly   dates are centred at June 15, 12:00h.
+            Monthly  dates are centred at 15th, 12:00h.
+            Daily    dates are centred at 12:00h.
+            Hourly   dates are centred at 30 min.
+            Minutely dates are centred at 30 sec.
+            Mean daily dates centred on 30 min of 01. January of first year.
 
 
         Definition

@@ -109,7 +109,7 @@ def sigma_filter(x, y, z=3, func=functions.line_p, p=[0.,1.], plot=False):
         import matplotlib.pyplot as plt
         
     # create masked work array
-    y_new  = np.ma.array(y)
+    y_new  = np.ma.array(y.copy())
     if np.ma.count_masked(y_new) == 0: y_new.mask = np.zeros(y_new.shape)
     # Initialise fitted  parameters
     p_opt = np.copy(p)
@@ -119,7 +119,7 @@ def sigma_filter(x, y, z=3, func=functions.line_p, p=[0.,1.], plot=False):
     while go_on:
         # fit function to data
         mm = np.where(~y_new.mask)[0]
-        xx = x[mm]
+        xx = x[mm].compressed()
         yy = y_new.compressed()
         p_opt = opt.fmin(functions.cost_abs, p_opt, args=(func,xx,yy), disp=False)
 
