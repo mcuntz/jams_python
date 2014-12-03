@@ -275,20 +275,27 @@ def clockplot(sub, si, sti=None, stierr=None,
                 ss = [i]
             ss = [ r''+j.strip() for j in ss ]
             for j, s in enumerate(ss):
-                ss[j] = r'$\mathrm{'+s+'}$'
+                ss[j] = r'$\mathrm{'+s+r'}$'
                 if '-' in ss[j]:
                     ss[j] = ss[j].replace('-}$', '}$-')
                 if ' ' in ss[j]:
                     ss[j] = ss[j].replace(' ', '\ ')
+                if "'" in isaname[j]:
+                    ss[j] = ss[j].replace("'", "}\\textrm{'}\mathrm{")
             imod.append(ss)
         ismod = imod
-        comp = [ r'$\mathbf{'+i+'}$' for i in comp ]
+        comp = [ r'$\mathbf{'+i+r'}$' for i in comp ]
+        for j in range(len(comp)):
+            if "'" in comp[j]:
+                comp[j] = comp[j].replace("'", "}\\textrm{'}\mathbf{")
         for j, s in enumerate(isaname):
-            isaname[j] = r'$\mathrm{'+s+'}$'
+            isaname[j] = r'$\mathrm{'+s+r'}$'
             if '-' in isaname[j]:
                 isaname[j] = isaname[j].replace('-}$', '}$-')
             if ' ' in isaname[j]:
                 isaname[j] = isaname[j].replace(' ', '\ ')
+            if "'" in isaname[j]:
+                isaname[j] = isaname[j].replace("'", "}\\textrm{'}\mathrm{")
     else:
         imod = []
         for i in ismod:
