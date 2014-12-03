@@ -15,7 +15,7 @@ def around(num, powten, ceil=False, floor=False):
 
         Input
         -----
-        num        number array
+        num        ND array of floats
 
 
         Optional Input
