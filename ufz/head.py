@@ -150,90 +150,33 @@ def head(ifile, n=10, noblank=False, comment='', skip=0, keepnewline=False):
         History
         -------
         Written,  MC, Nov 2014
+        Modified, DS, Nov 2014
     """
-    # Open file
-    handle = False
-    if isinstance(ifile, file):
-        handle = True
-        f = ifile
-    else:
-        try:
-            f = open(ifile, 'r')
-        except IOError:
-            raise ValueError('Cannot open file '+ifile)
+
+        # Open file
+    f = ifile if isinstance(ifile,file) else open(ifile,"r") 
+        
+    # consume lines
+    for _ in xrange(skip):
+        f.readline()
+
     # Read lines
     count = 0
     header = []
-    if skip > 0:
-        iskip = 0
-        while iskip < skip:
-            l = f.readline()
-            iskip += 1
-    if noblank and (comment != ''):        # exclude blank, exclude comment
-        while count <= n:
-            ll = f.readline()
-            if len(ll) == 0: break
-            l  = ll.strip(string.whitespace)
-            if (l != ''):
-                if (l[0] not in comment):
-                    if keepnewline:
-                        header.append(ll)
-                    else:
-                        if ll.endswith('\n'):
-                            header.append(ll[:-1])
-                        else:
-                            header.append(ll)
-                    count += 1
-    elif noblank and (comment == ''):      # exclude blank, include comment
-        while count <= n:
-            ll = f.readline()
-            if len(ll) == 0: break
-            l     = ll.strip(string.whitespace)
-            if (l != ''):
-                if keepnewline:
-                    header.append(ll)
-                else:
-                    if ll.endswith('\n'):
-                        header.append(ll[:-1])
-                    else:
-                        header.append(ll)
-                count += 1
-    elif (not noblank) and (comment != ''):# include blank, exclude comment
-        while count <= n:
-            ll = f.readline()
-            if len(ll) == 0: break
-            l  = ll.strip(string.whitespace)
-            if (l == ''):
-                if keepnewline:
-                    header.append(ll)
-                else:
-                    if ll.endswith('\n'):
-                        header.append(ll[:-1])
-                    else:
-                        header.append(ll)
-                count += 1
-            else:
-                if (l[0] not in comment):
-                    if keepnewline:
-                        header.append(ll)
-                    else:
-                        if ll.endswith('\n'):
-                            header.append(ll[:-1])
-                        else:
-                            header.append(ll)
-                    count += 1
-    else:                                  # include blank, include comment
-        for i in range(n):
-            ll = f.readline()
-            if len(ll) == 0: break
-            if keepnewline:
-                header.append(ll)
-            else:
-                if ll.endswith('\n'):
-                    header.append(ll[:-1])
-                else:
-                    header.append(ll)
-    if not handle:
+    while count < n:
+        line = f.readline()
+        if not line:
+            break
+        if noblank and not line.strip():
+            continue
+        if line[0] in comment:
+            continue
+        if not keepnewline:
+            line = line.strip("\n")
+        header.append(line)
+        count += 1        
+        
+    if f is not ifile:
         f.close()
 
     return header
