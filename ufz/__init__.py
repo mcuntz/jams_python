@@ -16,6 +16,7 @@
     alpha_equ_h2o          Equilibrium fractionation between liquid water and vapour.
     alpha_kin_h2o          Kinetic fractionation of molecular diffusion of water vapour.
     area_poly              Area of a polygon.
+    argsort                Wrapper for numpy.argsort, numpy.ma.argsort, and using sorted for Python iterables.
     around                 Round to the passed power of ten.
     astr                   Wrapper for autostring.
     autostring             Format number (array) with given decimal precision.
@@ -100,6 +101,7 @@
     saltelli               Parameter sampling for Sobol indices calculation.
     sce                    Shuffle-Complex-Evolution algorithm for function min(max)imisation
     semivariogram          Calculates semivariogram from spatial data.
+    sendmail               Send an e-mail.
     sg                     Wrapper savitzky_golay.
     sg2d                   Wrapper savitzky_golay2d.
     sigma_filter           Mask values deviating more than z standard deviations from a given function.
@@ -143,6 +145,7 @@
 
     Array manipulation
     ------------------
+    argsort                Wrapper for numpy.argsort, numpy.ma.argsort, and using sorted for Python iterables.
     closest                Index in array which entry is closest to a given number.
     pack                   Similar to Fortran pack function with mask.
     maskgroup              Masks elements in a 1d array gathered in small groups.
@@ -253,6 +256,7 @@
     find_in_path           Look for file in system path.
     int2roman              Integer to roman numeral conversion.
     roman2int              Roman numeral to integer conversion.
+    sendmail               Send an e-mail.
     tee                    Prints arguments on screen and in file.
     zacharias              Soil water content with van Genuchten and Zacharias et al. (2007).
     zacharias_check        Checks validity of parameter set for Zacharias et al. (2007).
@@ -429,6 +433,8 @@
               AP, Nov 2014 - gap2lai, leafprojection
               MC, Dec 2014 - directory_from_gui, file_from_gui, files_from_gui
               MC, Dec 2014 - logtools
+              MC, Dec 2014 - sendmail
+              MC, Dec 2014 - argsort
 """
 from __future__ import print_function
 
@@ -441,6 +447,7 @@ from .abc2plot          import abc2plot
 from .alpha_equ_h2o     import alpha_equ_h2o
 from .alpha_kin_h2o     import alpha_kin_h2o
 from .area_poly         import area_poly
+from .argsort           import argsort
 from .around            import around
 from .autostring        import autostring, astr
 from .brewer            import register_brewer, get_brewer, plot_brewer, print_brewer
@@ -510,6 +517,7 @@ from .saltelli          import saltelli
 from .savitzky_golay    import savitzky_golay, sg, savitzky_golay2d, sg2d
 from .sce               import sce
 from .semivariogram     import semivariogram
+from .sendmail          import sendmail
 from .sigma_filter      import sigma_filter
 from .signature2plot    import signature2plot
 from .sobol_index       import sobol_index

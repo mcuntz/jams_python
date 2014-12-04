@@ -152,12 +152,11 @@ def head(ifile, n=10, noblank=False, comment='', skip=0, keepnewline=False):
         Written,  MC, Nov 2014
         Modified, DS, Nov 2014
     """
+    # Open file
+    f = ifile if isinstance(ifile,file) else open(ifile,"r")
 
-        # Open file
-    f = ifile if isinstance(ifile,file) else open(ifile,"r") 
-        
     # consume lines
-    for _ in xrange(skip):
+    for _ in range(skip):
         f.readline()
 
     # Read lines
@@ -174,8 +173,8 @@ def head(ifile, n=10, noblank=False, comment='', skip=0, keepnewline=False):
         if not keepnewline:
             line = line.strip("\n")
         header.append(line)
-        count += 1        
-        
+        count += 1
+
     if f is not ifile:
         f.close()
 
