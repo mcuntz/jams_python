@@ -2,7 +2,7 @@
 from __future__ import print_function
 import string
 
-def lif(file, noblank=False, comment='', skip=0, maxcol=False):
+def lif(ifile, noblank=False, comment='', skip=0, maxcol=False):
     """
         Count number of lines in a file.
         
@@ -11,12 +11,12 @@ def lif(file, noblank=False, comment='', skip=0, maxcol=False):
 
         Definition
         ----------
-        def lif(file, noblank=False, comment='', skip=0):
+        def lif(ifile, noblank=False, comment='', skip=0):
 
 
         Input
         -----
-        file         source file name
+        ifile         source file name
 
 
         Optional input parameters
@@ -113,50 +113,33 @@ def lif(file, noblank=False, comment='', skip=0, maxcol=False):
         Written,  MC, Jul 2009
         Modified, MC, Nov 2012 - maxcol
                   MC, Feb 2013 - ported to Python 3
+                  MC, Dec 2014 - changed similar to elegant code of David for head.py
     """
     # Open file
-    try:
-        f = open(file, 'r')
-    except IOError:
-        raise ValueError('Cannot open file '+file)
-    # Count lines
+    f = ifile if isinstance(ifile,file) else open(ifile,"r")
+
+    # consume lines
+    for _ in range(skip):
+        f.readline()
+
+    # Read lines
     count = 0
-    if skip > 0:
-        iskip = 0
-        while iskip < skip:
-            l = f.readline()
-            iskip += 1
     imax = []
-    if noblank and (comment != ''):        # exclude blank, exclude comment
-        for line in f:
-            ll    = line
-            imax.append(len(ll))
-            l     = ll.strip(string.whitespace)
-            if (l != ''):
-                if (l[0] not in comment): count += 1
-    elif noblank and (comment == ''):      # exclude blank, include comment
-        for line in f:
-            ll    = line
-            imax.append(len(ll))
-            l     = ll.strip(string.whitespace)
-            if (l != ''): count += 1
-    elif (not noblank) and (comment != ''):# include blank, exclude comment
-        for line in f:
-            ll    = line
-            imax.append(len(ll))
-            l     = ll.strip(string.whitespace)
-            if (l == ''):
-                count += 1
-            else:
-                if (l[0] not in comment): count += 1
-    else:                                  # include blank, include comment
-        for line in f:
-            imax.append(len(line))
-        count = len(imax)
-    f.close()
+    for line in f:
+        if not line:
+            break
+        if noblank and not line.strip():
+            continue
+        if line[0] in comment:
+            continue
+        imax.append(len(line.strip("\n"))) # lines include \0 at the end.
+        count += 1
+
+    if f is not ifile:
+        f.close()
 
     if maxcol:
-        return count, max(imax)-1 # lines include \0 at the end.
+        return count, max(imax)
     else:
         return count
 
