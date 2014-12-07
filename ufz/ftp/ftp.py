@@ -5,12 +5,12 @@ import datetime
 import glob
 from ufz.argsort import argsort
 
-__all__ = [ 'get_binary', 'get_check_binary', 'get_check_unix_ascii',
-            'get_check_windows_ascii', 'get_names', 'get_names_dates',
-            'get_names_dates_sizes', 'get_names_sizes', 'get_names_times',
-            'get_names_times_sizes', 'get_size',
-            'get_sizes', 'get_unix_ascii', 'get_windows_ascii',
-            'set_mtime' ]
+__all__ = ['get_binary', 'get_check_binary', 'get_check_unix_ascii',
+           'get_check_windows_ascii', 'get_names', 'get_names_dates',
+           'get_names_dates_sizes', 'get_names_sizes', 'get_names_times',
+           'get_names_times_sizes', 'get_size',
+           'get_sizes', 'get_unix_ascii', 'get_windows_ascii',
+           'set_mtime']
 
 # ------------------------------------------------------------------------------------------
 
