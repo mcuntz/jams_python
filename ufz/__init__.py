@@ -1,17 +1,15 @@
 #!/usr/bin/env python
 """
     UFZ Computational Hydrosystems Python Utilities
-    Module offers miscellaneous functions in different categories
+
+    Package offers miscellaneous functions and sub-modules in different categories.
 
     Get help on each function by typing
-    >>> help()
-    help> ufz.function
-    Or
     >>> import ufz
     >>> help(ufz.function)
 
-    Provided functions (alphabetic w/o obsolete)
-    ------------------
+    Provided functions and modules (alphabetic w/o obsolete functions)
+    ------------------------------------------------------------------
     abc2plot               Write a, b, c, ... on plots.
     alpha_equ_h2o          Equilibrium fractionation between liquid water and vapour.
     alpha_kin_h2o          Kinetic fractionation of molecular diffusion of water vapour.
@@ -42,12 +40,14 @@
     ellipse_area           Area of ellipse (or circle)
     errormeasures          Definition of different error measures.
     esat                   Calculates the saturation vapour pressure of water/ice.
+    file                   Module with file list function.
     file_from_gui          Open file selection dialog for one single file, returns selected files
     files_from_gui         Open file selection dialog, returns selected files
     fill_nonfinite         Fill missing values by linear interpolation.
     find_in_path           Look for file in system path.
     fread                  Reads in float array from ascii file.
-    functions              Common functions that are used in curve_fit or fmin parameter estimations.
+    ftp                    Module with functions for interacting with an open FTP connection.
+    functions              Module with common functions that are used in curve_fit or fmin parameter estimations.
     gap2lai                Calculation of leaf area index from gap probability observations.
     get_angle              Returns the angle in radiant from each point in xy1 to each point in xy2.
     get_brewer             Registers and returns Brewer colormap.
@@ -73,7 +73,7 @@
     lhs                    Latin Hypercube Sampling of any distribution without correlations.
     lif                    Count number of lines in file.
     line_dev_mask          Maskes elements of an array deviating from a line fit.
-    logtools               Control file functions of Logtools, the Logger Tools Software of Olaf Kolle.
+    logtools               Module with control file functions of Logtools, the Logger Tools Software of Olaf Kolle.
     mad                    Median absolute deviation test.
     means                  Calculate daily, monthly, yearly, etc. means of data depending on date stamp.
     morris_sampling        Sampling of optimised trajectories for Morris measures / elementary effects
@@ -106,6 +106,7 @@
     sg2d                   Wrapper savitzky_golay2d.
     sigma_filter           Mask values deviating more than z standard deviations from a given function.
     signature2plot         Write a copyright notice on a plot.
+    tail                   Return list with last n lines of file.
     maskgroup              Masks elements in a 1d array gathered in small groups.
     savez                  Save several numpy arrays into a single file in uncompressed ``.npz`` format.
     savez_compressed       Save several arrays into a single file in compressed ``.npz`` format.
@@ -126,8 +127,8 @@
     zacharias_check        Checks validity of parameter set for Zacharias et al. (2007).
 
 
-    Provided functions per category
-    -------------------------------
+    Provided functions and modules per category
+    -------------------------------------------
         Array manipulation
         Ascii files
         Data processing
@@ -140,8 +141,7 @@
         Models
         Plotting
         Special files
-        Obsolete
-    -------------------------------
+    -------------------------------------------
 
     Array manipulation
     ------------------
@@ -158,6 +158,7 @@
     head                   Return list with first n lines of file.
     lif                    Count number of lines in file.
     sread                  Reads in string array from ascii file.
+    tail                   Return list with last n lines of file.
 
 
     Data processing
@@ -173,7 +174,7 @@
     kernel_regression_h    Optimal bandwidth for kernel regression.
     leafprojection         Calculation of leaf projection from leaf angle observations.
     line_dev_mask          Maskes elements of an array deviating from a line fit.
-    logtools               Control file functions of Logtools, the Logger Tools Software of Olaf Kolle.
+    logtools               Module with control file functions of Logtools, the Logger Tools Software of Olaf Kolle.
     mad                    Median absolute deviation test.
     means                  Calculate daily, monthly, yearly, etc. means of data depending on date stamp.
     outlier                Rossner''s extreme standardized deviate outlier test.
@@ -227,7 +228,7 @@
     elementary_effects     Morris measures mu, stddev and mu*
     ellipse_area           Area of ellipse (or circle)
     errormeasures          Definition of different error measures.
-    functions              Common functions that are used in curve_fit or fmin parameter estimations.
+    functions              Module with common functions that are used in curve_fit or fmin parameter estimations.
     heaviside              Heaviside (or unit step) operator.
     jab                    Jackknife-after-Bootstrap error.
     lagcorr                Calculate time lag of maximum or minimum correlation of two arrays.
@@ -251,9 +252,11 @@
     autostring             Format number (array) with given decimal precision.
     const                  Provides physical, mathematical, computational, and isotope constants.
     directory_from_gui     Open directory selection dialog, returns selected directory
+    file                   Module with file list function.
     file_from_gui          Open file selection dialog for one single file, returns selected files
     files_from_gui         Open file selection dialog, returns selected files
     find_in_path           Look for file in system path.
+    ftp                    Module with functions for interacting with an open FTP connection.
     int2roman              Integer to roman numeral conversion.
     roman2int              Roman numeral to integer conversion.
     sendmail               Send an e-mail.
@@ -388,37 +391,25 @@
               MC, Jul 2013 - fill_nonfinite, means
               MC, Oct 2013 - morris, sce, inpoly, rossner, netcdfread, ncread, readnc, hdfread, hdf4read, hdf5read
               AP, Feb 2014 - maskgroup
-              AP, Feb 2014 - line_dev_mask
+                           - line_dev_mask
               MC, Feb 2014 - removed all import *
-              MC, Feb 2014 - sigma_filter
+                           - sigma_filter
               AP, Mar 2014 - lagcorr
               MC, Apr 2014 - correlate
               MC, May 2014 - signature2plot
-              MC, May 2014 - adapted new CHS license scheme
+                           - adapted new CHS license scheme
               AP, May 2014 - get_nearest
               AP, Jun 2014 - get_angle
               AW, Jun 2014 - t2sap
-              AP, Jul 2014 - errormeasures
-              AP, Jul 2014 - homo_sampling
-              AP, Jul 2014 - sltclean
-              AP, Jul 2014 - meteo4slt
-              AP, Jul 2014 - eddycorr
-              AP, Jul 2014 - eddyspec
-              AP, Aug 2014 - planarfit
-              AP, Aug 2014 - timestepcheck
-              AP, Aug 2014 - fluxplot
-              AP, Aug 2014 - itc
-              AP, Aug 2014 - spikeflag
-              AP, Aug 2014 - ustarflag
-              AP, Aug 2014 - fluxflag
-              AP, Aug 2014 - fluxfill
-              AP, Sep 2014 - energyclosure
-              AP, Sep 2014 - fluxpart
+              AP, Jul 2014 - errormeasures, homo_sampling, sltclean, meteo4slt, eddycorr, eddyspec
+              AP, Aug 2014 - planarfit, timestepcheck, fluxplot, itc, spikeflag, ustarflag
+                           - fluxflag, fluxfill
+              AP, Sep 2014 - energyclosure, fluxpart
               ST, Sep 2014 - dumpnetcdf
               MC, Sep 2014 - alpha_equ_h2o, alpha_kin_h2o
               AP, Sep 2014 - leafmodel
-              AP, Sep 2014 - profile2storage
-              AP, Sep 2014 - eddybox -> moved eddycorr, eddyspec, energyclosure,
+                           - profile2storage
+                           - eddybox -> moved eddycorr, eddyspec, energyclosure,
                                               fluxfill, fluxflag, fluxpart,
                                               fluxplot, gapfill, itc, meteo4slt,
                                               nee2gpp, nee2gpp_falge,
@@ -427,18 +418,19 @@
                                               sltclean, spikeflag, ustarflag into
                                               eddybox module
               AP, Sep 2014 - eddysuite
-              MC, Oct 2014 - module -> package
-              MC, Oct 2014 - clockplot, ellipse_area, savez, savez_compressed, grid_mid2edge, tee
+              MC, Oct 2014 - ufz module -> ufz package
+                           - clockplot, ellipse_area, savez, savez_compressed, grid_mid2edge, tee
               MC, Nov 2014 - pca, head
               AP, Nov 2014 - gap2lai, leafprojection
               MC, Dec 2014 - directory_from_gui, file_from_gui, files_from_gui
-              MC, Dec 2014 - logtools
-              MC, Dec 2014 - sendmail
-              MC, Dec 2014 - argsort
+                           - logtools, 
+                           - sendmail, argsort, tail
+                           - ftp
+                           - file
 """
 from __future__ import print_function
 
-# sub-packages without dependencies
+# sub-packages without dependencies to all ufz
 from ufz.const     import const
 from ufz.functions import functions
 
@@ -523,6 +515,7 @@ from .signature2plot    import signature2plot
 from .sobol_index       import sobol_index
 from .sread             import sread
 from .srrasa            import srrasa, srrasa_trans
+from .tail              import tail
 from .tcherkez          import tcherkez
 from .tee               import tee
 from .timestepcheck     import timestepcheck
@@ -534,16 +527,18 @@ from .xkcd              import xkcd
 from .yrange            import yrange
 from .zacharias         import zacharias, zacharias_check
 
-# sub-packages with dependencies have to be loaded separately as in scipy
+# sub-packages with dependencies to all ufz have to be loaded separately as in scipy
 from . import eddybox
 from . import leafmodel
 from . import logtools
+from . import file
+from . import ftp
 
 # Information
 __author__   = "Matthias Cuntz"
-__version__  = '3.0'
-__revision__ = "Revision: 1796"
-__date__     = 'Date: 05.10.2014'
+__version__  = '3.1.0'
+__revision__ = "Revision: 1923"
+__date__     = 'Date: 05.12.2014'
 
 # Main
 if __name__ == '__main__':
