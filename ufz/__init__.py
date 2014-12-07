@@ -38,6 +38,7 @@
     eddysuite              Example file for processing Eddy data with eddybox and EddySoft
     elementary_effects     Morris measures mu, stddev and mu*
     ellipse_area           Area of ellipse (or circle)
+    encrypt                Module to encrypt and decrypt text using a key system as well as a cipher.
     errormeasures          Definition of different error measures.
     esat                   Calculates the saturation vapour pressure of water/ice.
     file                   Module with file list function.
@@ -252,6 +253,7 @@
     autostring             Format number (array) with given decimal precision.
     const                  Provides physical, mathematical, computational, and isotope constants.
     directory_from_gui     Open directory selection dialog, returns selected directory
+    encrypt                Module to encrypt and decrypt text using a key system as well as a cipher.
     file                   Module with file list function.
     file_from_gui          Open file selection dialog for one single file, returns selected files
     files_from_gui         Open file selection dialog, returns selected files
@@ -427,11 +429,13 @@
                            - sendmail, argsort, tail
                            - ftp
                            - file
+                           - encrypt
 """
 from __future__ import print_function
 
 # sub-packages without dependencies to all ufz
 from ufz.const     import const
+from ufz.encrypt   import encrypt
 from ufz.functions import functions
 
 # Routines
@@ -529,10 +533,10 @@ from .zacharias         import zacharias, zacharias_check
 
 # sub-packages with dependencies to all ufz have to be loaded separately as in scipy
 from . import eddybox
-from . import leafmodel
-from . import logtools
 from . import file
 from . import ftp
+from . import leafmodel
+from . import logtools
 
 # Information
 __author__   = "Matthias Cuntz"
