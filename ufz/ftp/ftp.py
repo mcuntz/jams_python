@@ -3,6 +3,7 @@ from __future__ import print_function
 import os
 import datetime
 import glob
+import time
 from ufz.argsort import argsort
 
 __all__ = ['get_binary', 'get_check_binary', 'get_check_unix_ascii',
