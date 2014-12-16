@@ -146,10 +146,10 @@ def kriging(x, y, z, semi_mod, semi_popt, xnew=None, ynew=None, plot=False,
         ...                                    xnew=xnew,ynew=ynew,silent=True,
         ...                                    plot=False,masked=False,eop=None)
         >>> from autostring import astr
-        >>> print(astr(znew[0][0:8],2,pp=True))
-        ['2.77' '3.39' '3.92' '4.22' '4.28' '4.19' '4.03' '3.84']
-        >>> print(astr(np.mean(znew),2))
-        3.71
+        >>> print(astr(znew[0][0:8],1,pp=True))
+        ['2.8' '3.4' '3.9' '4.2' '4.3' '4.2' '4.0' '3.8']
+        >>> print(astr(np.mean(znew),1))
+        3.7
 
         # block krig the surface
         >>> bave, bvar = kriging(x, y, z, semi_mod, semi_popt,xnew=xnew, ynew=ynew,
@@ -173,8 +173,8 @@ def kriging(x, y, z, semi_mod, semi_popt, xnew=None, ynew=None, plot=False,
         >>> eopz, eopvar = kriging(x,y,z,semi_mod,semi_popt,xnew=None,
         ...                        ynew=None,plot=False,masked=False,
         ...                        silent=True,eop=poi)
-        >>> print(astr(eopz[0:8],2,pp=True))
-        ['7.78' '0.71' '3.09' '1.18' '7.38' '6.74' '2.14' '1.13']
+        >>> print(astr(eopz[0:8],1,pp=True))
+        ['7.8' '0.7' '3.1' '1.2' '7.4' '6.7' '2.1' '1.1']
 
         # krig both, whole surface and on points of interest
         >>> xnew = np.arange(np.min(x),np.max(x),5.)
@@ -184,10 +184,10 @@ def kriging(x, y, z, semi_mod, semi_popt, xnew=None, ynew=None, plot=False,
         ...                                          ynew=ynew,plot=False,
         ...                                          masked=False,silent=True,
         ...                                          eop=poi)
-        >>> print(astr(znew[0][0:8],2,pp=True))
-        ['2.77' '3.39' '3.92' '4.22' '4.28' '4.19' '4.03' '3.84']
-        >>> print(astr(eopz[0:8],2,pp=True))
-        ['7.78' '0.71' '3.09' '1.18' '7.38' '6.74' '2.14' '1.13']
+        >>> print(astr(znew[0][0:8],1,pp=True))
+        ['2.8' '3.4' '3.9' '4.2' '4.3' '4.2' '4.0' '3.8']
+        >>> print(astr(eopz[0:8],1,pp=True))
+        ['7.8' '0.7' '3.1' '1.2' '7.4' '6.7' '2.1' '1.1']
 
 
         License

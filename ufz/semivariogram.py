@@ -243,8 +243,8 @@ def semivariogram(x, y, v, nL, di, td, stype='omnidirectional', negscat=False,
         ['0.5']
         >>> print(astr(sill, 1))
         ['1.1']
-        >>> print(astr(irange, 0))
-        ['76']
+        >>> print(np.around(irange, -1))
+        [ 80.]
 
         # directional semivariogram with spherical model and fifty lags
         >>> td = 45
@@ -268,10 +268,10 @@ def semivariogram(x, y, v, nL, di, td, stype='omnidirectional', negscat=False,
         ...     x,y,v,nL,di,td,stype='directional+orientational',
         ...     negscat=False,model='spherical',graph=False,lunit='m',
         ...     p0=(0.5,0.5,100),runtimediag=False)
-        >>> print(astr(nugget, 2))
-        ['0.36' '0.40' '0.54' '0.50' '0.00' '0.57' '0.63' '0.45']
-        >>> print(astr(sill, 2))
-        ['0.97' '1.20' '1.15' '1.19' '1.00' '1.11' '1.12' '1.09']
+        >>> print(astr(nugget, 1))
+        ['0.4' '0.4' '0.5' '0.5' '0.0' '0.6' '0.6' '0.4']
+        >>> print(astr(sill, 1))
+        ['1.0' '1.2' '1.1' '1.2' '1.0' '1.1' '1.1' '1.1']
 
         License
         -------
