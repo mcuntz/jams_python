@@ -268,8 +268,9 @@ def semivariogram(x, y, v, nL, di, td, stype='omnidirectional', negscat=False,
         ...     x,y,v,nL,di,td,stype='directional+orientational',
         ...     negscat=False,model='spherical',graph=False,lunit='m',
         ...     p0=(0.5,0.5,100),runtimediag=False)
-        >>> print(astr(nugget, 1))
-        ['0.4' '0.4' '0.5' '0.5' '0.0' '0.6' '0.6' '0.4']
+        >>> soll = np.array([0.36, 0.4, 0.55, 0.5, 0, 0.6, 0.63, 0.45])
+        >>> print(np.allclose(nugget, soll, atol=0.1))
+        True
         >>> print(astr(sill, 1))
         ['1.0' '1.2' '1.1' '1.2' '1.0' '1.1' '1.1' '1.1']
 
