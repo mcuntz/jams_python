@@ -78,34 +78,32 @@ def gap2lai(tgap, lgap, G, alpha, boot=False):
         
         Examples
         --------
+        >>> from autostring import astr
+
         >>> # Create some data
         >>> tgap  = np.arange(0.,1.1,0.1)
         >>> lgap  = np.arange(0.,1.1,0.1)*0.1
         >>> G     = 0.5
         >>> alpha = 53.7
-        
+     
         >>> # compute each observation separately
         >>> Lt, Le, omega = gap2lai(tgap, lgap, G, alpha)
-        >>> print(np.ma.round(Lt,2))
-        [-- 2.81 1.97 1.47 1.11 0.84 0.62 0.43 0.27 0.13 0.0]
-        
-        >>> print(np.ma.round(Le,2))
-        [-- 2.73 1.91 1.43 1.08 0.82 0.6 0.42 0.26 0.12 0.0]
-        
-        >>> print(np.ma.round(omega,2))
-        [-- 0.97 0.97 0.97 0.97 0.98 0.98 0.98 0.99 0.99 --]
-        
+        >>> print(astr(Lt, 2, join=True))
+        --   2.81 1.97 1.47 1.11 0.84 0.62 0.43 0.27 0.13 0.00
+        >>> print(astr(Le, 2, join=True))
+        --   2.73 1.91 1.43 1.08 0.82 0.60 0.42 0.26 0.12 0.00
+        >>> print('!', astr(omega, 2, join=True), '!')
+        ! --   0.97 0.97 0.97 0.97 0.98 0.98 0.98 0.99 0.99 --   !
+     
         >>> # compute mean and standard error of the mean
         >>> Lt, Le, omega = gap2lai(tgap, lgap, G, alpha, boot=10000)
-        >>> print(np.ma.round(Lt,1))
-        [ 0.9  0.2]
-        
-        >>> print(np.ma.round(Le,1))
-        [ 0.8  0.2]
-        
-        >>> print(np.ma.round(omega,1))
-        [ 1.  0.]
-        
+        >>> print(astr(Lt, 1, join=True))
+        0.9 0.2
+        >>> print(astr(Le, 1, join=True))
+        0.8 0.2
+        >>> print(astr(omega, 1, join=True))
+        1.0 0.0
+
         >>> # if you don't have lgap, Le and Lt are equal
         >>> Lt, Le, omega = gap2lai(tgap, np.zeros_like(tgap), G, alpha)
         >>> print(np.ma.all(Lt==Le))        
@@ -275,8 +273,9 @@ def leafprojection(alpha, theta, t360=False, kernel=False, min=0., max=90.,
         >>> # 10 bootstraps
         >>> np.random.seed(1)
         >>> theta = np.ma.array(np.random.random(50)*360.)
-        >>> print(np.ma.round(leafprojection(57.3, theta, t360=True, kernel=True, boot=10), 3))
-        [ 0.503  0.003]
+        >>> from autostring import astr
+        >>> print(astr(leafprojection(57.3, theta, t360=True, kernel=True, boot=10), 3, joinall=True))
+        0.503 0.003
         
         
         License
@@ -446,3 +445,39 @@ def gap2lai_bootstrap2(x, y, boot):
 if __name__ == '__main__':
      import doctest
      doctest.testmod()
+
+     # from autostring import astr
+
+     # # Create some data
+     # tgap  = np.arange(0.,1.1,0.1)
+     # lgap  = np.arange(0.,1.1,0.1)*0.1
+     # G     = 0.5
+     # alpha = 53.7
+     
+     # # compute each observation separately
+     # Lt, Le, omega = gap2lai(tgap, lgap, G, alpha)
+     # print(np.ma.round(Lt,2))
+     # print(astr(Lt, 2, join=True))
+     # # --   2.81 1.97 1.47 1.11 0.84 0.62 0.43 0.27 0.13 0.00
+     # print(np.ma.round(Le,2))
+     # print(astr(Le, 2, join=True))
+     # # --   2.73 1.91 1.43 1.08 0.82 0.6 0.42 0.26 0.12 0.00
+     # print(np.ma.round(omega,2))
+     # print(astr(omega, 2, join=True))
+     # # --   0.97 0.97 0.97 0.97 0.98 0.98 0.98 0.99 0.99 --
+     
+     # # compute mean and standard error of the mean
+     # Lt, Le, omega = gap2lai(tgap, lgap, G, alpha, boot=10000)
+     # print(np.ma.round(Lt,1))
+     # print(astr(Lt, 1, join=True))
+     # # 0.9 0.2
+     # print(np.ma.round(Le,1))
+     # print(astr(Le, 1, join=True))
+     # # 0.8 0.2
+     # print(np.ma.round(omega,1))
+     # print(astr(omega, 1, join=True))
+     # # 1.0 0.0
+     # # if you don't have lgap, Le and Lt are equal
+     # Lt, Le, omega = gap2lai(tgap, np.zeros_like(tgap), G, alpha)
+     # print(np.ma.all(Lt==Le))        
+     # # True

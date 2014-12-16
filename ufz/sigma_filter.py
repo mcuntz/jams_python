@@ -67,7 +67,7 @@ def sigma_filter(x, y, z=3, func=functions.line_p, p=[0.,1.], plot=False):
         [False  True  True  True False  True False  True False False  True  True]
         >>> # detect outliers - sine
         >>> print(sigma_filter(x, y, z=5, p=[2.1,1.4], func=fun, plot=False)[0:12])
-        [False  True  True  True False  True False  True False False  True  True]
+        [False False  True False False False False False False False  True False]
         
         >>> def fun2(x, p):
         ...     return(p[0]+p[1]*np.sin(p[2]*x))
@@ -104,6 +104,7 @@ def sigma_filter(x, y, z=3, func=functions.line_p, p=[0.,1.], plot=False):
         History
         -------
         Written,  MC, Feb 2014 - changed line_dev_mask
+        Modified, MC, Dec 2014 - x.compressed error because x is non-masked
     """
     if plot:
         import matplotlib.pyplot as plt
@@ -119,7 +120,7 @@ def sigma_filter(x, y, z=3, func=functions.line_p, p=[0.,1.], plot=False):
     while go_on:
         # fit function to data
         mm = np.where(~y_new.mask)[0]
-        xx = x[mm].compressed()
+        xx = x[mm]
         yy = y_new.compressed()
         p_opt = opt.fmin(functions.cost_abs, p_opt, args=(func,xx,yy), disp=False)
 
@@ -185,10 +186,10 @@ if __name__ == '__main__':
     # #   True  True False False]
     # # detect outliers - sine
     # print(sigma_filter(x, y, z=5, p=[2.1,1.4], func=fun, plot=True))
-    # # [False  True  True  True False  True False  True False False  True  True
-    # #   True False False  True  True False False False  True False False False
-    # #   True False False False  True  True False False  True  True False False
-    # #   True  True False False]
+    # # [False False  True False False False False False False False  True
+    # #  False False False False False False False False False  True False
+    # #  False False False False False False False False False False False
+    # #  False False False False False False False]
     
     # def fun2(x, p):
     #     return(p[0]+p[1]*np.sin(p[2]*x))

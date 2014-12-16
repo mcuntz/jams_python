@@ -101,18 +101,19 @@ def pca(mat, corr=False, ndim=None, rvar=None):
         Written,  MC, Nov 2014
     """
     from scipy import linalg
+    imat = mat.copy()
     #
     # Check input
-    nd = mat.ndim  # save for later
+    nd = imat.ndim  # save for later
     assert nd > 1, 'array must be at 2D-ND.'
-    n, k = mat.shape
+    n, k = imat.shape
     #
     # Covariance or corelation matrix
     n1 = 1./(float(n)-1.)
     if corr:
-        mat /= np.std(mat, axis=0, ddof=1)
-    mat -= mat.mean(axis=0)
-    S  = n1 * np.dot(mat.T, mat)
+        imat /= np.std(imat, axis=0, ddof=1)
+    imat -= imat.mean(axis=0)
+    S  = n1 * np.dot(imat.T, imat)
     #
     # Eigenvectors and eigenvalues with linalg.eigh
     # rather than linlag.eig since S is symmetric.
@@ -140,7 +141,7 @@ def pca(mat, corr=False, ndim=None, rvar=None):
     #
     # Calculate principal components and return
     # (reduced) components, eigenvalues, (reduced) eigenvectors
-    return np.dot(evecs.T, mat.T).T, evals, evecs
+    return np.dot(evecs.T, imat.T).T, evals, evecs
 
 
 def check_pca(data, comps, eigenvectors, corr=False, rtol=1e-05, atol=1e-08):

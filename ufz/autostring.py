@@ -145,10 +145,11 @@ def autostring(num, prec=0, zero=False, set_printoptions=False, pp=False, join=F
                   MC, Feb 2013 - nan, inf and masked arrays
                   MC, Feb 2013 - ported to Python 3
                   MC, Oct 2014 - isinstance
+                  MC, Dec 2014 - tuple input
     """
     #
     # Check input
-    if isinstance(num, list): num = np.array(num)
+    if isinstance(num, (list, tuple)): num = np.array(num)
     isarr = np.ndim(num)
     if (isarr > 2):
         print("AUTOSTRING WARNING: autostring only works with scalars, 1D- and 2D arrays: return original array.")

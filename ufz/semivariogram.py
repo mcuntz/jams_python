@@ -140,6 +140,8 @@ def semivariogram(x, y, v, nL, di, td, stype='omnidirectional', negscat=False,
         Examples
         --------
         # provide you some sample data:
+        >>> # seed for reproducible results in doctest
+        >>> np.random.seed(1)
 
         # easting
         >>> x = np.array([557509.27,557518.11,557526.95,557535.79,557544.63,
@@ -242,7 +244,7 @@ def semivariogram(x, y, v, nL, di, td, stype='omnidirectional', negscat=False,
         >>> print(astr(sill, 1))
         ['1.1']
         >>> print(astr(irange, 0))
-        ['80']
+        ['76']
 
         # directional semivariogram with spherical model and fifty lags
         >>> td = 45
@@ -267,9 +269,9 @@ def semivariogram(x, y, v, nL, di, td, stype='omnidirectional', negscat=False,
         ...     negscat=False,model='spherical',graph=False,lunit='m',
         ...     p0=(0.5,0.5,100),runtimediag=False)
         >>> print(astr(nugget, 2))
-        ['0.37' '0.41' '0.55' '0.59' '0.00' '0.62' '0.63' '0.45']
+        ['0.36' '0.40' '0.54' '0.50' '0.00' '0.57' '0.63' '0.45']
         >>> print(astr(sill, 2))
-        ['0.97' '1.23' '1.15' '1.18' '1.00' '1.11' '1.12' '1.09']
+        ['0.97' '1.20' '1.15' '1.19' '1.00' '1.11' '1.12' '1.09']
 
         License
         -------

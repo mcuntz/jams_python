@@ -592,89 +592,89 @@ def kriging(x, y, z, semi_mod, semi_popt, xnew=None, ynew=None, plot=False,
 
 
 if __name__ == '__main__':
-    # import doctest
-    # doctest.testmod(optionflags=doctest.NORMALIZE_WHITESPACE)
+    import doctest
+    doctest.testmod(optionflags=doctest.NORMALIZE_WHITESPACE)
 
-    x = np.array([652225.,652175.,652205.,652235.,652265.,652165.,
-                  652195.,652225.,652255.,652285.,652175.,652205.,
-                  652235.,652265.,652175.,652205.,652235.,652265.,
-                  652195.,652225.,652255.,652285.,652235.,652265.,
-                  652225.,652255.,652285.,652195.,652200.,652200.,
-                  652240.,652230.,652260.,652260.,652265.])
-    y = np.array([5772960.,5772970.,5772970.,5772970.,5772970.,
-                  5772980.,5772980.,5772980.,5772980.,5772980.,
-                  5772990.,5772990.,5772990.,5772990.,5773000.,
-                  5773000.,5773000.,5773000.,5773010.,5773010.,
-                  5773010.,5773010.,5773020.,5773020.,5773030.,
-                  5773030.,5773030.,5772985.,5772990.,5772995.,
-                  5773015.,5773025.,5772985.,5772990.,5772995.])
-    z = np.array([2.16512767,4.97776467,4.2279204 ,0.        ,
-                  8.25658422,0.01238773,5.05858306,8.33503939,
-                  7.53470443,7.15304826,9.45150218,8.79359049,
-                  0.0536634 ,0.42101194,0.22721601,1.1458486 ,
-                  6.79183025,2.50622739,3.76725118,3.97934707,
-                  0.        ,0.24743279,1.4627512 ,0.38430722,
-                  5.30171261,0.        ,3.17667353,3.80908144,
-                  7.12445478,4.83891708,6.10898131,2.93801857,
-                  2.56170107,2.54503559,1.72767934])
-    # make semivariogram
-    from semivariogram import semivariogram
-    nL = 40
-    di = [0]
-    td = 180
-    nugget,sill,orange,vark,h,g,c,semi_mod,semi_popt = semivariogram(
-                  x,y,z,nL,di,td,stype='omnidirectional',negscat=0.5,
-                  model='exponential',graph=False,lunit='m',
-                  p0=(0.,20.,1./8.),runtimediag=False)
-    # x and y coordinates for the surface
-    xnew = np.arange(np.amin(x),np.amax(x),5.)
-    ynew = np.arange(np.amin(y),np.amax(y),5.)
-    xnew, ynew, znew, varnew = kriging(x,y,z,semi_mod,semi_popt,
-                                       xnew=xnew,ynew=ynew,silent=True,
-                                       plot=True,masked=False,eop=None)
-    print(np.round(znew[0],3))
-    # [ 3.576  3.758  3.912  3.937  3.884  3.83   3.792  3.759  3.71   3.613
-    #   3.407  2.981  2.165  2.366  2.458  2.797  3.304  3.817  4.298  4.717
-    #   4.918  4.77   4.478  4.238]
-    print(np.round(np.mean(znew),2))
-    # 3.69
+    # x = np.array([652225.,652175.,652205.,652235.,652265.,652165.,
+    #               652195.,652225.,652255.,652285.,652175.,652205.,
+    #               652235.,652265.,652175.,652205.,652235.,652265.,
+    #               652195.,652225.,652255.,652285.,652235.,652265.,
+    #               652225.,652255.,652285.,652195.,652200.,652200.,
+    #               652240.,652230.,652260.,652260.,652265.])
+    # y = np.array([5772960.,5772970.,5772970.,5772970.,5772970.,
+    #               5772980.,5772980.,5772980.,5772980.,5772980.,
+    #               5772990.,5772990.,5772990.,5772990.,5773000.,
+    #               5773000.,5773000.,5773000.,5773010.,5773010.,
+    #               5773010.,5773010.,5773020.,5773020.,5773030.,
+    #               5773030.,5773030.,5772985.,5772990.,5772995.,
+    #               5773015.,5773025.,5772985.,5772990.,5772995.])
+    # z = np.array([2.16512767,4.97776467,4.2279204 ,0.        ,
+    #               8.25658422,0.01238773,5.05858306,8.33503939,
+    #               7.53470443,7.15304826,9.45150218,8.79359049,
+    #               0.0536634 ,0.42101194,0.22721601,1.1458486 ,
+    #               6.79183025,2.50622739,3.76725118,3.97934707,
+    #               0.        ,0.24743279,1.4627512 ,0.38430722,
+    #               5.30171261,0.        ,3.17667353,3.80908144,
+    #               7.12445478,4.83891708,6.10898131,2.93801857,
+    #               2.56170107,2.54503559,1.72767934])
+    # # make semivariogram
+    # from semivariogram import semivariogram
+    # nL = 40
+    # di = [0]
+    # td = 180
+    # nugget,sill,orange,vark,h,g,c,semi_mod,semi_popt = semivariogram(
+    #               x,y,z,nL,di,td,stype='omnidirectional',negscat=0.5,
+    #               model='exponential',graph=False,lunit='m',
+    #               p0=(0.,20.,1./8.),runtimediag=False)
+    # # x and y coordinates for the surface
+    # xnew = np.arange(np.amin(x),np.amax(x),5.)
+    # ynew = np.arange(np.amin(y),np.amax(y),5.)
+    # xnew, ynew, znew, varnew = kriging(x,y,z,semi_mod,semi_popt,
+    #                                    xnew=xnew,ynew=ynew,silent=True,
+    #                                    plot=True,masked=False,eop=None)
+    # print(np.round(znew[0],3))
+    # # [ 3.576  3.758  3.912  3.937  3.884  3.83   3.792  3.759  3.71   3.613
+    # #   3.407  2.981  2.165  2.366  2.458  2.797  3.304  3.817  4.298  4.717
+    # #   4.918  4.77   4.478  4.238]
+    # print(np.round(np.mean(znew),2))
+    # # 3.69
 
-    # block krig the surface
-    bave, bvar = kriging(x, y, z, semi_mod, semi_popt,
-                         xnew=xnew, ynew=ynew,
-                         silent=True,plot=False,masked=False,eop=None,block=True)
-    print(np.round(bave,3), np.round(np.sqrt(bvar),3))
-    # 3.659 2.842
+    # # block krig the surface
+    # bave, bvar = kriging(x, y, z, semi_mod, semi_popt,
+    #                      xnew=xnew, ynew=ynew,
+    #                      silent=True,plot=False,masked=False,eop=None,block=True)
+    # print(np.round(bave,3), np.round(np.sqrt(bvar),3))
+    # # 3.659 2.842
 
-    # krig only at points of interest
-    poi = np.array([[652209.16,5772986.26],
-                    [652281.10,5773014.27],
-                    [652202.39,5772997.96],
-                    [652264.51,5772992.49],
-                    [652274.81,5772961.62],
-                    [652204.93,5772992.82],
-                    [652232.38,5773021.34],
-                    [652278.25,5773019.58],
-                    [652199.17,5773004.12],
-                    [652276.71,5773006.25]])
-    eopz, eopvar = kriging(x,y,z,semi_mod,semi_popt,xnew=None,
-                           ynew=None,plot=False,masked=False,
-                           silent=True,eop=poi)
-    print(np.round(eopz,3))
-        # [ 6.409  1.677  3.168  1.262  4.636  6.534  2.244  2.255  2.996  2.111]
+    # # krig only at points of interest
+    # poi = np.array([[652209.16,5772986.26],
+    #                 [652281.10,5773014.27],
+    #                 [652202.39,5772997.96],
+    #                 [652264.51,5772992.49],
+    #                 [652274.81,5772961.62],
+    #                 [652204.93,5772992.82],
+    #                 [652232.38,5773021.34],
+    #                 [652278.25,5773019.58],
+    #                 [652199.17,5773004.12],
+    #                 [652276.71,5773006.25]])
+    # eopz, eopvar = kriging(x,y,z,semi_mod,semi_popt,xnew=None,
+    #                        ynew=None,plot=False,masked=False,
+    #                        silent=True,eop=poi)
+    # print(np.round(eopz,3))
+    #     # [ 6.409  1.677  3.168  1.262  4.636  6.534  2.244  2.255  2.996  2.111]
 
-    # krig both, whole surface and on points of interest
-    xnew = np.arange(np.min(x),np.max(x),5.)
-    ynew = np.arange(np.min(y),np.max(y),5.)
-    xnew, ynew, znew, varnew, eopz, eopvar = kriging(x,y,z,semi_mod,
-                                             semi_popt,xnew=xnew,
-                                             ynew=ynew,plot=False,
-                                             masked=False,silent=True,
-                                             eop=poi)
-    print(np.round(znew[0],3))
-        # [ 3.576  3.758  3.912  3.937  3.884  3.83   3.792  3.759  3.71   3.613
-        #   3.407  2.981  2.165  2.366  2.458  2.797  3.304  3.817  4.298  4.717
-        #   4.918  4.77   4.478  4.238]
-    print(np.round(eopz,3))
-        # [ 6.409  1.677  3.168  1.262  4.636  6.534  2.244  2.255  2.996  2.111]
+    # # krig both, whole surface and on points of interest
+    # xnew = np.arange(np.min(x),np.max(x),5.)
+    # ynew = np.arange(np.min(y),np.max(y),5.)
+    # xnew, ynew, znew, varnew, eopz, eopvar = kriging(x,y,z,semi_mod,
+    #                                          semi_popt,xnew=xnew,
+    #                                          ynew=ynew,plot=False,
+    #                                          masked=False,silent=True,
+    #                                          eop=poi)
+    # print(np.round(znew[0],3))
+    #     # [ 3.576  3.758  3.912  3.937  3.884  3.83   3.792  3.759  3.71   3.613
+    #     #   3.407  2.981  2.165  2.366  2.458  2.797  3.304  3.817  4.298  4.717
+    #     #   4.918  4.77   4.478  4.238]
+    # print(np.round(eopz,3))
+    #     # [ 6.409  1.677  3.168  1.262  4.636  6.534  2.244  2.255  2.996  2.111]
 
