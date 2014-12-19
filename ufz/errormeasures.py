@@ -62,7 +62,8 @@ import numpy as np
 
     History
     -------
-    Written,  AP, Jul 2014
+    Written, AP, Jul 2014
+    Modified MC, Dec 2014 - use simple formulas that work with normal and masked arrays but do not deal with NaN
 """
 
 def bias(y_obs,y_mod):
@@ -79,23 +80,24 @@ def bias(y_obs,y_mod):
     -0.43
 
     """
-    # check
-    if (y_obs.ndim!=1) or (y_mod.ndim!=1):
-        raise ValueError('bias: input must be 1D')
-    elif y_obs.size!=y_mod.size:
-        raise ValueError('bias: input must be of same size')
-    # calc
-    else:
-        # check if masked or not
-        try:
-            temp = y_obs.mask
-            temp = y_mod.mask
-        except AttributeError:
-            y_obs=np.ma.array(y_obs, mask=np.isnan(y_obs))
-            y_mod=np.ma.array(y_mod, mask=np.isnan(y_mod))
-        y_modr = np.ma.array(y_mod, mask=y_mod.mask | y_obs.mask)    
-        y_obsr = np.ma.array(y_obs, mask=y_mod.mask | y_obs.mask)
-    return np.ma.mean(y_obsr) - np.ma.mean(y_modr)
+    # # check
+    # if (y_obs.ndim!=1) or (y_mod.ndim!=1):
+    #     raise ValueError('bias: input must be 1D')
+    # elif y_obs.size!=y_mod.size:
+    #     raise ValueError('bias: input must be of same size')
+    # # calc
+    # else:
+    #     # check if masked or not
+    #     try:
+    #         temp = y_obs.mask
+    #         temp = y_mod.mask
+    #     except AttributeError:
+    #         y_obs=np.ma.array(y_obs, mask=np.isnan(y_obs))
+    #         y_mod=np.ma.array(y_mod, mask=np.isnan(y_mod))
+    #     y_modr = np.ma.array(y_mod, mask=y_mod.mask | y_obs.mask)    
+    #     y_obsr = np.ma.array(y_obs, mask=y_mod.mask | y_obs.mask)
+    # return np.ma.mean(y_obsr) - np.ma.mean(y_modr)
+    return y_obs.mean() - y_mod.mean()
 
 def mae(y_obs,y_mod):
     """
@@ -143,23 +145,24 @@ def mse(y_obs,y_mod):
     0.54
 
     """
-    # check
-    if (y_obs.ndim!=1) or (y_mod.ndim!=1):
-        raise ValueError('mse: input must be 1D')
-    elif y_obs.size!=y_mod.size:
-        raise ValueError('mse: input must be of same size')
-    # calc
-    else:
-        # check if masked or not
-        try:
-            temp = y_obs.mask
-            temp = y_mod.mask
-        except AttributeError:
-            y_obs=np.ma.array(y_obs, mask=np.isnan(y_obs))
-            y_mod=np.ma.array(y_mod, mask=np.isnan(y_mod))
-        y_modr = np.ma.array(y_mod, mask=y_mod.mask | y_obs.mask)    
-        y_obsr = np.ma.array(y_obs, mask=y_mod.mask | y_obs.mask)
-        return np.ma.mean((y_obsr-y_modr)**2)
+    # # check
+    # if (y_obs.ndim!=1) or (y_mod.ndim!=1):
+    #     raise ValueError('mse: input must be 1D')
+    # elif y_obs.size!=y_mod.size:
+    #     raise ValueError('mse: input must be of same size')
+    # # calc
+    # else:
+    #     # check if masked or not
+    #     try:
+    #         temp = y_obs.mask
+    #         temp = y_mod.mask
+    #     except AttributeError:
+    #         y_obs=np.ma.array(y_obs, mask=np.isnan(y_obs))
+    #         y_mod=np.ma.array(y_mod, mask=np.isnan(y_mod))
+    #     y_modr = np.ma.array(y_mod, mask=y_mod.mask | y_obs.mask)    
+    #     y_obsr = np.ma.array(y_obs, mask=y_mod.mask | y_obs.mask)
+    #     return np.ma.mean((y_obsr-y_modr)**2)
+    return ((y_obs-y_mod)**2).mean()
 
 def rmse(y_obs,y_mod):
     """
@@ -175,23 +178,24 @@ def rmse(y_obs,y_mod):
     0.73
 
     """
-    # check
-    if (y_obs.ndim!=1) or (y_mod.ndim!=1):
-        raise ValueError('rmse: input must be 1D')
-    elif y_obs.size!=y_mod.size:
-        raise ValueError('rmse: input must be of same size')
-    # calc
-    else:
-        # check if masked or not
-        try:
-            temp = y_obs.mask
-            temp = y_mod.mask
-        except AttributeError:
-            y_obs=np.ma.array(y_obs, mask=np.isnan(y_obs))
-            y_mod=np.ma.array(y_mod, mask=np.isnan(y_mod))
-        y_modr = np.ma.array(y_mod, mask=y_mod.mask | y_obs.mask)    
-        y_obsr = np.ma.array(y_obs, mask=y_mod.mask | y_obs.mask)
-        return np.ma.sqrt(np.ma.mean((y_obsr-y_modr)**2))
+    # # check
+    # if (y_obs.ndim!=1) or (y_mod.ndim!=1):
+    #     raise ValueError('rmse: input must be 1D')
+    # elif y_obs.size!=y_mod.size:
+    #     raise ValueError('rmse: input must be of same size')
+    # # calc
+    # else:
+    #     # check if masked or not
+    #     try:
+    #         temp = y_obs.mask
+    #         temp = y_mod.mask
+    #     except AttributeError:
+    #         y_obs=np.ma.array(y_obs, mask=np.isnan(y_obs))
+    #         y_mod=np.ma.array(y_mod, mask=np.isnan(y_mod))
+    #     y_modr = np.ma.array(y_mod, mask=y_mod.mask | y_obs.mask)
+    #     y_obsr = np.ma.array(y_obs, mask=y_mod.mask | y_obs.mask)
+    #     return np.ma.sqrt(np.ma.mean((y_obsr-y_modr)**2))
+    return ((y_obs-y_mod)**2).mean()**0.5
 
 def nse(y_obs,y_mod):
     """
@@ -207,25 +211,27 @@ def nse(y_obs,y_mod):
     0.71
 
     """
-    # check
-    if (y_obs.ndim!=1) or (y_mod.ndim!=1):
-        raise ValueError('r2: input must be 1D')
-    elif y_obs.size!=y_mod.size:
-        raise ValueError('r2: input must be of same size')
-    # calc
-    else:
-        # check if masked or not
-        try:
-            temp = y_obs.mask
-            temp = y_mod.mask
-        except AttributeError:
-            y_obs=np.ma.array(y_obs, mask=np.isnan(y_obs))
-            y_mod=np.ma.array(y_mod, mask=np.isnan(y_mod))
-        y_modr = np.ma.array(y_mod, mask=y_mod.mask | y_obs.mask)    
-        y_obsr = np.ma.array(y_obs, mask=y_mod.mask | y_obs.mask)
-        a = np.ma.sum((y_obsr - y_modr)**2)
-        b = np.ma.sum((y_obsr - np.ma.mean(y_obsr))**2)
-    return 1. - (a / b)
+    # # check
+    # if (y_obs.ndim!=1) or (y_mod.ndim!=1):
+    #     raise ValueError('r2: input must be 1D')
+    # elif y_obs.size!=y_mod.size:
+    #     raise ValueError('r2: input must be of same size')
+    # # calc
+    # else:
+    #     # check if masked or not
+    #     try:
+    #         temp = y_obs.mask
+    #         temp = y_mod.mask
+    #     except AttributeError:
+    #         y_obs=np.ma.array(y_obs, mask=np.isnan(y_obs))
+    #         y_mod=np.ma.array(y_mod, mask=np.isnan(y_mod))
+    #     y_modr = np.ma.array(y_mod, mask=y_mod.mask | y_obs.mask)    
+    #     y_obsr = np.ma.array(y_obs, mask=y_mod.mask | y_obs.mask)
+    #     a = np.ma.sum((y_obsr - y_modr)**2)
+    #     b = np.ma.sum((y_obsr - np.ma.mean(y_obsr))**2)
+    # return 1. - (a / b)
+    return 1. - ((y_obs-y_mod)**2).sum()/((y_obs-y_obs.mean())**2).sum()
+
 
 def pear2(y_obs,y_mod):
     """
@@ -241,23 +247,24 @@ def pear2(y_obs,y_mod):
     0.99
 
     """
-    # check
-    if (y_obs.ndim!=1) or (y_mod.ndim!=1):
-        raise ValueError('pear2: input must be 1D')
-    elif y_obs.size!=y_mod.size:
-        raise ValueError('pear2: input must be of same size')
-    # calc
-    else:
-        # check if masked or not
-        try:
-            temp = y_obs.mask
-            temp = y_mod.mask
-        except AttributeError:
-            y_obs=np.ma.array(y_obs, mask=np.isnan(y_obs))
-            y_mod=np.ma.array(y_mod, mask=np.isnan(y_mod))
-        y_modr = np.ma.array(y_mod, mask=y_mod.mask | y_obs.mask)    
-        y_obsr = np.ma.array(y_obs, mask=y_mod.mask | y_obs.mask)    
-        return np.corrcoef(y_obsr.compressed(), y_modr.compressed())[0,1]**2
+    # # check
+    # if (y_obs.ndim!=1) or (y_mod.ndim!=1):
+    #     raise ValueError('pear2: input must be 1D')
+    # elif y_obs.size!=y_mod.size:
+    #     raise ValueError('pear2: input must be of same size')
+    # # calc
+    # else:
+    #     # check if masked or not
+    #     try:
+    #         temp = y_obs.mask
+    #         temp = y_mod.mask
+    #     except AttributeError:
+    #         y_obs=np.ma.array(y_obs, mask=np.isnan(y_obs))
+    #         y_mod=np.ma.array(y_mod, mask=np.isnan(y_mod))
+    #     y_modr = np.ma.array(y_mod, mask=y_mod.mask | y_obs.mask)    
+    #     y_obsr = np.ma.array(y_obs, mask=y_mod.mask | y_obs.mask)    
+    #     return np.corrcoef(y_obsr.compressed(), y_modr.compressed())[0,1]**2
+    return ((y_obs-y_obs.mean())*(y_mod-y_mod.mean())).mean()/y_obs.std()/y_mod.std()
 
 if __name__ == '__main__':
     import doctest
