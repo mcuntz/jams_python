@@ -342,7 +342,7 @@ def dumpnetcdf( fname, dims=None, fileattributes=None, **variables ):
         History
         -------
         Written,  ST, Sep 2014
-        Modified
+        Modified  ST, Jan 2015 - bug fix, only parse ndim dimensions to writenetcdf
     """
     # check if dims are given
     if dims is None:
@@ -365,11 +365,11 @@ def dumpnetcdf( fname, dims=None, fileattributes=None, **variables ):
         if type( value[1] ) != dict:
             if  value.ndim > len( dims ):
                 raise ValueError( '***size mismatch: variable '+key )
-            writenetcdf( fh, name = key, dims = dims, var = value, comp = True )
+            writenetcdf( fh, name = key, dims = dims[: value.ndim], var = value, comp = True )
         else:
             if  value[0].ndim > len( dims ):
                 raise ValueError( '***size mismatch: variable '+key )
-            writenetcdf( fh, name = key, dims = dims, var = value[0],
+            writenetcdf( fh, name = key, dims = dims[: value.ndim], var = value[0],
                          attributes = value[1], comp = True )
     fh.close()
 
