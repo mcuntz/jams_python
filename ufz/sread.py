@@ -1,13 +1,12 @@
 #!/usr/bin/env python
 from __future__ import print_function
 import numpy as np
-from ufz.lif import lif
 
-def sread(file, nc=0, skip=0, cskip=0, hskip=0, separator='',
-          squeeze=False, reform=False, skip_blank=False, comment='',
+def sread(file, nc=0, skip=0, cskip=0, hskip=0, separator=None,
+          squeeze=False, reform=False, skip_blank=False, comment=None,
           fill=False, fill_value='', strip=None,
           header=False, full_header=False,
-          quiet=False, transpose=False, strarr=False):
+          transpose=False, strarr=False):
     """
         Read strings into string array from a file.
         Lines or columns can be skipped.
@@ -21,11 +20,11 @@ def sread(file, nc=0, skip=0, cskip=0, hskip=0, separator='',
 
         Definition
         ----------
-        def sread(file, nc=0, skip=0, cskip=0, hskip=0, separator='',
-                  squeeze=False, reform=False, skip_blank=False, comment='',
+        def sread(file, nc=0, skip=0, cskip=0, hskip=0, separator=None,
+                  squeeze=False, reform=False, skip_blank=False, comment=None,
                   fill=False, fill_value='', strip=None,
                   header=False, full_header=False,
-                  quiet=False, transpose=False, strarr=False):
+                  transpose=False, strarr=False):
 
 
         Input
@@ -35,22 +34,19 @@ def sread(file, nc=0, skip=0, cskip=0, hskip=0, separator='',
 
         Optional Input Parameters
         -------------------------
-        nc           number of columns to be read (default: all)
+        nc           number of columns to be read (default: all (nc<=0))
                      nc can be a vector of column indeces,
-                       starting with 0; cskip will be ignored then.
-        separator    columns separator
+                     starting with 0; cskip will be ignored then.
+        skip         number of lines to skip at the beginning of file (default: 0)
+        cskip        number of columns to skip at the beginning of each line (default: 0)
+        hskip        number of lines in skip that do not belong to header (default: 0)
+        separator    column separator
                      If not given, columns separator are (in order):
-                       comma, semi-colon, whitespace
-        skip         number of lines to skip at the beginning of
-                       the file (default 0)
-        cskip        number of columns to skip at the beginning of
-                       each line (default 0)
-        hskip        number of lines in skip that do not belong to header (default 0)
-        comment      line gets excluded if first character of line is
-                      in comment sequence
+                     comma, semi-colon, whitespace
+        comment      line gets excluded if first character of line is in comment sequence
                      sequence can be e.g. string, list or tuple
-        fill_value   value to fill in if not enough columns line
-                      and fill=True (default '')
+        fill_value   value to fill in if not enough columns in line
+                     and fill=True (default: '')
         strip        Strip strings with str.strip(strip) (default: None)
 
 
@@ -59,7 +55,7 @@ def sread(file, nc=0, skip=0, cskip=0, hskip=0, separator='',
         squeeze      True:  2-dim array will be cleaned of degenerated
                             dimension, i.e. results in vector
                      False: array will be two-dimensional as read (default)
-        reform       Same as squeeze (looks for squeeze or reform)
+        reform       Same as squeeze.
         skip_blank   True:  continues reading after blank line
                      False: stops reading at first blank line (default)
         fill         True:  fills in fill_value if not enough columns in line
@@ -71,8 +67,6 @@ def sread(file, nc=0, skip=0, cskip=0, hskip=0, separator='',
                      False: header will be split in columns,
                             exactly as the data, and will hold only the
                             selected columns (default)
-        quiet        True:  do not show reason if read fails and returns None
-                     False: show error for failed read (default)
         transpose    True:  column-major format output(0:ncolumns,0:nlines)
                      False: row-major format output(0:nlines,0:ncolumns) (default)
         strarr       True:  return as numpy array of strings
@@ -81,9 +75,11 @@ def sread(file, nc=0, skip=0, cskip=0, hskip=0, separator='',
 
         Output
         ------
-        Either float array containing numbers from file if header=False
-        or string array of file header if header=True
-        or string vector of file header if header=True, full_header=True
+        Depending on options:
+            list of strings if header=False
+            2D-array of strings if strarr=True and header=False
+            String array of file header if header=True
+            String vector of file header if header=True and full_header=True
 
 
         Restrictions
@@ -112,7 +108,7 @@ def sread(file, nc=0, skip=0, cskip=0, hskip=0, separator='',
         >>> print(sread(filename, skip=1))
         [['1.1', '1.2', '1.3', '1.4'], ['2.1', '2.2', '2.3', '2.4']]
         >>> print(sread(filename, skip=2))
-        ['2.1', '2.2', '2.3', '2.4']
+        [['2.1', '2.2', '2.3', '2.4']]
         >>> print(sread(filename, skip=1, cskip=1))
         [['1.2', '1.3', '1.4'], ['2.2', '2.3', '2.4']]
         >>> print(sread(filename, nc=2, skip=1, cskip=1))
@@ -167,11 +163,6 @@ def sread(file, nc=0, skip=0, cskip=0, hskip=0, separator='',
         >>> file.close()
         >>> print(sread(filename, skip=1))
         [['1.1', '1.2', '1.3', '1.4'], ['2.1', '2.2', '2.3', '2.4']]
-        >>> sread(filename, skip=1, skip_blank=True)
-        SREAD: Line has not enough columns to be indexed: # First
-        >>> sread(filename, skip=1, skip_blank=True, quiet=True)
-        >>> print(sread(filename, skip=1, skip_blank=True, fill=True, fill_value='M'))
-        [['1.1', '1.2', '1.3', '1.4'], ['2.1', '2.2', '2.3', '2.4'], ['3.1', '3.2', '3.3', '3.4'], ['#', 'First', 'M', 'M'], ['!', 'Second', 'second', 'comment'], ['4.1', '4.2', '4.3', '4.4']]
         >>> print(sread(filename, skip=1, skip_blank=True, comment='#'))
         [['1.1', '1.2', '1.3', '1.4'], ['2.1', '2.2', '2.3', '2.4'], ['3.1', '3.2', '3.3', '3.4'], ['!', 'Second', 'second', 'comment'], ['4.1', '4.2', '4.3', '4.4']]
         >>> print(sread(filename, skip=1, skip_blank=True, comment='#!'))
@@ -210,11 +201,26 @@ def sread(file, nc=0, skip=0, cskip=0, hskip=0, separator='',
         >>> print(sread(filename3, nc=2, skip=2, hskip=1, header=True))
         ['head1', 'head2']
 
+        >>> # Create some more data with missing values
+        >>> filename4 = 'test4.dat'
+        >>> file = open(filename4, 'w')
+        >>> file.writelines('Extra header\\n')
+        >>> file.writelines('head1,head2,head3,head4\\n')
+        >>> file.writelines('1.1,1.2,1.3,1.4\\n')
+        >>> file.writelines('2.1,,2.3,2.4\\n')
+        >>> file.close()
+
+        >>> print(sread(filename4, skip=2))
+        [['1.1', '1.2', '1.3', '1.4'], ['2.1', '', '2.3', '2.4']]
+        >>> print(sread(filename4, skip=2, fill=True, fill_value='-1'))
+        [['1.1', '1.2', '1.3', '1.4'], ['2.1', '-1', '2.3', '2.4']]
+
         >>> # Clean up doctest
         >>> import os
         >>> os.remove(filename)
         >>> os.remove(filename2)
         >>> os.remove(filename3)
+        >>> os.remove(filename4)
 
 
         License
@@ -235,7 +241,7 @@ def sread(file, nc=0, skip=0, cskip=0, hskip=0, separator='',
         along with the UFZ makefile project (cf. gpl.txt and lgpl.txt).
         If not, see <http://www.gnu.org/licenses/>.
 
-        Copyright 2009-2013 Matthias Cuntz
+        Copyright 2009-2015 Matthias Cuntz
 
 
         History
@@ -245,25 +251,17 @@ def sread(file, nc=0, skip=0, cskip=0, hskip=0, separator='',
                   MC, Feb 2013 - ported to Python 3
                   MC, Nov 2014 - bug when nc is list and contains 0
                   MC, Nov 2014 - hskip
+                  MC, Feb 2015 - no lif, nc can be tuple
+                               - large re-write
     """
-    #
-    # Determine number of lines in file.
-    nr = lif(file, skip=skip, noblank=skip_blank, comment=comment)
-    if nr <= 0:
-        if not quiet:
-            print("SREAD: Empty file %s." % file)
-        return None
     #
     # Open file
     try:
         f = open(file, 'r')
     except IOError:
-        if not quiet:
-            print("SREAD: Cannot open file %s for reading." % file)
-        return None
+        raise IOError('Cannot open file '+file)
     #
     # Read header and Skip lines
-    count = 0
     if hskip > 0:
         ihskip = 0
         while ihskip < hskip:
@@ -280,19 +278,15 @@ def sread(file, nc=0, skip=0, cskip=0, hskip=0, separator='',
     split = -1
     while True:
         s = f.readline().rstrip()
-        if comment != '':
-            if s != '':
-                if s[0] not in comment:
-                    break
-                else:
-                    continue
-        if skip_blank:
-            if s != '':
-                break
-            else:
+        if len(s) == 0:
+            if skip_blank:
                 continue
+            else:
+                break
+        if comment is not None:
+            if (s[0] in comment): continue
         break
-    if separator == '':
+    if separator is None:
         sep = ','
         res = s.split(sep)
         nres = len(res)
@@ -308,14 +302,13 @@ def sread(file, nc=0, skip=0, cskip=0, hskip=0, separator='',
         sep = separator
         res = s.split(sep)
         nres = len(res)
-    count += 1
     #
     # Determine indices
-    if isinstance(nc, (list, np.ndarray)):
+    if isinstance(nc, (list, tuple, np.ndarray)):
         nnc = len(nc)
         iinc = nc
     else:
-        if nc == 0:
+        if nc <= 0:
             nnc = nres-cskip
             iinc = np.arange(nnc, dtype='int') + cskip
         else:
@@ -331,186 +324,87 @@ def sread(file, nc=0, skip=0, cskip=0, hskip=0, separator='',
             if full_header:
                 var = head
             else:
-                if (skip-hskip) == 1:
-                    hres = head[0].split(sep)
+                var = list()
+                k = 0
+                while k < (skip-hskip):
+                    hres = head[k].split(sep)
                     nhres = len(hres)
-                    if miinc >= nhres:
-                        if fill:
-                            var = list()
-                            m = 0
-                            for i in iinc:
-                                if iinc[i] < nhres:
-                                    if strip != None:
-                                        hres[i] = hres[i].strip(strip)
-                                    var.append(hres[i])
-                                    m += 1
-                            for i in range(nnc-m):
-                                var.append(fill_value)
-                        else:
-                            if not quiet:
-                                print(('SREAD: First header line has not enough '
-                                       'columns to be indexed: %s' % head[0]))
-                            f.close()
-                            return None
-                    else:
-                        if strip != None:
-                            var = [hres[i].strip(strip) for i in iinc]
-                        else:
-                            var = [hres[i] for i in iinc]
-                else:
-                    var = ['']
-                    k = 0
-                    while k < (skip-hskip):
-                        hres = head[k].split(sep)
-                        nhres = len(hres)
-                        if miinc >= nhres:
-                            if fill:
-                                htmp = list()
-                                m = 0
-                                for i in iinc:
-                                    if iinc[i] < nhres:
-                                        htmp.append(hres[i])
-                                        m += 1
-                                for i in range(nnc-m):
-                                    htmp.append(fill_value)
-                            else:
-                                if not quiet:
-                                    print(('FREAD: Header line has not enough '
-                                           'columns to be indexed: %s' % head[k]))
-                                f.close()
-                                return None
-                        else:
-                            if strip != None:
-                                htmp = [hres[i].strip(strip) for i in iinc]
-                            else:
-                                htmp = [hres[i] for i in iinc]
-                        if (squeeze or reform) and (len(htmp)==1):
-                            var.extend(htmp)
-                        else:
-                            var.append(htmp)
-                        k += 1
-                    del var[0]
+                    if (miinc >= nhres) and (not fill):
+                        f.close()
+                        raise ValueError('Line has not enough columns to index: '+head[k])
+                    null = line2var(hres, var, iinc, strip)
+                    k += 1
+                if (skip-hskip) == 1: var = var[0]
         f.close()
-        if (transpose & (np.ndim(var) > 1)):
-            var = np.transpose(var, tuple(reversed(list(range(np.ndim(var))))))
-            if not strarr:
-                nn   = np.size(var,axis=0)
-                lvar = list(range(nn))
-                for i in range(nn):
-                    lvar[i] = list(var[i,:])
-                var = lvar
         if strarr:
-            var = np.array(var,dtype=np.str)
+            var = np.array(var, dtype=np.str)
+            if transpose: var = var.T
+            if squeeze or reform: var = var.squeeze()
+            if fill: var = np.where(var=='', fill_value, var)
+        else:
+            if fill:
+                var = [ [ fill_value if i=='' else i for i in row ] for row in var ]
+            if squeeze or reform:
+                maxi = max([ len(i) for i in var])
+                if maxi==1: var = [ i[0] for i in var ]
+            if transpose and isinstance(var[0], list):
+                var = [list(i) for i in zip(*var)] # transpose
         return var
     #
-    # Values
-    if nr == 1:
-        if miinc >= nres:
-            if fill:
-                var = list()
-                m = 0
-                for i in iinc:
-                    if iinc[i] < nres:
-                        if strip != None:
-                            res[i] = res[i].strip(strip)
-                        var.append(res[i])
-                        m += 1
-                for i in range(nnc-m):
-                    var.append(fill_value)
+    # Values - first line
+    if (miinc >= nres) and (not fill):
+        f.close()
+        raise ValueError('Line has not enough columns to index: '+s)
+    var = list()
+    null = line2var(res, var, iinc, strip)
+    #
+    # Values - rest of file
+    for line in f:
+        s = line.rstrip()
+        if len(s) == 0:
+            if skip_blank:
+                continue
             else:
-                if not quiet:
-                    print(('SREAD: First line has not enough '
-                           'columns to be indexed: %s' % s))
-                f.close()
-                return None
-        else:
-            if strip != None:
-                var = [res[i].strip(strip) for i in iinc]
-            else:
-                var = [res[i] for i in iinc]
-    else:
-        var = ['']
-        if miinc >= nres:
-            if fill:
-                tmp = list()
-                m = 0
-                for i in iinc:
-                    if iinc[i] < nres:
-                        if strip != None:
-                            res[i] = res[i].strip(strip)
-                        tmp.append(res[i])
-                        m += 1
-                for i in range(nnc-m):
-                    tmp.append(fill_value)
-            else:
-                if not quiet:
-                    print(('SREAD: Line has not enough '
-                           'columns to be indexed: %s' % s))
-                f.close()
-                return None
-        else:
-            if strip != None:
-                tmp = [res[i].strip(strip) for i in iinc]
-            else:
-                tmp = [res[i] for i in iinc]
-        if (squeeze or reform) and (len(tmp)==1):
-            var.extend(tmp)
-        else:
-            var.append(tmp)
-        k = 1
-        while k < nr:
-            s = f.readline().rstrip()
-            if len(s) == 0:
-                if skip_blank:
-                    continue
-                else:
-                    break
-            if comment != '':
-                if (s[0] in comment): continue
-            res = s.split(sep)
-            nres = len(res)
-            if miinc >= nres:
-                if fill:
-                    tmp = list()
-                    m = 0
-                    for i in iinc:
-                        if iinc[i] < nres:
-                            if strip != None:
-                                res[i] = res[i].strip(strip)
-                            tmp.append(res[i])
-                            m += 1
-                    for i in range(nnc-m):
-                        tmp.append(fill_value)
-                else:
-                    if not quiet:
-                        print(('SREAD: Line has not enough '
-                               'columns to be indexed: %s' % s))
-                    f.close()
-                    return None
-            else:
-                if strip != None:
-                    tmp = [res[i].strip(strip) for i in iinc]
-                else:
-                    tmp = [res[i] for i in iinc]
-            if (squeeze or reform) and (len(tmp)==1):
-                var.extend(tmp)
-            else:
-                var.append(tmp)
-            k += 1
-        del var[0]
+                break
+        if comment is not None:
+            if (s[0] in comment): continue
+        res = s.split(sep)
+        nres = len(res)
+        if (miinc >= nres) and (not fill):
+            f.close()
+            raise ValueError('Line has not enough columns to index: '+s)
+        null = line2var(res, var, iinc, strip)
     f.close()
-    if (transpose & (np.ndim(var) > 1)):
-        var = np.transpose(var, tuple(reversed(list(range(np.ndim(var))))))
-        if not strarr:
-            nn   = np.size(var,axis=0)
-            lvar = list(range(nn))
-            for i in range(nn):
-                lvar[i] = list(var[i,:])
-            var = lvar
     if strarr:
-        var = np.array(var,dtype=np.str)
+        var = np.array(var, dtype=np.str)
+        if transpose: var = var.T
+        if squeeze or reform: var = var.squeeze()
+        if fill: var = np.where(var=='', fill_value, var)
+    else:
+        if fill:
+            var = [ [ fill_value if i=='' else i for i in row ] for row in var ]
+        if squeeze or reform:
+            maxi = max([ len(i) for i in var])
+            if maxi==1: var = [ i[0] for i in var ]
+        if transpose and isinstance(var[0], list):
+            var = [list(i) for i in zip(*var)] # transpose
 
     return var
+
+
+# Helper for append var with current line already splitted into list
+def line2var(res, var, iinc, strip):
+    nres = len(res)
+    if strip is None:
+        tmp = [res[i] for i in iinc if i < nres]
+    else:
+        tmp = [res[i].strip(strip) for i in iinc if i < nres]
+    rest = len([ i for i in iinc if i >= nres ])
+    if rest > 0:
+        tmp.extend(['']*rest)
+    var.append(tmp)
+    return
+
 
 if __name__ == '__main__':
     import doctest
