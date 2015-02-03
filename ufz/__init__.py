@@ -47,6 +47,7 @@
     fill_nonfinite         Fill missing values by linear interpolation.
     find_in_path           Look for file in system path.
     fread                  Reads in float array from ascii file.
+    fsread                 Simultaneous read of float and string array from ascii file.
     ftp                    Module with functions for interacting with an open FTP connection.
     functions              Module with common functions that are used in curve_fit or fmin parameter estimations.
     gap2lai                Calculation of leaf area index from gap probability observations.
@@ -156,6 +157,7 @@
     Ascii files
     -----------
     fread                  Reads in float array from ascii file.
+    fsread                 Simultaneous read of float and string array from ascii file.
     head                   Return list with first n lines of file.
     lif                    Count number of lines in file.
     sread                  Reads in string array from ascii file.
@@ -430,6 +432,7 @@
                            - ftp
                            - file
                            - encrypt
+              MC, Feb 2015 - fsread
 """
 from __future__ import print_function
 
@@ -469,6 +472,7 @@ from .fgui              import directory_from_gui, file_from_gui, files_from_gui
 from .fill_nonfinite    import fill_nonfinite
 from .find_in_path      import find_in_path
 from .fread             import fread
+from .fsread            import fsread
 try:
     from .gap_filling   import gap_filling
 except ImportError:
