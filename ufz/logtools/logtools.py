@@ -697,7 +697,7 @@ def mean(var1, axis=None, undef=-9999.):
         -------
         Written,  MC, Jun 2014
     """
-    return np.ma.mean(np.ma.array(var1, mask=(var1==undef)), axis=axis)
+    return np.ma.mean(np.ma.array(var1, mask=(var1==undef)), axis=axis).filled(undef)
 
 
 def mini(var1, axis=None, undef=-9999.):
@@ -732,7 +732,7 @@ def mini(var1, axis=None, undef=-9999.):
         -------
         Written,  MC, Jun 2014
     """
-    return np.ma.amin(np.ma.array(var1, mask=(var1==undef)), axis=axis)
+    return np.ma.amin(np.ma.array(var1, mask=(var1==undef)), axis=axis).filled(undef)
 
 
 def maxi(var1, axis=None, undef=-9999.):
@@ -767,7 +767,7 @@ def maxi(var1, axis=None, undef=-9999.):
         -------
         Written,  MC, Jun 2014
     """
-    return np.ma.amax(np.ma.array(var1, mask=(var1==undef)), axis=axis)
+    return np.ma.amax(np.ma.array(var1, mask=(var1==undef)), axis=axis).filled(undef)
 
 
 # Not implemented: met_torad
