@@ -16,6 +16,8 @@
     area_poly              Area of a polygon.
     argsort                Wrapper for numpy.argsort, numpy.ma.argsort, and using sorted for Python iterables.
     around                 Round to the passed power of ten.
+    ascii2ascii            Convert date notations between English and ascii formats.
+    ascii2eng              Convert date notations to English date format YYYY-MM-DD hh:mm:ss.
     astr                   Wrapper for autostring.
     autostring             Format number (array) with given decimal precision.
     cellarea               Calc areas of grid cells in m^2.
@@ -39,6 +41,7 @@
     elementary_effects     Morris measures mu, stddev and mu*
     ellipse_area           Area of ellipse (or circle)
     encrypt                Module to encrypt and decrypt text using a key system as well as a cipher.
+    eng2ascii              Convert date notations to ascii date format DD.MM.YYYY hh:mm:ss.
     errormeasures          Definition of different error measures.
     esat                   Calculates the saturation vapour pressure of water/ice.
     file                   Module with file list function.
@@ -197,8 +200,11 @@
 
     Date & Time
     -----------
+    ascii2ascii            Convert date notations between English and ascii formats.
+    ascii2eng              Convert date notations to English date format YYYY-MM-DD hh:mm:ss.
     date2dec               Converts arrays with calendar date to decimal date.
     dec2date               Converts arrays with decimal date to calendar date.
+    eng2ascii              Convert date notations to ascii date format DD.MM.YYYY hh:mm:ss.
 
 
     Grids / Polygons
@@ -433,6 +439,7 @@
                            - file
                            - encrypt
               MC, Feb 2015 - fsread
+                           - ascii2ascii, ascii2eng, eng2ascii
 """
 from __future__ import print_function
 
@@ -448,6 +455,7 @@ from .alpha_kin_h2o     import alpha_kin_h2o
 from .area_poly         import area_poly
 from .argsort           import argsort
 from .around            import around
+from .ascii2ascii       import ascii2ascii, ascii2eng, eng2ascii
 from .autostring        import autostring, astr
 from .brewer            import register_brewer, get_brewer, plot_brewer, print_brewer
 try:
