@@ -116,7 +116,7 @@ def ascii2ascii(edate, full=False, eng=False):
     iasc  = [ d for d in idate if '-' not in d ]
 
     # Copy ascii to ascii and transform eng to ascii
-    odate = idate.copy()
+    odate = np.zeros((ndate,), dtype='|S19')
     if eng:
         if len(iieng) > 0:
             odate[iieng] = dec2date(date2dec(eng=ieng),   eng=True)
