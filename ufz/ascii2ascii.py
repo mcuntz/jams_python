@@ -50,6 +50,18 @@ def ascii2ascii(edate, full=False, eng=False):
         >>> print(ascii2ascii(edate, eng=True, full=True))
         ['2014-11-12 12:00:00', '2015-03-01 17:56:00', '1990-12-01 00:00:00', '1786-05-04 00:00:00']
 
+        >>> print(ascii2ascii(list(edate)))
+        ['12.11.2014 12:00', '01.03.2015 17:56:00', '01.12.1990', '04.05.1786']
+
+        >>> print(ascii2ascii(tuple(edate)))
+        ('12.11.2014 12:00', '01.03.2015 17:56:00', '01.12.1990', '04.05.1786')
+
+        >>> print(ascii2ascii(np.array(edate)))
+        ['12.11.2014 12:00' '01.03.2015 17:56:00' '01.12.1990' '04.05.1786']
+
+        >>> print(ascii2ascii(edate[0]))
+        12.11.2014 12:00
+
 
         License
         -------
@@ -94,7 +106,7 @@ def ascii2ascii(edate, full=False, eng=False):
         idate   = edate.flatten()
     else:
         isscalar = True
-        idate  = np.array(edate)
+        idate  = np.array([edate])
     ndate = idate.size
         
     # Search eng and ascii dates
@@ -106,11 +118,15 @@ def ascii2ascii(edate, full=False, eng=False):
     # Copy ascii to ascii and transform eng to ascii
     odate = idate.copy()
     if eng:
-        odate[iieng] = dec2date(date2dec(eng=ieng),   eng=True)
-        odate[iiasc] = dec2date(date2dec(ascii=iasc), eng=True)
+        if len(iieng) > 0:
+            odate[iieng] = dec2date(date2dec(eng=ieng),   eng=True)
+        if len(iiasc) > 0:
+            odate[iiasc] = dec2date(date2dec(ascii=iasc), eng=True)
     else:
-        odate[iieng] = dec2date(date2dec(eng=ieng),   ascii=True)
-        odate[iiasc] = dec2date(date2dec(ascii=iasc), ascii=True)
+        if len(iieng) > 0:
+            odate[iieng] = dec2date(date2dec(eng=ieng),   ascii=True)
+        if len(iiasc) > 0:
+            odate[iiasc] = dec2date(date2dec(ascii=iasc), ascii=True)
     
     # Cut to input lengths
     if not full:
@@ -177,3 +193,13 @@ if __name__ == '__main__':
     # print(ascii2ascii(edate, full=True))
     # print(ascii2ascii(edate, eng=True))
     # print(ascii2ascii(edate, eng=True, full=True))
+    # print(type(ascii2ascii(edate)))
+    # print(type(ascii2ascii(list(edate))))
+    # print(type(ascii2ascii(tuple(edate))))
+    # print(type(ascii2ascii(np.array(edate))))
+    # print(type(ascii2ascii(edate[0])))
+    # print(ascii2ascii(edate))
+    # print(ascii2ascii(list(edate)))
+    # print(ascii2ascii(tuple(edate)))
+    # print(ascii2ascii(np.array(edate)))
+    # print(ascii2ascii(edate[0]))
