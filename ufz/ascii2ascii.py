@@ -89,34 +89,25 @@ def ascii2ascii(edate, full=False, eng=False):
         Written,  MC, Feb 2015
     """
     
-    # Input size and shape
-    islist   = False
-    istuple  = False
-    isarray  = False
-    isscalar = False
+    # Input type and shape
     if isinstance(edate, list):
-        islist = True
         idate  = np.array(edate)
     elif isinstance(edate, tuple):
-        istuple = True
         idate  = np.array(edate)
     elif isinstance(edate, np.ndarray):
-        isarray = True
-        ishape  = edate.shape
         idate   = edate.flatten()
     else:
-        isscalar = True
         idate  = np.array([edate])
     ndate = idate.size
         
-    # Search eng and ascii dates
+    # Values and indices of eng and ascii dates
     iieng = [ i for i, d in enumerate(idate) if '-' in d ]
     ieng  = [ d for d in idate if '-' in d ]
     iiasc = [ i for i, d in enumerate(idate) if '-' not in d ]
     iasc  = [ d for d in idate if '-' not in d ]
 
-    # Copy ascii to ascii and transform eng to ascii
-    odate = np.zeros((ndate,), dtype='|S19')
+    # Convert to given output type
+    odate = np.zeros((ndate,), dtype='|S19') # 'DD.MM.YYYY hh:mm:ss' are 19 characters
     if eng:
         if len(iieng) > 0:
             odate[iieng] = dec2date(date2dec(eng=ieng),   eng=True)
@@ -128,21 +119,18 @@ def ascii2ascii(edate, full=False, eng=False):
         if len(iiasc) > 0:
             odate[iiasc] = dec2date(date2dec(ascii=iasc), ascii=True)
     
-    # Cut to input lengths
+    # Cut output to input lengths
     if not full:
         for i, d in enumerate(odate):
-            ni = len(idate[i])
-            no = len(d)
-            if ni != no:
-                odate[i] = d[:ni]
+            odate[i] = d[:len(idate[i])]
                 
-    # Return
-    if islist:
+    # Return right type
+    if isinstance(edate, list):
         return list(odate)
-    elif istuple:
+    elif isinstance(edate, tuple):
         return tuple(odate)
-    elif isarray:
-        return odate.reshape(ishape)
+    elif isinstance(edate, np.ndarray):
+        return odate.reshape(edate.shape)
     else:
         return odate[0]
 
