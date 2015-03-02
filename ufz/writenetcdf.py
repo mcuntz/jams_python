@@ -369,7 +369,7 @@ def dumpnetcdf( fname, dims=None, fileattributes=None, **variables ):
         else:
             if  value[0].ndim > len( dims ):
                 raise ValueError( '***size mismatch: variable '+key )
-            writenetcdf( fh, name = key, dims = dims[: value.ndim], var = value[0],
+            writenetcdf( fh, name = key, dims = dims[: value[0].ndim ], var = value[0],
                          attributes = value[1], comp = True )
     fh.close()
 
