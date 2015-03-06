@@ -253,7 +253,7 @@ def writenetcdf(fhandle, vhandle=None, var=None, time=None, isdim=False, name=No
     return hand
 
 # write to file
-def dumpnetcdf( fname, dims=None, fileattributes=None, **variables ):
+def dumpnetcdf( fname, dims=None, fileattributes=None, create=True, **variables ):
     """
         Writes variables with the same dimension to a netcdf file (1D-5D).
         It is a wrapper around writenetcdf.
@@ -274,6 +274,7 @@ def dumpnetcdf( fname, dims=None, fileattributes=None, **variables ):
                                                 default is [ 'x', 'y', 'z', 'u', 'v' ]
         fileattributes  2D list or dictionary   global attributes of NetCDF file
                                                 (e.g., history, description, ...)
+        create          bool                    flag for creating file or appending variables
         variables       keyword arguments       keys become variable names, values are either
                                                 numpy arrays to write or list/tuple of
                                                 [ numpy array, attributes ] where attributes 
@@ -343,12 +344,16 @@ def dumpnetcdf( fname, dims=None, fileattributes=None, **variables ):
         -------
         Written,  ST, Sep 2014
         Modified  ST, Jan 2015 - bug fix, only parse ndim dimensions to writenetcdf
+                  ST & MZ, Mar 2015 - added flag to append variables
     """
     # check if dims are given
     if dims is None:
         dims = [ 'x', 'y', 'z', 'u', 'v' ]
     # open netcdf file
-    fh = nc.Dataset( fname, 'w', 'NETCDF4' )
+    if create:
+        fh = nc.Dataset( fname, 'w', 'NETCDF4' )
+    else:
+        fh = nc.Dataset( fname, 'a', 'NETCDF4' )
     # write file attributes
     if fileattributes is not None:
         writenetcdf(fh, fileattributes=fileattributes)
