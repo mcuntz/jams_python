@@ -358,13 +358,14 @@ def dumpnetcdf( fname, dims=None, fileattributes=None, create=True, **variables 
     if fileattributes is not None:
         writenetcdf(fh, fileattributes=fileattributes)
     # create dimensions according to first variable
-    if ( type( variables.values()[0][1] ) != dict ):
-        arr_shape = variables.values()[ 0 ].shape
-    else:
-        arr_shape = variables.values()[ 0 ][0].shape
-    for dd in np.arange( len( arr_shape ) ):
-        writenetcdf( fh, name = dims[dd], dims = arr_shape[dd], 
-                     var = np.arange( arr_shape[dd] ), isdim = True ) 
+    if create:
+        if ( type( variables.values()[0][1] ) != dict ):
+            arr_shape = variables.values()[ 0 ].shape
+        else:
+            arr_shape = variables.values()[ 0 ][0].shape
+        for dd in np.arange( len( arr_shape ) ):
+            writenetcdf( fh, name = dims[dd], dims = arr_shape[dd], 
+                         var = np.arange( arr_shape[dd] ), isdim = True ) 
     # loop over variables
     for key, value in variables.iteritems():
         if type( value[1] ) != dict:
