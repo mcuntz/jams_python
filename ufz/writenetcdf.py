@@ -344,7 +344,7 @@ def dumpnetcdf( fname, dims=None, fileattributes=None, create=True, **variables 
         -------
         Written,  ST, Sep 2014
         Modified  ST, Jan 2015 - bug fix, only parse ndim dimensions to writenetcdf
-                  ST & MZ, Mar 2015 - added flag to append variables
+                  ST & MZ, Mar 2015 - added flag to append variables 
     """
     # check if dims are given
     if dims is None:
