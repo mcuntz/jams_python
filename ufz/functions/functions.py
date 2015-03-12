@@ -54,6 +54,7 @@
         lloyd_only_rref   1 param:  Lloyd & Taylor (1994) Arrhenius type with fixed exponential term
         poly              n params: General polynomial: c0 + c1*x + c2*x**2 + ... + cn*x**n
         sabx              2 params: sqrt(f1x), i.e. general sqrt(1/x) function: sqrt(a + b/x)
+        see               3 params: Sequential Elementary Effects fitting function: a*(x-b)**c
 
     Current test functions are
     ackley                >=2 params:     Ackley function, global optimum: 0.0 at origin
@@ -367,9 +368,9 @@ def line0(x,a):
   return a*x
 
 def line0_p(x,p):
-  ''' Straight line through origin: a*x
+  ''' Straight line through origin: p[0]*x
         x    independent variable
-        a    parameter
+        p    parameter
   '''
   return p*x
 
@@ -471,7 +472,7 @@ def sabx(x, a, b):
   return np.sqrt(a+b/x)
 
 def sabx_p(x, p):
-  """ sqrt(a + b/x)
+  """ sqrt(p[0] + p[1]/x)
         p    array of size 2, parameters
         x    independent variable
   """
@@ -498,9 +499,9 @@ def cost2_sabx(p,x,y):
 # c0 + c1*x + c2*x**2 + ... + cn*x**n
 def poly(x,*args):
   ''' General polynomial: c0 + c1*x + c2*x**2 + ... + cn*x**n
-        x    independent variable
-        a    1. parameter
-        b    2. parameter
+        x     independent variable
+        c0    1. parameter
+        c1    2. parameter
         ...
   '''
   return np.polynomial.polynomial.polyval(x, list(args))
@@ -527,6 +528,39 @@ def cost2_poly(p,x,y):
         y    dependent variable to optimise
   '''
   return np.sum((y-poly_p(x,p))**2)
+
+
+# -----------------------------------------------------------
+# a*(x-b)**c - Sequential Elementary Effects fitting function
+def see(x, a, b, c):
+  """ a*(x-b)**c
+        a, b, c  parameters
+        x        independent variable
+  """
+  return np.where((x-b)<0., 0., a*(x-b)**c)
+
+def see_p(x, p):
+  """ p[0]*(x-p[1])**p[2]
+        a, b, c  parameters
+        x        independent variable
+  """
+  return np.where((x-p[1]) < 0., 0., p[0] * (x-p[1])**p[2])
+
+def cost_see(p, x, y):
+  ''' Cost function for Sequential Elementary Effects fitting function with sum of absolute deviations
+        p    array of size 3, parameters
+        x    independent variable
+        y    dependent variable to optimise
+  '''
+  return np.sum(np.abs(y-see_p(x,p)))
+
+def cost2_see(p,x,y):
+  ''' Cost function for Sequential Elementary Effects fitting function with sum of squared deviations
+        p    array of size 3, parameters
+        x    independent variable
+        y    dependent variable to optimise
+  '''
+  return np.sum((y-see_p(x,p))**2)
 
 
 # -----------------------------------------------------------
