@@ -49,6 +49,7 @@ def clockplot(sub, si, sti=None, stierr=None,
               pmod        = [ 1,                 8,                  9,               8,
                               1,                 3,                  5,               3,
                               5,                 9],             # # of parameters per class
+              cmod        = 'mhm',                               # color scheme chosen ('mhm' or 'noah')
               saname      = ['Sobol', 'weighted Sobol', 'RMSE'], # stack names
               indexname   = ['$S_i$', '$S_{Ti}-S_i$'],           # index legend name
               star        = None,                                # star symbols
@@ -109,6 +110,7 @@ def clockplot(sub, si, sti=None, stierr=None,
                       pmod  = [ 1,                 8,                  9,               8,
                                 1,                 3,                  5,               3,
                                 5,                 9],
+                      cmod  = 'mhm',
                       saname = ['Sobol', 'weighted Sobol', 'RMSE'],
                       indexname = ['$S_i$', '$S_{Ti}-S_i$'],
                       star = None,
@@ -176,6 +178,7 @@ def clockplot(sub, si, sti=None, stierr=None,
         pmod = [ 1,                 8,                  9,               8,
                  1,                 3,                  5,               3,
                  5,                 9],                                                  number of parameters per class
+        cmod = 'mhm',                                                                    color scheme chose ('mhm' or 'noah')
         saname = ['Sobol', 'weighted Sobol', 'RMSE'],                                    stack names
         indexname = ['$S_i$', '$S_{Ti}-S_i$'],                                           index legend name
         star = None,                                                                     star symbols
@@ -321,20 +324,40 @@ def clockplot(sub, si, sti=None, stierr=None,
         c = np.ones(nmod)*0.7
         c = [ str(i) for i in c ]
     else:
-        # c = [(165./255.,  0./255., 38./255.), # interception
-        #      (215./255., 48./255., 39./255.), # snow
-        #      (244./255.,109./255., 67./255.), # soil moisture
-        #      (244./255.,109./255., 67./255.), # soil moisture
-        #      (253./255.,174./255., 97./255.), # direct runoff
-        #      (254./255.,224./255.,144./255.), # Evapotranspiration
-        #      (171./255.,217./255.,233./255.), # interflow
-        #      (116./255.,173./255.,209./255.), # percolation
-        #      ( 69./255.,117./255.,180./255.), # routing
-        #      ( 49./255., 54./255.,149./255.)] # geology
-        from ufz.brewer import get_brewer
-        c = get_brewer('rdylbu11', rgb=True)
-        tmp = c.pop(5)   # rm yellow
-        c.insert(2,c[2]) # same colour for both soil moistures
+        if (cmod == 'mhm'):
+            # c = [(165./255.,  0./255., 38./255.), # interception
+            #      (215./255., 48./255., 39./255.), # snow
+            #      (244./255.,109./255., 67./255.), # soil moisture
+            #      (244./255.,109./255., 67./255.), # soil moisture
+            #      (253./255.,174./255., 97./255.), # direct runoff
+            #      (254./255.,224./255.,144./255.), # Evapotranspiration
+            #      (171./255.,217./255.,233./255.), # interflow
+            #      (116./255.,173./255.,209./255.), # percolation
+            #      ( 69./255.,117./255.,180./255.), # routing
+            #      ( 49./255., 54./255.,149./255.)] # geology
+            from ufz.brewer import get_brewer
+            c = get_brewer('rdylbu11', rgb=True)
+            tmp = c.pop(5)   # rm yellow
+            c.insert(2,c[2]) # same colour for both soil moistures
+        elif (cmod == 'noah'):
+            from ufz.brewer import get_brewer
+            c = []
+            c.append(get_brewer('reds8',   rgb=True)[3])   #  Radiation      ----   
+            c.append(get_brewer('ylorbr4', rgb=True)[2])   #  Soil Physio.      |
+            c.append(get_brewer('greens4', rgb=True)[2])   #  Veg. Struct.      |   
+            c.append(get_brewer('bugn4',   rgb=True)[2])   #  Physiology     --------
+            c.append(get_brewer('blues4',  rgb=True)[2])   #  Soil Water        |   |
+            c.append(get_brewer('blues4',  rgb=True)[3])   #  Runoff            |   |
+            c.append(get_brewer('reds8',   rgb=True)[5])   #  Input       *     |   |
+            c.append(get_brewer('reds8',   rgb=True)[3])   #  Radiation   *  ----   |
+            c.append(get_brewer('ylorrd8', rgb=True)[2])   #  Transfer    *         |
+            c.append(get_brewer('bugn4',   rgb=True)[2])   #  Physio.     *  --------
+            c.append(get_brewer('blues6',  rgb=True)[2])   #  Snow Water  *
+            c.append(get_brewer('greys8',  rgb=True)[2])   #  Snow Energy * 
+            c.append(get_brewer('greys4',  rgb=True)[2])   #  Soil Energy * 
+
+        else:
+            raise ValueError("cmod can be only 'mhm' or 'noah'")
 
     # conversion factor from parameter number to radian
     n2rad = 2.*np.pi/(nparam+space4yaxis)
