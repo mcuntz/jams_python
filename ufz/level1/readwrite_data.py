@@ -45,7 +45,7 @@ def read_data(files):
         sdate, record, dat, flags, iidate, hdate, hrecord, hdat, hflags = ufz.level1.read_data(files)
 
         # Set flags if variables were not treated yet
-        flags[:,idx] = np.where(flags[:,idx]==np.int(undef), 3, flags[:,idx])
+        flags[:,idx] = np.where(flags[:,idx]==np.int(undef), 9, flags[:,idx])
 
         # Write back data
         ufz.level1.write_data(files, sdate, record, dat, flags, iidate, hdate, hrecord, hdat, hflags)
@@ -166,7 +166,7 @@ def write_data(infiles, sdate, record, dat, flags, iidate, hdate, hrecord, hdat,
         sdate, record, dat, flags, iidate, hdate, hrecord, hdat, hflags = ufz.level1.read_data(files)
 
         # Set flags if variables were not treated yet
-        flags[:,idx] = np.where(flags[:,idx]==np.int(undef), 3, flags[:,idx])
+        flags[:,idx] = np.where(flags[:,idx]==np.int(undef), 9, flags[:,idx])
 
         # Write back data
         ufz.level1.write_data(files, sdate, record, dat, flags, iidate, hdate, hrecord, hdat, hflags)
@@ -226,7 +226,8 @@ def write_data(infiles, sdate, record, dat, flags, iidate, hdate, hrecord, hdat,
         for j in range(iidate[ff], iidate[ff+1]):
             dstr = isdate[j]+','+str(record[j])
             for i in range(len(hdat)):
-                #For test: restate -9999 for all flags: dstr += ','+str(dat[j,i])+',-9999'
+                # For test: restate -9999 for all flags:
+                # dstr += ','+str(dat[j,i])+',-9999'
                 dstr += ','+str(dat[j,i])+','+str(flags[j,i])
             print(dstr, file=f)
         f.close()

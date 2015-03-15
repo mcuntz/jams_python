@@ -23,8 +23,8 @@
     date  = ufz.date2dec(eng=sdate)
 
     # Set flags if variables were not treated yet
-    flags[:,idx] = np.where(flags[:,idx]==np.int(undef), 3, flags[:,idx])
-    # 1st test - set first flag after the initial 3 to 2 if dat is undef
+    flags[:,idx] = np.where(flags[:,idx]==np.int(undef), 9, flags[:,idx])
+    # 1st test - set first flag after the initial 9 to 2 if dat is undef
     itest  = 1
     isflag = 2
     for i in idx:
