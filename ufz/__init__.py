@@ -44,7 +44,7 @@
     eng2ascii              Convert date notations to ascii date format DD.MM.YYYY hh:mm:ss.
     errormeasures          Definition of different error measures.
     esat                   Calculates the saturation vapour pressure of water/ice.
-    file                   Module with file list function.
+    files                  Module with file list function.
     file_from_gui          Open file selection dialog for one single file, returns selected files
     files_from_gui         Open file selection dialog, returns selected files
     fill_nonfinite         Fill missing values by linear interpolation.
@@ -75,6 +75,7 @@
     lagcorr                Calculate time lag of maximum or minimum correlation of two arrays.
     leafmodel              Model to compute photosynthesis and stomatal conductance of canopies.
     leafprojection         Calculation of leaf projection from leaf angle observations.
+    level1                 Module with functions dealing with CHS level1 data files, data and flags.
     lhs                    Latin Hypercube Sampling of any distribution without correlations.
     lif                    Count number of lines in file.
     line_dev_mask          Maskes elements of an array deviating from a line fit.
@@ -179,6 +180,7 @@
     kernel_regression      Multi-dimensional non-parametric regression.
     kernel_regression_h    Optimal bandwidth for kernel regression.
     leafprojection         Calculation of leaf projection from leaf angle observations.
+    level1                 Module with functions dealing with CHS level1 data files, data and flags.
     line_dev_mask          Maskes elements of an array deviating from a line fit.
     logtools               Module with control file functions of Logtools, the Logger Tools Software of Olaf Kolle.
     mad                    Median absolute deviation test.
@@ -262,7 +264,7 @@
     const                  Provides physical, mathematical, computational, and isotope constants.
     directory_from_gui     Open directory selection dialog, returns selected directory
     encrypt                Module to encrypt and decrypt text using a key system as well as a cipher.
-    file                   Module with file list function.
+    files                  Module with file list function.
     file_from_gui          Open file selection dialog for one single file, returns selected files
     files_from_gui         Open file selection dialog, returns selected files
     find_in_path           Look for file in system path.
@@ -440,6 +442,8 @@
                            - encrypt
               MC, Feb 2015 - fsread
                            - ascii2ascii, ascii2eng, eng2ascii
+              MC, Mar 2015 - level1
+                           - rename file to files
 """
 from __future__ import print_function
 
@@ -545,9 +549,10 @@ from .zacharias         import zacharias, zacharias_check
 
 # sub-packages with dependencies to all ufz have to be loaded separately as in scipy
 from . import eddybox
-from . import file
+from . import files
 from . import ftp
 from . import leafmodel
+from . import level1
 from . import logtools
 
 # Information

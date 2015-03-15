@@ -83,7 +83,7 @@
     -------
     Written,  MC, Jun-Dec 2014
 """
-from .file import *
+from .files import *
 
 # Information
 __author__   = "Matthias Cuntz"
