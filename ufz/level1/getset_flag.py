@@ -1,10 +1,8 @@
 #!/usr/bin/env python
 from __future__ import print_function
 import numpy as np
-from ufz.ascii2ascii import ascii2eng
-from ufz.fsread import fsread
 
-__all__ = ['get_flag', 'read_data', 'set_flag']
+__all__ = ['get_flag', 'set_flag']
 
 # --------------------------------------------------------------------
 
@@ -81,122 +79,6 @@ def get_flag(flags, n):
         out[ii] = (flags[ii] // 10**(ilog10[ii]-n)) % 10
 
     return out
-
-# --------------------------------------------------------------------
-
-def read_data(files):
-    """
-        Read and concatenate data from CHS level1 data files.
-
-
-        Definition
-        ----------
-        def read_data(files):
-
-
-        Input
-        -----
-        files   list with CHS data level1 file names
-
-        
-        Output
-        ------
-        sdate, record, dat, flags, iidate, hdate, hrecord, hdat, hflags
-            where
-        sdate     (n,)-array of ascii dates in format YYYY-MM-DD hh:mm:ss
-        record    (n,)-array of record number
-        dat       (n,m)-array of data
-        flags     (n,m)-array of flags
-        iidate    list of nfile+1 entries with start and end indeces in output arrays of the input files
-        hdate     date/time header
-        hrecord   record header
-        hdat      data headers
-        hflags    flags headers
-
-
-        Examples
-        --------
-        files = ufz.files_from_gui(title='Choose Level 1 file(s)')
-        sdate, record, dat, flags, iidate, hdate, hrecord, hdat, hflags = ufz.level1.read_data(files)
-
-
-        License
-        -------
-        This file is part of the UFZ Python package.
-
-        The UFZ Python package is free software: you can redistribute it and/or modify
-        it under the terms of the GNU Lesser General Public License as published by
-        the Free Software Foundation, either version 3 of the License, or
-        (at your option) any later version.
-
-        The UFZ Python package is distributed in the hope that it will be useful,
-        but WITHOUT ANY WARRANTY; without even the implied warranty of
-        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-        GNU Lesser General Public License for more details.
-
-        You should have received a copy of the GNU Lesser General Public License
-        along with the UFZ makefile project (cf. gpl.txt and lgpl.txt).
-        If not, see <http://www.gnu.org/licenses/>.
-
-        Copyright 2015 Matthias Cuntz
-
-
-        History
-        -------
-        Written,  MC, Mar 2015
-    """
-    for cff, ff in enumerate(files):
-        # date, data
-        isdat, ssdat = fsread(ff, skip=1, snc=[0], nc=-1) # array
-        isdate  = ssdat[:,0]
-        irecord = isdat[:,0]
-        idat    = isdat[:,1::2]
-        iflags  = isdat[:,2::2].astype(np.int)
-
-        # date header, data header
-        ihead, shead = fsread(ff, skip=1, snc=[0], nc=-1, header=True) # list
-        ihdate   = shead[0]
-        ihrecord = ihead[0]
-        ihdat    = ihead[1::2]
-        ihflags  = ihead[2::2]
-
-        # Concatenate arrays, check that headers are the same
-        if cff == 0:
-            check_hdat = ihdat # save 1st header for check of following headers 
-            if isdate.size > 1:
-                sdate   = isdate
-                record  = irecord
-                dat     = idat
-                flags   = iflags
-                hdate   = ihdate
-                hrecord = ihrecord
-                hdat    = ihdat
-                hflags  = ihflags
-            else: # assure array and header in case of only one input line
-                sdate   = np.array([isdate])
-                record  = np.array([irecord])
-                dat     = np.array([idat])
-                flags   = np.array([iflags])
-                hdate   = list(ihdate)
-                hrecord = list(ihrecord)
-                hdat    = list(ihdat)
-                hflags  = list(ihflags)
-            iidate = [0, sdate.size] # list with start and end indeces in total arrays
-        else:
-            # Check that the headers are the same
-            if ihdat != check_hdat: raise ValueError('read_data: names in headers are not the same.')
-            # append date and data
-            sdate  = np.append(sdate,  isdate,  axis=0)
-            record = np.append(record, irecord, axis=0)
-            dat    = np.append(dat,    idat,    axis=0)
-            flags  = np.append(flags,  iflags,  axis=0)
-            iidate.append(sdate.size) # append start/end index list
-
-    # assure YYYY-MM-DD hh:mm:ss format even if files had DD.MM.YYYY hh:m:ss format
-    sdate = ascii2eng(sdate, full=True)
-    
-    return sdate, record, dat, flags, iidate, hdate, hrecord, hdat, hflags
-
 
 # --------------------------------------------------------------------
 

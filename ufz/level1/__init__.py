@@ -8,21 +8,32 @@
     get_flag         Get the flags at position n from CHS data flag vector.
     read_data        Read and concatenate data from CHS level1 data files.
     set_flag         Set the flags at position n to iflag at indeces ii of CHS data flag vector.
+    write_data       Write concatenated data back to individual CHS level1 data files.
 
 
     Example
     -------
     # get files
-    files = ufz.files_from_gui(title='Choose Level 1 file(s)')
+    infiles = ufz.files_from_gui(title='Choose Level 1 file(s)')
+
     # read files
-    sdate, record, dat, flags, iidate, hdate, hrecord, hdat, hflags = read_data(files)
+    sdate, record, dat, flags, iidate, hdate, hrecord, hdat, hflags = read_data(infiles)
+
     # julian dates
     date  = ufz.date2dec(eng=sdate)
+
+    # Set flags if variables were not treated yet
+    flags[:,idx] = np.where(flags[:,idx]==np.int(undef), 3, flags[:,idx])
     # 1st test - set first flag after the initial 3 to 2 if dat is undef
-    itest = 1
+    itest  = 1
+    isflag = 2
     for i in idx:
         ii = np.where(dat[:,i]==undef)[0]
-        flags[:,i] = set_flag(flags[:,i], itest, 2, ii)
+        flags[:,i] = set_flag(flags[:,i], itest, isflag, ii)
+
+    # write back data and flags
+    ufz.level1.write_data(infiles, sdate, record, dat, flags, iidate, hdate, hrecord, hdat, hflags)
+
     # plot
     i = 0
     xx = date
@@ -56,7 +67,8 @@
     -------
     Written,  MC, Mar 2015
 """
-from .level1 import *
+from .getset_flag    import get_flag, set_flag
+from .readwrite_data import read_data, write_data
 
 # Information
 __author__   = "Matthias Cuntz"

@@ -435,14 +435,14 @@
               MC, Nov 2014 - pca, head
               AP, Nov 2014 - gap2lai, leafprojection
               MC, Dec 2014 - directory_from_gui, file_from_gui, files_from_gui
-                           - logtools, 
+                           - logtools,
                            - sendmail, argsort, tail
                            - ftp
                            - file
                            - encrypt
               MC, Feb 2015 - fsread
                            - ascii2ascii, ascii2eng, eng2ascii
-              MC, Mar 2015 - level1
+              MC, Mar 2015 - module level1 with get_flag, set_flag, read_data, write_data
                            - rename file to files
 """
 from __future__ import print_function
@@ -489,7 +489,7 @@ try:
     from .gap_filling   import gap_filling
 except ImportError:
     pass # obsolete
-from .gap2lai           import gap2lai, leafprojection 
+from .gap2lai           import gap2lai, leafprojection
 from .get_angle         import get_angle
 from .get_nearest       import get_nearest
 from .grid_mid2edge     import grid_mid2edge

@@ -219,38 +219,23 @@ if __name__ == '__main__':
     # Plot
     #
 
-    if (outtype == 'pdf'):
-        if plotname == '':
-            pdffile = __file__[0:__file__.rfind(".")] + '.pdf'
-        else:
-            pdffile = plotname
-        print('Plot PDF ', pdffile)
-        pdf_pages = PdfPages(pdffile)
-    elif (outtype == 'png'):
-        if plotname == '':
-            pngbase = __file__[0:__file__.rfind(".")] + '_'
-        else:
-            pngbase = plotname
-        print('Plot PNG ', pngbase)
-    elif (outtype == 'd3'):
-        if plotname == '':
-            htmlfile = __file__[0:__file__.rfind(".")] + '.html'
-        else:
-            htmlfile = plotname
-        print('Plot D3 ', htmlfile)
-    elif (outtype == 'html'):
-        if plotname == '':
-            htmlfile = __file__[0:__file__.rfind(".")] + '.html'
-        else:
-            htmlfile = plotname
-        print('Plot HTML ', htmlfile)
+    outtype_ends = ['', '.pdf', '_', '.html', '.html']
+    if plotname == '':
+        plotfile = __file__[0:__file__.rfind(".")] + outtype_ends[outtypes.index(outtype)]
     else:
-        print('Plot X')
+        plotfile = plotname
+    if outtype == '':
+        print('    Plot X')
+    else:
+        print('    Plot ', plotfile)
+
+    if (outtype == 'pdf'):
+        pdf_pages = PdfPages(plotfile)
     # figsize = mpl.rcParams['figure.figsize']
 
-    if (outtype == 'html') or (outtype == 'd3'):
-        print('Write html file ', htmlfile)
-        fhtml = open(htmlfile,'w')
+    if outtype in ['html','d3']:
+        print('    Write html file ', plotfile)
+        fhtml = open(plotfile,'w')
         print('<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">', file=fhtml)
         print("<html>", file=fhtml)
         print("<head>", file=fhtml)
@@ -309,11 +294,11 @@ if __name__ == '__main__':
         pdf_pages.savefig(fig)
         plt.close(fig)
     elif (outtype == 'png'):
-        pngfile = pngbase+"{0:04d}".format(ifig)+".png"
+        pngfile = plotfile+"{0:04d}".format(ifig)+".png"
         fig.savefig(pngfile, transparent=transparent, bbox_inches=bbox_inches, pad_inches=pad_inches)
         plt.close(fig)
     elif (outtype == 'html'):
-        pngfile = htmlfile[0:htmlfile.rfind(".")] + "_" + "{0:04d}".format(ifig)+".png"
+        pngfile = plotfile[0:plotfile.rfind(".")] + "_" + "{0:04d}".format(ifig)+".png"
         fig.savefig(pngfile, transparent=transparent, bbox_inches=bbox_inches, pad_inches=pad_inches)
         plt.close(fig)
         print('<p><img src='+pngfile+'/></p>', file=fhtml)
@@ -366,11 +351,11 @@ if __name__ == '__main__':
         pdf_pages.savefig(fig)
         plt.close(fig)
     elif (outtype == 'png'):
-        pngfile = pngbase+"{0:04d}".format(ifig)+".png"
+        pngfile = plotfile+"{0:04d}".format(ifig)+".png"
         fig.savefig(pngfile, transparent=transparent, bbox_inches=bbox_inches, pad_inches=pad_inches)
         plt.close(fig)
     elif (outtype == 'html'):
-        pngfile = htmlfile[0:htmlfile.rfind(".")] + "_" + "{0:04d}".format(ifig)+".png"
+        pngfile = plotfile[0:plotfile.rfind(".")] + "_" + "{0:04d}".format(ifig)+".png"
         fig.savefig(pngfile, transparent=transparent, bbox_inches=bbox_inches, pad_inches=pad_inches)
         plt.close(fig)
         print('<p><img src='+pngfile+'/></p>', file=fhtml)
