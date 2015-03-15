@@ -7,17 +7,20 @@
     ------------------
     get_flag         Get the flags at position n from CHS data flag vector.
     read_data        Read and concatenate data from CHS level1 data files.
-    set_flag         Set the flags at position n to iflag at indeces ii of CHS data flag vector.
+    set_flag         Set the flags at position n to iflag at indices ii of CHS data flag vector.
     write_data       Write concatenated data back to individual CHS level1 data files.
 
 
     Example
     -------
+    import ufz
+    from ufz.level1 import get_flag, set_flag
+
     # get files
     infiles = ufz.files_from_gui(title='Choose Level 1 file(s)')
 
     # read files
-    sdate, record, dat, flags, iidate, hdate, hrecord, hdat, hflags = read_data(infiles)
+    sdate, record, dat, flags, iidate, hdate, hrecord, hdat, hflags = ufz.level1.read_data(infiles)
 
     # julian dates
     date  = ufz.date2dec(eng=sdate)
