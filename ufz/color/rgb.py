@@ -1,18 +1,15 @@
 #!/usr/bin/env python
-from __future__ import print_function
-import numpy as np
-import ufz.const as const
 """
-    Interpolate between colours; make continuous colour maps.
+    Interpolate between colours in RGB space; make continuous colour maps.
 
 
     Definition
     ----------
-    Calculates colour between two colors
+    Calculates colour between two given colors in RGB space
         def rgb_blend(col1, col2, fraction=0.5):
-    n interpolated colours between two colours
+    n interpolated colours between two colours in RGB space
         def rgb_range(col1, col2, n=255, cmap=None, pow=1):
-    n interpolated colours between several colours changing at certain fractions
+    n interpolated colours in RGB space between several colours changing at certain fractions
         def rgb_gradient(colours, fractions, n=255, cmap=None):
 
 
@@ -98,6 +95,13 @@ import ufz.const as const
     -------
     Written,  MC, Apr 2013
 """
+from __future__ import print_function
+import numpy as np
+import ufz.const as const
+
+__all__ = ['rgb_blend', 'rgb_gradient', 'rgb_range']
+
+# ---------------------------------------------------------------------
 
 # http://stackoverflow.com/questions/25007/conditional-formatting-percentage-to-color-conversion
 def rgb_blend(col1, col2, fraction=0.5):
@@ -115,11 +119,11 @@ def rgb_blend(col1, col2, fraction=0.5):
 
         Optional Input
         --------------
-            fraction   fraction between 0=col1 and 1=col2; default: 0.5
+            fraction  fraction between 0=col1 and 1=col2; default: 0.5
 
         Output
         ------
-        rgb_blend      rgb tuple
+        rgb_blend     rgb tuple
 
         Examples
         --------
@@ -134,6 +138,7 @@ def rgb_blend(col1, col2, fraction=0.5):
     """
     return tuple([v1 + (v2-v1)*fraction for (v1, v2) in zip(col1, col2)])
 
+# ---------------------------------------------------------------------
 
 def rgb_range(col1, col2, n=255, cmap=None, pow=1):
     """
@@ -150,15 +155,15 @@ def rgb_range(col1, col2, n=255, cmap=None, pow=1):
 
         Optional Input
         --------------
-            n          number of interpolated colours with first colour=col1 and last colour=col2; default: 255
-            cmap       if given, register colour map under that name
-            pow        1 (default) is linear interpolation
-                       >1 remains longer near col1, i.e. higher values are detailed
-                       <1 remains longer near col2, i.e. lower values are detailed
+            n         number of interpolated colours with first colour=col1 and last colour=col2; default: 255
+            cmap      if given, register colour map under that name
+            pow       1 (default) is linear interpolation
+                      >1 remains longer near col1, i.e. higher values are detailed
+                      <1 remains longer near col2, i.e. lower values are detailed
 
         Output
         ------
-        rgb_range      list of rgb tuples
+        rgb_range     list of rgb tuples
 
         Examples
         --------
@@ -173,12 +178,6 @@ def rgb_range(col1, col2, n=255, cmap=None, pow=1):
         -------
         Written,  MC, Apr 2013
     """
-    print("# ------------------------------------------------------")
-    print("#")
-    print("# Warning: ufz.rgb_range is moved to ufz.color.rgb_range.")
-    print("#          This call will be removed in the near future.")
-    print("#")
-    print("# ------------------------------------------------------")
     colr = [rgb_blend(col1, col2, (np.float(i)/np.float(n-1))**pow) for i in range(n)]
     if cmap is not None:
         import matplotlib.colors as col
@@ -187,6 +186,7 @@ def rgb_range(col1, col2, n=255, cmap=None, pow=1):
         cm.register_cmap(name=cmap,cmap=iscmap)
     return colr
 
+# ---------------------------------------------------------------------
 
 def rgb_gradient(colours, fractions, n=255, cmap=None):
     """
@@ -203,13 +203,13 @@ def rgb_gradient(colours, fractions, n=255, cmap=None):
 
         Optional Input
         --------------
-            n          number of interpolated colours with first colour=first colour in colours
-                       and last colour=last colour in colours; default: 255
-            cmap       if given, register colour map under that name
+            n         number of interpolated colours with first colour=first colour in colours
+                      and last colour=last colour in colours; default: 255
+            cmap      if given, register colour map under that name
 
         Output
         ------
-        rgb_gradient   list of rgb tuples
+        rgb_gradient  list of rgb tuples
 
         Examples
         --------
@@ -226,12 +226,6 @@ def rgb_gradient(colours, fractions, n=255, cmap=None):
         -------
         Written,  MC, Apr 2013
     """
-    print("# ------------------------------------------------------")
-    print("#")
-    print("# Warning: ufz.rgb_gradient is moved to ufz.color.rgb_gradient.")
-    print("#          This call will be removed in the near future.")
-    print("#")
-    print("# ------------------------------------------------------")
     cols  = np.array(colours)
     fracs = np.array(fractions)
     if cols.shape[0] != fracs.size: raise Error('colours.shape[0] != fractions.size')
@@ -257,6 +251,7 @@ def rgb_gradient(colours, fractions, n=255, cmap=None):
 
     return colors
 
+# ---------------------------------------------------------------------
 
 if __name__ == '__main__':
     import doctest

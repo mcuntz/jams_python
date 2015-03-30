@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 import numpy as np
 from ufz.date2dec import date2dec
-from ufz.const import cqua, cwat, cair, rhoq
+from ufz.const import cheat_quartz, cheat_water, cheat_air, density_quartz
 from scipy.interpolate import splrep, splint
 import scipy.optimize as opt
 
@@ -287,8 +287,8 @@ def soilheatflux(Ts, theta, depths, por, undef=-9999):
     theta = np.ma.array(theta, mask=theta==undef)
     
     # calc soil density and soil heat capacity
-    rhos  = (1.-por)*rhoq
-    csoil = cqua*(1.-por) + cwat*theta + cair*(1-theta)*por
+    rhos  = (1.-por)*density_quartz
+    csoil = cheat_quartz*(1.-por) + cheat_water*theta + cheat_air*(1-theta)*por
     
     # calculate heat flux    
     T_diff = (Ts[:-1,:] - Ts[1:,:])/1800. * rhos * csoil[:-1,:]

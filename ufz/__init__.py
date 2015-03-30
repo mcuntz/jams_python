@@ -23,12 +23,14 @@
     cellarea               Calc areas of grid cells in m^2.
     clockplot              The clockplot of mHM.
     closest                Index in array which entry is closest to a given number.
+    color                  Module with color functions for plotting.
     colors                 Wrapper for colour.
     colours                Define UFZ colours.
     const                  Provides physical, mathematical, computational, and isotope constants.
     convex_hull            Calculate subset of points that make a convex hull around a set of 2D points.
     correlate              Computes the cross-correlation function of two series x and y.
     cuntz_gleixner         Cuntz-Gleixner model of 13C discrimination.
+    dielectric_water       Dielectric constant of liquid water.
     directory_from_gui     Open directory selection dialog, returns selected directory
     dewpoint               Calculates the dew point from ambient humidity.
     date2dec               Converts arrays with calendar date to decimal date.
@@ -98,7 +100,9 @@
     readnc                 Wrapper for readnetcdf.
     readnetcdf             Reads variables or information from netcdf file.
     register_brewer        Registers and registers Brewer colormap.
-    rgb                    Interpolate between colours; make continuous colour maps.
+    rgb_blend              Calculates colour between two given colors in rgb space.
+    rgb_gradient           n interpolated colours in rgb space between several colours changing at certain fractions.
+    rgb_range              n interpolated colours in rgb space between two colours
     roman2int              Roman numeral to integer conversion.
     rossner                Wrapper for outlier.
     t2sap                  Conversion of temperature difference to sap flux density.
@@ -254,6 +258,7 @@
     Meteorology
     -----------
     dewpoint               Calculates the dew point from ambient humidity.
+    dielectric_water       Dielectric constant of liquid water.
     esat                   Calculates the saturation vapour pressure of water/ice.
 
 
@@ -286,6 +291,7 @@
     --------
     abc2plot               Write a, b, c, ... on plots.
     clockplot              The clockplot of mHM.
+    color                  Module with color functions for plotting.
     colors                 Wrapper for colour.
     colours                Define UFZ colours.
     get_brewer             Registers and returns Brewer colormap.
@@ -293,7 +299,9 @@
     position               Position arrays of subplots to be used with add_axes.
     print_brewer           Prints available Brewer colormap names.
     register_brewer        Registers and registers Brewer colormap.
-    rgb                    Interpolate between colours; make continuous colour maps.
+    rgb_blend              Calculates colour between two given colors in rgb space.
+    rgb_gradient           n interpolated colours in rgb space between several colours changing at certain fractions.
+    rgb_range              n interpolated colours in rgb space between two colours
     signature2plot         Write a copyright notice on a plot.
     tsym                   Raw unicodes for common symbols.
     xkcd                   Make plot look handdrawn.
@@ -360,7 +368,7 @@
        along with the UFZ makefile project (cf. gpl.txt and lgpl.txt).
        If not, see <http://www.gnu.org/licenses/>.
 
-    Copyright 2009-2014 Matthias Cuntz, Arndt Piayda, Matthias Zink, Tino Rau, Maren Goehler,
+    Copyright 2009-2015 Matthias Cuntz, Arndt Piayda, Matthias Zink, Tino Rau, Maren Goehler,
                         Stephan Thober, Juliane Mai, Andreas Wiedemann
 
 
@@ -444,13 +452,16 @@
                            - ascii2ascii, ascii2eng, eng2ascii
               MC, Mar 2015 - module level1 with get_flag, set_flag, read_data, write_data
                            - rename file to files
+                           - dielectric_water
+                           - color
+                           - redone all __init__.py
 """
 from __future__ import print_function
 
-# sub-packages without dependencies to all ufz
-from ufz.const     import const
-from ufz.encrypt   import encrypt
-from ufz.functions import functions
+# sub-packages without dependencies to rest of ufz
+from . import const
+from . import encrypt
+from . import functions
 
 # Routines
 from .abc2plot          import abc2plot
@@ -476,6 +487,7 @@ from .cuntz_gleixner    import cuntz_gleixner
 from .date2dec          import date2dec
 from .dec2date          import dec2date
 from .dewpoint          import dewpoint
+from .dielectric_water  import dielectric_water
 from .division          import division, div
 from .ellipse_area      import ellipse_area
 from .errormeasures     import bias, mae, mse, rmse, nse, pear2
@@ -509,7 +521,10 @@ from .mad               import mad
 from .maskgroup         import maskgroup
 from .means             import means
 from .morris            import morris_sampling, elementary_effects
-from .npyio             import savez, savez_compressed
+try:
+    from .npyio         import savez, savez_compressed
+except ImportError:
+    pass # old numpy version
 try:
     from .outlier       import outlier, rossner
 except:
@@ -547,7 +562,9 @@ from .xkcd              import xkcd
 from .yrange            import yrange
 from .zacharias         import zacharias, zacharias_check
 
-# sub-packages with dependencies to all ufz have to be loaded separately as in scipy
+# sub-packages with dependencies to rest ufz have to be loaded separately as in scipy
+from . import color
+# ToDo: from here on redo __init__.py
 from . import eddybox
 from . import files
 from . import ftp
@@ -557,9 +574,9 @@ from . import logtools
 
 # Information
 __author__   = "Matthias Cuntz"
-__version__  = '3.1.0'
-__revision__ = "Revision: 1923"
-__date__     = 'Date: 05.12.2014'
+__version__  = '3.2.0'
+__revision__ = "Revision: 2071"
+__date__     = 'Date: 25.03.2015'
 
 # Main
 if __name__ == '__main__':

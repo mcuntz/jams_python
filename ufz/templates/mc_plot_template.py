@@ -151,11 +151,11 @@ elwidth     = 1.0         # errorbar line width
 alwidth     = 1.0         # axis line width
 msize       = 1.0         # marker size
 mwidth      = 1.0         # marker edge width
-mcol1       = ufz.colours('red')        # primary marker colour
+mcol1       = ufz.color.colours('red')        # primary marker colour
 mcol2       = '0.0'                     # secondary
 mcol3       = (202/255.,0/255.,32/255.) # third
-mcols       = ufz.colours(['blue','red','darkgray','orange','darkblue','black'])
-lcol1       = ufz.colours('blue')   # primary line colour
+mcols       = ufz.color.colours(['blue','red','darkgray','orange','darkblue','black'])
+lcol1       = ufz.color.colours('blue')   # primary line colour
 lcol2       = '0.0'
 lcol3       = '0.0'
 lcols       = mcols
@@ -535,7 +535,7 @@ if dorandom:
   ylab   = r'$\aleph(\mu = '+ufz.astr(mu)+', \sigma = '+ufz.astr(sigma*2,1)+')$'
   sub    = fig.add_axes(ufz.position(nrow,ncol,iplot,hspace=hspace,vspace=vspace),sharey=sub2)
 
-  cm = ufz.get_brewer('RdYlBu'+str(ncolor))
+  cm = ufz.color.get_brewer('RdYlBu'+str(ncolor))
   ii = np.argsort(uniform)
   mark1  = sub.scatter(uniform[ii], gauss[ii]*2., marker='o', c=np.arange(uniform.size)%(uniform.size//3), cmap=cm,
                        linewidth=mwidth, s=msize) # colored markers in 3 repeating colour sequence
@@ -574,7 +574,7 @@ if dobasemap:
 
   nrow = 3
   ncol = 1
-  cm = ufz.get_brewer('RdYlBu'+str(ncolor),reverse=True)
+  cm = ufz.color.get_brewer('RdYlBu'+str(ncolor),reverse=True)
   delon = 60
   delat = 30
 
@@ -697,7 +697,7 @@ if docartopy:
 
   nrow = 3
   ncol = 1
-  cm = ufz.get_brewer('RdYlBu'+str(ncolor),reverse=True)
+  cm = ufz.color.get_brewer('RdYlBu'+str(ncolor),reverse=True)
   delon = 60
   delat = 60
 

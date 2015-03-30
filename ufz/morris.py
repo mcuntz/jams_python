@@ -8,7 +8,7 @@
     Definitions
     -----------
     def morris_sampling(NumFact, LB, UB, N=500, p=4, r=10, GroupMat=np.array([]), Diagnostic=0):
-    def elementary_effects(NumFact, Sample, OutFact, Output, p=4, Group=[]):
+    def elementary_effects(NumFact, Sample, OutFact, Output, p=4, Group=[], Diagnostic=False):
 
 
     Input
@@ -42,6 +42,8 @@
         Group             [NumFactor, NumGroups] Matrix describing the groups.
                           Each column represents one group. The element of each column are zero
                           if the factor is not in the group. Otherwise it is 1.
+        Diagnostic        True:  print out diagnostics
+                          False: otherwise (default)
 
     Output
     ------
@@ -566,7 +568,7 @@ def Optimized_Groups(NumFact, LB, UB, N=500, p=4, r=10, GroupMat=np.array([]), D
     return OptMatrix, OptOutVec
 
 
-def Morris_Measure_Groups(NumFact, Sample, OutFact, Output, p=4, Group=[]):
+def Morris_Measure_Groups(NumFact, Sample, OutFact, Output, p=4, Group=[], Diagnostic=False):
     """
         Given the Morris sample matrix, the output values and the group matrix compute the Morris measures.
 
@@ -590,6 +592,8 @@ def Morris_Measure_Groups(NumFact, Sample, OutFact, Output, p=4, Group=[]):
         Group             [NumFact, NumGroups] Matrix describing the groups.
                           Each column represents one group. The element of each column are zero
                           if the factor is not in the group. Otherwise it is 1.
+        Diagnostic        True:  print out diagnostics
+                          False: otherwise (default)
 
 
         Output
@@ -640,10 +644,10 @@ def Morris_Measure_Groups(NumFact, Sample, OutFact, Output, p=4, Group=[]):
 
     try:
         NumGroups = Group.shape[1]
-        print('{:d} Groups are used'.format(NumGroups))
+        if Diagnostic: print('{:d} Groups are used'.format(NumGroups))
     except:
         NumGroups = 0
-        print('No Groups are used')
+        if Diagnostic: print('No Groups are used')
 
     Delt = p/(2.*(p-1.))
 
@@ -652,7 +656,7 @@ def Morris_Measure_Groups(NumFact, Sample, OutFact, Output, p=4, Group=[]):
         sizeb=sizea+1
         GroupMat=Group
         GroupMat = GroupMat.transpose()
-        print(NumGroups)
+        if Diagnostic: print(NumGroups)
     else:
         sizea = NumFact
         sizeb=sizea+1
@@ -692,9 +696,10 @@ def Morris_Measure_Groups(NumFact, Sample, OutFact, Output, p=4, Group=[]):
             A = (Single_Sample[1:sizeb,:]-Single_Sample[:sizea,:]).transpose()
             Delta=A[np.where(A)] #AAN TE PASSEN?
 
-            print(A)
-            print(Delta)
-            print(Single_Facts)
+            if Diagnostic: 
+                print(A)
+                print(Delta)
+                print(Single_Facts)
 
             # For each point of the fixed trajectory compute the values of the Morris function.
             for j in range(sizea):

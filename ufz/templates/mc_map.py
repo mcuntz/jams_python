@@ -122,11 +122,11 @@ elwidth     = 1.0         # errorbar line width
 alwidth     = 1.0         # axis line width
 msize       = 1.0         # marker size
 mwidth      = 1.0         # marker edge width
-mcol1       = ufz.colours('red')        # primary marker colour
+mcol1       = ufz.color.colours('red')        # primary marker colour
 mcol2       = '0.0'                     # secondary
 mcol3       = (202/255.,0/255.,32/255.) # third
-mcols       = ufz.colours(['blue','red','darkgray','orange','darkblue','black'])
-lcol1       = ufz.colours('blue')   # primary line colour
+mcols       = ufz.color.colours(['blue','red','darkgray','orange','darkblue','black'])
+lcol1       = ufz.color.colours('blue')   # primary line colour
 lcol2       = '0.0'
 lcol3       = '0.0'
 lcols       = mcols
@@ -240,9 +240,9 @@ if True:
     ncolor  = 8  # of colors in plot
     b1 = (1,1,1) #
     b2 = [ i/255. for i in (4, 90, 141) ]
-    tmp  = ufz.rgb_range(b1, b2, ncolor, cmap='MyBlue')
+    tmp  = ufz.color.rgb_range(b1, b2, ncolor, cmap='MyBlue')
     cmap = mpl.cm.get_cmap('MyBlue')
-    #cmap = ufz.get_brewer('RdBu'+str(ncolor),reverse=True)
+    #cmap = ufz.color.get_brewer('RdBu'+str(ncolor),reverse=True)
 
     mini  = 0.
     maxi  = 1.5
@@ -310,9 +310,9 @@ if True:
     ncolor  = 8  # of colors in plot
     b1 = (1,1,1) #
     b2 = [ i/255. for i in (4, 90, 141) ]
-    tmp  = ufz.rgb_range(b1, b2, ncolor, cmap='MyBlue')
+    tmp  = ufz.color.rgb_range(b1, b2, ncolor, cmap='MyBlue')
     cmap = mpl.cm.get_cmap('MyBlue')
-    #cmap = ufz.get_brewer('RdBu'+str(ncolor),reverse=True)
+    #cmap = ufz.color.get_brewer('RdBu'+str(ncolor),reverse=True)
 
     mini  = 0.
     maxi  = 1.5
@@ -375,9 +375,9 @@ if True:
     ncolor  = 8  # of colors in plot
     b1 = (1,1,1) #
     b2 = [ i/255. for i in (4, 90, 141) ]
-    tmp  = ufz.rgb_range(b1, b2, ncolor, cmap='MyBlue')
+    tmp  = ufz.color.rgb_range(b1, b2, ncolor, cmap='MyBlue')
     cmap = mpl.cm.get_cmap('MyBlue')
-    #cmap = ufz.get_brewer('RdBu'+str(ncolor),reverse=True)
+    #cmap = ufz.color.get_brewer('RdBu'+str(ncolor),reverse=True)
 
     mini  = 0.
     maxi  = 1.5

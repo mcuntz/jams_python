@@ -1,56 +1,18 @@
 #!/usr/bin/env python
 from __future__ import print_function
 
-ufzdarkblue   = (0,62,110)
-ufzblue       = (0,88,156)
-ufzlightblue  = (0,162,224)
-ufzred        = (212,45,18)
-ufzorange     = (207,104,0)
-ufzyellow     = (230,175,17)
-ufzdarkgreen  = (20,77,40)
-ufzgreen      = (169,181,9)
-ufzlightgreen = ufzgreen
-ufzgray1      = (81,81,81)
-ufzgray2      = (156,156,156)
-ufzgray3      = (185,185,185)
-ufzgrey1      = ufzgray1
-ufzgrey2      = ufzgray2
-ufzgrey3      = ufzgray3
-ufzdarkgray   = ufzgray1
-ufzgray       = ufzgray2
-ufzlightgray  = ufzgray3
-ufzdarkgrey   = ufzgray1
-ufzgrey       = ufzgray2
-ufzlightgrey  = ufzgray3
-ufzblack      = (0,0,0)
-ufzwhite      = (255,255,255)
+from ufz.color import ufzdarkblue, ufzblue, ufzlightblue
+from ufz.color import ufzred, ufzorange, ufzyellow, ufzdarkgreen, ufzgreen, ufzlightgreen
+from ufz.color import ufzgray1, ufzgray2, ufzgray3, ufzgrey1, ufzgrey2, ufzgrey3
+from ufz.color import ufzdarkgray, ufzgray, ufzlightgray, ufzdarkgrey, ufzgrey, ufzlightgrey
+from ufz.color import ufzblack, ufzwhite
+from ufz.color import darkblue, blue, lightblue, red, orange, yellow, darkgreen, green, lightgreen
+from ufz.color import gray1, gray2, gray3, grey1, grey2, grey3, darkgray, gray, lightgray, darkgrey
+from ufz.color import grey, lightgrey, black, white
 
-# In Emacs copy ori and query-replace-regexp
-# ^\([[:alnum:]]*\).*  ->  \1 = \1
-# ^ufz  ->
-darkblue   = ufzdarkblue
-blue       = ufzblue
-lightblue  = ufzlightblue
-red        = ufzred
-orange     = ufzorange
-yellow     = ufzyellow
-darkgreen  = ufzdarkgreen
-green      = ufzgreen
-lightgreen = ufzlightgreen
-gray1      = ufzgray1
-gray2      = ufzgray2
-gray3      = ufzgray3
-grey1      = ufzgrey1
-grey2      = ufzgrey2
-grey3      = ufzgrey3
-darkgray   = ufzdarkgray
-gray       = ufzgray
-lightgray  = ufzlightgray
-darkgrey   = ufzdarkgrey
-grey       = ufzgrey
-lightgrey  = ufzlightgrey
-black      = ufzblack
-white      = ufzwhite
+__all__ = ['colours', 'colors']
+
+# ---------------------------------------------------------------------
 
 ufzall = ['ufzdarkblue', 'ufzblue', 'ufzlightblue',
           'ufzred', 'ufzorange', 'ufzyellow',
@@ -69,6 +31,7 @@ ufzall = ['ufzdarkblue', 'ufzblue', 'ufzlightblue',
           'darkgrey', 'grey', 'lightgrey',
           'black', 'white']
 
+# ---------------------------------------------------------------------
 
 def get_colour_tuple(name, rgb256=False):
     """
@@ -116,10 +79,11 @@ def get_colour_tuple(name, rgb256=False):
     exec('out = '+name.lower(), globals(), d)
     out = d['out']
     if rgb256:
-        return out
+        return tuple([ i*255. for i in out ])
     else:
-        return tuple([ i/255. for i in out ])
+        return out
 
+# ---------------------------------------------------------------------
 
 def colours(name=False, rgb=True, rgb256=False, names=False):
     """
@@ -208,13 +172,6 @@ def colours(name=False, rgb=True, rgb256=False, names=False):
         Modified, MC, Jul 2013 - name can be iterable
                                - added black and white
     """
-    print("# ------------------------------------------------------")
-    print("#")
-    print("# Warning: ufz.colours is moved to ufz.color.colours.")
-    print("#          This call will be removed in the near future.")
-    print("#")
-    print("# ------------------------------------------------------")
-
     if names:
         return ufzall
 
@@ -235,6 +192,7 @@ def colours(name=False, rgb=True, rgb256=False, names=False):
             out += [get_colour_tuple(cname, rgb256=rgb256)]
         return out
 
+# ---------------------------------------------------------------------
 
 def colors(*args, **kwargs):
     """
@@ -265,6 +223,7 @@ def colors(*args, **kwargs):
     """
     return colours(*args, **kwargs)
 
+# ---------------------------------------------------------------------
 
 if __name__ == '__main__':
     import doctest

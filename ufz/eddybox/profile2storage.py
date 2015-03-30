@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 import numpy as np
 from ufz.date2dec import date2dec
-from ufz.const import M_CO2, M_WV, M_DAIR, cair, lam, T0
+from ufz.const import mmol_co2, mmol_h2o, mmol_air, cheat_air, latentheat_vaporization, T0
 from scipy.interpolate import splrep, splint
 from ufz.esat import esat
 
@@ -197,7 +197,7 @@ def profile2storage(fluxfile, fluxfile2, profilefile, outdir, heights, CO2=None,
         assert H2O.shape[1]==len(heights), 'profile2storage: number of H2O cols must equal heights'
         # calculate storage flux and storage flux flag
         sfH2O     = stor2flux(H2O, rho, heights, dt, 'H2O')
-        sfH2O_Wm2 = sfH2O * M_WV * lam /1.e6
+        sfH2O_Wm2 = sfH2O * mmol_h2o * latentheat_vaporization /1.e6
         sfH2Oflag = sfH2O.mask.astype(np.int)
         # add to eddy flux
         newE      = E + np.ma.filled(sfH2O, 0)
@@ -243,10 +243,10 @@ def profile2storage(fluxfile, fluxfile2, profilefile, outdir, heights, CO2=None,
         assert rH.shape[1]==len(heights), 'profile2storage: number of rH cols must equal heights'
         # calculate specific humidity
         vapourpressure = esat(T+T0)*(rH/100.)/100. #[hPa]
-        specifichumidity = (M_WV/M_DAIR*vapourpressure) / (p-(1.-M_WV/M_DAIR)*vapourpressure)
+        specifichumidity = (mmol_h2o/mmol_air*vapourpressure) / (p-(1.-mmol_h2o/mmol_air)*vapourpressure)
         # calculate storage flux and storage flux flag
         sfrH_Wm2  = stor2flux(specifichumidity, rho, heights, dt, 'rH')
-        sfrH      = sfrH_Wm2 * 1.e6 / (M_WV * lam)
+        sfrH      = sfrH_Wm2 * 1.e6 / (mmol_h2o * latentheat_vaporization)
         sfrHflag  = sfrH.mask.astype(np.int)
         # add to eddy flux
         newE      = E + np.ma.filled(sfrH, 0)
@@ -279,17 +279,17 @@ def stor2flux(concentrations, rho, heights, dt, constituent='CO2'):
     xe = np.amax(heights)   # top height of interpolation
     
     if constituent=='CO2':
-        # mole volume [m3/mol] = M_CO2[g/mol]/(rho[kg/m3]*1000.)
-        m = M_CO2/(rho*1000.)
+        # mole volume [m3/mol] = mmol_co2[g/mol]/(rho[kg/m3]*1000.)
+        m = mmol_co2/(rho*1000.)
     elif constituent=='H2O':
-        # mole volume [m3/mol] = M_WV[g/mol]/(rho[kg/m3]*1000.)
-        m = M_WV/(rho*1000.)
+        # mole volume [m3/mol] = mmol_h2o[g/mol]/(rho[kg/m3]*1000.)
+        m = mmol_h2o/(rho*1000.)
     elif constituent=='T':
         # 1/energy content of the air [1/(J/m3 K)] = 1/ (rho[kg/m3]*heat capacity of air [J/kg K])
-        m = 1./(rho*cair)
+        m = 1./(rho*cheat_air)
     elif constituent=='rH':
         # 1/energy content of vapor [1/(J/m3)] = 1/ (rho[kg/m3] * specific heat of vaporization of water [J/kg])
-        m = 1./(rho * lam)
+        m = 1./(rho * latentheat_vaporization)
     else:
         raise ValueError('stor2flux: unknown constituent')
     

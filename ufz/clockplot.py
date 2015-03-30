@@ -335,12 +335,12 @@ def clockplot(sub, si, sti=None, stierr=None,
             #      (116./255.,173./255.,209./255.), # percolation
             #      ( 69./255.,117./255.,180./255.), # routing
             #      ( 49./255., 54./255.,149./255.)] # geology
-            from ufz.brewer import get_brewer
+            from ufz.color.brewer import get_brewer
             c = get_brewer('rdylbu11', rgb=True)
             tmp = c.pop(5)   # rm yellow
             c.insert(2,c[2]) # same colour for both soil moistures
         elif (cmod == 'noah'):
-            from ufz.brewer import get_brewer
+            from ufz.color.brewer import get_brewer
             c = []
             c.append(get_brewer('reds8',   rgb=True)[3])   #  Radiation      ----   
             c.append(get_brewer('ylorbr4', rgb=True)[2])   #  Soil Physio.      |

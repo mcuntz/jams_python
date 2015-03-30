@@ -69,23 +69,23 @@ def tcherkez(Rstar, Phi=0.3, T=0.056,
         >>> ci    = 0.7*ca
         >>> Delta = a+(b-a)*ci/ca
         >>> delta_a1 = -8e-3
-        >>> Ra1      = (delta_a1+1.)*const.RPDB
+        >>> Ra1      = (delta_a1+1.)*const.R13VPDB
         >>> Rstar1   = (1.-Delta)*Ra1
         >>> from autostring import astr
-        >>> print(astr((np.array(tcherkez(Rstar1, Phi=0.3, T=0.056))/const.RPDB-1.)*1000.,3,pp=True))
+        >>> print(astr((np.array(tcherkez(Rstar1, Phi=0.3, T=0.056))/const.R13VPDB-1.)*1000.,3,pp=True))
         ['12.764' '17.125' '12.978']
 
         >>> delta_a2 = -7.8e-3
-        >>> Ra2      = (delta_a2+1.)*const.RPDB
+        >>> Ra2      = (delta_a2+1.)*const.R13VPDB
         >>> Rstar2   = (1.-Delta)*Ra2
-        >>> R1 = (np.array(tcherkez([Rstar1, Rstar2], Rcyt=True))/const.RPDB-1.)*1000.
+        >>> R1 = (np.array(tcherkez([Rstar1, Rstar2], Rcyt=True))/const.R13VPDB-1.)*1000.
         >>> print(astr(R1,3,pp=True))
         [['12.978' '13.182']]
 
         >>> R1, R2 = tcherkez([Rstar1, Rstar2], Rchl=True, Rcyt=True)
-        >>> print(astr((R1/const.RPDB-1.)*1000.,3,pp=True))
+        >>> print(astr((R1/const.R13VPDB-1.)*1000.,3,pp=True))
         ['17.125' '17.330']
-        >>> print(astr((R2/const.RPDB-1.)*1000.,3,pp=True))
+        >>> print(astr((R2/const.R13VPDB-1.)*1000.,3,pp=True))
         ['12.978' '13.182']
 
 

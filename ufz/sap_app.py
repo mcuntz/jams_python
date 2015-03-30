@@ -22,7 +22,7 @@ def t2sap(date, data, swd=None, undef=-9999.):
         data    ND array (n,...) of the raw data in mV. First dimension is time
 
 
-        Options
+        Optional Input
         --------------
         undef   values are excluded from calculations (default: -9999)
         swd     if None:     sapflux calculation according to original Granier
@@ -40,19 +40,14 @@ def t2sap(date, data, swd=None, undef=-9999.):
                 SFD = 0.0119*K**1.231*3600 [Granier, 1985]
 
 
-        Restrictions
-        ------------
-        None
-
-
         References
         ----------
-        Clearwater, M. J., Meinzer, F. C., Andrade, J. L., Goldstein, G., Holbrook, N. M.,
-            Potential errors in measurement of nonuniform sap flow using heat dissipation probes,
-            Tree Physiology 19, 681-687, 1999
-        Granier, A.,
+        Granier, A.
             Evaluation of transpiration in a Douglas-fir stand by means of sap flow measurements,
             Tree Physiology 3, 309-320, 1987
+        Clearwater, M. J., Meinzer, F. C., Andrade, J. L., Goldstein, G., Holbrook, N. M.
+            Potential errors in measurement of nonuniform sap flow using heat dissipation probes,
+            Tree Physiology 19, 681-687, 1999
 
 
         Examples

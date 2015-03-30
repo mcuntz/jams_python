@@ -65,7 +65,7 @@
     Written,  MC, Jun-Dec 2014 - modified from
               http://code.activestate.com/recipes/577954-encrypt-and-decrypt-text-and-text-files-beta/
 """
-from .encrypt import *
+from .encrypt import file_cipher, set_up_cipher, wordEncrypt, wordDecrypt
 
 # Information
 __author__   = "Matthias Cuntz"

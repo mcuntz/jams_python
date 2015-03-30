@@ -9,13 +9,16 @@
     ...
     Define the following constants:
         Mathematical
-            Pi, Pi2, TwoPi, Sqrt2
+            Pi, Pi2, Pi3, TwoPi, Sqrt2
         Physical
             Gravity, T0, P0, T25, sigma, R, Na, REarth
         Isotope
-            RPDB
+            R13VPDB, R18VSMOW, R2VSMOW
         Computational
             tiny
+        Material
+            mmol_co2, mmol_h2o, mmol_air
+            density_quartz, cheat_quartz, cheat_water, cheat_air, latentheat_vaporization
 
 
     Examples
@@ -48,10 +51,15 @@
     -------
     Written,  MC, Oct 2014
 """
-from .const import *
+from .const import Pi, Pi2, Pi3, TwoPi, Sqrt2
+from .const import Gravity, T0, P0, T25, sigma, R, Na, REarth
+from .const import mmol_co2, mmol_h2o, mmol_air
+from .const import density_quartz, cheat_quartz, cheat_water, cheat_air, latentheat_vaporization
+from .const import R13VPDB, R18VSMOW, R2VSMOW
+from .const import tiny, eps
 
 # Information
 __author__   = "Matthias Cuntz"
-__version__  = '1.0'
-__revision__ = "Revision: 1796"
-__date__     = 'Date: 05.10.2014'
+__version__  = '1.1'
+__revision__ = "Revision: 2071"
+__date__     = 'Date: 24.03.2015'

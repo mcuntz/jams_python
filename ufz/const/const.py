@@ -11,15 +11,16 @@ import numpy as np
     ...
     Define the following constants:
         Mathematical
-            Pi, Pi2, TwoPi, Sqrt2
+            Pi, Pi2, Pi3, TwoPi, Sqrt2
         Physical
-            Gravity, T0, P0, T25, sigma, R, Na, REarth, dielH2O
+            Gravity, T0, P0, T25, sigma, R, Na, REarth
         Isotope
-            RPDB
+            R13VPDB, R18VSMOW, R2VSMOW
         Computational
             tiny
         Material
-            cqua, cwat, cair, lam, rhoq
+            mmol_co2, mmol_h2o, mmol_air
+            density_quartz, cheat_quartz, cheat_water, cheat_air, latentheat_vaporization
 
 
     Examples
@@ -40,7 +41,7 @@ import numpy as np
     >>> print(astr(sigma,3,pp=True))
     5.670e-08
 
-    >>> print(astr(RPDB,3,pp=True))
+    >>> print(astr(R13VPDB,3,pp=True))
     0.011
 
     >>> print(astr(tiny,3,pp=True))
@@ -49,29 +50,26 @@ import numpy as np
     >>> print(astr(REarth,3,pp=True))
     6371000.000
 
-    >>> print(astr(M_WV,3,pp=True))
+    >>> print(astr(mmol_h2o,3,pp=True))
     18.015
 
-    >>> print(astr(M_DAIR,3,pp=True))
+    >>> print(astr(mmol_air,3,pp=True))
     28.964
+
+    >>> print(astr(density_quartz,3,pp=True))
+    2.650
     
-    >>> print(astr(dielH2O(300.),3,pp=True))
-    77.693
-    
-    >>> print(astr(cqua,3,pp=True))
+    >>> print(astr(cheat_quartz,3,pp=True))
     800.000
     
-    >>> print(astr(cwat,3,pp=True))
+    >>> print(astr(cheat_water,3,pp=True))
     4180.000
     
-    >>> print(astr(cair,3,pp=True))
+    >>> print(astr(cheat_air,3,pp=True))
     1010.000
 
-    >>> print(astr(lam,3,pp=True))
+    >>> print(astr(latentheat_vaporization,3,pp=True))
     2.450e+06
-
-    >>> print(astr(rhoq,3,pp=True))
-    2.650
 
 
     License
@@ -99,52 +97,57 @@ import numpy as np
     -------
     Written,  MC, Jan 2012
     Modified, MC, Feb 2013 - ported to Python 3
-    Modified, AP, Mar 2014 - add: dielectric constant H2O
-    Modified, AP, Sep 2014 - add: heat capacity of quartz, air and water, density of quartz
+              AP, Mar 2014 - dielectric constant H2O
+              AP, Sep 2014 - heat capacity of quartz, air and water, density of quartz
+              MC, Mar 2015 - Pi3=Pi/3
+                           - rename heat capacities, molar masses, density of quartz
+                           - moved dielH2O to own routine/file
+                           - R13VPDB, R18VSMOW, R2VSMOW
 """
+
+__all__ = ['Pi', 'Pi2', 'Pi3', 'TwoPi', 'Sqrt2',
+           'Gravity', 'T0', 'P0', 'T25', 'sigma', 'R', 'Na', 'REarth',
+           'mmol_co2', 'mmol_h2o', 'mmol_air',
+           'density_quartz', 'cheat_quartz', 'cheat_water', 'cheat_air', 'latentheat_vaporization',
+           'R13VPDB', 'R18VSMOW', 'R2VSMOW',
+           'tiny', 'eps']
+
 # Mathematical
 Pi    = 3.141592653589793238462643383279502884197    # Pi
 Pi2   = 1.57079632679489661923132169163975144209858  # Pi/2
+Pi3   = 1.0471975511965977461542144610931676280656   # Pi/3
 TwoPi = 6.283185307179586476925286766559005768394    # 2*Pi
 Sqrt2 = 1.41421356237309504880168872420969807856967  # Sqrt(2)
 
 # Physical
-Gravity = 9.81          # Standard average Earth's gravity [m^2/s]
-T0      = 273.15        # Celcius <-> Kelvin [K]
-P0      = 101325.       # Standard pressure [Pa]
-T25     = 298.15        # Standard ambient temperature [K]
-sigma   = 5.67e-08      # Stefan-Boltzmann constant [W/m^2/K^4]
-R       = 8.3144621     # Ideal gas constant [J/K/mol]
-Na      = 6.02214129e23 # Avogrado number [mol^-1]
-REarth  = 6371009.      # Radius of Earth [m]
-M_CO2   = 44.01         # Molar mass CO2 [g*mol^-1]
-M_WV    = 18.01528      # Molar mass water vapour [g*mol^-1]
-M_DAIR  = 28.9644       # Molar mass of dry air [g*mol^-1]
-# from Cambell, G., Soil Physics with BASIC, Elsevier Science, 1985:
-rhoq    = 2.65          # density of quartz [g cm-3]
-cqua    = 0.80e3        # heat capacity of quartz [J kg-1 K-1]
-cwat    = 4.18e3        # heat capacity of water [J kg-1 K-1]
-cair    = 1.01e3        # heat capacity of air [J kg-1 K-1]
-lam     = 2.45e6        # specific heat of vaporization of water [J/kg]
+Gravity  = 9.81          # Standard average Earth's gravity [m^2 s^-1]
+T0       = 273.15        # Celcius <-> Kelvin [K]
+P0       = 101325.       # Standard pressure [Pa]
+T25      = 298.15        # Standard ambient temperature [K]
+sigma    = 5.67e-08      # Stefan-Boltzmann constant [W m^-2 K^-4]
+R        = 8.3144621     # Ideal gas constant [J K^-1 mol^-1]
+Na       = 6.02214129e23 # Avogrado number [mol^-1]
+REarth   = 6371009.      # Radius of Earth [m]
 
-def dielH2O(T):         # dielectric constant of water [F/m]
-    '''
-    in:     temperature T [K]
-    out:    dielectric constant of H2O [F/m]
-    source: Kaatze, U.: Reference liquids for the calibration of dielectric
-            sensors and measurement instruments,
-            Measurement Science and Technology, 2007, 18
-            valid for 0 - 60 degC
-    '''
-    return 78.35*np.ma.exp(-4.55e-3*(T-298.15))
+# Material
+mmol_co2 = 44.01         # Molar mass CO2 [g mol^-1]
+mmol_h2o = 18.01528      # Molar mass water [g mol^-1]
+mmol_air = 28.9644       # Molar mass of dry air [g mol^-1]
+# from Cambell G (1985) Soil Physics with BASIC, Elsevier Science
+density_quartz = 2.65    # density of quartz [g cm^-3]
+cheat_quartz   = 800.    # heat capacity of quartz [J kg^-1 K^-1]
+cheat_water    = 4180.   # heat capacity of water [J kg^-1 K^-1]
+cheat_air      = 1010.   # heat capacity of air [J kg^-1 K^-1]
+latentheat_vaporization = 2.45e6 # latent heat of vaporization of water [J kg^-1]
 
 # Isotope
-RPDB = 0.0112372 # Isotope ratio of VPDB-CO2
+R13VPDB  = 0.0112372     # 13C isotope ratio of VPDB
+R18VSMOW = 2005.2e-6     # 18O isotope ratio of VSMOW
+R2VSMOW  = 155.76e-6     # 2H  isotope ratio of VSMOW
 
 # Computational
 tiny = 1e-6
 eps  = np.finfo(np.float).eps
-
 
 if __name__ == '__main__':
     import doctest
