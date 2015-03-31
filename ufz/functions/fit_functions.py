@@ -116,7 +116,9 @@
 """
 from __future__ import print_function
 import numpy as np
+import scipy.special as sp
 import ufz.const as const
+from ufz.functions import logistic, logistic_offset
 
 __all__ = ['cost_abs', 'cost_square',
            'arrhenius', 'arrhenius_p', 'cost_arrhenius', 'cost2_arrhenius',
@@ -131,8 +133,8 @@ __all__ = ['cost_abs', 'cost_square',
            'multiline_p',
            'sabx', 'sabx_p', 'cost_sabx', 'cost2_sabx',
            'poly', 'poly_p', 'cost_poly', 'cost2_poly',
-           'logistic', 'logistic_p', 'cost_logistic', 'cost2_logistic',
-           'logistic_offset', 'logistic_offset_p', 'cost_logistic_offset', 'cost2_logistic_offset',
+           'logistic_p', 'cost_logistic', 'cost2_logistic',
+           'logistic_offset_p', 'cost_logistic_offset', 'cost2_logistic_offset',
            'see', 'see_p', 'cost_see', 'cost2_see']
 
 # -----------------------------------------------------------
@@ -536,19 +538,13 @@ def cost2_poly(p,x,y):
 
 # -----------------------------------------------------------
 # a/(1+exp(-b(x-c))) - logistic function
-def logistic(x, a, b, c):
-  """ logistic function a/(1+exp(-b(x-c)))
-        a, b, c  parameters
-        x        independent variable
-  """
-  return a/(1.+np.exp(-b*(x-c)))
 
 def logistic_p(x, p):
   """ logistic function p[0]/(1+exp(-p[1](x-p[2])))
         p        array of size 3, parameters
         x        independent variable
   """
-  return p[0]/(1.+np.exp(-p[1]*(x-p[2])))
+  return logistic(x, p[0], p[1], p[2])
 
 def cost_logistic(p, x, y):
   ''' Cost function for logistic function fitting function with sum of absolute deviations
@@ -569,19 +565,12 @@ def cost2_logistic(p,x,y):
 
 # -----------------------------------------------------------
 # a/(1+exp(-b(x-c))) + d - logistic function with offset
-def logistic_offset(x, a, b, c, d):
-  """ logistic function with offset a/(1+exp(-b(x-c))) + d
-        a, b, c, d  parameters
-        x           independent variable
-  """
-  return a/(1.+np.exp(-b*(x-c))) + d
-
 def logistic_offset_p(x, p):
   """ logistic function with offset p[0]/(1+exp(-p[1](x-p[2]))) + p[3]
         p    4D-array of parameters
         x    independent variable
   """
-  return p[0]/(1.+np.exp(-p[1]*(x-p[2]))) + p[3]
+  return logistic_offset(x, p[0], p[1], p[2], p[3])
 
 def cost_logistic_offset(p, x, y):
   ''' Cost function for logistic function with offset fitting function with sum of absolute deviations

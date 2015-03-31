@@ -40,7 +40,17 @@
 
     Definition
     ----------
-    Current functions are (there is always the second form with the name appended by _p;
+    Current general functionsare:
+    curvature             Curvature of function f: f''/(1+f'^2)^3/2
+    logistic              logistic function L/(1+exp(-k(x-x0)))
+    dlogistic             First derivative of logistic function
+    d2logistic            Second derivative of logistic function
+    logistic_offset       logistic function with offset L/(1+exp(-k(x-x0))) + a
+    dlogistic_offset      First derivative of logistic function with offset
+    d2logistic_offset     Second derivative of logistic function with offset
+
+
+    Current fitting functions are (there is always the second form with the name appended by _p;
     these are used in the cost functions).
 
         arrhenius         1 param:  Arrhenius temperature dependence of biochemical rates:
@@ -61,7 +71,8 @@
         sabx              2 params: sqrt(f1x), i.e. general sqrt(1/x) function: sqrt(a + b/x)
         see               3 params: Sequential Elementary Effects fitting function: a*(x-b)**c
 
-    Current optimisation test functions are
+
+    Current optimisation test functions are:
     ackley                >=2 params:     Ackley function, global optimum: 0.0 at origin
     goldstein_price       2 params:       Goldstein-Price function, global optimum: 3.0 (0.0,-1.0)
     griewank              2 or 10 params: Griewank function, global optimum: 0 at origin
@@ -70,11 +81,16 @@
     six_hump_camelback    2 params:       Six-hump Camelback function
                                           True Optima: -1.031628453489877, (-0.08983,0.7126), (0.08983,-0.7126)
 
-    Current sensitivity analysis test functions are
-    saltelli              Example on page 111 of Saltelli et al. (2008)
+
+    Current sensitivity analysis test functions are:
+    B                     B of Saltelli et al. (2010)
+    g                     g-function attributed to Sobol' (1990, 1993), given by Saltelli et al. (2008, 2010)
     Gstar                 G* of Saltelli et al. (2010)
-    B                     B  of Saltelli et al. (2010)
+    ishigami_homma        Ishigami and Homma (1990), given by Saltelli et al. (2008, page 179)
     K                     K  of Saltelli et al. (2010)
+    morris                After Morris (1991)
+    oakley_ohagan         Oakley and O'Hagan (2004), parameters given in Saltelli et al. (2008)
+                          or on http://www.jeremy-oakley.staff.shef.ac.uk/psa_example.txt
 
 
     Input / Output
@@ -135,9 +151,11 @@
     Written,  MC, Oct 2014
     Modified, MC, Mar 2015 - group functions in files
 """
-from .opti_test_functions import ackley, griewank, goldstein_price
-from .opti_test_functions import rastrigin, rosenbrock, six_hump_camelback
-from .sa_test_functions   import B, g, Gstar, K, morris, oakley_ohagan, saltelli
+
+from .general_functions   import curvature
+from .general_functions   import logistic, dlogistic, d2logistic
+from .general_functions   import logistic_offset, dlogistic_offset, d2logistic_offset
+
 from .fit_functions       import cost_abs, cost_square
 from .fit_functions       import arrhenius, arrhenius_p, cost_arrhenius, cost2_arrhenius
 from .fit_functions       import f1x, f1x_p, cost_f1x, cost2_f1x
@@ -151,9 +169,14 @@ from .fit_functions       import lloyd_only_rref, lloyd_only_rref_p, cost_lloyd_
 from .fit_functions       import multiline_p
 from .fit_functions       import sabx, sabx_p, cost_sabx, cost2_sabx
 from .fit_functions       import poly, poly_p, cost_poly, cost2_poly
-from .fit_functions       import logistic, logistic_p, cost_logistic, cost2_logistic
-from .fit_functions       import logistic_offset, logistic_offset_p, cost_logistic_offset, cost2_logistic_offset
+from .fit_functions       import logistic_p, cost_logistic, cost2_logistic
+from .fit_functions       import logistic_offset_p, cost_logistic_offset, cost2_logistic_offset
 from .fit_functions       import see, see_p, cost_see, cost2_see
+
+from .opti_test_functions import ackley, griewank, goldstein_price
+from .opti_test_functions import rastrigin, rosenbrock, six_hump_camelback
+
+from .sa_test_functions   import B, g, Gstar, K, morris, oakley_ohagan, ishigami_homma
 
 # Information
 __author__   = "Matthias Cuntz"
