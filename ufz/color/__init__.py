@@ -204,12 +204,13 @@
     from matplotlib.pylab import *
 
     fig = figure(figsize=(8,6))
-    ax1 = fig.add_axes([0.05, 0.85, 0.9, 0.10])
-    ax2 = fig.add_axes([0.05, 0.70, 0.9, 0.10])
-    ax3 = fig.add_axes([0.05, 0.55, 0.9, 0.10])
-    ax4 = fig.add_axes([0.05, 0.40, 0.9, 0.10])
-    ax5 = fig.add_axes([0.05, 0.25, 0.9, 0.10])
-    ax6 = fig.add_axes([0.05, 0.10, 0.9, 0.10])
+    ax1 = fig.add_axes([0.05, 0.90, 0.9, 0.10])
+    ax2 = fig.add_axes([0.05, 0.75, 0.9, 0.10])
+    ax3 = fig.add_axes([0.05, 0.60, 0.9, 0.10])
+    ax4 = fig.add_axes([0.05, 0.45, 0.9, 0.10])
+    ax5 = fig.add_axes([0.05, 0.30, 0.9, 0.10])
+    ax6 = fig.add_axes([0.05, 0.15, 0.9, 0.10])
+    ax7 = fig.add_axes([0.05, 0.00, 0.9, 0.10])
 
     # 7 sequential colours of increasing luminance
     nn     = 7
@@ -250,6 +251,14 @@
     cmap   = mpl.colors.ListedColormap(cc)
     norm   = mpl.colors.BoundaryNorm(np.arange(cmap.N+1), cmap.N)
     cb     = mpl.colorbar.ColorbarBase(ax6, cmap=cmap, norm=norm, orientation='horizontal')
+
+    # 9 diverging colours from 3 given colours, first increasing then decreasing luminance
+    # but interpolated in L*C*h space instead of L*a*b
+    nn     = 9
+    cc     = ufz.color.bezier(['darkred', 'lightyellow', 'teal'], nn, lch=True)
+    cmap   = mpl.colors.ListedColormap(cc)
+    norm   = mpl.colors.BoundaryNorm(np.arange(cmap.N+1), cmap.N)
+    cb     = mpl.colorbar.ColorbarBase(ax7, cmap=cmap, norm=norm, orientation='horizontal')
 
     show()
 
