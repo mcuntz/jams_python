@@ -46,11 +46,13 @@
     eng2ascii              Convert date notations to ascii date format DD.MM.YYYY hh:mm:ss.
     errormeasures          Definition of different error measures.
     esat                   Calculates the saturation vapour pressure of water/ice.
+    Field                  Generates random hydraulic conductivity fields.
     files                  Module with file list function.
     file_from_gui          Open file selection dialog for one single file, returns selected files
     files_from_gui         Open file selection dialog, returns selected files
     fill_nonfinite         Fill missing values by linear interpolation.
     find_in_path           Look for file in system path.
+    Filtered_Incompr_Field Generates random filtered velocity fields.
     fread                  Reads in float array from ascii file.
     fsread                 Simultaneous read of float and string array from ascii file.
     ftp                    Module with functions for interacting with an open FTP connection.
@@ -66,6 +68,7 @@
     head                   Return list with first n lines of file.
     heaviside              Heaviside (or unit step) operator.
     homo_sampling          Generation of homogeneous, randomly distributed points in a given rectangular area.
+    Incompr_Field          Generates random velocity fields.
     in_poly                Determines whether a 2D point falls in a polygon.
     inpoly                 Wrapper for in_poly.
     int2roman              Integer to roman numeral conversion.
@@ -284,6 +287,9 @@
 
     Models
     ------
+    Field                  Generates random hydraulic conductivity fields.
+    Filtered_Incompr_Field Generates random filtered velocity fields.
+    Incompr_Field          Generates random velocity fields.
     leafmodel              Model to compute photosynthesis and stomatal conductance of canopies
 
 
@@ -493,6 +499,7 @@ from .ellipse_area      import ellipse_area
 from .errormeasures     import bias, mae, mse, rmse, nse, pear2
 from .esat              import esat
 from .fgui              import directory_from_gui, file_from_gui, files_from_gui
+from .field_gen         import Field, Incompr_Field, Filtered_Incompr_Field
 from .fill_nonfinite    import fill_nonfinite
 from .find_in_path      import find_in_path
 from .fread             import fread
