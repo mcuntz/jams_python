@@ -84,7 +84,7 @@
 
     Current sensitivity analysis test functions are:
     B                     B of Saltelli et al. (2010)
-    g                     g-function attributed to Sobol' (1990, 1993), given by Saltelli et al. (2008, 2010)
+    G / g                 G-function attributed to Sobol' (1990, 1993), given by Saltelli et al. (2008, 2010)
     Gstar                 G* of Saltelli et al. (2010)
     ishigami_homma        Ishigami and Homma (1990), given by Saltelli et al. (2008, page 179)
     K                     K  of Saltelli et al. (2010)
@@ -176,7 +176,7 @@ from .fit_functions       import see, see_p, cost_see, cost2_see
 from .opti_test_functions import ackley, griewank, goldstein_price
 from .opti_test_functions import rastrigin, rosenbrock, six_hump_camelback
 
-from .sa_test_functions   import B, g, Gstar, K, morris, oakley_ohagan, ishigami_homma
+from .sa_test_functions   import B, g, G, Gstar, K, morris, oakley_ohagan, ishigami_homma
 
 # Information
 __author__   = "Matthias Cuntz"

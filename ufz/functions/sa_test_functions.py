@@ -21,7 +21,7 @@
 
     Current functions are:
     B                     B of Saltelli et al. (2010)
-    g                     g-function attributed to Sobol' (1990, 1993), given by Saltelli et al. (2008, 2010)
+    G / g                 G-function attributed to Sobol' (1990, 1993), given by Saltelli et al. (2008, 2010)
     Gstar                 G* of Saltelli et al. (2010)
     ishigami_homma        Ishigami and Homma (1990), given by Saltelli et al. (2008, page 179)
     K                     K  of Saltelli et al. (2010)
@@ -73,7 +73,7 @@
 """
 from __future__ import print_function
 
-__all__ = ['B', 'g', 'Gstar', 'K', 'morris', 'oakley_ohagan', 'ishigami_homma']
+__all__ = ['B', 'g', 'G', 'Gstar', 'K', 'morris', 'oakley_ohagan', 'ishigami_homma']
 
 import numpy as np
 
@@ -121,7 +121,32 @@ def B(X):
 
 def g(X, a):
     """
-        g-function: Sobol' (1990) Matematicheskoe Modelirovanie 2, 112-118 (in Russian)
+        G-function: Sobol' (1990) Matematicheskoe Modelirovanie 2, 112-118 (in Russian)
+                    Sobol' (1993) Mathematical Modelling and Computational Experiment 1, 407-414 (English translation)
+
+        
+        Input
+        -----
+        X        (nX,) or (nX,npoints) array of floats
+        a        (nX,) array of floats
+
+
+        Output
+        ------
+        float or (npoints,) array of floats
+
+        
+        History
+        -------
+        Written,  MC & JM, Mar 2015
+    """
+    return Gstar(X, np.ones(len(a)), np.zeros(len(a)), a)
+
+# -----------------------------------------------------------
+
+def G(X, a):
+    """
+        G-function: Sobol' (1990) Matematicheskoe Modelirovanie 2, 112-118 (in Russian)
                     Sobol' (1993) Mathematical Modelling and Computational Experiment 1, 407-414 (English translation)
 
         
