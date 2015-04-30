@@ -468,6 +468,7 @@ from __future__ import print_function
 from . import const
 from . import encrypt
 from . import functions
+from . import geostat
 
 # Routines
 from .abc2plot          import abc2plot
