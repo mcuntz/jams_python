@@ -1,14 +1,13 @@
 #!/usr/bin/env python
 from __future__ import print_function
 import numpy as np
-from ufz.ascii2ascii import ascii2eng
-from ufz.fsread import fsread
+import ufz
 
 __all__ = ['read_data', 'write_flag']
 
 # --------------------------------------------------------------------
 
-def read_data(files):
+def read_data(files, undef=-9999.):
     """
         Read and concatenate data from CHS level1 data files.
 
@@ -22,33 +21,39 @@ def read_data(files):
         -----
         files     (nfile,)-list with CHS data level1 file names
 
+
+        Optional Input
+        --------------
+        undef     fill value for data and flags if non-existant (default: -9999.)
+
         
         Output
         ------
-        sdate, record, dat, flags, iidate, hdate, hrecord, hdat, hflags
+        sdate, record, dat, flags, iidate, hdate, hrecord, hdat, hflags, iihead
             where
         sdate     (n,)-array of ascii dates in format YYYY-MM-DD hh:mm:ss
         record    (n,)-array of record number
         dat       (n,m)-array of data
         flags     (n,m)-array of flags
-        iidate    (nfile+1,)-list with start indices of the input files in the output arrays
+        iidate    (nfile,)-list with indices in the output arrays of the input files
         hdate     date/time header
         hrecord   record header
         hdat      data headers
         hflags    flags headers
+        iihead    (nfile,)-list with indices in the output array of headers in the input files
 
 
         Examples
         --------
         # Read data
         files = ufz.files_from_gui(title='Choose Level 1 file(s)')
-        sdate, record, dat, flags, iidate, hdate, hrecord, hdat, hflags = ufz.level1.read_data(files)
+        sdate, record, dat, flags, iidate, hdate, hrecord, hdat, hflags, iihead = ufz.level1.read_data(files)
 
         # Set flags if variables were not treated yet
         flags[:,idx] = np.where(flags[:,idx]==np.int(undef), 9, flags[:,idx])
 
         # Write back data
-        ufz.level1.write_data(files, sdate, record, dat, flags, iidate, hdate, hrecord, hdat, hflags)
+        ufz.level1.write_data(files, sdate, record, dat, flags, iidate, hdate, hrecord, hdat, hflags, iihead)
 
 
         License
@@ -75,62 +80,93 @@ def read_data(files):
         History
         -------
         Written,  MC, Mar 2015
+        Modified, MC, May 2015 - different variable in different input files
     """
+
+    iundef = np.int(undef)
+
+    # Get unique header and time stamps of all input file
+    for cff, ff in enumerate(files):
+        ihead      = ufz.fread(ff, skip=1, header=True)        # head with TIMESTAMP and RECORD
+        if (ihead[1].split()[0]).lower() != 'record':
+            raise ValueError('read_data: assumes the following structure: Date, Record, data, flag, data, flag, ...')
+        idate      = ufz.sread(ff, skip=1, nc=1, squeeze=True) # TIMESTAMP
+        idate      = ufz.ascii2eng(idate, full=True)
+        if cff == 0:
+            hdat   = ihead[2::2]
+            hflags = ihead[3::2]
+            adate  = idate
+        else:
+            hdat   += ihead[2::2]
+            hflags += ihead[3::2]
+            adate  += idate
+    hdat   = list(set(hdat))   # unique data head
+    hflags = list(set(hflags)) # unique flags head
+    adate  = list(set(adate))  # unique dates
+    hdat.sort()
+    hflags.sort()
+    adate.sort()
+
+    # Fill missing time steps in all time steps
+    date  = ufz.date2dec(eng=adate)
+    dd    = np.round(np.diff(date)*24.*60.).astype(np.int) # minutes between time steps
+    dmin  = np.amin(dd)                                    # time step in minutes
+    dt    = np.float(dmin)/(24.*60.)                       # time step in fractional day
+    igaps = np.where(dd != dmin)[0]                        # indexes of gaps
+    for i in igaps[::-1]:
+        nt      = np.round((date[i+1]-date[i])/dt).astype(np.int) # # of missing dates
+        newdate = (date[i]+np.arange(1,nt)*dt)[::-1]              # the missing dates in reverse order
+        for j in range(nt-1):
+            date.insert(i+1, newdate[j]) # fill in missing dates, last one first
+    adate = ufz.dec2date(date, eng=True)
+
+    # Read files and fill in output array
+    nrow   = len(adate)
+    ncol   = len(hdat)
+    dat    = np.ones((nrow,ncol))*undef # output array without
+    flags  = np.ones((nrow,ncol), dtype=np.int)*iundef # output array
+    record = np.ones(nrow, dtype=np.int)*iundef        # output array
+    iidate = list()                     # list with indices of dates in dat/flag/record arrays
+    iihead = list()                     # list with indices of header in hdat/hflags lists
     for cff, ff in enumerate(files):
         # date, data
-        isdat, ssdat = fsread(ff, skip=1, snc=[0], nc=-1) # array
+        isdat, ssdat = ufz.fsread(ff, skip=1, snc=[0], nc=-1) # array
         isdate  = ssdat[:,0]
-        irecord = isdat[:,0]
+        irecord = isdat[:,0].astype(np.int)
         idat    = isdat[:,1::2]
         iflags  = isdat[:,2::2].astype(np.int)
-
+        isdate  = ufz.ascii2eng(isdate, full=True)
         # date header, data header
-        ihead, shead = fsread(ff, skip=1, snc=[0], nc=-1, header=True) # list
+        ihead, shead = ufz.fsread(ff, skip=1, snc=[0], nc=-1, header=True) # list
         ihdate   = shead[0]
         ihrecord = ihead[0]
         ihdat    = ihead[1::2]
         ihflags  = ihead[2::2]
-
-        # Concatenate arrays, check that headers are the same
+        # date and record header
         if cff == 0:
-            check_hdat = ihdat # save 1st header for check of following headers 
-            if isdate.size > 1:
-                sdate   = isdate
-                record  = irecord
-                dat     = idat
-                flags   = iflags
-                hdate   = ihdate
-                hrecord = ihrecord
-                hdat    = ihdat
-                hflags  = ihflags
-            else: # assure array and header in case of only one input line
-                sdate   = np.array([isdate])
-                record  = np.array([irecord])
-                dat     = np.array([idat])
-                flags   = np.array([iflags])
-                hdate   = list(ihdate)
-                hrecord = list(ihrecord)
-                hdat    = list(ihdat)
-                hflags  = list(ihflags)
-            iidate = [0, sdate.size] # list with start and end indices in total arrays
+            hdate   = ihdate
+            hrecord = ihrecord
         else:
-            # Check that the headers are the same
-            if ihdat != check_hdat: raise ValueError('read_data: names in headers are not the same.')
-            # append date and data
-            sdate  = np.append(sdate,  isdate,  axis=0)
-            record = np.append(record, irecord, axis=0)
-            dat    = np.append(dat,    idat,    axis=0)
-            flags  = np.append(flags,  iflags,  axis=0)
-            iidate.append(sdate.size) # append start/end index list
+            if (ihdate != hdate) or (ihrecord != hrecord):
+                raise ValueError('read_data: assumes the same date and record headers.')
 
-    # assure YYYY-MM-DD hh:mm:ss format even if files had DD.MM.YYYY hh:m:ss format
-    sdate = ascii2eng(sdate, full=True)
+        # fill output arrays and index lists
+        iiidate = np.where(np.in1d(adate,isdate))[0] # indexes in dat/flags of time steps in current file
+        iidate.append(iiidate)                       
+        record[iiidate] = irecord[:]                 # write at appropriate places in record
+        iiihead = list()
+        for i, h in enumerate(ihdat):
+            hh = hdat.index(h)
+            iiihead.extend([hh])
+            dat[iiidate, hh]   = idat[:,i]          # write at appropriate places in dat
+            flags[iiidate, hh] = iflags[:,i]        # write at appropriate places in flags
+        iihead.append(iiihead)
     
-    return sdate, record, dat, flags, iidate, hdate, hrecord, hdat, hflags
+    return adate, record, dat, flags, iidate, hdate, hrecord, hdat, hflags, iihead
 
 # --------------------------------------------------------------------
 
-def write_data(infiles, sdate, record, dat, flags, iidate, hdate, hrecord, hdat, hflags):
+def write_data(infiles, sdate, record, dat, flags, iidate, hdate, hrecord, hdat, hflags, iihead):
     """
         Write concatenated data back to individual CHS level1 data files.
 
@@ -147,11 +183,12 @@ def write_data(infiles, sdate, record, dat, flags, iidate, hdate, hrecord, hdat,
         record    (n,)-array of record number
         dat       (n,m)-array of data
         flags     (n,m)-array of flags
-        iidate    (nfile+1,)-list with start indices of the input files in the output arrays
+        iidate    (nfile,)-list with indices in the output arrays of the input files
         hdate     date/time header
         hrecord   record header
         hdat      data headers
         hflags    flags headers
+        iihead    (nfile,)-list with indices in the output array of headers in the input files
 
         
         Output
@@ -163,13 +200,13 @@ def write_data(infiles, sdate, record, dat, flags, iidate, hdate, hrecord, hdat,
         --------
         # Read data
         files = ufz.files_from_gui(title='Choose Level 1 file(s)')
-        sdate, record, dat, flags, iidate, hdate, hrecord, hdat, hflags = ufz.level1.read_data(files)
+        sdate, record, dat, flags, iidate, hdate, hrecord, hdat, hflags, iihead = ufz.level1.read_data(files)
 
         # Set flags if variables were not treated yet
         flags[:,idx] = np.where(flags[:,idx]==np.int(undef), 9, flags[:,idx])
 
         # Write back data
-        ufz.level1.write_data(files, sdate, record, dat, flags, iidate, hdate, hrecord, hdat, hflags)
+        ufz.level1.write_data(files, sdate, record, dat, flags, iidate, hdate, hrecord, hdat, hflags, iihead)
 
 
         License
@@ -196,6 +233,7 @@ def write_data(infiles, sdate, record, dat, flags, iidate, hdate, hrecord, hdat,
         History
         -------
         Written,  MC, Mar 2015
+        Modified, MC, May 2015 - different variable in different input files
     """
     # Assure iterable infiles
     if not isinstance(infiles, (list, tuple, np.ndarray)): infiles = [infiles]
@@ -203,31 +241,33 @@ def write_data(infiles, sdate, record, dat, flags, iidate, hdate, hrecord, hdat,
     # Few checks of sizes
     ntime = dat.shape[0]
     ncol  = dat.shape[1]
-    assert len(infiles)   == len(iidate)-1, 'File list and index list do not conform.'
-    assert sdate.size     == ntime,         'Not enough dates.'
-    assert record.size    == ntime,         'Not enough record numbers.'
-    assert flags.shape[0] == ntime,         'Not enough flag time steps.'
-    assert flags.shape[1] == ncol,          'Not enough flag columns.'
-    assert len(hdat)      == ncol,          'Not enough data headers.'
-    assert len(hflags)    == ncol,          'Not enough flag headers.'
+    assert len(infiles)   == len(iidate),  'File list and date index list do not conform.'
+    assert len(infiles)   == len(iihead),  'File list and header index list do not conform.'
+    assert len(sdate)     == ntime,        'Not enough dates.'
+    assert len(record)    == ntime,        'Not enough record numbers.'
+    assert flags.shape[0] == ntime,        'Not enough flag time steps.'
+    assert flags.shape[1] == ncol,         'Not enough flag columns.'
+    assert len(hdat)      == ncol,         'Not enough data headers.'
+    assert len(hflags)    == ncol,         'Not enough flag headers.'
 
     # assure YYYY-MM-DD hh:mm:ss format even if sdate has DD.MM.YYYY hh:m:ss format
-    isdate = ascii2eng(sdate, full=True)
+    isdate = ufz.ascii2eng(sdate, full=True)
 
     # Write individual files
-    for ff in range(len(infiles)):
-        f = open(infiles[ff], 'wb')
+    for cff, ff in enumerate(infiles):
+        f = open(ff, 'wb')
         # header
         hstr = hdate+','+hrecord
-        for i in range(len(hdat)):
+        ihead = iihead[cff]
+        for i in ihead:
             hstr += ','+hdat[i]+','+hflags[i]
         print(hstr, file=f)
         # data
-        for j in range(iidate[ff], iidate[ff+1]):
+        idate = iidate[cff]
+        for j in idate:
             dstr = isdate[j]+','+str(record[j])
-            for i in range(len(hdat)):
-                # For test: restate -9999 for all flags:
-                # dstr += ','+str(dat[j,i])+',-9999'
+            for i in ihead:
+                # dstr += ','+str(dat[j,i])+',-9999'   # for test: restate -9999 for all flags:
                 dstr += ','+str(dat[j,i])+','+str(flags[j,i])
             print(dstr, file=f)
         f.close()
