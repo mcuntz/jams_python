@@ -103,8 +103,9 @@ def read_data(files, undef=-9999.):
     hdat   = list(set(hdat))   # unique data head
     hflags = list(set(hflags)) # unique flags head
     adate  = list(set(adate))  # unique dates
-    hdat.sort()
-    hflags.sort()
+    ii     = ufz.argsort(hdat)
+    hdat   = [ hdat[i] for i in ii ]
+    hflags = [ hflags[i] for i in ii ]
     adate.sort()
 
     # Fill missing time steps in all time steps
