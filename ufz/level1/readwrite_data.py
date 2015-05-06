@@ -7,14 +7,14 @@ __all__ = ['read_data', 'write_data']
 
 # --------------------------------------------------------------------
 
-def read_data(files, undef=-9999., strip=None, norecord=False):
+def read_data(files, undef=-9999., strip=None, norecord=False, nofill=False):
     """
         Read and concatenate data from CHS level1 data files.
 
 
         Definition
         ----------
-        def read_data(files, undef=-9999., strip=None, norecord=False):
+        def read_data(files, undef=-9999., strip=None, norecord=False, nofill=False):
 
 
         Input
@@ -29,7 +29,8 @@ def read_data(files, undef=-9999., strip=None, norecord=False):
                   If None then strip quotes " and ' (default).
                   If False then no strip (30% faster).
                   Otherwise strip character given by strip.
-        norecord  Do not assume that second column is record number.
+        norecord  True: Do not assume that second column is record number.
+        nofill    True: do not fill-up equal distant time steps
 
         
         Output
@@ -63,7 +64,7 @@ def read_data(files, undef=-9999., strip=None, norecord=False):
 
         # Read data without record
         files = ufz.files_from_gui(title='Choose Level 1 file(s)')
-        sdate, dat, flags, iidate, hdate, hdat, hflags, iihead = ufz.level1.read_data(files, norecord=True)
+        sdate, dat, flags, iidate, hdate, hdat, hflags, iihead = ufz.level1.read_data(files, norecord=True, nofill=True)
 
         # Set flags if variables were not treated yet
         flags[:,idx] = np.where(flags[:,idx]==np.int(undef), 9, flags[:,idx])
@@ -98,6 +99,7 @@ def read_data(files, undef=-9999., strip=None, norecord=False):
         Modified, MC, May 2015 - different variable in different input files
                                - strip
                                - norecord
+                               - nofill
     """
 
     iundef = np.int(undef)
@@ -135,17 +137,18 @@ def read_data(files, undef=-9999., strip=None, norecord=False):
     adate.sort()
 
     # Fill missing time steps in all time steps
-    date  = ufz.date2dec(eng=adate)
-    dd    = np.round(np.diff(date)*24.*60.).astype(np.int) # minutes between time steps
-    dmin  = np.amin(dd)                                    # time step in minutes
-    dt    = np.float(dmin)/(24.*60.)                       # time step in fractional day
-    igaps = np.where(dd != dmin)[0]                        # indexes of gaps
-    for i in igaps[::-1]:
-        nt      = np.round((date[i+1]-date[i])/dt).astype(np.int) # # of missing dates
-        newdate = (date[i]+np.arange(1,nt)*dt)[::-1]              # the missing dates in reverse order
-        for j in range(nt-1):
-            date.insert(i+1, newdate[j]) # fill in missing dates, last one first
-    adate = ufz.dec2date(date, eng=True)
+    if not nofill:
+        date  = ufz.date2dec(eng=adate)
+        dd    = np.round(np.diff(date)*24.*60.).astype(np.int) # minutes between time steps
+        dmin  = np.amin(dd)                                    # time step in minutes
+        dt    = np.float(dmin)/(24.*60.)                       # time step in fractional day
+        igaps = np.where(dd != dmin)[0]                        # indexes of gaps
+        for i in igaps[::-1]:
+            nt      = np.round((date[i+1]-date[i])/dt).astype(np.int) # # of missing dates
+            newdate = (date[i]+np.arange(1,nt)*dt)[::-1]              # the missing dates in reverse order
+            for j in range(nt-1):
+                date.insert(i+1, newdate[j]) # fill in missing dates, last one first
+        adate = ufz.dec2date(date, eng=True)
 
     # Read files and fill in output array
     nrow   = len(adate)
