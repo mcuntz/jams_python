@@ -3,18 +3,18 @@ from __future__ import print_function
 import numpy as np
 import ufz
 
-__all__ = ['read_data', 'write_flag']
+__all__ = ['read_data', 'write_data']
 
 # --------------------------------------------------------------------
 
-def read_data(files, undef=-9999.):
+def read_data(files, undef=-9999., strip=None, norecord=False):
     """
         Read and concatenate data from CHS level1 data files.
 
 
         Definition
         ----------
-        def read_data(files):
+        def read_data(files, undef=-9999., strip=None, norecord=False):
 
 
         Input
@@ -25,6 +25,11 @@ def read_data(files, undef=-9999.):
         Optional Input
         --------------
         undef     fill value for data and flags if non-existant (default: -9999.)
+        strip     Strip strings with str.strip(strip) during read.
+                  If None then strip quotes " and ' (default).
+                  If False then no strip (30% faster).
+                  Otherwise strip character given by strip.
+        norecord  Do not assume that second column is record number.
 
         
         Output
@@ -32,12 +37,12 @@ def read_data(files, undef=-9999.):
         sdate, record, dat, flags, iidate, hdate, hrecord, hdat, hflags, iihead
             where
         sdate     (n,)-array of ascii dates in format YYYY-MM-DD hh:mm:ss
-        record    (n,)-array of record number
+        if norecord==False: record    (n,)-array of record number
         dat       (n,m)-array of data
         flags     (n,m)-array of flags
         iidate    (nfile,)-list with indices in the output arrays of the input files
         hdate     date/time header
-        hrecord   record header
+        if norecord==False: hrecord   record header
         hdat      data headers
         hflags    flags headers
         iihead    (nfile,)-list with indices in the output array of headers in the input files
@@ -55,6 +60,16 @@ def read_data(files, undef=-9999.):
         # Write back data
         ufz.level1.write_data(files, sdate, record, dat, flags, iidate, hdate, hrecord, hdat, hflags, iihead)
 
+
+        # Read data without record
+        files = ufz.files_from_gui(title='Choose Level 1 file(s)')
+        sdate, dat, flags, iidate, hdate, hdat, hflags, iihead = ufz.level1.read_data(files, norecord=True)
+
+        # Set flags if variables were not treated yet
+        flags[:,idx] = np.where(flags[:,idx]==np.int(undef), 9, flags[:,idx])
+
+        # Write back data
+        ufz.level1.write_data(files, sdate, dat, flags, iidate, hdate, hdat, hflags, iihead)
 
         License
         -------
@@ -81,24 +96,35 @@ def read_data(files, undef=-9999.):
         -------
         Written,  MC, Mar 2015
         Modified, MC, May 2015 - different variable in different input files
+                               - strip
+                               - norecord
     """
 
     iundef = np.int(undef)
 
     # Get unique header and time stamps of all input file
     for cff, ff in enumerate(files):
-        ihead      = ufz.fread(ff, skip=1, header=True)        # head with TIMESTAMP and RECORD
-        if (ihead[1].split()[0]).lower() != 'record':
-            raise ValueError('read_data: assumes the following structure: Date, Record, data, flag, data, flag, ...')
-        idate      = ufz.sread(ff, skip=1, nc=1, squeeze=True) # TIMESTAMP
+        ihead      = ufz.fread(ff, skip=1, strip=strip, header=True)        # head with TIMESTAMP and RECORD
+        if not norecord:
+            if (ihead[1].split()[0]).lower() != 'record':
+                raise ValueError('Assume the following structure: Date, Record, data, flag, data, flag, ...')
+        idate      = ufz.sread(ff, skip=1, nc=1, squeeze=True, strip=strip) # TIMESTAMP
         idate      = ufz.ascii2eng(idate, full=True)
         if cff == 0:
-            hdat   = ihead[2::2]
-            hflags = ihead[3::2]
+            if norecord:
+                hdat   = ihead[1::2]
+                hflags = ihead[2::2]
+            else:
+                hdat   = ihead[2::2]
+                hflags = ihead[3::2]
             adate  = idate
         else:
-            hdat   += ihead[2::2]
-            hflags += ihead[3::2]
+            if norecord:
+                hdat   += ihead[1::2]
+                hflags += ihead[2::2]
+            else:
+                hdat   += ihead[2::2]
+                hflags += ihead[3::2]
             adate  += idate
     hdat   = list(set(hdat))   # unique data head
     hflags = list(set(hflags)) # unique flags head
@@ -125,56 +151,266 @@ def read_data(files, undef=-9999.):
     nrow   = len(adate)
     ncol   = len(hdat)
     dat    = np.ones((nrow,ncol))*undef # output array without
-    flags  = np.ones((nrow,ncol), dtype=np.int)*iundef # output array
-    record = np.ones(nrow, dtype=np.int)*iundef        # output array
+    flags  = np.ones((nrow,ncol), dtype=np.int)*iundef           # output array
+    if not norecord: record = np.ones(nrow, dtype=np.int)*iundef # output array
     iidate = list()                     # list with indices of dates in dat/flag/record arrays
     iihead = list()                     # list with indices of header in hdat/hflags lists
     for cff, ff in enumerate(files):
         # date, data
-        isdat, ssdat = ufz.fsread(ff, skip=1, snc=[0], nc=-1) # array
+        isdat, ssdat = ufz.fsread(ff, skip=1, snc=[0], nc=-1, strip=strip) # array
         isdate  = ssdat[:,0]
-        irecord = isdat[:,0].astype(np.int)
-        idat    = isdat[:,1::2]
-        iflags  = isdat[:,2::2].astype(np.int)
+        if norecord:
+            idat    = isdat[:,0::2]
+            iflags  = isdat[:,1::2].astype(np.int)
+        else:
+            irecord = isdat[:,0].astype(np.int)
+            idat    = isdat[:,1::2]
+            iflags  = isdat[:,2::2].astype(np.int)
         isdate  = ufz.ascii2eng(isdate, full=True)
         # date header, data header
-        ihead, shead = ufz.fsread(ff, skip=1, snc=[0], nc=-1, header=True) # list
+        ihead, shead = ufz.fsread(ff, skip=1, snc=[0], nc=-1, strip=strip, header=True) # list
         ihdate   = shead[0]
-        ihrecord = ihead[0]
-        ihdat    = ihead[1::2]
-        ihflags  = ihead[2::2]
+        if norecord:
+            ihdat    = ihead[0::2]
+            ihflags  = ihead[1::2]
+        else:
+            ihrecord = ihead[0]
+            ihdat    = ihead[1::2]
+            ihflags  = ihead[2::2]
         # date and record header
         if cff == 0:
             hdate   = ihdate
-            hrecord = ihrecord
+            if not norecord: hrecord = ihrecord
         else:
-            if (ihdate != hdate) or (ihrecord != hrecord):
-                raise ValueError('read_data: assumes the same date and record headers.')
+            if norecord:
+                if (ihdate != hdate):
+                    raise ValueError('Assume the same date headers.')
+            else:
+                if (ihdate != hdate) or (ihrecord != hrecord):
+                    raise ValueError('Assume the same date and record headers.')
 
         # fill output arrays and index lists
-        iiidate = np.where(np.in1d(adate,isdate))[0] # indexes in dat/flags of time steps in current file
+        iiidate = np.where(np.in1d(adate,isdate))[0]  # indexes in dat/flags of time steps in current file
         iidate.append(iiidate)                       
-        record[iiidate] = irecord[:]                 # write at appropriate places in record
+        if not norecord: record[iiidate] = irecord[:] # write at appropriate places in record
         iiihead = list()
         for i, h in enumerate(ihdat):
             hh = hdat.index(h)
             iiihead.extend([hh])
-            dat[iiidate, hh]   = idat[:,i]          # write at appropriate places in dat
-            flags[iiidate, hh] = iflags[:,i]        # write at appropriate places in flags
+            dat[iiidate, hh]   = idat[:,i]            # write at appropriate places in dat
+            flags[iiidate, hh] = iflags[:,i]          # write at appropriate places in flags
         iihead.append(iiihead)
     
-    return adate, record, dat, flags, iidate, hdate, hrecord, hdat, hflags, iihead
+    if norecord:
+        return adate, dat, flags, iidate, hdate, hdat, hflags, iihead
+    else:
+        return adate, record, dat, flags, iidate, hdate, hrecord, hdat, hflags, iihead
 
 # --------------------------------------------------------------------
 
-def write_data(infiles, sdate, record, dat, flags, iidate, hdate, hrecord, hdat, hflags, iihead):
+def write_data(*args):
     """
         Write concatenated data back to individual CHS level1 data files.
+
+        Wrapper to write_data_norecord and write_data_record.
 
 
         Definition
         ----------
-        def write_data(infiles, sdate, record, dat, flags, iidate, hdate, hrecord, hdat, hflags):
+        def write_data(infiles, sdate, record, dat, flags, iidate, hdate, hrecord, hdat, hflags, iihead):
+        or
+        def write_data(infiles, sdate, dat, flags, iidate, hdate, hdat, hflags, iihead):
+
+
+        Input
+        -----
+        infiles   (nfile,)-list with CHS data level1 file names
+        sdate     (n,)-array of ascii dates in format YYYY-MM-DD hh:mm:ss
+        [record   (n,)-array of record number]
+        dat       (n,m)-array of data
+        flags     (n,m)-array of flags
+        iidate    (nfile,)-list with indices in the output arrays of the input files
+        hdate     date/time header
+        [hrecord  record header]
+        hdat      data headers
+        hflags    flags headers
+        iihead    (nfile,)-list with indices in the output array of headers in the input files
+
+        
+        Output
+        ------
+        files will be overwritten
+
+
+        Examples
+        --------
+        # Read data
+        files = ufz.files_from_gui(title='Choose Level 1 file(s)')
+        sdate, record, dat, flags, iidate, hdate, hrecord, hdat, hflags, iihead = ufz.level1.read_data(files)
+
+        # Set flags if variables were not treated yet
+        flags[:,idx] = np.where(flags[:,idx]==np.int(undef), 9, flags[:,idx])
+
+        # Write back data
+        ufz.level1.write_data(files, sdate, record, dat, flags, iidate, hdate, hrecord, hdat, hflags, iihead)
+
+        
+        # Read data
+        files = ufz.files_from_gui(title='Choose Level 1 file(s)')
+        sdate, dat, flags, iidate, hdate, hdat, hflags, iihead = ufz.level1.read_data(files, norecord=True)
+
+        # Set flags if variables were not treated yet
+        flags[:,idx] = np.where(flags[:,idx]==np.int(undef), 9, flags[:,idx])
+
+        # Write back data
+        ufz.level1.write_data(files, sdate, dat, flags, iidate, hdate, hdat, hflags, iihead)
+
+        License
+        -------
+        This file is part of the UFZ Python package.
+
+        The UFZ Python package is free software: you can redistribute it and/or modify
+        it under the terms of the GNU Lesser General Public License as published by
+        the Free Software Foundation, either version 3 of the License, or
+        (at your option) any later version.
+
+        The UFZ Python package is distributed in the hope that it will be useful,
+        but WITHOUT ANY WARRANTY; without even the implied warranty of
+        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+        GNU Lesser General Public License for more details.
+
+        You should have received a copy of the GNU Lesser General Public License
+        along with the UFZ makefile project (cf. gpl.txt and lgpl.txt).
+        If not, see <http://www.gnu.org/licenses/>.
+
+        Copyright 2015 Matthias Cuntz
+
+
+        History
+        -------
+        Written,  MC, May 2015
+    """
+    if len(args) == 9:
+        write_data_norecord(*args)
+    elif len(args) == 11:
+        write_data_record(*args)
+    else:
+        raise ValueError('Must have 9 or 11 arguments.')
+
+# --------------------------------------------------------------------
+
+def write_data_norecord(infiles, sdate, dat, flags, iidate, hdate, hdat, hflags, iihead):
+    """
+        Write concatenated data back to individual CHS level1 data files without record column.
+
+
+        Definition
+        ----------
+        def write_data_norecord(infiles, sdate, dat, flags, iidate, hdate, hdat, hflags, iihead):
+
+
+        Input
+        -----
+        infiles   (nfile,)-list with CHS data level1 file names
+        sdate     (n,)-array of ascii dates in format YYYY-MM-DD hh:mm:ss
+        dat       (n,m)-array of data
+        flags     (n,m)-array of flags
+        iidate    (nfile,)-list with indices in the output arrays of the input files
+        hdate     date/time header
+        hdat      data headers
+        hflags    flags headers
+        iihead    (nfile,)-list with indices in the output array of headers in the input files
+
+        
+        Output
+        ------
+        files will be overwritten
+
+
+        Examples
+        --------
+        # Read data
+        files = ufz.files_from_gui(title='Choose Level 1 file(s)')
+        sdate, dat, flags, iidate, hdate, hdat, hflags, iihead = ufz.level1.read_data(files, norecord=True)
+
+        # Set flags if variables were not treated yet
+        flags[:,idx] = np.where(flags[:,idx]==np.int(undef), 9, flags[:,idx])
+
+        # Write back data
+        ufz.level1.write_data_norecord(files, sdate, dat, flags, iidate, hdate, hdat, hflags, iihead)
+
+
+        License
+        -------
+        This file is part of the UFZ Python package.
+
+        The UFZ Python package is free software: you can redistribute it and/or modify
+        it under the terms of the GNU Lesser General Public License as published by
+        the Free Software Foundation, either version 3 of the License, or
+        (at your option) any later version.
+
+        The UFZ Python package is distributed in the hope that it will be useful,
+        but WITHOUT ANY WARRANTY; without even the implied warranty of
+        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+        GNU Lesser General Public License for more details.
+
+        You should have received a copy of the GNU Lesser General Public License
+        along with the UFZ makefile project (cf. gpl.txt and lgpl.txt).
+        If not, see <http://www.gnu.org/licenses/>.
+
+        Copyright 2015 Matthias Cuntz
+
+
+        History
+        -------
+        Written,  MC, Mar 2015 - from write_data
+    """
+    # Assure iterable infiles
+    if not isinstance(infiles, (list, tuple, np.ndarray)): infiles = [infiles]
+
+    # Few checks of sizes
+    ntime = dat.shape[0]
+    ncol  = dat.shape[1]
+    assert len(infiles)   == len(iidate),  'File list and date index list do not conform.'
+    assert len(infiles)   == len(iihead),  'File list and header index list do not conform.'
+    assert len(sdate)     == ntime,        'Not enough dates.'
+    assert flags.shape[0] == ntime,        'Not enough flag time steps.'
+    assert flags.shape[1] == ncol,         'Not enough flag columns.'
+    assert len(hdat)      == ncol,         'Not enough data headers.'
+    assert len(hflags)    == ncol,         'Not enough flag headers.'
+
+    # assure YYYY-MM-DD hh:mm:ss format even if sdate has DD.MM.YYYY hh:m:ss format
+    isdate = ufz.ascii2eng(sdate, full=True)
+
+    # Write individual files
+    for cff, ff in enumerate(infiles):
+        f = open(ff, 'wb')
+        # header
+        hstr = hdate
+        ihead = iihead[cff]
+        for i in ihead:
+            hstr += ','+hdat[i]+','+hflags[i]
+        print(hstr, file=f)
+        # data
+        idate = iidate[cff]
+        for j in idate:
+            dstr = isdate[j]
+            for i in ihead:
+                # dstr += ','+str(dat[j,i])+',-9999'   # for test: restate -9999 for all flags:
+                dstr += ','+str(dat[j,i])+','+str(flags[j,i])
+            print(dstr, file=f)
+        f.close()
+
+# --------------------------------------------------------------------
+
+def write_data_record(infiles, sdate, record, dat, flags, iidate, hdate, hrecord, hdat, hflags, iihead):
+    """
+        Write concatenated data back to individual CHS level1 data files with record number.
+
+
+        Definition
+        ----------
+        def write_data_record(infiles, sdate, record, dat, flags, iidate, hdate, hrecord, hdat, hflags, iihead):
 
 
         Input
@@ -207,7 +443,7 @@ def write_data(infiles, sdate, record, dat, flags, iidate, hdate, hrecord, hdat,
         flags[:,idx] = np.where(flags[:,idx]==np.int(undef), 9, flags[:,idx])
 
         # Write back data
-        ufz.level1.write_data(files, sdate, record, dat, flags, iidate, hdate, hrecord, hdat, hflags, iihead)
+        ufz.level1.write_data_record(files, sdate, record, dat, flags, iidate, hdate, hrecord, hdat, hflags, iihead)
 
 
         License
@@ -235,6 +471,7 @@ def write_data(infiles, sdate, record, dat, flags, iidate, hdate, hrecord, hdat,
         -------
         Written,  MC, Mar 2015
         Modified, MC, May 2015 - different variable in different input files
+                               - renamed to write_data_record
     """
     # Assure iterable infiles
     if not isinstance(infiles, (list, tuple, np.ndarray)): infiles = [infiles]

@@ -89,7 +89,7 @@
 from math import floor, cos, sin, sqrt, acos, atan2
 from ufz.color import limit
 
-__all__ = ['rgb2hex',   'hex2rgb',   'hex2rgb01',
+__all__ = ['rgb2hex',   'hex2rgb',   'hex2rgb01', # convert between hexadecimal and rgb colour representations
            'rgb2hsi',   'hsi2rgb',   'hsi2rgb01',
            'rgb2hsl',   'hsl2rgb',   'hsl2rgb01',
            'rgb2hsv',   'hsv2rgb',   'hsv2rgb01',
