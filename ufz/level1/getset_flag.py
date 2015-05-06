@@ -236,20 +236,25 @@ def get_maxflag(flags):
         Written,  JM, Mar 2015
     """
 
-    # Determine number of flags
-    n_flags_precip = 18
-    
-    # Determine overall flag:
-    #      cumflag=2,  if at least one flag is 2,     e.g. '9002010'
-    #      cumflag=1,  if at least one flag is 1,     e.g. '9000100'
-    #      cumflag=0,  if all individual flags are 0, e.g. '9000000'
-    #      cumflag=-1, if flag is '9'
-    #      cumflag=-2, if flag is '-9999'
-    cumflag=np.ones(np.shape(flags), dtype=np.int) * (-2)
-    for ii in np.arange(1,n_flags_precip+1):
-        cumflag = np.maximum(cumflag,get_flag(flags,ii))
-    
-    return cumflag
+    maxflag = np.ones(np.shape(flags), dtype=np.int) * (-2)
+
+    fmax = np.amax(flags)
+    if fmax == -9999:
+        return maxflag
+    elif fmax == 9:
+        maxflag = np.ones(np.shape(flags), dtype=np.int) * (-1)
+        return maxflag
+    else:
+        n_flags_precip = np.log10(fmax).astype(np.int)
+        # Determine overall flag:
+        #      maxflag=2,  if at least one flag is 2,     e.g. '9002010'
+        #      maxflag=1,  if at least one flag is 1,     e.g. '9000100'
+        #      maxflag=0,  if all individual flags are 0, e.g. '9000000'
+        #      maxflag=-1, if flag is '9'
+        #      maxflag=-2, if flag is '-9999'
+        for ii in np.arange(n_flags_precip):
+            maxflag = np.maximum(maxflag, get_flag(flags,ii+1))
+        return maxflag
 
 # --------------------------------------------------------------------
 
