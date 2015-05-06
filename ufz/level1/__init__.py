@@ -6,6 +6,7 @@
     Provided functions
     ------------------
     get_flag         Get the flags at position n from CHS data flag vector.
+    get_maxflag      Get the maximal flag of the string with the individual flags.
     read_data        Read and concatenate data from CHS level1 data files.
     set_flag         Set the flags at position n to iflag at indices ii of CHS data flag vector.
     write_data       Write concatenated data back to individual CHS level1 data files.
@@ -14,7 +15,7 @@
     Example
     -------
     import ufz
-    from ufz.level1 import get_flag, set_flag
+    from ufz.level1 import get_flag, set_flag, get_maxflag
 
     # get files
     infiles = ufz.files_from_gui(title='Choose Level 1 file(s)')
@@ -36,6 +37,9 @@
 
     # write back data and flags
     ufz.level1.write_data(infiles, sdate, record, dat, flags, iidate, hdate, hrecord, hdat, hflags)
+
+    # get the overall flag for each data point
+    ufz.level1.get_maxflag(flags)
 
     # plot
     i = 0
@@ -69,8 +73,9 @@
     History
     -------
     Written,  MC, Mar 2015
+    Modified  JM, Mar 2015  -  adding get_maxflag
 """
-from .getset_flag    import get_flag, set_flag
+from .getset_flag    import get_flag, set_flag, get_maxflag
 from .readwrite_data import read_data, write_data
 
 # Information
