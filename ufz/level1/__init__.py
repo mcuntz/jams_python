@@ -7,6 +7,7 @@
     ------------------
     get_flag         Get the flags at position n from CHS data flag vector.
     get_maxflag      Get the maximal flag of the string with the individual flags.
+    get_value_excel  Get value in column of sheet in excelfile given variable name.
     read_data        Read and concatenate data from CHS level1 data files.
     set_flag         Set the flags at position n to iflag at indices ii of CHS data flag vector.
     write_data       Write concatenated data back to individual CHS level1 data files.
@@ -14,38 +15,44 @@
 
     Example
     -------
-    import ufz
-    from ufz.level1 import get_flag, set_flag, get_maxflag
-
     # get files
     infiles = ufz.files_from_gui(title='Choose Level 1 file(s)')
 
     # read files
-    sdate, record, dat, flags, iidate, hdate, hrecord, hdat, hflags = ufz.level1.read_data(infiles)
+    sdate, record, dat, flags, iidate, hdate, hrecord, hdat, hflags, iihead = ufz.level1.read_data(infiles)
 
-    # julian dates
-    date  = ufz.date2dec(eng=sdate)
+    # Get variables and indexes of variables in dat and flags
+    myvars = [ v for v in hdat if v.startswith('stemT') ]
+    idx    = [ hdat.index(v) for v in myvars ]
 
     # Set flags if variables were not treated yet
     flags[:,idx] = np.where(flags[:,idx]==np.int(undef), 9, flags[:,idx])
+
     # 1st test - set first flag after the initial 9 to 2 if dat is undef
     itest  = 1
     isflag = 2
     for i in idx:
         ii = np.where(dat[:,i]==undef)[0]
-        flags[:,i] = set_flag(flags[:,i], itest, isflag, ii)
+        if ii.size>0: flags[:,i] = ufz.level1.set_flag(flags[:,i], itest, isflag, ii)
+
+    # 2nd test - set second flag to 2 if dat is not in [min,max]
+    #            treat only data that had no flag==2 before
+    itest = 2
+    isflag = 2
+    for i, v in zip(idx, myvars):
+        mini = ufz.level1.get_value_excel('CHS-measurements.xlsx', 'Forest Hohes Holz', v, 'Min')
+        maxi = ufz.level1.get_value_excel('CHS-measurements.xlsx', 'Forest Hohes Holz', v, 'Max')
+        maxflags = ufz.level1.get_maxflag(flags[:,i])
+        ii = np.where((maxflags < 2) & ((dat[:,i] < swdrmin) | (dat[:,i] > swdrmax)))[0]
+        if ii.size>0: flags[:,i] = ufz.level1.set_flag(flags[:,i], itest, isflag, ii)
 
     # write back data and flags
-    ufz.level1.write_data(infiles, sdate, record, dat, flags, iidate, hdate, hrecord, hdat, hflags)
+    ufz.level1.write_data(infiles, sdate, record, dat, flags, iidate, hdate, hrecord, hdat, hflags, iihead)
 
-    # get the overall flag for each data point
-    ufz.level1.get_maxflag(flags)
-
-    # plot
+    # plot data without any flag
     i = 0
-    xx = date
-    # original data without undef
-    yy = np.ma.array(dat[:,i], mask=(get_flag(flags[:,i],1)==2))
+    xx = ufz.date2dec(eng=sdate)
+    yy = np.ma.array(dat[:,i], mask=(ufz.level1.get_maxflag(flags[:,i])==2))
     mark1 = sub.plot(xx, yy)
 
 
@@ -73,13 +80,15 @@
     History
     -------
     Written,  MC, Mar 2015
-    Modified  JM, Mar 2015  -  adding get_maxflag
+    Modified  JM, May 2015 - get_maxflag
+              MC, May 2015 - excel - get_value_excel
 """
+from .excel          import get_value_excel
 from .getset_flag    import get_flag, set_flag, get_maxflag
 from .readwrite_data import read_data, write_data
 
 # Information
 __author__   = "Matthias Cuntz"
-__version__  = '1.0'
-__revision__ = "Revision: 2051"
-__date__     = 'Date: 15.03.2015'
+__version__  = '1.1'
+__revision__ = "Revision: 2129"
+__date__     = 'Date: 06.05.2015'
