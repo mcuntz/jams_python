@@ -2,6 +2,7 @@
 from __future__ import print_function
 import numpy as np
 import ufz
+from collections import OrderedDict
 
 __all__ = ['read_data', 'write_data']
 
@@ -128,9 +129,9 @@ def read_data(files, undef=-9999., strip=None, norecord=False, nofill=False):
                 hdat   += ihead[2::2]
                 hflags += ihead[3::2]
             adate  += idate
-    hdat   = list(set(hdat))   # unique data head
-    hflags = list(set(hflags)) # unique flags head
-    adate  = list(set(adate))  # unique dates
+    hdat   = list(OrderedDict.fromkeys(hdat))   # unique data head
+    hflags = list(OrderedDict.fromkeys(hflags)) # unique flags head
+    adate  = list(OrderedDict.fromkeys(adate))  # unique dates
     ii     = ufz.argsort(hdat)
     hdat   = [ hdat[i] for i in ii ]
     hflags = [ hflags[i] for i in ii ]
