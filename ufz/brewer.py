@@ -228,7 +228,7 @@ ncl_meteo_swiss_maps = ['hotcold_18lev', 'hotcolr_19lev', 'mch_default', 'perc2_
                         't2m_29lev', 'temp_19lev', 'temp_diff_18lev', 'temp_diff_1lev', 'topo_15lev',
                         'wind_17lev']
 
-mma_maps = ['dark_rainbow_8', 'dark_rainbow_16', 'dark_rainbow_256']
+mma_maps = ['dark_rainbow_6', 'dark_rainbow_8', 'dark_rainbow_12', 'dark_rainbow_16', 'dark_rainbow_256']
 
 all_maps = sequential_maps + diverging_maps + qualitative_maps + osu_maps + ncl_large_maps + ncl_small_maps + ncl_meteo_swiss_maps + mma_maps
 
