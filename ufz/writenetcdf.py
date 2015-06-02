@@ -4,7 +4,7 @@ import numpy as np                       # array manipulation
 import netCDF4 as nc
 
 def writenetcdf(fhandle, vhandle=None, var=None, time=None, isdim=False, name=None, dims=None,
-                attributes=None, fileattributes=None, comp=False, vartype=None):
+                attributes=None, fileattributes=None, comp=False, vartype=None, create_var=True ):
     """
         Writes dimensions, variables, dependencies and attributes to NetCDF file
         for 1D to 6D data.
@@ -33,7 +33,7 @@ def writenetcdf(fhandle, vhandle=None, var=None, time=None, isdim=False, name=No
         vartype         string                  netcdf variable type
                                                 default: 'f4' for normal variables
                                                          'f8' for variable with isdim=True and dims=None (=unlimited)
-
+        create_var      boolean                 create variable for dimension although var is None
 
         Description
         -----------
@@ -163,6 +163,7 @@ def writenetcdf(fhandle, vhandle=None, var=None, time=None, isdim=False, name=No
                   MC,      Jun 2012 - vartype
                   MC,      Feb 2013 - ported to Python 3
                   MC,      Apr 2014 - attributes can be given as dictionary e.g. from readnetcdf with attributes=True
+                  ST,      May 2015 - added create_var flag that allows to disable automatic creation of variables for dimensions
     """
     # create File attributes
     if fileattributes is not None:
@@ -188,9 +189,7 @@ def writenetcdf(fhandle, vhandle=None, var=None, time=None, isdim=False, name=No
         if isdim:
             idim = fhandle.createDimension(name, dims)
             # create variable for the dimension
-            if dims is None:
-                hand = fhandle.createVariable(name, typ, (name,))
-            else:
+            if not var is None or create_var:
                 hand = fhandle.createVariable(name, typ, (name,))
         else:
             keys   = list(fhandle.dimensions.keys())
@@ -250,7 +249,8 @@ def writenetcdf(fhandle, vhandle=None, var=None, time=None, isdim=False, name=No
                 hand[:,:,:,:,:,:] = var
             else:
                 raise ValueError('Number of dimensions not supported (>6): '+str(np.size(shand)))
-    return hand
+    if not var is None or create_var:
+        return hand
 
 # write to file
 def dumpnetcdf( fname, dims=None, fileattributes=None, create=True, **variables ):
@@ -365,7 +365,7 @@ def dumpnetcdf( fname, dims=None, fileattributes=None, create=True, **variables 
             arr_shape = variables.values()[ 0 ][0].shape
         for dd in np.arange( len( arr_shape ) ):
             writenetcdf( fh, name = dims[dd], dims = arr_shape[dd], 
-                         var = np.arange( arr_shape[dd] ), isdim = True ) 
+                         var = None, isdim = True, create_var = False ) 
     # loop over variables
     for key, value in variables.iteritems():
         if type( value[1] ) != dict:
