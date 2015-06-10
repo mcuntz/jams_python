@@ -2,6 +2,7 @@
 from __future__ import print_function
 import numpy as np                       # array manipulation
 import netCDF4 as nc
+from readnetcdf import readnetcdf
 
 def writenetcdf(fhandle, vhandle=None, var=None, time=None, isdim=False, name=None, dims=None,
                 attributes=None, fileattributes=None, comp=False, vartype=None, create_var=True ):
@@ -308,7 +309,7 @@ def dumpnetcdf( fname, dims=None, fileattributes=None, create=True, **variables 
         # check file
         >>> from readnetcdf import readnetcdf
         >>> print([str(i) for i in readnetcdf('test_dump.nc', variables=True)])
-        ['xx', 'yy', 'data']
+        ['data']
         >>> readdata = readnetcdf('test_dump.nc', var='data')
         >>> print(np.any((readdata[:,:] - dat) != 0.))
         False
@@ -358,14 +359,22 @@ def dumpnetcdf( fname, dims=None, fileattributes=None, create=True, **variables 
     if fileattributes is not None:
         writenetcdf(fh, fileattributes=fileattributes)
     # create dimensions according to first variable
+    if ( type( variables.values()[0][1] ) != dict ):
+        arr_shape = variables.values()[ 0 ].shape
+    else:
+        arr_shape = variables.values()[ 0 ][0].shape
     if create:
-        if ( type( variables.values()[0][1] ) != dict ):
-            arr_shape = variables.values()[ 0 ].shape
-        else:
-            arr_shape = variables.values()[ 0 ][0].shape
         for dd in np.arange( len( arr_shape ) ):
             writenetcdf( fh, name = dims[dd], dims = arr_shape[dd], 
-                         var = None, isdim = True, create_var = False ) 
+                         var = None, isdim = True, create_var = False )
+    else:
+        # read dimensions from file
+        file_dims = get_dims( fname )
+        for dd in  np.arange( len( arr_shape ) ):
+            if not dims[dd] in file_dims:
+                writenetcdf( fh, name = dims[dd], dims = arr_shape[dd], 
+                            var = None, isdim = True, create_var = False )
+            
     # loop over variables
     for key, value in variables.iteritems():
         if type( value[1] ) != dict:
@@ -378,6 +387,87 @@ def dumpnetcdf( fname, dims=None, fileattributes=None, create=True, **variables 
             writenetcdf( fh, name = key, dims = dims[: value[0].ndim ], var = value[0],
                          attributes = value[1], comp = True )
     fh.close()
+
+# returns list of all dimensions given a filename 
+def get_dims( fname ):
+    """
+        This functions returns all dimension names contained in a netcdf file as list
+
+        Definition
+        ----------
+        def get_dims( fname )
+
+
+        Input           Format                  Description
+        -----           -----                   -----------
+        fname           string                  filename of netcdf file
+
+        Description
+        -----------
+        reads all dimension names from netcdf file
+        dnames = get_dims( 'test.nc' )
+
+        Restrictions
+        ------------
+        None
+
+        Examples
+        --------
+        >>> import numpy as np
+        >>> dat    = np.array([[-9., 5., 5., -9. ,5.,-9.,5., -9. ,  5., 5.,  5.],
+        ...                     [ 5.,-9.,-9., -9. ,5.,-9.,5., -9. , -9.,-9.,  5.],
+        ...                     [ 5.,-9.,-9., -9. ,5., 5.,5., -9. ,  5., 5.,  5.],
+        ...                     [ 5.,-9.,-9., -9. ,5.,-9.,5., -9. ,  5.,-9., -9.],
+        ...                     [-9., 5., 5., -9. ,5.,-9.,5., -9. ,  5., 5.,  5.] ])
+        >>> dims    = [ 'xx', 'yy' ]
+        >>> FiAtt   = ([['description', 'test dump_netcdf'],
+        ...            ['history'    , 'Created by Stephan Thober']])
+        >>> dumpnetcdf( 'test_dump.nc', dims = dims, fileattributes = FiAtt, 
+        ...            data = ( dat, {'long_name':'CHS'} ) )
+
+        # check file
+        >>> from readnetcdf import readnetcdf
+        >>> print( get_dims( 'test_dump.nc' ) )
+        [u'xx', u'yy']
+
+        >>> import os
+        >>> os.remove('test_dump.nc')
+
+
+        License
+        -------
+        This file is part of the UFZ Python package.
+
+        The UFZ Python package is free software: you can redistribute it and/or modify
+        it under the terms of the GNU Lesser General Public License as published by
+        the Free Software Foundation, either version 3 of the License, or
+        (at your option) any later version.
+
+        The UFZ Python package is distributed in the hope that it will be useful,
+        but WITHOUT ANY WARRANTY; without even the implied warranty of
+        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+        GNU Lesser General Public License for more details.
+
+        You should have received a copy of the GNU Lesser General Public License
+        along with the UFZ makefile project (cf. gpl.txt and lgpl.txt).
+        If not, see <http://www.gnu.org/licenses/>.
+
+        Copyright 2015-2015 Stephan Thober
+
+
+        History
+        -------
+        Written,  ST, Jun 2015
+    """
+    file_vars = readnetcdf( fname, var = '', variables = True )
+    file_dims = []
+    for var in file_vars:
+        tmp_dims = readnetcdf( fname, var = var, dims = True )
+        for dims in tmp_dims:
+            if not dims in file_dims:
+                file_dims.append( dims )
+    return file_dims
+
 
 if __name__ == '__main__':
     import doctest
