@@ -4,6 +4,7 @@ import os
 import datetime
 import glob
 from ufz.argsort import argsort
+import numpy as np
 
 __all__ = ['fullnames', 'fullnames_dates', 'fullnames_dates_sizes', 'fullnames_sizes',
            'fullnames_times', 'fullnames_times_sizes',
@@ -33,7 +34,7 @@ def fullnames(fname=None, dirs=None):
         Optional Input
         --------------
         fname        filename, filename globbing is possible such as '*.dat' (all files)
-        dirs         list of directory names (default: '.')
+        dirs         list of or single directory names (default: '.')
 
         
         Output
@@ -79,12 +80,18 @@ def fullnames(fname=None, dirs=None):
         History
         -------
         Written,  MC, Dec 2014
+        Modified, MC, Jun 2015 - dirs can be single directory
+                               - dirs can be empty
     """
     if dirs is None:
         idirs = ['.']
     else:
-        idirs = dirs
+        if isinstance(dirs, (list, tuple, np.ndarray)):
+            idirs = dirs
+        else:
+            idirs = [dirs]
     lls  = []
+    curdir = os.path.realpath(os.path.curdir)
     for i in idirs:
         if i != '.':
             os.chdir(str(i))
@@ -95,7 +102,7 @@ def fullnames(fname=None, dirs=None):
         fnames = [ os.path.abspath(f) for f in fnames ]
         lls  += fnames
         if i != '.':
-            os.chdir('..')
+            os.chdir(curdir)
     lls.sort()
     return lls
 
@@ -114,7 +121,7 @@ def fullnames_dates(fname=None, dirs=None):
         Optional Input
         --------------
         fname        filename, filename globbing is possible such as '*.dat' (all files)
-        dirs         list of directory names (default: '.')
+        dirs         list of or single directory names (default: '.')
 
         
         Output
@@ -160,13 +167,19 @@ def fullnames_dates(fname=None, dirs=None):
         History
         -------
         Written,  MC, Dec 2014
+        Modified, MC, Jun 2015 - dirs can be single directory
+                               - dirs can be empty
     """
     if dirs is None:
         idirs = ['.']
     else:
-        idirs = dirs
+        if isinstance(dirs, (list, tuple, np.ndarray)):
+            idirs = dirs
+        else:
+            idirs = [dirs]
     lls  = []
     llsd = []
+    curdir = os.path.realpath(os.path.curdir)
     for i in idirs:
         if i != '.':
             os.chdir(str(i))
@@ -178,7 +191,7 @@ def fullnames_dates(fname=None, dirs=None):
         lls  += fnames
         llsd += [ datetime.datetime.fromtimestamp(os.stat(n).st_mtime) for n in fnames ]
         if i != '.':
-            os.chdir('..')
+            os.chdir(curdir)
     ii = argsort(lls)
     lls  = [ lls[i] for i in ii ]
     llsd = [ llsd[i] for i in ii ]
@@ -199,7 +212,7 @@ def fullnames_dates_sizes(fname=None, dirs=None):
         Optional Input
         --------------
         fname        filename, filename globbing is possible such as '*.dat' (all files)
-        dirs         list of directory names (default: '.')
+        dirs         list of or single directory names (default: '.')
 
         
         Output
@@ -245,14 +258,20 @@ def fullnames_dates_sizes(fname=None, dirs=None):
         History
         -------
         Written,  MC, Dec 2014
+        Modified, MC, Jun 2015 - dirs can be single directory
+                               - dirs can be empty
     """
     if dirs is None:
         idirs = ['.']
     else:
-        idirs = dirs
+        if isinstance(dirs, (list, tuple, np.ndarray)):
+            idirs = dirs
+        else:
+            idirs = [dirs]
     lls  = []
     llsd = []
     llss = []
+    curdir = os.path.realpath(os.path.curdir)
     for i in idirs:
         if i != '.':
             os.chdir(str(i))
@@ -265,7 +284,7 @@ def fullnames_dates_sizes(fname=None, dirs=None):
         llsd += [ datetime.datetime.fromtimestamp(os.stat(n).st_mtime) for n in fnames ]
         llss += [ int(os.stat(n).st_size) for n in fnames ]
         if i != '.':
-            os.chdir('..')
+            os.chdir(curdir)
     ii = argsort(lls)
     lls  = [ lls[i] for i in ii ]
     llsd = [ llsd[i] for i in ii ]
@@ -288,7 +307,7 @@ def fullnames_sizes(fname=None, dirs=None):
         Optional Input
         --------------
         fname        filename, filename globbing is possible such as '*.dat' (all files)
-        dirs         list of directory names (default: '.')
+        dirs         list of or single directory names (default: '.')
 
         
         Output
@@ -334,13 +353,19 @@ def fullnames_sizes(fname=None, dirs=None):
         History
         -------
         Written,  MC, Dec 2014
+        Modified, MC, Jun 2015 - dirs can be single directory
+                               - dirs can be empty
     """
     if dirs is None:
         idirs = ['.']
     else:
-        idirs = dirs
+        if isinstance(dirs, (list, tuple, np.ndarray)):
+            idirs = dirs
+        else:
+            idirs = [dirs]
     lls  = []
     llss = []
+    curdir = os.path.realpath(os.path.curdir)
     for i in idirs:
         if i != '.':
             os.chdir(str(i))
@@ -352,7 +377,7 @@ def fullnames_sizes(fname=None, dirs=None):
         lls  += fnames
         llss += [ int(os.stat(n).st_size) for n in fnames ]
         if i != '.':
-            os.chdir('..')
+            os.chdir(curdir)
     ii = argsort(lls)
     lls  = [ lls[i] for i in ii ]
     llss = [ llss[i] for i in ii ]
@@ -471,7 +496,7 @@ def last_fullname(fname=None, dirs=None):
         Optional Input
         --------------
         fname        filename, filename globbing is possible such as '*.dat' (all files)
-        dirs         list of directory names (default: '.')
+        dirs         list of or single directory names (default: '.')
 
         
         Output
@@ -546,7 +571,7 @@ def last_fullname_date(fname=None, dirs=None):
         Optional Input
         --------------
         fname        filename, filename globbing is possible such as '*.dat' (all files)
-        dirs         list of directory names (default: '.')
+        dirs         list of or single directory names (default: '.')
 
         
         Output
@@ -621,7 +646,7 @@ def last_fullname_date_size(fname=None, dirs=None):
         Optional Input
         --------------
         fname        filename, filename globbing is possible such as '*.dat' (all files)
-        dirs         list of directory names (default: '.')
+        dirs         list of or single directory names (default: '.')
 
         
         Output
@@ -696,7 +721,7 @@ def last_fullname_size(fname=None, dirs=None):
         Optional Input
         --------------
         fname        filename, filename globbing is possible such as '*.dat' (all files)
-        dirs         list of directory names (default: '.')
+        dirs         list of or single directory names (default: '.')
 
         
         Output
@@ -869,7 +894,7 @@ def last_name(fname=None, dirs=None):
         Optional Input
         --------------
         fname        filename, filename globbing is possible such as '*.dat' (all files)
-        dirs         list of directory names (default: '.')
+        dirs         list of or single directory names (default: '.')
 
         
         Output
@@ -944,7 +969,7 @@ def last_name_date(fname=None, dirs=None):
         Optional Input
         --------------
         fname        filename, filename globbing is possible such as '*.dat' (all files)
-        dirs         list of directory names (default: '.')
+        dirs         list of or single directory names (default: '.')
 
         
         Output
@@ -1019,7 +1044,7 @@ def last_name_date_size(fname=None, dirs=None):
         Optional Input
         --------------
         fname        filename, filename globbing is possible such as '*.dat' (all files)
-        dirs         list of directory names (default: '.')
+        dirs         list of or single directory names (default: '.')
 
         
         Output
@@ -1094,7 +1119,7 @@ def last_name_size(fname=None, dirs=None):
         Optional Input
         --------------
         fname        filename, filename globbing is possible such as '*.dat' (all files)
-        dirs         list of directory names (default: '.')
+        dirs         list of or single directory names (default: '.')
 
         
         Output
@@ -1267,7 +1292,7 @@ def names(fname=None, dirs=None):
         Optional Input
         --------------
         fname        filename, filename globbing is possible such as '*.dat' (all files)
-        dirs         list of directory names (default: '.')
+        dirs         list of or single directory names (default: '.')
 
         
         Output
@@ -1313,12 +1338,18 @@ def names(fname=None, dirs=None):
         History
         -------
         Written,  MC, Dec 2014
+        Modified, MC, Jun 2015 - dirs can be single directory
+                               - dirs can be empty
     """
     if dirs is None:
         idirs = ['.']
     else:
-        idirs = dirs
+        if isinstance(dirs, (list, tuple, np.ndarray)):
+            idirs = dirs
+        else:
+            idirs = [dirs]
     lls  = []
+    curdir = os.path.realpath(os.path.curdir)
     for i in idirs:
         if i != '.':
             os.chdir(str(i))
@@ -1328,7 +1359,7 @@ def names(fname=None, dirs=None):
             fnames = glob.glob(fname)
         lls  += fnames
         if i != '.':
-            os.chdir('..')
+            os.chdir(curdir)
     lls.sort()
     return lls
 
@@ -1347,7 +1378,7 @@ def names_dates(fname=None, dirs=None):
         Optional Input
         --------------
         fname        filename, filename globbing is possible such as '*.dat' (all files)
-        dirs         list of directory names (default: '.')
+        dirs         list of or single directory names (default: '.')
 
         
         Output
@@ -1393,13 +1424,19 @@ def names_dates(fname=None, dirs=None):
         History
         -------
         Written,  MC, Dec 2014
+        Modified, MC, Jun 2015 - dirs can be single directory
+                               - dirs can be empty
     """
     if dirs is None:
         idirs = ['.']
     else:
-        idirs = dirs
+        if isinstance(dirs, (list, tuple, np.ndarray)):
+            idirs = dirs
+        else:
+            idirs = [dirs]
     lls  = []
     llsd = []
+    curdir = os.path.realpath(os.path.curdir)
     for i in idirs:
         if i != '.':
             os.chdir(str(i))
@@ -1410,7 +1447,7 @@ def names_dates(fname=None, dirs=None):
         lls  += fnames
         llsd += [ datetime.datetime.fromtimestamp(os.stat(n).st_mtime) for n in fnames ]
         if i != '.':
-            os.chdir('..')
+            os.chdir(curdir)
     ii = argsort(lls)
     lls  = [ lls[i] for i in ii ]
     llsd = [ llsd[i] for i in ii ]
@@ -1431,7 +1468,7 @@ def names_dates_sizes(fname=None, dirs=None):
         Optional Input
         --------------
         fname        filename, filename globbing is possible such as '*.dat' (all files)
-        dirs         list of directory names (default: '.')
+        dirs         list of or single directory names (default: '.')
 
         
         Output
@@ -1477,14 +1514,20 @@ def names_dates_sizes(fname=None, dirs=None):
         History
         -------
         Written,  MC, Dec 2014
+        Modified, MC, Jun 2015 - dirs can be single directory
+                               - dirs can be empty
     """
     if dirs is None:
         idirs = ['.']
     else:
-        idirs = dirs
+        if isinstance(dirs, (list, tuple, np.ndarray)):
+            idirs = dirs
+        else:
+            idirs = [dirs]
     lls  = []
     llsd = []
     llss = []
+    curdir = os.path.realpath(os.path.curdir)
     for i in idirs:
         if i != '.':
             os.chdir(str(i))
@@ -1496,7 +1539,7 @@ def names_dates_sizes(fname=None, dirs=None):
         llsd += [ datetime.datetime.fromtimestamp(os.stat(n).st_mtime) for n in fnames ]
         llss += [ int(os.stat(n).st_size) for n in fnames ]
         if i != '.':
-            os.chdir('..')
+            os.chdir(curdir)
     ii = argsort(lls)
     lls  = [ lls[i] for i in ii ]
     llsd = [ llsd[i] for i in ii ]
@@ -1519,7 +1562,7 @@ def names_sizes(fname=None, dirs=None):
         Optional Input
         --------------
         fname        filename, filename globbing is possible such as '*.dat' (all files)
-        dirs         list of directory names (default: '.')
+        dirs         list of or single directory names (default: '.')
 
         
         Output
@@ -1565,13 +1608,19 @@ def names_sizes(fname=None, dirs=None):
         History
         -------
         Written,  MC, Dec 2014
+        Modified, MC, Jun 2015 - dirs can be single directory
+                               - dirs can be empty
     """
     if dirs is None:
         idirs = ['.']
     else:
-        idirs = dirs
+        if isinstance(dirs, (list, tuple, np.ndarray)):
+            idirs = dirs
+        else:
+            idirs = [dirs]
     lls  = []
     llss = []
+    curdir = os.path.realpath(os.path.curdir)
     for i in idirs:
         if i != '.':
             os.chdir(str(i))
@@ -1582,7 +1631,7 @@ def names_sizes(fname=None, dirs=None):
         lls  += fnames
         llss += [ int(os.stat(n).st_size) for n in fnames ]
         if i != '.':
-            os.chdir('..')
+            os.chdir(curdir)
     ii = argsort(lls)
     lls  = [ lls[i] for i in ii ]
     llss = [ llss[i] for i in ii ]
@@ -1849,7 +1898,7 @@ def newest_fullname_size(*args, **kwargs):
         Optional Input
         --------------
         fname        filename, filename globbing is possible such as '*.dat' (all files)
-        dirs         list of directory names (default: '.')
+        dirs         list of or single directory names (default: '.')
 
         
         Output
