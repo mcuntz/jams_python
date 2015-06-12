@@ -266,7 +266,7 @@ if __name__ == '__main__':
     iplot += 1
     xlab   = r'$(0,100)$'
     ylab   = r'$\sin(x)$'
-    # if (iplot == 0) | (outtype != 'pdf') | (outtype == 'png') | (outtype == 'html'):
+    # if (iplot == 0) | (outtype == 'pdf') | (outtype == 'png') | (outtype == 'html'):
     #     sub  = fig.add_axes(ufz.position(nrow,ncol,iplot,hspace=hspace,vspace=vspace))
     #     sub1 = sub
     # else:
