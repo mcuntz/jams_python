@@ -123,6 +123,7 @@ class Field(object):
             seed (int, optional): master seed for different RNG streams
         """
         self.__master_RNG = r.RandomState(seed)
+        # MC - seed with maximum 4294967295 instead of sys.maxsize for Mac OS X
         # self.master_RNG = \
         #     lambda: self.__master_RNG.random_integers(sys.maxsize-1)
         self.master_RNG = \
