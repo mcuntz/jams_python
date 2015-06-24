@@ -86,7 +86,7 @@ def fullnames(fname=None, dirs=None):
     if dirs is None:
         idirs = ['.']
     else:
-        if isinstance(dirs, (list, tuple, np.ndarray)):
+        if isinstance(dirs, (list, tuple, np.ndarray, set)):
             idirs = dirs
         else:
             idirs = [dirs]
@@ -173,7 +173,7 @@ def fullnames_dates(fname=None, dirs=None):
     if dirs is None:
         idirs = ['.']
     else:
-        if isinstance(dirs, (list, tuple, np.ndarray)):
+        if isinstance(dirs, (list, tuple, np.ndarray, set)):
             idirs = dirs
         else:
             idirs = [dirs]
@@ -264,7 +264,7 @@ def fullnames_dates_sizes(fname=None, dirs=None):
     if dirs is None:
         idirs = ['.']
     else:
-        if isinstance(dirs, (list, tuple, np.ndarray)):
+        if isinstance(dirs, (list, tuple, np.ndarray, set)):
             idirs = dirs
         else:
             idirs = [dirs]
@@ -359,7 +359,7 @@ def fullnames_sizes(fname=None, dirs=None):
     if dirs is None:
         idirs = ['.']
     else:
-        if isinstance(dirs, (list, tuple, np.ndarray)):
+        if isinstance(dirs, (list, tuple, np.ndarray, set)):
             idirs = dirs
         else:
             idirs = [dirs]
@@ -1344,7 +1344,7 @@ def names(fname=None, dirs=None):
     if dirs is None:
         idirs = ['.']
     else:
-        if isinstance(dirs, (list, tuple, np.ndarray)):
+        if isinstance(dirs, (list, tuple, np.ndarray, set)):
             idirs = dirs
         else:
             idirs = [dirs]
@@ -1430,7 +1430,7 @@ def names_dates(fname=None, dirs=None):
     if dirs is None:
         idirs = ['.']
     else:
-        if isinstance(dirs, (list, tuple, np.ndarray)):
+        if isinstance(dirs, (list, tuple, np.ndarray, set)):
             idirs = dirs
         else:
             idirs = [dirs]
@@ -1520,7 +1520,7 @@ def names_dates_sizes(fname=None, dirs=None):
     if dirs is None:
         idirs = ['.']
     else:
-        if isinstance(dirs, (list, tuple, np.ndarray)):
+        if isinstance(dirs, (list, tuple, np.ndarray, set)):
             idirs = dirs
         else:
             idirs = [dirs]
@@ -1614,7 +1614,7 @@ def names_sizes(fname=None, dirs=None):
     if dirs is None:
         idirs = ['.']
     else:
-        if isinstance(dirs, (list, tuple, np.ndarray)):
+        if isinstance(dirs, (list, tuple, np.ndarray, set)):
             idirs = dirs
         else:
             idirs = [dirs]
