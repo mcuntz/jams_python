@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 from __future__ import print_function
 import numpy as np
-import netcdftime as nt
 
 def dec2date(indata, calendar='standard', refdate=None, units=None,
              excelerr=True, fulldate=None, yr=False,
@@ -143,8 +142,8 @@ def dec2date(indata, calendar='standard', refdate=None, units=None,
         >>> minute = np.array([30,15,20,35,41,8,0])
         >>> second = np.array([15,10,40,50,34,37,0])
         >>> from date2dec import date2dec
-        >>> decimal = date2dec(calendar='standard',yr=year,mo=month,dy=day,hr=hour,mi=minute,sc=second)
-        >>> year, month, day, hour, minute, second = dec2date(decimal, calendar= 'standard', fulldate = True)
+        >>> decimal = date2dec(calendar='standard', yr=year, mo=month, dy=day, hr=hour, mi=minute, sc=second)
+        >>> year, month, day, hour, minute, second = dec2date(decimal, calendar= 'standard', fulldate=True)
         >>> print(year)
         [2000 1810 1630 1510 1271  619    1]
         >>> print(month)
@@ -159,20 +158,20 @@ def dec2date(indata, calendar='standard', refdate=None, units=None,
         [15 10 40 50 34 37  0]
 
         # calendar = 'julian'
-        >>> decimal = date2dec(calendar='julian',yr=year,mo=month,dy=day,hr=hour,mi=minute,sc=second)
-        >>> year = dec2date(decimal, calendar='julian', yr = True)
+        >>> decimal = date2dec(calendar='julian', yr=year, mo=month, dy=day, hr=hour, mi=minute, sc=second)
+        >>> year = dec2date(decimal, calendar='julian', yr=True)
         >>> print(year)
         [2000 1810 1630 1510 1271  619    1]
 
         # calendar = 'proleptic_gregorian'
-        >>> decimal = date2dec(calendar='proleptic_gregorian',yr=year,mo=month,dy=day,hr=hour,mi=minute,sc=second)
-        >>> ascii = dec2date(decimal, calendar='proleptic_gregorian', ascii = True)
+        >>> decimal = date2dec(calendar='proleptic_gregorian', yr=year, mo=month, dy=day, hr=hour, mi=minute, sc=second)
+        >>> ascii = dec2date(decimal, calendar='proleptic_gregorian', ascii=True)
         >>> print(ascii[::4])
         ['05.01.2000 12:30:15' '18.03.1271 19:41:34']
 
         # calendar = 'excel1900' WITH excelerr = True -> 1900 considered as leap year
-        >>> decimal = date2dec(calendar='excel1900',yr=year,mo=month,dy=day,hr=hour,mi=minute,sc=second)
-        >>> year, day = dec2date(decimal, calendar='excel1900', yr = True, dy = True)
+        >>> decimal = date2dec(calendar='excel1900', yr=year, mo=month, dy=day, hr=hour, mi=minute, sc=second)
+        >>> year, day = dec2date(decimal, calendar='excel1900', yr=True, dy=True)
         >>> print(year)
         [2000 1810 1630 1510 1271  619    1]
         >>> print(day)
@@ -180,37 +179,37 @@ def dec2date(indata, calendar='standard', refdate=None, units=None,
 
         # calendar = 'excel1900' WITH excelerr = False -> 1900 considered as NO leap year
         # Older versions of netcdftime.py produced unnecessary output (Line 262)
-        >>> decimal = date2dec(calendar='excel1900',yr=year,mo=month,dy=day,hr=hour,mi=minute,sc=second,excelerr=False)
-        >>> if nt.__version__ < '0.9.4':
-        ...     asciidate = dec2date(decimal, calendar='excel1900', ascii = True, excelerr = False)
-        ... elif nt.__version__ == '0.9.4':
-        ...     asciidate = dec2date(decimal, calendar='excel1900', ascii = True, excelerr = False)
-        ...     for i in range(3):
-        ...         print('0 300')
-        ... else:
-        ...     asciidate = dec2date(decimal, calendar='excel1900', ascii = True, excelerr = False)
-        ...     for i in range(7):
-        ...         print('0 300')
-        0 300
-        0 300
-        0 300
-        0 300
-        0 300
-        0 300
-        0 300
+        # >>> decimal = date2dec(calendar='excel1900',yr=year,mo=month,dy=day,hr=hour,mi=minute,sc=second,excelerr=False)
+        # >>> if nt.__version__ < '0.9.4':
+        # ...     asciidate = dec2date(decimal, calendar='excel1900', ascii = True, excelerr = False)
+        # ... elif nt.__version__ == '0.9.4':
+        # ...     asciidate = dec2date(decimal, calendar='excel1900', ascii = True, excelerr = False)
+        # ...     for i in range(3):
+        # ...         print('0 300')
+        # ... else:
+        # ...     asciidate = dec2date(decimal, calendar='excel1900', ascii = True, excelerr = False)
+        # ...     for i in range(7):
+        # ...         print('0 300')
+        # 0 300
+        # 0 300
+        # 0 300
+        # 0 300
+        # 0 300
+        # 0 300
+        # 0 300
 
-        >>> print(asciidate[::4])
-        ['05.01.2000 12:30:15' '18.03.1271 19:41:34']
+        # >>> print(asciidate[::4])
+        # ['05.01.2000 12:30:15' '18.03.1271 19:41:34']
 
         #calendar = 'excel1904'
-        >>> decimal = date2dec(calendar='excel1904',yr=year,mo=month,dy=day,hr=hour,mi=minute,sc=second)
+        >>> decimal = date2dec(calendar='excel1904', yr=year, mo=month, dy=day, hr=hour, mi=minute, sc=second)
         >>> asciidate = dec2date(decimal, calendar='excel1904', ascii = True)
         >>> print(asciidate[::4])
         ['05.01.2000 12:30:15' '18.03.1271 19:41:34']
-        >>> asciidate = dec2date(decimal, calendar='excel1904', ascii=True, refdate='1910-01-00 00:00:00')
+        >>> asciidate = dec2date(decimal, calendar='excel1904', ascii=True, refdate='1909-12-31 00:00:00')
         >>> print(asciidate[::4])
         ['05.01.2006 12:30:15' '18.03.1277 19:41:34']
-        >>> print(dec2date(decimal[::4], calendar='excel1904', ascii=True, units='days since 1910-01-00 00:00:00'))
+        >>> print(dec2date(decimal[::4], calendar='excel1904', ascii=True, units='days since 1909-12-31 00:00:00'))
         ['05.01.2006 12:30:15' '18.03.1277 19:41:34']
         >>> print(dec2date(decimal[::4], calendar='excel1904', ascii=True, units='days since 1910-01-01 00:00:00'))
         ['06.01.2006 12:30:15' '19.03.1277 19:41:34']
@@ -325,10 +324,20 @@ def dec2date(indata, calendar='standard', refdate=None, units=None,
                  'all_leap', '360_day', 'decimal', 'decimal360']
     #
     # Checks
-    if ((nt.__version__ <= '0.9.2') & (calendar == '360_day')):
-        raise ValueError("dec2date error: Your version of netcdftime.py is equal"
-                         " or below 0.9.2. The 360_day calendar does not work with"
-                         " arrays here. Please download a newer one.")
+    is1 = False
+    try:
+        import netcdftime as nt
+        testit = nt.__version__
+    except:
+        is1 = True
+    if not is1:
+        if ((nt.__version__ <= '0.9.2') & (calendar == '360_day')):
+            raise ValueError("dec2date error: Your version of netcdftime.py is equal"
+                             " or below 0.9.2. The 360_day calendar does not work with"
+                             " arrays here. Please download a newer one.")
+    else:
+        import netCDF4 as nt
+    #
     calendar = calendar.lower()
     if (calendar not in calendars):
         raise ValueError("Wrong calendar! Choose: "+''.join([i+' ' for i in calendars]))
@@ -421,7 +430,7 @@ def dec2date(indata, calendar='standard', refdate=None, units=None,
             elif refdate is not None:
                 unit = 'days since {0:s}'.format(refdate)
             else:
-                unit = 'days since 1900-01-00 00:00:00'
+                unit = 'days since 1899-12-31 00:00:00'
                 if excelerr: doerr = True
             if doerr:
                 indata1 = np.where(indata >= 61., indata-1, indata)
@@ -434,7 +443,7 @@ def dec2date(indata, calendar='standard', refdate=None, units=None,
             elif refdate is not None:
                 unit = 'days since {0:s}'.format(refdate)
             else:
-                unit = 'days since 1904-01-00 00:00:00'
+                unit = 'days since 1903-12-31 00:00:00'
             timeobj = nt.num2date(indata, unit, calendar = 'gregorian')
         elif (calendar == '365_day') or (calendar == 'noleap'):
             if units is not None:

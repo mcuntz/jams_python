@@ -123,8 +123,10 @@ class Field(object):
             seed (int, optional): master seed for different RNG streams
         """
         self.__master_RNG = r.RandomState(seed)
+        # self.master_RNG = \
+        #     lambda: self.__master_RNG.random_integers(sys.maxsize-1)
         self.master_RNG = \
-            lambda: self.__master_RNG.random_integers(sys.maxsize-1)
+            lambda: self.__master_RNG.random_integers(4294967295)
         r1 = r.RandomState(self.master_RNG())
         r2 = r.RandomState(self.master_RNG())
         r3 = r.RandomState(self.master_RNG())
@@ -913,3 +915,7 @@ class Filtered_Incompr_Field(Incompr_Field):
 if __name__ == '__main__':
     import doctest
     doctest.testmod()
+
+    # f = Field(1, 1, [1, 1], 100, 15011997)
+    # f.mode = 'single'
+    # round(f.K(0,0), 4)

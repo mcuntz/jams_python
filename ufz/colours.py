@@ -162,22 +162,52 @@ def colours(name=False, rgb=True, rgb256=False, names=False):
         Examples
         --------
         >>> print(colours('ufzdarkblue', rgb256=True))
+        # ------------------------------------------------------
+        #
+        # Warning: ufz.colours is moved to ufz.color.colours.
+        #          This call will be removed in the near future.
+        #
+        # ------------------------------------------------------
         (0, 62, 110)
 
         >>> print(colours(names=True)[0:3])
+        # ------------------------------------------------------
+        #
+        # Warning: ufz.colours is moved to ufz.color.colours.
+        #          This call will be removed in the near future.
+        #
+        # ------------------------------------------------------
         ['ufzdarkblue', 'ufzblue', 'ufzlightblue']
 
         >>> import numpy as np
         >>> from autostring import astr
         >>> cc = colours('UFZDARKBLUE')
+        # ------------------------------------------------------
+        #
+        # Warning: ufz.colours is moved to ufz.color.colours.
+        #          This call will be removed in the near future.
+        #
+        # ------------------------------------------------------
         >>> print(astr(np.array(cc), 4))
         ['0.0000' '0.2431' '0.4314']
 
         >>> cc = colours('DarkBlue')
+        # ------------------------------------------------------
+        #
+        # Warning: ufz.colours is moved to ufz.color.colours.
+        #          This call will be removed in the near future.
+        #
+        # ------------------------------------------------------
         >>> print(astr(np.array(cc), 4))
         ['0.0000' '0.2431' '0.4314']
 
         >>> print(colours(['orange','ufzdarkblue'], rgb256=True))
+        # ------------------------------------------------------
+        #
+        # Warning: ufz.colours is moved to ufz.color.colours.
+        #          This call will be removed in the near future.
+        #
+        # ------------------------------------------------------
         [(207, 104, 0), (0, 62, 110)]
 
 
@@ -245,22 +275,52 @@ def colors(*args, **kwargs):
         Examples
         --------
         >>> print(colors('ufzdarkblue', rgb256=True))
+        # ------------------------------------------------------
+        #
+        # Warning: ufz.colours is moved to ufz.color.colours.
+        #          This call will be removed in the near future.
+        #
+        # ------------------------------------------------------
         (0, 62, 110)
 
         >>> print(colors(names=True)[0:3])
+        # ------------------------------------------------------
+        #
+        # Warning: ufz.colours is moved to ufz.color.colours.
+        #          This call will be removed in the near future.
+        #
+        # ------------------------------------------------------
         ['ufzdarkblue', 'ufzblue', 'ufzlightblue']
 
         >>> import numpy as np
         >>> from autostring import astr
         >>> cc = colors('UFZDARKBLUE')
+        # ------------------------------------------------------
+        #
+        # Warning: ufz.colours is moved to ufz.color.colours.
+        #          This call will be removed in the near future.
+        #
+        # ------------------------------------------------------
         >>> print(astr(np.array(cc), 4))
         ['0.0000' '0.2431' '0.4314']
 
         >>> cc = colors('DarkBlue')
+        # ------------------------------------------------------
+        #
+        # Warning: ufz.colours is moved to ufz.color.colours.
+        #          This call will be removed in the near future.
+        #
+        # ------------------------------------------------------
         >>> print(astr(np.array(cc), 4))
         ['0.0000' '0.2431' '0.4314']
 
         >>> print(colors(['orange','ufzdarkblue'], rgb256=True))
+        # ------------------------------------------------------
+        #
+        # Warning: ufz.colours is moved to ufz.color.colours.
+        #          This call will be removed in the near future.
+        #
+        # ------------------------------------------------------
         [(207, 104, 0), (0, 62, 110)]
     """
     return colours(*args, **kwargs)

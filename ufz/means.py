@@ -87,7 +87,7 @@ def means(date, dat, year=False, month=False, day=False, hour=False, minute=Fals
 
         >>> odates, xout = means(jdates, x, meanmonth=True)
         >>> print(astr(xout[0:5], 3, pp=True))
-        ['--   ' '4.000' '2.000' '3.000' '--   ']
+        ['4.000' '2.000' '3.000' '--   ' '--   ']
 
         >>> print(astr(means(jdates, x, month=True, onlydat=True), 3, pp=True))
         ['4.000' '2.000' '3.000']
@@ -416,7 +416,7 @@ def means(date, dat, year=False, month=False, day=False, hour=False, minute=Fals
 
         # Mean monthly
         if meanmonth:
-            mos  = np.arange(12)
+            mos  = np.arange(12)+1
             nout = mos.size
             dout = np.ones(nout)*myundef
             if ismasked:

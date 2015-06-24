@@ -62,14 +62,44 @@ import ufz.const as const
     >>> r = (1.0,0.0,0.0)
     >>> b = (0.0,0.0,1.0)
     >>> print(rgb_blend(r,b,0.0), rgb_blend(r,b,0.5), rgb_blend(r,b,1.0))
+    # ------------------------------------------------------
+    #
+    # Warning: ufz.rgb_range is moved to ufz.color.rgb_range.
+    #          This call will be removed in the near future.
+    #
+    # ------------------------------------------------------
     (1.0, 0.0, 0.0) (0.5, 0.0, 0.5) (0.0, 0.0, 1.0)
     >>> print(rgb_range(r,b,3))
+    # ------------------------------------------------------
+    #
+    # Warning: ufz.rgb_range is moved to ufz.color.rgb_range.
+    #          This call will be removed in the near future.
+    #
+    # ------------------------------------------------------
     [(1.0, 0.0, 0.0), (0.5, 0.0, 0.5), (0.0, 0.0, 1.0)]
     >>> print(rgb_range(r,b,3,pow=2))
+    # ------------------------------------------------------
+    #
+    # Warning: ufz.rgb_range is moved to ufz.color.rgb_range.
+    #          This call will be removed in the near future.
+    #
+    # ------------------------------------------------------
     [(1.0, 0.0, 0.0), (0.75, 0.0, 0.25), (0.0, 0.0, 1.0)]
     >>> print(rgb_gradient([r,b],[0.0,1.0],3))
+    # ------------------------------------------------------
+    #
+    # Warning: ufz.rgb_gradient is moved to ufz.color.rgb_gradient.
+    #          This call will be removed in the near future.
+    #
+    # ------------------------------------------------------
     [(1.0, 0.0, 0.0), (0.5, 0.0, 0.5), (0.0, 0.0, 1.0)]
     >>> print(rgb_gradient([r,r,b,b],[0.0,0.25,0.75,1.0],5, cmap='MyGradient'))
+    # ------------------------------------------------------
+    #
+    # Warning: ufz.rgb_gradient is moved to ufz.color.rgb_gradient.
+    #          This call will be removed in the near future.
+    #
+    # ------------------------------------------------------
     [(1.0, 0.0, 0.0), (1.0, 0.0, 0.0), (0.5, 0.0, 0.5), (0.0, 0.0, 1.0), (0.0, 0.0, 1.0)]
 
 
@@ -165,8 +195,20 @@ def rgb_range(col1, col2, n=255, cmap=None, pow=1):
         >>> r = (1.0,0.0,0.0)
         >>> b = (0.0,0.0,1.0)
         >>> print(rgb_range(r,b,3))
+        # ------------------------------------------------------
+        #
+        # Warning: ufz.rgb_range is moved to ufz.color.rgb_range.
+        #          This call will be removed in the near future.
+        #
+        # ------------------------------------------------------
         [(1.0, 0.0, 0.0), (0.5, 0.0, 0.5), (0.0, 0.0, 1.0)]
         >>> print(rgb_range(r,b,3,pow=2))
+        # ------------------------------------------------------
+        #
+        # Warning: ufz.rgb_range is moved to ufz.color.rgb_range.
+        #          This call will be removed in the near future.
+        #
+        # ------------------------------------------------------
         [(1.0, 0.0, 0.0), (0.75, 0.0, 0.25), (0.0, 0.0, 1.0)]
 
         History
@@ -216,10 +258,28 @@ def rgb_gradient(colours, fractions, n=255, cmap=None):
         >>> r = (1.0,0.0,0.0)
         >>> b = (0.0,0.0,1.0)
         >>> print(rgb_gradient([r,b],[0.0,1.0],3))
+        # ------------------------------------------------------
+        #
+        # Warning: ufz.rgb_gradient is moved to ufz.color.rgb_gradient.
+        #          This call will be removed in the near future.
+        #
+        # ------------------------------------------------------
         [(1.0, 0.0, 0.0), (0.5, 0.0, 0.5), (0.0, 0.0, 1.0)]
         >>> print(rgb_gradient([r,r,b,b],[0.0,0.25,0.75,1.0],5))
+        # ------------------------------------------------------
+        #
+        # Warning: ufz.rgb_gradient is moved to ufz.color.rgb_gradient.
+        #          This call will be removed in the near future.
+        #
+        # ------------------------------------------------------
         [(1.0, 0.0, 0.0), (1.0, 0.0, 0.0), (0.5, 0.0, 0.5), (0.0, 0.0, 1.0), (0.0, 0.0, 1.0)]
         >>> print(rgb_gradient([r,r,b,b],[0.0,0.25,0.75,1.0],5, cmap='MyGradient'))
+        # ------------------------------------------------------
+        #
+        # Warning: ufz.rgb_gradient is moved to ufz.color.rgb_gradient.
+        #          This call will be removed in the near future.
+        #
+        # ------------------------------------------------------
         [(1.0, 0.0, 0.0), (1.0, 0.0, 0.0), (0.5, 0.0, 0.5), (0.0, 0.0, 1.0), (0.0, 0.0, 1.0)]
 
         History
