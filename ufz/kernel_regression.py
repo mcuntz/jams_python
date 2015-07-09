@@ -55,11 +55,11 @@ def kernel_regression(x, y, h=None, silverman=False, xout=None):
         >>> print(astr(h,6))
         ['0.172680' '9.516907']
 
-        >>> print(astr(kernel_regression(x,y,h)[0:6],6))
-        ['0.522409' '0.525699' '0.541796' '0.517808' '0.476442' '0.492302']
+        >>> print(astr(kernel_regression(x,y,h)[0:6],5))
+        ['0.52241' '0.52570' '0.54180' '0.51781' '0.47644' '0.49230']
 
-        >>> print(astr(kernel_regression(x,y)[0:6],6))
-        ['0.522409' '0.525699' '0.541796' '0.517808' '0.476442' '0.492302']
+        >>> print(astr(kernel_regression(x,y)[0:6],5))
+        ['0.52241' '0.52570' '0.54180' '0.51781' '0.47644' '0.49230']
 
         >>> h = kernel_regression_h(x,y,silverman=True)
         >>> print(astr(h,6))
@@ -184,11 +184,11 @@ def kernel_regression_h(x, y, silverman=False):
         >>> x[:,1] = 1./(np.arange(10,dtype=np.float)/9.+0.1)
         >>> y      = 1. + x[:,0]**2 - np.sin(x[:,1])**2
         >>> from autostring import astr
-        >>> print(astr(kernel_regression_h(x,y),6))
-        ['0.172680' '9.516907']
+        >>> print(astr(kernel_regression_h(x,y),5))
+        ['0.17268' '9.51691']
 
-        >>> print(astr(kernel_regression_h(x,y,silverman=True),6))
-        ['0.229190' '1.903381']
+        >>> print(astr(kernel_regression_h(x,y,silverman=True),5))
+        ['0.22919' '1.90338']
 
 
         License

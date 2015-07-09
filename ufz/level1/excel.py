@@ -71,7 +71,7 @@ def get_value_excel(excelfile, sheet, variable, column):
     # open Excel file
     wb = xlrd.open_workbook(excelfile)
     # check sheet exists
-    if sheet not in wb.sheet_names(): raise ValueError('No sheet'+sheet+' in file '+excelfile)
+    if sheet not in wb.sheet_names(): raise ValueError('No sheet '+sheet+' in file '+excelfile)
     sh = wb.sheet_by_name(sheet)
     # Return varible and column names
     columns   = sh.row_values(0,0)
