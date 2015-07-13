@@ -193,8 +193,12 @@ if __name__ == '__main__':
             mpl.rc('text.latex', unicode=True)
             mpl.rcParams['text.latex.preamble']=r'\usepackage{wasysym}'
         else:
-            #mpl.rc('font',**{'family':'sans-serif','sans-serif':['Helvetica']})
-            mpl.rc('font',**{'family':'serif','serif':['times']})
+            # mpl.rc('font',**{'family':'sans-serif','sans-serif':['Helvetica']})
+            # mpl.rc('font', **{'family':'serif', 'serif':['times']})
+            mpl.rc('font', family='serif') 
+            mpl.rc('font', serif='Times New Roman')
+            mpl.rc('font', family='sans-serif') 
+            mpl.rc('font', serif='Arial')
         mpl.rc('text.latex', unicode=True)
     elif (outtype == 'png') or (outtype == 'html') or (outtype == 'd3'):
         mpl.use('Agg') # set directly after import matplotlib

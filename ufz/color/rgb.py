@@ -110,7 +110,7 @@ def rgb_blend(col1, col2, fraction=0.5):
 
         Definition
         ----------
-            def rgb_blend(col1, col2, fraction=0.5):
+        def rgb_blend(col1, col2, fraction=0.5):
 
         Input
         -----
@@ -146,7 +146,7 @@ def rgb_range(col1, col2, n=255, cmap=None, pow=1):
 
         Definition
         ----------
-            def rgb_range(col1, col2, n=255, cmap=None):
+        def rgb_range(col1, col2, n=255, cmap=None, pow=1):
 
         Input
         -----
@@ -194,7 +194,7 @@ def rgb_gradient(colours, fractions, n=255, cmap=None):
 
         Definition
         ----------
-            def rgb_gradient(colours, fractions, n=255, cmap=None):
+        def rgb_gradient(colours, fractions, n=255, cmap=None):
 
         Input
         -----
