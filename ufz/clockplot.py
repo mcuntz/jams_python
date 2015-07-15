@@ -50,6 +50,7 @@ def clockplot(sub, si, sti=None, stierr=None,
                               1,                 3,                  5,               3,
                               5,                 9],             # # of parameters per class
               cmod        = 'mhm',                               # color scheme chosen ('mhm' or 'noah')
+              cmap        = None,                                # Color for each module mod (if not given cmod determines colors)
               saname      = ['Sobol', 'weighted Sobol', 'RMSE'], # stack names
               indexname   = ['$S_i$', '$S_{Ti}-S_i$'],           # index legend name
               star        = None,                                # star symbols
@@ -111,6 +112,9 @@ def clockplot(sub, si, sti=None, stierr=None,
                                 1,                 3,                  5,               3,
                                 5,                 9],
                       cmod  = 'mhm',
+                      cmap  = [['reds8',   1], ['reds8',   2], ['reds8',   3], ['reds8',   4],
+                               ['blues8',  3], ['blues8',  4], ['blues8',  5], ['blues8',  6], 
+                               ['reds8',   5], ['reds8',   6]],
                       saname = ['Sobol', 'weighted Sobol', 'RMSE'],
                       indexname = ['$S_i$', '$S_{Ti}-S_i$'],
                       star = None,
@@ -179,6 +183,9 @@ def clockplot(sub, si, sti=None, stierr=None,
                  1,                 3,                  5,               3,
                  5,                 9],                                                  number of parameters per class
         cmod = 'mhm',                                                                    color scheme chose ('mhm' or 'noah')
+        cmap = [['reds8',   1], ['reds8',   2], ['reds8',   3], ['reds8',   4],
+                 ['blues8',  3], ['blues8',  4], ['blues8',  5], ['blues8',  6], 
+                 ['reds8',   5], ['reds8',   6]],                                        colors for each class
         saname = ['Sobol', 'weighted Sobol', 'RMSE'],                                    stack names
         indexname = ['$S_i$', '$S_{Ti}-S_i$'],                                           index legend name
         star = None,                                                                     star symbols
@@ -324,40 +331,48 @@ def clockplot(sub, si, sti=None, stierr=None,
         c = np.ones(nmod)*0.7
         c = [ str(i) for i in c ]
     else:
+        from ufz.color.brewer import get_brewer
         if (cmod == 'mhm'):
-            # c = [(165./255.,  0./255., 38./255.), # interception
-            #      (215./255., 48./255., 39./255.), # snow
-            #      (244./255.,109./255., 67./255.), # soil moisture
-            #      (244./255.,109./255., 67./255.), # soil moisture
-            #      (253./255.,174./255., 97./255.), # direct runoff
-            #      (254./255.,224./255.,144./255.), # Evapotranspiration
-            #      (171./255.,217./255.,233./255.), # interflow
-            #      (116./255.,173./255.,209./255.), # percolation
-            #      ( 69./255.,117./255.,180./255.), # routing
-            #      ( 49./255., 54./255.,149./255.)] # geology
-            from ufz.color.brewer import get_brewer
-            c = get_brewer('rdylbu11', rgb=True)
-            tmp = c.pop(5)   # rm yellow
-            c.insert(2,c[2]) # same colour for both soil moistures
+            c = [get_brewer('rdylbu11',rgb=True)[0],  # interception
+                 get_brewer('rdylbu11',rgb=True)[1],  # snow
+                 get_brewer('rdylbu11',rgb=True)[2],  # soil moisture
+                 get_brewer('rdylbu11',rgb=True)[2],  # soil moisture
+                 get_brewer('rdylbu11',rgb=True)[3],  # direct runoff
+                 get_brewer('rdylbu11',rgb=True)[4],  # Evapotranspiration
+                 get_brewer('rdylbu11',rgb=True)[6],  # interflow
+                 get_brewer('rdylbu11',rgb=True)[7],  # percolation
+                 get_brewer('rdylbu11',rgb=True)[8],  # routing
+                 get_brewer('rdylbu11',rgb=True)[9]]  # geology
         elif (cmod == 'noah'):
-            from ufz.color.brewer import get_brewer
-            c = []
-            c.append(get_brewer('reds8',   rgb=True)[3])   #  Radiation      ----   
-            c.append(get_brewer('ylorbr4', rgb=True)[2])   #  Soil Physio.      |
-            c.append(get_brewer('greens4', rgb=True)[2])   #  Veg. Struct.      |   
-            c.append(get_brewer('bugn4',   rgb=True)[2])   #  Physiology     --------
-            c.append(get_brewer('blues4',  rgb=True)[2])   #  Soil Water        |   |
-            c.append(get_brewer('blues4',  rgb=True)[3])   #  Runoff            |   |
-            c.append(get_brewer('reds8',   rgb=True)[5])   #  Input       *     |   |
-            c.append(get_brewer('reds8',   rgb=True)[3])   #  Radiation   *  ----   |
-            c.append(get_brewer('ylorrd8', rgb=True)[2])   #  Transfer    *         |
-            c.append(get_brewer('bugn4',   rgb=True)[2])   #  Physio.     *  --------
-            c.append(get_brewer('blues6',  rgb=True)[2])   #  Snow Water  *
-            c.append(get_brewer('greys8',  rgb=True)[2])   #  Snow Energy * 
-            c.append(get_brewer('greys4',  rgb=True)[2])   #  Soil Energy * 
-
+            c = [get_brewer('reds8',  rgb=True)[3], #  Radiation
+                 get_brewer('ylorbr4',rgb=True)[2], #  SoilPhysiology
+                 get_brewer('ylorrd8',rgb=True)[2], #  Transfer
+                 get_brewer('greens4',rgb=True)[2], #  VegetationStructure
+                 get_brewer('bugn4',  rgb=True)[2], #  Physiology
+                 get_brewer('blues4', rgb=True)[2], #  SoilWater
+                 get_brewer('blues6', rgb=True)[5], #  Runoff
+                 get_brewer('greys8', rgb=True)[2], #  SnowEnergy
+                 get_brewer('greys8', rgb=True)[4], #  SoilEnergy
+                 get_brewer('greys8', rgb=True)[5], #  Carbon
+                 get_brewer('rdpu5',  rgb=True)[2], #  VOC
+                 get_brewer('reds8',  rgb=True)[5], #  Input*
+                 get_brewer('reds8',  rgb=True)[3], #  Radiation*
+                 get_brewer('ylorbr4',rgb=True)[2], #  SoilPhysiology*
+                 get_brewer('ylorrd8',rgb=True)[2], #  Transfer*
+                 get_brewer('greens4',rgb=True)[2], #  VegetationStructure*
+                 get_brewer('bugn4',  rgb=True)[2], #  Physiology*
+                 get_brewer('blues4', rgb=True)[2], #  SoilWater*
+                 get_brewer('blues6', rgb=True)[5], #  Runoff*
+                 get_brewer('blues4', rgb=True)[3], #  SnowWater*
+                 get_brewer('greys8', rgb=True)[2], #  SnowEnergy*
+                 get_brewer('greys8', rgb=True)[4], #  SoilEnergy*
+                 get_brewer('greys8', rgb=True)[5], #  Carbon*
+                 get_brewer('greys9', rgb=True)[6]] #  ????
         else:
             raise ValueError("cmod can be only 'mhm' or 'noah'")
+
+    if cmap is not None:
+        c = cmap
 
     # conversion factor from parameter number to radian
     n2rad = 2.*np.pi/(nparam+space4yaxis)
@@ -378,35 +393,41 @@ def clockplot(sub, si, sti=None, stierr=None,
     mleft   = (space4yaxis+np.cumsum([0]+pmod[:-1])+fwm)*n2rad # left start at space4yaxis
     mheight = np.ones(nmod)*ymax*(1.-bmod)                     # height from bmod*ymax to ymax
     mwidth  = (np.array(pmod)-2.*fwm)*n2rad                    # width is number of params per module
-    bar1    = sub.bar(mleft, mheight, mwidth, bottom=bmod*ymax,
-                      color=c, alpha=alphamod,
+    iidx = np.where(np.array(pmod) > 0)
+    bar1    = sub.bar(mleft[iidx], mheight[iidx], mwidth[iidx], bottom=bmod*ymax,
+                      color=np.array(c)[iidx], alpha=alphamod,
                       linewidth=0)
+    print(c)
+    print(pmod)
+    print(np.array(pmod)[iidx])
+    print(np.array(c)[iidx])
 
     # module and class labels
     xm = mleft+0.5*mwidth
     for i in range(nmod):
-        # module
-        for j, m in enumerate(ismod[i]):
-            mlabel12 = (ylabel2-ylabel1)*0.3
-            if len(ismod[i]) > 1:
-                ylab = ylabel1 + (2*j-1)*mlabel12
-            else:
-                ylab = ylabel1
-            label = sub.text(xm[i], ylab*ymax, m,
-                             fontsize=ntextsize, horizontalalignment='center', verticalalignment='center')
-            if (xm[i] < 0.5*np.pi) | (xm[i] > 1.5*np.pi):
-                label.set_rotation(np.rad2deg(-xm[i]))
-            else:
-                label.set_rotation(np.rad2deg(-xm[i])+180.)
-        # class
-        if docomp:
-            label = sub.text(xm[i], ylabel2*ymax, comp[i],
-                             fontsize=mtextsize, fontweight='bold',
-                             horizontalalignment='center', verticalalignment='center')
-            if (xm[i] < 0.5*np.pi) | (xm[i] > 1.5*np.pi):
-                label.set_rotation(np.rad2deg(-xm[i]))
-            else:
-                label.set_rotation(np.rad2deg(-xm[i])+180.)
+        if (pmod[i] > 0):
+            # module
+            for j, m in enumerate(ismod[i]):
+                mlabel12 = (ylabel2-ylabel1)*0.3
+                if len(ismod[i]) > 1:
+                    ylab = ylabel1 + (2*j-1)*mlabel12
+                else:
+                    ylab = ylabel1
+                label = sub.text(xm[i], ylab*ymax, m,
+                                 fontsize=ntextsize, horizontalalignment='center', verticalalignment='center')
+                if (xm[i] < 0.5*np.pi) | (xm[i] > 1.5*np.pi):
+                    label.set_rotation(np.rad2deg(-xm[i]))
+                else:
+                    label.set_rotation(np.rad2deg(-xm[i])+180.)
+            # class
+            if docomp:
+                label = sub.text(xm[i], ylabel2*ymax, comp[i],
+                                 fontsize=mtextsize, fontweight='bold',
+                                 horizontalalignment='center', verticalalignment='center')
+                if (xm[i] < 0.5*np.pi) | (xm[i] > 1.5*np.pi):
+                    label.set_rotation(np.rad2deg(-xm[i]))
+                else:
+                    label.set_rotation(np.rad2deg(-xm[i])+180.)
 
     # y-axis
     # grid
