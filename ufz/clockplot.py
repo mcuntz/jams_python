@@ -397,10 +397,6 @@ def clockplot(sub, si, sti=None, stierr=None,
     bar1    = sub.bar(mleft[iidx], mheight[iidx], mwidth[iidx], bottom=bmod*ymax,
                       color=np.array(c)[iidx], alpha=alphamod,
                       linewidth=0)
-    print(c)
-    print(pmod)
-    print(np.array(pmod)[iidx])
-    print(np.array(c)[iidx])
 
     # module and class labels
     xm = mleft+0.5*mwidth
