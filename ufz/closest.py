@@ -4,7 +4,7 @@ import numpy as np
 
 def closest(vec, num, value=False):
     """
-        Index in array which entry is closest to a given number.
+        Index in array at which the entry is closest to a given number.
 
 
         Definition
@@ -14,18 +14,19 @@ def closest(vec, num, value=False):
 
         Input
         -----
-        vec        vector
+        vec        ND-array
         num        number to compare
 
 
         Optional Input
         --------------
-        value      If true, give closest number instead of index
+        value      If true, give closest array element instead of index
 
 
         Output
         ------
-        Index of element closest to given number num.
+        Flat index of element closest to given number num.
+        Use np.unravel_index to get index tuple.
 
 
         Restrictions
@@ -36,11 +37,20 @@ def closest(vec, num, value=False):
         Examples
         --------
         >>> vec = np.arange(100)/99.*5.
-        >>> from autostring import astr
-        >>> print(astr(closest(vec, 3.125),pp=True))
+        >>> print(closest(vec, 3.125))
         62
-
+        >>> from autostring import astr
         >>> print(astr(closest(vec, 3.125, value=True),3,pp=True))
+        3.131
+
+        >>> vec = np.arange(100).reshape((10,10))/99.*5.
+        >>> print(astr(closest(vec, 3.125, value=True),3,pp=True))
+        3.131
+        >>> print(closest(vec, 3.125))
+        62
+        >>> print(np.unravel_index(closest(vec, 3.125), vec.shape))
+        (6, 2)
+        >>> print(astr(vec[np.unravel_index(closest(vec, 3.125), vec.shape)],3,pp=True))
         3.131
 
 
@@ -69,10 +79,11 @@ def closest(vec, num, value=False):
         -------
         Written,  MC, Jan 2012
         Modified, MC, Feb 2013 - ported to Python 3
+                  MC, Jul 2015 - 
     """
     out = np.ma.argmin(np.ma.abs(np.ma.array(vec)-num))
     if value:
-      return vec[out]
+      return vec.flat[out]
     else:
       return out
 
@@ -80,4 +91,3 @@ def closest(vec, num, value=False):
 if __name__ == '__main__':
     import doctest
     doctest.testmod(optionflags=doctest.NORMALIZE_WHITESPACE)
-
