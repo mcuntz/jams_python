@@ -344,8 +344,8 @@ def ncread(*args, **kwargs):
     """
         Wrapper for readnetcdf
         def readnetcdf(file, var='', code=-1, reform=False, squeeze=False,
-                       variables=False, codes=False, units=False,
-                       longnames=False, attributes=False, sort=False):
+                       variables=False, codes=False, dims=False, units=False, longnames=False, 
+                       attributes=False, sort=False, pointer=False, overwrite=False):
 
 
         Examples
@@ -388,8 +388,8 @@ def readnc(*args, **kwargs):
     """
         Wrapper for readnetcdf
         def readnetcdf(file, var='', code=-1, reform=False, squeeze=False,
-                       variables=False, codes=False, units=False,
-                       longnames=False, attributes=False, sort=False):
+                       variables=False, codes=False, dims=False, units=False, longnames=False, 
+                       attributes=False, sort=False, pointer=False, overwrite=False):
 
 
         Examples
