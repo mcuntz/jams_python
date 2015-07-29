@@ -265,7 +265,7 @@ def dumpnetcdf( fname, dims=None, fileattributes=None, create=True, **variables 
 
         Definition
         ----------
-        def writenetcdf( fname, dims=None, **variables )
+        def dumpnetcdf( fname, dims=None, **variables )
 
 
         Input           Format                  Description
@@ -376,16 +376,18 @@ def dumpnetcdf( fname, dims=None, fileattributes=None, create=True, **variables 
                             var = None, isdim = True, create_var = False )
             
     # loop over variables
+    
     for key, value in variables.iteritems():
         if type( value[1] ) != dict:
             if  value.ndim > len( dims ):
                 raise ValueError( '***size mismatch: variable '+key )
-            writenetcdf( fh, name = key, dims = dims[: value.ndim], var = value, comp = True )
+            writenetcdf( fh, name = key, dims = dims[: value.ndim], var = value,
+                         vartype=value.dtype, comp = True )
         else:
             if  value[0].ndim > len( dims ):
                 raise ValueError( '***size mismatch: variable '+key )
             writenetcdf( fh, name = key, dims = dims[: value[0].ndim ], var = value[0],
-                         attributes = value[1], comp = True )
+                         vartype = value[0].dtype, attributes = value[1], comp = True )
     fh.close()
 
 # returns list of all dimensions given a filename 
