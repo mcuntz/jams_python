@@ -30,6 +30,8 @@ def get_flag(flags, n):
 
         Examples
         --------
+        --> see __init__.py for full example of workflow
+
         >>> flags = np.array([9, 90, 91, 900, 901, 9001, 9201, 912121212])
         >>> print(get_flag(flags, 0))
         [9 9 9 9 9 9 9 9]
@@ -121,6 +123,8 @@ def set_flag(flags, n, iflag, ii=None):
 
         Examples
         --------
+        --> see __init__.py for full example of workflow
+
         >>> flags = np.array([9, 90, 901, 9101, 912121212])
         >>> print(set_flag(flags, 1, 2, [0,1,2]))
         [       92        92       921      9101 912121212]
@@ -205,6 +209,8 @@ def get_maxflag(flags):
 
         Examples
         --------
+        --> see __init__.py for full example of workflow
+
         >>> flags = np.array([9, 90, 91, 900, 901, 9001, 9201, 912121212, -9999])
         >>> print(get_maxflag(flags))
         [-1  0  1  0  1  1  2  2 -2]

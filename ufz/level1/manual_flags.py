@@ -39,6 +39,8 @@ def get_manual_flags(flagfile, variable, julian=True):
 
         Examples
         --------
+        --> see __init__.py for full example of workflow
+
         sdate, edate, mflags = get_manual_flags('Manual_Flags_Soilnet_HH.csv"', 'Box02_Moist1')
 
 

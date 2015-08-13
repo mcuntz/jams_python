@@ -52,6 +52,8 @@ def read_data(files, undef=-9999., strip=None, norecord=False, nofill=False):
 
         Examples
         --------
+        --> see __init__.py for full example of workflow
+
         # Read data
         files = ufz.files_from_gui(title='Choose Level 1 file(s)')
         sdate, record, dat, flags, iidate, hdate, hrecord, hdat, hflags, iihead = ufz.level1.read_data(files)
@@ -248,6 +250,8 @@ def write_data(*args):
 
         Examples
         --------
+        --> see __init__.py for full example of workflow
+
         # Read data
         files = ufz.files_from_gui(title='Choose Level 1 file(s)')
         sdate, record, dat, flags, iidate, hdate, hrecord, hdat, hflags, iihead = ufz.level1.read_data(files)
@@ -333,6 +337,8 @@ def write_data_norecord(infiles, sdate, dat, flags, iidate, hdate, hdat, hflags,
 
         Examples
         --------
+        --> see __init__.py for full example of workflow
+
         # Read data
         files = ufz.files_from_gui(title='Choose Level 1 file(s)')
         sdate, dat, flags, iidate, hdate, hdat, hflags, iihead = ufz.level1.read_data(files, norecord=True)
@@ -439,6 +445,8 @@ def write_data_record(infiles, sdate, record, dat, flags, iidate, hdate, hrecord
 
         Examples
         --------
+        --> see __init__.py for full example of workflow
+
         # Read data
         files = ufz.files_from_gui(title='Choose Level 1 file(s)')
         sdate, record, dat, flags, iidate, hdate, hrecord, hdat, hflags, iihead = ufz.level1.read_data(files)

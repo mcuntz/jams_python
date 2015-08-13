@@ -36,6 +36,8 @@ def get_value_excel(excelfile, sheet, variable, column):
 
         Examples
         --------
+        --> see __init__.py for full example of workflow
+
         mini = get_value_excel('CHS-measurements.xlsx', 'Logger Hohes Holz', 'BC1_Ptemp [degC]', 'Min')
         -> -20.0
         mini, maxi = get_value_excel('CHS-measurements.xlsx', 'Logger Hohes Holz', 'BC1_Ptemp [degC]', ['Min', 'Max'])

@@ -31,11 +31,12 @@
 
     # 1st test - check manual flags
     itest = 1
+    jisdate = np.array(ufz.date2dec(eng=isdate))
     for v in myvars:
         msdate, medate, mflags = get_manual_flags(manual_flag_file, v)
         if len(msdate) > 0:
             for dd in range(len(msdate)):
-                ii = np.where((sdate>=msdate[dd]) & (sdate<=medate[dd]))[0]
+                ii = np.where((jsdate>=msdate[dd]) & (jsdate<=medate[dd]))[0]
                 if ii.size>0: flags[:,i] = ufz.level1.set_flag(flags[:,i], itest, mflags[dd], ii)
 
     # 2nd test - set first flag after the initial 9 to 2 if dat is undef
