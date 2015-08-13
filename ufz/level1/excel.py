@@ -18,6 +18,14 @@ def get_value_excel(excelfile, sheet, variable, column):
         If variable and/or column is None then the list of variables and columns is returned.
 
         
+        Input
+        -----
+        excelfile   Filename of Excel file
+        sheet       Name of Sheet in Excel file
+        variable    Variable name in column "headerout (final)"
+        column      Name in header line
+
+
         Output
         ------
         content of the desired cell
@@ -67,6 +75,7 @@ def get_value_excel(excelfile, sheet, variable, column):
         Written,  MC, Mar 2015
         Modified, MC, Jul 2015 - column/variable can be iterable
                                - column/variable can None, returning names
+                      Aug 2015 - added docu of input variables
     """
     # open Excel file
     wb = xlrd.open_workbook(excelfile)
