@@ -7,7 +7,7 @@ __all__ = ['get_manual_flags']
 
 # --------------------------------------------------------------------
 
-def get_manual_flags(flagfile, variable, julian=True):
+def get_manual_flags(flagfile, variable, dendro=None, julian=True):
     """
         Get start and end dates as well as flag values for a specific variable from a manual flag file.
 
@@ -30,11 +30,14 @@ def get_manual_flags(flagfile, variable, julian=True):
         --------------
         julian     True: return julian dates (default)
                    False: return ascii strings in format DD.MM.YYYY hh:mm
+        dendro     True: return also diameter at breast height and corresponding dendrometer reading
+                   False: return only dates and flag
 
 
         Output
         ------
-        list of start dates, list of end dates, list of flags
+        list of start dates, list of end dates, list of flags (if dendro=False)
+        list of start dates, list of end dates, list of flags, list of diameter at breast height, list of initial dendrometer readings (if dendro=False)
 
 
         Examples
@@ -42,6 +45,7 @@ def get_manual_flags(flagfile, variable, julian=True):
         --> see __init__.py for full example of workflow
 
         sdate, edate, mflags = get_manual_flags('Manual_Flags_Soilnet_HH.csv"', 'Box02_Moist1')
+        sdate, edate, mflags, bdh, d_ini = get_manual_flags('Manual_Flags_Soilnet_HH.csv"', 'Box02_Moist1', dendro=True)
 
 
         License
@@ -68,6 +72,7 @@ def get_manual_flags(flagfile, variable, julian=True):
         History
         -------
         Written,  MC, Aug 2015
+        Modified, AW, Aug 2015, optional readout of dendrometer-data:  DBH and Dini
     """
     # Default dates
     sdef = "01.01.1900 00:00:00"
@@ -79,14 +84,20 @@ def get_manual_flags(flagfile, variable, julian=True):
     start   = sdat[:,1]
     end     = sdat[:,2]
     flag    = sdat[:,3]
-    comment = sdat[:,4]
-    
+    dbh     = sdat[:,4]
+    dbh[dbh==''] = '0'
+    d_ini   = sdat[:,5]
+    d_ini[d_ini==''] = '0'
+    # comment = sdat[:,6]
+     
     # select variable
     ii = np.where(var_id == variable)[0]
     if ii.size > 0:
-        sdate = start[ii]
-        edate = end[ii]
-        mflag = flag[ii].astype(np.int)
+        sdate   = start[ii]
+        edate   = end[ii]
+        mflag   = flag[ii].astype(np.int)
+        l_dbh   = dbh[ii].astype(np.float)
+        l_d_ini = d_ini[ii].astype(np.float)
         # Fill default dates
         jj = np.where(sdate == "")[0]
         if jj.size > 0: sdate[jj] = sdef
@@ -101,8 +112,15 @@ def get_manual_flags(flagfile, variable, julian=True):
         sdate = list()
         edate = list()
         mflag = list()
+        l_dbh   = list()
+        l_d_ini = list()
 
-    return [sdate, edate, mflag]
+    if dendro == True:
+        return [sdate, edate, mflag, l_dbh, l_d_ini]  
+    else:
+        return [sdate, edate, mflag]   
+
+   
 
 # --------------------------------------------------------------------
 
