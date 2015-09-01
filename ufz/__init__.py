@@ -468,6 +468,7 @@
                            - dielectric_water
                            - color
                            - redone all __init__.py
+              DS, Sep 2015 - hollickLyneFilter
 """
 from __future__ import print_function
 
@@ -485,6 +486,7 @@ from .argsort           import argsort
 from .around            import around
 from .ascii2ascii       import ascii2ascii, ascii2eng, eng2ascii
 from .autostring        import autostring, astr
+from .baseflow          import hollickLyneFilter
 from .brewer            import register_brewer, get_brewer, plot_brewer, print_brewer
 try:
     from .calcvpd       import calcvpd
