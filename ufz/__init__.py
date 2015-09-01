@@ -20,6 +20,7 @@
     ascii2eng              Convert date notations to English date format YYYY-MM-DD hh:mm:ss.
     astr                   Wrapper for autostring.
     autostring             Format number (array) with given decimal precision.
+    baseflow               Calculate baseflow from discharge timeseries
     cellarea               Calc areas of grid cells in m^2.
     clockplot              The clockplot of mHM.
     closest                Index in array which entry is closest to a given number.
@@ -147,6 +148,7 @@
         Data processing
         Date & Time
         Grids / Polygons
+        Hydrology
         Isotopes
         Math
         Meteorology
@@ -227,6 +229,11 @@
     volume_poly            Volume of function above a polygon
     get_angle              Returns the angle in radiant from each point in xy1 to each point in xy2.
     get_nearest            Returns a value z for each point in xy near to the xyz field.
+
+
+    Hydrology
+    ---------
+    baseflow               Calculate baseflow from discharge timeseries
 
 
     Isotopes
