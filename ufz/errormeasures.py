@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 from __future__ import print_function
 import numpy as np
+from scipy.stats import t
 
 """
     Defines common error measures.
@@ -8,13 +9,14 @@ import numpy as np
     
     Definition
     ----------
-    def bias(y_obs,y_mod):    bias
-    def mae(y_obs,y_mod):     mean absolute error
-    def mse(y_obs,y_mod):     mean squared error
-    def rmse(y_obs,y_mod):    root mean squared error
-    def nse(y_obs,y_mod):     Nash-Sutcliffe-Efficiency
-    def pear2(y_obs,y_mod):   Squared Pearson correlation coefficient
-
+    def bias(y_obs,y_mod):      bias
+    def mae(y_obs,y_mod):       mean absolute error
+    def mse(y_obs,y_mod):       mean squared error
+    def rmse(y_obs,y_mod):      root mean squared error
+    def nse(y_obs,y_mod):       Nash-Sutcliffe-Efficiency
+    def pear2(y_obs,y_mod):     Squared Pearson correlation coefficient
+    def confint(y_obs, p=0.95): Confidence interval of samples
+    
 
     Input
     -----
@@ -64,6 +66,7 @@ import numpy as np
     -------
     Written, AP, Jul 2014
     Modified MC, Dec 2014 - use simple formulas that work with normal and masked arrays but do not deal with NaN
+    Modified AP, Sep 2015 - add confidence interval
 """
 
 def bias(y_obs,y_mod):
@@ -265,6 +268,23 @@ def pear2(y_obs,y_mod):
     #     y_obsr = np.ma.array(y_obs, mask=y_mod.mask | y_obs.mask)    
     #     return np.corrcoef(y_obsr.compressed(), y_modr.compressed())[0,1]**2
     return ((y_obs-y_obs.mean())*(y_mod-y_mod.mean())).mean()/y_obs.std()/y_mod.std()
+    
+def confint(y_obs, p=0.95):
+    """
+    calculates confidence interval of the mean of the sample applying a 
+    student-t-distribution to a given probability p (default p=0.95)
+     
+    Examples
+    --------
+    >>> # Create some data
+    >>> y_obs = np.array([12.7867, 13.465, 14.1433, 15.3733, 16.6033])
+    >>> # calculate confident interval
+    >>> print(np.round(confint(y_obs)))
+    [ 13.  16.]
+
+    """
+    s = y_obs.size
+    return np.array(t.interval(p, s-1., loc=y_obs.mean(), scale=y_obs.std()/np.sqrt(s)))
 
 if __name__ == '__main__':
     import doctest

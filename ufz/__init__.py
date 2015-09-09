@@ -469,6 +469,7 @@
                            - color
                            - redone all __init__.py
               DS, Sep 2015 - hollickLyneFilter
+              AP, Sep 2015 - confidence intervals
 """
 from __future__ import print_function
 
