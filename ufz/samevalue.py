@@ -7,7 +7,7 @@ Created on Sun Aug 30 18:35:32 2015
 import numpy as np
 
 """
-        Checks in a 1D-array if changes of values within a certain range are smaller than a defined threshold.
+        Checks if abs. differences of array values within a certain window are smaller than threshold.
         Return mask. 
 
 
@@ -19,13 +19,15 @@ import numpy as np
         Input
         -----
         x            1D-array
-        tol          threshold for values. All oscillation of values smaller than thid will be handled as equal and masked
-        window       defines the size of the window in which all values must be smaller that the "tol" value to become masked   
+        tol          tolerance for difference of two subsequent values.
+                     If absolute difference between two values is smaller than tol array entries will be masked
+        window       size of window where all abs. differences of subsequent values has to be smaller than tol to get masked
+                     if at least one difference is larger than tol all array entries within window stay unmasked
         
 
         Output
         ------
-        new_mask     mask of x where values in a certain window are smaller that the threshold
+        new_mask     mask of x where abs. difference of two subsequent values within a certain window are smaller that tol
 
 
         Examples
@@ -91,21 +93,22 @@ import numpy as np
 
 """
 def samevalue(x,tol,window):
-    # define mask where input values smaller than toleranz
+    # define mask where input values smaller than tolerance
     x         = np.ma.array(x)        
     diff      = np.abs(np.diff(x))
-    x_mask    = np.ma.masked_where(diff > float(tol), diff)
+    tol       = np.float(tol)
+    x_mask    = np.ma.masked_where(diff > tol, diff)
     
-    # mask x only if values are smaller than toleranz in a range as long or longer than the window-size  
+    # mask x only if values are smaller than tolerance in a range as long or longer than the window-size  
     count = 0    
-    for i in range(len(x[count:])):
+    for i in range(np.shape(x)[0]):
         if i > window and sum(x_mask.mask[count:][i-window:i]) < 1:
             first_unique_index                      = i-window+1
             last_unique_index                       = np.argmax(diff[first_unique_index:] > tol)
             x[first_unique_index:first_unique_index + last_unique_index] = np.ma.masked
-            count =+ last_unique_index
+            count += last_unique_index
         else:
-            count =+1
+            count += 1
         
     return x.mask
 
