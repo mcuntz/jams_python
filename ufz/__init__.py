@@ -122,6 +122,7 @@
     signature2plot         Write a copyright notice on a plot.
     tail                   Return list with last n lines of file.
     maskgroup              Masks elements in a 1d array gathered in small groups.
+    samevalue              Checks if abs. differences of array values within a certain window are smaller than threshold.
     savez                  Save several numpy arrays into a single file in uncompressed ``.npz`` format.
     savez_compressed       Save several arrays into a single file in compressed ``.npz`` format.
     sobol_index            Calculates the first-order and total variance-based sensitivity indices.
@@ -163,6 +164,7 @@
     argsort                Wrapper for numpy.argsort, numpy.ma.argsort, and using sorted for Python iterables.
     closest                Index in array which entry is closest to a given number.
     pack                   Similar to Fortran pack function with mask.
+    samevalue              Checks if abs. differences of array values within a certain window are smaller than threshold.
     maskgroup              Masks elements in a 1d array gathered in small groups.
     unpack                 Similar to Fortran unpack function with mask.
 
@@ -469,7 +471,8 @@
                            - color
                            - redone all __init__.py
               DS, Sep 2015 - hollickLyneFilter
-              AP, Sep 2015 - confidence intervals
+              AP, Sep 2015 - confidence intervals to errormeasures
+              AW, Sep 2015 - samevalue
 """
 from __future__ import print_function
 
@@ -557,8 +560,9 @@ from .readhdf5          import readhdf5, hdf5read
 from .readnetcdf        import readnetcdf, netcdfread, ncread, readnc
 from .rgb               import rgb_blend, rgb_range, rgb_gradient
 from .romanliterals     import int2roman, roman2int
-from .sap_app           import t2sap
 from .saltelli          import saltelli
+from .samevalue         import samevalue
+from .sap_app           import t2sap
 from .savitzky_golay    import savitzky_golay, sg, savitzky_golay2d, sg2d
 from .sce               import sce
 from .semivariogram     import semivariogram
