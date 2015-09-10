@@ -84,11 +84,12 @@ def get_manual_flags(flagfile, variable, dendro=None, julian=True):
     start   = sdat[:,1]
     end     = sdat[:,2]
     flag    = sdat[:,3]
-    dbh     = sdat[:,4]
-    dbh[dbh==''] = '0'
-    d_ini   = sdat[:,5]
-    d_ini[d_ini==''] = '0'
-    # comment = sdat[:,6]
+    if dendro == True:
+        dbh     = sdat[:,4]
+        dbh[dbh==''] = '0'
+        d_ini   = sdat[:,5]
+        d_ini[d_ini==''] = '0'
+    # comment = sdat[:,-1]
      
     # select variable
     ii = np.where(var_id == variable)[0]
@@ -96,8 +97,9 @@ def get_manual_flags(flagfile, variable, dendro=None, julian=True):
         sdate   = start[ii]
         edate   = end[ii]
         mflag   = flag[ii].astype(np.int)
-        l_dbh   = dbh[ii].astype(np.float)
-        l_d_ini = d_ini[ii].astype(np.float)
+        if dendro == True:
+            l_dbh   = dbh[ii].astype(np.float)
+            l_d_ini = d_ini[ii].astype(np.float)
         # Fill default dates
         jj = np.where(sdate == "")[0]
         if jj.size > 0: sdate[jj] = sdef
@@ -112,8 +114,9 @@ def get_manual_flags(flagfile, variable, dendro=None, julian=True):
         sdate = list()
         edate = list()
         mflag = list()
-        l_dbh   = list()
-        l_d_ini = list()
+        if dendro == True:
+            l_dbh   = list()
+            l_d_ini = list()
 
     if dendro == True:
         return [sdate, edate, mflag, l_dbh, l_d_ini]  
