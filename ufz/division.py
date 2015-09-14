@@ -82,12 +82,13 @@ def division(a, b, otherwise=np.nan, prec=0.):
         Modified, MC, May 2012 - div
                   MC, Feb 2013 - ported to Python 3
                   MC, Oct 2014 - do not return masked array if no masked array given
+                  MC, Sep 2015 - bug: returned non-masked array in case of masked array input
     """
     oldsettings = np.geterr()
     np.seterr(divide='ignore')
 
     if isinstance(a, np.ma.masked_array) or isinstance(b, np.ma.masked_array):
-        out = np.where(np.ma.abs(np.ma.array(b)) > np.abs(prec), np.ma.array(a)/np.ma.array(b), otherwise)
+        out = np.ma.where(np.ma.abs(np.ma.array(b)) > np.abs(prec), np.ma.array(a)/np.ma.array(b), otherwise)
     else:
         out = np.where(np.abs(np.array(b)) > np.abs(prec), np.array(a)/np.array(b), otherwise)
 
