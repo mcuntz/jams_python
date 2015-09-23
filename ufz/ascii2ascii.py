@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 from __future__ import print_function
 import numpy as np
-from ufz.date2dec import date2dec
-from ufz.dec2date import dec2date
 
 __all__ = ['ascii2ascii', 'eng2ascii', 'ascii2eng']
 
@@ -29,7 +27,7 @@ def ascii2ascii(edate, full=False, eng=False):
         eng     True:  output format is English YYYY-MM-DD hh:mm:ss
                 False: output format is ascii DD.MM.YYYY hh:mm:ss (default)
 
-        
+
         Output
         ------
         list/ND-array of date strings in chosen date format (default: ascii)
@@ -87,8 +85,9 @@ def ascii2ascii(edate, full=False, eng=False):
         History
         -------
         Written,  MC, Feb 2015
+        Modified, MC, Sep 2015 - removed date2dec and dec2date
     """
-    
+
     # Input type and shape
     if isinstance(edate, list):
         idate  = np.array(edate)
@@ -99,31 +98,29 @@ def ascii2ascii(edate, full=False, eng=False):
     else:
         idate  = np.array([edate])
     ndate = idate.size
-        
-    # Values and indices of eng and ascii dates
-    iieng = [ i for i, d in enumerate(idate) if '-' in d ]
-    ieng  = [ d for d in idate if '-' in d ]
-    iiasc = [ i for i, d in enumerate(idate) if '-' not in d ]
-    iasc  = [ d for d in idate if '-' not in d ]
 
     # Convert to given output type
     odate = np.zeros((ndate,), dtype='|S19') # 'DD.MM.YYYY hh:mm:ss' are 19 characters
-    if eng:
-        if len(iieng) > 0:
-            odate[iieng] = dec2date(date2dec(eng=ieng),   eng=True)
-        if len(iiasc) > 0:
-            odate[iiasc] = dec2date(date2dec(ascii=iasc), eng=True)
-    else:
-        if len(iieng) > 0:
-            odate[iieng] = dec2date(date2dec(eng=ieng),   ascii=True)
-        if len(iiasc) > 0:
-            odate[iiasc] = dec2date(date2dec(ascii=iasc), ascii=True)
-    
-    # Cut output to input lengths
-    if not full:
-        for i, d in enumerate(odate):
-            odate[i] = d[:len(idate[i])]
-                
+    for i, d in enumerate(idate):
+        if eng:
+            if '-' in d:
+                dd = d
+            else:
+                dd = d[6:10]+'-'+d[3:5]+'-'+d[0:2]+d[10:] # ascii -> eng
+        else:
+            if '-' not in d:
+                dd = d
+            else:
+                dd = d[8:10]+'.'+d[5:7]+'.'+d[0:4]+d[10:] # eng -> ascii
+        if not full:
+            odate[i] = dd
+        else:
+            if len(d) < 11:
+                dd += ' 00:00:00'
+            else:
+                dd += ':00:00'
+            odate[i] = dd[:19]
+
     # Return right type
     if isinstance(edate, list):
         return list(odate)
