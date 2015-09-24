@@ -190,32 +190,43 @@ if __name__ == '__main__':
         mpl.rc('figure', figsize=(8.27,11.69)) # a4 portrait
         if usetex:
             mpl.rc('text', usetex=True)
-            mpl.rc('text.latex', unicode=True)
-            mpl.rcParams['text.latex.preamble']=r'\usepackage{wasysym}'
+            #   r'\renewcommand\familydefault{\sfdefault}', # normal text font is sans serif
+            #   r'\usepackage{helvet}',                     # normal text font is helvetica
+            mpl.rcParams['text.latex.preamble'] = [
+                r'\usepackage{wasysym}',
+                r'\renewcommand\familydefault{\sfdefault}', # normal text font is sans serif
+                r'\usepackage[EULERGREEK]{sansmath}',       # load up the sansmath so that math is sfdefault
+                r'\sansmath'                                # <- have to tell tex to use sansmath
+                ]
         else:
-            # mpl.rc('font',**{'family':'sans-serif','sans-serif':['Helvetica']})
-            # mpl.rc('font', **{'family':'serif', 'serif':['times']})
-            mpl.rc('font', family='serif') 
-            mpl.rc('font', serif='Times New Roman')
-            mpl.rc('font', family='sans-serif') 
-            mpl.rc('font', serif='Arial')
-        mpl.rc('text.latex', unicode=True)
+            # mpl.rcParams['font.family'] = 'serif'
+            # mpl.rcParams['font.sans-serif'] = 'Times'
+            mpl.rcParams['font.family']     = 'sans-serif'
+            mpl.rcParams['font.sans-serif'] = 'Arial'       # Arial, Verdana
     elif (outtype == 'png') or (outtype == 'html') or (outtype == 'd3'):
         mpl.use('Agg') # set directly after import matplotlib
         import matplotlib.pyplot as plt
         mpl.rc('figure', figsize=(8.27,11.69)) # a4 portrait
         if usetex:
             mpl.rc('text', usetex=True)
-            mpl.rc('text.latex', unicode=True)
-            mpl.rcParams['text.latex.preamble']=r'\usepackage{wasysym}'
+            #   r'\renewcommand\familydefault{\sfdefault}', # normal text font is sans serif
+            #   r'\usepackage{helvet}',                     # normal text font is helvetica
+            mpl.rcParams['text.latex.preamble'] = [
+                r'\usepackage{wasysym}',
+                r'\renewcommand\familydefault{\sfdefault}', # normal text font is sans serif
+                r'\usepackage[EULERGREEK]{sansmath}',       # load up the sansmath so that math is sfdefault
+                r'\sansmath'                                # <- have to tell tex to use sansmath
+                ]
         else:
-            #mpl.rc('font',**{'family':'sans-serif','sans-serif':['Helvetica']})
-            mpl.rc('font',**{'family':'serif','serif':['times']})
-        mpl.rc('text.latex', unicode=True)
+            # mpl.rcParams['font.family'] = 'serif'
+            # mpl.rcParams['font.sans-serif'] = 'Times'
+            mpl.rcParams['font.family']     = 'sans-serif'
+            mpl.rcParams['font.sans-serif'] = 'Arial'       # Arial, Verdana
         mpl.rc('savefig', dpi=dpi, format='png')
     else:
         import matplotlib.pyplot as plt
         mpl.rc('figure', figsize=(4./5.*8.27,4./5.*11.69)) # a4 portrait
+    mpl.rc('text.latex', unicode=True)
     mpl.rc('font', size=textsize)
     mpl.rc('lines', linewidth=lwidth, color='black')
     mpl.rc('axes', linewidth=alwidth, labelcolor='black')
@@ -269,7 +280,7 @@ if __name__ == '__main__':
 
     iplot += 1
     xlab   = r'$(0,100)$'
-    ylab   = r'$\sin(x)$'
+    ylab   = r'$\delta\Delta\sin(x)$'
     # if (iplot == 0) | (outtype == 'pdf') | (outtype == 'png') | (outtype == 'html'):
     #     sub  = fig.add_axes(ufz.position(nrow,ncol,iplot,hspace=hspace,vspace=vspace))
     #     sub1 = sub
@@ -289,7 +300,8 @@ if __name__ == '__main__':
     if xlim != None: plt.setp(sub, xlim=xlim)
     if ylim != None: plt.setp(sub, ylim=ylim)
 
-    ll = sub.legend(mark1, [r'$\mathrm{sin\ Nothing}$'], frameon=frameon, ncol=1,
+        #ll = sub.legend(mark1, [r'$\mathrm{sin\ Nothing}$'], frameon=frameon, ncol=1,
+    ll = sub.legend(mark1, [r'sin Nothing 100'], frameon=frameon, ncol=1,
                     labelspacing=llrspace, handletextpad=llhtextpad, handlelength=llhlength,
                     loc='upper left', bbox_to_anchor=(llxbbox,llybbox), scatterpoints=1, numpoints=1)
     plt.setp(ll.get_texts(), fontsize='small')
