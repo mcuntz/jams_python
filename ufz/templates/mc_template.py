@@ -198,10 +198,13 @@ if __name__ == '__main__':
                 #   r'\renewcommand\familydefault{\sfdefault}', # normal text font is sans serif
                 #   r'\usepackage{helvet}',                     # normal text font is helvetica
                 mpl.rcParams['text.latex.preamble'] = [
-                    r'\usepackage{wasysym}',
+                    r'\usepackage{wasysym}',                    # for permil symbol
                     r'\renewcommand\familydefault{\sfdefault}', # normal text font is sans serif
-                    r'\usepackage[EULERGREEK]{sansmath}',       # load up the sansmath so that math is sfdefault
-                    r'\sansmath'                                # <- have to tell tex to use sansmath
+                    r'\usepackage{sfmath}'                      # load up the sfmath so that math is sfdefault
+                    ]
+            else:
+                mpl.rcParams['text.latex.preamble'] = [
+                    r'\usepackage{wasysym}'                     # for permil symbol
                     ]
         else:
             if serif:
@@ -220,10 +223,13 @@ if __name__ == '__main__':
                 #   r'\renewcommand\familydefault{\sfdefault}', # normal text font is sans serif
                 #   r'\usepackage{helvet}',                     # normal text font is helvetica
                 mpl.rcParams['text.latex.preamble'] = [
-                    r'\usepackage{wasysym}',
+                    r'\usepackage{wasysym}',                    # for permil symbol
                     r'\renewcommand\familydefault{\sfdefault}', # normal text font is sans serif
-                    r'\usepackage[EULERGREEK]{sansmath}',       # load up the sansmath so that math is sfdefault
-                    r'\sansmath'                                # <- have to tell tex to use sansmath
+                    r'\usepackage{sfmath}'                      # load up the sfmath so that math is sfdefault
+                    ]
+            else:
+                mpl.rcParams['text.latex.preamble'] = [
+                    r'\usepackage{wasysym}'                     # for permil symbol
                     ]
         else:
             if serif:
