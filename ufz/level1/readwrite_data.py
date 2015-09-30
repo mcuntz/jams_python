@@ -164,7 +164,7 @@ def read_data(files, undef=-9999., strip=None, norecord=False, nofill=False):
     for cff, ff in enumerate(files):
         # date, data
         isdat, ssdat = ufz.fsread(ff, skip=1, snc=[0], nc=-1, strip=strip) # array
-        isdate  = ssdat[:,0]
+        isdate = ssdat[:,0]
         if norecord:
             idat    = isdat[:,0::2]
             iflags  = isdat[:,1::2].astype(np.int)

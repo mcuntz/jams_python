@@ -13,6 +13,7 @@ optional arguments:
   -p plotname, --plotname plotname
                         Name of plot output file for types pdf, html or d3,
                         and name basis for type png (default: mc_template).
+  -s, --serif           Use serif font; default sans serif.
   -t outtype, --type outtype
                         Output type is pdf, png, html, or d3 (default: open
                         screen windows).
@@ -36,7 +37,7 @@ GNU Lesser General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License
 along with The UFZ Python library.  If not, see <http://www.gnu.org/licenses/>.
 
-Copyright 2012-2014 Matthias Cuntz
+Copyright 2012-2015 Matthias Cuntz
 
 
 History
@@ -48,6 +49,7 @@ Modified, MC, Jul 2013 - optparse->argparse
           MC, Mar 2014 - split into individual templates
           MC, Nov 2014 - script -> function
                        - pdf, png, html, or d3
+          MC, Sep 2015 - Serif and sans serif fonts
 """
 
 # -------------------------------------------------------------------------
@@ -62,12 +64,15 @@ if __name__ == '__main__':
     plotname = ''
     outtype  = ''
     usetex   = False
-    parser  = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter,
-                                      description='''This is the Python template for any new program of Matthias Cuntz.''')
+    serif    = False
+    parser   = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter,
+                                       description='''This is the Python template for any new program of Matthias Cuntz.''')
     parser.add_argument('-p', '--plotname', action='store',
                         default=plotname, dest='plotname', metavar='plotname',
                         help='Name of plot output file for types pdf, html or d3, '
                         'and name basis for type png (default: '+__file__[0:__file__.rfind(".")]+').')
+    parser.add_argument('-s', '--serif', action='store_true', default=serif, dest="serif",
+                        help="Use serif font; default sans serif.")
     parser.add_argument('-t', '--type', action='store',
                         default=outtype, dest='outtype', metavar='outtype',
                         help='Output type is pdf, png, html, or d3 (default: open screen windows).')
@@ -80,6 +85,7 @@ if __name__ == '__main__':
     infile   = args.file
     plotname = args.plotname
     outtype  = args.outtype
+    serif    = args.serif
     usetex   = args.usetex
 
     del parser, args
@@ -90,7 +96,7 @@ if __name__ == '__main__':
 #
 
 # Comment|Uncomment - Begin
-# def mc_template(infile=None, plotname='', outtype='', usetex=False):
+# def mc_template(infile=None, plotname='', outtype='', serif=False, usetex=False):
 #     """
 #     This is the Python template for any new program of Matthias Cuntz.
 
@@ -98,10 +104,15 @@ if __name__ == '__main__':
 #       infile                Mandatory input file.
 
 #     optional arguments:
-#       plotname              Name of plot output file if type is pdf, html or d3, and
-#                             name basis if type is png (default: mc_template).
-#       outtype               Output type is pdf, png, html, or d3 (default: open screen windows).
-#       usetex                True: Use LaTeX to render text in pdf, png, and html (default: False)
+#       -h, --help            show this help message and exit
+#       -p plotname, --plotname plotname
+#                             Name of plot output file for types pdf, html or d3,
+#                             and name basis for type png (default: mc_template).
+#       -s, --serif           Use serif font; default sans serif.
+#       -t outtype, --type outtype
+#                             Output type is pdf, png, html, or d3 (default: open
+#                             screen windows).
+#       -u, --usetex          Use LaTeX to render text in pdf, png and html.
 #     """
 # Comment|Uncomment - End
 
@@ -158,13 +169,6 @@ if __name__ == '__main__':
     lcol3       = '0.0'
     lcols       = mcols
 
-    # Map
-    delon   = 60.        # spacing between longitude labels
-    delat   = 60.        # spacing between latitude labels
-    xsize   = textsize   # axis label size
-    ncolor  = 10         # # of colors in plot
-    cbsize  = textsize   # colorbar label size
-
     # Legend
     llxbbox     = 0           # x-anchor legend bounding box
     llybbox     = 1           # y-anchor legend bounding box
@@ -190,38 +194,44 @@ if __name__ == '__main__':
         mpl.rc('figure', figsize=(8.27,11.69)) # a4 portrait
         if usetex:
             mpl.rc('text', usetex=True)
-            #   r'\renewcommand\familydefault{\sfdefault}', # normal text font is sans serif
-            #   r'\usepackage{helvet}',                     # normal text font is helvetica
-            mpl.rcParams['text.latex.preamble'] = [
-                r'\usepackage{wasysym}',
-                r'\renewcommand\familydefault{\sfdefault}', # normal text font is sans serif
-                r'\usepackage[EULERGREEK]{sansmath}',       # load up the sansmath so that math is sfdefault
-                r'\sansmath'                                # <- have to tell tex to use sansmath
-                ]
+            if not serif:
+                #   r'\renewcommand\familydefault{\sfdefault}', # normal text font is sans serif
+                #   r'\usepackage{helvet}',                     # normal text font is helvetica
+                mpl.rcParams['text.latex.preamble'] = [
+                    r'\usepackage{wasysym}',
+                    r'\renewcommand\familydefault{\sfdefault}', # normal text font is sans serif
+                    r'\usepackage[EULERGREEK]{sansmath}',       # load up the sansmath so that math is sfdefault
+                    r'\sansmath'                                # <- have to tell tex to use sansmath
+                    ]
         else:
-            # mpl.rcParams['font.family'] = 'serif'
-            # mpl.rcParams['font.sans-serif'] = 'Times'
-            mpl.rcParams['font.family']     = 'sans-serif'
-            mpl.rcParams['font.sans-serif'] = 'Arial'       # Arial, Verdana
+            if serif:
+                mpl.rcParams['font.family']     = 'serif'
+                mpl.rcParams['font.sans-serif'] = 'Times'
+            else:
+                mpl.rcParams['font.family']     = 'sans-serif'
+                mpl.rcParams['font.sans-serif'] = 'Arial'       # Arial, Verdana
     elif (outtype == 'png') or (outtype == 'html') or (outtype == 'd3'):
         mpl.use('Agg') # set directly after import matplotlib
         import matplotlib.pyplot as plt
         mpl.rc('figure', figsize=(8.27,11.69)) # a4 portrait
         if usetex:
             mpl.rc('text', usetex=True)
-            #   r'\renewcommand\familydefault{\sfdefault}', # normal text font is sans serif
-            #   r'\usepackage{helvet}',                     # normal text font is helvetica
-            mpl.rcParams['text.latex.preamble'] = [
-                r'\usepackage{wasysym}',
-                r'\renewcommand\familydefault{\sfdefault}', # normal text font is sans serif
-                r'\usepackage[EULERGREEK]{sansmath}',       # load up the sansmath so that math is sfdefault
-                r'\sansmath'                                # <- have to tell tex to use sansmath
-                ]
+            if not serif:
+                #   r'\renewcommand\familydefault{\sfdefault}', # normal text font is sans serif
+                #   r'\usepackage{helvet}',                     # normal text font is helvetica
+                mpl.rcParams['text.latex.preamble'] = [
+                    r'\usepackage{wasysym}',
+                    r'\renewcommand\familydefault{\sfdefault}', # normal text font is sans serif
+                    r'\usepackage[EULERGREEK]{sansmath}',       # load up the sansmath so that math is sfdefault
+                    r'\sansmath'                                # <- have to tell tex to use sansmath
+                    ]
         else:
-            # mpl.rcParams['font.family'] = 'serif'
-            # mpl.rcParams['font.sans-serif'] = 'Times'
-            mpl.rcParams['font.family']     = 'sans-serif'
-            mpl.rcParams['font.sans-serif'] = 'Arial'       # Arial, Verdana
+            if serif:
+                mpl.rcParams['font.family']     = 'serif'
+                mpl.rcParams['font.sans-serif'] = 'Times'
+            else:
+                mpl.rcParams['font.family']     = 'sans-serif'
+                mpl.rcParams['font.sans-serif'] = 'Arial'       # Arial, Verdana
         mpl.rc('savefig', dpi=dpi, format='png')
     else:
         import matplotlib.pyplot as plt
@@ -279,8 +289,12 @@ if __name__ == '__main__':
     # ylim = [-0.4,0.4]
 
     iplot += 1
-    xlab   = r'$(0,100)$'
-    ylab   = r'$\delta\Delta\sin(x)$'
+    if usetex:
+        xlab   = r'$f(x)\ (0,100)$'
+        ylab   = r'$\delta\Delta\sin(x)$'
+    else:
+        xlab   = r'$f(x)$ (0,100)'
+        ylab   = r'$\delta\Delta\sin(x)$'
     # if (iplot == 0) | (outtype == 'pdf') | (outtype == 'png') | (outtype == 'html'):
     #     sub  = fig.add_axes(ufz.position(nrow,ncol,iplot,hspace=hspace,vspace=vspace))
     #     sub1 = sub
@@ -300,8 +314,12 @@ if __name__ == '__main__':
     if xlim != None: plt.setp(sub, xlim=xlim)
     if ylim != None: plt.setp(sub, ylim=ylim)
 
-        #ll = sub.legend(mark1, [r'$\mathrm{sin\ Nothing}$'], frameon=frameon, ncol=1,
-    ll = sub.legend(mark1, [r'sin Nothing 100'], frameon=frameon, ncol=1,
+    larr = mark1
+    if usetex:
+        tarr = [r'$\sin(x)\ \mathrm{sin\ Nothing\ 100}$']
+    else:
+        tarr = [r'sin Nothing 100']
+    ll = sub.legend(larr, tarr, frameon=frameon, ncol=1,
                     labelspacing=llrspace, handletextpad=llhtextpad, handlelength=llhlength,
                     loc='upper left', bbox_to_anchor=(llxbbox,llybbox), scatterpoints=1, numpoints=1)
     plt.setp(ll.get_texts(), fontsize='small')
@@ -343,8 +361,12 @@ if __name__ == '__main__':
     # ylim = [-0.4,0.4]
 
     iplot += 1
-    xlab   = r'$(0,1)$'
-    ylab   = r'$2\sin(x)$'
+    if usetex:
+        xlab   = r'$(0,1)$'
+        ylab   = r'$2\sin(x)$'
+    else:
+        xlab   = r'(0,1)'
+        ylab   = r'$2\sin(x)$'
     sub    = fig.add_axes(ufz.position(nrow,ncol,iplot,hspace=hspace,vspace=vspace))
 
 
@@ -358,7 +380,12 @@ if __name__ == '__main__':
     if xlim != None: plt.setp(sub, xlim=xlim) # set axis limit if wanted
     if ylim != None: plt.setp(sub, ylim=ylim)
 
-    ll = sub.legend(line1, [r'$\mathrm{sin\ Nothing}$'], frameon=frameon, ncol=1,
+    larr = line1
+    if usetex:
+        tarr = [r'$\mathrm{sin\ Nothing}$']
+    else:
+        tarr = [r'sin Nothing']
+    ll = sub.legend(larr, tarr, frameon=frameon, ncol=1,
                     labelspacing=llrspace, handletextpad=llhtextpad, handlelength=llhlength,
                     loc='upper left', bbox_to_anchor=(llxbbox,llybbox), scatterpoints=1, numpoints=1)
     plt.setp(ll.get_texts(), fontsize='small')
@@ -417,12 +444,15 @@ if __name__ == '__main__':
 #     plotname = ''
 #     outtype  = ''
 #     usetex   = False
-#     parser  = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter,
-#                                       description='''This is the Python template for any new program of Matthias Cuntz.''')
+#     serif    = False
+#     parser   = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter,
+#                                        description='''This is the Python template for any new program of Matthias Cuntz.''')
 #     parser.add_argument('-p', '--plotname', action='store',
 #                         default=plotname, dest='plotname', metavar='plotname',
 #                         help='Name of plot output file for types pdf, html or d3, '
 #                         'and name basis for type png (default: '+__file__[0:__file__.rfind(".")]+').')
+#     parser.add_argument('-s', '--serif', action='store_true', default=serif, dest="serif",
+#                         help="Use serif font; default sans serif.")
 #     parser.add_argument('-t', '--type', action='store',
 #                         default=outtype, dest='outtype', metavar='outtype',
 #                         help='Output type is pdf, png, html, or d3 (default: open screen windows).')
@@ -435,6 +465,7 @@ if __name__ == '__main__':
 #     infile   = args.file
 #     plotname = args.plotname
 #     outtype  = args.outtype
+#     serif    = args.serif
 #     usetex   = args.usetex
 
 #     del parser, args
