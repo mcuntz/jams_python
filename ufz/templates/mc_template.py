@@ -195,12 +195,11 @@ if __name__ == '__main__':
         if usetex:
             mpl.rc('text', usetex=True)
             if not serif:
-                #   r'\renewcommand\familydefault{\sfdefault}', # normal text font is sans serif
-                #   r'\usepackage{helvet}',                     # normal text font is helvetica
+                #   r'\usepackage{helvet}',                             # use Helvetica
                 mpl.rcParams['text.latex.preamble'] = [
-                    r'\usepackage{wasysym}',                    # for permil symbol
-                    r'\renewcommand\familydefault{\sfdefault}', # normal text font is sans serif
-                    r'\usepackage{sfmath}'                      # load up the sfmath so that math is sfdefault
+                    r'\usepackage[math,lf,footnotefigures]{MyriadPro}', # use MyriadPro font
+                    r'\renewcommand{\familydefault}{\sfdefault}',       # normal text font is sans serif
+                    r'\usepackage{wasysym}',                            # for permil symbol (load after MyriadPro)
                     ]
             else:
                 mpl.rcParams['text.latex.preamble'] = [
@@ -220,12 +219,11 @@ if __name__ == '__main__':
         if usetex:
             mpl.rc('text', usetex=True)
             if not serif:
-                #   r'\renewcommand\familydefault{\sfdefault}', # normal text font is sans serif
-                #   r'\usepackage{helvet}',                     # normal text font is helvetica
+                #   r'\usepackage{helvet}',                             # use Helvetica
                 mpl.rcParams['text.latex.preamble'] = [
-                    r'\usepackage{wasysym}',                    # for permil symbol
-                    r'\renewcommand\familydefault{\sfdefault}', # normal text font is sans serif
-                    r'\usepackage{sfmath}'                      # load up the sfmath so that math is sfdefault
+                    r'\usepackage[math,lf,footnotefigures]{MyriadPro}', # use MyriadPro font
+                    r'\renewcommand{\familydefault}{\sfdefault}',       # normal text font is sans serif
+                    r'\usepackage{wasysym}',                            # for permil symbol (load after MyriadPro)
                     ]
             else:
                 mpl.rcParams['text.latex.preamble'] = [
