@@ -40,9 +40,11 @@ def clockplot(sub, si, sti=None, stierr=None,
               dosig       = False,          # True: add signature to plot
               dolegend    = False,          # True: add legend to each subplot
               doabc       = False,          # True: add subpanel numbering
-              mod         = ['Interception',    'Snow',             'Soil moisture', 'Soil moisture',
+              modul         = ['Interception',    'Snow',             'Soil moisture', 'Soil moisture',
                              'Direct\n runoff', 'Evapo-\n transp.', 'Interflow',     'Percolation',
                              'Routing',         'Geology'],      # module names
+              modhalign    = None,          # Horizontal alignment of module names
+              modvalign    = None,          # Vertical alignment of module names
               comp        = ['P',               'P',                'S',             'ET',
                              'Q',               'ET',               'S',             'S',
                              'Q',               'S'],            # class names
@@ -52,7 +54,7 @@ def clockplot(sub, si, sti=None, stierr=None,
               cmod        = 'mhm',                               # color scheme chosen ('mhm' or 'noah')
               cmap        = None,                                # Color for each module mod (if not given cmod determines colors)
               saname      = ['Sobol', 'weighted Sobol', 'RMSE'], # stack names
-              indexname   = ['$S_i$', '$S_{Ti}-S_i$'],           # index legend name
+              indexname   = [r'$S_i$', r'$S_{Ti}-S_i$'],           # index legend name
               star        = None,                                # star symbols
               dystar      = 0.95,                                # % of ymax for stars
               scol        = '1.0',                               # star colour
@@ -102,9 +104,11 @@ def clockplot(sub, si, sti=None, stierr=None,
                       dosig     = False,
                       dolegend  = False,
                       doabc     = False,
-                      mod   = ['Interception',    'Snow',             'Soil moisture', 'Soil moisture',
+                      modul   = ['Interception',    'Snow',             'Soil moisture', 'Soil moisture',
                                'Direct\n runoff', 'Evapo-\n transp.', 'Interflow',     'Percolation',
                                'Routing',         'Geology'],
+                      modhalign    = None,
+                      modvalign    = None,
                       comp  = ['P',               'P',                'S',             'ET',
                                'Q',               'ET',               'S',             'S',
                                'Q',               'S'],
@@ -173,9 +177,11 @@ def clockplot(sub, si, sti=None, stierr=None,
         dosig = False                True: add signature (sig) to plot
         dolegend = False             True: add legend to each subplot
         doabc = False                True: add subpanel numbering
-        mod  = ['Interception',    'Snow',             'Soil moisture', 'Soil moisture',
+        modul  = ['Interception',    'Snow',             'Soil moisture', 'Soil moisture',
                 'Direct\n runoff', 'Evapo-\n transp.', 'Interflow',     'Percolation',
                 'Routing',         'Geology'],                                           module names
+        modhalign = None,             list of horizontal alignments of module names
+        modvalign = None,             list of vertical alignments of module names
         comp = ['P',               'P',                'S',             'ET',
                 'Q',               'ET',               'S',             'S',
                 'Q',               'S'],                                                 class names
@@ -267,18 +273,35 @@ def clockplot(sub, si, sti=None, stierr=None,
     if sti is not None:
         idsi = isti-isi
 
+    if modhalign is not None:
+        if isinstance(modhalign, (list, tuple, np.ndarray)):
+            assert len(modul) == len(modhalign), 'modhalign must be scalar or same size as modul.'
+            imodhalign = modhalign
+        else:
+            imodhalign = [modhalign]*len(modul)
+    else:
+        imodhalign = ['center']*len(modul)
+    if modvalign is not None:
+        if isinstance(modvalign, (list, tuple, np.ndarray)):
+            assert len(modul) == len(modvalign), 'modvalign must be scalar or same size as modul.'
+            imodvalign = modvalign
+        else:
+            imodvalign = [modvalign]*len(modul)
+    else:
+        imodvalign = ['center']*len(modul)
+
     if type(saname) is list:
         isaname = saname[:]
     else:
         isaname = [saname]
-    if type(mod) is list:
-        ismod = mod[:]
+    if type(modul) is list:
+        ismod = modul[:]
     else:
-        ismod = [mod]
+        ismod = [modul]
     # Prepare annotations
     if usetex:
         imod = []
-        for i in ismod:
+        for ii, i in enumerate(ismod):
             if '\n' in i:
                 ss = i.split('\n')
             else:
@@ -369,7 +392,8 @@ def clockplot(sub, si, sti=None, stierr=None,
                  get_brewer('greys8', rgb=True)[5], #  Carbon*
                  get_brewer('greys9', rgb=True)[6]] #  ????
         else:
-            raise ValueError("cmod can be only 'mhm' or 'noah'")
+            if cmap is None:
+                raise ValueError("cmod can be only 'mhm' or 'noah', otherwise cmap has to be given.")
 
     if cmap is not None:
         c = cmap
@@ -403,18 +427,19 @@ def clockplot(sub, si, sti=None, stierr=None,
     for i in range(nmod):
         if (pmod[i] > 0):
             # module
+            nm = len(ismod[i])
             for j, m in enumerate(ismod[i]):
-                mlabel12 = (ylabel2-ylabel1)*0.3
-                if len(ismod[i]) > 1:
-                    ylab = ylabel1 + (2*j-1)*mlabel12
-                else:
-                    ylab = ylabel1
-                label = sub.text(xm[i], ylab*ymax, m,
-                                 fontsize=ntextsize, horizontalalignment='center', verticalalignment='center')
+                mlabel12 = (ylabel2-ylabel1)*1./float(nm)
                 if (xm[i] < 0.5*np.pi) | (xm[i] > 1.5*np.pi):
-                    label.set_rotation(np.rad2deg(-xm[i]))
+                    ylab = ylabel2 - (j+1)*mlabel12
+                    rot  = np.rad2deg(-xm[i])
                 else:
-                    label.set_rotation(np.rad2deg(-xm[i])+180.)
+                    ylab = ylabel2 - (nm-j)*mlabel12
+                    rot  = np.rad2deg(-xm[i])+180.
+                label = sub.text(xm[i], ylab*ymax, m, rotation=rot,
+                                 fontsize=ntextsize,
+                                 horizontalalignment=imodhalign[i],
+                                 verticalalignment=imodvalign[i])
             # class
             if docomp:
                 label = sub.text(xm[i], ylabel2*ymax, comp[i],
@@ -522,6 +547,15 @@ def clockplot(sub, si, sti=None, stierr=None,
                              marker='*', markeredgecolor=scol, markerfacecolor='None',
                              markersize=ssize, markeredgewidth=swidth)
 
+    # subplot numbering
+    if doabc and (iplot is not None):
+        from ufz.abc2plot import abc2plot
+        abc2plot(sub, dxabc, dyabc, iplot, transform=sub.transAxes,
+                 lower=True, parenthesis='close',
+                 bold=True, large=True,
+                 mathrm=True, usetex=usetex,
+                 horizontalalignment='right', verticalalignment='bottom')
+
     # Signature
     if dosig:
         from ufz.signature2plot import signature2plot
@@ -569,13 +603,13 @@ def clockplot(sub, si, sti=None, stierr=None,
             iindexname = indexname[:]
         else:
             iindexname = [indexname]
-        t = r''+iindexname[0]
+        t = iindexname[0]
         dy2 = 1. - 0.01 * shifty
-        lsub.text(0.15, dy2+0.05, r''+iindexname[0], fontsize=ntextsize,
+        lsub.text(0.15, dy2+0.05, t, fontsize=ntextsize,
                   horizontalalignment='center', verticalalignment='bottom')
         if sti is not None:
-            t = r''+iindexname[1]
-            lsub.text(0.45, dy2+0.05, r''+iindexname[1], fontsize=ntextsize,
+            t = iindexname[1]
+            lsub.text(0.45, dy2+0.05, t, fontsize=ntextsize,
                       horizontalalignment='center', verticalalignment='bottom')
         # Star
         if star is not None:
@@ -587,20 +621,11 @@ def clockplot(sub, si, sti=None, stierr=None,
             lsub.plot([dxstar1], [dystar1], linestyle='none', clip_on=False,
                       marker='*', markeredgecolor=scol, markerfacecolor='None',
                       markersize=ssize, markeredgewidth=swidth)
-            print(isaname[nsi-1])
             lsub.text(dx1, dystar1, isaname[nsi], fontsize=ntextsize,
                       horizontalalignment='left', verticalalignment='center')
 
     lsub.set_xlim([0,1])
     lsub.set_ylim([0,1])
-
-    # subplot numbering
-    if doabc and iplot is not None:
-        from ufz.abc2plot import abc2plot
-        abc2plot(lsub, dxabc, dyabc, iplot, lower=True, parenthesis='close',
-                 bold=True, large=True,
-                 mathrm=True, usetex=usetex,
-                 horizontalalignment='right', verticalalignment='bottom')
 
     lsub.set_title('')
     lsub.set_xlabel('')
