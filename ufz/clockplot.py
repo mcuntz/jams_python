@@ -552,7 +552,7 @@ def clockplot(sub, si, sti=None, stierr=None,
         from ufz.abc2plot import abc2plot
         abc2plot(sub, dxabc, dyabc, iplot, transform=sub.transAxes,
                  lower=True, parenthesis='close',
-                 bold=True, large=True,
+                 bold=True, xlarge=True,
                  mathrm=True, usetex=usetex,
                  horizontalalignment='right', verticalalignment='bottom')
 
