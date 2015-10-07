@@ -74,13 +74,12 @@ def str2tex(strin, space2linebreak=False, bold=False, italic=False, usetex=True)
         along with the UFZ makefile project (cf. gpl.txt and lgpl.txt).
         If not, see <http://www.gnu.org/licenses/>.
 
-        Copyright 2014 Matthias Cuntz
+        Copyright 2015 Matthias Cuntz
 
 
         History
         -------
-        Written,  MC, Feb 2015
-        Modified, MC, Sep 2015 - removed date2dec and dec2date
+        Written,  MC, Oct 2015
     """
 
     # Input type and shape

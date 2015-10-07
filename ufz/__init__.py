@@ -79,6 +79,7 @@
     kernel_regression_h    Optimal bandwidth for kernel regression.
     kriging                Krig a surface from a set of 2D points.
     lagcorr                Calculate time lag of maximum or minimum correlation of two arrays.
+    lat_fmt                Set lat label string (called by Basemap.drawparallels) if LaTeX package clash.
     leafmodel              Model to compute photosynthesis and stomatal conductance of canopies.
     leafprojection         Calculation of leaf projection from leaf angle observations.
     level1                 Module with functions dealing with CHS level1 data files, data and flags.
@@ -86,6 +87,7 @@
     lif                    Count number of lines in file.
     line_dev_mask          Maskes elements of an array deviating from a line fit.
     logtools               Module with control file functions of Logtools, the Logger Tools Software of Olaf Kolle.
+    lon_fmt                Set lon label string (called by Basemap.drawmeridians) if LaTeX package clash.
     mad                    Median absolute deviation test.
     means                  Calculate daily, monthly, yearly, etc. means of data depending on date stamp.
     morris_sampling        Sampling of optimised trajectories for Morris measures / elementary effects
@@ -311,6 +313,8 @@
     colors                 Wrapper for colour.
     colours                Define UFZ colours.
     get_brewer             Registers and returns Brewer colormap.
+    lat_fmt                Set lat label string (called by Basemap.drawparallels) if LaTeX package clash.
+    lon_fmt                Set lon label string (called by Basemap.drawmeridians) if LaTeX package clash.
     plot_brewer            Plots available Brewer color maps in pdf file.
     position               Position arrays of subplots to be used with add_axes.
     print_brewer           Prints available Brewer colormap names.
@@ -475,7 +479,7 @@
               DS, Sep 2015 - hollickLyneFilter
               AP, Sep 2015 - confidence intervals to errormeasures
               AW, Sep 2015 - samevalue
-              MC, Oct 2015 - str2tex
+              MC, Oct 2015 - str2tex, lat_fmt, lon_fmt
 """
 from __future__ import print_function
 
@@ -537,6 +541,7 @@ from .interpol          import interpol
 from .kernel_regression import kernel_regression, kernel_regression_h
 from .kriging           import kriging
 from .lagcorr           import lagcorr
+from .latlon_fmt        import lat_fmt, lon_fmt
 from .lhs               import lhs
 from .lif               import lif
 from .line_dev_mask     import line_dev_mask
