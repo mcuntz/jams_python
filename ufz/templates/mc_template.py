@@ -199,6 +199,7 @@ if __name__ == '__main__':
                 mpl.rcParams['text.latex.preamble'] = [
                     r'\usepackage[math,lf,mathtabular,footnotefigures]{MyriadPro}', # use MyriadPro font
                     r'\renewcommand{\familydefault}{\sfdefault}',       # normal text font is sans serif
+                    r'\figureversion{lining,tabular}',
                     r'\usepackage{wasysym}',                            # for permil symbol (load after MyriadPro)
                     ]
             else:
@@ -223,6 +224,7 @@ if __name__ == '__main__':
                 mpl.rcParams['text.latex.preamble'] = [
                     r'\usepackage[math,lf,mathtabular,footnotefigures]{MyriadPro}', # use MyriadPro font
                     r'\renewcommand{\familydefault}{\sfdefault}',       # normal text font is sans serif
+                    r'\figureversion{lining,tabular}',
                     r'\usepackage{wasysym}',                            # for permil symbol (load after MyriadPro)
                     ]
             else:
