@@ -197,7 +197,7 @@ if __name__ == '__main__':
             if not serif:
                 #   r'\usepackage{helvet}',                             # use Helvetica
                 mpl.rcParams['text.latex.preamble'] = [
-                    r'\usepackage[math,lf,footnotefigures]{MyriadPro}', # use MyriadPro font
+                    r'\usepackage[math,lf,mathtabular,footnotefigures]{MyriadPro}', # use MyriadPro font
                     r'\renewcommand{\familydefault}{\sfdefault}',       # normal text font is sans serif
                     r'\usepackage{wasysym}',                            # for permil symbol (load after MyriadPro)
                     ]
@@ -221,7 +221,7 @@ if __name__ == '__main__':
             if not serif:
                 #   r'\usepackage{helvet}',                             # use Helvetica
                 mpl.rcParams['text.latex.preamble'] = [
-                    r'\usepackage[math,lf,footnotefigures]{MyriadPro}', # use MyriadPro font
+                    r'\usepackage[math,lf,mathtabular,footnotefigures]{MyriadPro}', # use MyriadPro font
                     r'\renewcommand{\familydefault}{\sfdefault}',       # normal text font is sans serif
                     r'\usepackage{wasysym}',                            # for permil symbol (load after MyriadPro)
                     ]
