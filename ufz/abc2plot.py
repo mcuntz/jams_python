@@ -5,7 +5,8 @@ from ufz.romanliterals import int2roman
 def abc2plot(handle, dx, dy, iplot,
              integer=False, roman=False, lower=False,
              parenthesis=None, brackets=None, braces=None,
-             small=False, medium=None, large=False, xlarge=False, xxlarge=False,
+             small=False, medium=None, large=False,
+             xsmall=False, xxsmall=False, xlarge=False, xxlarge=False,
              bold=False, italic=False,
              usetex=False, mathrm=False, string=False, **kwargs):
     """
@@ -21,7 +22,8 @@ def abc2plot(handle, dx, dy, iplot,
         def abc2plot(handle, dx, dy, iplot,
                      integer=False, roman=False, lower=False,
                      parenthesis=None, brackets=None, braces=None,
-                     small=False, medium=None, large=False, xlarge=False, xxlarge=False,
+                     small=False, medium=None, large=False,
+                     xsmall=False, xxsmall=False, xlarge=False, xxlarge=False,
                      bold=False, italic=False,
                      usetex=False, mathrm=False, string=False, **kwargs):
 
@@ -57,6 +59,8 @@ def abc2plot(handle, dx, dy, iplot,
         small       True:    fontsize='small'
         medium      True:    fontsize='medium' (default)
         large       True:    fontsize='large'
+        xsmall      True:    fontsize='x-small'
+        xxsmall     True:    fontsize='xx-small'
         xlarge      True:    fontsize='x-large'
         xxlarge     True:    fontsize='xx-large'
         bold        True:    fontweight='bold'
@@ -122,20 +126,20 @@ def abc2plot(handle, dx, dy, iplot,
                   MC, Apr 2014 - assert
                   MC, May 2014 - **kwargs replaces default horizontalalignment='left', verticalalignment='bottom'
                                - italic
-                  MC, Oct 2015 - xlarge, xxlarge
+                  MC, Oct 2015 - xlarge, xxlarge, xsmall, xxsmall
     """
     # Check input
     assert (roman+integer) < 2, 'either roman literals or integers can be chosen.'
     if medium is None:
-        if (small+large+xlarge+xxlarge) > 1:
-            raise ValueError('only one of small, medium, large, xlarge, or xxlarge font size can be chosen (1).')
-        elif (small+large+xlarge+xxlarge) == 1:
+        if (small+large+xsmall+xxsmall+xlarge+xxlarge) > 1:
+            raise ValueError('only one of xxsmall, xsmall, small, medium, large, xlarge, or xxlarge font size can be chosen (1).')
+        elif (small+large+xsmall+xxsmall+xlarge+xxlarge) == 1:
             medium = False
         else:
             medium = True
     else:
-        assert (small+medium+large+xlarge+xxlarge) <= 1, 'only one of small, medium, large, xlarge, or xxlarge font size can be chosen (2).'
-        assert (small+medium+large+xlarge+xxlarge) > 0, 'If medium=false then another size has to be chosen explicitly: small or large.'
+        assert (small+medium+large+xsmall+xxsmall+xlarge+xxlarge) <= 1, 'only one of xxsmall, xsmall, small, medium, large, xlarge, or xxlarge font size can be chosen (2).'
+        assert (small+medium+large+xsmall+xxsmall+xlarge+xxlarge) > 0, 'If medium=false then another size has to be chosen explicitly: small or large.'
     if usetex & mathrm:
         assert (bold+italic) <= 1, 'if usetex and mathrm then bold and italic are mutually exclusive.'
 
@@ -157,6 +161,8 @@ def abc2plot(handle, dx, dy, iplot,
     if small:   fs='small'
     if medium:  fs='medium'
     if large:   fs='large'
+    if xsmall:  fs='x-small'
+    if xxsmall: fs='xx-small'
     if xlarge:  fs='x-large'
     if xxlarge: fs='xx-large'
 
