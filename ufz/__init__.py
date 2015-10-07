@@ -120,6 +120,7 @@
     sg2d                   Wrapper savitzky_golay2d.
     sigma_filter           Mask values deviating more than z standard deviations from a given function.
     signature2plot         Write a copyright notice on a plot.
+    str2tex                Convert strings to LaTeX strings in math environement used by matplotlib's usetex
     tail                   Return list with last n lines of file.
     maskgroup              Masks elements in a 1d array gathered in small groups.
     samevalue              Checks if abs. differences of array values within a certain window are smaller than threshold.
@@ -318,6 +319,7 @@
     rgb_gradient           n interpolated colours in rgb space between several colours changing at certain fractions.
     rgb_range              n interpolated colours in rgb space between two colours
     signature2plot         Write a copyright notice on a plot.
+    str2tex                Convert strings to LaTeX strings in math environement used by matplotlib's usetex
     tsym                   Raw unicodes for common symbols.
     xkcd                   Make plot look handdrawn.
     yrange                 Calculates plot range from input array.
@@ -473,6 +475,7 @@
               DS, Sep 2015 - hollickLyneFilter
               AP, Sep 2015 - confidence intervals to errormeasures
               AW, Sep 2015 - samevalue
+              MC, Oct 2015 - str2tex
 """
 from __future__ import print_function
 
@@ -572,6 +575,7 @@ from .signature2plot    import signature2plot
 from .sobol_index       import sobol_index
 from .sread             import sread
 from .srrasa            import srrasa, srrasa_trans
+from .str2tex           import str2tex
 from .tail              import tail
 from .tcherkez          import tcherkez
 from .tee               import tee
