@@ -108,25 +108,52 @@ def str2tex(strin, space2linebreak=False, bold=False, italic=False, usetex=True)
         else:            
             mtex = r'$\mathrm{'
             ttex = r'$\textrm{'
-    
+
+    # helpers
+    a0 = chr(0) # ascii 0
+    # string replacements
+    rep_n        = lambda s : s.replace('\n', '}$'+a0+'\n'+a0+mtex)
+    rep_down     = lambda s : s.replace('_', '\_')
+    rep_up       = lambda s : s.replace('^', '\^')
+    rep_percent  = lambda s : s.replace('%', '\%')
+    rep_space    = lambda s : s.replace(' ', '\ ')
+    rep_minus    = lambda s : s.replace('-', '}$'+ttex+'-}$'+mtex)
+    rep_a02space = lambda s : s.replace(a0, ' ')
+    rep_space2n  = lambda s : s.replace(' ', '\n')
     if usetex:
-        a0 = chr(0)
         for j, s in enumerate(istrin):
             if '$' in s:
+                # -, _, ^ only escaped if not between $
                 ss = s.split('$')
                 for ii in range(0,len(ss),2):
                     ss[ii] = mtex+ss[ii]+'}$'
+                    # - not minus sign
+                    if '-' in ss[ii]:
+                        ss[ii] = rep_minus(ss[ii])
+                        if ss[ii].endswith('{}$'): ss[ii] = ss[ii][:-11] # remove trailing $\mathrm{}$
+                    # \n not in tex mode but normal matplotlib
+                    if '\n' in ss[ii]: ss[ii] = rep_n(ss[ii])
+                    # escape _
+                    if '_' in ss[ii]:  ss[ii] = rep_down(ss[ii])
+                    # escape ^
+                    if '^' in ss[ii]:  ss[ii] = rep_up(ss[ii])
                 istrin[j] = '$'.join(ss)
-                if s[0] == '$': istrin[j] = istrin[j][11:] # remove leading $\mathrm{}$
+                if s[0] == '$': istrin[j] = istrin[j][11:] # remove leading $\mathrm{}$ if started with $
             else:
                 istrin[j] = mtex+s+'}$'
-            # - not minus sign
-            if '-' in istrin[j]:
-                istrin[j] = istrin[j].replace('-', '}$'+ttex+'-}$'+mtex)
-                if istrin[j].endswith('{}$'): istrin[j] = istrin[j][:-11] # remove trailing $\mathrm{}$
-            # \n not in tex mode but normal matplotlib
-            if '\n' in istrin[j]:
-                istrin[j] = istrin[j].replace('\n', '}$'+a0+'\n'+a0+mtex)
+                # - not minus sign
+                if '-' in istrin[j]:
+                    istrin[j] = rep_minus(istrin[j])
+                    if istrin[j].endswith('{}$'): istrin[j] = istrin[j][:-11] # remove trailing $\mathrm{}$
+                # \n not in tex mode but normal matplotlib
+                if '\n' in istrin[j]: istrin[j] = rep_n(istrin[j])
+                # escape _
+                if '_' in istrin[j]:  istrin[j] = rep_down(istrin[j])
+                # escape ^
+                if '^' in istrin[j]:  istrin[j] = rep_up(istrin[j])
+
+            # escape %
+            if '%' in istrin[j]: istrin[j] = rep_percent(istrin[j])
             # escape space or linebreak at space
             if ' ' in istrin[j]:
                 if space2linebreak:
@@ -139,13 +166,11 @@ def str2tex(strin, space2linebreak=False, bold=False, italic=False, usetex=True)
                             istrin[j] = istrin[j] + a0 + '\n' + a0 + mtex+ iic
                 else:                
                     # escaped space 
-                    istrin[j] = istrin[j].replace(' ', '\ ')
+                    istrin[j] = rep_space(istrin[j])
             # rm ascii character 0 around linebreaks introduced above
-            if a0 in istrin[j]:
-                istrin[j] = istrin[j].replace(a0, ' ')
+            if a0 in istrin[j]: istrin[j] = rep_a02space(istrin[j])
     else:
-        if space2linebreak:
-            istrin = [ i.replace(' ','\n') for i in istrin ]
+        if space2linebreak: istrin = [ rep_space2n(i) for i in istrin ]
 
     # Return right type
     if isinstance(strin, list):
