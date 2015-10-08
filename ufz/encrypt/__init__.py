@@ -5,25 +5,26 @@
 
     Constants
     ---------
-    cipher_file       Name of file with cipher
+    file_cipher       Name of file with cipher.
+    file_pass         Name of the file with e-mail address list.
 
 
     Functions
     ---------
-    set_up_cipher     Create or change cipher
-    wordEncrypt       Encrypt word into list of keys using cipher
-    wordDecrypt       Decrypts list of keys into original word using cipher
+    set_up_cipher     Create or change cipher.
+    wordEncrypt       Encrypt word into list of keys using cipher.
+    wordDecrypt       Decrypts list of keys into original word using cipher.
+    sendfail          Send e-mail to e-mail addresses in file_pass, decrypting with file_cipher.
 
 
     Example
     -------
     # Setup the encryption and decryption of password
-    if not os.path.exists(cipher_file):
-        set_up_cipher(cipher_file)
+    if not os.path.exists(file_cipher):
+        set_up_cipher(file_cipher)
 
     # Store encrypted password
-    pass_file = os.path.join(os.path.expanduser('~'),'.pass.cipher')
-    if not os.path.exists(pass_file):
+    if not os.path.exists(file_pass):
         print('')
         prompt = 'Enter password: '
         ipass = getpass.getpass(prompt)
@@ -33,10 +34,13 @@
         f.close()
 
     # Read encrypted password
-    f = open(pass_file, 'rb')
+    f = open(file_pass, 'rb')
     cpass = f.readline()[:-1]
     f.close()
     password = wordDecrypt([ int(c) for c in cpass.split()])
+
+    # Send fail e-mail
+    sendfail('This test', 'Did not work', from='me@ufz.de')
 
 
     License
@@ -57,18 +61,19 @@
     along with the UFZ makefile project (cf. gpl.txt and lgpl.txt).
     If not, see <http://www.gnu.org/licenses/>.
 
-    Copyright 2014 Matthias Cuntz
+    Copyright 2014-2015 Matthias Cuntz
 
 
     History
     -------
     Written,  MC, Jun-Dec 2014 - modified from
               http://code.activestate.com/recipes/577954-encrypt-and-decrypt-text-and-text-files-beta/
+    Modified, MC, Oct 2015     - sendfail
 """
-from .encrypt import file_cipher, set_up_cipher, wordEncrypt, wordDecrypt
+from .encrypt import file_cipher, file_pass, set_up_cipher, wordEncrypt, wordDecrypt, sendfail
 
 # Information
 __author__   = "Matthias Cuntz"
-__version__  = '1.0'
-__revision__ = "Revision: 1931"
-__date__     = 'Date: 08.12.2014'
+__version__  = '1.1'
+__revision__ = "Revision: 2349"
+__date__     = 'Date: 08.10.2015'

@@ -3,12 +3,15 @@ from __future__ import print_function
 from random import randint, choice
 from math import ceil, log
 import os
+import getpass
+from ufz import sendmail
 
-__all__ = ['file_cipher', 'set_up_cipher', 'wordEncrypt', 'wordDecrypt']
+__all__ = ['file_cipher', 'file_pass', 'set_up_cipher', 'wordEncrypt', 'wordDecrypt', 'sendfail']
 
 # modified from http://code.activestate.com/recipes/577954-encrypt-and-decrypt-text-and-text-files-beta/
 
 file_cipher = os.path.join(os.path.expanduser('~'),'.ufz.cipher')
+file_pass   = os.path.join(os.path.expanduser('~'),'.ufz.email.cipher')
 getVar = lambda searchList, ind:  [searchList[i] for i in ind]
 find   = lambda searchList, elem: [[i for i, x in enumerate(searchList) if x == e] for e in elem]
 mod    = lambda n, m:             n % m
@@ -267,6 +270,73 @@ def wordDecrypt(encryptedList):
     decryptedList = map(int,baseExpansion(encryptedWord, keys[1], keys[0]))
     
     return "".join(getVar(cipher,decryptedList))
+
+
+def sendfail(subject, message, from='ufz.encrypt.sendfail'):
+    """
+        Send e-mail to e-mail addresses in file_pass, decrypting with file_cipher.
+
+
+        Definition
+        ----------
+        sendfail(subject, message, from='ufz.encrypt.sendfail')
+
+
+        Input
+        -----
+        subject   Subject of the e-mail
+        message   Message body of e-mail
+
+
+        Optional Input
+        --------------
+        from      Sender name of e-mail
+
+
+        Examples
+        --------
+        sendfail('This did not work.', from='me@ufz.de')
+        sendfail('This did not work.', 'Really.')
+
+
+        License
+        -------
+        This file is part of the UFZ Python package.
+
+        The UFZ Python package is free software: you can redistribute it and/or modify
+        it under the terms of the GNU Lesser General Public License as published by
+        the Free Software Foundation, either version 3 of the License, or
+        (at your option) any later version.
+
+        The UFZ Python package is distributed in the hope that it will be useful,
+        but WITHOUT ANY WARRANTY; without even the implied warranty of
+        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+        GNU Lesser General Public License for more details.
+
+        You should have received a copy of the GNU Lesser General Public License
+        along with the UFZ makefile project (cf. gpl.txt and lgpl.txt).
+        If not, see <http://www.gnu.org/licenses/>.
+
+        Copyright 2014-2015 Matthias Cuntz
+
+
+        History
+        -------
+        Written,  MC, Dec 2014
+        Modified, MC, Oct 2015 - transfer to ufz library; message body
+    """
+    f = open(file_pass, 'rb')
+    email = f.readline()[:-1]
+    cpass = f.readline()[:-1]
+    f.close()
+    user = getpass.getuser()
+    password = wordDecrypt([ int(c) for c in cpass.split()])
+    _ = sendmail(from,
+                 to       = email,
+                 subject  = subject,
+                 message  = message,
+                 login    = user,
+                 password = password)
 
 
 if __name__ == '__main__':
