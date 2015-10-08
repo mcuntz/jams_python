@@ -272,7 +272,7 @@ def wordDecrypt(encryptedList):
     return "".join(getVar(cipher,decryptedList))
 
 
-def sendfail(subject, message, sender='ufz.encrypt.sendfail'):
+def sendfail(subject, message='', sender='ufz.encrypt.sendfail'):
     """
         Send e-mail to e-mail addresses in file_pass, decrypting with file_cipher.
 
