@@ -272,14 +272,14 @@ def wordDecrypt(encryptedList):
     return "".join(getVar(cipher,decryptedList))
 
 
-def sendfail(subject, message, from='ufz.encrypt.sendfail'):
+def sendfail(subject, message, sender='ufz.encrypt.sendfail'):
     """
         Send e-mail to e-mail addresses in file_pass, decrypting with file_cipher.
 
 
         Definition
         ----------
-        sendfail(subject, message, from='ufz.encrypt.sendfail')
+        sendfail(subject, message, sender='ufz.encrypt.sendfail')
 
 
         Input
@@ -290,12 +290,12 @@ def sendfail(subject, message, from='ufz.encrypt.sendfail'):
 
         Optional Input
         --------------
-        from      Sender name of e-mail
+        sender      Sender name of e-mail
 
 
         Examples
         --------
-        sendfail('This did not work.', from='me@ufz.de')
+        sendfail('This did not work.', sender='me@ufz.de')
         sendfail('This did not work.', 'Really.')
 
 
@@ -331,7 +331,7 @@ def sendfail(subject, message, from='ufz.encrypt.sendfail'):
     f.close()
     user = getpass.getuser()
     password = wordDecrypt([ int(c) for c in cpass.split()])
-    _ = sendmail(from,
+    _ = sendmail(sender,
                  to       = email,
                  subject  = subject,
                  message  = message,

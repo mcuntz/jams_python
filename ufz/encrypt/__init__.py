@@ -40,7 +40,7 @@
     password = wordDecrypt([ int(c) for c in cpass.split()])
 
     # Send fail e-mail
-    sendfail('This test', 'Did not work', from='me@ufz.de')
+    sendfail('This test', 'Did not work', sender='me@ufz.de')
 
 
     License
