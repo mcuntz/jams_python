@@ -204,7 +204,9 @@ def get_maxflag(flags):
         returns:
             2, if at least one flag is 2
             1, if at least one flag is 1
-            0, if all flags are 0 or still -9999
+            0, if all flags are 0
+           -1, if flag is '9'
+           -2, if flag is still -9999
 
 
         Examples
