@@ -4,7 +4,7 @@ from random import randint, choice
 from math import ceil, log
 import os
 import getpass
-from ufz import sendmail
+from ufz.sendmail import sendmail
 
 __all__ = ['file_cipher', 'file_pass', 'set_up_cipher', 'wordEncrypt', 'wordDecrypt', 'sendfail']
 
