@@ -56,6 +56,19 @@ Modified, MC, Jul 2013 - optparse->argparse
 # Command line arguments - if script
 #
 
+def filebase(f):
+    f1 = f
+    if f.startswith('..'):
+        f1 = f[2:]
+    elif f.startswith('.'):
+        f1 = f[1:]
+    else:
+        f1 = f
+    if '.' in f1:
+        return f[0:f.rfind(".")]
+    else:
+        return f
+
 # Comment|Uncomment - Begin
 if __name__ == '__main__':
 
@@ -70,7 +83,7 @@ if __name__ == '__main__':
     parser.add_argument('-p', '--plotname', action='store',
                         default=plotname, dest='plotname', metavar='plotname',
                         help='Name of plot output file for types pdf, html or d3, '
-                        'and name basis for type png (default: '+__file__[0:__file__.rfind(".")]+').')
+                        'and name basis for type png (default: '+filebase(__file__)+').')
     parser.add_argument('-s', '--serif', action='store_true', default=serif, dest="serif",
                         help="Use serif font; default sans serif.")
     parser.add_argument('-t', '--type', action='store',
@@ -255,7 +268,7 @@ if __name__ == '__main__':
 
     outtype_ends = ['', '.pdf', '_', '.html', '.html']
     if plotname == '':
-        plotfile = __file__[0:__file__.rfind(".")] + outtype_ends[outtypes.index(outtype)]
+        plotfile = filebase(__file__) + outtype_ends[outtypes.index(outtype)]
     else:
         plotfile = plotname
     if outtype == '':
@@ -273,7 +286,7 @@ if __name__ == '__main__':
         print('<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">', file=fhtml)
         print("<html>", file=fhtml)
         print("<head>", file=fhtml)
-        print("<title>"+__file__[0:__file__.rfind(".")]+"</title>", file=fhtml)
+        print("<title>"+plotfile+"</title>", file=fhtml)
         print("</head>", file=fhtml)
         print("<body>", file=fhtml)
 
@@ -341,7 +354,7 @@ if __name__ == '__main__':
         fig.savefig(pngfile, transparent=transparent, bbox_inches=bbox_inches, pad_inches=pad_inches)
         plt.close(fig)
     elif (outtype == 'html'):
-        pngfile = plotfile[0:plotfile.rfind(".")] + "_" + "{0:04d}".format(ifig)+".png"
+        pngfile = filebase(plotfile) + "_" + "{0:04d}".format(ifig)+".png"
         fig.savefig(pngfile, transparent=transparent, bbox_inches=bbox_inches, pad_inches=pad_inches)
         plt.close(fig)
         print('<p><img src='+pngfile+'/></p>', file=fhtml)
@@ -456,7 +469,7 @@ if __name__ == '__main__':
 #     parser.add_argument('-p', '--plotname', action='store',
 #                         default=plotname, dest='plotname', metavar='plotname',
 #                         help='Name of plot output file for types pdf, html or d3, '
-#                         'and name basis for type png (default: '+__file__[0:__file__.rfind(".")]+').')
+#                         'and name basis for type png (default: '+filebase(__file__)+').')
 #     parser.add_argument('-s', '--serif', action='store_true', default=serif, dest="serif",
 #                         help="Use serif font; default sans serif.")
 #     parser.add_argument('-t', '--type', action='store',

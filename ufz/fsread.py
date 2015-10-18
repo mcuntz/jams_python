@@ -32,9 +32,11 @@ def fsread(file, nc=0, snc=0, skip=0, cskip=0, hskip=0, separator=None,
         nc           number of columns to be read into float array (default: all (nc<=0))
                      nc can be a vector of column indeces,
                      starting with 0; cskip will be ignored then.
+                     if snc!=0: nc must be iterable or -1 for all other columns.
         snc          number of columns to be read into string array (default: none (snc=0))
                      snc can be a vector of column indeces,
                      starting with 0; cskip will be ignored then.
+                     if nc!=0: snc must be iterable or -1 for all other columns.
         skip         number of lines to skip at the beginning of file (default: 0)
         cskip        number of columns to skip at the beginning of each line (default: 0)
         hskip        number of lines in skip that do not belong to header (default: 0)

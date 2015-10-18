@@ -62,6 +62,8 @@ def directory_from_gui(initialdir='.', title='Choose directory'):
     dirs = tkFileDialog.askdirectory(parent=root,
                                       title=title,
                                       initialdir=initialdir)
+    root.destroy()
+
     return dirs
 
 
@@ -182,6 +184,8 @@ def files_from_gui(initialdir='.', title='Choose file(s)', multiple=True):
                                          initialdir=initialdir)
     files = list(root.tk.splitlist(files))
     
+    root.destroy()
+
     return files
 
 
