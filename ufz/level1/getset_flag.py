@@ -183,7 +183,7 @@ AL        def set_flag(flags, n, iflag, ii=None):
 
 # --------------------------------------------------------------------
 
-def get_maxflag(flags, no = None):
+def get_maxflag(flags, no = 0):
     """
         Returns the overall flag for each flag from CHS data flag vector.
 
