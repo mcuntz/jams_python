@@ -101,7 +101,7 @@ def set_flag(flags, n, iflag, ii=None):
 
         Definition
         ----------
-        def set_flag(flags, n, iflag, ii=None):
+AL        def set_flag(flags, n, iflag, ii=None):
 
 
         Input
@@ -183,21 +183,21 @@ def set_flag(flags, n, iflag, ii=None):
 
 # --------------------------------------------------------------------
 
-def get_maxflag(flags):
+def get_maxflag(flags, no = None):
     """
         Returns the overall flag for each flag from CHS data flag vector.
 
 
         Definition
         ----------
-        def get_maxflag(flags):
+        def get_maxflag(flags, no):
 
 
         Input
         -----
         flags   ND-array of integers
-
-        
+        no      flag which is excluded from the calculation of maxflag
+                
         Output
         ------
         ND-array of integers with overall flag 
@@ -216,6 +216,10 @@ def get_maxflag(flags):
         >>> flags = np.array([9, 90, 91, 900, 901, 9001, 9201, 912121212, -9999])
         >>> print(get_maxflag(flags))
         [-1  0  1  0  1  1  2  2 -2]
+        
+        >>> flags = np.array([9, 90, 91, 900, 901, 9001, 9201, 912121212, -9999])
+        >>> print(get_maxflag(flags, no = 1))
+        [-1  -1 -1  0  1  1  1  2 -2]
 
 
         License
@@ -242,6 +246,7 @@ def get_maxflag(flags):
         History
         -------
         Written,  JM, Mar 2015
+        Added option 'no', Julian Vogel,Oct 2015
     """
 
     maxflag = np.ones(np.shape(flags), dtype=np.int) * (-2)
@@ -261,7 +266,8 @@ def get_maxflag(flags):
         #      maxflag=-1, if flag is '9'
         #      maxflag=-2, if flag is '-9999'
         for ii in np.arange(n_flags_precip):
-            maxflag = np.maximum(maxflag, get_flag(flags,ii+1))
+            if ii != (no-1):
+                maxflag = np.maximum(maxflag, get_flag(flags,ii+1))
         return maxflag
 
 # --------------------------------------------------------------------
