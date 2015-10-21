@@ -32,6 +32,7 @@
     correlate              Computes the cross-correlation function of two series x and y.
     cuntz_gleixner         Cuntz-Gleixner model of 13C discrimination.
     dielectric_water       Dielectric constant of liquid water.
+    directories_from_gui   Open directory selection dialogs, returns consecutiveley selected directories
     directory_from_gui     Open directory selection dialog, returns selected directory
     dewpoint               Calculates the dew point from ambient humidity.
     date2dec               Converts arrays with calendar date to decimal date.
@@ -282,6 +283,7 @@
     astr                   Wrapper for autostring.
     autostring             Format number (array) with given decimal precision.
     const                  Provides physical, mathematical, computational, and isotope constants.
+    directories_from_gui   Open directory selection dialogs, returns consecutiveley selected directories
     directory_from_gui     Open directory selection dialog, returns selected directory
     encrypt                Module to encrypt and decrypt text using a key system as well as a cipher.
     files                  Module with file list function.
@@ -480,6 +482,7 @@
               AP, Sep 2015 - confidence intervals to errormeasures
               AW, Sep 2015 - samevalue
               MC, Oct 2015 - str2tex, lat_fmt, lon_fmt
+              MC, Oct 2015 - directories_from_gui
 """
 from __future__ import print_function
 
@@ -518,7 +521,7 @@ from .division          import division, div
 from .ellipse_area      import ellipse_area
 from .errormeasures     import bias, mae, mse, rmse, nse, pear2
 from .esat              import esat
-from .fgui              import directory_from_gui, file_from_gui, files_from_gui
+from .fgui              import directories_from_gui, directory_from_gui, file_from_gui, files_from_gui
 from .fdir              import flow_direction
 from .field_gen         import Field, Incompr_Field, Filtered_Incompr_Field
 from .fill_nonfinite    import fill_nonfinite
