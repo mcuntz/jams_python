@@ -501,41 +501,44 @@ def date2dec(calendar = 'standard', units=None,
     # depending on chosen calendar and optional set of the time units
     # decimal date is calculated
     output = np.zeros(outsize)
+    t0    = nt.datetime(1582, 10, 05, 00, 00, 00)
+    t1    = nt.datetime(1582, 10, 15, 00, 00, 00)
+    is121 = True if (min(timeobj)<t0) and (max(timeobj)>=t1) else False
     if (calendar == 'standard') or (calendar == 'gregorian'):
         if units is None:
             units = 'days since 0001-01-01 12:00:00'
             dec0 = 1721424
         else:
             dec0 = 0
-        if nt.__version__ > '1.1.8':
-            output = nt.date2num(timeobj, units, calendar='gregorian')+dec0
-        else:
+        if is121 and (nt.__version__ < '1.2.2'):
             for ii, tt in enumerate(timeobj): output[ii] = nt.date2num(tt, units, calendar='gregorian')+dec0
+        else:
+            output = nt.date2num(timeobj, units, calendar='gregorian')+dec0
     elif calendar == 'julian':
         if units is None:
             units = 'days since 0001-01-01 12:00:00'
             dec0 = 1721424
         else:
             dec0 = 0
-        if nt.__version__ > '1.1.8':
-            output = nt.date2num(timeobj, units, calendar='julian')+dec0
-        else:
+        if is121 and (nt.__version__ < '1.2.2'):
             for ii, tt in enumerate(timeobj): output[ii] = nt.date2num(tt, units, calendar='julian')+dec0
+        else:
+            output = nt.date2num(timeobj, units, calendar='julian')+dec0
     elif calendar == 'proleptic_gregorian':
         if units is None: units = 'days since 0001-01-01 00:00:00'
-        if nt.__version__ > '1.1.8':
-            output = nt.date2num(timeobj, units, calendar='proleptic_gregorian')
-        else:
+        if is121 and (nt.__version__ < '1.2.2'):
             for ii, tt in enumerate(timeobj): output[ii] = nt.date2num(tt, units, calendar='proleptic_gregorian')
+        else:
+            output = nt.date2num(timeobj, units, calendar='proleptic_gregorian')
     elif calendar == 'excel1900':
         doerr = False
         if units is None:
             units = 'days since 1899-12-31 00:00:00'
             if excelerr: doerr = True
-        if nt.__version__ > '1.1.8':
-            output = nt.date2num(timeobj, units, calendar='gregorian')
-        else:
+        if is121 and (nt.__version__ < '1.2.2'):
             for ii, tt in enumerate(timeobj): output[ii] = nt.date2num(tt, units, calendar='gregorian')
+        else:
+            output = nt.date2num(timeobj, units, calendar='gregorian')
         if doerr:
             output = np.where(output >= 60., output+1., output)
             # date2num treats 29.02.1900 as 01.03.1990, i.e. is the same decimal number
@@ -547,28 +550,28 @@ def date2dec(calendar = 'standard', units=None,
                         output[i] -= 1.
     elif calendar == 'excel1904':
         if units is None: units = 'days since 1903-12-31 00:00:00'
-        if nt.__version__ > '1.1.8':
-            output = nt.date2num(timeobj, units, calendar='gregorian')
-        else:
+        if is121 and (nt.__version__ < '1.2.2'):
             for ii, tt in enumerate(timeobj): output[ii] = nt.date2num(tt, units, calendar='gregorian')
+        else:
+            output = nt.date2num(timeobj, units, calendar='gregorian')
     elif (calendar == '365_day') or (calendar == 'noleap'):
         if units is None: units = 'days since 0001-01-01 00:00:00'
-        if nt.__version__ > '1.1.8':
-            output = nt.date2num(timeobj, units, calendar='365_day')
-        else:
+        if is121 and (nt.__version__ < '1.2.2'):
             for ii, tt in enumerate(timeobj): output[ii] = nt.date2num(tt, units, calendar='365_day')
+        else:
+            output = nt.date2num(timeobj, units, calendar='365_day')
     elif (calendar == '366_day') or (calendar == 'all_leap'):
         if units is None: units = 'days since 0001-01-01 00:00:00'
-        if nt.__version__ > '1.1.8':
-            output = nt.date2num(timeobj, units, calendar='366_day')
-        else:
+        if is121 and (nt.__version__ < '1.2.2'):
             for ii, tt in enumerate(timeobj): output[ii] = nt.date2num(tt, units, calendar='366_day')
+        else:
+            output = nt.date2num(timeobj, units, calendar='366_day')
     elif calendar == '360_day':
         if units is None: units = 'days since 0001-01-01 00:00:00'
-        if nt.__version__ > '1.1.8':
-            output = nt.date2num(timeobj, units, calendar='360_day')
-        else:
+        if is121 and (nt.__version__ < '1.2.2'):
             for ii, tt in enumerate(timeobj): output[ii] = nt.date2num(tt, units, calendar='360_day')
+        else:
+            output = nt.date2num(timeobj, units, calendar='360_day')
     elif calendar == 'decimal':
         ntime = np.size(yr)
         leap  = np.array((((yr%4)==0) & ((yr%100)!=0)) | ((yr%400)==0))
