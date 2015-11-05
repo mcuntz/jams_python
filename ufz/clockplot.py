@@ -58,8 +58,10 @@ def clockplot(sub, si, sti=None, stierr=None,
               star        = None,                                # star symbols
               dystar      = 0.95,                                # % of ymax for stars
               scol        = '1.0',                               # star colour
+              sfcol       = 'None',                              # star face colour
               ssize       = 3.0,                                 # star size
               swidth      = 1.0,                                 # star edge width
+              ssym        = '*',                                 # star symbol
               sig         = 'J Mai & M Cuntz'):                  # signature
     """
         The clock plot with modules and up to three index stacks.
@@ -124,8 +126,10 @@ def clockplot(sub, si, sti=None, stierr=None,
                       star = None,
                       dystar = 0.95,
                       scol = '1.0',
+                      sfcol = 'None',
                       ssize = 3.0,
                       swidth = 1.0,
+                      ssym = '*',
                       sig = 'J Mai & M Cuntz'):
 
 
@@ -197,8 +201,10 @@ def clockplot(sub, si, sti=None, stierr=None,
         star = None,                                                                     star symbols
         dystar = 0.95,                                                                   % of ymax for stars
         scol = '1.0',                                                                    star colour
+        sfcol = 'None',                                                                  star face colour
         ssize = 3.0,                                                                     star size
         swidth = 1.0,                                                                    star edge width
+        ssym = '*',                                                                      star symbol
         sig = 'J Mai & M Cuntz'                                                          signature
 
 
@@ -544,7 +550,7 @@ def clockplot(sub, si, sti=None, stierr=None,
         xstar = (pleft+0.5*pwidth)[star.astype(np.bool)]
         ystar = np.ones(xstar.shape[0]) * ymax * dystar
         star_mucm = sub.plot(xstar, ystar, linestyle='none',
-                             marker='*', markeredgecolor=scol, markerfacecolor='None',
+                             marker=ssym, markeredgecolor=scol, markerfacecolor=sfcol,
                              markersize=ssize, markeredgewidth=swidth)
 
     # subplot numbering
