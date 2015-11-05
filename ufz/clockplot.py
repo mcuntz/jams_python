@@ -625,7 +625,7 @@ def clockplot(sub, si, sti=None, stierr=None,
                 dxstar1 = 0.15
             dystar1 = 1. - (2.*nsi+1.01)/2. * shifty
             lsub.plot([dxstar1], [dystar1], linestyle='none', clip_on=False,
-                      marker='*', markeredgecolor=scol, markerfacecolor='None',
+                      marker=ssym, markeredgecolor=scol, markerfacecolor=sfcol,
                       markersize=ssize, markeredgewidth=swidth)
             lsub.text(dx1, dystar1, isaname[nsi], fontsize=ntextsize,
                       horizontalalignment='left', verticalalignment='center')
