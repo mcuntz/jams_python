@@ -566,7 +566,10 @@ from .pca               import pca, check_pca
 from .pi                import pi
 from .position          import position
 from .readhdf           import readhdf, hdfread
-from .readhdf4          import readhdf4, hdf4read
+try:
+    from .readhdf4          import readhdf4, hdf4read
+except ImportError:
+    pass # not installed
 from .readhdf5          import readhdf5, hdf5read
 from .readnetcdf        import readnetcdf, netcdfread, ncread, readnc
 from .rgb               import rgb_blend, rgb_range, rgb_gradient
