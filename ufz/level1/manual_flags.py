@@ -84,11 +84,13 @@ def get_manual_flags(flagfile, variable, dendro=None, julian=True):
     start   = sdat[:,1]
     end     = sdat[:,2]
     flag    = sdat[:,3]
-    if dendro == True:
+    if dendro:
         dbh     = sdat[:,4]
-        dbh[dbh==''] = '0'
+        ii = np.where(dbh=='')[0]
+        if ii.size > 0: dbh[ii] = '0'
         d_ini   = sdat[:,5]
-        d_ini[d_ini==''] = '0'
+        ii = np.where(d_ini=='')[0]
+        if ii.size > 0: d_ini[ii] = '0'
     # comment = sdat[:,-1]
      
     # select variable
@@ -97,7 +99,7 @@ def get_manual_flags(flagfile, variable, dendro=None, julian=True):
         sdate   = start[ii]
         edate   = end[ii]
         mflag   = flag[ii].astype(np.int)
-        if dendro == True:
+        if dendro:
             l_dbh   = dbh[ii].astype(np.float)
             l_d_ini = d_ini[ii].astype(np.float)
         # Fill default dates
@@ -114,11 +116,11 @@ def get_manual_flags(flagfile, variable, dendro=None, julian=True):
         sdate = list()
         edate = list()
         mflag = list()
-        if dendro == True:
+        if dendro:
             l_dbh   = list()
             l_d_ini = list()
 
-    if dendro == True:
+    if dendro:
         return [sdate, edate, mflag, l_dbh, l_d_ini]  
     else:
         return [sdate, edate, mflag]   
