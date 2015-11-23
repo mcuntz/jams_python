@@ -2,6 +2,7 @@
 from __future__ import print_function
 import numpy as np
 from ufz.date2dec import date2dec
+from ufz.ascii2ascii import ascii2ascii
 
 def t2sap(date, data, swd=None, undef=-9999.):
     """
@@ -108,7 +109,7 @@ def t2sap(date, data, swd=None, undef=-9999.):
     data_masked = np.ma.array(data, mask=(data==undef))
 
     # julian day
-    jd        = np.array(date2dec(ascii = date))
+    jd        = np.array(date2dec(ascii = ascii2ascii(date)))
     # integer julian day 
     jd_int    = jd.astype(np.int)
     # unique days
