@@ -483,6 +483,7 @@
               AW, Sep 2015 - samevalue
               MC, Oct 2015 - str2tex, lat_fmt, lon_fmt
               MC, Oct 2015 - directories_from_gui
+              ST, Nov 2015 - added kge
 """
 from __future__ import print_function
 
@@ -519,7 +520,7 @@ from .dewpoint          import dewpoint
 from .dielectric_water  import dielectric_water
 from .division          import division, div
 from .ellipse_area      import ellipse_area
-from .errormeasures     import bias, mae, mse, rmse, nse, pear2
+from .errormeasures     import bias, mae, mse, rmse, nse, kge, pear2
 from .esat              import esat
 from .fgui              import directories_from_gui, directory_from_gui, file_from_gui, files_from_gui
 from .fdir              import flow_direction

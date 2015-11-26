@@ -14,6 +14,7 @@ from scipy.stats import t
     def mse(y_obs,y_mod):       mean squared error
     def rmse(y_obs,y_mod):      root mean squared error
     def nse(y_obs,y_mod):       Nash-Sutcliffe-Efficiency
+    def kge(y_obs,y_mod):       Kling-Gupta-Efficiency
     def pear2(y_obs,y_mod):     Squared Pearson correlation coefficient
     def confint(y_obs, p=0.95): Confidence interval of samples
     
@@ -67,6 +68,7 @@ from scipy.stats import t
     Written, AP, Jul 2014
     Modified MC, Dec 2014 - use simple formulas that work with normal and masked arrays but do not deal with NaN
     Modified AP, Sep 2015 - add confidence interval
+    Modified ST, Nov 2015 - added KGE
 """
 
 def bias(y_obs,y_mod):
@@ -234,6 +236,46 @@ def nse(y_obs,y_mod):
     #     b = np.ma.sum((y_obsr - np.ma.mean(y_obsr))**2)
     # return 1. - (a / b)
     return 1. - ((y_obs-y_mod)**2).sum()/((y_obs-y_obs.mean())**2).sum()
+
+
+def kge(y_obs,y_mod):
+    """
+    calculates Kling-Gupta-Efficiency = 1 - sqrt((1-r)**2 + (1-a)**2 + (1-b)**2),
+    where r is the Pearson correlation of y_obs and y_mod,
+          a is mean(y_mod) / mean(y_obs), and
+          b is std(y_mod) / std(y_obs)
+       
+    Examples
+    --------
+    >>> # Create some data
+    >>> y_obs = np.array([12.7867, 13.465, 14.1433, 15.3733, 16.6033])
+    >>> y_mod = np.array([12.8087, 13.151, 14.3741, 16.2302, 17.9433])
+    >>> # calculate Kling-Gupta-Efficiency
+    >>> print(np.round(kge(y_obs, y_mod),2))
+    0.58
+
+    """
+    # # check
+    # if (y_obs.ndim!=1) or (y_mod.ndim!=1):
+    #     raise ValueError('r2: input must be 1D')
+    # elif y_obs.size!=y_mod.size:
+    #     raise ValueError('r2: input must be of same size')
+    # # calc
+    # else:
+    #     # check if masked or not
+    #     try:
+    #         temp = y_obs.mask
+    #         temp = y_mod.mask
+    #     except AttributeError:
+    #         y_obs=np.ma.array(y_obs, mask=np.isnan(y_obs))
+    #         y_mod=np.ma.array(y_mod, mask=np.isnan(y_mod))
+    #     y_modr = np.ma.array(y_mod, mask=y_mod.mask | y_obs.mask)    
+    #     y_obsr = np.ma.array(y_obs, mask=y_mod.mask | y_obs.mask)
+    #     r = np.ma.corrcoef(y_obsr, y_modr)[0, 1]
+    #     a = np.ma.mean(y_modr) / np.ma.mean(y_obsr)
+    #     b = np.ma.std(y_modr) / np.ma.std(y_obsr)
+    # return 1. - np.sqrt((1 - r)**2 + (1 - a)**2 + (1 - b)**2)
+    return 1. - np.sqrt((1 - np.corrcoef(y_obs, y_mod)[0, 1])**2 + (1 - np.mean(y_mod) / np.mean(y_obs))**2 + (1 - np.std(y_mod) / np.std(y_obs))**2)
 
 
 def pear2(y_obs,y_mod):
