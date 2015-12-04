@@ -110,6 +110,7 @@
     rgb_blend              Calculates colour between two given colors in rgb space.
     rgb_gradient           n interpolated colours in rgb space between several colours changing at certain fractions.
     rgb_range              n interpolated colours in rgb space between two colours
+    river_network          a class for creating a river network from a DEM including flow direction, flow accumulation and channel order
     roman2int              Roman numeral to integer conversion.
     rossner                Wrapper for outlier.
     t2sap                  Conversion of temperature difference to sap flux density.
@@ -240,7 +241,8 @@
     Hydrology
     ---------
     baseflow               Calculate baseflow from discharge timeseries
-
+    river_network          a class for creating a river network from a DEM including flow direction, flow accumulation and channel order
+    
 
     Isotopes
     --------
@@ -484,6 +486,7 @@
               MC, Oct 2015 - str2tex, lat_fmt, lon_fmt
               MC, Oct 2015 - directories_from_gui
               ST, Nov 2015 - added kge
+              ST, Dec 2015 - added river_network
 """
 from __future__ import print_function
 
@@ -523,7 +526,7 @@ from .ellipse_area      import ellipse_area
 from .errormeasures     import bias, mae, mse, rmse, nse, kge, pear2
 from .esat              import esat
 from .fgui              import directories_from_gui, directory_from_gui, file_from_gui, files_from_gui
-from .fdir              import stream_network
+from .river_network     import river_network
 from .field_gen         import Field, Incompr_Field, Filtered_Incompr_Field
 from .fill_nonfinite    import fill_nonfinite
 from .find_in_path      import find_in_path

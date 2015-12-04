@@ -39,8 +39,81 @@ local_flow_direction = np.array([8, 16, 32, 4, -1, 64, 2, 1, 128])
 inflow_direction = np.array([128, 1, 2, 64, -9999, 4, 32, 16, 8])
 
 
-class stream_network(object):
-    def __init__(self, dem=None, fdir=None, co=None, do_co=False, fa=None, do_fa=False):
+class river_network(object):
+    def __init__(self, dem=None, fdir=None, co=None, do_co=False, fa=None, do_fa=False, print_info=False):
+        """
+            Initializes a river_network object describing the flow path of a river through the landscape.
+
+            Definition
+            ----------
+            river_network(dem=None, fdir=None, co=None, do_co=False, fa=None, do_fa=False):
+
+
+            Input
+            -----
+            dem          digital elevation model (dem), basis for calculating flow direction fdir
+            fdir         flow direction following convention below.
+
+            Optional Input Parameters
+            -------------------------
+            co           channel order following Strahler 1952
+            do_co        flag for calculating channel order
+            fa           flow accumulation
+            do_fa        flag for calculating flow accumulation
+            print_info   flag for printing additional information
+
+            Options
+            -------
+
+            Output
+            ------
+
+            Restrictions
+            ------------
+                Either dem or fdir has to be provided, both cannot be omitted.
+                
+                The origin of the flow direction field is assumed to be located in the upper left corner.
+                Then flow directions are following this convention:
+
+                Flow direction is assumed like this meaning that the ORIGIN IS THE UPPER LEFT CORNER
+                          64             y-axis
+                      32      128          |
+                  16      -1       1       |
+                       8       2          \|/
+                           4               V
+                     x-axis ------>
+
+                Sinks are marked by -1.
+
+            Examples
+            --------
+                   
+            License
+            -------
+            This file is part of the UFZ Python package.
+
+            The UFZ Python package is free software: you can redistribute it and/or modify
+            it under the terms of the GNU Lesser General Public License as published by
+            the Free Software Foundation, either version 3 of the License, or
+            (at your option) any later version.
+
+            The UFZ Python package is distributed in the hope that it will be useful,
+            but WITHOUT ANY WARRANTY; without even the implied warranty of
+            MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+            GNU Lesser General Public License for more details.
+
+            You should have received a copy of the GNU Lesser General Public License
+            along with the UFZ makefile project (cf. gpl.txt and lgpl.txt).
+            If not, see <http://www.gnu.org/licenses/>.
+
+            Copyright 2009-2015 Stephan Thober
+
+
+            History
+            -------
+            Written,  ST, Dec 2015
+            Modified                
+        """
         # initialize all arrays
         self.dem = None # digital elevation model
         self.fdir = None # flow direction
@@ -48,19 +121,19 @@ class stream_network(object):
         self.co = None # channel order
         self.fa = None # flow accumulation
         # consistency check
-        if fdir == None and dem == None:
-            raise ValueError('***ERROR: specify either dem or fdir to create a stream_network object')
-        if fdir == None:
+        if fdir is None  and dem is None:
+            raise ValueError('***ERROR: specify either dem or fdir to create a river_network object')
+        if fdir is None:
             # create flow direction if necessary
             self.dem = dem
             self.fdir = self.flow_direction()
         else:
             self.fdir = fdir
         # assign flow accumulation
-        if not fa == None:
+        if not fa is None:
             self.fa = fa
         # assign channel order
-        if not co == None:
+        if not co is None:
             self.co = co
         # assign sinks
         self.sinks = self._get_sinks()
@@ -69,23 +142,102 @@ class stream_network(object):
             self.co = np.zeros(self.fdir.shape)
             self.fa = np.zeros(self.fdir.shape)
             for ii in np.arange(self.sinks[0].shape[0]):
-                co, fa = self.network_properties(self.fdir, self.sinks[0][ii], self.sinks[1][ii],
-                                            do_co=do_co, co=self.co,
-                                            do_fa=do_fa, fa=self.fa)
+                self.co, self.fa = self.network_properties(self.fdir, self.sinks[0][ii], self.sinks[1][ii],
+                                                           do_co=do_co, co=self.co,
+                                                           do_fa=do_fa, fa=self.fa,
+                                                           print_info=print_info)
         elif do_co and not do_fa:
             self.co = np.zeros(self.fdir.shape)
             for ii in np.arange(self.sinks[0].shape[0]):
                 self.co = self.network_properties(self.fdir, self.sinks[0][ii], self.sinks[1][ii],
                                                   do_co=do_co, co=self.co,
-                                                  do_fa=do_fa)
+                                                  do_fa=do_fa,
+                                                  print_info=print_info)
         elif not do_co and do_fa:
             self.fa = np.zeros(self.fdir.shape)
             for ii in np.arange(self.sinks[0].shape[0]):
                 self.fa = self.network_properties(self.fdir, self.sinks[0][ii], self.sinks[1][ii],
                                                   do_co=do_co,
-                                                  do_fa=do_fa, fa=self.fa)
-    
+                                                  do_fa=do_fa, fa=self.fa,
+                                                  print_info=print_info)
+
+
     def flow_direction(self):
+        """
+            Calculates flow direction from a DEM.
+
+            Definition
+            ----------
+            def flow_direction(self)
+
+
+            Input
+            -----
+            self         self - river_network object containing a dem array
+
+            Optional Input Parameters
+            -------------------------
+
+            Options
+            -------
+
+            Output
+            ------
+            fd           array containing flow direction with the following convention
+
+            Restrictions
+            ------------
+                The origin of the flow direction field is assumed to be located in the upper left corner.
+                Then flow directions are following this convention:
+
+                flow direction is assumed like this meaning that the ORIGIN IS THE UPPER LEFT CORNER
+                          64             y-axis
+                      32      128          |
+                  16      -1       1       |
+                       8       2          \|/
+                           4               V
+                     x-axis ------>
+
+                Sinks are marked by -1.
+
+            Examples
+            --------
+            >>> # Create some data
+            >>> dem = np.ma.array([[ 30,   2,   1],
+            ...                    [  5,  10,  25],
+            ...                    [ 15,  23,  24]])
+            >>> dem.mask = np.zeros(dem.shape, dtype='bool')
+            >>> river_network(dem=dem, do_fa=False, do_co=False).fdir
+            array([[   1.,    1.,   -1.],
+                   [ 128.,  128.,   64.],
+                   [  64.,   32.,   32.]])
+                   
+            License
+            -------
+            This file is part of the UFZ Python package.
+
+            The UFZ Python package is free software: you can redistribute it and/or modify
+            it under the terms of the GNU Lesser General Public License as published by
+            the Free Software Foundation, either version 3 of the License, or
+            (at your option) any later version.
+
+            The UFZ Python package is distributed in the hope that it will be useful,
+            but WITHOUT ANY WARRANTY; without even the implied warranty of
+            MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+            GNU Lesser General Public License for more details.
+
+            You should have received a copy of the GNU Lesser General Public License
+            along with the UFZ makefile project (cf. gpl.txt and lgpl.txt).
+            If not, see <http://www.gnu.org/licenses/>.
+
+            Copyright 2009-2015 Stephan Thober, David Schaefer
+
+
+            History
+            -------
+            Written,  ST & DS, Dec 2015
+            Modified                
+        """
         # global variable used: correct_direction
         fd = np.zeros(self.dem.shape)
         #
@@ -94,7 +246,7 @@ class stream_network(object):
                 if self.dem.mask[ii, jj]:
                     continue
                 # get mask of neighbors and y and x locations
-                neighbors, yy, xx = _get_neighbors(self.dem, ii, jj)
+                neighbors, yy, xx = self._get_neighbors(self.dem, ii, jj)
                 # get position of cell with steepest gradient
                 pos_min = np.ma.argmin(self.dem[yy, xx] - self.dem[ii, jj])
                 fd[ii, jj] = local_flow_direction[neighbors][pos_min]
@@ -105,6 +257,10 @@ class stream_network(object):
         """
             Calculates channel order number and flow accumulation starting from one sink in a flow direction map
 
+            channel order is calculated following Strahler 1952. It is ONE for headwater. If channels join, the
+            channel order of the resulting stream is the highest one of the inflowing streams, if two or more than
+            two inflowing streams have the highest channel order, the channel order of the resulting stream is one
+            higher than the highest channel order of the inflowing streams.
 
             Definition
             ----------
@@ -113,8 +269,8 @@ class stream_network(object):
 
             Input
             -----
-            file         self - stream_network object
-            fd           flow direction field, basically stream_network.fd
+            self         self - river_network object
+            fd           flow direction field, basically river_network.fd
             yy           row coordinate of sink
             xx           column coordinate of sink
 
@@ -151,13 +307,15 @@ class stream_network(object):
                 The origin of the flow direction field is assumed to be located in the upper left corner.
                 Then flow directions are following this convention:
 
-                flow direction is assumed like this
+                flow direction is assumed like this meaning that the ORIGIN IS THE UPPER LEFT CORNER
                           64             y-axis
                       32      128          |
                   16      -1       1       |
                        8       2          \|/
                            4               V
                      x-axis ------>
+
+                Sinks are marked by -1.
 
             Examples
             --------
@@ -171,7 +329,7 @@ class stream_network(object):
             ...          [  1,  64,  64, 64,   1,   1,   1,  1, -1],
             ...          [  1,   2, 128, 64, 128,   1, 128, 64, 64],
             ...          [128,   1, 128, 64, 128, 128,  64, 64, 16]])
-            >>> stream_network(fdir=fd, do_fa=False, do_co=True).co
+            >>> river_network(fdir=fd, do_fa=False, do_co=True).co
             array([[ 1.,  1.,  1.,  1.,  1.,  1.,  1.,  1.,  1.],
                    [ 1.,  2.,  1.,  1.,  2.,  1.,  1.,  2.,  1.],
                    [ 1.,  1.,  3.,  3.,  3.,  3.,  1.,  2.,  1.],
@@ -181,7 +339,7 @@ class stream_network(object):
                    [ 1.,  1.,  1.,  2.,  1.,  2.,  3.,  3.,  4.],
                    [ 1.,  2.,  1.,  2.,  1.,  1.,  2.,  1.,  1.],
                    [ 1.,  1.,  2.,  1.,  1.,  1.,  1.,  1.,  1.]])
-            >>> stream_network(fdir=fd, do_fa=True, do_co=True).fa
+            >>> river_network(fdir=fd, do_fa=True, do_co=False).fa
             array([[  1.,   1.,   2.,   3.,   1.,   2.,   1.,   1.,   1.],
                    [  1.,   4.,   1.,   2.,   7.,   3.,   2.,   3.,   1.],
                    [  1.,   1.,  28.,  31.,  39.,  44.,   3.,   5.,   1.],
@@ -215,23 +373,12 @@ class stream_network(object):
 
             History
             -------
-            Written,  ST, Dec 2015
+            Written,  ST & DS, Dec 2015
             Modified                
         """
-        # calculate channel order according to Strahler 1952 and flow accumulation
-        #
-        # do_co - flag for calculating channel order
-        # do_fa - flag for calculating flow accumulation
-        #
-        # channel order of headwater is ONE, if channels join, the channel order
-        # of the resulting stream is the highest one of the inflowing streams,
-        # if two or more than two inflowing streams have the highest channel order,
-        # the channel order of the resulting stream is one higher than the highest
-        # channel order of the inflowing streams
-        # -------------------------------------------------------------------------
-        if co == None:
+        if co is None and do_fa:
             co = np.zeros(fd.shape)
-        if fa == None and do_fa:
+        if fa is None and do_fa:
             fa = np.zeros(fd.shape)
         # flow direction stack to emulate recursion
         if not do_co and not do_fa:
@@ -243,7 +390,12 @@ class stream_network(object):
             upstream = self._get_upstream(fd, fd_stack[-1])
             if print_info:
                 print('upstream locations: ', upstream)
-            ext = [l for l in upstream if co[l[0],l[1]] == 0]
+            if do_co:
+                # use co for identifying upstream cells
+                ext = [l for l in upstream if co[l[0],l[1]] == 0]
+            else:
+                # use fa for identifying upstream cells
+                ext = [l for l in upstream if fa[l[0],l[1]] == 0]
             if ext:
                 fd_stack.extend(ext)
                 continue
@@ -269,6 +421,7 @@ class stream_network(object):
             return co
         elif not do_co and do_fa:
             return fa
+
 
     def _get_sinks(self, sink=-1):
         return np.ma.where(self.fdir == sink)
@@ -302,4 +455,3 @@ class stream_network(object):
 if __name__ == '__main__':
     import doctest
     doctest.testmod(optionflags=doctest.NORMALIZE_WHITESPACE)
-    print('Done')
