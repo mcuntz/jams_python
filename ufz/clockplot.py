@@ -14,7 +14,9 @@ def clockplot(sub, si, sti=None, stierr=None,
               elwidth     = 1.0,            # errorbar line width
               alwidth     = 1.0,            # axis line width
               glwidth     = 0.5,            # grid line width
+              acol        = 'black',        # axis colour
               mcol        = '0.4',          # grid colour
+              ecol        = 'black',        # error bar colour
               mcols       = ['0.0', '0.4', '0.4', '0.7', '0.7', '1.0'],      # stack colors
               lcols       = ['None', 'None', 'None', 'None', 'None', '0.0'], # stack bourder colours
               hatches     = [None, None, None, None, None, '//'],            # stack hatching
@@ -80,7 +82,9 @@ def clockplot(sub, si, sti=None, stierr=None,
                       elwidth     = 1.0,
                       alwidth     = 1.0,
                       glwidth     = 0.5,
+                      acol        = 'black',
                       mcol        = '0.4',
+                      ecol        = 'black',
                       mcols       = ['0.0', '0.4', '0.4', '0.7', '0.7', '1.0'],
                       lcols       = ['None', 'None', 'None', 'None', 'None', '0.0'],
                       hatches     = [None, None, None, None, None, '//'],
@@ -155,7 +159,9 @@ def clockplot(sub, si, sti=None, stierr=None,
         elwidth = 1.0                errorbar line width
         alwidth = 1.0                axis line width
         glwidth = 0.5                grid line width
+        acol = 'black'               axis colour
         mcol = '0.4'                 grid colour
+        ecol = 'black',              error bar colour
         mcols = ['0.0', '0.4', '0.4', '0.7', '0.7', '1.0']        stack colors
         lcols = ['None', 'None', 'None', 'None', 'None', '0.0']   stack border colours
         hatches = [None, None, None, None, None, '//']            stack hatching
@@ -279,6 +285,7 @@ def clockplot(sub, si, sti=None, stierr=None,
     if sti is not None:
         idsi = isti-isi
 
+    # alignement of module names
     if modhalign is not None:
         if isinstance(modhalign, (list, tuple, np.ndarray)):
             assert len(modul) == len(modhalign), 'modhalign must be scalar or same size as modul.'
@@ -296,6 +303,7 @@ def clockplot(sub, si, sti=None, stierr=None,
     else:
         imodvalign = ['center']*len(modul)
 
+    # Prepare annotations
     if type(saname) is list:
         isaname = saname[:]
     else:
@@ -304,7 +312,6 @@ def clockplot(sub, si, sti=None, stierr=None,
         ismod = modul[:]
     else:
         ismod = [modul]
-    # Prepare annotations
     if usetex:
         imod = []
         for ii, i in enumerate(ismod):
@@ -468,7 +475,7 @@ def clockplot(sub, si, sti=None, stierr=None,
     # in "axis normal coordinates" for rectangular ticks, etc.
     dyy    = np.array([0,ymax])
     yy     = ((1.+2.*bpar)*ymax+dyy)/((2.+2.*bpar)*ymax)
-    yaxis  = sub.plot([0.5,0.5], yy, transform=sub.transAxes, linestyle='-', linewidth=alwidth, color='k')
+    yaxis  = sub.plot([0.5,0.5], yy, transform=sub.transAxes, linestyle='-', linewidth=alwidth, color=acol)
     nyticks = 5
     xx      = np.ones(nyticks)*0.5
     dyy     = np.linspace(0,ymax,nyticks)
@@ -476,7 +483,7 @@ def clockplot(sub, si, sti=None, stierr=None,
     ytickwidth = 0.015
     for i in range(nyticks):
         yticks = sub.plot([xx[i],xx[i]+ytickwidth], [yy[i],yy[i]], transform=sub.transAxes,
-                          linestyle='-', linewidth=alwidth, color='k')
+                          linestyle='-', linewidth=alwidth, color=acol)
     # y-tickmarks at top and bottom
     tx = xx[0]+1.5*ytickwidth
     ty = yy[0]
@@ -538,11 +545,11 @@ def clockplot(sub, si, sti=None, stierr=None,
             pewidth = 0.1*n2rad
             for i in range(xx.size):
                 yerrm = sub.plot([xx[i],xx[i]], [yy[i]-perr[i],yy[i]+perr[i]], # middle line
-                                 linestyle='-', linewidth=elwidth, color='k')
+                                 linestyle='-', linewidth=elwidth, color=ecol)
                 yerrl = sub.plot([xx[i]-pewidth,xx[i]+pewidth], [yy[i]-perr[i],yy[i]-perr[i]], # lower bar
-                                 linestyle='-', linewidth=elwidth, color='k')
+                                 linestyle='-', linewidth=elwidth, color=ecol)
                 yerru = sub.plot([xx[i]-pewidth,xx[i]+pewidth], [yy[i]+perr[i],yy[i]+perr[i]], # upper bar
-                                 linestyle='-', linewidth=elwidth, color='k')
+                                 linestyle='-', linewidth=elwidth, color=ecol)
 
     # Stars
     if star is not None:
@@ -578,12 +585,12 @@ def clockplot(sub, si, sti=None, stierr=None,
     sub.set_yticks([])
     sub.set_yticklabels([])
 
-    # Fake subplot for legend and numbering
-    spos = sub.get_position()
-    fig  = sub.get_figure()
-    lsub = fig.add_axes([spos.x0+llxbbox*spos.width, spos.y0+llybbox*spos.height, 0.5*spos.width, 0.1*spos.height])
-
     if dolegend:
+        # Fake subplot for legend and numbering
+        spos = sub.get_position()
+        fig  = sub.get_figure()
+        lsub = fig.add_axes([spos.x0+llxbbox*spos.width, spos.y0+llybbox*spos.height, 0.5*spos.width, 0.1*spos.height])
+
         x1, y1 = lsub.transData.transform_affine(np.array([0,0]))
         x2, y2 = lsub.transData.transform_affine(np.array([1,1]))
         dpi = lsub.figure.dpi                         # pixels per inch
@@ -630,15 +637,15 @@ def clockplot(sub, si, sti=None, stierr=None,
             lsub.text(dx1, dystar1, isaname[nsi], fontsize=ntextsize,
                       horizontalalignment='left', verticalalignment='center')
 
-    lsub.set_xlim([0,1])
-    lsub.set_ylim([0,1])
+        lsub.set_xlim([0,1])
+        lsub.set_ylim([0,1])
 
-    lsub.set_title('')
-    lsub.set_xlabel('')
-    lsub.set_ylabel('')
-    lsub.set_xticks([])
-    lsub.set_yticks([])
-    lsub.set_axis_off()
+        lsub.set_title('')
+        lsub.set_xlabel('')
+        lsub.set_ylabel('')
+        lsub.set_xticks([])
+        lsub.set_yticks([])
+        lsub.set_axis_off()
 
 
 if __name__ == '__main__':
