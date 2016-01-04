@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 from __future__ import print_function
 """
-usage: mc_template.py [-h] [-u] [-p plotname] [-t outtype] [infile]
+usage: mc_template.py [-h] [-u] [-p plotname] [-s] [-t outtype] [-w] [infile]
 
 This is the Python template for any new program of Matthias Cuntz.
 
@@ -18,6 +18,7 @@ optional arguments:
                         Output type is pdf, png, html, or d3 (default: open
                         screen windows).
   -u, --usetex          Use LaTeX to render text in pdf, png and html.
+  -w, --white           White lines on transparent or black background; default: black lines on transparent or white background.
 
 
 License
@@ -50,6 +51,7 @@ Modified, MC, Jul 2013 - optparse->argparse
           MC, Nov 2014 - script -> function
                        - pdf, png, html, or d3
           MC, Sep 2015 - Serif and sans serif fonts
+          MC, Dec 2015 - white lines on black or transparent background
 """
 
 # -------------------------------------------------------------------------
@@ -78,6 +80,7 @@ if __name__ == '__main__':
     outtype  = ''
     usetex   = False
     serif    = False
+    dowhite  = False
     parser   = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter,
                                        description='''This is the Python template for any new program of Matthias Cuntz.''')
     parser.add_argument('-p', '--plotname', action='store',
@@ -91,8 +94,10 @@ if __name__ == '__main__':
                         help='Output type is pdf, png, html, or d3 (default: open screen windows).')
     parser.add_argument('-u', '--usetex', action='store_true', default=usetex, dest="usetex",
                         help="Use LaTeX to render text in pdf, png and html.")
+    parser.add_argument('-w', '--white', action='store_true', default=dowhite, dest="dowhite",
+                        help="White lines on transparent or black background; default: black lines on transparent or white background.")
     parser.add_argument('file', nargs='?', default=None, metavar='infile',
-                       help='Mandatory input file.')
+                        help='Mandatory input file.')
 
     args     = parser.parse_args()
     infile   = args.file
@@ -100,6 +105,7 @@ if __name__ == '__main__':
     outtype  = args.outtype
     serif    = args.serif
     usetex   = args.usetex
+    dowhite  = args.dowhite
 
     del parser, args
 # Comment|Uncomment - End
@@ -109,7 +115,7 @@ if __name__ == '__main__':
 #
 
 # Comment|Uncomment - Begin
-# def mc_template(infile=None, plotname='', outtype='', serif=False, usetex=False):
+# def mc_template(infile=None, plotname='', outtype='', serif=False, usetex=False, dowhite=False):
 #     """
 #     This is the Python template for any new program of Matthias Cuntz.
 
@@ -126,6 +132,7 @@ if __name__ == '__main__':
 #                             Output type is pdf, png, html, or d3 (default: open
 #                             screen windows).
 #       -u, --usetex          Use LaTeX to render text in pdf, png and html.
+#       -w, --white           White lines on transparent or black background; default: black lines on transparent or white background.
 #     """
 # Comment|Uncomment - End
 
@@ -154,6 +161,14 @@ if __name__ == '__main__':
             print("No mpld3 found. Use output type html instead of d3.")
             outtype = 'html'
 
+    if dowhite:
+        fgcolor = 'white'
+        bgcolor = 'black'
+    else:
+        fgcolor = 'black'
+        bgcolor = 'white'
+
+
     # -------------------------------------------------------------------------
     # Customize plots
     #
@@ -174,12 +189,15 @@ if __name__ == '__main__':
     msize       = 1.0         # marker size
     mwidth      = 1.0         # marker edge width
     mcol1       = ufz.color.colours('red')        # primary marker colour
-    mcol2       = '0.0'                     # secondary
+    mcol2       = fgcolor                     # secondary
     mcol3       = (202/255.,0/255.,32/255.) # third
-    mcols       = ufz.color.colours(['blue','red','darkgray','orange','darkblue','black'])
+    if dowhite:
+        mcols       = ufz.color.colours(['blue','red','lightgray','orange','lightblue',fgcolor])
+    else:
+        mcols       = ufz.color.colours(['blue','red','darkgray','orange','darkblue','black'])
     lcol1       = ufz.color.colours('blue')   # primary line colour
-    lcol2       = '0.0'
-    lcol3       = '0.0'
+    lcol2       = fgcolor
+    lcol3       = fgcolor
     lcols       = mcols
 
     # Legend
@@ -257,9 +275,18 @@ if __name__ == '__main__':
         mpl.rc('figure', figsize=(4./5.*8.27,4./5.*11.69)) # a4 portrait
     mpl.rc('text.latex', unicode=True)
     mpl.rc('font', size=textsize)
-    mpl.rc('lines', linewidth=lwidth, color='black')
-    mpl.rc('axes', linewidth=alwidth, labelcolor='black')
     mpl.rc('path', simplify=False) # do not remove
+    # print(mpl.rcParams)
+    mpl.rc('axes', linewidth=alwidth, edgecolor=fgcolor, facecolor=bgcolor, labelcolor=fgcolor)
+    mpl.rc('figure', edgecolor=bgcolor, facecolor='grey')
+    mpl.rc('grid', color=fgcolor)
+    mpl.rc('lines', linewidth=lwidth, color=fgcolor)
+    mpl.rc('patch', edgecolor=fgcolor)
+    mpl.rc('savefig', edgecolor=bgcolor, facecolor=bgcolor)
+    mpl.rc('patch', edgecolor=fgcolor)
+    mpl.rc('text', color=fgcolor)
+    mpl.rc('xtick', color=fgcolor)
+    mpl.rc('ytick', color=fgcolor)
 
 
     # -------------------------------------------------------------------------
@@ -323,8 +350,8 @@ if __name__ == '__main__':
     sub    = fig.add_axes(ufz.position(nrow,ncol,iplot,hspace=hspace,vspace=vspace))
 
     mark1  = sub.plot(np.sin(np.arange(100)))
-    plt.setp(mark1, linestyle='None', marker='o', markeredgecolor=mcol1, markerfacecolor='None',
-             markersize=msize, markeredgewidth=mwidth, label=r'UniNorm')
+    plt.setp(mark1, linestyle='none', marker='o', markeredgecolor=mcol1, markerfacecolor='none',
+             markersize=msize, markeredgewidth=mwidth)
 
     plt.setp(sub, xlabel=xlab)
     plt.setp(sub, ylabel=ylab)
@@ -390,7 +417,7 @@ if __name__ == '__main__':
 
 
     line1 = sub.plot(2.*np.sin(np.arange(100)))
-    plt.setp(line1, linestyle='-', linewidth=lwidth, marker=None, color=lcol1, label='Gauss')
+    plt.setp(line1, linestyle='-', linewidth=lwidth, marker=None, color=lcol1)
 
     plt.setp(sub, xlabel=xlab)
     plt.setp(sub, ylabel=ylab)
@@ -464,6 +491,7 @@ if __name__ == '__main__':
 #     outtype  = ''
 #     usetex   = False
 #     serif    = False
+#     dowhite  = False
 #     parser   = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter,
 #                                        description='''This is the Python template for any new program of Matthias Cuntz.''')
 #     parser.add_argument('-p', '--plotname', action='store',
@@ -477,8 +505,10 @@ if __name__ == '__main__':
 #                         help='Output type is pdf, png, html, or d3 (default: open screen windows).')
 #     parser.add_argument('-u', '--usetex', action='store_true', default=usetex, dest="usetex",
 #                         help="Use LaTeX to render text in pdf, png and html.")
+#     parser.add_argument('-w', '--white', action='store_true', default=dowhite, dest="dowhite",
+#                         help="White lines on transparent or black background; default: black lines on transparent or white background.")
 #     parser.add_argument('file', nargs='?', default=None, metavar='infile',
-#                        help='Mandatory input file.')
+#                         help='Mandatory input file.')
 
 #     args     = parser.parse_args()
 #     infile   = args.file
@@ -486,10 +516,11 @@ if __name__ == '__main__':
 #     outtype  = args.outtype
 #     serif    = args.serif
 #     usetex   = args.usetex
+#     dowhite  = args.dowhite
 
 #     del parser, args
     
 #     # Call function
-#     mc_template(infile, plotname=plotname, outtype=outtype, usetex=usetex)
+#     mc_template(infile, plotname=plotname, outtype=outtype, usetex=usetex, dowhite=dowhite)
 
 # Comment|Uncomment - End
