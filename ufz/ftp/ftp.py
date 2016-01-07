@@ -6,12 +6,15 @@ import glob
 import time
 from ufz.argsort import argsort
 
-__all__ = ['get_binary', 'get_check_binary', 'get_check_unix_ascii',
-           'get_check_windows_ascii', 'get_names', 'get_names_dates',
-           'get_names_dates_sizes', 'get_names_sizes', 'get_names_times',
-           'get_names_times_sizes', 'get_size',
-           'get_sizes', 'get_unix_ascii', 'get_windows_ascii',
-           'set_mtime']
+__all__ = ['get_binary', 'get_check_binary',
+           'get_mac_ascii', 'get_check_mac_ascii',
+           'get_unix_ascii', 'get_check_unix_ascii',
+           'get_windows_ascii', 'get_check_windows_ascii',
+           'get_names', 'get_names_dates', 'get_names_sizes', 'get_names_times',
+           'get_names_dates_sizes', 'get_names_times_sizes',
+           'get_size', 'get_sizes',
+           'set_mtime',
+           'put_binary', 'put_check_binary']
 
 # ------------------------------------------------------------------------------------------
 
@@ -161,6 +164,420 @@ def get_check_binary(ftp, fname):
 
 # ------------------------------------------------------------------------------------------
 
+def get_mac_ascii(ftp, fname):
+    """
+        Get a Mac ascii file from an open FTP connection.
+
+
+        Definition
+        ----------
+        def get_mac_ascii(ftp, fname):
+
+
+        Input
+        -----
+        ftp          instance of the ftplib.FTP class
+        fname        filename
+
+
+        Output
+        ------
+        File fname in current local directory
+
+
+        Examples
+        --------
+        import ftplib
+        import os
+        ftp = ftplib.FTP("ftp.server.de")
+        ftp.login("user", "password")
+        ftp.cwd('ftp/directory')
+        os.chdir('local/directory')
+        get_mac_ascii(ftp, 'test.dat')
+        ftp.close()
+
+
+        License
+        -------
+        This file is part of the UFZ Python package.
+
+        The UFZ Python package is free software: you can redistribute it and/or modify
+        it under the terms of the GNU Lesser General Public License as published by
+        the Free Software Foundation, either version 3 of the License, or
+        (at your option) any later version.
+
+        The UFZ Python package is distributed in the hope that it will be useful,
+        but WITHOUT ANY WARRANTY; without even the implied warranty of
+        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+        GNU Lesser General Public License for more details.
+
+        You should have received a copy of the GNU Lesser General Public License
+        along with the UFZ makefile project (cf. gpl.txt and lgpl.txt).
+        If not, see <http://www.gnu.org/licenses/>.
+
+        Copyright 2014 Matthias Cuntz
+
+
+        History
+        -------
+        Written,  MC, Dec 2014 - modified from
+                                 http://www.java2s.com/Tutorial/Python/0420__Network/ASCIIfiledownload.htm
+    """
+    def writeline(data):
+        fd.write(data + '\r') # Mac-Format
+    fd = open(fname, 'wt')
+    ftp.retrlines('RETR '+fname, writeline)
+    fd.close()
+    set_mtime(ftp, fname)
+
+# ------------------------------------------------------------------------------------------
+
+def get_check_mac_ascii(ftp, fname):
+    """
+        Get a Mac ascii file from an open FTP connection and
+        check that local filesize is the same as the remote file size.
+
+
+        Definition
+        ----------
+        def get_check_mac_ascii(ftp, fname):
+
+
+        Input
+        -----
+        ftp          instance of the ftplib.FTP class
+        fname        filename
+
+
+        Output
+        ------
+        File fname in current local directory
+
+
+        Examples
+        --------
+        import ftplib
+        import os
+        ftp = ftplib.FTP("ftp.server.de")
+        ftp.login("user", "password")
+        ftp.cwd('ftp/directory')
+        os.chdir('local/directory')
+        if not get_check_mac_ascii(ftp, 'test.dat'):
+            print('Error in transfer')
+        ftp.close()
+
+
+        License
+        -------
+        This file is part of the UFZ Python package.
+
+        The UFZ Python package is free software: you can redistribute it and/or modify
+        it under the terms of the GNU Lesser General Public License as published by
+        the Free Software Foundation, either version 3 of the License, or
+        (at your option) any later version.
+
+        The UFZ Python package is distributed in the hope that it will be useful,
+        but WITHOUT ANY WARRANTY; without even the implied warranty of
+        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+        GNU Lesser General Public License for more details.
+
+        You should have received a copy of the GNU Lesser General Public License
+        along with the UFZ makefile project (cf. gpl.txt and lgpl.txt).
+        If not, see <http://www.gnu.org/licenses/>.
+
+        Copyright 2014 Matthias Cuntz
+
+
+        History
+        -------
+        Written,  MC, Dec 2014
+    """
+    rsize = get_size(ftp, fname)
+    get_mac_ascii(ftp, fname)
+    lsize = os.stat(fname).st_size
+    if rsize == lsize:
+        return True
+    else:
+        return False
+
+# ------------------------------------------------------------------------------------------
+
+def get_unix_ascii(ftp, fname):
+    """
+        Get a Unix/Linux ascii file from an open FTP connection.
+
+
+        Definition
+        ----------
+        def get_unix_ascii(ftp, fname):
+
+
+        Input
+        -----
+        ftp          instance of the ftplib.FTP class
+        fname        filename
+
+
+        Output
+        ------
+        File fname in current local directory
+
+
+        Examples
+        --------
+        import ftplib
+        import os
+        ftp = ftplib.FTP("ftp.server.de")
+        ftp.login("user", "password")
+        ftp.cwd('ftp/directory')
+        os.chdir('local/directory')
+        get_unix_ascii(ftp, 'test.dat')
+        ftp.close()
+
+
+        License
+        -------
+        This file is part of the UFZ Python package.
+
+        The UFZ Python package is free software: you can redistribute it and/or modify
+        it under the terms of the GNU Lesser General Public License as published by
+        the Free Software Foundation, either version 3 of the License, or
+        (at your option) any later version.
+
+        The UFZ Python package is distributed in the hope that it will be useful,
+        but WITHOUT ANY WARRANTY; without even the implied warranty of
+        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+        GNU Lesser General Public License for more details.
+
+        You should have received a copy of the GNU Lesser General Public License
+        along with the UFZ makefile project (cf. gpl.txt and lgpl.txt).
+        If not, see <http://www.gnu.org/licenses/>.
+
+        Copyright 2014 Matthias Cuntz
+
+
+        History
+        -------
+        Written,  MC, Dec 2014 - modified from
+                                 http://www.java2s.com/Tutorial/Python/0420__Network/ASCIIfiledownload.htm
+    """
+    def writeline(data):
+        fd.write(data + '\n') # Unix-Format
+    fd = open(fname, 'wt')
+    ftp.retrlines('RETR '+fname, writeline)
+    fd.close()
+    set_mtime(ftp, fname)
+
+# ------------------------------------------------------------------------------------------
+
+def get_check_unix_ascii(ftp, fname):
+    """
+        Get a Unix/Linux ascii file from an open FTP connection and
+        check that local filesize is the same as the remote file size.
+
+
+        Definition
+        ----------
+        def get_check_unix_ascii(ftp, fname):
+
+
+        Input
+        -----
+        ftp          instance of the ftplib.FTP class
+        fname        filename
+
+
+        Output
+        ------
+        File fname in current local directory
+
+
+        Examples
+        --------
+        import ftplib
+        import os
+        ftp = ftplib.FTP("ftp.server.de")
+        ftp.login("user", "password")
+        ftp.cwd('ftp/directory')
+        os.chdir('local/directory')
+        if not get_check_unix_ascii(ftp, 'test.dat'):
+            print('Error in transfer')
+        ftp.close()
+
+
+        License
+        -------
+        This file is part of the UFZ Python package.
+
+        The UFZ Python package is free software: you can redistribute it and/or modify
+        it under the terms of the GNU Lesser General Public License as published by
+        the Free Software Foundation, either version 3 of the License, or
+        (at your option) any later version.
+
+        The UFZ Python package is distributed in the hope that it will be useful,
+        but WITHOUT ANY WARRANTY; without even the implied warranty of
+        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+        GNU Lesser General Public License for more details.
+
+        You should have received a copy of the GNU Lesser General Public License
+        along with the UFZ makefile project (cf. gpl.txt and lgpl.txt).
+        If not, see <http://www.gnu.org/licenses/>.
+
+        Copyright 2014 Matthias Cuntz
+
+
+        History
+        -------
+        Written,  MC, Dec 2014
+    """
+    rsize = get_size(ftp, fname)
+    get_unix_ascii(ftp, fname)
+    lsize = os.stat(fname).st_size
+    if rsize == lsize:
+        return True
+    else:
+        return False
+
+# ------------------------------------------------------------------------------------------
+
+def get_windows_ascii(ftp, fname):
+    """
+        Get a Windows ascii file from an open FTP connection.
+
+
+        Definition
+        ----------
+        def get_windows_ascii(ftp, fname):
+
+
+        Input
+        -----
+        ftp          instance of the ftplib.FTP class
+        fname        filename
+
+
+        Output
+        ------
+        File fname in current local directory
+
+
+        Examples
+        --------
+        import ftplib
+        import os
+        ftp = ftplib.FTP("ftp.server.de")
+        ftp.login("user", "password")
+        ftp.cwd('ftp/directory')
+        os.chdir('local/directory')
+        get_windows_ascii(ftp, 'test.dat')
+        ftp.close()
+
+
+        License
+        -------
+        This file is part of the UFZ Python package.
+
+        The UFZ Python package is free software: you can redistribute it and/or modify
+        it under the terms of the GNU Lesser General Public License as published by
+        the Free Software Foundation, either version 3 of the License, or
+        (at your option) any later version.
+
+        The UFZ Python package is distributed in the hope that it will be useful,
+        but WITHOUT ANY WARRANTY; without even the implied warranty of
+        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+        GNU Lesser General Public License for more details.
+
+        You should have received a copy of the GNU Lesser General Public License
+        along with the UFZ makefile project (cf. gpl.txt and lgpl.txt).
+        If not, see <http://www.gnu.org/licenses/>.
+
+        Copyright 2014 Matthias Cuntz
+
+
+        History
+        -------
+        Written,  MC, Dec 2014 - modified from
+                                 http://www.java2s.com/Tutorial/Python/0420__Network/ASCIIfiledownload.htm
+    """
+    def writeline(data):
+        fd.write(data + '\r\n') # Windows-Format
+    fd = open(fname, 'wt')
+    ftp.retrlines('RETR '+fname, writeline)
+    fd.close()
+    set_mtime(ftp, fname)
+
+# ------------------------------------------------------------------------------------------
+
+def get_check_windows_ascii(ftp, fname):
+    """
+        Get a Windows ascii file from an open FTP connection and
+        check that local filesize is the same as the remote file size.
+
+
+        Definition
+        ----------
+        def get_check_windows_ascii(ftp, fname):
+
+
+        Input
+        -----
+        ftp          instance of the ftplib.FTP class
+        fname        filename
+
+
+        Output
+        ------
+        File fname in current local directory
+
+
+        Examples
+        --------
+        import ftplib
+        import os
+        ftp = ftplib.FTP("ftp.server.de")
+        ftp.login("user", "password")
+        ftp.cwd('ftp/directory')
+        os.chdir('local/directory')
+        if not get_check_windows_ascii(ftp, 'test.dat'):
+            print('Error in transfer')
+        ftp.close()
+
+
+        License
+        -------
+        This file is part of the UFZ Python package.
+
+        The UFZ Python package is free software: you can redistribute it and/or modify
+        it under the terms of the GNU Lesser General Public License as published by
+        the Free Software Foundation, either version 3 of the License, or
+        (at your option) any later version.
+
+        The UFZ Python package is distributed in the hope that it will be useful,
+        but WITHOUT ANY WARRANTY; without even the implied warranty of
+        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+        GNU Lesser General Public License for more details.
+
+        You should have received a copy of the GNU Lesser General Public License
+        along with the UFZ makefile project (cf. gpl.txt and lgpl.txt).
+        If not, see <http://www.gnu.org/licenses/>.
+
+        Copyright 2014 Matthias Cuntz
+
+
+        History
+        -------
+        Written,  MC, Dec 2014
+    """
+    rsize = get_size(ftp, fname)
+    get_windows_ascii(ftp, fname)
+    lsize = os.stat(fname).st_size
+    if rsize == lsize:
+        return True
+    else:
+        return False
+
+# ------------------------------------------------------------------------------------------
+
 def get_names(ftp, fname=None):
     """
         Get filename(s) in current directory of open FTP connection.
@@ -297,6 +714,7 @@ def get_names_dates(ftp, fname=None):
         History
         -------
         Written,  MC, Dec 2014
+        Modified, MC, Jan 2016 - return datetime.datetime
     """
     today    = datetime.date.today()
     thisyear = str(today.year)
@@ -317,6 +735,8 @@ def get_names_dates(ftp, fname=None):
                 yr = thisyear
             else:
                 hhmm = '00:00'
+            hhmi = hhmm.split(':')
+            hh, mi = [ int(hi) for hi in hhmi ]
             yyyy  = int(yr)
             dd    = int(i[6]) # day
             mm    = i[5]      # month as Jan, Feb, ...
@@ -324,7 +744,7 @@ def get_names_dates(ftp, fname=None):
             idate = datetime.date(yyyy,mm,dd)
             if idate > today: # time instead for files younger than 6 month, even in the last year
                 yyyy -= 1
-                idate = datetime.date(yyyy,mm,dd)
+            idate = datetime.datetime(yyyy,mm,dd,hh,mi)
             dates.append(idate) # file date
     ii = argsort(names)
     names = [ names[i] for i in ii ]
@@ -393,6 +813,7 @@ def get_names_dates_sizes(ftp, fname=None):
         History
         -------
         Written,  MC, Dec 2014
+        Modified, MC, Jan 2016 - return datetime.datetime
     """
     today    = datetime.date.today()
     thisyear = str(today.year)
@@ -415,6 +836,8 @@ def get_names_dates_sizes(ftp, fname=None):
                 yr = thisyear
             else:
                 hhmm = '00:00'
+            hhmi = hhmm.split(':')
+            hh, mi = [ int(hi) for hi in hhmi ]
             yyyy  = int(yr)
             dd    = int(i[6]) # day
             mm    = i[5]      # month as Jan, Feb, ...
@@ -422,7 +845,7 @@ def get_names_dates_sizes(ftp, fname=None):
             idate = datetime.date(yyyy,mm,dd)
             if idate > today: # time instead for files younger than 6 month, even in the last year
                 yyyy -= 1
-                idate = datetime.date(yyyy,mm,dd)
+            idate = datetime.datetime(yyyy,mm,dd,hh,mi)
             dates.append(idate)           # file date
     ii = argsort(names)
     names = [ names[i] for i in ii ]
@@ -743,282 +1166,6 @@ def get_sizes(ftp, fname=None):
 
 # ------------------------------------------------------------------------------------------
 
-def get_unix_ascii(ftp, fname):
-    """
-        Get a Unix/Linux ascii file from an open FTP connection.
-
-
-        Definition
-        ----------
-        def get_unix_ascii(ftp, fname):
-
-
-        Input
-        -----
-        ftp          instance of the ftplib.FTP class
-        fname        filename
-
-
-        Output
-        ------
-        File fname in current local directory
-
-
-        Examples
-        --------
-        import ftplib
-        import os
-        ftp = ftplib.FTP("ftp.server.de")
-        ftp.login("user", "password")
-        ftp.cwd('ftp/directory')
-        os.chdir('local/directory')
-        get_unix_ascii(ftp, 'test.dat')
-        ftp.close()
-
-
-        License
-        -------
-        This file is part of the UFZ Python package.
-
-        The UFZ Python package is free software: you can redistribute it and/or modify
-        it under the terms of the GNU Lesser General Public License as published by
-        the Free Software Foundation, either version 3 of the License, or
-        (at your option) any later version.
-
-        The UFZ Python package is distributed in the hope that it will be useful,
-        but WITHOUT ANY WARRANTY; without even the implied warranty of
-        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-        GNU Lesser General Public License for more details.
-
-        You should have received a copy of the GNU Lesser General Public License
-        along with the UFZ makefile project (cf. gpl.txt and lgpl.txt).
-        If not, see <http://www.gnu.org/licenses/>.
-
-        Copyright 2014 Matthias Cuntz
-
-
-        History
-        -------
-        Written,  MC, Dec 2014 - modified from
-                                 http://www.java2s.com/Tutorial/Python/0420__Network/ASCIIfiledownload.htm
-    """
-    def writeline(data):
-        fd.write(data + '\n') # Unix-Format
-    fd = open(fname, 'wt')
-    ftp.retrlines('RETR '+fname, writeline)
-    fd.close()
-    set_mtime(ftp, fname)
-
-# ------------------------------------------------------------------------------------------
-
-def get_check_unix_ascii(ftp, fname):
-    """
-        Get a Unix/Linux ascii file from an open FTP connection and
-        check that local filesize is the same as the remote file size.
-
-
-        Definition
-        ----------
-        def get_check_unix_ascii(ftp, fname):
-
-
-        Input
-        -----
-        ftp          instance of the ftplib.FTP class
-        fname        filename
-
-
-        Output
-        ------
-        File fname in current local directory
-
-
-        Examples
-        --------
-        import ftplib
-        import os
-        ftp = ftplib.FTP("ftp.server.de")
-        ftp.login("user", "password")
-        ftp.cwd('ftp/directory')
-        os.chdir('local/directory')
-        if not get_check_unix_ascii(ftp, 'test.dat'):
-            print('Error in transfer')
-        ftp.close()
-
-
-        License
-        -------
-        This file is part of the UFZ Python package.
-
-        The UFZ Python package is free software: you can redistribute it and/or modify
-        it under the terms of the GNU Lesser General Public License as published by
-        the Free Software Foundation, either version 3 of the License, or
-        (at your option) any later version.
-
-        The UFZ Python package is distributed in the hope that it will be useful,
-        but WITHOUT ANY WARRANTY; without even the implied warranty of
-        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-        GNU Lesser General Public License for more details.
-
-        You should have received a copy of the GNU Lesser General Public License
-        along with the UFZ makefile project (cf. gpl.txt and lgpl.txt).
-        If not, see <http://www.gnu.org/licenses/>.
-
-        Copyright 2014 Matthias Cuntz
-
-
-        History
-        -------
-        Written,  MC, Dec 2014
-    """
-    rsize = get_size(ftp, fname)
-    get_unix_ascii(ftp, fname)
-    lsize = os.stat(fname).st_size
-    if rsize == lsize:
-        return True
-    else:
-        return False
-
-# ------------------------------------------------------------------------------------------
-
-def get_windows_ascii(ftp, fname):
-    """
-        Get a Windows ascii file from an open FTP connection.
-
-
-        Definition
-        ----------
-        def get_windows_ascii(ftp, fname):
-
-
-        Input
-        -----
-        ftp          instance of the ftplib.FTP class
-        fname        filename
-
-
-        Output
-        ------
-        File fname in current local directory
-
-
-        Examples
-        --------
-        import ftplib
-        import os
-        ftp = ftplib.FTP("ftp.server.de")
-        ftp.login("user", "password")
-        ftp.cwd('ftp/directory')
-        os.chdir('local/directory')
-        get_windows_ascii(ftp, 'test.dat')
-        ftp.close()
-
-
-        License
-        -------
-        This file is part of the UFZ Python package.
-
-        The UFZ Python package is free software: you can redistribute it and/or modify
-        it under the terms of the GNU Lesser General Public License as published by
-        the Free Software Foundation, either version 3 of the License, or
-        (at your option) any later version.
-
-        The UFZ Python package is distributed in the hope that it will be useful,
-        but WITHOUT ANY WARRANTY; without even the implied warranty of
-        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-        GNU Lesser General Public License for more details.
-
-        You should have received a copy of the GNU Lesser General Public License
-        along with the UFZ makefile project (cf. gpl.txt and lgpl.txt).
-        If not, see <http://www.gnu.org/licenses/>.
-
-        Copyright 2014 Matthias Cuntz
-
-
-        History
-        -------
-        Written,  MC, Dec 2014 - modified from
-                                 http://www.java2s.com/Tutorial/Python/0420__Network/ASCIIfiledownload.htm
-    """
-    def writeline(data):
-        fd.write(data + '\r\n') # Windows-Format
-    fd = open(fname, 'wt')
-    ftp.retrlines('RETR '+fname, writeline)
-    fd.close()
-    set_mtime(ftp, fname)
-
-# ------------------------------------------------------------------------------------------
-
-def get_check_windows_ascii(ftp, fname):
-    """
-        Get a Windows ascii file from an open FTP connection and
-        check that local filesize is the same as the remote file size.
-
-
-        Definition
-        ----------
-        def get_check_windows_ascii(ftp, fname):
-
-
-        Input
-        -----
-        ftp          instance of the ftplib.FTP class
-        fname        filename
-
-
-        Output
-        ------
-        File fname in current local directory
-
-
-        Examples
-        --------
-        import ftplib
-        import os
-        ftp = ftplib.FTP("ftp.server.de")
-        ftp.login("user", "password")
-        ftp.cwd('ftp/directory')
-        os.chdir('local/directory')
-        if not get_check_windows_ascii(ftp, 'test.dat'):
-            print('Error in transfer')
-        ftp.close()
-
-
-        License
-        -------
-        This file is part of the UFZ Python package.
-
-        The UFZ Python package is free software: you can redistribute it and/or modify
-        it under the terms of the GNU Lesser General Public License as published by
-        the Free Software Foundation, either version 3 of the License, or
-        (at your option) any later version.
-
-        The UFZ Python package is distributed in the hope that it will be useful,
-        but WITHOUT ANY WARRANTY; without even the implied warranty of
-        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-        GNU Lesser General Public License for more details.
-
-        You should have received a copy of the GNU Lesser General Public License
-        along with the UFZ makefile project (cf. gpl.txt and lgpl.txt).
-        If not, see <http://www.gnu.org/licenses/>.
-
-        Copyright 2014 Matthias Cuntz
-
-
-        History
-        -------
-        Written,  MC, Dec 2014
-    """
-    rsize = get_size(ftp, fname)
-    get_windows_ascii(ftp, fname)
-    lsize = os.stat(fname).st_size
-    if rsize == lsize:
-        return True
-    else:
-        return False
-
-# ------------------------------------------------------------------------------------------
-
 def set_mtime(ftp, fname):
     """
         Set the access and modification times of a local file
@@ -1097,6 +1244,141 @@ def set_mtime(ftp, fname):
         yyyy -= 1
     mtime = int(time.mktime(time.strptime(str(dd)+'.'+str(mm)+'.'+str(yyyy)+' '+hhmm, "%d.%m.%Y %H:%M")))
     os.utime(fname, (mtime, mtime))
+
+# ------------------------------------------------------------------------------------------
+
+def put_binary(ftp, fname):
+    """
+        Put a binary file to an open FTP connection.
+
+
+        Definition
+        ----------
+        def put_binary(ftp, fname):
+
+
+        Input
+        -----
+        ftp          instance of the ftplib.FTP class
+        fname        filename
+
+
+        Output
+        ------
+        File fname in current local directory
+
+
+        Examples
+        --------
+        import ftplib
+        import os
+        ftp = ftplib.FTP("ftp.server.de")
+        ftp.login("user", "password")
+        ftp.cwd('ftp/directory')
+        os.chdir('local/directory')
+        put_binary(ftp, 'test.dat')
+        ftp.close()
+
+
+        License
+        -------
+        This file is part of the UFZ Python package.
+
+        The UFZ Python package is free software: you can redistribute it and/or modify
+        it under the terms of the GNU Lesser General Public License as published by
+        the Free Software Foundation, either version 3 of the License, or
+        (at your option) any later version.
+
+        The UFZ Python package is distributed in the hope that it will be useful,
+        but WITHOUT ANY WARRANTY; without even the implied warranty of
+        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+        GNU Lesser General Public License for more details.
+
+        You should have received a copy of the GNU Lesser General Public License
+        along with the UFZ makefile project (cf. gpl.txt and lgpl.txt).
+        If not, see <http://www.gnu.org/licenses/>.
+
+        Copyright 2016 Matthias Cuntz
+
+
+        History
+        -------
+        Written,  MC, Jan 2016
+    """
+    ftp.voidcmd("TYPE I")
+    myfile = open(fname, 'rb')
+    ftp.storbinary('STOR ' + fname, myfile)
+    myfile.close()
+
+# ------------------------------------------------------------------------------------------
+
+def put_check_binary(ftp, fname):
+    """
+        Put a binary file to an open FTP connection and
+        check that local filesize is the same as the remote file size.
+
+
+        Definition
+        ----------
+        def put_check_binary(ftp, fname):
+
+
+        Input
+        -----
+        ftp          instance of the ftplib.FTP class
+        fname        filename
+
+
+        Output
+        ------
+        File fname in current local directory
+
+
+        Examples
+        --------
+        import ftplib
+        import os
+        ftp = ftplib.FTP("ftp.server.de")
+        ftp.login("user", "password")
+        ftp.cwd('ftp/directory')
+        os.chdir('local/directory')
+        if not put_check_binary(ftp, 'test.dat'):
+            print('Error in transfer')
+        ftp.close()
+
+
+        License
+        -------
+        This file is part of the UFZ Python package.
+
+        The UFZ Python package is free software: you can redistribute it and/or modify
+        it under the terms of the GNU Lesser General Public License as published by
+        the Free Software Foundation, either version 3 of the License, or
+        (at your option) any later version.
+
+        The UFZ Python package is distributed in the hope that it will be useful,
+        but WITHOUT ANY WARRANTY; without even the implied warranty of
+        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+        GNU Lesser General Public License for more details.
+
+        You should have received a copy of the GNU Lesser General Public License
+        along with the UFZ makefile project (cf. gpl.txt and lgpl.txt).
+        If not, see <http://www.gnu.org/licenses/>.
+
+        Copyright 2016 Matthias Cuntz
+
+
+        History
+        -------
+        Written,  MC, Jan 2016
+    """
+    lsize = os.stat(fname).st_size
+    put_binary(ftp, fname)
+    rsize = get_size(ftp, fname)
+    if rsize == lsize:
+        return True
+    else:
+        return False
 
 
 if __name__ == '__main__':

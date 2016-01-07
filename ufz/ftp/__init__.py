@@ -9,23 +9,27 @@
     get_check_binary            - Get a binary file from an ftp connection
                                   True if all bytes transfered
                                   False if local bytes differ after transfer
+    get_unix_ascii              - Get a Unix/Linux ascii file from an ftp connection
     get_check_unix_ascii        - Get a Unix/Linux ascii file from an ftp connection
                                   True if all bytes transfered
                                   False if local bytes differ after transfer
+    get_windows_ascii           - Get a Windows ascii file from an ftp connection
     get_check_windows_ascii     - Get a Windows ascii file from an ftp connection
                                   True if all bytes transfered
                                   False if local bytes differ after transfer
     get_names                   - Get file names in current directory on ftp connection
     get_names_dates             - Get file names and dates in current directory on ftp connection
-    get_names_dates_sizes       - Get file names, dates and sizes in current directory on ftp connection
     get_names_sizes             - Get file names and sizes in current directory on ftp connection
     get_names_times             - Wrapper for get_names_dates
+    get_names_dates_sizes       - Get file names, dates and sizes in current directory on ftp connection
     get_names_times_sizes       - Wrapper for get_names_dates_sizes
     get_size                    - Get the size of a file on an ftp connection
     get_sizes                   - Get file sizes in current directory on ftp connection
-    get_unix_ascii              - Get a Unix/Linux ascii file from an ftp connection
-    get_windows_ascii           - Get a Windows ascii file from an ftp connection
     set_mtime(ftp, fname)       - Set access and modification time of local file from date information on ftp connection
+    put_binary                  - Put a binary file to an ftp connection
+    put_check_binary            - Put a binary file to an ftp connection
+                                  True if all bytes transfered
+                                  False if remote bytes differ after transfer
 
 
     Example
@@ -88,17 +92,18 @@
     along with the UFZ makefile project (cf. gpl.txt and lgpl.txt).
     If not, see <http://www.gnu.org/licenses/>.
 
-    Copyright 2014 Matthias Cuntz
+    Copyright 2014-2016 Matthias Cuntz
 
 
     History
     -------
     Written,  MC, Jun-Dec 2014
+    Modified, MC, Jan 2016
 """
 from .ftp import *
 
 # Information
 __author__   = "Matthias Cuntz"
-__version__  = '1.0'
-__revision__ = "Revision: 1923"
-__date__     = 'Date: 05.12.2014'
+__version__  = '1.1'
+__revision__ = "Revision: 2468"
+__date__     = 'Date: 06.01.2016'
