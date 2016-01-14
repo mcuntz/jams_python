@@ -133,21 +133,21 @@ AL        def set_flag(flags, n, iflag, ii=None):
         --------
         --> see __init__.py for full example of workflow
 
-        >>> flags = np.array([9, 90, 901, 9101, 912121212])
+        >>> flags = np.array([9, 90, 901, 9101, 912121212, -9999])
         >>> print(set_flag(flags, 1, 2, [0,1,2]))
-        [       92        92       921      9101 912121212]
+        [       92        92       921      9101 912121212        90]
 
         >>> print(set_flag(flags, 3, 2, [0,1,2,3]))
-        [     9002      9002      9012      9102 912121212]
+        [     9002      9002      9012      9102 912121212      9000]
 
         >>> print(set_flag(flags, 1, 2))
-        [       92        92       921      9201 922121212]
+        [       92        92       921      9201 922121212        92]
 
-        >>> flags = np.array([[9, 90, 901, 9101, 912121212],
-        ...                   [9, 90, 901, 9101, 912121212]])
+        >>> flags = np.array([[9, 90, 901, 9101, 912121212, -9999],
+        ...                   [9, 90, 901, 9101, 912121212, -9999]])
         >>> print(set_flag(flags, 1, 1, [[0,0,1],[0,1,2]]))
-        [[       91        91       901      9101 912121212]
-         [       90        90       911      9101 912121212]]
+        [[       91        91       901      9101 912121212        90]
+         [       90        90       911      9101 912121212        90]]
 
         License
         -------
@@ -176,10 +176,12 @@ AL        def set_flag(flags, n, iflag, ii=None):
         Modified, MC, Jan 2016 - ND arrays possible
     """
     fflags = flags.copy()
+    uu = np.where(fflags < 0)                        # if undef, set to treated that mean 9
+    if uu[0].size > 0: fflags[uu] = 9
     # extend flag vector if needed
-    ilog10 = np.log10(fflags).astype(np.int)    # are there enough flag positions (i)
-    jj     = np.where(ilog10 < n)
-    if jj[0].size > 0:                          # increase number (filled with 0)
+    ilog10 = np.log10(fflags).astype(np.int)         # are there enough flag positions (i)
+    jj = np.where(ilog10 < n)
+    if jj[0].size > 0:                               # increase number of entries (filled with 0)
         fflags[jj] *= 10**(n-ilog10[jj])
         ilog10      = np.log10(fflags).astype(np.int)
 
