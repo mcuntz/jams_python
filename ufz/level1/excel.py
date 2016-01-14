@@ -3,7 +3,74 @@ from __future__ import print_function
 import numpy as np
 import xlrd
 
-__all__ = ['get_value_excel']
+__all__ = ['get_header_excel', 'get_value_excel']
+
+# --------------------------------------------------------------------
+
+def get_header_excel(excelfile, sheet):
+    """
+        Get the header row of an Excel sheet.
+
+        Same as get_value_excel(excelfile, sheet, '', None).
+
+
+        Input
+        -----
+        excelfile   Filename of Excel file
+        sheet       Name of Sheet in Excel file
+
+
+        Output
+        ------
+        list with entries of first row of Excel sheet
+
+
+        Examples
+        --------
+        --> see __init__.py for full example of workflow
+
+        hh = get_header_excel('CHS-measurements.xlsx', 'Logger Hohes Holz')
+        -> ['variable description', 'date start', 'date end', ... ]
+
+
+        License
+        -------
+        This file is part of the UFZ Python package.
+
+        The UFZ Python package is free software: you can redistribute it and/or modify
+        it under the terms of the GNU Lesser General Public License as published by
+        the Free Software Foundation, either version 3 of the License, or
+        (at your option) any later version.
+
+        The UFZ Python package is distributed in the hope that it will be useful,
+        but WITHOUT ANY WARRANTY; without even the implied warranty of
+        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+        GNU Lesser General Public License for more details.
+
+        You should have received a copy of the GNU Lesser General Public License
+        along with the UFZ makefile project (cf. gpl.txt and lgpl.txt).
+        If not, see <http://www.gnu.org/licenses/>.
+
+        Copyright 2016 Matthias Cuntz
+
+
+        History
+        -------
+        Written,  MC, Mar 2016
+    """
+    # open Excel file
+    wb = xlrd.open_workbook(excelfile)
+    # check sheet exists
+    if sheet not in wb.sheet_names(): raise ValueError('No sheet '+sheet+' in file '+excelfile)
+    sh = wb.sheet_by_name(sheet)
+    # Return variable and column names
+    columns   = sh.row_values(0,0)
+
+    # relase Excel file
+    del wb
+
+    return columns
+
 
 # --------------------------------------------------------------------
 
@@ -17,7 +84,7 @@ def get_value_excel(excelfile, sheet, variable, column):
 
         If variable and/or column is None then the list of variables and columns is returned.
 
-        
+
         Input
         -----
         excelfile   Filename of Excel file
@@ -84,7 +151,7 @@ def get_value_excel(excelfile, sheet, variable, column):
     # check sheet exists
     if sheet not in wb.sheet_names(): raise ValueError('No sheet '+sheet+' in file '+excelfile)
     sh = wb.sheet_by_name(sheet)
-    # Return varible and column names
+    # Return variable and column names
     columns   = sh.row_values(0,0)
     variables = sh.col_values(columns.index('headerout (final)'), start_rowx=1, end_rowx=sh.nrows)
     if (variable is None) and (column is None):
@@ -128,8 +195,9 @@ def get_value_excel(excelfile, sheet, variable, column):
             out = parameter[variables.index(variable)]
     # relase Excel file
     del wb
-    
+
     return out
+
 
 # --------------------------------------------------------------------
 
@@ -149,4 +217,6 @@ if __name__ == '__main__':
     # # print(get_value_excel(setup_chs, 'Logger Hohes Holz', None, ''))
     # print(get_value_excel(setup_chs, 'Logger Hohes Holz', '', None))
     # # print(get_value_excel(setup_chs, 'Logger Hohes Holz', None, None))
+    # print(get_value_excel(setup_chs, 'Logger Hohes Holz', None, ''))
 
+    # print(get_header_excel(setup_chs, sheet))

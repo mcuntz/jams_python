@@ -8,6 +8,7 @@
     get_flag         Get the flags at position n from CHS data flag vector.
     get_manual_flags Get start and end dates as well as flag values for a specific variable from a manual flag file.
     get_maxflag      Get the maximal flag of the string with the individual flags.
+    get_header_excel Get the header row of an Excel sheet.
     get_value_excel  Get value in column of sheet in excelfile given variable name.
     read_data        Read and concatenate data from CHS level1 data files.
     set_flag         Set the flags at position n to iflag at indices ii of CHS data flag vector.
@@ -95,14 +96,15 @@
     Modified  JM, May 2015 - get_maxflag
               MC, May 2015 - excel - get_value_excel
               MC, Aug 2015 - get_manual_flags
+              MC, Jan 2016 - get_header_excel
 """
-from .excel          import get_value_excel
+from .excel          import get_header_excel, get_value_excel
 from .getset_flag    import get_flag, set_flag, get_maxflag
 from .manual_flags   import get_manual_flags
 from .readwrite_data import read_data, write_data
 
 # Information
 __author__   = "Matthias Cuntz"
-__version__  = '1.2'
-__revision__ = "Revision: 2227"
-__date__     = 'Date: 12.08.2015'
+__version__  = '1.3'
+__revision__ = "Revision: 2477"
+__date__     = 'Date: 14.01.2016'
