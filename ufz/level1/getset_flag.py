@@ -21,7 +21,7 @@ def get_flag(flags, n):
         flags   ND-array of integers
         n       position to extract
 
-        
+
         Output
         ------
         ND-array of integers with flag at position n of flags
@@ -48,6 +48,12 @@ def get_flag(flags, n):
         >>> print(get_flag(flags, 4))
         [-1 -1 -1 -1 -1 -1 -1  2]
 
+        >>> flags = np.array([[9, 90, 91, 900, 901, 9001,  9201, 912121212],
+        ...                   [9, 91, 92, 901, 912, 9101, -9999, 912121212]])
+        >>> print(get_flag(flags, 1))
+        [[-1  0  1  0  0  0  2  1]
+         [-1  1  2  0  1  1 -2  1]]
+
 
         License
         -------
@@ -74,7 +80,7 @@ def get_flag(flags, n):
         -------
         Written,  MC, Mar 2015
     """
-    
+
     out = np.ones(flags.shape, dtype=np.int)*(-1)   # if not enough digits -> -1
 
     # deal with -9999
@@ -85,13 +91,14 @@ def get_flag(flags, n):
     jj = np.where(flags > 0)
     if jj[0].size>0:
         oo = out[jj]
-        ilog10 = np.log10(flags[jj]).astype(np.int)         # how many digits
-        ii = np.where((ilog10-n) >= 0)               # otherwise extract n-th digit
+        ilog10 = np.log10(flags[jj]).astype(np.int) # how many digits
+        ii = np.where((ilog10-n) >= 0)              # otherwise extract n-th digit
         if ii[0].size > 0:
             oo[ii] = (flags[jj][ii] // 10**(ilog10[ii]-n)) % 10
         out[jj] = oo
 
     return out
+
 
 # --------------------------------------------------------------------
 
@@ -116,7 +123,7 @@ AL        def set_flag(flags, n, iflag, ii=None):
         --------------
         ii      indices at which to set flag (default: None, i.e. each entry)
 
-        
+
         Output
         ------
         ND-array of integers with flag at position n of flags set to iflag
@@ -136,6 +143,11 @@ AL        def set_flag(flags, n, iflag, ii=None):
         >>> print(set_flag(flags, 1, 2))
         [       92        92       921      9201 922121212]
 
+        >>> flags = np.array([[9, 90, 901, 9101, 912121212],
+        ...                   [9, 90, 901, 9101, 912121212]])
+        >>> print(set_flag(flags, 1, 1, [[0,0,1],[0,1,2]]))
+        [[       91        91       901      9101 912121212]
+         [       90        90       911      9101 912121212]]
 
         License
         -------
@@ -161,15 +173,16 @@ AL        def set_flag(flags, n, iflag, ii=None):
         History
         -------
         Written,  MC, Mar 2015
+        Modified, MC, Jan 2016 - ND arrays possible
     """
     fflags = flags.copy()
     # extend flag vector if needed
-    ilog10 = np.log10(fflags).astype(np.int)  # are there enough flag positions (i)
-    jj = np.where(ilog10 < n)[0]
-    if jj.size > 0:                          # increase number (filled with 0)
+    ilog10 = np.log10(fflags).astype(np.int)    # are there enough flag positions (i)
+    jj     = np.where(ilog10 < n)
+    if jj[0].size > 0:                          # increase number (filled with 0)
         fflags[jj] *= 10**(n-ilog10[jj])
-        ilog10 = np.log10(fflags).astype(np.int)
-        
+        ilog10      = np.log10(fflags).astype(np.int)
+
     # get entries in flag vector
     isflags = get_flag(fflags, n)
 
@@ -182,9 +195,10 @@ AL        def set_flag(flags, n, iflag, ii=None):
 
     return fflags
 
+
 # --------------------------------------------------------------------
 
-def get_maxflag(flags, no = 0):
+def get_maxflag(flags, no=0):
     """
         Returns the overall flag for each flag from CHS data flag vector.
 
@@ -197,11 +211,12 @@ def get_maxflag(flags, no = 0):
         Input
         -----
         flags   ND-array of integers
-        no      column which is excluded from the calculation of maxflag
-                
+        no      column or list of columns that will be excluded from the determination of the maximum flag
+
+
         Output
         ------
-        ND-array of integers with overall flag 
+        ND-array of integers with overall flag
         returns:
             2, if at least one flag is 2
             1, if at least one flag is 1
@@ -217,10 +232,24 @@ def get_maxflag(flags, no = 0):
         >>> flags = np.array([9, 90, 91, 900, 901, 9001, 9201, 912121212, -9999])
         >>> print(get_maxflag(flags))
         [-1  0  1  0  1  1  2  2 -2]
-        
-        >>> flags = np.array([9, 90, 91, 900, 901, 9001, 9201, 912121212, -9999])
-        >>> print(get_maxflag(flags, no = 1))
-        [-1  -1 -1  0  1  1  1  2 -2]
+
+        >>> print(get_maxflag(flags, no=1))
+        [-1 -1 -1  0  1  1  1  2 -2]
+
+        >>> print(get_maxflag(flags, no=[1,3]))
+        [-1 -1 -1  0  1  0  0  2 -2]
+
+        >>> flags = np.array([[9, 90, 91, 900, 901, 9001,  9201, 912121212],
+        ...                   [9, 91, 92, 901, 912, 9101, -9999, 912121212]])
+        >>> print(get_maxflag(flags))
+        [[-1  0  1  0  1  1  2  2]
+         [-1  1  2  1  2  1 -2  2]]
+
+        >>> flags = np.array([[9, 90, 91, 900, 901, 9001,  9201, 912121212],
+        ...                   [9, 91, 92, 901, 912, 9101, -9999, 912121212]])
+        >>> print(get_maxflag(flags, no=[1,3]))
+        [[-1 -1 -1  0  1  0  0  2]
+         [-1 -1 -1  1  2  0 -2  2]]
 
 
         License
@@ -247,29 +276,37 @@ def get_maxflag(flags, no = 0):
         History
         -------
         Written,  JM, Mar 2015
-        Added option 'no', Julian Vogel,Oct 2015
+        Modified, JV, Oct 2015 - no
+                  MC, Jan 2016 - no iterable
     """
-    
-    maxflag = np.ones(np.shape(flags), dtype=np.int) * (-2)
+    # assue no as list
+    try:
+        nno = len(no)
+    except:
+        no = [no]
 
+    # Determine overall flag:
+    #   maxflag=-2, if flag is '-9999'
+    #   maxflag=-1, if flag is '9'
+    #   maxflag=0,  if all individual flags are 0, e.g. '9000000'
+    #   maxflag=1,  if at least one flag is 1,     e.g. '9000100'
+    #   maxflag=2,  if at least one flag is 2,     e.g. '9002010'
     fmax = np.amax(flags)
     if fmax == -9999:
-        return maxflag
+        # return -2 if no flags set yet
+        return np.ones(np.shape(flags), dtype=np.int)*(-2)
     elif fmax == 9:
-        maxflag = np.ones(np.shape(flags), dtype=np.int) * (-1)
-        return maxflag
+        # return -1 if no flags set yet but flags were already initialised
+        return np.ones(np.shape(flags), dtype=np.int)*(-1)
     else:
-        n_flags_precip = np.log10(fmax).astype(np.int)
-        # Determine overall flag:
-        #      maxflag=2,  if at least one flag is 2,     e.g. '9002010'
-        #      maxflag=1,  if at least one flag is 1,     e.g. '9000100'
-        #      maxflag=0,  if all individual flags are 0, e.g. '9000000'
-        #      maxflag=-1, if flag is '9'
-        #      maxflag=-2, if flag is '-9999'
-        for ii in np.arange(n_flags_precip):
-            if ii != (no-1):
-                maxflag = np.maximum(maxflag, get_flag(flags,ii+1))
+        maxflag = np.ones(np.shape(flags), dtype=np.int)*(-2)
+        n_flags = np.log10(fmax).astype(np.int)
+        for ii in range(n_flags):
+            iii = ii+1
+            if iii not in no:
+                maxflag = np.maximum(maxflag, get_flag(flags,iii))
         return maxflag
+
 
 # --------------------------------------------------------------------
 
