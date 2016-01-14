@@ -220,3 +220,6 @@ if __name__ == '__main__':
     # print(get_value_excel(setup_chs, 'Logger Hohes Holz', None, ''))
 
     # print(get_header_excel(setup_chs, sheet))
+
+    # v = 'BC1_Voltage [V]'
+    # print(get_value_excel(setup_chs, sheet, v, ['Flag_0', 'Flag_1', 'Flag_2', 'Flag_3', 'Flag_4', 'Flag_5']))
