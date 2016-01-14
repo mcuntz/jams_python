@@ -5,6 +5,7 @@
 
     Provided functions
     ------------------
+    constant_values  Checks if a given series of data contains consecutive values which are constant over a certain time period.
     get_flag         Get the flags at position n from CHS data flag vector.
     get_manual_flags Get start and end dates as well as flag values for a specific variable from a manual flag file.
     get_maxflag      Get the maximal flag of the string with the individual flags.
@@ -98,10 +99,11 @@
               MC, Aug 2015 - get_manual_flags
               MC, Jan 2016 - get_header_excel
 """
-from .excel          import get_header_excel, get_value_excel
-from .getset_flag    import get_flag, set_flag, get_maxflag
-from .manual_flags   import get_manual_flags
-from .readwrite_data import read_data, write_data
+from .constant_values import constant_values
+from .excel           import get_header_excel, get_value_excel
+from .getset_flag     import get_flag, set_flag, get_maxflag
+from .manual_flags    import get_manual_flags
+from .readwrite_data  import read_data, write_data
 
 # Information
 __author__   = "Matthias Cuntz"

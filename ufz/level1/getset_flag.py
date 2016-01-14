@@ -74,6 +74,7 @@ def get_flag(flags, n):
         -------
         Written,  MC, Mar 2015
     """
+    
     out = np.ones(flags.shape, dtype=np.int)*(-1)   # if not enough digits -> -1
 
     # deal with -9999
@@ -196,7 +197,7 @@ def get_maxflag(flags, no = 0):
         Input
         -----
         flags   ND-array of integers
-        no      flag which is excluded from the calculation of maxflag
+        no      column which is excluded from the calculation of maxflag
                 
         Output
         ------
@@ -248,7 +249,7 @@ def get_maxflag(flags, no = 0):
         Written,  JM, Mar 2015
         Added option 'no', Julian Vogel,Oct 2015
     """
-
+    
     maxflag = np.ones(np.shape(flags), dtype=np.int) * (-2)
 
     fmax = np.amax(flags)
