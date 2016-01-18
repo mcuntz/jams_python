@@ -81,7 +81,7 @@ def get_manual_flags(flagfile, variable, dendro=None, julian=True):
 
     # Read manual flag file
     sdat    = ufz.sread(flagfile, comment="#", strarr=True, skip=1)
-    var_id  = sdat[:,0]
+    var_id  = np.array([ i.strip() for i in sdat[:,0] ])
     start   = sdat[:,1]
     end     = sdat[:,2]
     flag    = sdat[:,3]
@@ -95,7 +95,7 @@ def get_manual_flags(flagfile, variable, dendro=None, julian=True):
     # comment = sdat[:,-1]
      
     # select variable
-    ii = np.where(var_id.strip() == variable)[0]
+    ii = np.where(var_id == variable)[0]
     if ii.size > 0:
         sdate   = start[ii]
         edate   = end[ii]
