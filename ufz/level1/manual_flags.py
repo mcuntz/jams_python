@@ -73,6 +73,7 @@ def get_manual_flags(flagfile, variable, dendro=None, julian=True):
         -------
         Written,  MC, Aug 2015
         Modified, AW, Aug 2015, optional readout of dendrometer-data:  DBH and Dini
+        Modified, MC, Jan 2016, igrnore leading and trailing balnk in variable ids
     """
     # Default dates
     sdef = "01.01.1900 00:00:00"
@@ -94,7 +95,7 @@ def get_manual_flags(flagfile, variable, dendro=None, julian=True):
     # comment = sdat[:,-1]
      
     # select variable
-    ii = np.where(var_id == variable)[0]
+    ii = np.where(var_id.strip() == variable)[0]
     if ii.size > 0:
         sdate   = start[ii]
         edate   = end[ii]
