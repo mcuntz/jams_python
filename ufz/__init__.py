@@ -566,12 +566,13 @@ try:
 except:
     print("No extra statistics in scipy, i.e. in UFZ package. Disabled functions: outlier, rossner.")
 from .pack              import pack
+from .pareto_metrics    import sn
 from .pca               import pca, check_pca
 from .pi                import pi
 from .position          import position
-from .readhdf           import readhdf, hdfread
+from .readhdf           import readhdf,  hdfread
 try:
-    from .readhdf4          import readhdf4, hdf4read
+    from .readhdf4      import readhdf4, hdf4read
 except ImportError:
     pass # not installed
 from .readhdf5          import readhdf5, hdf5read
