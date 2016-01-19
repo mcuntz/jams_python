@@ -31,22 +31,24 @@ def gap2lai(tgap, lgap, G, alpha, boot=False):
         lgap         array(N), large gap fraction, e.g. fraction of the number
                      of pixels only found in the largest gap of your cover photo
                      divided by the total number of pixels in your image. [-]
-        alpha        float, view zenith angle at which your observations are
-                     made. 0 equals zenith, 90 equals horizont. [deg]
         G            float, value of the leaf projection function at view zenith
                      angle alpha [-]
+        alpha        float, view zenith angle at which your observations are
+                     made. 0 equals zenith, 90 equals horizont. [deg]
                      
         
         Optional Input
         --------------
-        boot         bool or int, if set False (default), for every gap fraction
-                     value a separate output of Le, Lt and omega is computed. If
-                     set to an int, the gap fractions are bootstrapped int times
+        boot         bool or int
+                     if set False (default), for every gap fraction
+                     value a separate output of Le, Lt and omega is computed.
+                     If set to an int, the gap fractions are bootstrapped int times
                      and a mean +- standard error of the mean for Le, Lt and
                      omega is computed. WARNING: you are not allowed to average
                      the separate Le or Lt values after computation to get a
                      mean Le or Lt since you would introduce apparent clumping
                      correction.
+                     If set True then boot=1.
         
 
         Output
