@@ -17,13 +17,13 @@ def pi(s=None, m=None, norm=None, b=False, evalues=False, ematrix=False):
         Optional Input
         --------------
         Either
-          s       sensitivity matrix[nparams,n]
+          s      sensitivity matrix[nparams,n]
         or
-          m       transpose(s).s matrix[nparams,nparams]
+          m      transpose(s).s matrix[nparams,nparams]
         norm     normalised indexes; also output normalisation
                  'sum':   index /= sum(index)
-                 'ev':    index /= sum(eigenvectors)
-                 'evsum': both index /= sum(eigenvectors) then index /= sum(index)
+                 'ev':    index /= sum(eigenvalues)
+                 'evsum': both index /= sum(eigenvalues) then index /= sum(index)
         b        True:  output B index
                  False: output PI index
         evalues  True:  output eigenvalues
