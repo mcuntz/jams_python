@@ -526,7 +526,7 @@ from .ellipse_area      import ellipse_area
 from .errormeasures     import bias, mae, mse, rmse, nse, kge, pear2
 from .esat              import esat
 from .fgui              import directories_from_gui, directory_from_gui, file_from_gui, files_from_gui
-from .river_network     import river_network
+from .river_network     import river_network, upscale_fdir
 from .field_gen         import Field, Incompr_Field, Filtered_Incompr_Field
 from .fill_nonfinite    import fill_nonfinite
 from .find_in_path      import find_in_path
