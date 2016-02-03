@@ -487,6 +487,7 @@
               MC, Oct 2015 - directories_from_gui
               ST, Nov 2015 - added kge
               ST, Dec 2015 - added river_network
+              ST, Feb 2016 - added function for writing 2d arrays to ascii file
 """
 from __future__ import print_function
 
@@ -532,6 +533,7 @@ from .fill_nonfinite    import fill_nonfinite
 from .find_in_path      import find_in_path
 from .fread             import fread
 from .fsread            import fsread
+from .fwrite            import fwrite
 try:
     from .gap_filling   import gap_filling
 except ImportError:
