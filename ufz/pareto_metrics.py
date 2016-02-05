@@ -5,11 +5,13 @@ import numpy as np
 __all__ = ['sn','cz','hi']
 
 def is_dominated(nobj, point, front):
-    # checks whether a new canidate "point" is dominated by the "front" or not
-    # does not manipulate "front"
+    # checks whether a new canidate 'point' is dominated by the 'front' or not
+    # does not manipulate 'front'
     #
-    # returns: 1 --> point is not dominated and hence should added to the "front"
-    #          0 --> point is already part of the "front"
+    # returns: 2 --> point is a new edge meaning that should be added to the 'front' to increase its extend
+    #          1 --> point is dominating other points on front and hence should be added to the 'front' and others removed
+    #          0 --> point is neither dominating others nor dominated by others, ie. it is either part of the 'front' or
+    #                is a new point filling gaps or extends front and should hence be added
     #         -1 --> point is dominated
     
     nsets = np.shape(front)[0]
@@ -34,29 +36,30 @@ def is_dominated(nobj, point, front):
         # print('numeql = ',numeql,'   numimp = ',numimp, '   numdeg = ',numdeg)
                 
         if (numimp == 0) and (numdeg > 0):
-            # "point" is dominated
+            # 'point' is dominated
             dominanceFlag = -1
             # print('return 1: ',dominanceFlag)
             return dominanceFlag
         else:
             if (numeql == nobj):
-                # Objective functions are the same for "point" and archived solution ii
+                # Objective functions are the same for 'point' and archived solution ii
                 dominanceFlag = 0
                 # print('return 2: ',dominanceFlag)
                 return dominanceFlag
             else:
                 if (numimp > 0) and (numdeg == 0):
-                    # "point" dominates ii-th solution in the front
+                    # 'point' dominates ii-th solution in the front
                     dominanceFlag = 1
                     # print('return 3: ',dominanceFlag)
                     return dominanceFlag
     # print('return 4: ',dominanceFlag)
+    
     return dominanceFlag
 
 def point_to_front(nobj, point, front):
-    # It checks if "point" is dominating some points of "front".
-    # If "point" dominates others, it adds "point" to "front" and deletes dominated ones. At the end the updated "front"
-    # is returned. It hence is doing the same as the routine "is_dominated", but returns updated front instead of only
+    # It checks if 'point' is dominating some points of 'front'.
+    # If 'point' dominates others, it adds 'point' to 'front' and deletes dominated ones. At the end the updated 'front'
+    # is returned. It hence is doing the same as the routine 'is_dominated', but returns updated front instead of only
     # information about the domination status.
     #
     # (originally routine NDcheck in Matlab version by Masoud)
@@ -90,34 +93,34 @@ def point_to_front(nobj, point, front):
                 numdeg += 1
                 
         if (numimp == 0) and (numdeg > 0):
-            # "point" is dominated --> return "front" unchanged
+            # 'point' is dominated --> return 'front' unchanged
             dominanceFlag = -1
             return front
         else:
             if (numeql == nobj):
-                # Objective functions are the same for "point" and archived solution ii
-                # Replace solution ii in "front" with "point"
+                # Objective functions are the same for 'point' and archived solution ii
+                # Replace solution ii in 'front' with 'point'
                 front[ii] = point
                 dominanceFlag = 0
                 return front
             else:
                 if (numimp > 0) and (numdeg == 0):
-                    # "point" dominates ii-th solution in the "front"
+                    # 'point' dominates ii-th solution in the 'front'
                     if (nsets > 1):
-                        # Remove solution ii from "front"
+                        # Remove solution ii from 'front'
                         front = np.delete(front,ii,axis=0)
                         nsets  -= 1
                     else:
-                        # Remove last point in "front"
-                        # This means all points on "front" are dominated by new candidate "point"
+                        # Remove last point in 'front'
+                        # This means all points on 'front' are dominated by new candidate 'point'
                         front = np.array([])
                         nsets -= 1
                     ii -= 1
                     dominanceFlag = 1
 
     if (dominanceFlag == 0):
-        # "point" is a new edge of the "front"
-        # hence "point" will be added and extent of "front" increases
+        # 'point' is a new point of the 'front' but does not dominate any current member
+        # hence 'point' will be added
         np.vstack([front,np.array(point)])
 
     if (nsets == 0):
@@ -148,9 +151,9 @@ def sn(front, reference_front):
 
         Input
         -----
-        front			    members of current front
+        front               members of current front
                             array with n1 rows (number of points) and m cols (number of objectives)
-	    reference_front		all members of the best Pareto front (often unknown)
+        reference_front     all members of the best Pareto front (often unknown)
                             array with n2 rows (number of points) and m cols (number of objectives)
 
 
@@ -232,24 +235,24 @@ def cz(front, all_fronts, all_cz=False):
 
         Input
         -----
-        front			    members of current front
+        front               members of current front
                             array with n1 rows (number of points) and m cols (number of objectives)
-	    all_fronts   		fronts of all fronts under consideration
-                            these will be aggregated and the amount of points from "front" in the aggreagtion counted
+        all_fronts          fronts of all fronts under consideration
+                            these will be aggregated and the amount of points from 'front' in the aggreagtion counted
                             list of k arrays with n2(k) rows (number of points) and m cols (number of objectives)
 
 
         Optional Input
         --------------
         all_cz              if True the CZ of every member of all_fronts is returned as a list of integers
-                            "front" is then ignored
+                            'front' is then ignored
 
 
         Output
         ------
         Scalar integer giving the number of points of the current front which are nondominated by any other point of
-        all given fronts "all_fronts". Scalar is less equal sum( n2(k) ).
-        If "all_cz" True, then output is list of integers.
+        all given fronts 'all_fronts'. Scalar is less equal sum( n2(k) ).
+        If 'all_cz' True, then output is list of integers.
 
 
         Literature
@@ -327,7 +330,7 @@ def cz(front, all_fronts, all_cz=False):
         return [ np.sum(np.array([ np.where(np.all(aggretated_front==ff,axis=1))[0].shape[0] for ff in list(kk) ])) for kk in all_fronts ]
 
 
-def hi(front, reference_point, nsamples=None, reference_front=None):
+def hi(front, reference_point, nsamples=None, reference_front=None, hi_range=False):
     """
         (Convergence metric)
         
@@ -337,7 +340,7 @@ def hi(front, reference_point, nsamples=None, reference_front=None):
         front (Hadka and Reed, 2012).
 
         By default, the routine returns an estimation of the hypervolume dominated by the approximated Pareto front
-        set "front" and bounded by the reference point "reference_point". This means the volume covered by the "front" relative to the
+        set 'front' and bounded by the reference point 'reference_point'. This means the volume covered by the 'front' relative to the
         overall feasible hypervolume.
 
                 ^
@@ -351,10 +354,10 @@ def hi(front, reference_point, nsamples=None, reference_front=None):
                 |                        *--------------|
                 |                                       |
                 -------------------------------------------------->
-                                                  5
+                                                        5
 
         Optionally, HI can be returned as the ratio of the hypervolume relative to that of the known best Pareto front Z* when
-        argument "reference front" is given. Hence, HI lies within [0,1] which a large value representing a hypervolume closer to Z*.
+        argument 'reference front' is given. Hence, HI lies within [0,1] which a large value representing a hypervolume closer to Z*.
 
                 ^
                 |
@@ -367,18 +370,18 @@ def hi(front, reference_point, nsamples=None, reference_front=None):
                 |   (best)  *            *--------------|
                 |               *-----------------------|
                 -------------------------------------------------->
-                                                  5        
+                                                        5        
 
         Definition
         ----------
-        def hi(front, reference_point, nsamples=None, reference_front=None):
+        def hi(front, reference_point, nsamples=None, reference_front=None, hi_range=False):
 
 
         Input
         -----
-        front			    members of current front
+        front               members of current front
                             array with n1 rows (number of points) and m cols (number of objectives)
-	    reference_point		worst possible point in objective space
+        reference_point     worst possible point in objective space
 
 
         Optional Input
@@ -388,16 +391,19 @@ def hi(front, reference_point, nsamples=None, reference_front=None):
         reference_front     best known pareto front
                             if given the HI is returned as the ratio between HI of tested front and HI of the reference front
                             value is hence bounded between 0 and 1 where large values indicate a front closer to the reference front
+        hi_range            if True an lower and upper value for HI will be returned
+                            this range is due to pointwise given 'front', i.e. the coarser the 'front' the more randomly sampled points
+                            have a dominance flag of zero and the more uncertain is the HI
 
                             
         Output
         ------
         if( reference_front == None):
-            Scalar floating number of the ratio between hypervolume covered by the "front" and
-            hypervolume bounded by "reference point"
+            Scalar floating number of the ratio between hypervolume covered by the 'front' and
+            hypervolume bounded by 'reference point'
         else:
-            Scalar floating number of the ratio between hypervolume covered by the "front" and
-            hypervolume covered by "reference front"
+            Scalar floating number of the ratio between hypervolume covered by the 'front' and
+            hypervolume covered by 'reference front'
 
             
         Literature
@@ -407,11 +413,11 @@ def hi(front, reference_point, nsamples=None, reference_front=None):
         [Draft]
 
         Hadka, D., and Reed, P. (2012).
-        "Diagnostic Assessment of Search Controls and Failure Modes in Many-Objective Evolutionary Optimization."
+        'Diagnostic Assessment of Search Controls and Failure Modes in Many-Objective Evolutionary Optimization.'
         Evolutionary Computation, 20(3), 423-452.
 
         Zitzler, E., and Thiele, L. (1999).
-        "Multiobjective evolutionary algorithms: a comparative case study and the strength Pareto approach."
+        'Multiobjective evolutionary algorithms: a comparative case study and the strength Pareto approach.'
         Evolutionary Computation, IEEE Transactions on, 3(4), 257-271.
 
         
@@ -423,15 +429,34 @@ def hi(front, reference_point, nsamples=None, reference_front=None):
         Examples
         --------
         >>> from autostring import astr
+        >>> front           = np.array([[10,12],[12.5,11],[15,10],[17.5,9],[20,8]])
+        >>> reference_point = np.array([25,15])
+        >>> reference_front = np.array([[8,12],[11,10],[14,8],[17,6],[20,4]])
+        >>> hypervolume_indicator = hi(front, reference_point, nsamples=10000)
+        >>> # theoretical value: 85/375 = 0.226667
+        >>> print(astr(hypervolume_indicator,prec=4))
+        0.2321
+        >>> hypervolume_indicator = hi(front, reference_point, nsamples=10000, hi_range=True)
+        >>> # theoretical value: 85/375 = 0.226667
+        >>> print(astr(hypervolume_indicator,prec=4))
+        ['0.2195' '0.2448']
+        >>> hypervolume_indicator = hi(front, reference_point, reference_front=reference_front, nsamples=10000)
+        >>> # theoretical value: 85/139 = 0.6115
+        >>> print(astr(hypervolume_indicator,prec=4))
+        0.6258
+        >>> hypervolume_indicator = hi(front, reference_point, reference_front=reference_front, nsamples=10000, hi_range=True)
+        >>> # theoretical value: 85/139 = 0.6115
+        >>> print(astr(hypervolume_indicator,prec=4))
+        ['0.5440' '0.7234']
         >>> front           = np.array([[6,11],[6,8],[7,6],[8,5],[10,3],[12,2],[15,2],[18,2]])
         >>> reference_point = np.array([25,15])
         >>> reference_front = np.array([[3,13],[3,11],[3,9],[4,8],[5,7],[6,6],[7,5],[8,4],[10,3],[12,2],[14,1],[16,1],[18,1],[20,1],[22,1]])
         >>> hypervolume_indicator = hi(front, reference_point)
         >>> print(astr(hypervolume_indicator,prec=4))
-        0.6060
+        0.6180
         >>> hypervolume_indicator = hi(front, reference_point, reference_front=reference_front)
         >>> print(astr(hypervolume_indicator,prec=4))
-        0.8511
+        0.8477
         
 
         License
@@ -461,6 +486,7 @@ def hi(front, reference_point, nsamples=None, reference_front=None):
     """
 
     import random
+    from autostring import astr
 
     # check for optionals
     if (nsamples == None):
@@ -469,12 +495,12 @@ def hi(front, reference_point, nsamples=None, reference_front=None):
         nsamp = nsamples
     
 
-    # hypervolume of "front"
+    # initialization
     nsets_front = front.shape[0]
     nobj        = front.shape[1]
     random.seed(1000)
 
-    # add edge points to "front"
+    # add edge points to 'front'
     best_all_directions = np.min(front,axis=0)
     for iobj in range(nobj):
         edge = best_all_directions.copy()
@@ -485,24 +511,56 @@ def hi(front, reference_point, nsamples=None, reference_front=None):
         # edge[iobj] = best_all_directions[iobj]
         front = np.vstack([front,np.array(edge)])
 
-    # hypervolume of "front"
+    # add edge points to 'reference_front'
+    if (reference_front != None):
+        best_all_directions = np.min(reference_front,axis=0)
+        for iobj in range(nobj):
+            edge = best_all_directions.copy()
+            edge[iobj] = reference_point[iobj]
+            # print(edge)
+            # Or is it ??
+            # edge = reference_point
+            # edge[iobj] = best_all_directions[iobj]
+            reference_front = np.vstack([reference_front,np.array(edge)])
+
+    # draw random points in feasible domain bounded by 0 and 'reference_point'
     mc_sample = [ [ random.random()*reference_point[ii] for ii in range(nobj) ] for jj in range(nsamp) ]
+
+    # hypervolume of 'front'
     dom_flags = [ is_dominated(nobj, sample, front) for sample in mc_sample ]
     n_below_front = np.where(np.array(dom_flags)== 1)[0].shape[0]
-    n_above_front = np.where(np.array(dom_flags)==-1)[0].shape[0]  # this will be the hypervolume
+    n_above_front = np.where(np.array(dom_flags)==-1)[0].shape[0]   # this will be the hypervolume
     n_on_front    = np.where(np.array(dom_flags)== 0)[0].shape[0]   # should never happen, otherwise adding of edges is wrong or it is an integer problem
 
+    # front_file = open('hypervolume_front.out','w')
+    # for isamp in range(nsamp):
+    #     front_file.write(astr(dom_flags[isamp]) + '  ' + astr(mc_sample[isamp][0],prec=4) + '  ' + astr(mc_sample[isamp][1],prec=4) + '  ' +  '\n') 
+    # front_file.close()
+
+    # hypervolume of 'reference_front'
     if (reference_front != None):
-        # hypervolume of "reference_front"
         dom_flags = [ is_dominated(nobj, sample, reference_front) for sample in mc_sample ]
         n_below_reffront = np.where(np.array(dom_flags)== 1)[0].shape[0]
-        n_above_reffront = np.where(np.array(dom_flags)==-1)[0].shape[0]  # this will be the hypervolume
+        n_above_reffront = np.where(np.array(dom_flags)==-1)[0].shape[0]   # this will be the hypervolume
         n_on_reffront    = np.where(np.array(dom_flags)== 0)[0].shape[0]   # should never happen, otherwise adding of edges is wrong or it is an integer problem
+
+        # reffront_file = open('hypervolume_reffront.out','w')
+        # for isamp in range(nsamp):
+        #     reffront_file.write(astr(dom_flags[isamp]) + '  ' + astr(mc_sample[isamp][0],prec=4) + '  ' + astr(mc_sample[isamp][1],prec=4) + '  ' + '\n') 
+        # reffront_file.close()
     
     if (reference_front == None):
-        hi = (1.0 * n_above_front) / (1.0 * nsamp)
+        if hi_range:
+            hi = np.array([(1.0*n_above_front + 0.0*n_on_front) / (1.0*nsamp),
+                           (1.0*n_above_front + 1.0*n_on_front) / (1.0*nsamp) ])
+        else:
+            hi = (1.0*n_above_front + 0.5*n_on_front) / (1.0*nsamp)
     else:
-        hi = (1.0 * n_above_front) / (1.0 * n_above_reffront)
+        if hi_range:
+            hi = np.array([(1.0*n_above_front + 0.0*n_on_front) / (1.0*n_above_reffront + 1.0*n_on_reffront),
+                           (1.0*n_above_front + 1.0*n_on_front) / (1.0*n_above_reffront + 0.0*n_on_reffront) ])
+        else:
+            hi = (1.0*n_above_front + 0.5*n_on_front) / (1.0*n_above_reffront + 0.5*n_on_reffront)
         
     return hi
 
