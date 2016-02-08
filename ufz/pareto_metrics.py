@@ -38,13 +38,17 @@ __all__ = ['sn','cz','hi','ef','aed']
 #
 # Literature
 # ----------
-#        Hadka and Reed (2012)
+#        Hadka, D., & Reed, P. M. (2013).
+#        Borg: An Auto-Adaptive Many-Objective Evolutionary Computing Framework.
+#        Evolutionary Computation, 21(2), 231-259.
 #
 #        Kollat, J. B., & Reed, P. M. (2006).
 #        Comparing state-of-the-art evolutionary multi-objective algorithms for long-term groundwater monitoring design.
 #        Advances in Water Resources, 29(6), 792-807. doi:10.1016/j.advwatres.2005.07.010
 #
-#        Wang et al. (2015)
+#        Wang, Q., Guidolin, M., Savic, D., & Kapelan, Z. (2015).
+#        Two-Objective Design of Benchmark Problems of a Water Distribution System via MOEAs: Towards the Best-Known Approximation of the True Pareto Front.
+#        Journal of Water Resources Planning and Management, 141(3), 04014060. doi:10.1061/(ASCE)WR.1943-5452.0000460
 #
 #        Zaharie, D. (2002).
 #        Critical values for the control parameters of differential evolution algorithms (pp. 62-67).
@@ -536,7 +540,7 @@ def hi(front, reference_point, nsamples=None, reference_front=None, hi_range=Fal
     from autostring import astr
 
     # check for optionals
-    if (nsamples == None):
+    if (nsamples is None):
         nsamp = 1000
     else:
         nsamp = nsamples
@@ -559,7 +563,7 @@ def hi(front, reference_point, nsamples=None, reference_front=None, hi_range=Fal
         front = np.vstack([front,np.array(edge)])
 
     # add edge points to 'reference_front'
-    if (reference_front != None):
+    if ( not(reference_front is None) ):
         best_all_directions = np.min(reference_front,axis=0)
         for iobj in range(nobj):
             edge = best_all_directions.copy()
@@ -585,7 +589,7 @@ def hi(front, reference_point, nsamples=None, reference_front=None, hi_range=Fal
     # front_file.close()
 
     # hypervolume of 'reference_front'
-    if (reference_front != None):
+    if ( not(reference_front is None) ):
         dom_flags = [ is_dominated(nobj, sample, reference_front) for sample in mc_sample ]
         n_below_reffront = np.where(np.array(dom_flags)== 1)[0].shape[0]
         n_above_reffront = np.where(np.array(dom_flags)==-1)[0].shape[0]   # this will be the hypervolume
@@ -596,7 +600,7 @@ def hi(front, reference_point, nsamples=None, reference_front=None, hi_range=Fal
         #     reffront_file.write(astr(dom_flags[isamp]) + '  ' + astr(mc_sample[isamp][0],prec=4) + '  ' + astr(mc_sample[isamp][1],prec=4) + '  ' + '\n') 
         # reffront_file.close()
     
-    if (reference_front == None):
+    if (reference_front is None):
         if hi_range:
             hi = np.array([(1.0*n_above_front + 0.0*n_on_front) / (1.0*nsamp),
                            (1.0*n_above_front + 1.0*n_on_front) / (1.0*nsamp) ])
