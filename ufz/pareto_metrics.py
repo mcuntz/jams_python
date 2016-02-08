@@ -59,8 +59,7 @@ def is_dominated(nobj, point, front):
     # checks whether a new canidate 'point' is dominated by the 'front' or not
     # does not manipulate 'front'
     #
-    # returns: 2 --> point is a new edge meaning that should be added to the 'front' to increase its extend
-    #          1 --> point is dominating other points on front and hence should be added to the 'front' and others removed
+    # returns: 1 --> point is dominating other points on front and hence should be added to the 'front' and others removed
     #          0 --> point is neither dominating others nor dominated by others, ie. it is either part of the 'front' or
     #                is a new point filling gaps or extends front and should hence be added
     #         -1 --> point is dominated
@@ -69,8 +68,6 @@ def is_dominated(nobj, point, front):
 
     dominanceFlag = 0
     ii = -1
-    # print(' ')
-    # print('point: ',point)
     while (ii < nsets-1):
         ii += 1
         numeql = 0
@@ -84,26 +81,21 @@ def is_dominated(nobj, point, front):
                 numimp += 1
             if (point[jj] >  front[ii,jj]):
                 numdeg += 1
-        # print('numeql = ',numeql,'   numimp = ',numimp, '   numdeg = ',numdeg)
                 
         if (numimp == 0) and (numdeg > 0):
             # 'point' is dominated
             dominanceFlag = -1
-            # print('return 1: ',dominanceFlag)
             return dominanceFlag
         else:
             if (numeql == nobj):
                 # Objective functions are the same for 'point' and archived solution ii
                 dominanceFlag = 0
-                # print('return 2: ',dominanceFlag)
                 return dominanceFlag
             else:
                 if (numimp > 0) and (numdeg == 0):
                     # 'point' dominates ii-th solution in the front
                     dominanceFlag = 1
-                    # print('return 3: ',dominanceFlag)
                     return dominanceFlag
-    # print('return 4: ',dominanceFlag)
     
     return dominanceFlag
 
