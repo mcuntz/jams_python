@@ -96,6 +96,7 @@
     netcdfread             Wrapper for readnetcdf.
     outlier                Rossner''s extreme standardized deviate outlier test.
     pack                   Similar to Fortran pack function with mask.
+    pareto_metrics         Performance metrics to compare Pareto fronts.
     pca                    Principal component analysis (PCA) upon the first dimension of an 2D-array.
     pi                     Parameter importance index PI or alternatively B index calculation.
     plot_brewer            Plots available Brewer color maps in pdf file.
@@ -267,6 +268,7 @@
     lagcorr                Calculate time lag of maximum or minimum correlation of two arrays.
     lhs                    Latin Hypercube Sampling of any distribution without correlations.
     morris_sampling        Sampling of optimised trajectories for Morris measures / elementary effects
+    pareto_metrics         Performance metrics to compare Pareto fronts.
     pi                     Parameter importance index PI or alternatively B index calculation.
     saltelli               Parameter sampling for Sobol indices calculation.
     sce                    Shuffle-Complex-Evolution algorithm for function min(max)imisation
@@ -488,6 +490,7 @@
               ST, Nov 2015 - added kge
               ST, Dec 2015 - added river_network
               ST, Feb 2016 - added function for writing 2d arrays to ascii file
+              JM, Feb 2016 - added pareto_metrics
 """
 from __future__ import print_function
 
@@ -568,7 +571,7 @@ try:
 except:
     print("No extra statistics in scipy, i.e. in UFZ package. Disabled functions: outlier, rossner.")
 from .pack              import pack
-from .pareto_metrics    import sn
+from .pareto_metrics    import sn, cz, hi, ef, aed, is_dominated, point_to_front
 from .pca               import pca, check_pca
 from .pi                import pi
 from .position          import position
