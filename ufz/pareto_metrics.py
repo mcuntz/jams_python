@@ -2,7 +2,7 @@
 from __future__ import print_function
 import numpy as np
 
-__all__ = ['sn','cz','hi']
+__all__ = ['sn','cz','hi','ef','aed']
 
 def is_dominated(nobj, point, front):
     # checks whether a new canidate 'point' is dominated by the 'front' or not
@@ -132,6 +132,8 @@ def point_to_front(nobj, point, front):
 
 def sn(front, reference_front):
     """
+        (Solution quality metric)
+        
         The run-time search quality of a multi-objective optimization algorithm can be measured by the number of solutions
         that form an approxiamte Pareto front at searching time t that are nondominated by the Pareto front Z* in objective space.
         This number of points is called success number SN(t) of the algorithm. SN(t) is basically counting the number of points
@@ -222,6 +224,8 @@ def sn(front, reference_front):
 
 def cz(front, all_fronts, all_cz=False):
     """
+        (Solution quality metric)
+        
         To charcterize and compare the performance of different Multi-objective algorithms (MOAs), the contribution of
         each algorithm to the aggregated best front from all MOEAs can be used.
         
@@ -565,32 +569,242 @@ def hi(front, reference_point, nsamples=None, reference_front=None, hi_range=Fal
     return hi
 
 
+def ef(front, reference_front):
+    """
+        (Spacing metric)
+        
+        This metric measures the approximate extend of the front (EF) relative to the known best Pareto front Z* given by
+
+             EF = max_(i,j = 1,...,N) ( dist(F_i, F_j) ) / max_(F,G in Z*) ( dist(F, G) )
+
+        where the nominator indicates the maximum distance between two points on an algorithm's front and the denominator
+        is the maximum distance between two points on the known Pareto front Z*. dist(X,Y) is the Euclidean distance between
+        two vectors X and Y. To calculate EF, each dimension of the solution vectors in Z* is normalized to [0,1] initially,
+        followed by the normalization on each dimension of the 'front' Z using the data ranges from Z*.
+
+        A larger value of EF suggests that the approximate front is closer to the Pareto front in terms of solution extend.
+        It should be noted that the proposed EF only measures the coverage of the two-objective Pareto approximate fronts, and
+        that the overall quality of the fronts has to be assessed using other metrics.
+   
+
+        Definition
+        ----------
+        def ef(front, reference_front)
+
+
+        Input
+        -----
+        front               members of current front
+                            array with n1 rows (number of points) and m cols (number of objectives)
+        reference_front     all members of the best Pareto front (often unknown)
+                            array with n2 rows (number of points) and m cols (number of objectives)
+
+
+        Optional Input
+        --------------
+        None
+
+                            
+        Output
+        ------
+        Scalar floating number determining the extend of the 'front' relative to the extend of the 'reference_front'.
+
+            
+        Literature
+        ----------
+        F Zheng, AC Zecchin, HR Maier, and AR Simpson
+        Comparison of the searching behavior of NSGA-II, SAMODE and Borg MOEAs applied to water distribution system design problems
+        [Draft]
+
+        
+        Restrictions
+        ------------
+        Objectives are assumed to be minimized.
+
+
+        Examples
+        --------
+        >>> from autostring import astr
+        >>> reference_front = np.array([[3,13],[3,11],[3,9],[4,8],[5,7],[6,6],[7,5],[8,4],[10,3],[12,2],[14,1],[16,1],[18,1],[20,1],[22,1]])
+        >>> front_1 = np.array([[6,11],[6,8],[7,6],[8,5],[10,3],[12,2],[15,2],[18,2]])
+        >>> front_2 = np.array([[5,10],[5,9],[6,8],[7,7],[8,6],[9,5],[10,4],[12,3],[14,3],[15,2],[16,1],[18,1]])
+        >>> front_3 = np.array([[7,10],[7,8],[8,7],[10,6],[12,5],[13,4],[16,4],[18,3],[20,3]])
+        >>> extend_front = ef(front_1, reference_front)
+        >>> print(astr(extend_front,prec=4))
+        0.6933
+        >>> extend_front = ef(front_2, reference_front)
+        >>> print(astr(extend_front,prec=4))
+        0.7179
+        >>> extend_front = ef(front_3, reference_front)
+        >>> print(astr(extend_front,prec=4))
+        0.6358
+        
+
+        License
+        -------
+        This file is part of the UFZ Python package.
+
+        The UFZ Python package is free software: you can redistribute it and/or modify
+        it under the terms of the GNU Lesser General Public License as published by
+        the Free Software Foundation, either version 3 of the License, or
+        (at your option) any later version.
+
+        The UFZ Python package is distributed in the hope that it will be useful,
+        but WITHOUT ANY WARRANTY; without even the implied warranty of
+        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+        GNU Lesser General Public License for more details.
+
+        You should have received a copy of the GNU Lesser General Public License
+        along with the UFZ makefile project (cf. gpl.txt and lgpl.txt).
+        If not, see <http://www.gnu.org/licenses/>.
+
+        Copyright 2016 Juliane Mai
+
+
+        History
+        -------
+        Written,  JM, Feb 2016 
+    """
+    from scipy.spatial.distance import pdist
+
+    nobj = reference_front.shape[1]
+    if ( nobj != 2 ):
+        raise ValueError('pareto_metrics: This metric is only applicable for 2-dimensional fronts!')
+
+    # assure that input is floating and not integer
+    reference_front = reference_front.astype(float)
+    front           = front.astype(float)
+
+    # column-wise range of reference-front used to scale 'front' and 'reference_front'
+    col_min = np.min(reference_front,axis=0)
+    col_max = np.max(reference_front,axis=0)
+    
+    reference_front     = (reference_front - col_min ) / (col_max - col_min)
+    front               = (          front - col_min ) / (col_max - col_min)
+    extend_front = np.max(pdist(front)) / np.max(pdist(reference_front))
+    return extend_front
+
+
+def aed(front, reference_front):
+    """
+        (Convergence metric)
+        
+        The average Euclidean distance (AED) between an approximate front and the known best Pareto front Z* is, besides HI,
+        typically used to represent an MOA's convergence status in the objective space (Kollat and Reed, 2006).
+        The average Euclidean distance represents the average of all minimal Euclidean distances between a point of the 
+        'front' to all points of the 'reference front'.
+
+            AED = 1/N * sum_{i=1}^N min( dist(F_i, F) ),  where dist(F_i,F) is Euclidean distance of point F_i of 'front'
+                                                                            to the points of 'reference front' F
+
+        To allow for a comparison of AED values of different 'fronts', a normalization of the AED is applied. Therefore, all
+        dimensions of the reference front Z* are normalized using the minimal and maxiaml values of each dimension. All
+        dimensions are hence normaized to [0,1]. The same normalization is subsequently applied to the dimensions 'front' using the
+        minimal and maximal values of the 'reference front'. The AED is thus within the range [0,1] where a lower value indicates a
+        better front in general, as it possesses an overall shorter distance to the Pareto front in objective space.
+
+        It should be noted that this metric does not take the extend of the 'front' into account as it measures the mean of the
+        Euclidean distance between each solution F_i of the 'front' and its corresponding nearest member in the refence front Z*.
+   
+
+        Definition
+        ----------
+        def aed(front, reference_front)
+
+
+        Input
+        -----
+        front               members of current front
+                            array with n1 rows (number of points) and m cols (number of objectives)
+        reference_front     all members of the best Pareto front (often unknown)
+                            array with n2 rows (number of points) and m cols (number of objectives)
+
+
+        Optional Input
+        --------------
+        None
+
+                            
+        Output
+        ------
+        Scalar floating number determining the average euclidean distance of the 'front' to the 'reference_front'
+
+            
+        Literature
+        ----------
+        F Zheng, AC Zecchin, HR Maier, and AR Simpson
+        Comparison of the searching behavior of NSGA-II, SAMODE and Borg MOEAs applied to water distribution system design problems
+        [Draft]
+
+        
+        Restrictions
+        ------------
+        Objectives are assumed to be minimized.
+
+
+        Examples
+        --------
+        >>> from autostring import astr
+        >>> reference_front = np.array([[3,13],[3,11],[3,9],[4,8],[5,7],[6,6],[7,5],[8,4],[10,3],[12,2],[14,1],[16,1],[18,1],[20,1],[22,1]])
+        >>> front_1 = np.array([[6,11],[6,8],[7,6],[8,5],[10,3],[12,2],[15,2],[18,2]])
+        >>> front_2 = np.array([[5,10],[5,9],[6,8],[7,7],[8,6],[9,5],[10,4],[12,3],[14,3],[15,2],[16,1],[18,1]])
+        >>> front_3 = np.array([[7,10],[7,8],[8,7],[10,6],[12,5],[13,4],[16,4],[18,3],[20,3]])
+        >>> avergae_euclid_dist = aed(front_1, reference_front)
+        >>> print(astr(avergae_euclid_dist,prec=4))
+        0.0071
+        >>> avergae_euclid_dist = aed(front_2, reference_front)
+        >>> print(astr(avergae_euclid_dist,prec=4))
+        0.0090
+        >>> avergae_euclid_dist = aed(front_3, reference_front)
+        >>> print(astr(avergae_euclid_dist,prec=4))
+        0.0341
+        
+
+        License
+        -------
+        This file is part of the UFZ Python package.
+
+        The UFZ Python package is free software: you can redistribute it and/or modify
+        it under the terms of the GNU Lesser General Public License as published by
+        the Free Software Foundation, either version 3 of the License, or
+        (at your option) any later version.
+
+        The UFZ Python package is distributed in the hope that it will be useful,
+        but WITHOUT ANY WARRANTY; without even the implied warranty of
+        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+        GNU Lesser General Public License for more details.
+
+        You should have received a copy of the GNU Lesser General Public License
+        along with the UFZ makefile project (cf. gpl.txt and lgpl.txt).
+        If not, see <http://www.gnu.org/licenses/>.
+
+        Copyright 2016 Juliane Mai
+
+
+        History
+        -------
+        Written,  JM, Feb 2016 
+    """
+
+    # assure that input is floating and not integer
+    reference_front = reference_front.astype(float)
+    front           = front.astype(float)
+
+    # column-wise range of reference-front used to scale 'front' and 'reference_front'
+    col_min = np.min(reference_front,axis=0)
+    col_max = np.max(reference_front,axis=0)
+    
+    reference_front     = (reference_front - col_min ) / (col_max - col_min)
+    front               = (          front - col_min ) / (col_max - col_min)
+    average_euclid_dist = np.mean([ np.min(np.sum((reference_front-ifront)**2,axis=1)) for ifront in front ])
+    return average_euclid_dist
+
+
+
 if __name__ == '__main__':
     import doctest
     doctest.testmod(optionflags=doctest.NORMALIZE_WHITESPACE)
 
-    # from autostring import astr
-    # front_1 = np.array([[6,11],[6,8],[7,6],[8,5],[10,3],[12,2],[15,2],[18,2]])
-    # front_2 = np.array([[5,10],[5,9],[6,8],[7,7],[8,6],[9,5],[10,4],[12,3],[14,3],[15,2],[16,1],[18,1]])
-    # front_3 = np.array([[7,10],[7,8],[8,7],[10,6],[12,5],[13,4],[16,4],[18,3],[20,3]])
-    # all_fronts = [ front_1, front_2, front_3 ]
-
-    # # aggregate the fronts
-    # nfronts = len(all_fronts)
-    # nobj    = all_fronts[0].shape[1]
-    # aggretated_front = []
-    # for ifronts in range(nfronts):
-    #     nsets = all_fronts[ifronts].shape[0]
-    #     for isets in range(nsets):
-    #         aggretated_front = point_to_front(nobj, all_fronts[ifronts][isets], aggretated_front)
-
-    # print(aggretated_front)
-        
-    # # counts elements of current front which are members of aggregated front
-    # print( np.sum(np.array([ np.where(np.all(aggretated_front==ff,axis=1))[0].shape[0] for ff in list(front_1) ])) )
-    # print( np.sum(np.array([ np.where(np.all(aggretated_front==ff,axis=1))[0].shape[0] for ff in list(front_2) ])) )
-    # print( np.sum(np.array([ np.where(np.all(aggretated_front==ff,axis=1))[0].shape[0] for ff in list(front_3) ])) )
-    # print( [ np.sum(np.array([ np.where(np.all(aggretated_front==ff,axis=1))[0].shape[0] for ff in list(kk) ])) for kk in all_fronts ] )
 
 
     
