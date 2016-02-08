@@ -4,6 +4,57 @@ import numpy as np
 
 __all__ = ['sn','cz','hi','ef','aed']
 
+# Overview of the metrics (Table 1 in Zheng F et al., [Draft])
+#
+#   -------------------------------------------------------------------------------------------------------------------
+#   Metric       Symbol      Metric range              Run-time search behavior   Comments
+#   Category                 Value interpretation      characteristic
+#   -------------------------------------------------------------------------------------------------------------------
+#   Solution     SN          [0,Infty]                 MOA's ability to find      Wang et al. (2015), but 
+#   quality                  larger value is better    solutions that are on      current study is the first to 
+#   metric                                             Pareto front               consider its run-time statistics
+#   -------------------------------------------------------------------------------------------------------------------
+#   Solution     CZ          [0,Infty]                 Relative performance of    Developed by Zheng et al. [Draft]
+#   quality                  larger value is better    MOAs in providing non-     
+#   metric                                             dominated solutions
+#   -------------------------------------------------------------------------------------------------------------------
+#   Spacing      EF          [0,1]                     Front extend within the    Developed by Zheng et al. [Draft]
+#   metric                   larger value is better    objective space     
+#                                                     
+#   -------------------------------------------------------------------------------------------------------------------
+#   Convergence  HI          [0,1]                     Solution quality,          Hadka and Reed (2012), but
+#   metric                   larger value is better    diversity and uniformity   current study is the first to
+#                                                                                 consider its run-time variation
+#   -------------------------------------------------------------------------------------------------------------------
+#   Convergence  AED         [0,1]                     Convergence in objective   Kollat and Reed (2006)
+#   metric                   smaller value is better   space   
+#                                                      
+#   -------------------------------------------------------------------------------------------------------------------
+#   Convergence  Var         [0,1]                     Convergence in decision    Introduced in Zharie (2002), but
+#   metric                                             space                      current study is the first to
+#                                                                                 consider it in multi-objective space
+#   -------------------------------------------------------------------------------------------------------------------
+#
+#
+# Literature
+# ----------
+#        Hadka and Reed (2012)
+#
+#        Kollat, J. B., & Reed, P. M. (2006).
+#        Comparing state-of-the-art evolutionary multi-objective algorithms for long-term groundwater monitoring design.
+#        Advances in Water Resources, 29(6), 792–807. doi:10.1016/j.advwatres.2005.07.010
+#
+#        Wang et al. (2015)
+#
+#        Zaharie, D. (2002).
+#        Critical values for the control parameters of differential evolution algorithms (pp. 62–67).
+#        Presented at the 8th International Mendel Conference on Soft Computation.
+#
+#        F Zheng, AC Zecchin, HR Maier, and AR Simpson
+#        Comparison of the searching behavior of NSGA-II, SAMODE and Borg MOEAs applied to water
+#        distribution system design problems
+#        [Draft]
+
 def is_dominated(nobj, point, front):
     # checks whether a new canidate 'point' is dominated by the 'front' or not
     # does not manipulate 'front'
