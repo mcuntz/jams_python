@@ -42,12 +42,12 @@ __all__ = ['sn','cz','hi','ef','aed']
 #
 #        Kollat, J. B., & Reed, P. M. (2006).
 #        Comparing state-of-the-art evolutionary multi-objective algorithms for long-term groundwater monitoring design.
-#        Advances in Water Resources, 29(6), 792–807. doi:10.1016/j.advwatres.2005.07.010
+#        Advances in Water Resources, 29(6), 792-807. doi:10.1016/j.advwatres.2005.07.010
 #
 #        Wang et al. (2015)
 #
 #        Zaharie, D. (2002).
-#        Critical values for the control parameters of differential evolution algorithms (pp. 62–67).
+#        Critical values for the control parameters of differential evolution algorithms (pp. 62-67).
 #        Presented at the 8th International Mendel Conference on Soft Computation.
 #
 #        F Zheng, AC Zecchin, HR Maier, and AR Simpson
