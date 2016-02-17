@@ -246,13 +246,13 @@ def upscale_fdir(sn, factor, print_info=False, return_maxlocs=False, do_co=False
 
         
 class river_network(object):
-    def __init__(self, dem=None, fdir=None, co=None, do_co=False, fa=None, do_fa=False, print_info=False, missing_value=-9., sinks=None):
+    def __init__(self, dem=None, fdir=None, co=None, do_co=False, fa=None, do_fa=False, print_info=False, missing_value=-9999., sinks=None):
         """
             Initializes a river_network object describing the flow path of a river through the landscape.
 
             Definition
             ----------
-            river_network(dem=None, fdir=None, co=None, do_co=False, fa=None, do_fa=False, missing_value=-9, sinks=None):
+            river_network(dem=None, fdir=None, co=None, do_co=False, fa=None, do_fa=False, missing_value=-9999., sinks=None):
 
 
             Input
