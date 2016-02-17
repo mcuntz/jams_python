@@ -252,7 +252,7 @@ class river_network(object):
 
             Definition
             ----------
-            river_network(dem=None, fdir=None, co=None, do_co=False, fa=None, do_fa=False):
+            river_network(dem=None, fdir=None, co=None, do_co=False, fa=None, do_fa=False, missing_value=-9, sinks=None):
 
 
             Input
@@ -453,7 +453,7 @@ class river_network(object):
 
             Definition
             ----------
-            def flow_direction(self)
+            def flow_direction(self, print_info=False)
 
 
             Input
@@ -462,6 +462,7 @@ class river_network(object):
 
             Optional Input Parameters
             -------------------------
+            print_info - flag for printing additional information
 
             Options
             -------
@@ -558,25 +559,26 @@ class river_network(object):
 
             Definition
             ----------
-            def network_properties(self, fd, yy, xx, print_info=False, do_co=True, co=None, do_fa=True, fa=None):
+            def network_properties(self, fd, yy, xx, print_info=False, do_co=True, co=None, do_fa=True, fa=None, missing_value=-9999.):
 
 
             Input
             -----
-            self         self - river_network object
-            fd           flow direction field, basically river_network.fd
-            yy           row coordinate of sink
-            xx           column coordinate of sink
+            self          self - river_network object
+            fd            flow direction field, basically river_network.fd
+            yy            row coordinate of sink
+            xx            column coordinate of sink
 
 
             Optional Input Parameters
             -------------------------
-            print_info   write additional info on std_out
-            do_co        calculate channel order
-            co           given channel order field
-            do_fa        calculate flow accumulation
-            fa           given flow accumulation
-
+            print_info    write additional info on std_out
+            do_co         calculate channel order
+            co            given channel order field
+            do_fa         calculate flow accumulation
+            fa            given flow accumulation
+            missing_value floating point value for masking
+            
             Options
             -------
             print_info   True: write additional information
