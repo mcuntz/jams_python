@@ -575,13 +575,19 @@ from .pareto_metrics    import sn, cz, hi, ef, aed, is_dominated, point_to_front
 from .pca               import pca, check_pca
 from .pi                import pi
 from .position          import position
-from .readhdf           import readhdf,  hdfread
+try:
+    from .readhdf           import readhdf,  hdfread
+except ImportError:
+    pass # not installed
 try:
     from .readhdf4      import readhdf4, hdf4read
 except ImportError:
     pass # not installed
 from .readhdf5          import readhdf5, hdf5read
-from .readnetcdf        import readnetcdf, netcdfread, ncread, readnc
+try:
+    from .readnetcdf        import readnetcdf, netcdfread, ncread, readnc
+except ImportError:
+    pass # not installed
 from .rgb               import rgb_blend, rgb_range, rgb_gradient
 from .romanliterals     import int2roman, roman2int
 from .saltelli          import saltelli
@@ -604,7 +610,10 @@ from .timestepcheck     import timestepcheck
 from .tsym              import tsym
 from .unpack            import unpack
 from .volume_poly       import volume_poly
-from .writenetcdf       import writenetcdf, dumpnetcdf
+try:
+    from .writenetcdf       import writenetcdf, dumpnetcdf
+except ImportError:
+    pass # not installed
 from .xkcd              import xkcd
 from .yrange            import yrange
 from .zacharias         import zacharias, zacharias_check
