@@ -396,6 +396,8 @@ def sread(file, nc=0, skip=0, cskip=0, hskip=0, separator=None,
 def line2var(res, var, iinc, strip):
     nres = len(res)
     if strip is None:
+        tmp = [res[i].strip('"').strip("'") for i in iinc if i < nres]
+    elif not strip:
         tmp = [res[i] for i in iinc if i < nres]
     else:
         tmp = [res[i].strip(strip) for i in iinc if i < nres]

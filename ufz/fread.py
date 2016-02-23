@@ -424,7 +424,7 @@ def line2var(res, var, iinc, strip):
     nres = len(res)
     if strip is None:
         tmp = [res[i].strip('"').strip("'") for i in iinc if i < nres]
-    elif strip == False:
+    elif not strip:
         tmp = [res[i] for i in iinc if i < nres]
     else:
         tmp = [res[i].strip(strip) for i in iinc if i < nres]

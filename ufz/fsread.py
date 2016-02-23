@@ -204,7 +204,11 @@ def fsread(file, nc=0, snc=0, skip=0, cskip=0, hskip=0, separator=None,
         -------
         Written,  MC, Feb 2015 - modified fread
     """
-    #
+
+    # Input error
+    if (nc <= -1) and (snc <= -1):
+        raise ValueError('nc and snc must numbers or list of indices; -1 means read the rest. nc and snc cannot both be -1.')
+
     # wrap to fread/sread
     if not isinstance(snc, (list, tuple, np.ndarray)):
         if snc==0:
@@ -213,32 +217,21 @@ def fsread(file, nc=0, snc=0, skip=0, cskip=0, hskip=0, separator=None,
                          fill=fill, fill_value=fill_value, strip=strip,
                          header=header, full_header=full_header,
                          transpose=transpose, strarr=strarr)
+    # snc!=0
     if not isinstance(nc, (list, tuple, np.ndarray)):
-        if nc==0: # snc!=0
-            isnc = snc
-            if not isinstance(snc, (list, tuple, np.ndarray)):
-                if snc < 0: isnc = 0
-            return sread(file, nc=isnc, skip=skip, cskip=cskip, hskip=hskip, separator=separator,
+        if nc==0:
+            return sread(file, nc=snc, skip=skip, cskip=cskip, hskip=hskip, separator=separator,
                          squeeze=squeeze, reform=reform, skip_blank=skip_blank, comment=comment,
                          fill=fill, fill_value=sfill_value, strip=strip,
                          header=header, full_header=full_header,
                          transpose=transpose, strarr=strarr)
-    #
-    # Check indices
-    if isinstance(nc, (list, tuple, np.ndarray)):
-        if not isinstance(snc, (list, tuple, np.ndarray)):
-            if snc != -1:
-                raise ValueError('nc and snc must be list of indices, or if nc is list, then snc can be -1 to read the rest into strarr; or vice versa.')
-    else:
-        if nc != -1:
-            raise ValueError('nc and snc must be list of indices, or if nc is list, then snc can be -1 to read the rest into strarr; or vice versa.')
-    #
+
     # Open file
     try:
         f = open(file, 'r')
     except IOError:
         raise IOError('Cannot open file '+file)
-    #
+
     # Read header and Skip lines
     if hskip > 0:
         ihskip = 0
@@ -251,7 +244,7 @@ def fsread(file, nc=0, snc=0, skip=0, cskip=0, hskip=0, separator=None,
         while iskip < (skip-hskip):
             head[iskip] = f.readline().rstrip()
             iskip += 1
-    #
+
     # read first line to determine nc and separator (if not set)
     split = -1
     while True:
@@ -280,33 +273,45 @@ def fsread(file, nc=0, snc=0, skip=0, cskip=0, hskip=0, separator=None,
         sep = separator
         res = s.split(sep)
         nres = len(res)
-    #
+
     # Determine indices
-    if isinstance(nc, (list, tuple, np.ndarray)):
-        nnc = len(nc)
-        iinc = nc
-        if isinstance(snc, (list, tuple, np.ndarray)):
-            if np.in1d(nc, snc, assume_unique=True).any():
-                raise ValueError('float and string indices overlap.')
-            nsnc  = len(snc)
-            iisnc = snc
-        else:
-            iisnc = list(np.delete(np.arange(nres), iinc))
-            nsnc  = len(iisnc)
-    else:
-        nsnc  = len(snc) # must be iterable here
+    if isinstance(nc, (list, tuple, np.ndarray)) and isinstance(snc, (list, tuple, np.ndarray)):
+        if np.in1d(nc, snc, assume_unique=True).any():
+            raise ValueError('float and string indices overlap.')
+        iinc  = nc
         iisnc = snc
-        if isinstance(nc, (list, tuple, np.ndarray)):
-            if np.in1d(nc, snc, assume_unique=True).any():
-                raise ValueError('float and string indices overlap.')
-            nnc  = len(nc)
-            iinc = nc
+    elif isinstance(nc, (list, tuple, np.ndarray)):
+        iinc   = nc
+        iirest = list(np.delete(np.arange(nres), iinc))
+        if snc <= -1:
+            iisnc = iirest
         else:
-            iinc = list(np.delete(np.arange(nres), iisnc))
-            nnc  = len(iinc)
+            iisnc = iirest[:snc]
+    elif isinstance(snc, (list, tuple, np.ndarray)):
+        iisnc  = snc
+        iirest = list(np.delete(np.arange(nres), iisnc))
+        if nc <= -1:
+            iinc = iirest
+        else:
+            iinc = iirest[:nc]
+    else:
+        # cannot be nc=-1 and snc=-1
+        if nc <= -1:
+            iisnc = range(snc)
+            iinc  = range(snc,nres)
+        else:
+            if snc <= -1:
+                iinc = range(nc)
+                iisnc  = range(nc,nres)
+            else:
+                # red snc first then nc
+                iisnc = range(snc)
+                iinc  = range(snc,snc+nc)
+    nnc    = len(iinc)
+    nsnc   = len(iisnc)
     miinc  = max(iinc)
     miisnc = max(iisnc)
-    aiinc = list()
+    aiinc  = list()
     aiinc.extend(iinc)
     aiinc.extend(iisnc)
     miianc = max(aiinc)
@@ -392,16 +397,32 @@ def fsread(file, nc=0, snc=0, skip=0, cskip=0, hskip=0, separator=None,
     # list -> array
     if fill:
         var = [ [ fill_value if i=='' else i for i in row ] for row in var ]
+    # var  = np.array(var, dtype=np.float)
+    # svar = np.array(svar, dtype=np.str)
+    # if fill:
+    #     svar = np.where(svar=='', sfill_value, svar)
+    # if squeeze or reform:
+    #     var  = var.squeeze()
+    #     svar = svar.squeeze()
+    # if transpose:
+    #     var  = var.T
+    #     svar = svar.T
     var  = np.array(var, dtype=np.float)
-    svar = np.array(svar, dtype=np.str)
-    if fill:
-        svar = np.where(svar=='', sfill_value, svar)
-    if squeeze or reform:
-        var  = var.squeeze()
-        svar = svar.squeeze()
-    if transpose:
-        var  = var.T
-        svar = svar.T
+    if squeeze or reform: var  = var.squeeze()
+    if transpose: var  = var.T
+    if strarr:
+        svar = np.array(svar, dtype=np.str)
+        if transpose: svar = svar.T
+        if squeeze or reform: svar = svar.squeeze()
+        if fill: svar = np.where(svar=='', sfill_value, svar)
+    else:
+        if fill:
+            svar = [ [ fill_value if i=='' else i for i in row ] for row in svar ]
+        if squeeze or reform:
+            maxi = max([ len(i) for i in svar])
+            if maxi==1: svar = [ i[0] for i in svar ]
+        if transpose and isinstance(svar[0], list):
+            svar = [list(i) for i in zip(*svar)] # transpose
 
     return var, svar
 
@@ -411,7 +432,7 @@ def line2var(res, var, iinc, strip):
     nres = len(res)
     if strip is None:
         tmp = [res[i].strip('"').strip("'") for i in iinc if i < nres]
-    elif strip == False:
+    elif not strip:
         tmp = [res[i] for i in iinc if i < nres]
     else:
         tmp = [res[i].strip(strip) for i in iinc if i < nres]

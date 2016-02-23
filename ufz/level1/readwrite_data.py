@@ -163,7 +163,7 @@ def read_data(files, undef=-9999., strip=None, norecord=False, nofill=False):
     iihead = list()                     # list with indices of header in hdat/hflags lists
     for cff, ff in enumerate(files):
         # date, data
-        isdat, ssdat = ufz.fsread(ff, skip=1, snc=[0], nc=-1, strip=strip) # array
+        isdat, ssdat = ufz.fsread(ff, skip=1, snc=[0], nc=-1, strip=strip, strarr=True) # array
         isdate = ssdat[:,0]
         if norecord:
             idat    = isdat[:,0::2]
