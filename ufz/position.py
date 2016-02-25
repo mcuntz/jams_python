@@ -5,6 +5,7 @@ import numpy as np
 def position(row=1, col=1, num=1,
              left=0.125, right=0.9, bottom=0.1, top=0.9,
              hspace=0.1, vspace=None, wspace=None,
+             width=None, height=None,
              sortcol=False, golden=False, inversegolden=False,
              figsize=(1.,1.)):
     """
@@ -24,6 +25,7 @@ def position(row=1, col=1, num=1,
         def position(row=1, col=1, num=1,
                      left=0.125, right=0.9, bottom=0.1, top=0.9,
                      hspace=0.1, vspace=None, wspace=None,
+                     width=None, height=None,
                      sortcol=False, golden=False, inversegolden=False,
                      figsize=(1.,1.)):
 
@@ -40,6 +42,8 @@ def position(row=1, col=1, num=1,
         hspace         space between columns (default 0.1)
         vspace         space between rows (default 0.1)
         wspace         historical, same as vspace; will be overwritten by vspace
+        width          prescribe width of plots (default None)
+        height         prescribe height of plots (default None)
         sortcol        fill columns then rows (default False)
         golden         golden ratio of width/height = (1+sqrt(5))/2
                        (default False)
@@ -135,6 +139,7 @@ def position(row=1, col=1, num=1,
         Modified, MC, Feb 2013 - ported to Python 3
                   MC, Jul 2013 - vspace, wspace obsolete
                   MC, Apr 2014 - assert
+                  ST, Feb 2016 - added height and width
     """
     #
     # Check
@@ -154,8 +159,14 @@ def position(row=1, col=1, num=1,
     scaley = figsize[0]/float(max(figsize))
     #
     # width, height
-    dx = (right-left-(col-1)*hspace)/col
-    dy = (top-bottom-(row-1)*ivspace)/row
+    if width is None:
+        dx = (right-left-(col-1)*hspace)/col
+    else:
+        dx = width
+    if height is None:
+        dy = (top-bottom-(row-1)*ivspace)/row
+    else:
+        dy = height
     #
     # golden ratio
     ratio = (1.+np.sqrt(5.))/2.
