@@ -145,9 +145,7 @@ if __name__ == '__main__':
     outtype = outtype.lower()
     outtypes = ['', 'pdf', 'png', 'html', 'd3']
     if outtype not in outtypes:
-        print('\nError: output type must be in ', outtypes)
-        import sys
-        sys.exit()
+        raise IOError('\nOutput '+outype+' type must be in: {:s}'.format(outtypes))
 
     import numpy as np
     import ufz
@@ -335,12 +333,8 @@ if __name__ == '__main__':
     # ylim = [-0.4,0.4]
 
     iplot += 1
-    if usetex:
-        xlab   = r'$f(x)\ (0,100)$'
-        ylab   = r'$\delta\Delta\sin(x)$'
-    else:
-        xlab   = r'$f(x)$ (0,100)'
-        ylab   = r'$\delta\Delta\sin(x)$'
+    xlab   = ufz.str2tex('f(x) (0,100)', usetex=usetex)
+    ylab   = ufz.str2tex(r'$\delta \Delta \sin(x)$', usetex=usetex)
     # if (iplot == 0) | (outtype == 'pdf') | (outtype == 'png') | (outtype == 'html'):
     #     sub  = fig.add_axes(ufz.position(nrow,ncol,iplot,hspace=hspace,vspace=vspace))
     #     sub1 = sub
@@ -361,10 +355,7 @@ if __name__ == '__main__':
     if ylim != None: plt.setp(sub, ylim=ylim)
 
     larr = mark1
-    if usetex:
-        tarr = [r'$\sin(x)\ \mathrm{sin\ Nothing\ 100}$']
-    else:
-        tarr = [r'sin Nothing 100']
+    tarr = [ufz.str2tex(r'$\sin(x)$ sin Nothing 100', usetex=usetex)]
     ll = sub.legend(larr, tarr, frameon=frameon, ncol=1,
                     labelspacing=llrspace, handletextpad=llhtextpad, handlelength=llhlength,
                     loc='upper left', bbox_to_anchor=(llxbbox,llybbox), scatterpoints=1, numpoints=1)
@@ -407,14 +398,9 @@ if __name__ == '__main__':
     # ylim = [-0.4,0.4]
 
     iplot += 1
-    if usetex:
-        xlab   = r'$(0,1)$'
-        ylab   = r'$2\sin(x)$'
-    else:
-        xlab   = r'(0,1)'
-        ylab   = r'$2\sin(x)$'
+    xlab   = ufz.str2tex('(0,10)', usetex=usetex)
+    ylab   = ufz.str2tex(r'2$\sin(x)$', usetex=usetex)
     sub    = fig.add_axes(ufz.position(nrow,ncol,iplot,hspace=hspace,vspace=vspace))
-
 
     line1 = sub.plot(2.*np.sin(np.arange(100)))
     plt.setp(line1, linestyle='-', linewidth=lwidth, marker=None, color=lcol1)
@@ -427,10 +413,7 @@ if __name__ == '__main__':
     if ylim != None: plt.setp(sub, ylim=ylim)
 
     larr = line1
-    if usetex:
-        tarr = [r'$\mathrm{sin\ Nothing}$']
-    else:
-        tarr = [r'sin Nothing']
+    tarr = [ufz.str2tex(r'$\sin$ Nothing', usetex=usetex)]
     ll = sub.legend(larr, tarr, frameon=frameon, ncol=1,
                     labelspacing=llrspace, handletextpad=llhtextpad, handlelength=llhlength,
                     loc='upper left', bbox_to_anchor=(llxbbox,llybbox), scatterpoints=1, numpoints=1)
