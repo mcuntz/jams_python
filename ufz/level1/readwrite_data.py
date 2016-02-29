@@ -105,6 +105,7 @@ def read_data(files, undef=-9999., strip=None, norecord=False, nofill=False):
                                - nofill
     """
 
+    debug = False
     iundef = np.int(undef)
 
     # Get unique header and time stamps of all input file
@@ -162,6 +163,7 @@ def read_data(files, undef=-9999., strip=None, norecord=False, nofill=False):
     iidate = list()                     # list with indices of dates in dat/flag/record arrays
     iihead = list()                     # list with indices of header in hdat/hflags lists
     for cff, ff in enumerate(files):
+        if debug: print('File name: ', ff)
         # date, data
         isdat, ssdat = ufz.fsread(ff, skip=1, snc=[0], nc=-1, strip=strip, strarr=True) # array
         isdate = ssdat[:,0]
@@ -197,6 +199,10 @@ def read_data(files, undef=-9999., strip=None, norecord=False, nofill=False):
 
         # fill output arrays and index lists
         iiidate = np.where(np.in1d(adate,isdate))[0]  # indexes in dat/flags of time steps in current file
+        if debug:
+            print('Numbers should match: ', iiidate.size, idat.shape[0])
+            print('Current time steps:  ', len(isdate), [ aa for aa in isdate ])
+            print('Selected time steps: ', len(iiidate), [ adate[aa] for aa in iiidate ])
         iidate.append(iiidate)                       
         if not norecord: record[iiidate] = irecord[:] # write at appropriate places in record
         iiihead = list()
