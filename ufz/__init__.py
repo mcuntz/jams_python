@@ -131,6 +131,8 @@
     samevalue              Checks if abs. differences of array values within a certain window are smaller than threshold.
     savez                  Save several numpy arrays into a single file in uncompressed ``.npz`` format.
     savez_compressed       Save several arrays into a single file in compressed ``.npz`` format.
+    smax                   Calculating smooth maximum of two numbers
+    smin                   Calculating smooth minimum of two numbers
     sobol_index            Calculates the first-order and total variance-based sensitivity indices.
     sread                  Reads in string array from ascii file.
     srrasa                 Generates stratified random 2D points within a given rectangular area.
@@ -172,6 +174,8 @@
     pack                   Similar to Fortran pack function with mask.
     samevalue              Checks if abs. differences of array values within a certain window are smaller than threshold.
     maskgroup              Masks elements in a 1d array gathered in small groups.
+    smax                   Calculating smooth maximum of two numbers
+    smin                   Calculating smooth minimum of two numbers
     unpack                 Similar to Fortran unpack function with mask.
 
 
@@ -491,6 +495,7 @@
               ST, Dec 2015 - added river_network
               ST, Feb 2016 - added function for writing 2d arrays to ascii file
               JM, Feb 2016 - added pareto_metrics
+              ST, Mar 2016 - added smax and smin
 """
 from __future__ import print_function
 
@@ -599,6 +604,7 @@ from .semivariogram     import semivariogram
 from .sendmail          import sendmail
 from .sigma_filter      import sigma_filter
 from .signature2plot    import signature2plot
+from .smooth_minmax     import smin, smax
 from .sobol_index       import sobol_index
 from .sread             import sread
 from .srrasa            import srrasa, srrasa_trans
