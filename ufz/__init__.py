@@ -94,6 +94,7 @@
     morris_sampling        Sampling of optimised trajectories for Morris measures / elementary effects
     ncread                 Wrapper for readnetcdf.
     netcdfread             Wrapper for readnetcdf.
+    netcdf4                Convenience layer around netCDF4
     outlier                Rossner''s extreme standardized deviate outlier test.
     pack                   Similar to Fortran pack function with mask.
     pareto_metrics         Performance metrics to compare Pareto fronts.
@@ -347,6 +348,7 @@
     hdf5read               Wrapper for readhdf5.
     ncread                 Wrapper for readnetcdf.
     netcdfread             Wrapper for readnetcdf.
+    netcdf4                Convenience layer around netCDF4
     readhdf                Reads variables or information from hdf4 and hdf5 files.
     readhdf4               Reads variables or information from hdf4 files.
     readhdf5               Reads variables or information from hdf5 file.
@@ -496,6 +498,7 @@
               ST, Feb 2016 - added function for writing 2d arrays to ascii file
               JM, Feb 2016 - added pareto_metrics
               ST, Mar 2016 - added smax and smin
+              DS, Mar 2016 - added netcdf4
 """
 from __future__ import print_function
 
@@ -571,6 +574,7 @@ try:
     from .npyio         import savez, savez_compressed
 except ImportError:
     pass # old numpy version
+from .netcdf4 import netcdf4
 try:
     from .outlier       import outlier, rossner
 except:
