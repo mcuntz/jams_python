@@ -4,7 +4,7 @@ import numpy as np
 import ufz
 from collections import OrderedDict
 
-__all__ = ['read_data', 'write_data']
+__all__ = ['read_data', 'write_data', 'write_data_dmp', 'write_data_one_file']
 
 # --------------------------------------------------------------------
 
@@ -93,7 +93,7 @@ def read_data(files, undef=-9999., strip=None, norecord=False, nofill=False):
         along with the UFZ makefile project (cf. gpl.txt and lgpl.txt).
         If not, see <http://www.gnu.org/licenses/>.
 
-        Copyright 2015 Matthias Cuntz
+        Copyright 2015-2016 Matthias Cuntz
 
 
         History
@@ -313,6 +313,197 @@ def write_data(*args):
 
 # --------------------------------------------------------------------
 
+def write_data_dmp(*args):
+    """
+        Write data to individual Tereno Level2b files.
+
+        Wrapper to write_data_norecord_dmp.
+
+
+        Definition
+        ----------
+        def write_data_dmp(infiles, sdate, record, dat, flags, iidate, hdate, hrecord, hdat, hflags, iihead, hdmp):
+        or
+        def write_data_dmp(infiles, sdate, dat, flags, iidate, hdate, hdat, hflags, iihead, hdmp):
+
+
+        Input
+        -----
+        infiles   (nfile,)-list with CHS data level1 file names
+        sdate     (n,)-array of ascii dates in format YYYY-MM-DD hh:mm:ss
+        [record   (n,)-array of record number]
+        dat       (n,m)-array of data
+        flags     (n,m)-array of flags
+        iidate    (nfile,)-list with indices in the output arrays of the input files
+        hdate     date/time header
+        [hrecord  record header]
+        hdat      data headers
+        hflags    flags headers
+        iihead    (nfile,)-list with indices in the output array of headers in the input files
+        hdmp      data headers in Data Management Portal (DMP)
+
+        
+        Output
+        ------
+        files will be overwritten
+
+
+        Examples
+        --------
+        --> see __init__.py for full example of workflow
+
+        # Read data
+        files = ufz.files_from_gui(title='Choose Level 1 file(s)')
+        sdate, record, dat, flags, iidate, hdate, hrecord, hdat, hflags, iihead = ufz.level1.read_data(files)
+
+        # Set flags if variables were not treated yet
+        flags[:,idx] = np.where(flags[:,idx]==np.int(undef), 9, flags[:,idx])
+
+        # Write back data
+        ofiles = [ f.replace('level2','level2b') for f in files ]
+        hdmp = ufz.level1.get_value_excel(chsxlsfile, sheet, hdat, 'headerout (DB)')
+        ufz.level1.write_data_dmp(ofiles, sdate, record, dat, flags, iidate, hdate, hrecord, hdat, hflags, iihead, hdmp)
+
+        
+        # Read data
+        files = ufz.files_from_gui(title='Choose Level 1 file(s)')
+        sdate, dat, flags, iidate, hdate, hdat, hflags, iihead = ufz.level1.read_data(files, norecord=True)
+
+        # Set flags if variables were not treated yet
+        flags[:,idx] = np.where(flags[:,idx]==np.int(undef), 9, flags[:,idx])
+
+        # Write back data
+        ofiles = [ f.replace('level2','level2b') for f in files ]
+        hdmp = ufz.level1.get_value_excel(chsxlsfile, sheet, hdat, 'headerout (DB)')
+        ufz.level1.write_data_dmp(ofiles, sdate, dat, flags, iidate, hdate, hdat, hflags, iihead, hdmp)
+
+        License
+        -------
+        This file is part of the UFZ Python package.
+
+        The UFZ Python package is free software: you can redistribute it and/or modify
+        it under the terms of the GNU Lesser General Public License as published by
+        the Free Software Foundation, either version 3 of the License, or
+        (at your option) any later version.
+
+        The UFZ Python package is distributed in the hope that it will be useful,
+        but WITHOUT ANY WARRANTY; without even the implied warranty of
+        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+        GNU Lesser General Public License for more details.
+
+        You should have received a copy of the GNU Lesser General Public License
+        along with the UFZ makefile project (cf. gpl.txt and lgpl.txt).
+        If not, see <http://www.gnu.org/licenses/>.
+
+        Copyright 2015 Matthias Cuntz
+
+
+        History
+        -------
+        Written,  MC, May 2015
+    """
+    if len(args) == 10:
+        write_data_norecord_dmp(*args)
+    elif len(args) == 12:
+        write_data_norecord_dmp(args[0],args[1],args[3],args[4],args[5],args[6],args[8],args[9],args[10],args[11])
+    else:
+        raise ValueError('Must have 10 or 12 arguments.')
+
+# --------------------------------------------------------------------
+
+def write_data_one_file(*args):
+    """
+        Write concatenated data back to one CHS data file.
+
+        Wrapper to write_data_norecord_one_file and write_data_record_one_file.
+
+
+        Definition
+        ----------
+        def write_data_one_file(infiles, sdate, record, dat, flags, hdate, hrecord, hdat, hflags):
+        or
+        def write_data_one_file(infiles, sdate, dat, flags, hdate, hdat, hflags):
+
+
+        Input
+        -----
+        infiles   (nfile,)-list with CHS data level1 file names
+        sdate     (n,)-array of ascii dates in format YYYY-MM-DD hh:mm:ss
+        [record   (n,)-array of record number]
+        dat       (n,m)-array of data
+        flags     (n,m)-array of flags
+        hdate     date/time header
+        [hrecord  record header]
+        hdat      data headers
+        hflags    flags headers
+
+        
+        Output
+        ------
+        file will be overwritten
+
+
+        Examples
+        --------
+        --> see __init__.py for full example of workflow
+
+        # Read data
+        files = ufz.files_from_gui(title='Choose Level 1 file(s)')
+        sdate, record, dat, flags, iidate, hdate, hrecord, hdat, hflags, iihead = ufz.level1.read_data(files)
+
+        # Set flags if variables were not treated yet
+        flags[:,idx] = np.where(flags[:,idx]==np.int(undef), 9, flags[:,idx])
+
+        # Write back data
+        ofile = files[0].replace('level1', 'level2')        
+        ufz.level1.write_data_one_file(ofile, sdate, record, dat, flags, hdate, hrecord, hdat, hflags)
+
+        
+        # Read data
+        files = ufz.files_from_gui(title='Choose Level 1 file(s)')
+        sdate, dat, flags, iidate, hdate, hdat, hflags, iihead = ufz.level1.read_data(files, norecord=True)
+
+        # Set flags if variables were not treated yet
+        flags[:,idx] = np.where(flags[:,idx]==np.int(undef), 9, flags[:,idx])
+
+        # Write back data
+        ofile = files[0].replace('level1', 'level2')        
+        ufz.level1.write_data_one_file(ofile, sdate, dat, flags, hdate, hdat, hflags)
+
+        License
+        -------
+        This file is part of the UFZ Python package.
+
+        The UFZ Python package is free software: you can redistribute it and/or modify
+        it under the terms of the GNU Lesser General Public License as published by
+        the Free Software Foundation, either version 3 of the License, or
+        (at your option) any later version.
+
+        The UFZ Python package is distributed in the hope that it will be useful,
+        but WITHOUT ANY WARRANTY; without even the implied warranty of
+        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+        GNU Lesser General Public License for more details.
+
+        You should have received a copy of the GNU Lesser General Public License
+        along with the UFZ makefile project (cf. gpl.txt and lgpl.txt).
+        If not, see <http://www.gnu.org/licenses/>.
+
+        Copyright 2016 Matthias Cuntz
+
+
+        History
+        -------
+        Written,  MC, May 2016
+    """
+    if len(args) == 7:
+        write_data_norecord_one_file(*args)
+    elif len(args) == 9:
+        write_data_record_one_file(*args)
+    else:
+        raise ValueError('Must have 7 or 9 arguments.')
+
+# --------------------------------------------------------------------
+
 def write_data_norecord(infiles, sdate, dat, flags, iidate, hdate, hdat, hflags, iihead):
     """
         Write concatenated data back to individual CHS level1 data files without record column.
@@ -416,6 +607,221 @@ def write_data_norecord(infiles, sdate, dat, flags, iidate, hdate, hdat, hflags,
                 dstr += ','+str(dat[j,i])+','+str(flags[j,i])
             print(dstr, file=f)
         f.close()
+
+# --------------------------------------------------------------------
+
+def write_data_norecord_dmp(infiles, sdate, dat, flags, iidate, hdate, hdat, hflags, iihead, hdmp):
+    """
+        Write data to individual Tereno Level2b files.
+
+
+        Definition
+        ----------
+        def write_data_norecord_dmp(infiles, sdate, dat, flags, iidate, hdate, hdat, hflags, iihead, hdmp):
+
+
+        Input
+        -----
+        infiles   (nfile,)-list with CHS data level2b file names
+        sdate     (n,)-array of ascii dates in format YYYY-MM-DD hh:mm:ss
+        dat       (n,m)-array of data
+        flags     (n,m)-array of flags
+        iidate    (nfile,)-list with indices in the output arrays of the input files
+        hdate     date/time header
+        hdat      data headers
+        hflags    flags headers
+        iihead    (nfile,)-list with indices in the output array of headers in the input files
+        hdmp      data headers in Data Management Portal (DMP)
+
+        
+        Output
+        ------
+        files will be overwritten
+
+
+        Examples
+        --------
+        --> see __init__.py for full example of workflow
+
+        # Read data
+        files = ufz.files_from_gui(title='Choose Level 1 file(s)')
+        sdate, dat, flags, iidate, hdate, hdat, hflags, iihead = ufz.level1.read_data(files, norecord=True)
+
+        # Set flags if variables were not treated yet
+        flags[:,idx] = np.where(flags[:,idx]==np.int(undef), 9, flags[:,idx])
+
+        # Write back data
+        ofiles = [ f.replace('level2','level2b') for f in files ]
+        hdmp = ufz.level1.get_value_excel(chsxlsfile, sheet, hdat, 'headerout(DB)')
+        ufz.level1.write_data_norecord_dmp(ofiles, sdate, dat, flags, iidate, hdate, hdat, hflags, iihead, hdmp)
+
+
+        License
+        -------
+        This file is part of the UFZ Python package.
+
+        The UFZ Python package is free software: you can redistribute it and/or modify
+        it under the terms of the GNU Lesser General Public License as published by
+        the Free Software Foundation, either version 3 of the License, or
+        (at your option) any later version.
+
+        The UFZ Python package is distributed in the hope that it will be useful,
+        but WITHOUT ANY WARRANTY; without even the implied warranty of
+        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+        GNU Lesser General Public License for more details.
+
+        You should have received a copy of the GNU Lesser General Public License
+        along with the UFZ makefile project (cf. gpl.txt and lgpl.txt).
+        If not, see <http://www.gnu.org/licenses/>.
+
+        Copyright 2016 Matthias Cuntz
+
+
+        History
+        -------
+        Written,  MC, Mar 2016 - from write_data_norecord
+    """
+    # Assure iterable infiles
+    if not isinstance(infiles, (list, tuple, np.ndarray)): infiles = [infiles]
+
+    # Few checks of sizes
+    ntime = dat.shape[0]
+    ncol  = dat.shape[1]
+    assert len(infiles)   == len(iidate),  'File list and date index list do not conform.'
+    assert len(infiles)   == len(iihead),  'File list and header index list do not conform.'
+    assert len(sdate)     == ntime,        'Not enough dates.'
+    assert flags.shape[0] == ntime,        'Not enough flag time steps.'
+    assert flags.shape[1] == ncol,         'Not enough flag columns.'
+    assert len(hdat)      == ncol,         'Not enough data headers.'
+    assert len(hflags)    == ncol,         'Not enough flag headers.'
+    assert len(hdmp)      == ncol,         'Not enough database headers.'
+
+    # assure YYYY-MM-DD hh:mm:ss format even if sdate has DD.MM.YYYY hh:m:ss format
+    isdate = ufz.ascii2eng(sdate, full=True)
+        
+    # Tereno flags: OK, DOUBTFUL or BAD
+    if np.any(flags > 2): # level1 flags
+        oflags = np.maximum(ufz.level1.get_maxflag(flags), 0)
+    else:                 # level2 flags
+        oflags = flags
+    strflags = np.zeros(oflags.shape, dtype='S'+str(len('DOUBTFUL,Other,NIL')))
+    ii = np.where(oflags == 0)
+    if ii[0].size>0: strflags[ii] = 'OK,NIL,NIL'
+    ii = np.where(oflags == 1)
+    if ii[0].size>0: strflags[ii] = 'DOUBTFUL,Other,NIL'
+    ii = np.where(oflags == 2)
+    if ii[0].size>0: strflags[ii] = 'BAD,Other,NIL'
+
+    # Write individual files
+    for cff, ff in enumerate(infiles):
+        f = open(ff, 'wb')
+        # header
+        hstr = 'timestamp,sensorname,value,quality_flag,quality_cause,quality_comment'
+        print(hstr, file=f)
+        # data
+        ihead = iihead[cff]
+        idate = iidate[cff]
+        for j in idate:
+            for i in ihead:
+                dstr = isdate[j]+','+hdmp[i]+','+str(dat[j,i])+','+strflags[j,i]
+                print(dstr, file=f)
+        f.close()
+
+# --------------------------------------------------------------------
+
+def write_data_norecord_one_file(infile, sdate, dat, flags, hdate, hdat, hflags):
+    """
+        Write concatenated data back to one CHS data file without record column.
+
+
+        Definition
+        ----------
+        def write_data_norecord_one_file(infile, sdate, dat, flags, hdate, hdat, hflags):
+
+
+        Input
+        -----
+        infiles   (nfile,)-list with CHS data level1 file names
+        sdate     (n,)-array of ascii dates in format YYYY-MM-DD hh:mm:ss
+        dat       (n,m)-array of data
+        flags     (n,m)-array of flags
+        hdate     date/time header
+        hdat      data headers
+        hflags    flags headers
+
+        
+        Output
+        ------
+        file will be overwritten
+
+
+        Examples
+        --------
+        --> see __init__.py for full example of workflow
+
+        # Read data
+        files = ufz.files_from_gui(title='Choose Level 1 file(s)')
+        sdate, dat, flags, iidate, hdate, hdat, hflags, iihead = ufz.level1.read_data(files, norecord=True)
+
+        # Set flags if variables were not treated yet
+        flags[:,idx] = np.where(flags[:,idx]==np.int(undef), 9, flags[:,idx])
+
+        # Write back data
+        ofile = files[0].replace('level1', 'level2')
+        ufz.level1.write_data_norecord_one_file(ofile, sdate, dat, flags, hdate, hdat, hflags)
+
+
+        License
+        -------
+        This file is part of the UFZ Python package.
+
+        The UFZ Python package is free software: you can redistribute it and/or modify
+        it under the terms of the GNU Lesser General Public License as published by
+        the Free Software Foundation, either version 3 of the License, or
+        (at your option) any later version.
+
+        The UFZ Python package is distributed in the hope that it will be useful,
+        but WITHOUT ANY WARRANTY; without even the implied warranty of
+        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+        GNU Lesser General Public License for more details.
+
+        You should have received a copy of the GNU Lesser General Public License
+        along with the UFZ makefile project (cf. gpl.txt and lgpl.txt).
+        If not, see <http://www.gnu.org/licenses/>.
+
+        Copyright 2016 Matthias Cuntz
+
+
+        History
+        -------
+        Written,  MC, Mar 2016 - from write_data_norecord
+    """
+    # Few checks of sizes
+    ntime = dat.shape[0]
+    ncol  = dat.shape[1]
+    assert len(sdate)     == ntime,        'Not enough dates.'
+    assert flags.shape[0] == ntime,        'Not enough flag time steps.'
+    assert flags.shape[1] == ncol,         'Not enough flag columns.'
+    assert len(hdat)      == ncol,         'Not enough data headers.'
+    assert len(hflags)    == ncol,         'Not enough flag headers.'
+
+    # assure YYYY-MM-DD hh:mm:ss format even if sdate has DD.MM.YYYY hh:m:ss format
+    isdate = ufz.ascii2eng(sdate, full=True)
+
+    # Write individual files
+    f = open(infile, 'wb')
+    # header
+    hstr = hdate
+    for i in range(ncol):
+        hstr += ','+hdat[i]+','+hflags[i]
+    print(hstr, file=f)
+    # data
+    for j in range(nrow):
+        dstr = isdate[j]
+        for i in range(ncol):
+            dstr += ','+str(dat[j,i])+','+str(flags[j,i])
+        print(dstr, file=f)
+    f.close()
 
 # --------------------------------------------------------------------
 
@@ -527,6 +933,105 @@ def write_data_record(infiles, sdate, record, dat, flags, iidate, hdate, hrecord
                 dstr += ','+str(dat[j,i])+','+str(flags[j,i])
             print(dstr, file=f)
         f.close()
+
+# --------------------------------------------------------------------
+
+def write_data_record_one_file(infile, sdate, record, dat, flags, hdate, hrecord, hdat, hflags):
+    """
+        Write concatenated data back to one CHS data file with record number.
+
+
+        Definition
+        ----------
+        def write_data_record_one_file(infile, sdate, record, dat, flags, hdate, hrecord, hdat, hflags):
+
+
+        Input
+        -----
+        infiles   (nfile,)-list with CHS data level1 file names
+        sdate     (n,)-array of ascii dates in format YYYY-MM-DD hh:mm:ss
+        record    (n,)-array of record number
+        dat       (n,m)-array of data
+        flags     (n,m)-array of flags
+        hdate     date/time header
+        hrecord   record header
+        hdat      data headers
+        hflags    flags headers
+
+        
+        Output
+        ------
+        file will be overwritten
+
+
+        Examples
+        --------
+        --> see __init__.py for full example of workflow
+
+        # Read data
+        files = ufz.files_from_gui(title='Choose Level 1 file(s)')
+        sdate, record, dat, flags, iidate, hdate, hrecord, hdat, hflags, iihead = ufz.level1.read_data(files)
+
+        # Set flags if variables were not treated yet
+        flags[:,idx] = np.where(flags[:,idx]==np.int(undef), 9, flags[:,idx])
+
+        # Write back data to one file
+        ofile = files[0].replace('level1', 'level2')
+        ufz.level1.write_data_record_one_file(ofile, sdate, record, dat, flags, hdate, hrecord, hdat, hflags)
+
+
+        License
+        -------
+        This file is part of the UFZ Python package.
+
+        The UFZ Python package is free software: you can redistribute it and/or modify
+        it under the terms of the GNU Lesser General Public License as published by
+        the Free Software Foundation, either version 3 of the License, or
+        (at your option) any later version.
+
+        The UFZ Python package is distributed in the hope that it will be useful,
+        but WITHOUT ANY WARRANTY; without even the implied warranty of
+        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+        GNU Lesser General Public License for more details.
+
+        You should have received a copy of the GNU Lesser General Public License
+        along with the UFZ makefile project (cf. gpl.txt and lgpl.txt).
+        If not, see <http://www.gnu.org/licenses/>.
+
+        Copyright 2016 Matthias Cuntz
+
+
+        History
+        -------
+        Written,  MC, Mar 2016 - from write_data_record
+    """
+    # Few checks of sizes
+    ntime = dat.shape[0]
+    ncol  = dat.shape[1]
+    assert len(sdate)     == ntime,        'Not enough dates.'
+    assert len(record)    == ntime,        'Not enough record numbers.'
+    assert flags.shape[0] == ntime,        'Not enough flag time steps.'
+    assert flags.shape[1] == ncol,         'Not enough flag columns.'
+    assert len(hdat)      == ncol,         'Not enough data headers.'
+    assert len(hflags)    == ncol,         'Not enough flag headers.'
+
+    # assure YYYY-MM-DD hh:mm:ss format even if sdate has DD.MM.YYYY hh:m:ss format
+    isdate = ufz.ascii2eng(sdate, full=True)
+
+    # Write individual files
+    f = open(infile, 'wb')
+    # header
+    hstr = hdate+','+hrecord
+    for i in range(ncol):
+        hstr += ','+hdat[i]+','+hflags[i]
+    print(hstr, file=f)
+    # data
+    for j in range(ntime):
+        dstr = isdate[j]+','+str(record[j])
+        for i in range(ncol):
+            dstr += ','+str(dat[j,i])+','+str(flags[j,i])
+        print(dstr, file=f)
+    f.close()
 
 # --------------------------------------------------------------------
 

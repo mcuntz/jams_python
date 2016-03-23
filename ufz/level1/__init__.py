@@ -6,14 +6,15 @@
     Provided functions
     ------------------
     constant_values  Checks if a given series of data contains consecutive values which are constant over a certain time period.
-    get_flag         Get the flags at position n from CHS data flag vector.
-    get_manual_flags Get start and end dates as well as flag values for a specific variable from a manual flag file.
-    get_maxflag      Get the maximal flag of the string with the individual flags.
-    get_header_excel Get the header row of an Excel sheet.
-    get_value_excel  Get value in column of sheet in excelfile given variable name.
-    read_data        Read and concatenate data from CHS level1 data files.
-    set_flag         Set the flags at position n to iflag at indices ii of CHS data flag vector.
-    write_data       Write concatenated data back to individual CHS level1 data files.
+    get_flag              Get the flags at position n from CHS data flag vector.
+    get_manual_flags      Get start and end dates as well as flag values for a specific variable from a manual flag file.
+    get_maxflag           Get the maximal flag of the string with the individual flags.
+    get_header_excel      Get the header row of an Excel sheet.
+    get_value_excel       Get value in column of sheet in excelfile given variable name.
+    read_data             Read and concatenate data from CHS level1 data files.
+    set_flag              Set the flags at position n to iflag at indices ii of CHS data flag vector.
+    write_data            Write concatenated data back to individual CHS level1 data files.
+    write_data_one_file   Write concatenated data back to one CHS data file.
 
 
     Example
@@ -69,6 +70,18 @@
     yy = np.ma.array(dat[:,i], mask=(ufz.level1.get_maxflag(flags[:,i])==2))
     mark1 = sub.plot(xx, yy)
 
+    # Make level2
+    flags = ufz.maximum(ufz.level1.get_maxflag(flags), 0)
+
+    # write level2 data
+    ofile = infiles[0].replace('level1', 'level2')
+    ufz.level1.write_data_onefile(ofile, sdate, record, dat, flags, hdate, hrecord, hdat, hflags)
+
+    # write level2b data for DMP
+    ofile = infiles[0].replace('level1', 'level2b')
+    hdmp = ufz.level1.get_value_excel(chsxlsfile, sheet, hdat, 'headerout (DB)')
+    ufz.level1.write_data_dmp(ofile, sdate, record, dat, flags, hdate, hrecord, hdat, hflags, hdmp)
+
 
     License
     -------
@@ -98,12 +111,13 @@
               MC, May 2015 - excel - get_value_excel
               MC, Aug 2015 - get_manual_flags
               MC, Jan 2016 - get_header_excel
+              MC, Mar 2016 - write_data_dmp, write_data_one_file
 """
 from .constant_values import constant_values
 from .excel           import get_header_excel, get_value_excel
 from .getset_flag     import get_flag, set_flag, get_maxflag
 from .manual_flags    import get_manual_flags
-from .readwrite_data  import read_data, write_data
+from .readwrite_data  import read_data, write_data, write_data_dmp, write_data_one_file
 
 # Information
 __author__   = "Matthias Cuntz"
