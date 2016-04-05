@@ -114,6 +114,7 @@ def str2tex(strin, space2linebreak=False, bold=False, italic=False, usetex=True)
     rep_n        = lambda s : s.replace('\n', '}$'+a0+'\n'+a0+mtex)
     rep_down     = lambda s : s.replace('_', '\_')
     rep_up       = lambda s : s.replace('^', '\^')
+    rep_hash     = lambda s : s.replace('#', '\#')
     rep_percent  = lambda s : s.replace('%', '\%')
     rep_space    = lambda s : s.replace(' ', '\ ')
     rep_minus    = lambda s : s.replace('-', '}$'+ttex+'-}$'+mtex)
@@ -136,6 +137,8 @@ def str2tex(strin, space2linebreak=False, bold=False, italic=False, usetex=True)
                     if '_' in ss[ii]:  ss[ii] = rep_down(ss[ii])
                     # escape ^
                     if '^' in ss[ii]:  ss[ii] = rep_up(ss[ii])
+                    # escape #
+                    if '#' in ss[ii]:  ss[ii] = rep_hash(ss[ii])
                 istrin[j] = '$'.join(ss)
                 if s[0] == '$': istrin[j] = istrin[j][11:] # remove leading $\mathrm{}$ if started with $
             else:
@@ -150,6 +153,8 @@ def str2tex(strin, space2linebreak=False, bold=False, italic=False, usetex=True)
                 if '_' in istrin[j]:  istrin[j] = rep_down(istrin[j])
                 # escape ^
                 if '^' in istrin[j]:  istrin[j] = rep_up(istrin[j])
+                # escape #
+                if '#' in istrin[j]:  istrin[j] = rep_hash(istrin[j])
 
             # escape %
             if '%' in istrin[j]: istrin[j] = rep_percent(istrin[j])
