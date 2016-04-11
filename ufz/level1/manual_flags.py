@@ -99,7 +99,12 @@ def get_manual_flags(flagfile, variable, dendro=None, julian=True):
     if ii.size > 0:
         sdate   = start[ii]
         edate   = end[ii]
-        mflag   = flag[ii].astype(np.int)
+        try:
+            mflag   = flag[ii].astype(np.int)
+        except:
+            ufz.encrypt.sendfail(
+                'get_manual_flags: forgotten flag in file '+flagfile+' - var/start/end: '+variable+'/'+sdate+'/'+edate,
+                sender='matthias.cuntz@ufz.de')
         if dendro:
             l_dbh   = dbh[ii].astype(np.float)
             l_d_ini = d_ini[ii].astype(np.float)
