@@ -708,9 +708,9 @@ def write_data_norecord_dmp(infiles, sdate, dat, flags, iidate, hdate, hdat, hfl
     ii = np.where(oflags == 0)
     if ii[0].size>0: strflags[ii] = 'OK,NIL,NIL'
     ii = np.where(oflags == 1)
-    if ii[0].size>0: strflags[ii] = 'DOUBTFUL,Other,NIL'
+    if ii[0].size>0: strflags[ii] = 'DOUBTFUL,Other,Other'
     ii = np.where(oflags == 2)
-    if ii[0].size>0: strflags[ii] = 'BAD,Other,NIL'
+    if ii[0].size>0: strflags[ii] = 'BAD,Other,Other'
 
     # Write individual files
     for cff, ff in enumerate(infiles):
