@@ -139,7 +139,7 @@ if __name__ == '__main__':
     import doctest
     doctest.testmod(optionflags=doctest.NORMALIZE_WHITESPACE)
 
-    # base_folder = '/Volumes/Gruppen/tereno/CHS-Data'
+    # base_folder = '/Volumes/Gruppen/CHS-Data'
     # data_folder = base_folder+'/HohesHolz'
     # location_short_name = 'HH'
     # man_file = data_folder+"/Soilnet/Manual_Flags_Soilnet_"+location_short_name+".csv"

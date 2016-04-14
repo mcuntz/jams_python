@@ -205,7 +205,7 @@ if __name__ == '__main__':
     import doctest
     doctest.testmod(optionflags=doctest.NORMALIZE_WHITESPACE)
 
-    # base_folder = '/Volumes/Gruppen/tereno/CHS-Data'
+    # base_folder = '/Volumes/Gruppen/CHS-Data'
     # setup_chs = base_folder+'/CHS-measurements.xlsx'
     # sheet = 'Logger Hohes Holz'
     # v = 'Tair50HMP [degC]'
