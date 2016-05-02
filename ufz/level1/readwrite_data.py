@@ -33,7 +33,7 @@ def read_data(files, undef=-9999., strip=None, norecord=False, nofill=False):
         norecord  True: Do not assume that second column is record number.
         nofill    True: do not fill-up equal distant time steps
 
-        
+
         Output
         ------
         sdate, record, dat, flags, iidate, hdate, hrecord, hdat, hflags, iihead
@@ -203,7 +203,7 @@ def read_data(files, undef=-9999., strip=None, norecord=False, nofill=False):
             print('Numbers should match: ', iiidate.size, idat.shape[0])
             print('Current time steps:  ', len(isdate), [ aa for aa in isdate ])
             print('Selected time steps: ', len(iiidate), [ adate[aa] for aa in iiidate ])
-        iidate.append(iiidate)                       
+        iidate.append(iiidate)
         if not norecord: record[iiidate] = irecord[:] # write at appropriate places in record
         iiihead = list()
         for i, h in enumerate(ihdat):
@@ -212,7 +212,7 @@ def read_data(files, undef=-9999., strip=None, norecord=False, nofill=False):
             dat[iiidate, hh]   = idat[:,i]            # write at appropriate places in dat
             flags[iiidate, hh] = iflags[:,i]          # write at appropriate places in flags
         iihead.append(iiihead)
-    
+
     if norecord:
         return adate, dat, flags, iidate, hdate, hdat, hflags, iihead
     else:
@@ -248,7 +248,7 @@ def write_data(*args):
         hflags    flags headers
         iihead    (nfile,)-list with indices in the output array of headers in the input files
 
-        
+
         Output
         ------
         files will be overwritten
@@ -268,7 +268,7 @@ def write_data(*args):
         # Write back data
         ufz.level1.write_data(files, sdate, record, dat, flags, iidate, hdate, hrecord, hdat, hflags, iihead)
 
-        
+
         # Read data
         files = ufz.files_from_gui(title='Choose Level 1 file(s)')
         sdate, dat, flags, iidate, hdate, hdat, hflags, iihead = ufz.level1.read_data(files, norecord=True)
@@ -342,7 +342,7 @@ def write_data_dmp(*args):
         iihead    (nfile,)-list with indices in the output array of headers in the input files
         hdmp      data headers in Data Management Portal (DMP)
 
-        
+
         Output
         ------
         files will be overwritten
@@ -364,7 +364,7 @@ def write_data_dmp(*args):
         hdmp = ufz.level1.get_value_excel(chsxlsfile, sheet, hdat, 'headerout (DB)')
         ufz.level1.write_data_dmp(ofiles, sdate, record, dat, flags, iidate, hdate, hrecord, hdat, hflags, iihead, hdmp)
 
-        
+
         # Read data
         files = ufz.files_from_gui(title='Choose Level 1 file(s)')
         sdate, dat, flags, iidate, hdate, hdat, hflags, iihead = ufz.level1.read_data(files, norecord=True)
@@ -437,7 +437,7 @@ def write_data_one_file(*args):
         hdat      data headers
         hflags    flags headers
 
-        
+
         Output
         ------
         file will be overwritten
@@ -455,10 +455,10 @@ def write_data_one_file(*args):
         flags[:,idx] = np.where(flags[:,idx]==np.int(undef), 9, flags[:,idx])
 
         # Write back data
-        ofile = files[0].replace('level1', 'level2')        
+        ofile = files[0].replace('level1', 'level2')
         ufz.level1.write_data_one_file(ofile, sdate, record, dat, flags, hdate, hrecord, hdat, hflags)
 
-        
+
         # Read data
         files = ufz.files_from_gui(title='Choose Level 1 file(s)')
         sdate, dat, flags, iidate, hdate, hdat, hflags, iihead = ufz.level1.read_data(files, norecord=True)
@@ -467,7 +467,7 @@ def write_data_one_file(*args):
         flags[:,idx] = np.where(flags[:,idx]==np.int(undef), 9, flags[:,idx])
 
         # Write back data
-        ofile = files[0].replace('level1', 'level2')        
+        ofile = files[0].replace('level1', 'level2')
         ufz.level1.write_data_one_file(ofile, sdate, dat, flags, hdate, hdat, hflags)
 
         License
@@ -526,7 +526,7 @@ def write_data_norecord(infiles, sdate, dat, flags, iidate, hdate, hdat, hflags,
         hflags    flags headers
         iihead    (nfile,)-list with indices in the output array of headers in the input files
 
-        
+
         Output
         ------
         files will be overwritten
@@ -633,7 +633,7 @@ def write_data_norecord_dmp(infiles, sdate, dat, flags, iidate, hdate, hdat, hfl
         iihead    (nfile,)-list with indices in the output array of headers in the input files
         hdmp      data headers in Data Management Portal (DMP)
 
-        
+
         Output
         ------
         files will be overwritten
@@ -698,7 +698,7 @@ def write_data_norecord_dmp(infiles, sdate, dat, flags, iidate, hdate, hdat, hfl
 
     # assure YYYY-MM-DD hh:mm:ss format even if sdate has DD.MM.YYYY hh:m:ss format
     isdate = ufz.ascii2eng(sdate, full=True)
-        
+
     # Tereno flags: OK, DOUBTFUL or BAD
     if np.any(flags > 2): # level1 flags
         oflags = np.maximum(ufz.level1.get_maxflag(flags), 0)
@@ -749,7 +749,7 @@ def write_data_norecord_one_file(infile, sdate, dat, flags, hdate, hdat, hflags)
         hdat      data headers
         hflags    flags headers
 
-        
+
         Output
         ------
         file will be overwritten
@@ -849,7 +849,7 @@ def write_data_record(infiles, sdate, record, dat, flags, iidate, hdate, hrecord
         hflags    flags headers
         iihead    (nfile,)-list with indices in the output array of headers in the input files
 
-        
+
         Output
         ------
         files will be overwritten
@@ -958,7 +958,7 @@ def write_data_record_one_file(infile, sdate, record, dat, flags, hdate, hrecord
         hdat      data headers
         hflags    flags headers
 
-        
+
         Output
         ------
         file will be overwritten
