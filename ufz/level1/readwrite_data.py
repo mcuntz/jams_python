@@ -105,7 +105,7 @@ def read_data(files, undef=-9999., strip=None, norecord=False, nofill=False):
                                - nofill
     """
 
-    debug = False
+    debug = False 
     iundef = np.int(undef)
 
     # Get unique header and time stamps of all input file
@@ -200,9 +200,14 @@ def read_data(files, undef=-9999., strip=None, norecord=False, nofill=False):
         # fill output arrays and index lists
         iiidate = np.where(np.in1d(adate,isdate))[0]  # indexes in dat/flags of time steps in current file
         if debug:
+            def findDuplicates(l):      # this function returns all duplicates in a list
+                return list([x for x in l if l.count(x) > 1])
+
             print('Numbers should match: ', iiidate.size, idat.shape[0])
-            print('Current time steps:  ', len(isdate), [ aa for aa in isdate ])
-            print('Selected time steps: ', len(iiidate), [ adate[aa] for aa in iiidate ])
+            print('duplicate dates: ',findDuplicates(list(isdate)))
+            # print('Current time steps:  ', len(isdate), [ aa for aa in isdate ])
+            # print('Selected time steps: ', len(iiidate), [ adate[aa] for aa in iiidate ])                
+
         iidate.append(iiidate)
         if not norecord: record[iiidate] = irecord[:] # write at appropriate places in record
         iiihead = list()
