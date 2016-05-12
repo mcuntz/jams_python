@@ -37,6 +37,7 @@
     dewpoint               Calculates the dew point from ambient humidity.
     date2dec               Converts arrays with calendar date to decimal date.
     dec2date               Converts arrays with decimal date to calendar date.
+    distributions          Module for pdfs of additional distributions.
     div                    Wrapper for division.
     division               Divide two arrays, return 'otherwise' if division by 0.
     dumpnetcdf             Convenience function for writenetcdf
@@ -262,6 +263,7 @@
     ----
     around                 Round to the passed power of ten.
     correlate              Computes the cross-correlation function of two series x and y.
+    distributions          Module for pdfs of additional distributions.
     div                    Wrapper for division.
     division               Divide two arrays, return 'otherwise' if division by 0.
     elementary_effects     Morris measures mu, stddev and mu*
@@ -499,6 +501,7 @@
               JM, Feb 2016 - added pareto_metrics
               ST, Mar 2016 - added smax and smin
               DS, Mar 2016 - added netcdf4
+              MC, May 2016 - distributions
 """
 from __future__ import print_function
 
@@ -631,6 +634,7 @@ from .zacharias         import zacharias, zacharias_check
 # sub-packages with dependencies to rest ufz have to be loaded separately as in scipy
 from . import color
 # ToDo: from here on redo __init__.py
+from . import distributions
 from . import eddybox
 from . import files
 from . import ftp
