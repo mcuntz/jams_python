@@ -104,6 +104,7 @@
     plot_brewer            Plots available Brewer color maps in pdf file.
     position               Position arrays of subplots to be used with add_axes.
     print_brewer           Prints available Brewer colormap names.
+    qa                     Module of quality (error) measures.
     readhdf                Reads variables or information from hdf4 and hdf5 files.
     readhdf4               Reads variables or information from hdf4 files.
     readhdf5               Reads variables or information from hdf5 file.
@@ -277,6 +278,7 @@
     morris_sampling        Sampling of optimised trajectories for Morris measures / elementary effects
     pareto_metrics         Performance metrics to compare Pareto fronts.
     pi                     Parameter importance index PI or alternatively B index calculation.
+    qa                     Module of quality assessment (error) measures.
     saltelli               Parameter sampling for Sobol indices calculation.
     sce                    Shuffle-Complex-Evolution algorithm for function min(max)imisation
     sobol_index            Calculates the first-order and total variance-based sensitivity indices.
@@ -501,6 +503,7 @@
               JM, Feb 2016 - added pareto_metrics
               ST, Mar 2016 - added smax and smin
               DS, Mar 2016 - added netcdf4
+              MC, May 2016 - added qa
               MC, May 2016 - distributions
 """
 from __future__ import print_function
@@ -509,6 +512,7 @@ from __future__ import print_function
 from . import const
 from . import encrypt
 from . import functions
+from . import qa
 
 # Routines
 from .abc2plot          import abc2plot
