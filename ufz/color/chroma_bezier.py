@@ -200,7 +200,8 @@ def bezier(icolors, ncol=255, correctlightness=True, reverse=False, cmap=None, l
         else:
             idiverge = True
             if icol == 4:
-                raise ValueError, 'colours must have increasing or decreasing lightness in case of even number of colors: '+','+join(lights)
+                print('ll',lights)
+                raise ValueError, 'colours must have increasing or decreasing lightness in case of even number of colors: '+','+','.join([ str(i) for i in lights ])
 
     # Interpolate colours
     if icol == 1:

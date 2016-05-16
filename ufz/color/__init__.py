@@ -57,6 +57,8 @@
     rgb2rgb01, rgb012rgb               "
     col2rgb,   col2rgb01               Convert any colour known by matplotlib (plus RGB [0-255]) to RGB [0-1] or [0-255]
     bezier                             Bezier interpolation between 2-5 colours in Lab colour space
+    sron_colors        Distinct colour palettes of Paul Tol at SRON - Netherlands Institute for Space Research
+    sron_maps          Colour maps of Paul Tol at SRON - Netherlands Institute for Space Research
 
 
     Example
@@ -332,8 +334,11 @@ from .chroma_converter  import rgb2rgb01, rgb012rgb
 from .chroma_converter  import col2rgb,   col2rgb01
 from .chroma_bezier     import bezier
 
+# sron
+from .sron              import sron_colors, sron_colours, sron_maps
+
 # Information
 __author__   = "Matthias Cuntz"
-__version__  = '1.0'
-__revision__ = "Revision: 2071"
-__date__     = 'Date: 24.03.2015'
+__version__  = '1.5'
+__revision__ = "Revision: 2419"
+__date__     = 'Date: 16.05.2016'
