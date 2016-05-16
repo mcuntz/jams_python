@@ -138,9 +138,7 @@ if __name__ == '__main__':
 
     # Check input
     if (infile is None):
-        print('\nError: Input file must be given.\n')
-        import sys
-        sys.exit()
+        raise IOError('\nInput file must be given.\n')
 
     outtype = outtype.lower()
     outtypes = ['', 'pdf', 'png', 'html', 'd3']
@@ -504,6 +502,6 @@ if __name__ == '__main__':
 #     del parser, args
     
 #     # Call function
-#     mc_template(infile, plotname=plotname, outtype=outtype, usetex=usetex, dowhite=dowhite)
+#     mc_template(infile, plotname=plotname, outtype=outtype, serif=serif, usetex=usetex, dowhite=dowhite)
 
 # Comment|Uncomment - End
