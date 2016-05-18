@@ -1,10 +1,10 @@
 #!/usr/bin/env python
 """
-    Defines common error measures.
+    Defines common error measures and discharge signatures
 
-    
-    Definition
-    ----------
+
+    Error measures
+    --------------
     def bias(obs,mod):      bias
                             mean(obs) - mean(mod)
     def mae(obs,mod):       mean absolute error
@@ -21,25 +21,68 @@
                                   a is mean(mod) / mean(obs), and
                                   b is std(mod) / std(obs)
     def pearson(obs,mod):   Pearson's correlation coefficient
-                            mean((obs-mean(obs))/stddev(obs) * (mod-mean(mod))/stddev(mod))    
-
+                            mean((obs-mean(obs))/stddev(obs) * (mod-mean(mod))/stddev(mod))
 
     Input
     -----
-    obs        ND-array
-    mod        ND-array
+    obs         ND-array
+    mod         ND-array
+    quantiles   Scalar or 1D array_like percentages of exceedance
 
 
     Output
     ------
     Measure calculated along the first axis.
-                 
 
-    Restrictions
-    ------------
-    None
-    
-    
+
+
+    Discharge signatures
+    --------------------
+    def autocorrelation(dat, lags):
+                            Autocorrelation of a data series at given lags.
+    def flowdurationcurve(dat, quantiles=None, concavity_index=False,
+                          mid_segment_slope=False, mhigh_segment_volume=False,
+                          high_segment_volume=False, low_segment_volume=False):
+                            Flow duration curves for a given data vector. The Flow duration curve at a
+                            certain quantile x is the data point p where x% of the data points are above the value p.
+                            Optionally, can be calculated:
+                                the concavity index CI can be calculated [Zhang2014].
+                                the FDC mid-segment slope [Shafii et. al 2014]
+                                the FDC medium high-segment volume [Shafii et. al 2014]
+                                the FDC high-segment volume [Shafii et. al 2014]
+                                the FDC low-segment volume [Shafii et. al 2014]
+    def limbdensities(dat):
+                            Rising and declinging limb densities,
+                            which are the duration of the data increase (decrease) divided by the number of peaks.
+    def maximummonthlyflow(date, dat):
+                            Maximum of average flows per month
+    def moments(dat, mean_data=False, stddev_data=False, median_data=False,
+                            Moments of data and log-transformed data
+                            Returns several moments of data series given, i.e.
+                                * mean               of data
+                                * standard deviation of data
+                                * median             of data
+                                * maximum/ peak      of data
+                                * mean               of log-transformed data
+                                * standard deviation of log-transformed data
+                                * median             of log-transformed data
+                                * maximum/ peak      of log-transformed data
+     def peakdistribution(dat, quantiles=None, slope_peak_distribution=False):
+                            Calculates the peak distribution.
+                            Optionally, the slope of the peak distribution can be returned.
+
+
+    Input
+    -----
+    dat         1D array_like
+    quantiles   Scalar or 1D array_like percentages of exceedance
+
+
+    Output
+    ------
+    Discharge signature.
+
+
     Examples
     --------
     >>> # Create some data
@@ -90,20 +133,17 @@
     along with the UFZ makefile project (cf. gpl.txt and lgpl.txt).
     If not, see <http://www.gnu.org/licenses/>.
 
-    Copyright 2014 Arndt Piayda
+    Copyright 2016 Matthias Cuntz
 
 
     History
     -------
-    Written, AP, Jul 2014
-    Modified MC, Dec 2014 - use simple formulas that work with normal and masked arrays but do not deal with NaN
-    Modified AP, Sep 2015 - add confidence interval
-    Modified ST, Nov 2015 - added KGE
-    Modified MC, May 2016 - calc along 1st axis so that measures work for ND-arrays
-                          - all 1-liner
+    Written, MC, May 2016
 """
 
 from .quality_assess import bias, mae, mse, rmse, nse, kge, pearson
+from .signatures     import autocorrelation, flowdurationcurve, limbdensities
+from .signatures     import maximummonthlyflow, moments, peakdistribution
 
 # Information
 __author__   = "Matthias Cuntz"

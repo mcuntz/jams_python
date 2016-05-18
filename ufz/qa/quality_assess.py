@@ -4,7 +4,7 @@ import numpy as np
 """
     Defines common error measures.
 
-    
+
     Definition
     ----------
     def bias(obs,mod):      bias
@@ -23,7 +23,7 @@ import numpy as np
                                   a is mean(mod) / mean(obs), and
                                   b is std(mod) / std(obs)
     def pearson(obs,mod):   Pearson's correlation coefficient
-                            mean((obs-mean(obs))/stddev(obs) * (mod-mean(mod))/stddev(mod))    
+                            mean((obs-mean(obs))/stddev(obs) * (mod-mean(mod))/stddev(mod))
 
 
     Input
@@ -35,13 +35,13 @@ import numpy as np
     Output
     ------
     Measure calculated along the first axis.
-                 
+
 
     Restrictions
     ------------
     None
-    
-    
+
+
     Examples
     --------
     >>> # Create some data
