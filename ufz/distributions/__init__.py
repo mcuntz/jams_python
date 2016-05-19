@@ -5,11 +5,14 @@
 
     Provided distributions
     ----------------------
+    ep          Exponential Power
+    exponential Exponential
     gauss       Gauss (Normal)
     laplace     Laplace
     normal      Normal (Gauss)
     sep         Skew Exponential Power
     sstudentt   Skewed Student t
+    studentt    Student t
 
 
     Example
@@ -48,7 +51,7 @@
 """
 
 # UFZ colours
-from .distributions     import gauss, laplace, normal, sep, sstudentt
+from .distributions import ep, exponential, gauss, laplace, normal, sep, sstudentt, studentt
 
 # Information
 __author__   = "Matthias Cuntz"
