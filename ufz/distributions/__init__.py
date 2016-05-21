@@ -51,7 +51,7 @@
 """
 
 # UFZ colours
-from .distributions import ep, exponential, gauss, laplace, normal, sep, sstudentt, studentt
+from .distributions import ep, exponential, gauss, laplace, normal, sep, ssstudentt, studentt
 
 # Information
 __author__   = "Matthias Cuntz"

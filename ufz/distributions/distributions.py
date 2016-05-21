@@ -1,8 +1,29 @@
 #!/usr/bin/env python
 from __future__ import print_function
 import numpy as np
+"""
+    License
+    -------
+    This file is part of the UFZ Python package.
 
-__all__ = ['ep', 'exponential', 'gauss', 'laplace', 'normal', 'sep', 'sstudentt', 'studentt']
+    The UFZ Python package is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Lesser General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    The UFZ Python package is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+    GNU Lesser General Public License for more details.
+
+    You should have received a copy of the GNU Lesser General Public License
+    along with the UFZ makefile project (cf. gpl.txt and lgpl.txt).
+    If not, see <http://www.gnu.org/licenses/>.
+
+    Copyright 2016 Matthias Cuntz
+"""
+
+__all__ = ['ep', 'exponential', 'gauss', 'laplace', 'normal', 'sep', 'ssstudentt', 'sstudentt', 'studentt']
 
 def ep(x, loc=0., sca=1., kurt=0., sig=None):
     """
@@ -31,11 +52,6 @@ def ep(x, loc=0., sca=1., kurt=0., sig=None):
         Output
         ------
         Exponential power pdf at x
-
-
-        Restrictions
-        ------------
-        None
         
 
         Examples
@@ -53,27 +69,6 @@ def ep(x, loc=0., sca=1., kurt=0., sig=None):
         True
 
 
-        License
-        -------
-        This file is part of the UFZ Python package.
-
-        The UFZ Python package is free software: you can redistribute it and/or modify
-        it under the terms of the GNU Lesser General Public License as published by
-        the Free Software Foundation, either version 3 of the License, or
-        (at your option) any later version.
-
-        The UFZ Python package is distributed in the hope that it will be useful,
-        but WITHOUT ANY WARRANTY; without even the implied warranty of
-        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-        GNU Lesser General Public License for more details.
-
-        You should have received a copy of the GNU Lesser General Public License
-        along with the UFZ makefile project (cf. gpl.txt and lgpl.txt).
-        If not, see <http://www.gnu.org/licenses/>.
-
-        Copyright 2016 Matthias Cuntz
-
-
         History
         -------
         Written,  MC, May 2016
@@ -81,6 +76,7 @@ def ep(x, loc=0., sca=1., kurt=0., sig=None):
     if sig is None:
         return ep01((x-loc)/sca, kurt)/sca
     else:
+        sca = sig
         return ep01((x-loc)/sca, kurt)/sca
 
 
@@ -109,36 +105,6 @@ def ep01(x, kurt=0.):
         Exponential power pdf with loc=0, sca=1 at x
 
 
-        Restrictions
-        ------------
-        None
-        
-
-        Examples
-        --------
-
-
-        License
-        -------
-        This file is part of the UFZ Python package.
-
-        The UFZ Python package is free software: you can redistribute it and/or modify
-        it under the terms of the GNU Lesser General Public License as published by
-        the Free Software Foundation, either version 3 of the License, or
-        (at your option) any later version.
-
-        The UFZ Python package is distributed in the hope that it will be useful,
-        but WITHOUT ANY WARRANTY; without even the implied warranty of
-        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-        GNU Lesser General Public License for more details.
-
-        You should have received a copy of the GNU Lesser General Public License
-        along with the UFZ makefile project (cf. gpl.txt and lgpl.txt).
-        If not, see <http://www.gnu.org/licenses/>.
-
-        Copyright 2016 Matthias Cuntz
-
-
         History
         -------
         Written,  MC, May 2016
@@ -165,6 +131,9 @@ def ep01(x, kurt=0.):
         return om_beta # ToDo - vector
     else:
         return om_beta * np.exp(-c_beta*np.abs(x)**(2.0/(1.0+beta)))
+
+    
+# --------------------------------------------------------------------
 
 
 def exponential(x, loc=0., sca=1., theta=1., sig=None):
@@ -195,37 +164,6 @@ def exponential(x, loc=0., sca=1., theta=1., sig=None):
         Exponential pdf at x
 
 
-        Restrictions
-        ------------
-        None
-        
-
-        Examples
-        --------
-        None
-
-
-        License
-        -------
-        This file is part of the UFZ Python package.
-
-        The UFZ Python package is free software: you can redistribute it and/or modify
-        it under the terms of the GNU Lesser General Public License as published by
-        the Free Software Foundation, either version 3 of the License, or
-        (at your option) any later version.
-
-        The UFZ Python package is distributed in the hope that it will be useful,
-        but WITHOUT ANY WARRANTY; without even the implied warranty of
-        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-        GNU Lesser General Public License for more details.
-
-        You should have received a copy of the GNU Lesser General Public License
-        along with the UFZ makefile project (cf. gpl.txt and lgpl.txt).
-        If not, see <http://www.gnu.org/licenses/>.
-
-        Copyright 2016 Matthias Cuntz
-
-
         History
         -------
         Written,  MC, May 2016
@@ -234,6 +172,7 @@ def exponential(x, loc=0., sca=1., theta=1., sig=None):
     if sig is None:
         return exponential01((x-loc)/sca)/sca
     else:
+        sca = sig
         return exponential01((x-loc)/sca)/sca
 
 
@@ -262,43 +201,15 @@ def exponential01(x, theta=1.):
         Exponential pdf with loc=0, sca=1. at x
 
 
-        Restrictions
-        ------------
-        None
-        
-
-        Examples
-        --------
-        None
-
-
-        License
-        -------
-        This file is part of the UFZ Python package.
-
-        The UFZ Python package is free software: you can redistribute it and/or modify
-        it under the terms of the GNU Lesser General Public License as published by
-        the Free Software Foundation, either version 3 of the License, or
-        (at your option) any later version.
-
-        The UFZ Python package is distributed in the hope that it will be useful,
-        but WITHOUT ANY WARRANTY; without even the implied warranty of
-        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-        GNU Lesser General Public License for more details.
-
-        You should have received a copy of the GNU Lesser General Public License
-        along with the UFZ makefile project (cf. gpl.txt and lgpl.txt).
-        If not, see <http://www.gnu.org/licenses/>.
-
-        Copyright 2016 Matthias Cuntz
-
-
         History
         -------
         Written,  MC, May 2016
     """
 
     return np.exp(-x/theta)/theta
+
+    
+# --------------------------------------------------------------------
 
 
 def gauss(*args, **kwargs):
@@ -308,6 +219,9 @@ def gauss(*args, **kwargs):
         def normal(x, loc=0., sca=1., sig=None):
     """
     return normal(*args, **kwargs)
+
+    
+# --------------------------------------------------------------------
 
 
 def laplace(x, loc=0., sca=1., sig=None):
@@ -335,11 +249,6 @@ def laplace(x, loc=0., sca=1., sig=None):
         Output
         ------
         Laplace pdf at x
-
-
-        Restrictions
-        ------------
-        None
         
 
         Examples
@@ -358,27 +267,6 @@ def laplace(x, loc=0., sca=1., sig=None):
 
         >>> print(np.allclose(laplace(1., 2., 2.), laplace((1.-2.)/2.)/2.))
         True
-
-
-        License
-        -------
-        This file is part of the UFZ Python package.
-
-        The UFZ Python package is free software: you can redistribute it and/or modify
-        it under the terms of the GNU Lesser General Public License as published by
-        the Free Software Foundation, either version 3 of the License, or
-        (at your option) any later version.
-
-        The UFZ Python package is distributed in the hope that it will be useful,
-        but WITHOUT ANY WARRANTY; without even the implied warranty of
-        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-        GNU Lesser General Public License for more details.
-
-        You should have received a copy of the GNU Lesser General Public License
-        along with the UFZ makefile project (cf. gpl.txt and lgpl.txt).
-        If not, see <http://www.gnu.org/licenses/>.
-
-        Copyright 2016 Matthias Cuntz
 
 
         History
@@ -416,11 +304,6 @@ def laplace01(x):
         Output
         ------
         Laplace pdf with loc=0 and sca=1 at x
-
-
-        Restrictions
-        ------------
-        None
         
 
         Examples
@@ -432,33 +315,15 @@ def laplace01(x):
         0.0
 
 
-        License
-        -------
-        This file is part of the UFZ Python package.
-
-        The UFZ Python package is free software: you can redistribute it and/or modify
-        it under the terms of the GNU Lesser General Public License as published by
-        the Free Software Foundation, either version 3 of the License, or
-        (at your option) any later version.
-
-        The UFZ Python package is distributed in the hope that it will be useful,
-        but WITHOUT ANY WARRANTY; without even the implied warranty of
-        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-        GNU Lesser General Public License for more details.
-
-        You should have received a copy of the GNU Lesser General Public License
-        along with the UFZ makefile project (cf. gpl.txt and lgpl.txt).
-        If not, see <http://www.gnu.org/licenses/>.
-
-        Copyright 2016 Matthias Cuntz
-
-
         History
         -------
         Written,  MC, May 2016
     """
 
     return 0.5 * np.exp(-np.abs(x))
+
+    
+# --------------------------------------------------------------------
 
 
 def normal(x, loc=0., sca=1., sig=None):
@@ -486,11 +351,6 @@ def normal(x, loc=0., sca=1., sig=None):
         Output
         ------
         Normal (Gauss) pdf at x
-
-
-        Restrictions
-        ------------
-        None
         
 
         Examples
@@ -510,26 +370,6 @@ def normal(x, loc=0., sca=1., sig=None):
         >>> print(np.allclose(normal(1., 2., 2.), normal((1.-2.)/2.)/2.))
         True
 
-        License
-        -------
-        This file is part of the UFZ Python package.
-
-        The UFZ Python package is free software: you can redistribute it and/or modify
-        it under the terms of the GNU Lesser General Public License as published by
-        the Free Software Foundation, either version 3 of the License, or
-        (at your option) any later version.
-
-        The UFZ Python package is distributed in the hope that it will be useful,
-        but WITHOUT ANY WARRANTY; without even the implied warranty of
-        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-        GNU Lesser General Public License for more details.
-
-        You should have received a copy of the GNU Lesser General Public License
-        along with the UFZ makefile project (cf. gpl.txt and lgpl.txt).
-        If not, see <http://www.gnu.org/licenses/>.
-
-        Copyright 2016 Matthias Cuntz
-
 
         History
         -------
@@ -539,6 +379,7 @@ def normal(x, loc=0., sca=1., sig=None):
     if sig is None:
         return normal01((x-loc)/sca)/sca
     else:
+        sca = sig
         return normal01((x-loc)/sca)/sca
 
 
@@ -565,11 +406,6 @@ def normal01(x):
         Output
         ------
         Normal pdf with loc=0 and sca=1 at x
-
-
-        Restrictions
-        ------------
-        None
         
 
         Examples
@@ -581,33 +417,15 @@ def normal01(x):
         True
 
 
-        License
-        -------
-        This file is part of the UFZ Python package.
-
-        The UFZ Python package is free software: you can redistribute it and/or modify
-        it under the terms of the GNU Lesser General Public License as published by
-        the Free Software Foundation, either version 3 of the License, or
-        (at your option) any later version.
-
-        The UFZ Python package is distributed in the hope that it will be useful,
-        but WITHOUT ANY WARRANTY; without even the implied warranty of
-        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-        GNU Lesser General Public License for more details.
-
-        You should have received a copy of the GNU Lesser General Public License
-        along with the UFZ makefile project (cf. gpl.txt and lgpl.txt).
-        If not, see <http://www.gnu.org/licenses/>.
-
-        Copyright 2016 Matthias Cuntz
-
-
         History
         -------
         Written,  MC, May 2016
     """
 
     return 1./np.sqrt(2.*np.pi) * np.exp(-0.5*x*x)
+
+    
+# --------------------------------------------------------------------
 
 
 def sep(x, loc=0., sca=1., skew=1., kurt=0., sig=None):
@@ -637,11 +455,6 @@ def sep(x, loc=0., sca=1., skew=1., kurt=0., sig=None):
         Output
         ------
         Skew exponential power pdf at x
-
-
-        Restrictions
-        ------------
-        None
         
 
         Examples
@@ -659,27 +472,6 @@ def sep(x, loc=0., sca=1., skew=1., kurt=0., sig=None):
         True
 
 
-        License
-        -------
-        This file is part of the UFZ Python package.
-
-        The UFZ Python package is free software: you can redistribute it and/or modify
-        it under the terms of the GNU Lesser General Public License as published by
-        the Free Software Foundation, either version 3 of the License, or
-        (at your option) any later version.
-
-        The UFZ Python package is distributed in the hope that it will be useful,
-        but WITHOUT ANY WARRANTY; without even the implied warranty of
-        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-        GNU Lesser General Public License for more details.
-
-        You should have received a copy of the GNU Lesser General Public License
-        along with the UFZ makefile project (cf. gpl.txt and lgpl.txt).
-        If not, see <http://www.gnu.org/licenses/>.
-
-        Copyright 2016 Matthias Cuntz
-
-
         History
         -------
         Written,  MC, May 2016
@@ -688,6 +480,7 @@ def sep(x, loc=0., sca=1., skew=1., kurt=0., sig=None):
     if sig is None:
         return sep01((x-loc)/sca, skew, kurt)/sca
     else:
+        sca = sig
         return sep01((x-loc)/sca, skew, kurt)/sca
 
 
@@ -715,36 +508,11 @@ def sep01(x, skew=1., kurt=0.):
         Output
         ------
         Skew exponential power pdf with loc=0, sca=1 at x
-
-
-        Restrictions
-        ------------
-        None
         
 
         Examples
         --------
-
-
-        License
-        -------
-        This file is part of the UFZ Python package.
-
-        The UFZ Python package is free software: you can redistribute it and/or modify
-        it under the terms of the GNU Lesser General Public License as published by
-        the Free Software Foundation, either version 3 of the License, or
-        (at your option) any later version.
-
-        The UFZ Python package is distributed in the hope that it will be useful,
-        but WITHOUT ANY WARRANTY; without even the implied warranty of
-        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-        GNU Lesser General Public License for more details.
-
-        You should have received a copy of the GNU Lesser General Public License
-        along with the UFZ makefile project (cf. gpl.txt and lgpl.txt).
-        If not, see <http://www.gnu.org/licenses/>.
-
-        Copyright 2016 Matthias Cuntz
+        None
 
 
         History
@@ -803,15 +571,250 @@ def sep01(x, skew=1., kurt=0.):
     else:
         return 2.0*sig_xi/(xi+xi1) * om_beta * np.exp(-c_beta*np.abs(a_xi)**(2.0/(1.0+beta)))
 
+    
+# --------------------------------------------------------------------
 
-def sstudentt(x, nu, loc=0., sca=1., skew=1., sig=None):
+
+def sstudentt(x, nu, loc=0., sca=1., skew=1.):
     """
         The skewed Student t distribution with given degrees of freedom, location, scale, and skewness.
 
 
         Definition
         ----------
-        def sstudentt(x, nu, loc=0., sca=1., skew=1., sig=None):
+        def ssstudentt(x, nu, loc=0., sca=1., skew=1., sig=None):
+
+
+        Input
+        -----
+        x          array_like quantiles
+        nu         degrees of freedom
+
+
+        Optional Input
+        --------------
+        loc        location
+        sca        scale
+        skew       skewness parameter
+
+
+        Output
+        ------
+        Skewed Student t pdf at x
+
+
+        History
+        -------
+        Written,  MC, May 2016
+    """
+
+    return sstudentt01((x-loc)/sca, nu, skew)/sca
+
+
+def sstudentt01(x, nu, skew=1.):
+    """
+        The skewed Student t distribution with given degrees of freedom and skewness,
+        location zero and unit scale.
+        
+        If skew is not 1 then mean is not zero and standard deviation is not 1.
+
+
+        Definition
+        ----------
+        def sstudentt01(x, nu, skew=1.):
+
+
+        Input
+        -----
+        x          array_like quantiles
+        nu         degrees of freedom
+
+
+        Optional Input
+        --------------
+        skew       skewness parameter
+        
+
+        Output
+        ------
+        Skewed Student t pdf with loc=0 and sca=1 at x
+
+
+        History
+        -------
+        Written,  MC, May 2016
+    """
+
+    alpha = np.where(x<0.0, skew, 1./skew)
+    if not np.iterable(x): alpha = alpha[0]        
+
+    return 2.0/(skew+1./skew) * studentt01(alpha*x, nu)
+
+
+def sstudentt_mean(nu, loc=0., sca=1., skew=1.):
+    """
+        The mean of the skewed Student t distribution with given degrees of freedom,
+        location, scale, and skewness.
+
+
+        Definition
+        ----------
+        def sstudentt_mean(nu, loc=0., sca=1., skew=1.):
+
+
+        Input
+        -----
+        nu         degrees of freedom
+
+
+        Optional Input
+        --------------
+        loc        location
+        sca        scale
+        skew       skewness parameter
+        
+
+        Output
+        ------
+        Mean of skewed Student t pdf
+
+
+        History
+        -------
+        Written,  MC, May 2016
+    """
+
+    return sstudentt01_mean(nu, skew) * sca + loc
+
+
+def sstudentt01_mean(nu, skew=1.):
+    """
+        The mean of the skewed Student t distribution with given degrees of freedom and skewness,
+        location zero and unit scale.
+
+
+        Definition
+        ----------
+        def sstudentt01_mean(nu, skew=1.):
+
+
+        Input
+        -----
+        nu         degrees of freedom
+
+
+        Optional Input
+        --------------
+        skew       skewness parameter
+        
+
+        Output
+        ------
+        Mean of skewed Student t pdf with loc=0 and sca=1 at x
+
+
+        History
+        -------
+        Written,  MC, May 2016
+    """
+    import scipy.special as ss
+
+    mu  = 2.0 * (skew-1./skew) * ss.gamma(0.5*(nu+1.0)) / ss.gamma(0.5*nu)
+    mu *= (nu-2.0)/(nu-1.0) * nu/(nu-2.) / np.sqrt(np.pi*nu)
+
+    return mu
+
+
+def sstudentt_std(nu, sca=1., skew=1.):
+    """
+        The standard deviation of the skewed Student t distribution with given degrees of freedom,
+        scale, and skewness.
+
+
+        Definition
+        ----------
+        def sstudentt_std(nu, sca=1., skew=1.):
+
+
+        Input
+        -----
+        nu         degrees of freedom
+
+
+        Optional Input
+        --------------
+        sca        scale
+        skew       skewness parameter
+        
+
+        Output
+        ------
+        Standard deviation of skewed Student t pdf
+
+
+        History
+        -------
+        Written,  MC, May 2016
+    """
+
+    return sstudentt01_std(nu, skew) * sca
+
+
+def sstudentt01_std(nu, skew=1.):
+    """
+        The standard deviation of the skewed Student t distribution with given degrees of freedom and skewness,
+        and unit scale.
+
+
+        Definition
+        ----------
+        def sstudentt01_std(nu, skew=1.):
+
+
+        Input
+        -----
+        nu         degrees of freedom
+
+
+        Optional Input
+        --------------
+        skew       skewness parameter
+        
+
+        Output
+        ------
+        Standard deviation of skewed Student t pdf with sca=1 at x
+
+
+        History
+        -------
+        Written,  MC, May 2016
+    """
+
+    mu = sstudentt01_mean(nu, skew)
+    if skew != 1.:
+        M1 = mu / (skew-1./skew)
+    else:
+        M1 = 0.
+    M2  = nu/(nu-2.)
+    var = (M2-M1**2)*(skew**2+1./skew**2)+2.*M1**2-M2
+    if var > 0.0:
+        return np.sqrt(var)
+    else:
+        return 0.0
+
+
+# --------------------------------------------------------------------
+
+
+def ssstudentt(x, nu, loc=0., sca=1., skew=1., sig=None):
+    """
+        The standardised skewed Student t distribution with given degrees of freedom, location, scale, and skewness.
+
+
+        Definition
+        ----------
+        def ssstudentt(x, nu, loc=0., sca=1., skew=1., sig=None):
 
 
         Input
@@ -831,38 +834,12 @@ def sstudentt(x, nu, loc=0., sca=1., skew=1., sig=None):
         Output
         ------
         Skewed Student t pdf at x
-
-
-        Restrictions
-        ------------
-        None
         
 
         Examples
         --------
-        >>> print(np.allclose(sstudentt(1., 2., 2., 0.5, 2.), sstudentt((1.-2.)/0.5, 2., skew=2.)/0.5))
+        >>> print(np.allclose(ssstudentt(1., 2., 2., 0.5, 2.), ssstudentt((1.-2.)/0.5, 2., skew=2.)/0.5))
         True
-
-
-        License
-        -------
-        This file is part of the UFZ Python package.
-
-        The UFZ Python package is free software: you can redistribute it and/or modify
-        it under the terms of the GNU Lesser General Public License as published by
-        the Free Software Foundation, either version 3 of the License, or
-        (at your option) any later version.
-
-        The UFZ Python package is distributed in the hope that it will be useful,
-        but WITHOUT ANY WARRANTY; without even the implied warranty of
-        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-        GNU Lesser General Public License for more details.
-
-        You should have received a copy of the GNU Lesser General Public License
-        along with the UFZ makefile project (cf. gpl.txt and lgpl.txt).
-        If not, see <http://www.gnu.org/licenses/>.
-
-        Copyright 2016 Matthias Cuntz
 
 
         History
@@ -871,20 +848,21 @@ def sstudentt(x, nu, loc=0., sca=1., skew=1., sig=None):
     """
 
     if sig is None:
-        return sstudentt02((x-loc)/sca, nu, skew)/sca
+        return ssstudentt01((x-loc)/sca, nu, skew)/sca
     else:
-        return sstudentt02((x-loc)/sca, nu, skew)/sca
+        sca = sig
+        return ssstudentt01((x-loc)/sca, nu, skew)/sca
 
 
-def sstudentt01(x, nu, skew=1.):
+def ssstudentt01(x, nu, skew=1.):
     """
-        The skewed Student t distribution with given degrees of freedom and skewness,
+        The standardised skewed Student t distribution with given degrees of freedom and skewness,
         location zero and unit scale.
 
 
         Definition
         ----------
-        def sstudentt01(x, nu, skew=1.):
+        def ssstudentt01(x, nu, skew=1.):
 
 
         Input
@@ -903,146 +881,40 @@ def sstudentt01(x, nu, skew=1.):
         Skewed Student t pdf with loc=0 and sca=1 at x
 
 
-        Restrictions
-        ------------
-        None
-        
-
-        Examples
-        --------
-
-
-        License
-        -------
-        This file is part of the UFZ Python package.
-
-        The UFZ Python package is free software: you can redistribute it and/or modify
-        it under the terms of the GNU Lesser General Public License as published by
-        the Free Software Foundation, either version 3 of the License, or
-        (at your option) any later version.
-
-        The UFZ Python package is distributed in the hope that it will be useful,
-        but WITHOUT ANY WARRANTY; without even the implied warranty of
-        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-        GNU Lesser General Public License for more details.
-
-        You should have received a copy of the GNU Lesser General Public License
-        along with the UFZ makefile project (cf. gpl.txt and lgpl.txt).
-        If not, see <http://www.gnu.org/licenses/>.
-
-        Copyright 2016 Matthias Cuntz
-
-
         History
         -------
         Written,  MC, May 2016
     """
-    import scipy.special as ss
+    # import scipy.special as ss
 
-    xi = skew
+    # xi = skew
 
-    xi1    = 1.0/xi
-    c      = ss.gamma(0.5*(nu+1.0)) / (ss.gamma(0.5*nu) * np.sqrt(np.pi*nu))
-    mu_xi  = 2.0 * (xi*xi-xi1*xi)/(xi+xi1) * c * (nu-2.0)/(nu-1.0)
+    # mu_xi  = 2.0 * (xi-1./xi) * ss.gamma(0.5*(nu+1.0)) / ss.gamma(0.5*nu)
+    # mu_xi *= (nu-2.0)/(nu-1.0)
+    # mu_xi *= nu/(nu-2.) / np.sqrt(np.pi*nu)
+    # # mu_xi *= sca
     
-    sig_xi = -mu_xi*mu_xi + (xi**3+xi**3)/(xi+xi1)
-    if sig_xi > 0.0:
-        sig_xi = np.sqrt(sig_xi)
-    else:
-        sig_xi = 0.0
-    # print(sig_xi)
-    # m1 = 0.
-    # m2 = np.sqrt(nu/(nu-2.))
-    # sig_xi = np.sqrt((m2-m1**2)*(xi**2+1./xi**2)+2.*m1**2-m2)
-    # print(sig_xi)
-        
-    a_xi = mu_xi+sig_xi*x
-    if np.iterable(x):
-        for i in range(len(x)):
-            if a_xi[i] < 0.0:
-                a_xi[i] = a_xi[i] * xi
-            else:
-                a_xi[i] = a_xi[i] * xi1
-    else:
-        if a_xi < 0.0:
-            a_xi = a_xi * xi
-        else:
-            a_xi = a_xi * xi1
+    # if xi != 1.:
+    #     M1 = mu_xi / (xi-1./xi)
+    # else:
+    #     M1 = 0.
+    # M2  = nu/(nu-2.)
+    # # M2 *= sca**2
+    # var = (M2-M1**2)*(skew**2+1./skew**2)+2.*M1**2-M2
+    # sig_xi = np.sqrt(var)
 
-    return 2.0 * sig_xi / (xi+xi1) * c * (1.0 + a_xi*a_xi/nu)**(-0.5*(nu+1.0))
+    # z = mu_xi + sig_xi*x
+    # pdf = sig_xi * sstudentt01(z, nu, xi)
 
+    # return pdf
 
-def sstudentt02(x, nu, skew=1.):
-    """
-        The skewed Student t distribution with given degrees of freedom and skewness,
-        location zero and unit scale.
+    mu  = sstudentt01_mean(nu, skew)
+    sig = sstudentt01_std(nu, skew)
+    z   = mu + sig*x
+    return sig * sstudentt01(z, nu, skew)
 
-
-        Definition
-        ----------
-        def sstudentt01(x, nu, skew=1.):
-
-
-        Input
-        -----
-        x          array_like quantiles
-        nu         degrees of freedom
-
-
-        Optional Input
-        --------------
-        skew       skewness parameter
-        
-
-        Output
-        ------
-        Skewed Student t pdf with loc=0 and sca=1 at x
-
-
-        Restrictions
-        ------------
-        None
-        
-
-        Examples
-        --------
-
-
-        License
-        -------
-        This file is part of the UFZ Python package.
-
-        The UFZ Python package is free software: you can redistribute it and/or modify
-        it under the terms of the GNU Lesser General Public License as published by
-        the Free Software Foundation, either version 3 of the License, or
-        (at your option) any later version.
-
-        The UFZ Python package is distributed in the hope that it will be useful,
-        but WITHOUT ANY WARRANTY; without even the implied warranty of
-        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-        GNU Lesser General Public License for more details.
-
-        You should have received a copy of the GNU Lesser General Public License
-        along with the UFZ makefile project (cf. gpl.txt and lgpl.txt).
-        If not, see <http://www.gnu.org/licenses/>.
-
-        Copyright 2016 Matthias Cuntz
-
-
-        History
-        -------
-        Written,  MC, May 2016
-    """
-    import scipy.special as ss
-    import scipy.stats as sp
-
-    xi  = skew
-    xx = np.where(x<0.0, x*xi, x/xi)
-    if not np.iterable(x): xx = xx[0]
-    pdf = 2.0/(xi+1./xi) * sp.t.pdf(xx, nu)
-    # pdf = 2.0/(xi+1./xi) * studentt01(xx, nu)
-
-    return pdf
+    
+# --------------------------------------------------------------------
 
 
 def studentt(x, nu, loc=0., sca=1., sig=None):
@@ -1071,38 +943,12 @@ def studentt(x, nu, loc=0., sca=1., sig=None):
         Output
         ------
         Student t pdf at x
-
-
-        Restrictions
-        ------------
-        None
         
 
         Examples
         --------
-        >>> print(np.allclose(sstudentt(1., 2., 2., 0.5, 2.), sstudentt((1.-2.)/0.5, 2., skew=2.)/0.5))
+        >>> print(np.allclose(ssstudentt(1., 2., 2., 0.5, 2.), ssstudentt((1.-2.)/0.5, 2., skew=2.)/0.5))
         True
-
-
-        License
-        -------
-        This file is part of the UFZ Python package.
-
-        The UFZ Python package is free software: you can redistribute it and/or modify
-        it under the terms of the GNU Lesser General Public License as published by
-        the Free Software Foundation, either version 3 of the License, or
-        (at your option) any later version.
-
-        The UFZ Python package is distributed in the hope that it will be useful,
-        but WITHOUT ANY WARRANTY; without even the implied warranty of
-        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-        GNU Lesser General Public License for more details.
-
-        You should have received a copy of the GNU Lesser General Public License
-        along with the UFZ makefile project (cf. gpl.txt and lgpl.txt).
-        If not, see <http://www.gnu.org/licenses/>.
-
-        Copyright 2016 Matthias Cuntz
 
 
         History
@@ -1137,36 +983,6 @@ def studentt01(x, nu):
         Output
         ------
         Student t pdf with loc=0 and sca=1 at x
-
-
-        Restrictions
-        ------------
-        None
-        
-
-        Examples
-        --------
-
-
-        License
-        -------
-        This file is part of the UFZ Python package.
-
-        The UFZ Python package is free software: you can redistribute it and/or modify
-        it under the terms of the GNU Lesser General Public License as published by
-        the Free Software Foundation, either version 3 of the License, or
-        (at your option) any later version.
-
-        The UFZ Python package is distributed in the hope that it will be useful,
-        but WITHOUT ANY WARRANTY; without even the implied warranty of
-        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-        GNU Lesser General Public License for more details.
-
-        You should have received a copy of the GNU Lesser General Public License
-        along with the UFZ makefile project (cf. gpl.txt and lgpl.txt).
-        If not, see <http://www.gnu.org/licenses/>.
-
-        Copyright 2016 Matthias Cuntz
 
 
         History
