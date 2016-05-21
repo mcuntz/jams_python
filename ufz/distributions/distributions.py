@@ -1090,8 +1090,11 @@ def sstudentt01_mean(nu, skew=1.):
     """
     import scipy.special as ss
 
-    mu  = 2.0 * (skew-1./skew) * ss.gamma(0.5*(nu+1.0)) / ss.gamma(0.5*nu)
-    mu *= (nu-2.0)/(nu-1.0) * nu/(nu-2.) / np.sqrt(np.pi*nu)
+    if nu <= 1.:
+        return np.inf
+    else:
+        mu  = 2.0 * (skew-1./skew) * ss.gamma(0.5*(nu+1.0)) / ss.gamma(0.5*nu)
+        mu *= (nu-2.0)/(nu-1.0) * nu/(nu-2.) / np.sqrt(np.pi*nu)
 
     return mu
 
@@ -1174,17 +1177,20 @@ def sstudentt01_std(nu, skew=1.):
         Written,  MC, May 2016
     """
 
-    mu = sstudentt01_mean(nu, skew)
-    if skew != 1.:
-        M1 = mu / (skew-1./skew)
+    if nu <= 2.:
+        return np.inf
     else:
-        M1 = 0.
-    M2  = nu/(nu-2.)
-    var = (M2-M1**2)*(skew**2+1./skew**2)+2.*M1**2-M2
-    if var > 0.0:
-        return np.sqrt(var)
-    else:
-        return 0.0
+        mu = sstudentt01_mean(nu, skew)
+        if skew != 1.:
+            M1 = mu / (skew-1./skew)
+        else:
+            M1 = 0.
+        M2  = nu/(nu-2.)
+        var = (M2-M1**2)*(skew**2+1./skew**2)+2.*M1**2-M2
+        if var > 0.0:
+            return np.sqrt(var)
+        else:
+            return 0.0
 
 
 # --------------------------------------------------------------------
@@ -1264,7 +1270,7 @@ def studentt01(x, nu):
     """
     import scipy.special as ss
 
-    c      = ss.gamma(0.5*(nu+1.0)) / (ss.gamma(0.5*nu) * np.sqrt(np.pi*nu))
+    c = ss.gamma(0.5*(nu+1.0)) / (ss.gamma(0.5*nu) * np.sqrt(np.pi*nu))
     return c * (1.0 + x**2/nu)**(-0.5*(nu+1.0))
 
 
