@@ -184,13 +184,13 @@ if __name__ == '__main__':
     alwidth     = 1.0         # axis line width
     msize       = 1.0         # marker size
     mwidth      = 1.0         # marker edge width
-    mcol1       = ufz.color.colours('red')        # primary marker colour
-    mcol2       = fgcolor                     # secondary
-    mcol3       = (202/255.,0/255.,32/255.) # third
+    mcol1       = ufz.color.colours('red')  # primary marker colour
+    mcol2       = fgcolor                   # secondary
+    mcol3       = ufz.color.rgb2rgb01(202,0,32) # third
     if dowhite:
-        mcols       = ufz.color.colours(['blue','red','lightgray','orange','lightblue',fgcolor])
+        mcols   = ufz.color.colours(['blue','red','lightgray','orange','lightblue',fgcolor])
     else:
-        mcols       = ufz.color.colours(['blue','red','darkgray','orange','darkblue','black'])
+        mcols   = ufz.color.colours(['blue','red','darkgray','orange','darkblue','black'])
     lcol1       = ufz.color.colours('blue')   # primary line colour
     lcol2       = fgcolor
     lcol3       = fgcolor
