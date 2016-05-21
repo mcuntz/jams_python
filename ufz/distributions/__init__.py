@@ -11,7 +11,9 @@
     laplace     Laplace
     normal      Normal (Gauss)
     sep         Skew Exponential Power
+    ssep        Standardised skew Exponential Power
     sstudentt   Skewed Student t
+    ssstudentt  Standardised skewed Student t
     studentt    Student t
 
 
@@ -50,8 +52,10 @@
     Written,  MC, May 2016
 """
 
-# UFZ colours
-from .distributions import ep, exponential, gauss, laplace, normal, sep, ssstudentt, studentt
+from .distributions import gauss, normal
+from .distributions import exponential, laplace
+from .distributions import ep, sep, sep_mean, sep_std, ssep
+from .distributions import ssstudentt, sstudentt, sstudentt_mean, sstudentt_std, studentt
 
 # Information
 __author__   = "Matthias Cuntz"

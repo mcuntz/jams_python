@@ -23,7 +23,9 @@ import numpy as np
     Copyright 2016 Matthias Cuntz
 """
 
-__all__ = ['ep', 'exponential', 'gauss', 'laplace', 'normal', 'sep', 'ssstudentt', 'sstudentt', 'studentt']
+__all__ = ['ep', 'exponential', 'gauss', 'laplace', 'normal',
+           'sep', 'sep_mean', 'sep_std', 'ssep',
+           'ssstudentt', 'sstudentt', 'sstudentt_mean', 'sstudentt_std', 'studentt']
 
 def ep(x, loc=0., sca=1., kurt=0., sig=None):
     """
@@ -128,7 +130,12 @@ def ep01(x, kurt=0.):
             
     # pdf
     if np.abs(beta+1.0) < 0.003: # 2/(1-0.997) ~ 666
-        return om_beta # ToDo - vector
+        # Uniform between [-x1,x1]
+        height = om_beta
+        x1 = 0.5/height # int(pdf) = 1 = 2*x1*height
+        pdf = np.where((x > (-x1)) & (x < x1), height, 0.0)
+        if not np.iterable(x): pdf = pdf[0]
+        return pdf
     else:
         return om_beta * np.exp(-c_beta*np.abs(x)**(2.0/(1.0+beta)))
 
@@ -428,14 +435,14 @@ def normal01(x):
 # --------------------------------------------------------------------
 
 
-def sep(x, loc=0., sca=1., skew=1., kurt=0., sig=None):
+def sep(x, loc=0., sca=1., skew=1., kurt=0.):
     """
         The skew exponential power distribution with given location, scale, skewness, and kurtosis.
 
 
         Definition
         ----------
-        def sep(x, loc=0., sca=1., skew=1., kurt=0., sig=None):
+        def sep(x, loc=0., sca=1., skew=1., kurt=0.):
 
 
         Input
@@ -477,11 +484,7 @@ def sep(x, loc=0., sca=1., skew=1., kurt=0., sig=None):
         Written,  MC, May 2016
     """
 
-    if sig is None:
-        return sep01((x-loc)/sca, skew, kurt)/sca
-    else:
-        sca = sig
-        return sep01((x-loc)/sca, skew, kurt)/sca
+    return sep01((x-loc)/sca, skew, kurt)/sca
 
 
 def sep01(x, skew=1., kurt=0.):
@@ -510,10 +513,82 @@ def sep01(x, skew=1., kurt=0.):
         Skew exponential power pdf with loc=0, sca=1 at x
         
 
-        Examples
-        --------
-        None
+        Literature
+        ----------
+        Fernandez C & Steel M (1998) On Bayesian modeling of fat tails and skewness.
+            Journal of the American Statistical Association 93, 359-371.
 
+
+        History
+        -------
+        Written,  MC, May 2016
+    """
+
+    alpha = np.where(x<0.0, skew, 1./skew)
+    if not np.iterable(x): alpha = alpha[0]
+
+    return 2.0/(skew+1./skew) * ep01(alpha*x, kurt)
+
+
+def sep_mean(loc=0., sca=1., skew=1., kurt=0.):
+    """
+        Mean of skew exponential power distribution with given skewness and kurtosis, location and scale.
+
+
+        Definition
+        ----------
+        def sep_mean(loc=0., sca=1., skew=1., kurt=0.):
+
+
+        Optional Input
+        --------------
+        loc        location
+        sca        scale
+        skew       skewness parameter
+        kurt       kurtosis parameter
+        
+
+        Output
+        ------
+        Mean of skew exponential power pdf at x
+
+
+        History
+        -------
+        Written,  MC, May 2016
+    """
+
+    return sep01_mean(skew, kurt) * sca + loc
+
+
+def sep01_mean(skew=1., kurt=0.):
+    """
+        Mean of skew exponential power distribution with given skewness and kurtosis, location zero and unit scale.
+
+
+        Definition
+        ----------
+        def sep01_mean(skew=1., kurt=0.):
+
+
+        Optional Input
+        --------------
+        skew       skewness parameter
+        kurt       kurtosis parameter
+        
+
+        Output
+        ------
+        Mean of skew exponential power pdf with loc=0, sca=1 at x
+        
+
+        Literature
+        ----------
+        Fernandez C & Steel M (1998) On Bayesian modeling of fat tails and skewness.
+            Journal of the American Statistical Association 93, 359-371.
+        Schoups G & Vrugt JA (2010) A formal likelihood function for parameter and predictive
+            inference of hydrologic models with correlated, heteroscedastic, and non-Gaussian errors.
+            Water Resources Research 46, W10531.
 
         History
         -------
@@ -521,9 +596,7 @@ def sep01(x, skew=1., kurt=0.):
     """
     import scipy.special as ss
 
-    xi   = skew
-    beta = kurt
-    
+    beta = kurt # notation of Schoups and Vrugt (2010)    
     if beta != -1.0:
         b1 = 0.5*(1.0 + beta)
         b2 =      1.0 + beta
@@ -533,62 +606,121 @@ def sep01(x, skew=1., kurt=0.):
         g3 = ss.gamma(b3)
         # -> sqrt(3/4)
         M1 = g2 / np.sqrt(g3*g1)
-        # -> 0
-        c_beta = (g3/g1)**(1.0/(1.0+beta))
-        # -> sqrt(1/12)
-        om_beta = np.sqrt(g3)/((1.0+beta)*np.sqrt(g1**3))
     else:
         M1      = np.sqrt(0.75)
-        c_beta  = 0.0
-        om_beta = np.sqrt(1.0/12.0)
-    M2  = 1.0
-    xi1 = 1.0/xi
 
-    # coefficients
-    mu_xi   = M1*(xi-xi1)
-    sig_xi  = (M2-M1*M1)*(xi*xi+xi1*xi1) + 2.0*M1*M1 - M2
-    if sig_xi > 0.0:
-        sig_xi  = np.sqrt(sig_xi)
+    if skew != 1:
+        return M1*(skew-1./skew)
     else:
-        sig_xi  = 0.0
+        return 0.0
+
+
+def sep_std(sca=1., skew=1., kurt=0.):
+    """
+        Standard deviation of skew exponential power distribution with given skewness and kurtosis, location and scale.
+
+
+        Definition
+        ----------
+        def sep_std(sca=1., skew=1., kurt=0.):
+
+
+        Optional Input
+        --------------
+        sca        scale
+        skew       skewness parameter
+        kurt       kurtosis parameter
         
-    a_xi = mu_xi+sig_xi*x
-    if np.iterable(x):
-        for i in range(len(x)):
-            if a_xi[i] < 0.0:
-                a_xi[i] = a_xi[i] * xi
-            else:
-                a_xi[i] = a_xi[i] * xi1
+
+        Output
+        ------
+        Standard deviation of skew exponential power pdf at x
+        
+
+        Literature
+        ----------
+        Fernandez C & Steel M (1998) On Bayesian modeling of fat tails and skewness.
+            Journal of the American Statistical Association 93, 359-371.
+        Schoups G & Vrugt JA (2010) A formal likelihood function for parameter and predictive
+            inference of hydrologic models with correlated, heteroscedastic, and non-Gaussian errors.
+            Water Resources Research 46, W10531.
+
+
+        History
+        -------
+        Written,  MC, May 2016
+    """
+
+    return sep01_std(skew, kurt) * sca
+
+
+def sep01_std(skew=1., kurt=0.):
+    """
+        Standard deviation of skew exponential power distribution with given skewness and kurtosis,
+        location zero and unit scale.
+
+
+        Definition
+        ----------
+        def sep01_std(skew=1., kurt=0.):
+
+
+        Optional Input
+        --------------
+        skew       skewness parameter
+        kurt       kurtosis parameter
+        
+
+        Output
+        ------
+        Standard deviation of skew exponential power pdf with loc=0, sca=1 at x
+        
+
+        Literature
+        ----------
+        Fernandez C & Steel M (1998) On Bayesian modeling of fat tails and skewness.
+            Journal of the American Statistical Association 93, 359-371.
+        Schoups G & Vrugt JA (2010) A formal likelihood function for parameter and predictive
+            inference of hydrologic models with correlated, heteroscedastic, and non-Gaussian errors.
+            Water Resources Research 46, W10531.
+
+
+        History
+        -------
+        Written,  MC, May 2016
+    """
+
+    mu  = sep01_mean(skew, kurt)
+    if skew != 1.:
+        M1 = mu / (skew-1./skew)
     else:
-        if a_xi < 0.0:
-            a_xi = a_xi * xi
-        else:
-            a_xi = a_xi * xi1
-            
-    # pdf
-    if np.abs(beta+1.0) < 0.003: # 2/(1-0.997) ~ 666
-        return 2.0*sig_xi/(xi+xi1) * om_beta
+        M1 = 0.
+    M2  = 1.0
+    var = (M2-M1**2)*(skew**2+1./skew**2) + 2.0*M1**2 - M2
+    if var > 0.0:
+        sig  = np.sqrt(var)
     else:
-        return 2.0*sig_xi/(xi+xi1) * om_beta * np.exp(-c_beta*np.abs(a_xi)**(2.0/(1.0+beta)))
+        sig  = 0.0
+
+    return sig
 
     
 # --------------------------------------------------------------------
 
 
-def sstudentt(x, nu, loc=0., sca=1., skew=1.):
+def ssep(x, loc=0., sca=1., skew=1., kurt=0., sig=None):
     """
-        The skewed Student t distribution with given degrees of freedom, location, scale, and skewness.
+        The standardise skew exponential power distribution with given location, scale, skewness, and kurtosis.
 
 
         Definition
         ----------
-        def ssstudentt(x, nu, loc=0., sca=1., skew=1., sig=None):
+        def ssep(x, loc=0., sca=1., skew=1., kurt=0., sig=None):
 
 
         Input
         -----
         x          array_like quantiles
-        nu         degrees of freedom
 
 
         Optional Input
@@ -596,11 +728,37 @@ def sstudentt(x, nu, loc=0., sca=1., skew=1.):
         loc        location
         sca        scale
         skew       skewness parameter
+        kurt       kurtosis parameter
+        sig        standard deviation, overwrites scale
 
 
         Output
         ------
-        Skewed Student t pdf at x
+        Standardised skew exponential power pdf at x
+        
+
+        Literature
+        ----------
+        Fernandez C & Steel M (1998) On Bayesian modeling of fat tails and skewness.
+            Journal of the American Statistical Association 93, 359-371.
+        Schoups G & Vrugt JA (2010) A formal likelihood function for parameter and predictive
+            inference of hydrologic models with correlated, heteroscedastic, and non-Gaussian errors.
+            Water Resources Research 46, W10531.
+        
+
+        Examples
+        --------
+        >>> print(np.allclose(ssep(1., 2., 2., 0.5, 2.), ssep((1.-2.)/2., skew=0.5, kurt=2.)/2.))
+        True
+
+        >>> print(np.allclose(ssep(1.3, 0., 1., 1., 0.), normal(1.3, 0., 1.)))
+        True
+
+        >>> print(np.allclose(ssep(1.3, 0., 1., 1., 1.), laplace(1.3, 0., 1./np.sqrt(2.))))
+        True
+
+        >>> print(np.allclose(ssep(1.3, 0., np.sqrt(2.), 1., 1.), laplace(1.3, 0., 1.)))
+        True
 
 
         History
@@ -608,75 +766,46 @@ def sstudentt(x, nu, loc=0., sca=1., skew=1.):
         Written,  MC, May 2016
     """
 
-    return sstudentt01((x-loc)/sca, nu, skew)/sca
+    if sig is None:
+        return ssep01((x-loc)/sca, skew, kurt)/sca
+    else:
+        sca = sig
+        return ssep01((x-loc)/sca, skew, kurt)/sca
 
 
-def sstudentt01(x, nu, skew=1.):
+def ssep01(x, skew=1., kurt=0.):
     """
-        The skewed Student t distribution with given degrees of freedom and skewness,
-        location zero and unit scale.
-        
-        If skew is not 1 then mean is not zero and standard deviation is not 1.
+        The standardised skew exponential power distribution with given skewness and kurtosis, location zero and unit scale.
 
 
         Definition
         ----------
-        def sstudentt01(x, nu, skew=1.):
+        def ssep01(x, skew=1., kurt=0.):
 
 
         Input
         -----
         x          array_like quantiles
-        nu         degrees of freedom
 
 
         Optional Input
         --------------
         skew       skewness parameter
+        kurt       kurtosis parameter
         
 
         Output
         ------
-        Skewed Student t pdf with loc=0 and sca=1 at x
+        Standardised skew exponential power pdf with loc=0, sca=1 at x
+        
 
-
-        History
-        -------
-        Written,  MC, May 2016
-    """
-
-    alpha = np.where(x<0.0, skew, 1./skew)
-    if not np.iterable(x): alpha = alpha[0]        
-
-    return 2.0/(skew+1./skew) * studentt01(alpha*x, nu)
-
-
-def sstudentt_mean(nu, loc=0., sca=1., skew=1.):
-    """
-        The mean of the skewed Student t distribution with given degrees of freedom,
-        location, scale, and skewness.
-
-
-        Definition
+        Literature
         ----------
-        def sstudentt_mean(nu, loc=0., sca=1., skew=1.):
-
-
-        Input
-        -----
-        nu         degrees of freedom
-
-
-        Optional Input
-        --------------
-        loc        location
-        sca        scale
-        skew       skewness parameter
-        
-
-        Output
-        ------
-        Mean of skewed Student t pdf
+        Fernandez C & Steel M (1998) On Bayesian modeling of fat tails and skewness.
+            Journal of the American Statistical Association 93, 359-371.
+        Schoups G & Vrugt JA (2010) A formal likelihood function for parameter and predictive
+            inference of hydrologic models with correlated, heteroscedastic, and non-Gaussian errors.
+            Water Resources Research 46, W10531.
 
 
         History
@@ -684,124 +813,11 @@ def sstudentt_mean(nu, loc=0., sca=1., skew=1.):
         Written,  MC, May 2016
     """
 
-    return sstudentt01_mean(nu, skew) * sca + loc
-
-
-def sstudentt01_mean(nu, skew=1.):
-    """
-        The mean of the skewed Student t distribution with given degrees of freedom and skewness,
-        location zero and unit scale.
-
-
-        Definition
-        ----------
-        def sstudentt01_mean(nu, skew=1.):
-
-
-        Input
-        -----
-        nu         degrees of freedom
-
-
-        Optional Input
-        --------------
-        skew       skewness parameter
-        
-
-        Output
-        ------
-        Mean of skewed Student t pdf with loc=0 and sca=1 at x
-
-
-        History
-        -------
-        Written,  MC, May 2016
-    """
-    import scipy.special as ss
-
-    mu  = 2.0 * (skew-1./skew) * ss.gamma(0.5*(nu+1.0)) / ss.gamma(0.5*nu)
-    mu *= (nu-2.0)/(nu-1.0) * nu/(nu-2.) / np.sqrt(np.pi*nu)
-
-    return mu
-
-
-def sstudentt_std(nu, sca=1., skew=1.):
-    """
-        The standard deviation of the skewed Student t distribution with given degrees of freedom,
-        scale, and skewness.
-
-
-        Definition
-        ----------
-        def sstudentt_std(nu, sca=1., skew=1.):
-
-
-        Input
-        -----
-        nu         degrees of freedom
-
-
-        Optional Input
-        --------------
-        sca        scale
-        skew       skewness parameter
-        
-
-        Output
-        ------
-        Standard deviation of skewed Student t pdf
-
-
-        History
-        -------
-        Written,  MC, May 2016
-    """
-
-    return sstudentt01_std(nu, skew) * sca
-
-
-def sstudentt01_std(nu, skew=1.):
-    """
-        The standard deviation of the skewed Student t distribution with given degrees of freedom and skewness,
-        and unit scale.
-
-
-        Definition
-        ----------
-        def sstudentt01_std(nu, skew=1.):
-
-
-        Input
-        -----
-        nu         degrees of freedom
-
-
-        Optional Input
-        --------------
-        skew       skewness parameter
-        
-
-        Output
-        ------
-        Standard deviation of skewed Student t pdf with sca=1 at x
-
-
-        History
-        -------
-        Written,  MC, May 2016
-    """
-
-    mu = sstudentt01_mean(nu, skew)
-    if skew != 1.:
-        M1 = mu / (skew-1./skew)
-    else:
-        M1 = 0.
-    M2  = nu/(nu-2.)
-    var = (M2-M1**2)*(skew**2+1./skew**2)+2.*M1**2-M2
-    if var > 0.0:
-        return np.sqrt(var)
-    else:
-        return 0.0
+    mu  = sep01_mean(skew, kurt)
+    sig = sep01_std(skew, kurt)
+    z   = mu + sig*x
+    
+    return sig * sep01(z, skew, kurt)
 
 
 # --------------------------------------------------------------------
@@ -879,39 +895,296 @@ def ssstudentt01(x, nu, skew=1.):
         Output
         ------
         Skewed Student t pdf with loc=0 and sca=1 at x
+        
+
+        Literature
+        ----------
+        Fernandez C & Steel M (1998) On Bayesian modeling of fat tails and skewness.
+            Journal of the American Statistical Association 93, 359-371.
+        Schoups G & Vrugt JA (2010) A formal likelihood function for parameter and predictive
+            inference of hydrologic models with correlated, heteroscedastic, and non-Gaussian errors.
+            Water Resources Research 46, W10531.
 
 
         History
         -------
         Written,  MC, May 2016
     """
-    # import scipy.special as ss
-
-    # xi = skew
-
-    # mu_xi  = 2.0 * (xi-1./xi) * ss.gamma(0.5*(nu+1.0)) / ss.gamma(0.5*nu)
-    # mu_xi *= (nu-2.0)/(nu-1.0)
-    # mu_xi *= nu/(nu-2.) / np.sqrt(np.pi*nu)
-    # # mu_xi *= sca
-    
-    # if xi != 1.:
-    #     M1 = mu_xi / (xi-1./xi)
-    # else:
-    #     M1 = 0.
-    # M2  = nu/(nu-2.)
-    # # M2 *= sca**2
-    # var = (M2-M1**2)*(skew**2+1./skew**2)+2.*M1**2-M2
-    # sig_xi = np.sqrt(var)
-
-    # z = mu_xi + sig_xi*x
-    # pdf = sig_xi * sstudentt01(z, nu, xi)
-
-    # return pdf
 
     mu  = sstudentt01_mean(nu, skew)
     sig = sstudentt01_std(nu, skew)
     z   = mu + sig*x
+
     return sig * sstudentt01(z, nu, skew)
+
+    
+# --------------------------------------------------------------------
+
+
+def sstudentt(x, nu, loc=0., sca=1., skew=1.):
+    """
+        The skewed Student t distribution with given degrees of freedom, location, scale, and skewness.
+
+
+        Definition
+        ----------
+        def ssstudentt(x, nu, loc=0., sca=1., skew=1., sig=None):
+
+
+        Input
+        -----
+        x          array_like quantiles
+        nu         degrees of freedom
+
+
+        Optional Input
+        --------------
+        loc        location
+        sca        scale
+        skew       skewness parameter
+
+
+        Output
+        ------
+        Skewed Student t pdf at x
+        
+
+        Literature
+        ----------
+        Fernandez C & Steel M (1998) On Bayesian modeling of fat tails and skewness.
+            Journal of the American Statistical Association 93, 359-371.
+
+
+        History
+        -------
+        Written,  MC, May 2016
+    """
+
+    return sstudentt01((x-loc)/sca, nu, skew)/sca
+
+
+def sstudentt01(x, nu, skew=1.):
+    """
+        The skewed Student t distribution with given degrees of freedom and skewness,
+        location zero and unit scale.
+        
+        If skew is not 1 then mean is not zero and standard deviation is not 1.
+
+
+        Definition
+        ----------
+        def sstudentt01(x, nu, skew=1.):
+
+
+        Input
+        -----
+        x          array_like quantiles
+        nu         degrees of freedom
+
+
+        Optional Input
+        --------------
+        skew       skewness parameter
+        
+
+        Output
+        ------
+        Skewed Student t pdf with loc=0 and sca=1 at x
+        
+
+        Literature
+        ----------
+        Fernandez C & Steel M (1998) On Bayesian modeling of fat tails and skewness.
+            Journal of the American Statistical Association 93, 359-371.
+
+
+        History
+        -------
+        Written,  MC, May 2016
+    """
+
+    alpha = np.where(x<0.0, skew, 1./skew)
+    if not np.iterable(x): alpha = alpha[0]        
+
+    return 2.0/(skew+1./skew) * studentt01(alpha*x, nu)
+
+
+def sstudentt_mean(nu, loc=0., sca=1., skew=1.):
+    """
+        The mean of the skewed Student t distribution with given degrees of freedom,
+        location, scale, and skewness.
+
+
+        Definition
+        ----------
+        def sstudentt_mean(nu, loc=0., sca=1., skew=1.):
+
+
+        Input
+        -----
+        nu         degrees of freedom
+
+
+        Optional Input
+        --------------
+        loc        location
+        sca        scale
+        skew       skewness parameter
+        
+
+        Output
+        ------
+        Mean of skewed Student t pdf
+        
+
+        Literature
+        ----------
+        Fernandez C & Steel M (1998) On Bayesian modeling of fat tails and skewness.
+            Journal of the American Statistical Association 93, 359-371.
+
+
+        History
+        -------
+        Written,  MC, May 2016
+    """
+
+    return sstudentt01_mean(nu, skew) * sca + loc
+
+
+def sstudentt01_mean(nu, skew=1.):
+    """
+        The mean of the skewed Student t distribution with given degrees of freedom and skewness,
+        location zero and unit scale.
+
+
+        Definition
+        ----------
+        def sstudentt01_mean(nu, skew=1.):
+
+
+        Input
+        -----
+        nu         degrees of freedom
+
+
+        Optional Input
+        --------------
+        skew       skewness parameter
+        
+
+        Output
+        ------
+        Mean of skewed Student t pdf with loc=0 and sca=1 at x
+        
+
+        Literature
+        ----------
+        Scharnagl B et al. (2015) Inverse modelling of in situ soil water dynamics:
+            accounting for heteroscedastic, autocorrelated, and non-Gaussian distributed residuals.
+            Hydrology And Earth System Sciences Discussions 12, 2155-2199.
+
+
+        History
+        -------
+        Written,  MC, May 2016
+    """
+    import scipy.special as ss
+
+    mu  = 2.0 * (skew-1./skew) * ss.gamma(0.5*(nu+1.0)) / ss.gamma(0.5*nu)
+    mu *= (nu-2.0)/(nu-1.0) * nu/(nu-2.) / np.sqrt(np.pi*nu)
+
+    return mu
+
+
+def sstudentt_std(nu, sca=1., skew=1.):
+    """
+        The standard deviation of the skewed Student t distribution with given degrees of freedom,
+        scale, and skewness.
+
+
+        Definition
+        ----------
+        def sstudentt_std(nu, sca=1., skew=1.):
+
+
+        Input
+        -----
+        nu         degrees of freedom
+
+
+        Optional Input
+        --------------
+        sca        scale
+        skew       skewness parameter
+        
+
+        Output
+        ------
+        Standard deviation of skewed Student t pdf
+        
+
+        Literature
+        ----------
+        Fernandez C & Steel M (1998) On Bayesian modeling of fat tails and skewness.
+            Journal of the American Statistical Association 93, 359-371.
+
+
+        History
+        -------
+        Written,  MC, May 2016
+    """
+
+    return sstudentt01_std(nu, skew) * sca
+
+
+def sstudentt01_std(nu, skew=1.):
+    """
+        The standard deviation of the skewed Student t distribution with given degrees of freedom and skewness,
+        and unit scale.
+
+
+        Definition
+        ----------
+        def sstudentt01_std(nu, skew=1.):
+
+
+        Input
+        -----
+        nu         degrees of freedom
+
+
+        Optional Input
+        --------------
+        skew       skewness parameter
+        
+
+        Output
+        ------
+        Standard deviation of skewed Student t pdf with sca=1 at x
+        
+
+        Literature
+        ----------
+        Fernandez C & Steel M (1998) On Bayesian modeling of fat tails and skewness.
+            Journal of the American Statistical Association 93, 359-371.
+
+
+        History
+        -------
+        Written,  MC, May 2016
+    """
+
+    mu = sstudentt01_mean(nu, skew)
+    if skew != 1.:
+        M1 = mu / (skew-1./skew)
+    else:
+        M1 = 0.
+    M2  = nu/(nu-2.)
+    var = (M2-M1**2)*(skew**2+1./skew**2)+2.*M1**2-M2
+    if var > 0.0:
+        return np.sqrt(var)
+    else:
+        return 0.0
 
     
 # --------------------------------------------------------------------
@@ -998,3 +1271,73 @@ def studentt01(x, nu):
 if __name__ == '__main__':
     import doctest
     doctest.testmod(optionflags=doctest.NORMALIZE_WHITESPACE)
+
+    # import numpy as np
+    # import scipy.special as spec
+    # import scipy.stats as sp
+    # import ufz
+
+    # nn = 10000000
+    # xx1 = np.arange(nn)/float(nn) * 30.*100. - 15.*100.
+
+    # loc=1.
+    # sca=2.
+    # skew=2.
+    # kurt=0.5
+    # nu=3.1
+    # theta=1.5
+
+    # dx = xx1[2]-xx1[1]
+
+    # __all__ = ['ep', 'exponential', 'laplace', 'normal', 'sep', 'ssstudentt', 'studentt']
+    # __all__ = ['ssep', 'ssstudentt']
+
+    # for dd in __all__:
+    #     xx = xx1
+    #     if dd == 'ep':
+    #         pdf = ufz.distributions.ep(xx, loc, sca, kurt)
+    #     elif dd == 'exponential':
+    #         xx = xx1[xx1>0.]
+    #         pdf = ufz.distributions.exponential(xx, loc, sca, theta)
+    #     elif dd == 'laplace':
+    #         pdf = ufz.distributions.laplace(xx, loc, sig=sca)
+    #     elif dd == 'normal':
+    #         pdf = ufz.distributions.normal(xx, loc, sca)
+    #     elif dd == 'ssep':
+    #         pdf = ufz.distributions.ssep(xx, loc, sca, skew, kurt)
+    #     elif dd == 'ssstudentt':
+    #         pdf = ufz.distributions.ssstudentt(xx, nu, loc, sca, skew)
+    #     elif dd == 'studentt':
+    #         pdf = ufz.distributions.studentt(xx, nu, loc, sca)
+
+    #     dmean = np.sum(xx * pdf * dx)
+    #     dvar  = np.sum((xx-dmean)**2 * pdf * dx)
+    #     dstd  = np.sqrt(dvar)
+    #     dskew = np.sum(((xx-dmean)/dstd)**3 * pdf * dx)
+    #     dkurt = np.sum(((xx-dmean)/dstd)**4 * pdf * dx)
+    #     # print(dd, ':', dmean, dstd)
+    #     print(dd, ':', dmean, dvar, dskew, dkurt)
+
+    #     # xx   = xx1[xx1>0.]
+    #     # pdf  = ufz.distributions.studentt(xx, nu, loc, sca)
+    #     # M1   = 2.* np.sum(xx * pdf * dx)
+    #     # M2   = nu/(nu-2.) * sca**2
+    #     # dvarfs = (M2-M1**2)*(skew**2+1./skew**2)+2.*M1**2-M2
+    #     # # print('Fernandez var:', dvarfs)
+
+    #     xi = skew
+    #     mu_shmc  = 2.0 * (xi-1./xi) * spec.gamma(0.5*(nu+1.0)) / spec.gamma(0.5*nu)
+    #     mu_shmc *= (nu-2.0)/(nu-1.0)
+    #     mu_shmc *= nu/(nu-2.) / np.sqrt(np.pi*nu)
+    #     mu_shmc *= sca
+        
+    #     # var_shmc = -mu_shmc**2 + (xi**3+1./xi**3)/(xi+1./xi)
+    #     # # print('mu_shmc:', mu_shmc, var_shmc)
+
+    #     if xi != 1.:
+    #         M1 = mu_shmc / (xi-1./xi)
+    #     else:
+    #         M1 = 0.
+    #     M2   = nu/(nu-2.) * sca**2
+    #     dvar_mc = (M2-M1**2)*(skew**2+1./skew**2)+2.*M1**2-M2
+    #     print('dvar_mc:', mu_shmc, dvar_mc)
