@@ -54,7 +54,7 @@ def ep(x, loc=0., sca=1., kurt=0., sig=None):
         Output
         ------
         Exponential power pdf at x
-        
+
 
         Examples
         --------
@@ -100,7 +100,7 @@ def ep01(x, kurt=0.):
         Optional Input
         --------------
         kurt       kurtosis parameter
-        
+
 
         Output
         ------
@@ -114,7 +114,7 @@ def ep01(x, kurt=0.):
     import scipy.special as ss
 
     beta = kurt
-    
+
     if beta != -1.0:
         b1 = 0.5*(1.0 + beta)
         b3 = 1.5*(1.0 + beta)
@@ -127,7 +127,7 @@ def ep01(x, kurt=0.):
     else:
         c_beta  = 0.0
         om_beta = np.sqrt(1.0/12.0)
-            
+
     # pdf
     if np.abs(beta+1.0) < 0.003: # 2/(1-0.997) ~ 666
         # Uniform between [-x1,x1]
@@ -139,7 +139,7 @@ def ep01(x, kurt=0.):
     else:
         return om_beta * np.exp(-c_beta*np.abs(x)**(2.0/(1.0+beta)))
 
-    
+
 # --------------------------------------------------------------------
 
 
@@ -164,7 +164,7 @@ def exponential(x, loc=0., sca=1., theta=1., sig=None):
         sca        scale
         theta      duration (shape) parameter
         sig        standard deviation, overwrites scale
-        
+
 
         Output
         ------
@@ -201,7 +201,7 @@ def exponential01(x, theta=1.):
         Optional Input
         --------------
         theta      duration (shape) parameter
-        
+
 
         Output
         ------
@@ -215,7 +215,7 @@ def exponential01(x, theta=1.):
 
     return np.exp(-x/theta)/theta
 
-    
+
 # --------------------------------------------------------------------
 
 
@@ -227,7 +227,7 @@ def gauss(*args, **kwargs):
     """
     return normal(*args, **kwargs)
 
-    
+
 # --------------------------------------------------------------------
 
 
@@ -251,12 +251,12 @@ def laplace(x, loc=0., sca=1., sig=None):
         loc        location
         sca        scale
         sig        standard deviation, overwrites scale
-        
+
 
         Output
         ------
         Laplace pdf at x
-        
+
 
         Examples
         --------
@@ -306,12 +306,12 @@ def laplace01(x):
         Optional Input
         --------------
         None
-        
+
 
         Output
         ------
         Laplace pdf with loc=0 and sca=1 at x
-        
+
 
         Examples
         --------
@@ -329,7 +329,7 @@ def laplace01(x):
 
     return 0.5 * np.exp(-np.abs(x))
 
-    
+
 # --------------------------------------------------------------------
 
 
@@ -353,12 +353,12 @@ def normal(x, loc=0., sca=1., sig=None):
         loc        location
         sca        scale
         sig        standard deviation, overwrites scale
-        
+
 
         Output
         ------
         Normal (Gauss) pdf at x
-        
+
 
         Examples
         --------
@@ -408,12 +408,12 @@ def normal01(x):
         Optional Input
         --------------
         None
-        
+
 
         Output
         ------
         Normal pdf with loc=0 and sca=1 at x
-        
+
 
         Examples
         --------
@@ -431,7 +431,7 @@ def normal01(x):
 
     return 1./np.sqrt(2.*np.pi) * np.exp(-0.5*x*x)
 
-    
+
 # --------------------------------------------------------------------
 
 
@@ -462,7 +462,7 @@ def sep(x, loc=0., sca=1., skew=1., kurt=0.):
         Output
         ------
         Skew exponential power pdf at x
-        
+
 
         Examples
         --------
@@ -506,12 +506,12 @@ def sep01(x, skew=1., kurt=0.):
         --------------
         skew       skewness parameter
         kurt       kurtosis parameter
-        
+
 
         Output
         ------
         Skew exponential power pdf with loc=0, sca=1 at x
-        
+
 
         Literature
         ----------
@@ -525,7 +525,7 @@ def sep01(x, skew=1., kurt=0.):
     """
 
     alpha = np.where(x<0.0, skew, 1./skew)
-    if not np.iterable(x): alpha = alpha[0]
+    if not np.iterable(x): alpha = float(alpha)
 
     return 2.0/(skew+1./skew) * ep01(alpha*x, kurt)
 
@@ -546,7 +546,7 @@ def sep_mean(loc=0., sca=1., skew=1., kurt=0.):
         sca        scale
         skew       skewness parameter
         kurt       kurtosis parameter
-        
+
 
         Output
         ------
@@ -575,12 +575,12 @@ def sep01_mean(skew=1., kurt=0.):
         --------------
         skew       skewness parameter
         kurt       kurtosis parameter
-        
+
 
         Output
         ------
         Mean of skew exponential power pdf with loc=0, sca=1 at x
-        
+
 
         Literature
         ----------
@@ -596,7 +596,7 @@ def sep01_mean(skew=1., kurt=0.):
     """
     import scipy.special as ss
 
-    beta = kurt # notation of Schoups and Vrugt (2010)    
+    beta = kurt # notation of Schoups and Vrugt (2010)
     if beta != -1.0:
         b1 = 0.5*(1.0 + beta)
         b2 =      1.0 + beta
@@ -630,12 +630,12 @@ def sep_std(sca=1., skew=1., kurt=0.):
         sca        scale
         skew       skewness parameter
         kurt       kurtosis parameter
-        
+
 
         Output
         ------
         Standard deviation of skew exponential power pdf at x
-        
+
 
         Literature
         ----------
@@ -669,12 +669,12 @@ def sep01_std(skew=1., kurt=0.):
         --------------
         skew       skewness parameter
         kurt       kurtosis parameter
-        
+
 
         Output
         ------
         Standard deviation of skew exponential power pdf with loc=0, sca=1 at x
-        
+
 
         Literature
         ----------
@@ -704,7 +704,7 @@ def sep01_std(skew=1., kurt=0.):
 
     return sig
 
-    
+
 # --------------------------------------------------------------------
 
 
@@ -735,7 +735,7 @@ def ssep(x, loc=0., sca=1., skew=1., kurt=0., sig=None):
         Output
         ------
         Standardised skew exponential power pdf at x
-        
+
 
         Literature
         ----------
@@ -744,7 +744,7 @@ def ssep(x, loc=0., sca=1., skew=1., kurt=0., sig=None):
         Schoups G & Vrugt JA (2010) A formal likelihood function for parameter and predictive
             inference of hydrologic models with correlated, heteroscedastic, and non-Gaussian errors.
             Water Resources Research 46, W10531.
-        
+
 
         Examples
         --------
@@ -792,12 +792,12 @@ def ssep01(x, skew=1., kurt=0.):
         --------------
         skew       skewness parameter
         kurt       kurtosis parameter
-        
+
 
         Output
         ------
         Standardised skew exponential power pdf with loc=0, sca=1 at x
-        
+
 
         Literature
         ----------
@@ -816,7 +816,7 @@ def ssep01(x, skew=1., kurt=0.):
     mu  = sep01_mean(skew, kurt)
     sig = sep01_std(skew, kurt)
     z   = mu + sig*x
-    
+
     return sig * sep01(z, skew, kurt)
 
 
@@ -850,7 +850,7 @@ def ssstudentt(x, nu, loc=0., sca=1., skew=1., sig=None):
         Output
         ------
         Skewed Student t pdf at x
-        
+
 
         Examples
         --------
@@ -890,12 +890,12 @@ def ssstudentt01(x, nu, skew=1.):
         Optional Input
         --------------
         skew       skewness parameter
-        
+
 
         Output
         ------
         Skewed Student t pdf with loc=0 and sca=1 at x
-        
+
 
         Literature
         ----------
@@ -917,7 +917,7 @@ def ssstudentt01(x, nu, skew=1.):
 
     return sig * sstudentt01(z, nu, skew)
 
-    
+
 # --------------------------------------------------------------------
 
 
@@ -947,7 +947,7 @@ def sstudentt(x, nu, loc=0., sca=1., skew=1.):
         Output
         ------
         Skewed Student t pdf at x
-        
+
 
         Literature
         ----------
@@ -967,7 +967,7 @@ def sstudentt01(x, nu, skew=1.):
     """
         The skewed Student t distribution with given degrees of freedom and skewness,
         location zero and unit scale.
-        
+
         If skew is not 1 then mean is not zero and standard deviation is not 1.
 
 
@@ -985,12 +985,12 @@ def sstudentt01(x, nu, skew=1.):
         Optional Input
         --------------
         skew       skewness parameter
-        
+
 
         Output
         ------
         Skewed Student t pdf with loc=0 and sca=1 at x
-        
+
 
         Literature
         ----------
@@ -1004,7 +1004,7 @@ def sstudentt01(x, nu, skew=1.):
     """
 
     alpha = np.where(x<0.0, skew, 1./skew)
-    if not np.iterable(x): alpha = alpha[0]        
+    if not np.iterable(x): alpha = float(alpha)
 
     return 2.0/(skew+1./skew) * studentt01(alpha*x, nu)
 
@@ -1030,12 +1030,12 @@ def sstudentt_mean(nu, loc=0., sca=1., skew=1.):
         loc        location
         sca        scale
         skew       skewness parameter
-        
+
 
         Output
         ------
         Mean of skewed Student t pdf
-        
+
 
         Literature
         ----------
@@ -1070,12 +1070,12 @@ def sstudentt01_mean(nu, skew=1.):
         Optional Input
         --------------
         skew       skewness parameter
-        
+
 
         Output
         ------
         Mean of skewed Student t pdf with loc=0 and sca=1 at x
-        
+
 
         Literature
         ----------
@@ -1116,12 +1116,12 @@ def sstudentt_std(nu, sca=1., skew=1.):
         --------------
         sca        scale
         skew       skewness parameter
-        
+
 
         Output
         ------
         Standard deviation of skewed Student t pdf
-        
+
 
         Literature
         ----------
@@ -1156,12 +1156,12 @@ def sstudentt01_std(nu, skew=1.):
         Optional Input
         --------------
         skew       skewness parameter
-        
+
 
         Output
         ------
         Standard deviation of skewed Student t pdf with sca=1 at x
-        
+
 
         Literature
         ----------
@@ -1186,7 +1186,7 @@ def sstudentt01_std(nu, skew=1.):
     else:
         return 0.0
 
-    
+
 # --------------------------------------------------------------------
 
 
@@ -1216,7 +1216,7 @@ def studentt(x, nu, loc=0., sca=1., sig=None):
         Output
         ------
         Student t pdf at x
-        
+
 
         Examples
         --------
@@ -1251,7 +1251,7 @@ def studentt01(x, nu):
         -----
         x          array_like quantiles
         nu         degrees of freedom
-        
+
 
         Output
         ------
@@ -1330,7 +1330,7 @@ if __name__ == '__main__':
     #     mu_shmc *= (nu-2.0)/(nu-1.0)
     #     mu_shmc *= nu/(nu-2.) / np.sqrt(np.pi*nu)
     #     mu_shmc *= sca
-        
+
     #     # var_shmc = -mu_shmc**2 + (xi**3+1./xi**3)/(xi+1./xi)
     #     # # print('mu_shmc:', mu_shmc, var_shmc)
 
