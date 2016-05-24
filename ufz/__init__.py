@@ -281,6 +281,7 @@
     qa                     Module of quality assessment (error) measures.
     saltelli               Parameter sampling for Sobol indices calculation.
     sce                    Shuffle-Complex-Evolution algorithm for function min(max)imisation
+    sobol                  Generates Sobol sequences
     sobol_index            Calculates the first-order and total variance-based sensitivity indices.
 
 
