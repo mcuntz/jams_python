@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 """
-    Provide pdfs of additional distributions.
-
+    distributions.py        --> Provide pdfs of additional distributions.
+    sample_distributions.py --> Provide sampling from additional distributions.
 
     Provided distributions
     ----------------------
@@ -16,6 +16,13 @@
     ssstudentt  Standardised skewed Student t
     studentt    Student t
 
+
+    Provided sampling from distributions
+    ----------------------
+    sample_ep01    sample from exponential power function EP(0,1,beta)
+    sample_ep      sample from (general) exponential power function EP(loc,sca,beta)
+    sample_sep_fs  sample from skew exponential power distribution obtained by using the approach of Fernandez and Steel
+    sample_ssep    sample from standardized skew exponential power distribution (mean=zero, std. dev.=1)
 
     Example
     -------
@@ -44,18 +51,22 @@
     along with the UFZ makefile project (cf. gpl.txt and lgpl.txt).
     If not, see <http://www.gnu.org/licenses/>.
 
-    Copyright 2016 Matthias Cuntz
+    Copyright 2016 Matthias Cuntz, Juliane Mai, Dmitri Kavetski
 
 
     History
     -------
-    Written,  MC, May 2016
+    Written,  MC,    May 2016
+    Modified, JM+DK, May 2016  - adding sampling from distributions
 """
 
-from .distributions import gauss, normal
-from .distributions import exponential, laplace
-from .distributions import ep, sep, sep_mean, sep_std, ssep
-from .distributions import ssstudentt, sstudentt, sstudentt_mean, sstudentt_std, studentt
+from .distributions        import gauss, normal
+from .distributions        import exponential, laplace
+from .distributions        import ep, sep, sep_mean, sep_std, ssep
+from .distributions        import ssstudentt, sstudentt, sstudentt_mean, sstudentt_std, studentt
+from .sample_distributions import sample_ep01, sample_ep, sample_sep_fs, sample_ssep
+
+
 
 # Information
 __author__   = "Matthias Cuntz"
