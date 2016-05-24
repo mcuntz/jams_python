@@ -23,6 +23,8 @@
     sample_ep      sample from (general) exponential power function EP(loc,sca,beta)
     sample_sep_fs  sample from skew exponential power distribution obtained by using the approach of Fernandez and Steel
     sample_ssep    sample from standardized skew exponential power distribution (mean=zero, std. dev.=1)
+    sample_sep     sample from the (general) skew exponential power distribution with
+                               given location, scale, and parameters controlling skewness and kurtosis.
 
     Example
     -------
@@ -64,7 +66,7 @@ from .distributions        import gauss, normal
 from .distributions        import exponential, laplace
 from .distributions        import ep, sep, sep_mean, sep_std, ssep
 from .distributions        import ssstudentt, sstudentt, sstudentt_mean, sstudentt_std, studentt
-from .sample_distributions import sample_ep01, sample_ep, sample_sep_fs, sample_ssep
+from .sample_distributions import sample_ep01, sample_ep, sample_sep_fs, sample_ssep, sample_sep
 
 
 

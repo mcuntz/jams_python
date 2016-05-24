@@ -29,7 +29,9 @@ import scipy.stats as ss
 __all__ = ['sample_ep01',      # sample from exponential power function EP(0,1,beta)
            'sample_ep',        # sample from (general) exponential power function EP(loc,sca,beta)
            'sample_sep_fs',    # sample from skew exponential power distribution obtained by using the approach of Fernandez and Steel
-           'sample_ssep'       # sample from standardized skew exponential power distribution (mean=zero, std. dev.=1)
+           'sample_ssep',      # sample from standardized skew exponential power distribution (mean=zero, std. dev.=1)
+           'sample_sep'        # sample from the (general) skew exponential power distribution with
+                               # given location, scale, and parameters controlling skewness and kurtosis.
            ]
 
 def sample_ep01(nn, beta=0.):
