@@ -3,6 +3,8 @@ from __future__ import print_function
 import numpy as np
 import scipy.special as sp
 import scipy.stats as ss
+from .distributions import sep_mean, sep_std
+from .distributions import sstudentt_mean, sstudentt_std
 
 """
     License
@@ -22,7 +24,7 @@ import scipy.stats as ss
     You should have received a copy of the GNU Lesser General Public License
     along with the UFZ makefile project (cf. gpl.txt and lgpl.txt).
     If not, see <http://www.gnu.org/licenses/>.
-
+  
     Copyright 2016 Juliane Mai, Dmitri Kavetski
 """
 
@@ -30,8 +32,15 @@ __all__ = ['sample_ep01',      # sample from exponential power function EP(0,1,b
            'sample_ep',        # sample from (general) exponential power function EP(loc,sca,beta)
            'sample_sep_fs',    # sample from skew exponential power distribution obtained by using the approach of Fernandez and Steel
            'sample_ssep',      # sample from standardized skew exponential power distribution (mean=zero, std. dev.=1)
-           'sample_sep'        # sample from the (general) skew exponential power distribution with
+           'sample_sep',       # sample from the (general) skew exponential power distribution with
                                # given location, scale, and parameters controlling skewness and kurtosis.
+           #
+           'sample_studentt01',      # sample from Student-t distribution studentt(loc=0,sca=1)
+           'sample_studentt',        # sample from (general) Student-t distribution studentt(loc,sca)
+           'sample_sstudentt_fs',    # sample from skew Student-t distribution obtained by using the approach of Fernandez and Steel
+           'sample_ssstudentt',      # sample from standardized skew student-t distribution (mean=zero, std. dev.=1)
+           'sample_sstudentt'        # sample from the (general) skew Student-t distribution with
+                                     # given location, scale, and parameters controlling skewness and kurtosis.
            ]
 
 def sample_ep01(nn, beta=0.):
@@ -126,6 +135,84 @@ def sample_ep01(nn, beta=0.):
 
     return EP01
 
+def sample_studentt01(nn, nu):
+    """
+        Samples from the Student-t distribution studentt(df=nu, loc=0, sca=1) are drawn.
+
+        This distribution is symmetric.
+        
+
+        Definition
+        ----------
+        def sample_studentt01(nn):
+
+
+        Input
+        -----
+        nn       -> number of samples
+        nu       -> degrees of freedom
+
+        
+        Optional Input
+        --------------
+        None
+
+
+        Output
+        ------
+        Samples drawn from Student-t distribution
+
+
+        Restrictions
+        ------------
+        Not known
+
+
+        Examples
+        --------
+        None
+
+        
+        Literature
+        --------
+        Schoups, G., & Vrugt, J. A. (2010).
+        A formal likelihood function for parameter and predictive inference of hydrologic
+        models with correlated, heteroscedastic, and non-Gaussian errors.
+        Water Resources Research, 46(10).
+        --> Steps (1)-(3) described on page 5
+
+        
+        License
+        -------
+        This file is part of the UFZ Python package.
+
+        The UFZ Python package is free software: you can redistribute it and/or modify
+        it under the terms of the GNU Lesser General Public License as published by
+        the Free Software Foundation, either version 3 of the License, or
+        (at your option) any later version.
+
+        The UFZ Python package is distributed in the hope that it will be useful,
+        but WITHOUT ANY WARRANTY; without even the implied warranty of
+        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+        GNU Lesser General Public License for more details.
+
+        You should have received a copy of the GNU Lesser General Public License
+        along with the UFZ makefile project (cf. gpl.txt and lgpl.txt).
+        If not, see <http://www.gnu.org/licenses/>.
+
+        Copyright 2010-2016 Juliane Mai
+
+
+        History
+        -------
+        Written  JM, May 2016
+        Modified 
+    """
+
+    studentt01 = ss.t.rvs(nu, loc=0.0, scale=1.0, size=nn)
+
+    return studentt01
+
 def sample_ep(nn, loc=0., sca=1., beta=0.):
     """
         Samples from the (general) exponential power function EP(loc,sca,beta) are drawn.
@@ -207,6 +294,83 @@ def sample_ep(nn, loc=0., sca=1., beta=0.):
 
     return EP
 
+def sample_studentt(nn, nu, loc=0., sca=1.):
+    """
+        Samples from the (general) Student-t distribution studentt(nu,loc,sca) are drawn.
+
+        The mean is loc, standard deviation is sca.
+
+        This distribution is symmetric.
+
+        Definition
+        ----------
+        def sample_studentt(nn, nu, loc=0., sca=1.):
+
+
+        Input
+        -----
+        nn       -> number of samples
+        nu       -> degrees of freedom
+
+        
+        Optional Input
+        --------------
+        loc        location
+        sca        scale
+
+
+        Output
+        ------
+        Samples drawn from (general) Student-t distribution
+
+
+        Restrictions
+        ------------
+        Not known
+
+
+        Examples
+        --------
+        None 
+
+        
+        Literature
+        --------
+
+        
+        License
+        -------
+        This file is part of the UFZ Python package.
+
+        The UFZ Python package is free software: you can redistribute it and/or modify
+        it under the terms of the GNU Lesser General Public License as published by
+        the Free Software Foundation, either version 3 of the License, or
+        (at your option) any later version.
+
+        The UFZ Python package is distributed in the hope that it will be useful,
+        but WITHOUT ANY WARRANTY; without even the implied warranty of
+        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+        GNU Lesser General Public License for more details.
+
+        You should have received a copy of the GNU Lesser General Public License
+        along with the UFZ makefile project (cf. gpl.txt and lgpl.txt).
+        If not, see <http://www.gnu.org/licenses/>.
+
+        Copyright 2010-2016 Juliane Mai
+
+
+        History
+        -------
+        Written  JM, May 2016
+        Modified 
+    """
+
+    studentt01 = sample_studentt01(nn, nu)
+    studentt   = studentt01 * sca + loc
+    # studentt = ss.t.rvs(nu, loc=loc, scale=sca, size=nn)
+
+    return studentt
+
 def sample_sep_fs(nn, xi=1., beta=0.):
     """
         Samples from the skew exponential power distribution obtained
@@ -249,6 +413,10 @@ def sample_sep_fs(nn, xi=1., beta=0.):
         Water Resources Research, 46(10).
         --> Steps (4)-(5) described on page 5
 
+        Fernandez C & Steel M (1998).
+        On Bayesian modeling of fat tails and skewness.
+        Journal of the American Statistical Association 93, 359-371.
+
 
         History
         -------
@@ -263,17 +431,70 @@ def sample_sep_fs(nn, xi=1., beta=0.):
     # (5) Compute SEP_t which is a sample from the skew exponential power distribution
     #     SEP(mu_xi, sigma_xi, xi, beta) with mu_xi and sigma_xi given by (A5) and (A6)
     #     SEPt = wt * np.abs(EPt) * xi**wt
-    #
-    # TODO: put this 3 lines in a function
-    #       sample_skewed = skew_fernandez_steel(sample_symmetric, xi)
-    #       --> can be re-used for the student-t<
-    rr     = np.random.rand(nn)
-    absEP  = np.abs(EP)
-    SEP_fs = np.where(rr > 1.-xi/(xi+1./xi), absEP * xi, -absEP / xi)
+    SEP_fs = skew_fernandez_steel(EP, xi)
 
     return SEP_fs
 
-def sample_ssep(x, xi=1., beta=0.):
+def sample_sstudentt_fs(nn, nu, xi=1.):
+    """
+        Samples from the skew Student-t distribution obtained
+        by using the approach of Fernandez and Steel.
+        Parameters which control skewness needs to be given.
+
+
+        Definition
+        ----------
+        def sample_sstudentt_fs(nn, nu, skew=1.):
+
+
+        Input
+        -----
+        nn       -> number of samples
+        nu       -> degrees of freedom
+
+
+        Optional Input
+        --------------
+        xi       parameter which controls skewness
+
+
+        Output
+        ------
+        Samples from the skew Student-t distribution
+
+
+        Examples
+        --------
+        None
+
+
+        Literature
+        --------
+        Schoups, G., & Vrugt, J. A. (2010).
+        A formal likelihood function for parameter and predictive inference of hydrologic
+        models with correlated, heteroscedastic, and non-Gaussian errors.
+        Water Resources Research, 46(10).
+        --> Steps (4)-(5) described on page 5
+
+
+        History
+        -------
+        Written,  JM, May 2016
+    """
+
+    # (1) - (3) 
+    studentt = sample_studentt01(nn, nu)
+
+    # (4) Generate a random sign w_t (+1 or -1) with probabilities 1-xi/(xi+1/xi) and xi/(xi+1/xi)
+    #     wt = np.where(np.random.rand(nn) > 1.-xi/(xi+1./xi), 1, -1)
+    # (5) Compute SEP_t which is a sample from the skew exponential power distribution
+    #     SEP(mu_xi, sigma_xi, xi, beta) with mu_xi and sigma_xi given by (A5) and (A6)
+    #     SEPt = wt * np.abs(EPt) * xi**wt
+    sstudentt_fs = skew_fernandez_steel(studentt, xi)
+
+    return sstudentt_fs
+
+def sample_ssep(nn, xi=1., beta=0.):
     """
         Samples from the standardized skew exponential power distribution, obtained
         by standardizing the distribution resulting from the approach of Fernandez and Steel.
@@ -323,11 +544,67 @@ def sample_ssep(x, xi=1., beta=0.):
     SEP_fs = sample_sep_fs(nn, xi=xi, beta=beta)
     
     # (6) Standardize SEP_fs
-    mean_sep_fs  = ufz.distributions.sep_mean(skew=xi, kurt=beta)
-    std_sep_fs   = ufz.distributions.sep_std(skew=xi, kurt=beta)
+    mean_sep_fs  = sep_mean(skew=xi, kurt=beta)
+    std_sep_fs   = sep_std(skew=xi, kurt=beta)
     sSEP         = (SEP_fs - mean_sep_fs) / std_sep_fs   # standardized SEP (=Schoups and Vrugt's a_t)
 
     return sSEP
+
+def sample_ssstudentt(nn, nu, xi=1.):
+    """
+        Samples from the standardized skew Student-t distribution, obtained
+        by standardizing the distribution resulting from the approach of Fernandez and Steel.
+        Mean is zero and standard deviation is one.
+
+
+        Definition
+        ----------
+        def sample_ssstudentt(nn, nu, xi=1.):
+
+
+        Input
+        -----
+        nn       -> number of samples
+        nu       -> degrees of freedom
+
+
+        Optional Input
+        --------------
+        xi         parameter which controls the skewness
+
+
+        Output
+        ------
+        Samples from the standardized skew Student-t distribution
+
+
+        Examples
+        --------
+        None
+
+
+        Literature
+        --------
+        Schoups, G., & Vrugt, J. A. (2010).
+        A formal likelihood function for parameter and predictive inference of hydrologic
+        models with correlated, heteroscedastic, and non-Gaussian errors.
+        Water Resources Research, 46(10).
+        --> Steps (6) described on page 5
+
+
+        History
+        -------
+        Written,  JM, May 2016
+    """
+
+    sstudentt_fs = sample_sstudentt_fs(nn, nu, xi=xi)
+    
+    # (6) Standardize sstudentt_fs
+    mean_sstudentt_fs  = sstudentt_mean(nu, skew=xi)
+    std_sstudentt_fs   = sstudentt_std(nu, skew=xi)
+    ssstudentt         = (sstudentt_fs - mean_sstudentt_fs) / std_sstudentt_fs   # standardized skewed Student-t
+
+    return ssstudentt
 
 def sample_sep(nn, loc=0., sca=1., xi=1., beta=0.):
     """
@@ -395,85 +672,121 @@ def sample_sep(nn, loc=0., sca=1., xi=1., beta=0.):
 
     return SEP
 
-# # ------------------------------------------------------------
-# # Do some tests for the sampling of distributions
-# # ------------------------------------------------------------
+def sample_sstudentt(nn, nu, loc=0., sca=1., xi=1., sigma=None):
+    """
+        Samples from the (general) skew Student-t distribution with
+        given location, scale, and parameter controlling skewness.
+        This distribution is obtained by shifting and scaling the standardized skewed Student-t distribution.
 
-# import ufz
-# import matplotlib.pylab as plt
-# plt.close("all")
+        The location loc and the scale sca are the mean and standard deviation
+        of the distribution respectively.
 
-# nn    = 1000000   # number of random samples drawn
-# loc   = 5.0       # location parameter = mean
-# sca   = 0.8       # scale parameer = standard deviation
-# xi    = 1.0       # skew parameter (0,inf) 1=symmetric, >1=right skewed, <1=left skewed
-# beta  = -0.5       # ex. kurtosis parameter (-1,1] 1=fat tail, -1=thin tail
+        The xi parameter needs to be positive.
+             1 = symmetric
+            >1 = right skewed
+            <1 = left skewed        
 
-# print('loc            = ', loc)
-# print('sca            = ', sca)
-# print('xi             = ', xi)
-# print('beta           = ', beta)
-# print('')
 
-# # --------------
-# # EP tests
-# # --------------
-# ep_samples = sample_ep(nn, loc=loc, sca=sca, beta=beta)
-# plt.hist(ep_samples,bins=100,normed=True)
-# print('EP:  mean_samp      = ', np.mean(ep_samples))
-# print('EP:  std_samp       = ', np.std(ep_samples))
-# print('EP:  skew_samp      = ', ss.skew(ep_samples))
-# print('EP:  kurt_samp      = ', ss.kurtosis(ep_samples, fisher=True))
-# print('')
+        Definition
+        ----------
+        def sample_sstudentt(nn, nu, loc=0., sca=1., xi=1.):
 
-# # Compare with pdf of EP
-# dx = 0.01
-# ep_xx = np.arange(-10,10,dx)
-# ep_yy = ufz.distributions.ep(ep_xx, loc=loc, sca=sca, kurt=beta)
 
-# mean_num = np.sum(ep_xx*ep_yy*dx)
-# var_num  = np.sum((ep_xx-mean_num)**2*ep_yy*dx)
-# std_num  = np.sqrt(var_num)
-# skew_num  = np.sum(((ep_xx-mean_num)/std_num)**3*ep_yy*dx)
-# kurt_num  = np.sum(((ep_xx-mean_num)/std_num)**4*ep_yy*dx) - 3.0   # Fisher definition (Gaussian kurt=0.0)
-# print('EP:  mean_num       = ', mean_num )
-# print('EP:  std_num        = ', std_num  )
-# print('EP:  skew_num       = ', skew_num )
-# print('EP:  kurt_num       = ', kurt_num )
-# print('')
+        Input
+        -----
+        nn       -> number of samples
+        nu       -> degrees of freedom
 
-# bb = 2./(beta+1.)
-# print('EP:  calc kurt      = ', (sp.gamma(5./bb)*sp.gamma(1./bb))/((sp.gamma(3./bb))**2) - 3. )
 
-# plt.plot(ep_xx, ep_yy, 'r-', lw=5, alpha=0.6)
-# plt.show()
+        Optional Input
+        --------------
+        loc        location
+        sca        scale
+        sigma      standard deviation
+        xi         parameter which controls the skewness
 
-# # --------------
-# # SEP tests
-# # --------------
-# sep_samples = sample_sep(nn, loc=loc, sca=sca, xi=xi, beta=beta)
-# plt.hist(sep_samples,bins=100,normed=True)
-# print('SEP: mean_samp      = ', np.mean(sep_samples))
-# print('SEP: std_samp       = ', np.std(sep_samples))
-# print('SEP: skew_samp      = ', ss.skew(sep_samples))
-# print('SEP: kurt_samp      = ', ss.kurtosis(sep_samples, fisher=True))
-# print('')
 
-# # Compare with pdf of SEP
-# dx = 0.01
-# sep_xx = np.arange(-10,10,dx)
-# sep_yy = ufz.distributions.ssep(sep_xx, loc=loc, sca=sca, skew=xi, kurt=beta)
+        Output
+        ------
+        Samples from the (general) skew Student-t distribution
 
-# mean_num = np.sum(sep_xx*sep_yy*dx)
-# var_num  = np.sum((sep_xx-mean_num)**2*sep_yy*dx)
-# std_num  = np.sqrt(var_num)
-# skew_num  = np.sum(((sep_xx-mean_num)/std_num)**3*sep_yy*dx)
-# kurt_num  = np.sum(((sep_xx-mean_num)/std_num)**4*sep_yy*dx) - 3.0   # Fisher definition (Gaussian kurt=0.0)
-# print('SEP: mean_num       = ', mean_num )
-# print('SEP: std_num        = ', np.sqrt(var_num) )
-# print('SEP: skew_num       = ', skew_num )
-# print('SEP: kurt_num       = ', kurt_num )
-# print('')
 
-# plt.plot(sep_xx, sep_yy, 'r-', lw=5, alpha=0.6)
-# plt.show()
+        Examples
+        --------
+        None
+
+
+        Literature
+        --------
+        None 
+
+
+        History
+        -------
+        Written,  JM, May 2016
+    """
+
+    ssstudentt = sample_ssstudentt(nn, nu, xi=xi)
+    
+    if (sigma is None):
+        sigma = sca*np.sqrt(nu/(nu-2.))
+        
+    sstudentt  = loc + sigma * ssstudentt
+    
+
+    return sstudentt
+
+# ------------------------------------------------------------
+# Private routines
+# ------------------------------------------------------------
+def skew_fernandez_steel(sample_symmetric, xi):
+    """
+        Skews any given symmetric sample with a skewness factor xi
+        following the approch of Fernandez & Steel.     
+        
+
+        Definition
+        ----------
+        def skew_fernandez_steel(sample_symmetric, xi):
+
+
+        Input
+        -----
+        sample_symmetric       -> sample drawn from a symmetric distribution
+        xi                     -> skewness factor
+
+
+        Optional Input
+        --------------
+        None
+
+
+        Output
+        ------
+        Samples from the skewed version of symmetric distribution used to generate sample
+
+
+        Examples
+        --------
+        None
+
+
+        Literature
+        --------
+        Fernandez C & Steel M (1998).
+        On Bayesian modeling of fat tails and skewness.
+        Journal of the American Statistical Association 93, 359-371.
+
+
+        History
+        -------
+        Written,  JM, May 2016
+    """
+        
+    nn       = np.shape(sample_symmetric)[0]
+    rr       = np.random.rand(nn)
+    absSymm  = np.abs(sample_symmetric)
+    sample_fs   = np.where(rr > 1.-xi/(xi+1./xi), absSymm * xi, -absSymm / xi)
+
+    return sample_fs
+

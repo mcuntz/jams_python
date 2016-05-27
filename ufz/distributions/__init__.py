@@ -67,6 +67,7 @@ from .distributions        import exponential, laplace
 from .distributions        import ep, sep, sep_mean, sep_std, ssep
 from .distributions        import ssstudentt, sstudentt, sstudentt_mean, sstudentt_std, studentt
 from .sample_distributions import sample_ep01, sample_ep, sample_sep_fs, sample_ssep, sample_sep
+from .sample_distributions import sample_studentt01, sample_studentt, sample_sstudentt_fs, sample_ssstudentt, sample_sstudentt
 
 
 
