@@ -863,11 +863,11 @@ def ssstudentt(x, nu, loc=0., sca=1., skew=1., sig=None):
         Written,  MC, May 2016
     """
 
-    if sig is None:
-        return ssstudentt01((x-loc)/sca, nu, skew)/sca
-    else:
-        sca = sig
-        return ssstudentt01((x-loc)/sca, nu, skew)/sca
+    if sig is not(None):
+        # sigma is given but scale is required
+        sca = sig * np.sqrt((nu-2.)/nu)
+        
+    return ssstudentt01((x-loc)/sca, nu, skew)/sca
 
 
 def ssstudentt01(x, nu, skew=1.):
