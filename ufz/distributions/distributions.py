@@ -863,8 +863,8 @@ def ssstudentt(x, nu, loc=0., sca=1., skew=1., sig=None):
         Written,  MC, May 2016
     """
 
-    if sig is not(None):
-        # sigma is given but scale is required
+    if sig is not None:
+        # convert between scale and standard deviation
         sca = sig * np.sqrt((nu-2.)/nu)
         
     return ssstudentt01((x-loc)/sca, nu, skew)/sca
@@ -912,10 +912,10 @@ def ssstudentt01(x, nu, skew=1.):
     """
 
     mu  = sstudentt01_mean(nu, skew)
-    sig = sstudentt01_std(nu, skew)
-    z   = mu + sig*x
+    sca = sstudentt01_std(nu, skew) * np.sqrt((nu-2.)/nu)
+    z   = mu + sca*x
 
-    return sig * sstudentt01(z, nu, skew)
+    return sca * sstudentt01(z, nu, skew)
 
 
 # --------------------------------------------------------------------

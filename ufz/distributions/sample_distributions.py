@@ -3,8 +3,8 @@ from __future__ import print_function
 import numpy as np
 import scipy.special as sp
 import scipy.stats as ss
-from .distributions import sep_mean, sep_std
-from .distributions import sstudentt_mean, sstudentt_std
+from ufz.distributions import sep_mean, sep_std
+from ufz.distributions import sstudentt_mean, sstudentt_std
 
 """
     License
@@ -601,7 +601,7 @@ def sample_ssstudentt(nn, nu, xi=1.):
     
     # (6) Standardize sstudentt_fs
     mean_sstudentt_fs  = sstudentt_mean(nu, skew=xi)
-    std_sstudentt_fs   = sstudentt_std(nu, skew=xi)
+    std_sstudentt_fs   = sstudentt_std(nu, skew=xi) * np.sqrt((nu-2.)/nu)
     ssstudentt         = (sstudentt_fs - mean_sstudentt_fs) / std_sstudentt_fs   # standardized skewed Student-t
 
     return ssstudentt
@@ -672,7 +672,7 @@ def sample_sep(nn, loc=0., sca=1., xi=1., beta=0.):
 
     return SEP
 
-def sample_sstudentt(nn, nu, loc=0., sca=1., xi=1., sigma=None):
+def sample_sstudentt(nn, nu, loc=0., sca=1., xi=1., sig=None):
     """
         Samples from the (general) skew Student-t distribution with
         given location, scale, and parameter controlling skewness.
@@ -702,7 +702,7 @@ def sample_sstudentt(nn, nu, loc=0., sca=1., xi=1., sigma=None):
         --------------
         loc        location
         sca        scale
-        sigma      standard deviation
+        sig        standard deviation
         xi         parameter which controls the skewness
 
 
@@ -728,10 +728,10 @@ def sample_sstudentt(nn, nu, loc=0., sca=1., xi=1., sigma=None):
 
     ssstudentt = sample_ssstudentt(nn, nu, xi=xi)
     
-    if (sigma is None):
-        sigma = sca*np.sqrt(nu/(nu-2.))
+    if sig is not None:
+        sca = sig * np.sqrt((nu-2.)/nu)
         
-    sstudentt  = loc + sigma * ssstudentt
+    sstudentt  = loc + sca * ssstudentt
     
 
     return sstudentt
@@ -790,3 +790,184 @@ def skew_fernandez_steel(sample_symmetric, xi):
 
     return sample_fs
 
+
+if __name__ == '__main__':
+    import doctest
+    doctest.testmod(optionflags=doctest.NORMALIZE_WHITESPACE)
+
+    # # ------------------------------------------------------------
+    # # Do some tests for the sampling of distributions
+    # # ------------------------------------------------------------
+
+    # import ufz
+    # import matplotlib.pylab as plt
+    # plt.close("all")
+
+    # nn    = 10000000   # number of random samples drawn
+    # loc   = 0.0       # location parameter = mean
+    # sca   = 2.0       # scale parameer = standard deviation
+    # xi    = 1.5       # skew parameter (0,inf) 1=symmetric, >1=right skewed, <1=left skewed
+    # beta  = -0.5       # ex. kurtosis parameter (-1,1] 1=fat tail, -1=thin tail
+    # nu    = 6        # degrees of freedom for student-t
+
+    # test_EP         = False
+    # test_SEP        = False
+    # test_Studentt   = False
+    # test_ssStudentt = False
+    # test_sStudentt  = True
+
+    # print('loc  = ', loc)
+    # print('sca  = ', sca)
+    # print('xi   = ', xi)
+    # print('beta = ', beta)
+    # print('nu   = ', nu)
+    # print('')
+
+    # if (test_EP):
+    #     # --------------
+    #     # EP tests
+    #     # --------------
+    #     print('')
+    #     print('-----------------------------------------------------')
+    #     ep_samples = ufz.distributions.sample_ep(nn, loc=loc, sca=sca, beta=beta)
+    #     plt.hist(ep_samples,bins=100,normed=True)
+    #     print('EP:  mean_samp      = ', np.mean(ep_samples))
+    #     print('EP:  std_samp       = ', np.std(ep_samples))
+    #     print('EP:  skew_samp      = ', ss.skew(ep_samples))
+    #     print('EP:  kurt_samp      = ', ss.kurtosis(ep_samples, fisher=True))
+    #     print('')
+
+    #     # Compare with pdf of EP
+    #     dx = 0.01
+    #     ep_xx = np.arange(-10,10,dx)
+    #     ep_yy = ufz.distributions.ep(ep_xx, loc=loc, sca=sca, kurt=beta)
+
+    #     mean_num = np.sum(ep_xx*ep_yy*dx)
+    #     var_num  = np.sum((ep_xx-mean_num)**2*ep_yy*dx)
+    #     std_num  = np.sqrt(var_num)
+    #     skew_num  = np.sum(((ep_xx-mean_num)/std_num)**3*ep_yy*dx)
+    #     kurt_num  = np.sum(((ep_xx-mean_num)/std_num)**4*ep_yy*dx) - 3.0   # Fisher definition (Gaussian kurt=0.0)
+    #     print('EP:  mean_num       = ', mean_num )
+    #     print('EP:  std_num        = ', std_num  )
+    #     print('EP:  skew_num       = ', skew_num )
+    #     print('EP:  kurt_num       = ', kurt_num )
+    #     print('')
+
+    #     bb = 2./(beta+1.)
+    #     print('EP:  calc kurt      = ', (sp.gamma(5./bb)*sp.gamma(1./bb))/((sp.gamma(3./bb))**2) - 3. )
+
+    #     plt.plot(ep_xx, ep_yy, 'r-', lw=5, alpha=0.6)
+    #     plt.show()
+
+    # if (test_SEP):
+    #     # --------------
+    #     # SEP tests
+    #     # --------------
+    #     print('')
+    #     print('-----------------------------------------------------')
+    #     sep_samples = ufz.distributions.sample_sep(nn, loc=loc, sca=sca, xi=xi, beta=beta)
+    #     plt.hist(sep_samples,bins=100,normed=True)
+    #     print('SEP: mean_samp      = ', np.mean(sep_samples))
+    #     print('SEP: std_samp       = ', np.std(sep_samples))
+    #     print('SEP: skew_samp      = ', ss.skew(sep_samples))
+    #     print('SEP: kurt_samp      = ', ss.kurtosis(sep_samples, fisher=True))
+    #     print('')
+
+    #     # Compare with pdf of SEP
+    #     dx = 0.01
+    #     sep_xx = np.arange(-10,10,dx)
+    #     sep_yy = ufz.distributions.ssep(sep_xx, loc=loc, sca=sca, skew=xi, kurt=beta)
+
+    #     mean_num = np.sum(sep_xx*sep_yy*dx)
+    #     var_num  = np.sum((sep_xx-mean_num)**2*sep_yy*dx)
+    #     std_num  = np.sqrt(var_num)
+    #     skew_num  = np.sum(((sep_xx-mean_num)/std_num)**3*sep_yy*dx)
+    #     kurt_num  = np.sum(((sep_xx-mean_num)/std_num)**4*sep_yy*dx) - 3.0   # Fisher definition (Gaussian kurt=0.0)
+    #     print('SEP: mean_num       = ', mean_num )
+    #     print('SEP: std_num        = ', np.sqrt(var_num) )
+    #     print('SEP: skew_num       = ', skew_num )
+    #     print('SEP: kurt_num       = ', kurt_num )
+    #     print('')
+
+    #     plt.plot(sep_xx, sep_yy, 'r-', lw=5, alpha=0.6)
+    #     plt.show()
+
+
+    # if (test_Studentt):
+    #     # --------------
+    #     # Student-t tests
+    #     # --------------
+    #     print('')
+    #     print('-----------------------------------------------------')
+    #     studentt_samples = ufz.distributions.sample_studentt(nn, nu, loc=loc, sca=sca)
+    #     plt.hist(studentt_samples,bins=100,normed=True)
+    #     print('Student-t:  mean_samp      = ', np.mean(studentt_samples),                 ' ~ ',loc,                    ' : theoretical')
+    #     print('Student-t:  std_samp       = ', np.std(studentt_samples),                  ' ~ ',sca*np.sqrt(nu/(nu-2.)),' : theoretical')
+    #     print('Student-t:  skew_samp      = ', ss.skew(studentt_samples),                 ' ~ ',0.0,                    ' : theoretical')
+    #     print('Student-t:  kurt_samp      = ', ss.kurtosis(studentt_samples, fisher=True))
+    #     print('')
+
+    #     # Compare with pdf of Student-t
+    #     dx = 0.0001
+    #     studentt_xx = np.arange(-50+loc,50+loc,dx)
+    #     studentt_yy = ufz.distributions.studentt(studentt_xx, nu, loc=loc, sca=sca)
+
+    #     mean_num = np.sum(studentt_xx*studentt_yy*dx)
+    #     var_num  = np.sum((studentt_xx-mean_num)**2*studentt_yy*dx)
+    #     std_num  = np.sqrt(var_num)
+    #     skew_num  = np.sum(((studentt_xx-mean_num)/std_num)**3*studentt_yy*dx)
+    #     kurt_num  = np.sum(((studentt_xx-mean_num)/std_num)**4*studentt_yy*dx) - 3.0   # Fisher definition (Gaussian kurt=0.0)
+    #     print('Student-t:  mean_num       = ', mean_num )
+    #     print('Student-t:  std_num        = ', std_num  )
+    #     print('Student-t:  skew_num       = ', skew_num )
+    #     print('Student-t:  kurt_num       = ', kurt_num )
+    #     print('')
+
+    #     plt.plot(studentt_xx, studentt_yy, 'r-', lw=5, alpha=0.6)
+    #     plt.show()
+
+    # if (test_ssStudentt):
+    #     sstudentt_fs_samp = ufz.distributions.sample_sstudentt_fs(nn, nu, xi=xi)
+    #     mean_sstudentt_fs  = ufz.distributions.sstudentt_mean(nu, skew=xi)
+    #     std_sstudentt_fs   = ufz.distributions.sstudentt_std(nu, skew=xi)
+
+    #     print('ssStudent-t:  mean_func      = ', mean_sstudentt_fs)
+    #     print('ssStudent-t:  std_func       = ', std_sstudentt_fs)
+    #     print('')
+    #     print('ssStudent-t:  mean_samp      = ', np.mean(sstudentt_fs_samp))
+    #     print('ssStudent-t:  std_samp       = ', np.std(sstudentt_fs_samp))
+
+    # if (test_sStudentt):
+    #     # --------------
+    #     # skewed Student-t tests
+    #     # --------------
+    #     print('')
+    #     print('-----------------------------------------------------')
+    #     # sstudentt_samples = ufz.distributions.sample_sstudentt(nn, nu, loc=loc, sig=sca*np.sqrt(nu/(nu-2.)), xi=xi)
+    #     sstudentt_samples = ufz.distributions.sample_sstudentt(nn, nu, loc=loc, sca=sca, xi=xi)
+    #     plt.hist(sstudentt_samples,bins=100,normed=True)
+    #     print('sStudent-t:  mean_samp      = ', np.mean(sstudentt_samples))
+    #     print('sStudent-t:  std_samp       = ', np.std(sstudentt_samples))
+    #     print('sStudent-t:  skew_samp      = ', ss.skew(sstudentt_samples))
+    #     print('sStudent-t:  kurt_samp      = ', ss.kurtosis(sstudentt_samples, fisher=True))
+    #     print('')
+
+    #     # Compare with pdf of Student-t
+    #     dx = 0.0001
+    #     sstudentt_xx = np.arange(-30+loc,30+loc,dx)
+    #     # sstudentt_yy = ufz.distributions.ssstudentt(sstudentt_xx, nu, loc=loc, sig=sca*np.sqrt(nu/(nu-2.)), skew=xi)
+    #     sstudentt_yy = ufz.distributions.ssstudentt(sstudentt_xx, nu, loc=loc, sca=sca, skew=xi)
+
+    #     mean_num = np.sum(sstudentt_xx*sstudentt_yy*dx)
+    #     var_num  = np.sum((sstudentt_xx-mean_num)**2*sstudentt_yy*dx)
+    #     std_num  = np.sqrt(var_num)
+    #     skew_num  = np.sum(((sstudentt_xx-mean_num)/std_num)**3*sstudentt_yy*dx)
+    #     kurt_num  = np.sum(((sstudentt_xx-mean_num)/std_num)**4*sstudentt_yy*dx) - 3.0   # Fisher definition (Gaussian kurt=0.0)
+    #     print('sStudent-t:  mean_num       = ', mean_num )
+    #     print('sStudent-t:  std_num        = ', std_num  )
+    #     print('sStudent-t:  skew_num       = ', skew_num )
+    #     print('sStudent-t:  kurt_num       = ', kurt_num )
+    #     print('')
+
+    #     plt.plot(sstudentt_xx, sstudentt_yy, 'r-', lw=5, alpha=0.6)
+    #     plt.show()
