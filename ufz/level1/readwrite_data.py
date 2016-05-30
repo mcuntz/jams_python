@@ -105,7 +105,7 @@ def read_data(files, undef=-9999., strip=None, norecord=False, nofill=False):
                                - nofill
     """
 
-    debug = False 
+    debug = False
     iundef = np.int(undef)
 
     # Get unique header and time stamps of all input file
@@ -709,13 +709,15 @@ def write_data_norecord_dmp(infiles, sdate, dat, flags, iidate, hdate, hdat, hfl
         oflags = np.maximum(ufz.level1.get_maxflag(flags), 0)
     else:                 # level2 flags
         oflags = flags
-    strflags = np.zeros(oflags.shape, dtype='S'+str(len('DOUBTFUL,Other,NIL')))
+    strflags = np.zeros(oflags.shape, dtype='S'+str(len('DOUBTFUL,Other,From CHS flagging'))) #NIL
     ii = np.where(oflags == 0)
     if ii[0].size>0: strflags[ii] = 'OK,NIL,NIL'
     ii = np.where(oflags == 1)
     if ii[0].size>0: strflags[ii] = 'DOUBTFUL,Other,From CHS flagging'
     ii = np.where(oflags == 2)
     if ii[0].size>0: strflags[ii] = 'BAD,Other,From CHS flagging'
+   
+    
 
     # Write individual files
     for cff, ff in enumerate(infiles):
