@@ -327,7 +327,7 @@ class river_network(object):
              [False False False False False False False False False]
              [False False False False False False False False False]
              [False False False False False False False False False]],
-                   fill_value = -9.0)
+                   fill_value = -9999.0)
             <BLANKLINE>
             >>> river_network(fdir=fd, do_fa=False, do_co=True, sinks=sinks).co
             masked_array(data =
@@ -350,7 +350,7 @@ class river_network(object):
              [False False False False False False False False False]
              [False False False False False False False False False]
              [False False False False False False False False False]],
-                   fill_value = -9.0)
+                   fill_value = -9999.0)
             <BLANKLINE>
                    
             License

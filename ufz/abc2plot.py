@@ -247,7 +247,7 @@ def abc2plot(handle, dx, dy, iplot,
     ymin, ymax = handle.get_ylim()
     handle.text(xmin+dx*(xmax-xmin), ymin+dy*(ymax-ymin), t,
                 fontsize=fs, fontweight=fw, fontstyle=fst,
-                **kwargs)#,
+                **kwargs) #,
                 # horizontalalignment='left', verticalalignment='bottom')
 
 
