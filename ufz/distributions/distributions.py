@@ -728,7 +728,7 @@ def sep01_fs_mean(xi=1., beta=0.):
         # -> sqrt(3/4)
         M1 = g2 / np.sqrt(g3*g1)
     else:
-        M1      = np.sqrt(0.75)
+        M1 = np.sqrt(0.75)
 
     if xi != 1:
         return M1*(xi-1./xi)
