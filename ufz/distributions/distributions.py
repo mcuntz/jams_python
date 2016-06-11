@@ -23,9 +23,14 @@ import numpy as np
     Copyright 2016 Matthias Cuntz
 """
 
-__all__ = ['ep', 'exponential', 'gauss', 'laplace', 'normal',
-           'sep', 'sep_mean', 'sep_std', 'ssep',
-           'ssstudentt', 'sstudentt', 'sstudentt_mean', 'sstudentt_std', 'studentt']
+__all__ = ['exponential', 'laplace',
+           'gauss', 'norm', 'normal',                           # Normal (Gauss)
+           'ep', 'sep', 'sep_fs', 'sep_fs_mean', 'sep_fs_std',  # (Skew) Exponential Power
+           'st', 'st_fs', 'st_fs_mean', 'st_fs_std', 't']       # (Skew) Student-t
+
+
+# --------------------------------------------------------------------
+
 
 def ep(x, loc=0., sca=1., kurt=0., sig=None):
     """
@@ -75,11 +80,8 @@ def ep(x, loc=0., sca=1., kurt=0., sig=None):
         -------
         Written,  MC, May 2016
     """
-    if sig is None:
-        return ep01((x-loc)/sca, kurt)/sca
-    else:
-        sca = sig
-        return ep01((x-loc)/sca, kurt)/sca
+    if sig is not None: sca = sig
+    return ep01((x-loc)/sca, kurt)/sca
 
 
 def ep01(x, kurt=0.):
@@ -89,7 +91,7 @@ def ep01(x, kurt=0.):
 
         Definition
         ----------
-        def sep01(x, kurt=0.):
+        def ep01(x, kurt=0.):
 
 
         Input
@@ -143,14 +145,14 @@ def ep01(x, kurt=0.):
 # --------------------------------------------------------------------
 
 
-def exponential(x, loc=0., sca=1., theta=1., sig=None):
+def exponential(x, loc=0., sca=1., sig=None):
     """
         Exponential probability density function (pdf).
 
 
         Definition
         ----------
-        def exponential(x, loc=0., sca=1., theta=1., sig=None):
+        def exponential(x, loc=0., sca=1., sig=None):
 
 
         Input
@@ -162,7 +164,6 @@ def exponential(x, loc=0., sca=1., theta=1., sig=None):
         --------------
         loc        location
         sca        scale
-        theta      duration (shape) parameter
         sig        standard deviation, overwrites scale
 
 
@@ -176,31 +177,23 @@ def exponential(x, loc=0., sca=1., theta=1., sig=None):
         Written,  MC, May 2016
     """
 
-    if sig is None:
-        return exponential01((x-loc)/sca)/sca
-    else:
-        sca = sig
-        return exponential01((x-loc)/sca)/sca
+    if sig is not None: sca = sig
+    return exponential01((x-loc)/sca)/sca
 
 
-def exponential01(x, theta=1.):
+def exponential01(x):
     """
         Exponential probability density function (pdf) at location zero and with unit scale.
 
 
         Definition
         ----------
-        def exponential01(x, theta=1.):
+        def exponential01(x):
 
 
         Input
         -----
         x          array_like quantiles
-
-
-        Optional Input
-        --------------
-        theta      duration (shape) parameter
 
 
         Output
@@ -213,7 +206,11 @@ def exponential01(x, theta=1.):
         Written,  MC, May 2016
     """
 
-    return np.exp(-x/theta)/theta
+    iexp = np.where(x<0.0, 0., np.exp(-x))
+    if np.iterable(x):
+        return iexp
+    else:
+        return float(iexp)
 
 
 # --------------------------------------------------------------------
@@ -281,11 +278,8 @@ def laplace(x, loc=0., sca=1., sig=None):
         Written,  MC, May 2016
     """
 
-    if sig is None:
-        return laplace01((x-loc)/sca)/sca
-    else:
-        sca = sig/np.sqrt(2.)
-        return laplace01((x-loc)/sca)/sca
+    if sig is not None: sca = sig/np.sqrt(2.)
+    return laplace01((x-loc)/sca)/sca
 
 
 def laplace01(x):
@@ -328,6 +322,18 @@ def laplace01(x):
     """
 
     return 0.5 * np.exp(-np.abs(x))
+
+
+# --------------------------------------------------------------------
+
+
+def norm(*args, **kwargs):
+    """
+        Wrapper for normal
+
+        def normal(x, loc=0., sca=1., sig=None):
+    """
+    return normal(*args, **kwargs)
 
 
 # --------------------------------------------------------------------
@@ -383,11 +389,8 @@ def normal(x, loc=0., sca=1., sig=None):
         Written,  MC, May 2016
     """
 
-    if sig is None:
-        return normal01((x-loc)/sca)/sca
-    else:
-        sca = sig
-        return normal01((x-loc)/sca)/sca
+    if sig is not None: sca = sig
+    return normal01((x-loc)/sca)/sca
 
 
 def normal01(x):
@@ -429,20 +432,20 @@ def normal01(x):
         Written,  MC, May 2016
     """
 
-    return 1./np.sqrt(2.*np.pi) * np.exp(-0.5*x*x)
+    return 1./np.sqrt(2.*np.pi) * np.exp(-0.5*x**2)
 
 
 # --------------------------------------------------------------------
 
 
-def sep(x, loc=0., sca=1., skew=1., kurt=0.):
+def sep(x, loc=0., sca=1., skew=1., kurt=0., sig=None):
     """
         The skew exponential power distribution with given location, scale, skewness, and kurtosis.
 
 
         Definition
         ----------
-        def sep(x, loc=0., sca=1., skew=1., kurt=0.):
+        def sep(x, loc=0., sca=1., skew=1., kurt=0., sig=None):
 
 
         Input
@@ -462,6 +465,15 @@ def sep(x, loc=0., sca=1., skew=1., kurt=0.):
         Output
         ------
         Skew exponential power pdf at x
+
+
+        Literature
+        ----------
+        Fernandez C & Steel M (1998) On Bayesian modeling of fat tails and skewness.
+            Journal of the American Statistical Association 93, 359-371.
+        Schoups G & Vrugt JA (2010) A formal likelihood function for parameter and predictive
+            inference of hydrologic models with correlated, heteroscedastic, and non-Gaussian errors.
+            Water Resources Research 46, W10531.
 
 
         Examples
@@ -484,6 +496,7 @@ def sep(x, loc=0., sca=1., skew=1., kurt=0.):
         Written,  MC, May 2016
     """
 
+    if sig is not None: sca = sig
     return sep01((x-loc)/sca, skew, kurt)/sca
 
 
@@ -517,6 +530,110 @@ def sep01(x, skew=1., kurt=0.):
         ----------
         Fernandez C & Steel M (1998) On Bayesian modeling of fat tails and skewness.
             Journal of the American Statistical Association 93, 359-371.
+        Schoups G & Vrugt JA (2010) A formal likelihood function for parameter and predictive
+            inference of hydrologic models with correlated, heteroscedastic, and non-Gaussian errors.
+            Water Resources Research 46, W10531.
+
+
+        History
+        -------
+        Written,  MC, May 2016
+    """
+
+    mu  = sep01_fs_mean(skew, kurt)
+    sig = sep01_fs_std(skew, kurt)
+    z   = mu + sig*x
+
+    return sig * sep01_fs(z, skew, kurt)
+
+
+# --------------------------------------------------------------------
+
+
+def sep_fs(x, loc=0., sca=1., skew=1., kurt=0., sig=None):
+    """
+        The skew exponential power distribution Fernandez C & Steel M (1998)
+        with given location, scale, skewness, and kurtosis.
+
+
+        Definition
+        ----------
+        def sep_fs(x, loc=0., sca=1., skew=1., kurt=0., sig=None):
+
+
+        Input
+        -----
+        x          array_like quantiles
+
+
+        Optional Input
+        --------------
+        loc        location
+        sca        scale
+        skew       skewness parameter
+        kurt       kurtosis parameter
+        sig        standard deviation, overwrites scale
+
+
+        Output
+        ------
+        Skew exponential power pdf at x after Fernandez and Steel (1998)
+
+
+        Examples
+        --------
+        >>> print(np.allclose(sep(1., 2., 2., 0.5, 2.), sep((1.-2.)/2., skew=0.5, kurt=2.)/2.))
+        True
+
+        >>> print(np.allclose(sep(1.3, 0., 1., 1., 0.), normal(1.3, 0., 1.)))
+        True
+
+        >>> print(np.allclose(sep(1.3, 0., 1., 1., 1.), laplace(1.3, 0., 1./np.sqrt(2.))))
+        True
+
+        >>> print(np.allclose(sep(1.3, 0., np.sqrt(2.), 1., 1.), laplace(1.3, 0., 1.)))
+        True
+
+
+        History
+        -------
+        Written,  MC, May 2016
+    """
+
+    if sig is not None: sca = sig
+    return sep01_fs((x-loc)/sca, skew, kurt)/sca
+
+
+def sep01_fs(x, skew=1., kurt=0.):
+    """
+        The skew exponential power distribution after Fernandez and Steel (1998)
+        with location zero and unit scale.
+
+        Definition
+        ----------
+        def sep01_fs(x, skew=1., kurt=0.):
+
+
+        Input
+        -----
+        x          array_like quantiles
+
+
+        Optional Input
+        --------------
+        skew       skewness parameter
+        kurt       kurtosis parameter
+
+
+        Output
+        ------
+        Skew exponential power pdf with loc=0, sca=1 at x after Fernandez and Steel (1998)
+
+
+        Literature
+        ----------
+        Fernandez C & Steel M (1998) On Bayesian modeling of fat tails and skewness.
+            Journal of the American Statistical Association 93, 359-371.
 
 
         History
@@ -530,14 +647,17 @@ def sep01(x, skew=1., kurt=0.):
     return 2.0/(skew+1./skew) * ep01(alpha*x, kurt)
 
 
-def sep_mean(loc=0., sca=1., skew=1., kurt=0.):
+# --------------------------------------------------------------------
+
+
+def sep_fs_mean(loc=0., sca=1., skew=1., kurt=0., sig=None):
     """
         Mean of skew exponential power distribution with given skewness and kurtosis, location and scale.
 
 
         Definition
         ----------
-        def sep_mean(loc=0., sca=1., skew=1., kurt=0.):
+        def sep_fs_mean(loc=0., sca=1., skew=1., kurt=0., sig=None):
 
 
         Optional Input
@@ -546,6 +666,7 @@ def sep_mean(loc=0., sca=1., skew=1., kurt=0.):
         sca        scale
         skew       skewness parameter
         kurt       kurtosis parameter
+        sig        standard deviation, overwrites scale
 
 
         Output
@@ -558,17 +679,18 @@ def sep_mean(loc=0., sca=1., skew=1., kurt=0.):
         Written,  MC, May 2016
     """
 
-    return sep01_mean(skew, kurt) * sca + loc
+    if sig is not None: sca = sig
+    return sep01_fs_mean(skew, kurt) * sca + loc
 
 
-def sep01_mean(skew=1., kurt=0.):
+def sep01_fs_mean(skew=1., kurt=0.):
     """
         Mean of skew exponential power distribution with given skewness and kurtosis, location zero and unit scale.
 
 
         Definition
         ----------
-        def sep01_mean(skew=1., kurt=0.):
+        def sep01_fs_mean(skew=1., kurt=0.):
 
 
         Optional Input
@@ -615,14 +737,17 @@ def sep01_mean(skew=1., kurt=0.):
         return 0.0
 
 
-def sep_std(sca=1., skew=1., kurt=0.):
+# --------------------------------------------------------------------
+
+
+def sep_fs_std(sca=1., skew=1., kurt=0., sig=None):
     """
         Standard deviation of skew exponential power distribution with given skewness and kurtosis, location and scale.
 
 
         Definition
         ----------
-        def sep_std(sca=1., skew=1., kurt=0.):
+        def sep_fs_std(sca=1., skew=1., kurt=0., sig=None):
 
 
         Optional Input
@@ -630,6 +755,7 @@ def sep_std(sca=1., skew=1., kurt=0.):
         sca        scale
         skew       skewness parameter
         kurt       kurtosis parameter
+        sig        standard deviation, overwrites scale
 
 
         Output
@@ -651,10 +777,11 @@ def sep_std(sca=1., skew=1., kurt=0.):
         Written,  MC, May 2016
     """
 
-    return sep01_std(skew, kurt) * sca
+    if sig is not None: sca = sig
+    return sep01_fs_std(skew, kurt) * sca
 
 
-def sep01_std(skew=1., kurt=0.):
+def sep01_fs_std(skew=1., kurt=0.):
     """
         Standard deviation of skew exponential power distribution with given skewness and kurtosis,
         location zero and unit scale.
@@ -662,7 +789,7 @@ def sep01_std(skew=1., kurt=0.):
 
         Definition
         ----------
-        def sep01_std(skew=1., kurt=0.):
+        def sep01_fs_std(skew=1., kurt=0.):
 
 
         Optional Input
@@ -690,7 +817,7 @@ def sep01_std(skew=1., kurt=0.):
         Written,  MC, May 2016
     """
 
-    mu  = sep01_mean(skew, kurt)
+    mu  = sep01_fs_mean(skew, kurt)
     if skew != 1.:
         M1 = mu / (skew-1./skew)
     else:
@@ -708,129 +835,14 @@ def sep01_std(skew=1., kurt=0.):
 # --------------------------------------------------------------------
 
 
-def ssep(x, loc=0., sca=1., skew=1., kurt=0., sig=None):
-    """
-        The standardise skew exponential power distribution with given location, scale, skewness, and kurtosis.
-
-
-        Definition
-        ----------
-        def ssep(x, loc=0., sca=1., skew=1., kurt=0., sig=None):
-
-
-        Input
-        -----
-        x          array_like quantiles
-
-
-        Optional Input
-        --------------
-        loc        location
-        sca        scale
-        skew       skewness parameter
-        kurt       kurtosis parameter
-        sig        standard deviation, overwrites scale
-
-
-        Output
-        ------
-        Standardised skew exponential power pdf at x
-
-
-        Literature
-        ----------
-        Fernandez C & Steel M (1998) On Bayesian modeling of fat tails and skewness.
-            Journal of the American Statistical Association 93, 359-371.
-        Schoups G & Vrugt JA (2010) A formal likelihood function for parameter and predictive
-            inference of hydrologic models with correlated, heteroscedastic, and non-Gaussian errors.
-            Water Resources Research 46, W10531.
-
-
-        Examples
-        --------
-        >>> print(np.allclose(ssep(1., 2., 2., 0.5, 2.), ssep((1.-2.)/2., skew=0.5, kurt=2.)/2.))
-        True
-
-        >>> print(np.allclose(ssep(1.3, 0., 1., 1., 0.), normal(1.3, 0., 1.)))
-        True
-
-        >>> print(np.allclose(ssep(1.3, 0., 1., 1., 1.), laplace(1.3, 0., 1./np.sqrt(2.))))
-        True
-
-        >>> print(np.allclose(ssep(1.3, 0., np.sqrt(2.), 1., 1.), laplace(1.3, 0., 1.)))
-        True
-
-
-        History
-        -------
-        Written,  MC, May 2016
-    """
-
-    if sig is None:
-        return ssep01((x-loc)/sca, skew, kurt)/sca
-    else:
-        sca = sig
-        return ssep01((x-loc)/sca, skew, kurt)/sca
-
-
-def ssep01(x, skew=1., kurt=0.):
-    """
-        The standardised skew exponential power distribution with given skewness and kurtosis, location zero and unit scale.
-
-
-        Definition
-        ----------
-        def ssep01(x, skew=1., kurt=0.):
-
-
-        Input
-        -----
-        x          array_like quantiles
-
-
-        Optional Input
-        --------------
-        skew       skewness parameter
-        kurt       kurtosis parameter
-
-
-        Output
-        ------
-        Standardised skew exponential power pdf with loc=0, sca=1 at x
-
-
-        Literature
-        ----------
-        Fernandez C & Steel M (1998) On Bayesian modeling of fat tails and skewness.
-            Journal of the American Statistical Association 93, 359-371.
-        Schoups G & Vrugt JA (2010) A formal likelihood function for parameter and predictive
-            inference of hydrologic models with correlated, heteroscedastic, and non-Gaussian errors.
-            Water Resources Research 46, W10531.
-
-
-        History
-        -------
-        Written,  MC, May 2016
-    """
-
-    mu  = sep01_mean(skew, kurt)
-    sig = sep01_std(skew, kurt)
-    z   = mu + sig*x
-
-    return sig * sep01(z, skew, kurt)
-
-
-# --------------------------------------------------------------------
-
-
-def ssstudentt(x, nu, loc=0., sca=1., skew=1., sig=None):
+def st(x, nu, loc=0., sca=1., skew=1., sig=None):
     """
         The standardised skewed Student t distribution with given degrees of freedom, location, scale, and skewness.
 
 
         Definition
         ----------
-        def ssstudentt(x, nu, loc=0., sca=1., skew=1., sig=None):
+        def st(x, nu, loc=0., sca=1., skew=1., sig=None):
 
 
         Input
@@ -854,7 +866,7 @@ def ssstudentt(x, nu, loc=0., sca=1., skew=1., sig=None):
 
         Examples
         --------
-        >>> print(np.allclose(ssstudentt(1., 2., 2., 0.5, 2.), ssstudentt((1.-2.)/0.5, 2., skew=2.)/0.5))
+        >>> print(np.allclose(st(1., 3., 2., 0.5, 2.), st((1.-2.)/0.5, 3., skew=2.)/0.5))
         True
 
 
@@ -863,14 +875,11 @@ def ssstudentt(x, nu, loc=0., sca=1., skew=1., sig=None):
         Written,  MC, May 2016
     """
 
-    if sig is not None:
-        # convert between scale and standard deviation
-        sca = sig * np.sqrt((nu-2.)/nu)
-        
-    return ssstudentt01((x-loc)/sca, nu, skew)/sca
+    if sig is not None: sca = sig * np.sqrt((nu-2.)/nu)
+    return st01((x-loc)/sca, nu, skew)/sca
 
 
-def ssstudentt01(x, nu, skew=1.):
+def st01(x, nu, skew=1.):
     """
         The standardised skewed Student t distribution with given degrees of freedom and skewness,
         location zero and unit scale.
@@ -878,7 +887,7 @@ def ssstudentt01(x, nu, skew=1.):
 
         Definition
         ----------
-        def ssstudentt01(x, nu, skew=1.):
+        def st01(x, nu, skew=1.):
 
 
         Input
@@ -911,24 +920,24 @@ def ssstudentt01(x, nu, skew=1.):
         Written,  MC, May 2016
     """
 
-    mu  = sstudentt01_mean(nu, skew)
-    sca = sstudentt01_std(nu, skew) * np.sqrt((nu-2.)/nu)
+    mu  = st01_fs_mean(nu, skew)
+    sca = st01_fs_std(nu, skew) * np.sqrt((nu-2.)/nu)
     z   = mu + sca*x
 
-    return sca * sstudentt01(z, nu, skew)
+    return sca * st01_fs(z, nu, skew)
 
 
 # --------------------------------------------------------------------
 
 
-def sstudentt(x, nu, loc=0., sca=1., skew=1.):
+def st_fs(x, nu, loc=0., sca=1., skew=1., sig=None):
     """
         The skewed Student t distribution with given degrees of freedom, location, scale, and skewness.
 
 
         Definition
         ----------
-        def ssstudentt(x, nu, loc=0., sca=1., skew=1., sig=None):
+        def st(x, nu, loc=0., sca=1., skew=1., sig=None):
 
 
         Input
@@ -942,6 +951,7 @@ def sstudentt(x, nu, loc=0., sca=1., skew=1.):
         loc        location
         sca        scale
         skew       skewness parameter
+        sig        standard deviation, overwrites scale
 
 
         Output
@@ -960,10 +970,11 @@ def sstudentt(x, nu, loc=0., sca=1., skew=1.):
         Written,  MC, May 2016
     """
 
-    return sstudentt01((x-loc)/sca, nu, skew)/sca
+    if sig is not None: sca = sig * np.sqrt((nu-2.)/nu)
+    return st01_fs((x-loc)/sca, nu, skew)/sca
 
 
-def sstudentt01(x, nu, skew=1.):
+def st01_fs(x, nu, skew=1.):
     """
         The skewed Student t distribution with given degrees of freedom and skewness,
         location zero and unit scale.
@@ -973,7 +984,7 @@ def sstudentt01(x, nu, skew=1.):
 
         Definition
         ----------
-        def sstudentt01(x, nu, skew=1.):
+        def st01_fs(x, nu, skew=1.):
 
 
         Input
@@ -1006,10 +1017,10 @@ def sstudentt01(x, nu, skew=1.):
     alpha = np.where(x<0.0, skew, 1./skew)
     if not np.iterable(x): alpha = float(alpha)
 
-    return 2.0/(skew+1./skew) * studentt01(alpha*x, nu)
+    return 2.0/(skew+1./skew) * t01(alpha*x, nu)
 
 
-def sstudentt_mean(nu, loc=0., sca=1., skew=1.):
+def st_fs_mean(nu, loc=0., sca=1., skew=1., sig=None):
     """
         The mean of the skewed Student t distribution with given degrees of freedom,
         location, scale, and skewness.
@@ -1017,7 +1028,7 @@ def sstudentt_mean(nu, loc=0., sca=1., skew=1.):
 
         Definition
         ----------
-        def sstudentt_mean(nu, loc=0., sca=1., skew=1.):
+        def st_fs_mean(nu, loc=0., sca=1., skew=1., sig=None):
 
 
         Input
@@ -1030,6 +1041,7 @@ def sstudentt_mean(nu, loc=0., sca=1., skew=1.):
         loc        location
         sca        scale
         skew       skewness parameter
+        sig        standard deviation, overwrites scale
 
 
         Output
@@ -1048,10 +1060,11 @@ def sstudentt_mean(nu, loc=0., sca=1., skew=1.):
         Written,  MC, May 2016
     """
 
-    return sstudentt01_mean(nu, skew) * sca + loc
+    if sig is not None: sca = sig * np.sqrt((nu-2.)/nu)
+    return st01_fs_mean(nu, skew) * sca + loc
 
 
-def sstudentt01_mean(nu, skew=1.):
+def st01_fs_mean(nu, skew=1.):
     """
         The mean of the skewed Student t distribution with given degrees of freedom and skewness,
         location zero and unit scale.
@@ -1059,7 +1072,7 @@ def sstudentt01_mean(nu, skew=1.):
 
         Definition
         ----------
-        def sstudentt01_mean(nu, skew=1.):
+        def st01_fs_mean(nu, skew=1.):
 
 
         Input
@@ -1099,7 +1112,7 @@ def sstudentt01_mean(nu, skew=1.):
     return mu
 
 
-def sstudentt_std(nu, sca=1., skew=1.):
+def st_fs_std(nu, sca=1., skew=1., sig=None):
     """
         The standard deviation of the skewed Student t distribution with given degrees of freedom,
         scale, and skewness.
@@ -1107,7 +1120,7 @@ def sstudentt_std(nu, sca=1., skew=1.):
 
         Definition
         ----------
-        def sstudentt_std(nu, sca=1., skew=1.):
+        def st_fs_std(nu, sca=1., skew=1., sig=None):
 
 
         Input
@@ -1119,6 +1132,7 @@ def sstudentt_std(nu, sca=1., skew=1.):
         --------------
         sca        scale
         skew       skewness parameter
+        sig        standard deviation, overwrites scale
 
 
         Output
@@ -1137,10 +1151,11 @@ def sstudentt_std(nu, sca=1., skew=1.):
         Written,  MC, May 2016
     """
 
-    return sstudentt01_std(nu, skew) * sca
+    if sig is not None: sca = sig * np.sqrt((nu-2.)/nu)
+    return st01_fs_std(nu, skew) * sca
 
 
-def sstudentt01_std(nu, skew=1.):
+def st01_fs_std(nu, skew=1.):
     """
         The standard deviation of the skewed Student t distribution with given degrees of freedom and skewness,
         and unit scale.
@@ -1148,7 +1163,7 @@ def sstudentt01_std(nu, skew=1.):
 
         Definition
         ----------
-        def sstudentt01_std(nu, skew=1.):
+        def st01_fs_std(nu, skew=1.):
 
 
         Input
@@ -1180,7 +1195,7 @@ def sstudentt01_std(nu, skew=1.):
     if nu <= 2.:
         return np.inf
     else:
-        mu = sstudentt01_mean(nu, skew)
+        mu = st01_fs_mean(nu, skew)
         if skew != 1.:
             M1 = mu / (skew-1./skew)
         else:
@@ -1196,14 +1211,14 @@ def sstudentt01_std(nu, skew=1.):
 # --------------------------------------------------------------------
 
 
-def studentt(x, nu, loc=0., sca=1., sig=None):
+def t(x, nu, loc=0., sca=1., sig=None):
     """
         The Student t distribution with given degrees of freedom, location, scale, and skewness.
 
 
         Definition
         ----------
-        def studentt(x, nu, loc=0., sca=1., sig=None):
+        def t(x, nu, loc=0., sca=1., sig=None):
 
 
         Input
@@ -1226,7 +1241,7 @@ def studentt(x, nu, loc=0., sca=1., sig=None):
 
         Examples
         --------
-        >>> print(np.allclose(ssstudentt(1., 2., 2., 0.5, 2.), ssstudentt((1.-2.)/0.5, 2., skew=2.)/0.5))
+        >>> print(np.allclose(st(1., 3., 2., 0.5, 2.), st((1.-2.)/0.5, 3., skew=2.)/0.5))
         True
 
 
@@ -1235,14 +1250,11 @@ def studentt(x, nu, loc=0., sca=1., sig=None):
         Written,  MC, May 2016
     """
 
-    if sig is None:
-        return studentt01((x-loc)/sca, nu)/sca
-    else:
-        sca = np.sqrt((nu-2.)/nu)*sig
-        return studentt01((x-loc)/sca, nu)/sca
+    if sig is not None: sca = sig * np.sqrt((nu-2.)/nu)
+    return t01((x-loc)/sca, nu)/sca
 
 
-def studentt01(x, nu):
+def t01(x, nu):
     """
         The Student t distribution with given degrees of freedom and skewness,
         location zero and unit scale.
@@ -1250,7 +1262,7 @@ def studentt01(x, nu):
 
         Definition
         ----------
-        def studentt01(x, nu):
+        def t01(x, nu):
 
 
         Input
@@ -1284,66 +1296,87 @@ if __name__ == '__main__':
     # import ufz
 
     # nn = 10000000
-    # xx1 = np.arange(nn)/float(nn) * 30.*100. - 15.*100.
+    # xx = np.arange(nn)/float(nn) * 30.*100. - 15.*100.
 
-    # loc=1.
-    # sca=2.
-    # skew=2.
+    # loc=1.1
+    # sca=2.2
+    # sig=sca
+    # skew=3.3
     # kurt=0.5
-    # nu=3.1
-    # theta=1.5
+    # nu=4.4
 
-    # dx = xx1[2]-xx1[1]
+    # dx = xx[2]-xx[1]
 
-    # __all__ = ['ep', 'exponential', 'laplace', 'normal', 'sep', 'ssstudentt', 'studentt']
-    # __all__ = ['ssep', 'ssstudentt']
+    # __all__ = ['ep', 'exponential', 'laplace', 'normal', 'sep', 'st', 't']
 
+    # print('loc/sca/sig/sig**2/skew/kurt/nu:', loc, sca, sig, sig**2, skew, kurt, nu)
     # for dd in __all__:
-    #     xx = xx1
+    #     # use sca
     #     if dd == 'ep':
     #         pdf = ufz.distributions.ep(xx, loc, sca, kurt)
     #     elif dd == 'exponential':
-    #         xx = xx1[xx1>0.]
-    #         pdf = ufz.distributions.exponential(xx, loc, sca, theta)
+    #         pdf = ufz.distributions.exponential(xx, loc, sca)
     #     elif dd == 'laplace':
-    #         pdf = ufz.distributions.laplace(xx, loc, sig=sca)
+    #         pdf = ufz.distributions.laplace(xx, loc, sca)
     #     elif dd == 'normal':
     #         pdf = ufz.distributions.normal(xx, loc, sca)
-    #     elif dd == 'ssep':
-    #         pdf = ufz.distributions.ssep(xx, loc, sca, skew, kurt)
-    #     elif dd == 'ssstudentt':
-    #         pdf = ufz.distributions.ssstudentt(xx, nu, loc, sca, skew)
-    #     elif dd == 'studentt':
-    #         pdf = ufz.distributions.studentt(xx, nu, loc, sca)
+    #     elif dd == 'sep':
+    #         pdf = ufz.distributions.sep(xx, loc, sca, skew, kurt)
+    #     elif dd == 'st':
+    #         pdf = ufz.distributions.st(xx, nu, loc, sca, skew)
+    #     elif dd == 't':
+    #         pdf = ufz.distributions.t(xx, nu, loc, sca)
 
     #     dmean = np.sum(xx * pdf * dx)
     #     dvar  = np.sum((xx-dmean)**2 * pdf * dx)
     #     dstd  = np.sqrt(dvar)
     #     dskew = np.sum(((xx-dmean)/dstd)**3 * pdf * dx)
     #     dkurt = np.sum(((xx-dmean)/dstd)**4 * pdf * dx)
-    #     # print(dd, ':', dmean, dstd)
-    #     print(dd, ':', dmean, dvar, dskew, dkurt)
+    #     print(dd, ':', dmean, dstd, dvar, dskew, dkurt)
 
-    #     # xx   = xx1[xx1>0.]
-    #     # pdf  = ufz.distributions.studentt(xx, nu, loc, sca)
-    #     # M1   = 2.* np.sum(xx * pdf * dx)
+    #     # use sig
+    #     if dd == 'ep':
+    #         pdf = ufz.distributions.ep(xx, loc, kurt=kurt, sig=sig)
+    #     elif dd == 'exponential':
+    #         pdf = ufz.distributions.exponential(xx, loc, sig=sig)
+    #     elif dd == 'laplace':
+    #         pdf = ufz.distributions.laplace(xx, loc, sig=sig)
+    #     elif dd == 'normal':
+    #         pdf = ufz.distributions.normal(xx, loc, sig=sig)
+    #     elif dd == 'sep':
+    #         pdf = ufz.distributions.sep(xx, loc, skew=skew, kurt=kurt, sig=sig)
+    #     elif dd == 'st':
+    #         pdf = ufz.distributions.st(xx, nu, loc, skew=skew, sig=sig)
+    #     elif dd == 't':
+    #         pdf = ufz.distributions.t(xx, nu, loc, sig=sig)
+
+    #     dmean = np.sum(xx * pdf * dx)
+    #     dvar  = np.sum((xx-dmean)**2 * pdf * dx)
+    #     dstd  = np.sqrt(dvar)
+    #     dskew = np.sum(((xx-dmean)/dstd)**3 * pdf * dx)
+    #     dkurt = np.sum(((xx-dmean)/dstd)**4 * pdf * dx)
+    #     print(dd, ':', dmean, dstd, dvar, dskew, dkurt)
+
+    #     # # xx   = xx[xx>0.]
+    #     # # pdf  = ufz.distributions.t(xx, nu, loc, sca)
+    #     # # M1   = 2.* np.sum(xx * pdf * dx)
+    #     # # M2   = nu/(nu-2.) * sca**2
+    #     # # dvarfs = (M2-M1**2)*(skew**2+1./skew**2)+2.*M1**2-M2
+    #     # # # print('Fernandez var:', dvarfs)
+
+    #     # xi = skew
+    #     # mu_shmc  = 2.0 * (xi-1./xi) * spec.gamma(0.5*(nu+1.0)) / spec.gamma(0.5*nu)
+    #     # mu_shmc *= (nu-2.0)/(nu-1.0)
+    #     # mu_shmc *= nu/(nu-2.) / np.sqrt(np.pi*nu)
+    #     # mu_shmc *= sca
+
+    #     # # var_shmc = -mu_shmc**2 + (xi**3+1./xi**3)/(xi+1./xi)
+    #     # # # print('mu_shmc:', mu_shmc, var_shmc)
+
+    #     # if xi != 1.:
+    #     #     M1 = mu_shmc / (xi-1./xi)
+    #     # else:
+    #     #     M1 = 0.
     #     # M2   = nu/(nu-2.) * sca**2
-    #     # dvarfs = (M2-M1**2)*(skew**2+1./skew**2)+2.*M1**2-M2
-    #     # # print('Fernandez var:', dvarfs)
-
-    #     xi = skew
-    #     mu_shmc  = 2.0 * (xi-1./xi) * spec.gamma(0.5*(nu+1.0)) / spec.gamma(0.5*nu)
-    #     mu_shmc *= (nu-2.0)/(nu-1.0)
-    #     mu_shmc *= nu/(nu-2.) / np.sqrt(np.pi*nu)
-    #     mu_shmc *= sca
-
-    #     # var_shmc = -mu_shmc**2 + (xi**3+1./xi**3)/(xi+1./xi)
-    #     # # print('mu_shmc:', mu_shmc, var_shmc)
-
-    #     if xi != 1.:
-    #         M1 = mu_shmc / (xi-1./xi)
-    #     else:
-    #         M1 = 0.
-    #     M2   = nu/(nu-2.) * sca**2
-    #     dvar_mc = (M2-M1**2)*(skew**2+1./skew**2)+2.*M1**2-M2
-    #     print('dvar_mc:', mu_shmc, dvar_mc)
+    #     # dvar_mc = (M2-M1**2)*(skew**2+1./skew**2)+2.*M1**2-M2
+    #     # print('dvar_mc:', mu_shmc, dvar_mc)

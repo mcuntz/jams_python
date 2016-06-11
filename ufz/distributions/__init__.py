@@ -1,33 +1,36 @@
 #!/usr/bin/env python
 """
-    distributions.py        --> Provide pdfs of additional distributions.
-    sample_distributions.py --> Provide sampling from additional distributions.
+    distributions.py        -> pdfs of additional distributions.
+    sample_distributions.py -> sampling from additional distributions.
+
 
     Provided distributions
     ----------------------
-    ep          Exponential Power
+    ep          Exponential Power of Box and Tiao (1992)
     exponential Exponential
     gauss       Gauss (Normal)
     laplace     Laplace
+    norm        Normal (Gauss)
     normal      Normal (Gauss)
     sep         Skew Exponential Power
-    ssep        Standardised skew Exponential Power
-    sstudentt   Skewed Student t
-    ssstudentt  Standardised skewed Student t
-    studentt    Student t
+    sep_fs      Skew Exponential Power after Fernandez & Steel (1998)
+    st          Skew Student t
+    st_fs       Skew Student t after Fernandez & Steel (1998)
+    t           Student t
 
 
     Provided sampling from distributions
     ----------------------
-    sample_ep01    sample from exponential power function EP(0,1,beta)
-    sample_ep      sample from (general) exponential power function EP(loc,sca,beta)
-    sample_sep_fs  sample from skew exponential power distribution obtained by using the approach of Fernandez and Steel
-    sample_ssep    sample from standardized skew exponential power distribution (mean=zero, std. dev.=1)
-    sample_sep     sample from the (general) skew exponential power distribution with
-                               given location, scale, and parameters controlling skewness and kurtosis.
+    sample_ep      sample from exponential Power of Box and Tiao (1992)
+    sample_sep     sample from skew exponential power distribution
+    sample_sep_fs  sample from skew exponential power distribution after Fernandez and Steel (1998)
+    sample_st      Sample from skew Student t
+    sample_st_fs   Sample from skew Student t after Fernandez & Steel (1998)
+    sample_t       Sample from Student t
 
-    Example
-    -------
+
+    Examples
+    --------
     >>> import numpy as np
     >>> print(str(laplace(0.)))
     0.5
@@ -59,20 +62,19 @@
     History
     -------
     Written,  MC,    May 2016
-    Modified, JM+DK, May 2016  - adding sampling from distributions
+    Modified, JM+DK, May 2016  - sampling from distributions
 """
 
-from .distributions        import gauss, normal
 from .distributions        import exponential, laplace
-from .distributions        import ep, sep, sep_mean, sep_std, ssep
-from .distributions        import ssstudentt, sstudentt, sstudentt_mean, sstudentt_std, studentt
-from .sample_distributions import sample_ep01, sample_ep, sample_sep_fs, sample_ssep, sample_sep
-from .sample_distributions import sample_studentt01, sample_studentt, sample_sstudentt_fs, sample_ssstudentt, sample_sstudentt
+from .distributions        import gauss, normal, norm
+from .distributions        import ep, sep, sep_fs, sep_fs_mean, sep_fs_std
+from .distributions        import st, st_fs, st_fs_mean, st_fs_std, t
 
-
+from .sample_distributions import sample_ep, sample_sep, sample_sep_fs
+from .sample_distributions import sample_st, sample_st_fs, sample_t
 
 # Information
 __author__   = "Matthias Cuntz"
-__version__  = '1.0'
-__revision__ = "Revision: 2681"
-__date__     = 'Date: 12.05.2016'
+__version__  = '1.1'
+__revision__ = "Revision: 2740"
+__date__     = 'Date: 11.06.2016'
