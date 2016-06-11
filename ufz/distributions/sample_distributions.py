@@ -260,8 +260,8 @@ def sample_sep01(nn, xi=1., beta=0.):
     SEP_fs = sample_sep01_fs(nn, xi=xi, beta=beta)
 
     # (6) Standardize SEP_fs
-    mean_sep_fs = sep_fs_mean(skew=xi, kurt=beta)
-    std_sep_fs  = sep_fs_std(skew=xi, kurt=beta)
+    mean_sep_fs = sep_fs_mean(xi=xi, beta=beta)
+    std_sep_fs  = sep_fs_std(xi=xi, beta=beta)
     sSEP        = (SEP_fs - mean_sep_fs) / std_sep_fs   # standardized SEP (=Schoups and Vrugt's a_t)
 
     return sSEP
@@ -492,8 +492,8 @@ def sample_st01(nn, nu, xi=1.):
     st_fs = sample_st_fs(nn, nu, xi=xi)
 
     # (6) Standardize st_fs
-    mean_st_fs = st_fs_mean(nu, skew=xi)
-    std_st_fs  = st_fs_std(nu, skew=xi) * np.sqrt((nu-2.)/nu)
+    mean_st_fs = st_fs_mean(nu, xi=xi)
+    std_st_fs  = st_fs_std(nu, xi=xi) * np.sqrt((nu-2.)/nu)
     sst        = (st_fs - mean_st_fs) / std_st_fs   # standardized skew Student-t
 
     return sst
@@ -812,7 +812,7 @@ if __name__ == '__main__':
     #     # Compare with pdf of EP
     #     dx = 0.01
     #     ep_xx = np.arange(-10,10,dx)
-    #     ep_yy = ufz.distributions.ep(ep_xx, loc=loc, sca=sca, kurt=beta)
+    #     ep_yy = ufz.distributions.ep(ep_xx, loc=loc, sca=sca, beta=beta)
 
     #     mean_num = np.sum(ep_xx*ep_yy*dx)
     #     var_num  = np.sum((ep_xx-mean_num)**2*ep_yy*dx)
@@ -849,7 +849,7 @@ if __name__ == '__main__':
     #     # Compare with pdf of SEP
     #     dx = 0.01
     #     sep_xx = np.arange(-10,10,dx)
-    #     sep_yy = ufz.distributions.sep(sep_xx, loc=loc, sca=sca, skew=xi, kurt=beta)
+    #     sep_yy = ufz.distributions.sep(sep_xx, loc=loc, sca=sca, xi=xi, beta=beta)
 
     #     mean_num = np.sum(sep_xx*sep_yy*dx)
     #     var_num  = np.sum((sep_xx-mean_num)**2*sep_yy*dx)
@@ -902,8 +902,8 @@ if __name__ == '__main__':
 
     # if (test_st_fs):
     #     st_fs_samp = ufz.distributions.sample_st_fs(nn, nu, xi=xi)
-    #     mean_st_fs  = ufz.distributions.st_fs_mean(nu, skew=xi)
-    #     std_st_fs   = ufz.distributions.st_fs_std(nu, skew=xi)
+    #     mean_st_fs  = ufz.distributions.st_fs_mean(nu, xi=xi)
+    #     std_st_fs   = ufz.distributions.st_fs_std(nu, xi=xi)
 
     #     print('ssStudent-t:  mean_func      = ', mean_st_fs)
     #     print('ssStudent-t:  std_func       = ', std_st_fs)
@@ -930,8 +930,8 @@ if __name__ == '__main__':
     #     # Compare with pdf of Student-t
     #     dx = 0.0001
     #     st_xx = np.arange(-30+loc,30+loc,dx)
-    #     # st_yy = ufz.distributions.st(st_xx, nu, loc=loc, sig=sca*np.sqrt(nu/(nu-2.)), skew=xi)
-    #     st_yy = ufz.distributions.st(st_xx, nu, loc=loc, sca=sca, skew=xi)
+    #     # st_yy = ufz.distributions.st(st_xx, nu, loc=loc, sig=sca*np.sqrt(nu/(nu-2.)), xi=xi)
+    #     st_yy = ufz.distributions.st(st_xx, nu, loc=loc, sca=sca, xi=xi)
 
     #     mean_num = np.sum(st_xx*st_yy*dx)
     #     var_num  = np.sum((st_xx-mean_num)**2*st_yy*dx)
