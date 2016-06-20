@@ -39,7 +39,7 @@ def readnetcdf(file, var='', code=-1, reform=False, squeeze=False,
         units        get list of units of variables from attribute units
         longnames    get list of long names of variables from
                      attribute long_name
-        attributes   get dictionary of all attributes of specific variable
+        attributes   get dictionary of all attributes of specific variable or of file if variable is omitted
         sort         sort variable names. Codes, units and longnames will be
                      sorted accoringly so that indeces still match.
         pointer      if True, (return file pointer, variable pointer); only for reading
@@ -158,6 +158,7 @@ def readnetcdf(file, var='', code=-1, reform=False, squeeze=False,
                   MC, Oct 2013 - netcdfread, ncread, readnc
                   ST, Apr 2014 - added overwrite flag
                   ST, May 2014 - added dims flag
+                  ST, Jun 2016 - added read of file attributes
     """
     try:
         import netCDF4 as nc
@@ -255,7 +256,14 @@ def readnetcdf(file, var='', code=-1, reform=False, squeeze=False,
         return slongs
     # Get attributes
     if attributes:
-        if var not in vars:
+        if var == '':
+            attrs = dict()
+            attr = f.ncattrs()
+            for a in attr:
+                attrs[a] = getattr(f, a)
+            f.close()
+            return attrs
+        elif var not in vars:
             f.close()
             raise ValueError('Variable '+var+' not in file '+file)
         attrs = dict()
