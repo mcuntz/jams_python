@@ -286,7 +286,7 @@ def dumpnetcdf( fname, dims=None, fileattributes=None, create=True, **variables 
         write netcdf file in one single line
         dump_netcdf( 'test.nc', dims = [ 'time', 'northing', 'easting' ],
                      fileattributes 
-                     sm = sm_array, smi = [ smi_array, [['long_name','soil moisture index']] ] )
+                     sm = sm_array, smi = [ smi_array, {'long_name': 'soil moisture index'} ] )
 
         Restrictions
         ------------
@@ -302,7 +302,7 @@ def dumpnetcdf( fname, dims=None, fileattributes=None, create=True, **variables 
         ...                     [-9., 5., 5., -9. ,5.,-9.,5., -9. ,  5., 5.,  5.] ])
         >>> dims    = [ 'xx', 'yy' ]
         >>> FiAtt   = ([['description', 'test dump_netcdf'],
-        ...            ['history'    , 'Created by Stephan Thober']])
+        ...             ['history'    , 'Created by Stephan Thober']])
         >>> dumpnetcdf( 'test_dump.nc', dims = dims, fileattributes = FiAtt, 
         ...            data = ( dat, {'long_name':'CHS'} ) )
 
@@ -313,7 +313,7 @@ def dumpnetcdf( fname, dims=None, fileattributes=None, create=True, **variables 
         >>> readdata = readnetcdf('test_dump.nc', var='data')
         >>> print(np.any((readdata[:,:] - dat) != 0.))
         False
-        >>> if readdata.dtype == np.dtype('float32'): print('Toll')
+        >>> if readdata.dtype == np.dtype('float64'): print('Toll')
         Toll
 
         >>> import os
@@ -345,7 +345,8 @@ def dumpnetcdf( fname, dims=None, fileattributes=None, create=True, **variables 
         -------
         Written,  ST, Sep 2014
         Modified  ST, Jan 2015 - bug fix, only parse ndim dimensions to writenetcdf
-                  ST & MZ, Mar 2015 - added flag to append variables 
+                  ST & MZ, Mar 2015 - added flag to append variables
+                  ST, Jun 2016 - included dump for single numbers without attributes
     """
     # check if dims are given
     if dims is None:
@@ -376,18 +377,26 @@ def dumpnetcdf( fname, dims=None, fileattributes=None, create=True, **variables 
                             var = None, isdim = True, create_var = False )
             
     # loop over variables
-    
     for key, value in variables.iteritems():
-        if type( value[1] ) != dict:
+        if len(value) == 1:
+            # WRITE SINGLE NUMBER WITHOUT ATTRIBUTE
             if  value.ndim > len( dims ):
                 raise ValueError( '***size mismatch: variable '+key )
             writenetcdf( fh, name = key, dims = dims[: value.ndim], var = value,
                          vartype=value.dtype, comp = True )
         else:
-            if  value[0].ndim > len( dims ):
-                raise ValueError( '***size mismatch: variable '+key )
-            writenetcdf( fh, name = key, dims = dims[: value[0].ndim ], var = value[0],
-                         vartype = value[0].dtype, attributes = value[1], comp = True )
+            if type( value[1] ) == dict:
+                # WRITE WITH ATTRIBUTE
+                if  value[0].ndim > len( dims ):
+                    raise ValueError( '***size mismatch: variable '+key )
+                writenetcdf( fh, name = key, dims = dims[: value[0].ndim ], var = value[0],
+                             vartype = value[0].dtype, attributes = value[1], comp = True )
+            else:
+                # WRITE ARRAY WITHOUT ATTRIBUTE
+                if  value.ndim > len( dims ):
+                    raise ValueError( '***size mismatch: variable '+key )
+                writenetcdf( fh, name = key, dims = dims[: value.ndim], var = value,
+                            vartype=value.dtype, comp = True )
     fh.close()
 
 # returns list of all dimensions given a filename 
