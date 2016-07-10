@@ -117,7 +117,7 @@ from .constant_values import constant_values
 from .excel           import get_header_excel, get_value_excel
 from .getset_flag     import get_flag, set_flag, get_maxflag
 from .manual_flags    import get_manual_flags
-from .readwrite_data  import read_data, write_data, write_data_dmp, write_data_one_file
+from .readwrite_data  import read_data, write_data, write_data_dmp, write_data_dmp_size, write_data_one_file
 
 # Information
 __author__   = "Matthias Cuntz"
