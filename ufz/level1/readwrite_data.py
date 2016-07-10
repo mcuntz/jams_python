@@ -4,7 +4,7 @@ import numpy as np
 import ufz
 from collections import OrderedDict
 
-__all__ = ['read_data', 'write_data', 'write_data_dmp', 'write_data_one_file']
+__all__ = ['read_data', 'write_data', 'write_data_dmp', 'write_data_dmp_size','write_data_one_file']
 
 # --------------------------------------------------------------------
 
@@ -414,6 +414,107 @@ def write_data_dmp(*args):
     else:
         raise ValueError('Must have 10 or 12 arguments.')
 
+
+# --------------------------------------------------------------------
+
+def write_data_dmp_size(*args):
+    """
+        Write data to individual Tereno Level2b files and split if file size exceeds 10 MB.
+
+        Wrapper to write_data_norecord_dmp_size.
+
+
+        Definition
+        ----------
+        def write_data_dmp(infiles, sdate, record, dat, flags, iidate, hdate, hrecord, hdat, hflags, iihead, hdmp):
+        or
+        def write_data_dmp(infiles, sdate, dat, flags, iidate, hdate, hdat, hflags, iihead, hdmp):
+
+
+        Input
+        -----
+        infiles   (nfile,)-list with CHS data level1 file names
+        sdate     (n,)-array of ascii dates in format YYYY-MM-DD hh:mm:ss
+        [record   (n,)-array of record number]
+        dat       (n,m)-array of data
+        flags     (n,m)-array of flags
+        iidate    (nfile,)-list with indices in the output arrays of the input files
+        hdate     date/time header
+        [hrecord  record header]
+        hdat      data headers
+        hflags    flags headers
+        iihead    (nfile,)-list with indices in the output array of headers in the input files
+        hdmp      data headers in Data Management Portal (DMP)
+
+
+        Output
+        ------
+        files will be overwritten
+
+
+        Examples
+        --------
+        --> see __init__.py for full example of workflow
+
+        # Read data
+        files = ufz.files_from_gui(title='Choose Level 1 file(s)')
+        sdate, record, dat, flags, iidate, hdate, hrecord, hdat, hflags, iihead = ufz.level1.read_data(files)
+
+        # Set flags if variables were not treated yet
+        flags[:,idx] = np.where(flags[:,idx]==np.int(undef), 9, flags[:,idx])
+
+        # Write back data
+        ofiles = [ f.replace('level2','level2b') for f in files ]
+        hdmp = ufz.level1.get_value_excel(chsxlsfile, sheet, hdat, 'headerout (DB)')
+        ufz.level1.write_data_dmp(ofiles, sdate, record, dat, flags, iidate, hdate, hrecord, hdat, hflags, iihead, hdmp)
+
+
+        # Read data
+        files = ufz.files_from_gui(title='Choose Level 1 file(s)')
+        sdate, dat, flags, iidate, hdate, hdat, hflags, iihead = ufz.level1.read_data(files, norecord=True)
+
+        # Set flags if variables were not treated yet
+        flags[:,idx] = np.where(flags[:,idx]==np.int(undef), 9, flags[:,idx])
+
+        # Write back data
+        ofiles = [ f.replace('level2','level2b') for f in files ]
+        hdmp = ufz.level1.get_value_excel(chsxlsfile, sheet, hdat, 'headerout (DB)')
+        ufz.level1.write_data_dmp(ofiles, sdate, dat, flags, iidate, hdate, hdat, hflags, iihead, hdmp)
+
+        License
+        -------
+        This file is part of the UFZ Python package.
+
+        The UFZ Python package is free software: you can redistribute it and/or modify
+        it under the terms of the GNU Lesser General Public License as published by
+        the Free Software Foundation, either version 3 of the License, or
+        (at your option) any later version.
+
+        The UFZ Python package is distributed in the hope that it will be useful,
+        but WITHOUT ANY WARRANTY; without even the implied warranty of
+        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+        GNU Lesser General Public License for more details.
+
+        You should have received a copy of the GNU Lesser General Public License
+        along with the UFZ makefile project (cf. gpl.txt and lgpl.txt).
+        If not, see <http://www.gnu.org/licenses/>.
+
+        Copyright 2015 Matthias Cuntz
+
+
+        History
+        -------
+        Written,  MC, May 2015
+        Modified, BD, June 2016
+    """
+    if len(args) == 10:
+        write_data_norecord_dmp_size(*args)
+    elif len(args) == 12:
+        write_data_norecord_dmp_size(args[0],args[1],args[3],args[4],args[5],args[6],args[8],args[9],args[10],args[11])
+    else:
+        raise ValueError('Must have 10 or 12 arguments.')
+
+
 # --------------------------------------------------------------------
 
 def write_data_one_file(*args):
@@ -734,6 +835,158 @@ def write_data_norecord_dmp(infiles, sdate, dat, flags, iidate, hdate, hdat, hfl
                 print(dstr, file=f)
         f.close()
 
+# --------------------------------------------------------------------
+
+def write_data_norecord_dmp_size(infiles, sdate, dat, flags, iidate, hdate, hdat, hflags, iihead, hdmp):
+    """
+        Write data to individual Tereno Level2b files. If the files sizes exceeds 10 MB, the level2b file is splitted into chunks < 10 MB
+
+
+        Definition
+        ----------
+        def write_data_norecord_dmp(infiles, sdate, dat, flags, iidate, hdate, hdat, hflags, iihead, hdmp):
+
+
+        Input
+        -----
+        infiles   (nfile,)-list with CHS data level2b file names
+        sdate     (n,)-array of ascii dates in format YYYY-MM-DD hh:mm:ss
+        dat       (n,m)-array of data
+        flags     (n,m)-array of flags
+        iidate    (nfile,)-list with indices in the output arrays of the input files
+        hdate     date/time header
+        hdat      data headers
+        hflags    flags headers
+        iihead    (nfile,)-list with indices in the output array of headers in the input files
+        hdmp      data headers in Data Management Portal (DMP)
+
+
+        Output
+        ------
+        files will be overwritten
+
+
+        Examples
+        --------
+        --> see __init__.py for full example of workflow
+
+        # Read data
+        files = ufz.files_from_gui(title='Choose Level 1 file(s)')
+        sdate, dat, flags, iidate, hdate, hdat, hflags, iihead = ufz.level1.read_data(files, norecord=True)
+
+        # Set flags if variables were not treated yet
+        flags[:,idx] = np.where(flags[:,idx]==np.int(undef), 9, flags[:,idx])
+
+        # Write back data
+        ofiles = [ f.replace('level2','level2b') for f in files ]
+        hdmp = ufz.level1.get_value_excel(chsxlsfile, sheet, hdat, 'headerout(DB)')
+        ufz.level1.write_data_norecord_dmp(ofiles, sdate, dat, flags, iidate, hdate, hdat, hflags, iihead, hdmp)
+
+
+        License
+        -------
+        This file is part of the UFZ Python package.
+
+        The UFZ Python package is free software: you can redistribute it and/or modify
+        it under the terms of the GNU Lesser General Public License as published by
+        the Free Software Foundation, either version 3 of the License, or
+        (at your option) any later version.
+
+        The UFZ Python package is distributed in the hope that it will be useful,
+        but WITHOUT ANY WARRANTY; without even the implied warranty of
+        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+        GNU Lesser General Public License for more details.
+
+        You should have received a copy of the GNU Lesser General Public License
+        along with the UFZ makefile project (cf. gpl.txt and lgpl.txt).
+        If not, see <http://www.gnu.org/licenses/>.
+
+        Copyright 2016 Matthias Cuntz
+
+
+        History
+        -------
+        Written,  MC, Mar 2016 - from write_data_norecord
+        Modified, MD, June 2016 file size limit
+    """
+    # Assure iterable infiles
+    if not isinstance(infiles, (list, tuple, np.ndarray)): infiles = [infiles]
+
+    # Few checks of sizes
+    ntime = dat.shape[0]
+    ncol  = dat.shape[1]
+    assert len(infiles)   == len(iidate),  'File list and date index list do not conform.'
+    assert len(infiles)   == len(iihead),  'File list and header index list do not conform.'
+    assert len(sdate)     == ntime,        'Not enough dates.'
+    assert flags.shape[0] == ntime,        'Not enough flag time steps.'
+    assert flags.shape[1] == ncol,         'Not enough flag columns.'
+    assert len(hdat)      == ncol,         'Not enough data headers.'
+    assert len(hflags)    == ncol,         'Not enough flag headers.'
+    assert len(hdmp)      == ncol,         'Not enough database headers.'
+
+
+    # assure YYYY-MM-DD hh:mm:ss format even if sdate has DD.MM.YYYY hh:m:ss format
+    isdate = ufz.ascii2eng(sdate, full=True)
+
+    # Tereno flags: OK, DOUBTFUL or BAD
+    if np.any(flags > 2): # level1 flags
+        oflags = np.maximum(ufz.level1.get_maxflag(flags), 0)
+    else:                 # level2 flags
+        oflags = flags
+    strflags = np.zeros(oflags.shape, dtype='S'+str(len('DOUBTFUL,Other,From CHS flagging'))) #NIL
+    ii = np.where(oflags == 0)
+    if ii[0].size>0: strflags[ii] = 'OK,NIL,NIL'
+    ii = np.where(oflags == 1)
+    if ii[0].size>0: strflags[ii] = 'DOUBTFUL,Other,From CHS flagging'
+    ii = np.where(oflags == 2)
+    if ii[0].size>0: strflags[ii] = 'BAD,Other,From CHS flagging'
+    
+    
+
+    # Write individual files and split if size > 10 MB
+    for cff, ff in enumerate(infiles):
+    
+        k = 0
+        start_index = 0
+
+        # data
+        ihead = iihead[cff]
+        idate = iidate[cff]
+
+        while start_index < iidate[0][-1]:
+            
+            if start_index == 0:
+                f = open(ff, 'wb')
+            else:
+                f = open(ff[0:-12]+'_'+str(k)+ff[-12:], 'wb')
+
+            k += 1
+            # header
+            hstr = 'timestamp,sensorname,value,quality_flag,quality_cause,quality_comment'
+            print(hstr, file=f)
+            Line = []
+            for i in ihead:
+                Line.append(isdate[0]+','+hdmp[0]+','+str(dat[0,i])+','+strflags[0,i])
+    
+            Len = len(str(Line))
+            numLines = 0
+            for j in idate[start_index:]:
+                for i in ihead:
+                    numLines +=1
+                    dstr = isdate[j]+','+hdmp[i]+','+str(dat[j,i])+','+strflags[j,i]
+                    print(dstr, file=f)
+        
+                f.seek(0,2)
+                size = f.tell()
+                if(size > 9700000-1*Len or numLines > 100000 - len(ihead)-1):    # limit to less than 10 MB or 100 000 lines
+                    print('reached max. size')
+                    start_index = j
+                    break
+                else:
+                    start_index = iidate[0][-1]
+               
+            f.close()
+        
 # --------------------------------------------------------------------
 
 def write_data_norecord_one_file(infile, sdate, dat, flags, hdate, hdat, hflags):
