@@ -1076,7 +1076,7 @@ def write_data_norecord_one_file(infile, sdate, dat, flags, hdate, hdat, hflags)
         hstr += ','+hdat[i]+','+hflags[i]
     print(hstr, file=f)
     # data
-    for j in range(nrow):
+    for j in range(ntime):
         dstr = isdate[j]
         for i in range(ncol):
             dstr += ','+str(dat[j,i])+','+str(flags[j,i])
