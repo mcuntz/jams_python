@@ -34,9 +34,9 @@ with NcDataset("infile.nc", "r") as ncin:
 		# copy the content with out specific dimension/variable/group
 		ncout.copyDataset(ncin, skipdims=("x","y"), skipvars=("x","y"), skipgroups=("group1"))
 		# copy only the variable x from ncin to ncout 
-		ncout.copyVariable(ncin, "x")
+		ncout.copyVariable(ncin["x"])
 		# copy only the declaration of variable x from ncin to ncout, without copying the data
-		ncout.copyVariable(ncin, "x", data=False)
+		ncout.copyVariable(ncin["x"], data=False)
 		# copy all variables from ncin to ncout
 		ncout.copyVariables(ncin.variables)
 		# copy all but the variables x and y from ncin to ncout
@@ -44,6 +44,11 @@ with NcDataset("infile.nc", "r") as ncin:
 		# same as above but without copying the data
 		ncout.copyVariables(ncin.variables, skip=("x","y"), data=False)
 		# similar routines exist from groups dimensions and attributes
+        #
+		# copy whole dataset but one variable that is changed in the code
+        ncout.copyDataset(ncin, skipvars="var_name")
+        var = ncout.copyVariable(ncin["var_name"], data=False)
+        var[:] = some_local_variable
 ```
 
 netcdf4 offers some filtering functionality. NcDataset/NcGroup classes offer filter* methods:
