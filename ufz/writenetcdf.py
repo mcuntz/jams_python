@@ -254,7 +254,7 @@ def writenetcdf(fhandle, vhandle=None, var=None, time=None, isdim=False, name=No
         return hand
 
 # write to file
-def dumpnetcdf( fname, dims=None, fileattributes=None, create=True, **variables ):
+def dumpnetcdf( fname, dims=None, fileattributes=None, vnames=None, create=True, **variables ):
     """
         Writes variables with the same dimension to a netcdf file (1D-5D).
         It is a wrapper around writenetcdf.
@@ -265,7 +265,7 @@ def dumpnetcdf( fname, dims=None, fileattributes=None, create=True, **variables 
 
         Definition
         ----------
-        def dumpnetcdf( fname, dims=None, **variables )
+        def dumpnetcdf( fname, dims=None, fileattributes=None, vnames=None, create=True, **variables )
 
 
         Input           Format                  Description
@@ -276,8 +276,10 @@ def dumpnetcdf( fname, dims=None, fileattributes=None, create=True, **variables 
         fileattributes  2D list or dictionary   global attributes of NetCDF file
                                                 (e.g., history, description, ...)
         create          bool                    flag for creating file or appending variables
+        vnames          dictionary              dictionary that specifies the variable name
+                                                for each given variable
         variables       keyword arguments       keys become variable names, values are either
-                                                numpy arrays to write or list/tuple of
+                                                numpy arrays to write OR list/tuple of
                                                 [ numpy array, attributes ] where attributes 
                                                 must be a dictionary
 
@@ -347,10 +349,17 @@ def dumpnetcdf( fname, dims=None, fileattributes=None, create=True, **variables 
         Modified  ST, Jan 2015 - bug fix, only parse ndim dimensions to writenetcdf
                   ST & MZ, Mar 2015 - added flag to append variables
                   ST, Jun 2016 - included dump for single numbers without attributes
+                  ST, Aug 2016 - included separate variable names
     """
     # check if dims are given
     if dims is None:
         dims = [ 'x', 'y', 'z', 'u', 'v' ]
+    # check if variable names are given
+    if vnames is not None:
+        if type(vnames) != dict:
+            raise ValueError('Variable names must be dictionary with the same keys as given variables')
+        if len(vnames) != len(variables):
+            raise ValueError('Number of given variable names does not match number of variables')
     # open netcdf file
     if create:
         fh = nc.Dataset( fname, 'w', 'NETCDF4' )
@@ -360,7 +369,7 @@ def dumpnetcdf( fname, dims=None, fileattributes=None, create=True, **variables 
     if fileattributes is not None:
         writenetcdf(fh, fileattributes=fileattributes)
     # create dimensions according to first variable
-    if ( type( variables.values()[0][1] ) != dict ):
+    if ( type( variables.values()[0][-1] ) != dict ):
         arr_shape = variables.values()[ 0 ].shape
     else:
         arr_shape = variables.values()[ 0 ][0].shape
@@ -372,12 +381,17 @@ def dumpnetcdf( fname, dims=None, fileattributes=None, create=True, **variables 
         # read dimensions from file
         file_dims = get_dims( fname )
         for dd in  np.arange( len( arr_shape ) ):
+            # write dimensions if they do not exist
             if not dims[dd] in file_dims:
                 writenetcdf( fh, name = dims[dd], dims = arr_shape[dd], 
                             var = None, isdim = True, create_var = False )
-            
     # loop over variables
+    cc = 0
     for key, value in variables.iteritems():
+        # update vnames if required
+        if vnames is not None:
+            key = vnames[key]
+            cc += 1
         if len(value) == 1:
             # WRITE SINGLE NUMBER WITHOUT ATTRIBUTE
             if  value.ndim > len( dims ):
@@ -385,12 +399,12 @@ def dumpnetcdf( fname, dims=None, fileattributes=None, create=True, **variables 
             writenetcdf( fh, name = key, dims = dims[: value.ndim], var = value,
                          vartype=value.dtype, comp = True )
         else:
-            if type( value[1] ) == dict:
+            if type( value[-1] ) == dict:
                 # WRITE WITH ATTRIBUTE
                 if  value[0].ndim > len( dims ):
                     raise ValueError( '***size mismatch: variable '+key )
                 writenetcdf( fh, name = key, dims = dims[: value[0].ndim ], var = value[0],
-                             vartype = value[0].dtype, attributes = value[1], comp = True )
+                             vartype = value[0].dtype, attributes = value[-1], comp = True )
             else:
                 # WRITE ARRAY WITHOUT ATTRIBUTE
                 if  value.ndim > len( dims ):
