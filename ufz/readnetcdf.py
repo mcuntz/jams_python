@@ -43,8 +43,8 @@ def readnetcdf(file, var='', code=-1, reform=False, squeeze=False,
         sort         sort variable names. Codes, units and longnames will be
                      sorted accoringly so that indeces still match.
         pointer      if True, (return file pointer, variable pointer); only for reading
-        overwrite    if True, (return file pointer, variable pointer); modification of file/variable possible
-
+        overwrite    if True, (return file pointer, variable pointer); modification of file/variable possible if
+                     file contains only one variable
 
         Output
         ------
@@ -159,6 +159,7 @@ def readnetcdf(file, var='', code=-1, reform=False, squeeze=False,
                   ST, Apr 2014 - added overwrite flag
                   ST, May 2014 - added dims flag
                   ST, Jun 2016 - added read of file attributes
+                  ST, Aug 2016 - restricted use of overwrite option
     """
     try:
         import netCDF4 as nc
@@ -168,6 +169,9 @@ def readnetcdf(file, var='', code=-1, reform=False, squeeze=False,
     try:
         if overwrite:
             f = nc.Dataset(file, 'a')
+            if len(f.variables) > 1:
+                f.close()
+                raise ValueError('ERROR: only use the overwrite option for files with one variable.')
         else:
             f = nc.Dataset(file, 'r')
     except IOError:
