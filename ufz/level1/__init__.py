@@ -15,6 +15,7 @@
     set_flag              Set the flags at position n to iflag at indices ii of CHS data flag vector.
     write_data            Write concatenated data back to individual CHS level1 data files.
     write_data_one_file   Write concatenated data back to one CHS data file.
+    spike                 Spike filter for rectangularly shaped spikes.
 
 
     Example
@@ -112,11 +113,13 @@
               MC, Aug 2015 - get_manual_flags
               MC, Jan 2016 - get_header_excel
               MC, Mar 2016 - write_data_dmp, write_data_one_file
+              BD, Sep 2016 - spike
 """
 from .constant_values import constant_values
 from .excel           import get_header_excel, get_value_excel
 from .getset_flag     import get_flag, set_flag, get_maxflag
 from .manual_flags    import get_manual_flags
+from .spike    import spike
 from .readwrite_data  import read_data, write_data, write_data_dmp, write_data_dmp_size, write_data_one_file
 
 # Information
