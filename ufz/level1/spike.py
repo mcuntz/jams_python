@@ -101,6 +101,9 @@ def spike(datin, thresh=7, toler=0, length=15):
             if debug == True:
                 print('i=',i)
             spike_pos = []
+            if(ipos+i+1 > len(datin)-1):
+                ipos=len(datin)
+                break
             tm = [abs(datin[ipos]-datin[ipos+v]) for v in  list(range(2,i+2))]  #diff between first val before spike and all candidates for first val after spike
             tms = [datin[ipos]-datin[ipos+v] for v in  list(range(2,i+1))]  #diff between first val before spike and all candidates for first val after spike (with sign)
             if len(tm)==1 and tm[0] < toler:
