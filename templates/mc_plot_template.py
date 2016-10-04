@@ -28,20 +28,20 @@ optional arguments:
 
 License
 -------
-This file is part of the UFZ Python library.
+This file is part of the JAMS Python library.
 
-The UFZ Python library is free software: you can redistribute it and/or modify
+The JAMS Python library is free software: you can redistribute it and/or modify
 it under the terms of the GNU Lesser General Public License as published by
 the Free Software Foundation, either version 3 of the License, or
 (at your option) any later version.
 
-The UFZ Python library is distributed in the hope that it will be useful,
+The JAMS Python library is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 GNU Lesser General Public License for more details.
 
 You should have received a copy of the GNU Lesser General Public License
-along with the UFZ makefile project (cf. gpl.txt and lgpl.txt).
+along with the JAMS makefile project (cf. gpl.txt and lgpl.txt).
 If not, see <http://www.gnu.org/licenses/>.
 
 Copyright 2012-2013 Matthias Cuntz
@@ -120,7 +120,7 @@ del parser, args
 
 # import packages after help so that help with command line -h is fast
 import numpy as np
-import ufz
+import jams
 import scipy.optimize as opt
 import time
 t1 = time.time()
@@ -151,11 +151,11 @@ elwidth     = 1.0         # errorbar line width
 alwidth     = 1.0         # axis line width
 msize       = 1.0         # marker size
 mwidth      = 1.0         # marker edge width
-mcol1       = ufz.color.colours('red')        # primary marker colour
+mcol1       = jams.color.colours('red')        # primary marker colour
 mcol2       = '0.0'                     # secondary
 mcol3       = (202/255.,0/255.,32/255.) # third
-mcols       = ufz.color.colours(['blue','red','darkgray','orange','darkblue','black'])
-lcol1       = ufz.color.colours('blue')   # primary line colour
+mcols       = jams.color.colours(['blue','red','darkgray','orange','darkblue','black'])
+lcol1       = jams.color.colours('blue')   # primary line colour
 lcol2       = '0.0'
 lcol3       = '0.0'
 lcols       = mcols
@@ -266,15 +266,15 @@ if dorandom:
   f = open(ofile,'w')
   print('uniform gauss', file=f)
   for i in range(xx.shape[0]):
-      print(ufz.astr(xx[i],9), ufz.astr(yy[i],9), file=f)
+      print(jams.astr(xx[i],9), jams.astr(yy[i],9), file=f)
   f.close()
   del xx, yy
 
   # Read in ascii data and header. Define variables with names of header
   ifile = ofile
   print('Read ascii data ', ifile)
-  dat   = ufz.fread(ifile, skip=1, transpose=True)
-  head  = ufz.fread(ifile, skip=1, header=True)
+  dat   = jams.fread(ifile, skip=1, transpose=True)
+  head  = jams.fread(ifile, skip=1, header=True)
   ihead = dict(zip(head, range(len(head))))
   for ii in range(len(head)): exec(head[ii] + ' = ' + 'dat[ihead["'+head[ii]+'"],:]')
   del dat
@@ -305,7 +305,7 @@ if dorandom:
   hist, bin_edges = np.histogram(gauss, bins=nbins, density=True)
   bin_sizes   = np.diff(bin_edges)
   bin_centres = bin_edges[0]-0.5*bin_sizes[0] + np.cumsum(bin_sizes)
-  gauss_p = opt.fmin(ufz.functions.cost_gauss, np.array([1,1]), args=(bin_centres,hist), disp=False)
+  gauss_p = opt.fmin(jams.functions.cost_gauss, np.array([1,1]), args=(bin_centres,hist), disp=False)
 
 if dobasemap | docartopy:
   # Pseudo temperature
@@ -317,14 +317,14 @@ if dobasemap | docartopy:
   temp       = (np.cos(np.deg2rad(lat2)) + np.sin(np.deg2rad(lon2*10)))*20.
 
   # grid cell edges
-  lonh, lath   = ufz.grid_mid2edge(lon, lat)
+  lonh, lath   = jams.grid_mid2edge(lon, lat)
   # if lon_0=0 (@Mollweide) then need -180 t0 180
   # if lon_0=180 then need 0-360, i.e. no image wrapping. Have to do yourself
   mlon         = np.roll(lon,nlon//2)
   mlon         = np.where(mlon>180., mlon-360., mlon) 
   mlat         = lat
   mtemp        = np.roll(temp,nlon//2,1)
-  mlonh, mlath = ufz.grid_mid2edge(mlon, mlat)
+  mlonh, mlath = jams.grid_mid2edge(mlon, mlat)
 
 # -------------------------------------------------------------------------
 # Plot
@@ -361,8 +361,8 @@ if dorandom:
   # Scatter
   iplot += 1
   xlab   = r'$(0,1)$'
-  ylab   = r'$\aleph(\mu = '+ufz.astr(mu)+', \sigma = '+ufz.astr(sigma,1)+')$'
-  sub    = fig.add_axes(ufz.position(nrow,ncol,iplot,hspace=hspace,vspace=vspace))
+  ylab   = r'$\aleph(\mu = '+jams.astr(mu)+', \sigma = '+jams.astr(sigma,1)+')$'
+  sub    = fig.add_axes(jams.position(nrow,ncol,iplot,hspace=hspace,vspace=vspace))
 
   # possible parameters
   # linestyle: ['-'|'--'|'-.'|':'|'None'|' '|'' ] and any drawstyle in combination with a linestyle, e.g. 'steps--'.
@@ -422,7 +422,7 @@ if dorandom:
                   loc='upper right', bbox_to_anchor=(1+llxbbox,1+llybbox), scatterpoints=1, numpoints=1)
   plt.setp(ll.get_texts(), fontsize='small')
 
-  ufz.abc2plot(sub, dxabc, dyabc, iplot, lower=True, bold=True, usetex=usetex, mathrm=True, parenthesis='close')
+  jams.abc2plot(sub, dxabc, dyabc, iplot, lower=True, bold=True, usetex=usetex, mathrm=True, parenthesis='close')
 
   # redundant, only for demonstration
   xmin, xmax = sub.get_xlim()
@@ -432,18 +432,18 @@ if dorandom:
 
   # Gauss curve
   iplot += 1
-  xlab   = r'$N('+ufz.astr(mu)+','+ufz.astr(sigma,1)+')$'
+  xlab   = r'$N('+jams.astr(mu)+','+jams.astr(sigma,1)+')$'
   ylab   = r'$\mathrm{Rel. \; frequency}$'
-  sub    = fig.add_axes(ufz.position(nrow,ncol,iplot,hspace=hspace,vspace=vspace))
+  sub    = fig.add_axes(jams.position(nrow,ncol,iplot,hspace=hspace,vspace=vspace))
 
   nbins  = ndata/30
   count, bins, ipatches = sub.hist(gauss, bins=nbins, normed=True)
   for k in ipatches: plt.setp(k, facecolor=mcol1, edgecolor='none', linewidth=0.)
 
-  line1  = sub.plot(bins, ufz.functions.gauss(bins,mu,sigma))
+  line1  = sub.plot(bins, jams.functions.gauss(bins,mu,sigma))
   plt.setp(line1, linestyle='-', linewidth=lwidth, marker=None, color=lcol1, label='Gauss')
 
-  line2  = sub.plot(bin_centres, ufz.functions.gauss_p(bin_centres,gauss_p))
+  line2  = sub.plot(bin_centres, jams.functions.gauss_p(bin_centres,gauss_p))
   plt.setp(line2, linestyle='--', linewidth=lwidth, marker=None, color=lcols[4], label='Fit')
 
   plt.setp(sub, xlabel=xlab) # axis labels
@@ -458,14 +458,14 @@ if dorandom:
                   loc='upper right', bbox_to_anchor=(1+llxbbox,1+llybbox), scatterpoints=1, numpoints=1)
   plt.setp(ll.get_texts(), fontsize='small')
 
-  ufz.abc2plot(sub, dxabc, dyabc, iplot, lower=True, bold=True, usetex=usetex, mathrm=True, parenthesis='close')
+  jams.abc2plot(sub, dxabc, dyabc, iplot, lower=True, bold=True, usetex=usetex, mathrm=True, parenthesis='close')
 
 
   # Same as scatter but set xlabel names
   iplot += 1
   xlab   = r'$(0,1)$'
-  ylab   = r'$\aleph(\mu = '+ufz.astr(mu)+', \sigma = '+ufz.astr(sigma,1)+')$'
-  sub    = fig.add_axes(ufz.position(nrow,ncol,iplot,hspace=hspace,vspace=vspace))
+  ylab   = r'$\aleph(\mu = '+jams.astr(mu)+', \sigma = '+jams.astr(sigma,1)+')$'
+  sub    = fig.add_axes(jams.position(nrow,ncol,iplot,hspace=hspace,vspace=vspace))
 
   mark1  = sub.plot(uniform, gauss) # marker
   plt.setp(mark1, linestyle='None', marker='o', markeredgecolor=mcol1, markerfacecolor='None',
@@ -485,7 +485,7 @@ if dorandom:
                   loc='upper right', bbox_to_anchor=(1+llxbbox,1+llybbox), scatterpoints=1, numpoints=1)
   plt.setp(ll.get_texts(), fontsize='small')
 
-  ufz.abc2plot(sub, dxabc, dyabc, iplot, lower=True, bold=True, usetex=usetex, mathrm=True, parenthesis='close')
+  jams.abc2plot(sub, dxabc, dyabc, iplot, lower=True, bold=True, usetex=usetex, mathrm=True, parenthesis='close')
 
   ixticks = sub.get_xticks()
   xnames  = [ r'$\mathrm{U'+str(i)+'}$' for i in ixticks]
@@ -497,8 +497,8 @@ if dorandom:
   # Same as scatter but with second axis to the right
   iplot += 1
   xlab   = r'$(0,1)$'
-  ylab   = r'$\aleph(\mu = '+ufz.astr(mu)+', \sigma = '+ufz.astr(sigma,1)+')$'
-  sub    = fig.add_axes(ufz.position(nrow,ncol,iplot,hspace=hspace,vspace=vspace))
+  ylab   = r'$\aleph(\mu = '+jams.astr(mu)+', \sigma = '+jams.astr(sigma,1)+')$'
+  sub    = fig.add_axes(jams.position(nrow,ncol,iplot,hspace=hspace,vspace=vspace))
 
   mark1  = sub.plot(uniform, gauss) # marker
   plt.setp(mark1, linestyle='None', marker='o', markeredgecolor=mcol1, markerfacecolor='None',
@@ -518,9 +518,9 @@ if dorandom:
                   loc='upper right', bbox_to_anchor=(1+llxbbox,1+llybbox), scatterpoints=1, numpoints=1)
   plt.setp(ll.get_texts(), fontsize='small')
 
-  ufz.abc2plot(sub, dxabc, dyabc, iplot, lower=True, bold=True, usetex=usetex, mathrm=True, parenthesis='close')
+  jams.abc2plot(sub, dxabc, dyabc, iplot, lower=True, bold=True, usetex=usetex, mathrm=True, parenthesis='close')
 
-  ylab2 = r'$\aleph(\mu = '+ufz.astr(mu)+', \sigma = '+ufz.astr(sigma/2.,2)+')$'
+  ylab2 = r'$\aleph(\mu = '+jams.astr(mu)+', \sigma = '+jams.astr(sigma/2.,2)+')$'
   sub2  = sub.twinx()
   mark2 = sub2.plot(uniform, gauss*0.5)
   plt.setp(mark2, linestyle='None', marker='^', markeredgecolor=mcol2, markerfacecolor='None',
@@ -532,10 +532,10 @@ if dorandom:
   # Give points different colors
   iplot += 1
   xlab   = r'$(0,1)$'
-  ylab   = r'$\aleph(\mu = '+ufz.astr(mu)+', \sigma = '+ufz.astr(sigma*2,1)+')$'
-  sub    = fig.add_axes(ufz.position(nrow,ncol,iplot,hspace=hspace,vspace=vspace),sharey=sub2)
+  ylab   = r'$\aleph(\mu = '+jams.astr(mu)+', \sigma = '+jams.astr(sigma*2,1)+')$'
+  sub    = fig.add_axes(jams.position(nrow,ncol,iplot,hspace=hspace,vspace=vspace),sharey=sub2)
 
-  cm = ufz.color.get_brewer('RdYlBu'+str(ncolor))
+  cm = jams.color.get_brewer('RdYlBu'+str(ncolor))
   ii = np.argsort(uniform)
   mark1  = sub.scatter(uniform[ii], gauss[ii]*2., marker='o', c=np.arange(uniform.size)%(uniform.size//3), cmap=cm,
                        linewidth=mwidth, s=msize) # colored markers in 3 repeating colour sequence
@@ -550,7 +550,7 @@ if dorandom:
   if xlim != None: plt.setp(sub, xlim=xlim) # set axis limit if wanted
   if ylim != None: plt.setp(sub, ylim=ylim)
 
-  ufz.abc2plot(sub, dxabc, dyabc, iplot, lower=True, bold=True, usetex=usetex, mathrm=True, parenthesis='close')
+  jams.abc2plot(sub, dxabc, dyabc, iplot, lower=True, bold=True, usetex=usetex, mathrm=True, parenthesis='close')
 
 
   if (outtype == 'pdf'):
@@ -574,14 +574,14 @@ if dobasemap:
 
   nrow = 3
   ncol = 1
-  cm = ufz.color.get_brewer('RdYlBu'+str(ncolor),reverse=True)
+  cm = jams.color.get_brewer('RdYlBu'+str(ncolor),reverse=True)
   delon = 60
   delat = 30
 
   # Mollweide
   iplot += 1
 
-  sub  = fig.add_axes(ufz.position(nrow,ncol,iplot,hspace=hspace,vspace=vspace))
+  sub  = fig.add_axes(jams.position(nrow,ncol,iplot,hspace=hspace,vspace=vspace))
   m    = Basemap(projection='moll',lon_0=0,resolution='c')
 
   mx, my = m(mlonh,mlath)
@@ -611,7 +611,7 @@ if dobasemap:
   # LatLon
   iplot += 1
 
-  sub  = fig.add_axes(ufz.position(nrow,ncol,iplot,hspace=hspace,vspace=vspace))
+  sub  = fig.add_axes(jams.position(nrow,ncol,iplot,hspace=hspace,vspace=vspace))
   m    = Basemap(projection='cyl', lon_0=0, resolution='c')
 
   mx, my = m(mlonh,mlath)
@@ -648,7 +648,7 @@ if dobasemap:
   delon = 2
   delat = 2
 
-  sub  = fig.add_axes(ufz.position(inrow,incol,iplot,hspace=hspace,vspace=vspace))
+  sub  = fig.add_axes(jams.position(inrow,incol,iplot,hspace=hspace,vspace=vspace))
   m    = Basemap(projection='cyl', lon_0=0, resolution='c',
                  llcrnrlon=xlim[0], llcrnrlat=ylim[0], urcrnrlon=xlim[1], urcrnrlat=ylim[1])
 
@@ -697,7 +697,7 @@ if docartopy:
 
   nrow = 3
   ncol = 1
-  cm = ufz.color.get_brewer('RdYlBu'+str(ncolor),reverse=True)
+  cm = jams.color.get_brewer('RdYlBu'+str(ncolor),reverse=True)
   delon = 60
   delat = 60
 
@@ -705,7 +705,7 @@ if docartopy:
   print('Plot Mollweide')
   iplot += 1
 
-  sub  = fig.add_axes(ufz.position(nrow,ncol,iplot,hspace=hspace,vspace=vspace),
+  sub  = fig.add_axes(jams.position(nrow,ncol,iplot,hspace=hspace,vspace=vspace),
                       projection=ccrs.Mollweide(central_longitude=0))
 
   cvals  = np.amin(temp) + np.arange(ncolor+1)/np.float(ncolor)*(np.amax(temp)-np.amin(temp))
@@ -733,7 +733,7 @@ if docartopy:
   print('Plot LatLon')
   iplot += 1
 
-  sub    = fig.add_axes(ufz.position(nrow,ncol,iplot,hspace=hspace,vspace=vspace),
+  sub    = fig.add_axes(jams.position(nrow,ncol,iplot,hspace=hspace,vspace=vspace),
                         projection=ccrs.PlateCarree(central_longitude=0))
 
   cvals  = np.amin(temp) + np.arange(ncolor+1)/np.float(ncolor)*(np.amax(temp)-np.amin(temp))
@@ -780,7 +780,7 @@ if docartopy:
   delon = 2
   delat = 2
 
-  sub    = fig.add_axes(ufz.position(inrow,incol,iplot,hspace=hspace,vspace=vspace),
+  sub    = fig.add_axes(jams.position(inrow,incol,iplot,hspace=hspace,vspace=vspace),
                         projection=ccrs.PlateCarree())
 
   cvals  = np.amin(temp) + np.arange(ncolor+1)/np.float(ncolor)*(np.amax(temp)-np.amin(temp))
@@ -834,5 +834,5 @@ else:
     plt.show()
 
 t2    = time.time()
-strin = '[m]: '+ufz.astr((t2-t1)/60.,1) if (t2-t1)>60. else '[s]: '+ufz.astr(t2-t1,0)
+strin = '[m]: '+jams.astr((t2-t1)/60.,1) if (t2-t1)>60. else '[s]: '+jams.astr(t2-t1,0)
 print('Time for demonstration', strin)

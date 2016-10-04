@@ -1,0 +1,96 @@
+#!/bin/bash
+#
+# Makes html-pages of all Python scripts in current directory using pydoc
+#
+# Copyright 2012-2014 Matthias Cuntz - mc (at) macu.de
+#
+# License
+# This file is part of the JAMS Python package.
+#
+# The JAMS Python package is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Lesser General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# The JAMS Python package is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+# GNU Lesser General Public License for more details.
+#
+# You should have received a copy of the GNU Lesser General Public License
+# along with the JAMS Python package (cf. gpl.txt and lgpl.txt).
+# If not, see <http://www.gnu.org/licenses/>.
+#
+# Copyright 2012-2014 Matthias Cuntz
+#
+set -e
+#
+prog=$(basename $0)
+startdir=${PWD}
+#
+# usage
+function usage ()
+{
+    printf "\n"
+    printf "${prog} [-h] directories\n"
+    printf "\n"
+    printf "Make html-pages of all Python scripts in given directories using pydoc.\n"
+    printf "Pages will be in a sub-directories html of the given directories.\n"
+    printf "The starting pages are called as the directories as well as index.html.\n"
+    printf "\n"
+    printf "Options\n"
+    printf "    -h              Prints this help screen.\n"
+    printf "\n"
+    printf "Examples\n"
+    printf "    ${prog} jams jams/eddybox\n"
+}
+#
+# switches
+while getopts "h" Option ; do
+    case ${Option} in
+	h) usage 1>&2; exit 0;;
+	*) printf "Error ${prog}: unimplemented option.\n";  usage 1>&2; exit 1;;
+    esac
+done
+shift $((${OPTIND} - 1))
+#
+# Input
+if [ $# -lt 1 ] ; then
+    printf "Error ${pprog}: must give at least one directory.\n\n" 1>&2
+    usage 1>&2
+    exit 1
+fi
+#
+# cycle all given directories
+for i in "$@" ; do
+    cd ${startdir}
+    cd ${i}
+    isdir=${PWD}
+    #
+    # Delete old html files
+    if [[ ! -d "html" ]] ; then mkdir html ; fi
+    \rm -f html/*
+    #
+    # Create new html files
+    pack=$(basename ${isdir})
+    cd ..
+    pydoc -w ${pack}
+    mv ${pack}.html ${pack}/html/
+    cd ${pack}
+    for i in $(\ls *.py) ; do
+	dd=$(dirname ${i})
+	ff=$(basename ${i})
+	bb=${ff%.py}
+	if [[ ${bb} == __*__ ]] ; then continue ; fi
+	if [[ ${ff} == setup.py ]] ; then continue ; fi
+	pydoc -w ${bb}
+	oo="html/${pack}.${bb}.html"
+	mv ${bb}.html ${oo}
+    done
+    cd html
+    ln -s ${pack}.html index.html
+    cd ..
+done
+cd ${startdir}
+#
+exit 0

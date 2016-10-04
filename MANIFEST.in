@@ -1,14 +1,14 @@
+include LICENSE
 include MANIFEST.in
 include README
-include LICENSE
 include *.txt
 include setupegg.py
-include ufz/Humor-Sans.ttf
-include ufz/brewer.cmaps
-include ufz/test_*
-include ufz/bin/*
-include ufz/dist/*
-include ufz/eddybox/test_*
-include ufz/templates/*
-
+include templates/*
+include jams/Humor-Sans.ttf
+include jams/test_*
+include jams/bin/*
+include jams/color/brewer.tiff
+include jams/color/sron_colourschemes.pdf
+include jams/eddybox/test_*
+include jams/netcdf4/README.md
 global-exclude *.pyc *.pyo *.pyd

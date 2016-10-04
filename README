@@ -1,17 +1,21 @@
 
-This is the PYTHON package of the
+This is the Python package of JAMS.
 
+Created June 2009 by Matthias Cuntz at the
 Department Computational Hydrosystems
 Helmholtz Centre for Environmental Research - UFZ
-Permoserstr. 15
-04318 Leipzig, Germany
+Permoserstr. 15, 04318 Leipzig, Germany
 
-Created June 2009, Copyright 2009-2014 UFZ CHS
+Copyright 2009-2016 JAMS
 Contact Matthias Cuntz - mc (at) macu.de
 
 
+The library is maintained with a git repository at:
+    https://bitbucket.org/mcuntz/jams_python
+
+
 The package has to be in your Python path. For example in bash:
-    export PYTHONPATH=/path/to/the/ufz/package
+    export PYTHONPATH=/path/to/the/jams/package
 It can also be installed with the usual setup.py commands using distutils:
     python setup.py install
 If one wants to use the development capabilities of setuptools, you can use something like
@@ -24,32 +28,21 @@ Distutils also allows to make Windows installers with
 
 The documentation of the package is in the docstring of __init__.py so that one can get help on the
 Python prompt:
->>> import ufz
->>> help(ufz)
+>>> import jams
+>>> help(jams)
 
 The individual functions also provide their help as doctrings.
 Getting, for example, help on fread for reading floats from ascii files:
->>> import ufz
->>> help(ufz.fread)
+>>> import jams
+>>> help(jams.fread)
 
-One can produce html versions of the documentation in a directory html by calling the script: ./makehtml
+One can produce html versions of the documentation in a directory html by calling the script: ./jams/bin/makehtml
 This script works only for the basic package and not the subpackages.
 A more complete documentation is therefore given with by opening a documentation server with
   pydoc -p 1024
 and then call the url
-  http://localhost:1024/ufz.html
+  http://localhost:1024/jams.html
 in a web browser.
-
-
-The package is maintained with a subversion system at:
-https://svn.ufz.de/svn/chs-svn/PYTHON_chs_lib/
-
-Further information can be found at:
-https://svn.ufz.de/chs-svn/wiki/WikiPython
-
-
-The above wiki will be printed to a PDF file from time to time, which is provided in wiki.pdf.
-Be aware that the current PDF is almost never up to date.
 
 
 The package is compatible with Python 2 (> 2.6) and 3 (> 3.2).
@@ -64,7 +57,7 @@ mad.py uses bottleneck, if available.
 
 License
 -------
-This file is part of the UFZ Python package.
+This file is part of the JAMS Python package.
 
 Not all files in the package are free software. The license is given in the 'License' section
 of the docstring of each routine.
@@ -72,7 +65,7 @@ of the docstring of each routine.
 There are 3 possibilities:
 1. The routine is not yet released under the GNU Lesser General Public License.
    This is marked by a text such as
-        This file is part of the UFZ Python package.
+        This file is part of the JAMS Python package.
 
         It is NOT released under the GNU Lesser General Public License, yet.
 
@@ -89,18 +82,18 @@ There are 3 possibilities:
             J Geophys Res 188, 904-921, doi:10.1002/jgrg.20072
 
 3. The routine is released under the GNU Lesser General Public License. The following applies:
-   The UFZ Python package is free software: you can redistribute it and/or modify
+   The JAMS Python package is free software: you can redistribute it and/or modify
    it under the terms of the GNU Lesser General Public License as published by
    the Free Software Foundation, either version 3 of the License, or
    (at your option) any later version.
 
-   The UFZ Python package is distributed in the hope that it will be useful,
+   The JAMS Python package is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
    GNU Lesser General Public License for more details.
 
    You should have received a copy of the GNU Lesser General Public License
-   along with the UFZ makefile project (cf. gpl.txt and lgpl.txt).
+   along with the JAMS Python package (cf. gpl.txt and lgpl.txt).
    If not, see <http://www.gnu.org/licenses/>.
 
-   Copyright 2009-2014 Matthias Cuntz
+   Copyright 2009-2016 Matthias Cuntz

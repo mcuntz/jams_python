@@ -15,9 +15,8 @@ set -e
 
 module load /global/apps/chs-virtualenv/chspython/2.7.6
 
-if [ -d ${HOME}/program/chs-svn/PYTHON_chs_lib ] ; then export PYTHONPATH="${HOME}/program/chs-svn/PYTHON_chs_lib" ; fi
-if [ -d ${HOME}/prog/chs-svn/PYTHON_chs_lib ] ; then export PYTHONPATH="${HOME}/prog/chs-svn/PYTHON_chs_lib" ; fi
-if [ -d ${HOME}/prog/ufz/chs-svn/PYTHON_chs_lib ] ; then export PYTHONPATH="${HOME}/prog/ufz/chs-svn/PYTHON_chs_lib" ; fi
+if [ -d ${HOME}/prog/jams/python ] ; then export PYTHONPATH="${HOME}/prog/jams/python" ; fi
+if [ -d ${HOME}/prog/jams/jams_python ] ; then export PYTHONPATH="${HOME}/prog/jams/jams_python" ; fi
 if [ -d ${HOME}/prog/python/lib ] ; then export PYTHONPATH="${PYTHONPATH}:${HOME}/prog/python/lib" ; fi
 
 python mc_template.py mc_template.py -p t${JOB_ID}.pdf -t pdf

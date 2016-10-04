@@ -20,20 +20,20 @@ optional arguments:
 
 License
 -------
-This file is part of the UFZ Python library.
+This file is part of the JAMS Python library.
 
-The UFZ Python library is free software: you can redistribute it and/or modify
+The JAMS Python library is free software: you can redistribute it and/or modify
 it under the terms of the GNU Lesser General Public License as published by
 the Free Software Foundation, either version 3 of the License, or
 (at your option) any later version.
 
-The UFZ Python library is distributed in the hope that it will be useful,
+The JAMS Python library is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 GNU Lesser General Public License for more details.
 
 You should have received a copy of the GNU Lesser General Public License
-along with The UFZ Python library.  If not, see <http://www.gnu.org/licenses/>.
+along with The JAMS Python library.  If not, see <http://www.gnu.org/licenses/>.
 
 Copyright 2012-2014 Matthias Cuntz
 
@@ -91,7 +91,7 @@ del parser, args
 
 # import packages after help so that help with command line -h is fast
 import numpy as np
-import ufz
+import jams
 import time
 t1 = time.time()
 
@@ -122,11 +122,11 @@ elwidth     = 1.0         # errorbar line width
 alwidth     = 1.0         # axis line width
 msize       = 1.0         # marker size
 mwidth      = 1.0         # marker edge width
-mcol1       = ufz.color.colours('red')        # primary marker colour
+mcol1       = jams.color.colours('red')        # primary marker colour
 mcol2       = '0.0'                     # secondary
 mcol3       = (202/255.,0/255.,32/255.) # third
-mcols       = ufz.color.colours(['blue','red','darkgray','orange','darkblue','black'])
-lcol1       = ufz.color.colours('blue')   # primary line colour
+mcols       = jams.color.colours(['blue','red','darkgray','orange','darkblue','black'])
+lcol1       = jams.color.colours('blue')   # primary line colour
 lcol2       = '0.0'
 lcol3       = '0.0'
 lcols       = mcols
@@ -196,11 +196,11 @@ from mpl_toolkits.basemap import Basemap#, shiftgrid
 undef = 9999.
 
 print('Read input file ', infile)
-foster_lat  = ufz.readnetcdf(infile,'Y')
-foster_lon  = ufz.readnetcdf(infile,'X')
-foster_snow = ufz.readnetcdf(infile,'snow_depth') * 1e-3 # mm -> m
+foster_lat  = jams.readnetcdf(infile,'Y')
+foster_lon  = jams.readnetcdf(infile,'X')
+foster_snow = jams.readnetcdf(infile,'snow_depth') * 1e-3 # mm -> m
 
-foster_lonh, foster_lath = ufz.grid_mid2edge(foster_lon, foster_lat)
+foster_lonh, foster_lath = jams.grid_mid2edge(foster_lon, foster_lat)
 foster_snow_max = np.ma.amax(foster_snow, axis=0)
 
 # -------------------------------------------------------------------------
@@ -229,7 +229,7 @@ if True:
     fig = plt.figure(ifig)
     iplot += 1
 
-    sub = fig.add_axes(ufz.position(nrow,ncol,iplot,hspace=hspace,vspace=vspace))
+    sub = fig.add_axes(jams.position(nrow,ncol,iplot,hspace=hspace,vspace=vspace))
     m   = Basemap(projection='npstere', boundinglat=30, lon_0=0, resolution='c')
 
     clab = r'$\mathrm{Maximum \; Snow \; Depth \; [m]}$'
@@ -240,9 +240,9 @@ if True:
     ncolor  = 8  # of colors in plot
     b1 = (1,1,1) #
     b2 = [ i/255. for i in (4, 90, 141) ]
-    tmp  = ufz.color.rgb_range(b1, b2, ncolor, cmap='MyBlue')
+    tmp  = jams.color.rgb_range(b1, b2, ncolor, cmap='MyBlue')
     cmap = mpl.cm.get_cmap('MyBlue')
-    #cmap = ufz.color.get_brewer('RdBu'+str(ncolor),reverse=True)
+    #cmap = jams.color.get_brewer('RdBu'+str(ncolor),reverse=True)
 
     mini  = 0.
     maxi  = 1.5
@@ -298,7 +298,7 @@ if True:
 
     iplot += 1
 
-    sub = fig.add_axes(ufz.position(nrow,ncol,iplot,hspace=hspace,vspace=vspace))
+    sub = fig.add_axes(jams.position(nrow,ncol,iplot,hspace=hspace,vspace=vspace))
     m    = (Basemap(projection='merc', resolution='i',
                     llcrnrlon=lllon, llcrnrlat=lllat, urcrnrlon=urlon, urcrnrlat=urlat))
 
@@ -310,9 +310,9 @@ if True:
     ncolor  = 8  # of colors in plot
     b1 = (1,1,1) #
     b2 = [ i/255. for i in (4, 90, 141) ]
-    tmp  = ufz.color.rgb_range(b1, b2, ncolor, cmap='MyBlue')
+    tmp  = jams.color.rgb_range(b1, b2, ncolor, cmap='MyBlue')
     cmap = mpl.cm.get_cmap('MyBlue')
-    #cmap = ufz.color.get_brewer('RdBu'+str(ncolor),reverse=True)
+    #cmap = jams.color.get_brewer('RdBu'+str(ncolor),reverse=True)
 
     mini  = 0.
     maxi  = 1.5
@@ -364,7 +364,7 @@ if True:
 
     iplot += 1
 
-    sub = fig.add_axes(ufz.position(nrow,ncol,iplot,hspace=hspace,vspace=vspace))
+    sub = fig.add_axes(jams.position(nrow,ncol,iplot,hspace=hspace,vspace=vspace))
     m    = Basemap(projection='robin', lon_0=0, resolution='c')
 
     clab = r'$\mathrm{Maximum \; Snow \; Depth \; [m]}$'
@@ -375,9 +375,9 @@ if True:
     ncolor  = 8  # of colors in plot
     b1 = (1,1,1) #
     b2 = [ i/255. for i in (4, 90, 141) ]
-    tmp  = ufz.color.rgb_range(b1, b2, ncolor, cmap='MyBlue')
+    tmp  = jams.color.rgb_range(b1, b2, ncolor, cmap='MyBlue')
     cmap = mpl.cm.get_cmap('MyBlue')
-    #cmap = ufz.color.get_brewer('RdBu'+str(ncolor),reverse=True)
+    #cmap = jams.color.get_brewer('RdBu'+str(ncolor),reverse=True)
 
     mini  = 0.
     maxi  = 1.5
@@ -425,5 +425,5 @@ else:
     plt.show()
 
 t2    = time.time()
-strin = '[m]: '+ufz.astr((t2-t1)/60.,1) if (t2-t1)>60. else '[s]: '+ufz.astr(t2-t1,0)
+strin = '[m]: '+jams.astr((t2-t1)/60.,1) if (t2-t1)>60. else '[s]: '+jams.astr(t2-t1,0)
 print('Time ', strin)

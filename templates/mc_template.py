@@ -23,22 +23,22 @@ optional arguments:
 
 License
 -------
-This file is part of the UFZ Python library.
+This file is part of the JAMS Python library.
 
-The UFZ Python library is free software: you can redistribute it and/or modify
+The JAMS Python library is free software: you can redistribute it and/or modify
 it under the terms of the GNU Lesser General Public License as published by
 the Free Software Foundation, either version 3 of the License, or
 (at your option) any later version.
 
-The UFZ Python library is distributed in the hope that it will be useful,
+The JAMS Python library is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 GNU Lesser General Public License for more details.
 
 You should have received a copy of the GNU Lesser General Public License
-along with The UFZ Python library.  If not, see <http://www.gnu.org/licenses/>.
+along with the JAMS Python library.  If not, see <http://www.gnu.org/licenses/>.
 
-Copyright 2012-2015 Matthias Cuntz
+Copyright 2012-2016 Matthias Cuntz
 
 
 History
@@ -146,7 +146,7 @@ if __name__ == '__main__':
         raise IOError('\nOutput '+outype+' type must be in: {:s}'.format(outtypes))
 
     import numpy as np
-    import ufz
+    import jams
     import time
     t1 = time.time()
 
@@ -184,14 +184,14 @@ if __name__ == '__main__':
     alwidth     = 1.0         # axis line width
     msize       = 1.0         # marker size
     mwidth      = 1.0         # marker edge width
-    mcol1       = ufz.color.colours('red')  # primary marker colour
+    mcol1       = jams.color.colours('red')  # primary marker colour
     mcol2       = fgcolor                   # secondary
-    mcol3       = ufz.color.rgb2rgb01(202,0,32) # third
+    mcol3       = jams.color.rgb2rgb01(202,0,32) # third
     if dowhite:
-        mcols   = ufz.color.colours(['blue','red','lightgray','orange','lightblue',fgcolor])
+        mcols   = jams.color.colours(['blue','red','lightgray','orange','lightblue',fgcolor])
     else:
-        mcols   = ufz.color.colours(['blue','red','darkgray','orange','darkblue','black'])
-    lcol1       = ufz.color.colours('blue')   # primary line colour
+        mcols   = jams.color.colours(['blue','red','darkgray','orange','darkblue','black'])
+    lcol1       = jams.color.colours('blue')   # primary line colour
     lcol2       = fgcolor
     lcol3       = fgcolor
     lcols       = mcols
@@ -331,15 +331,15 @@ if __name__ == '__main__':
     # ylim = [-0.4,0.4]
 
     iplot += 1
-    xlab   = ufz.str2tex('f(x) (0,100)', usetex=usetex)
-    ylab   = ufz.str2tex(r'$\delta \Delta \sin(x)$', usetex=usetex)
+    xlab   = jams.str2tex('f(x) (0,100)', usetex=usetex)
+    ylab   = jams.str2tex(r'$\delta \Delta \sin(x)$', usetex=usetex)
     # if (iplot == 0) | (outtype == 'pdf') | (outtype == 'png') | (outtype == 'html'):
-    #     sub  = fig.add_axes(ufz.position(nrow,ncol,iplot,hspace=hspace,vspace=vspace))
+    #     sub  = fig.add_axes(jams.position(nrow,ncol,iplot,hspace=hspace,vspace=vspace))
     #     sub1 = sub
     # else:
     #     # special if windows or d3: zoom one panel zooms all panels
-    #     sub = fig.add_axes(ufz.position(nrow,ncol,iplot,hspace=hspace,vspace=vspace), sharex=sub1)
-    sub    = fig.add_axes(ufz.position(nrow,ncol,iplot,hspace=hspace,vspace=vspace))
+    #     sub = fig.add_axes(jams.position(nrow,ncol,iplot,hspace=hspace,vspace=vspace), sharex=sub1)
+    sub    = fig.add_axes(jams.position(nrow,ncol,iplot,hspace=hspace,vspace=vspace))
 
     mark1  = sub.plot(np.sin(np.arange(100)))
     plt.setp(mark1, linestyle='none', marker='o', markeredgecolor=mcol1, markerfacecolor='none',
@@ -353,13 +353,13 @@ if __name__ == '__main__':
     if ylim != None: plt.setp(sub, ylim=ylim)
 
     larr = mark1
-    tarr = [ufz.str2tex(r'$\sin(x)$ sin Nothing 100', usetex=usetex)]
+    tarr = [jams.str2tex(r'$\sin(x)$ sin Nothing 100', usetex=usetex)]
     ll = sub.legend(larr, tarr, frameon=frameon, ncol=1,
                     labelspacing=llrspace, handletextpad=llhtextpad, handlelength=llhlength,
                     loc='upper left', bbox_to_anchor=(llxbbox,llybbox), scatterpoints=1, numpoints=1)
     plt.setp(ll.get_texts(), fontsize='small')
 
-    ufz.abc2plot(sub, dxabc, dyabc, iplot, lower=True, bold=True, usetex=usetex, mathrm=True, parenthesis='close')
+    jams.abc2plot(sub, dxabc, dyabc, iplot, lower=True, bold=True, usetex=usetex, mathrm=True, parenthesis='close')
 
     # save pages
     if (outtype == 'pdf'):
@@ -396,9 +396,9 @@ if __name__ == '__main__':
     # ylim = [-0.4,0.4]
 
     iplot += 1
-    xlab   = ufz.str2tex('(0,10)', usetex=usetex)
-    ylab   = ufz.str2tex(r'2$\sin(x)$', usetex=usetex)
-    sub    = fig.add_axes(ufz.position(nrow,ncol,iplot,hspace=hspace,vspace=vspace))
+    xlab   = jams.str2tex('(0,10)', usetex=usetex)
+    ylab   = jams.str2tex(r'2$\sin(x)$', usetex=usetex)
+    sub    = fig.add_axes(jams.position(nrow,ncol,iplot,hspace=hspace,vspace=vspace))
 
     line1 = sub.plot(2.*np.sin(np.arange(100)))
     plt.setp(line1, linestyle='-', linewidth=lwidth, marker=None, color=lcol1)
@@ -411,13 +411,13 @@ if __name__ == '__main__':
     if ylim != None: plt.setp(sub, ylim=ylim)
 
     larr = line1
-    tarr = [ufz.str2tex(r'$\sin$ Nothing', usetex=usetex)]
+    tarr = [jams.str2tex(r'$\sin$ Nothing', usetex=usetex)]
     ll = sub.legend(larr, tarr, frameon=frameon, ncol=1,
                     labelspacing=llrspace, handletextpad=llhtextpad, handlelength=llhlength,
                     loc='upper left', bbox_to_anchor=(llxbbox,llybbox), scatterpoints=1, numpoints=1)
     plt.setp(ll.get_texts(), fontsize='small')
 
-    ufz.abc2plot(sub, dxabc, dyabc, iplot, lower=True, bold=True, usetex=usetex, mathrm=True, parenthesis='close')
+    jams.abc2plot(sub, dxabc, dyabc, iplot, lower=True, bold=True, usetex=usetex, mathrm=True, parenthesis='close')
 
     # save pages
     if (outtype == 'pdf'):
@@ -455,7 +455,7 @@ if __name__ == '__main__':
         plt.show()
 
     t2    = time.time()
-    strin = '[m]: '+ufz.astr((t2-t1)/60.,1) if (t2-t1)>60. else '[s]: '+ufz.astr(t2-t1,0)
+    strin = '[m]: '+jams.astr((t2-t1)/60.,1) if (t2-t1)>60. else '[s]: '+jams.astr(t2-t1,0)
     print('Time ', strin)
 
 
