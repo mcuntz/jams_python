@@ -7,6 +7,7 @@
 
     Example
     -------
+    >>> import jams
     >>> print(jams.color.rgb2hex(1, 101, 201))
     #0165c9
 

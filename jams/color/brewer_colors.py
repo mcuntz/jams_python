@@ -15,6 +15,7 @@
 
     Example
     -------
+    >>> import jams
     >>> print(jams.color.brewer_sequential['blues4'])
     [(239, 243, 255), (189, 215, 231), (107, 174, 214), (33, 113, 181)]
 

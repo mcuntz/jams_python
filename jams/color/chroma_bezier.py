@@ -286,96 +286,96 @@ if __name__ == '__main__':
     import doctest
     doctest.testmod(optionflags=doctest.NORMALIZE_WHITESPACE)
 
-    import numpy as np
-    from jams.color import chroma_brewer, hex2rgb01
+    # import numpy as np
+    # from jams.color import chroma_brewer, hex2rgb01
 
-    import matplotlib as mpl
-    from matplotlib.pylab import *
+    # import matplotlib as mpl
+    # from matplotlib.pylab import *
 
-    # L*a*b
-    fig = figure(figsize=(8,6))
-    ax1 = fig.add_axes([0.05, 0.85, 0.9, 0.10])
-    ax2 = fig.add_axes([0.05, 0.70, 0.9, 0.10])
-    ax3 = fig.add_axes([0.05, 0.55, 0.9, 0.10])
-    ax4 = fig.add_axes([0.05, 0.40, 0.9, 0.10])
-    ax5 = fig.add_axes([0.05, 0.25, 0.9, 0.10])
-    ax6 = fig.add_axes([0.05, 0.10, 0.9, 0.10])
+    # # L*a*b
+    # fig = figure(figsize=(8,6))
+    # ax1 = fig.add_axes([0.05, 0.85, 0.9, 0.10])
+    # ax2 = fig.add_axes([0.05, 0.70, 0.9, 0.10])
+    # ax3 = fig.add_axes([0.05, 0.55, 0.9, 0.10])
+    # ax4 = fig.add_axes([0.05, 0.40, 0.9, 0.10])
+    # ax5 = fig.add_axes([0.05, 0.25, 0.9, 0.10])
+    # ax6 = fig.add_axes([0.05, 0.10, 0.9, 0.10])
 
-    nn     = 7
-    cc     = bezier(['black', 'red', 'yellow', 'white'], nn)
-    cmap   = mpl.colors.ListedColormap(cc)
-    norm   = mpl.colors.BoundaryNorm(np.arange(cmap.N+1), cmap.N)
-    cb     = mpl.colorbar.ColorbarBase(ax1, cmap=cmap, norm=norm, orientation='horizontal')
+    # nn     = 7
+    # cc     = bezier(['black', 'red', 'yellow', 'white'], nn)
+    # cmap   = mpl.colors.ListedColormap(cc)
+    # norm   = mpl.colors.BoundaryNorm(np.arange(cmap.N+1), cmap.N)
+    # cb     = mpl.colorbar.ColorbarBase(ax1, cmap=cmap, norm=norm, orientation='horizontal')
 
-    cc     = bezier(['white', 'yellow', 'red', 'black'], reverse=True)
-    cmap   = mpl.colors.ListedColormap(cc)
-    norm   = mpl.colors.BoundaryNorm(np.arange(cmap.N+1), cmap.N)
-    cb     = mpl.colorbar.ColorbarBase(ax2, cmap=cmap, norm=norm, orientation='horizontal')
+    # cc     = bezier(['white', 'yellow', 'red', 'black'], reverse=True)
+    # cmap   = mpl.colors.ListedColormap(cc)
+    # norm   = mpl.colors.BoundaryNorm(np.arange(cmap.N+1), cmap.N)
+    # cb     = mpl.colorbar.ColorbarBase(ax2, cmap=cmap, norm=norm, orientation='horizontal')
 
-    nn     = 9
-    cc     = bezier(['darkred', 'deeppink', 'lightyellow', 'lightgreen', 'teal'], nn)
-    cmap   = mpl.colors.ListedColormap(cc)
-    norm   = mpl.colors.BoundaryNorm(np.arange(cmap.N+1), cmap.N)
-    cb     = mpl.colorbar.ColorbarBase(ax3, cmap=cmap, norm=norm, orientation='horizontal')
+    # nn     = 9
+    # cc     = bezier(['darkred', 'deeppink', 'lightyellow', 'lightgreen', 'teal'], nn)
+    # cmap   = mpl.colors.ListedColormap(cc)
+    # norm   = mpl.colors.BoundaryNorm(np.arange(cmap.N+1), cmap.N)
+    # cb     = mpl.colorbar.ColorbarBase(ax3, cmap=cmap, norm=norm, orientation='horizontal')
 
-    nn     = 9
-    cc     = bezier([ hex2rgb01(i) for i in chroma_brewer['Oranges'][::3] ], nn)
-    cmap   = mpl.colors.ListedColormap(cc)
-    norm   = mpl.colors.BoundaryNorm(np.arange(cmap.N+1), cmap.N)
-    cb     = mpl.colorbar.ColorbarBase(ax4, cmap=cmap, norm=norm, orientation='horizontal')
+    # nn     = 9
+    # cc     = bezier([ hex2rgb01(i) for i in chroma_brewer['Oranges'][::3] ], nn)
+    # cmap   = mpl.colors.ListedColormap(cc)
+    # norm   = mpl.colors.BoundaryNorm(np.arange(cmap.N+1), cmap.N)
+    # cb     = mpl.colorbar.ColorbarBase(ax4, cmap=cmap, norm=norm, orientation='horizontal')
 
-    nn     = 5
-    cc     = bezier([ rgb2rgb01(*i) for i in [(255,255,178), (253,141,60), (189,0,38)] ], nn, cmap='MyBrewer')
-    norm   = mpl.colors.BoundaryNorm(np.arange(nn+1), nn)
-    cb     = mpl.colorbar.ColorbarBase(ax5, cmap=mpl.cm.get_cmap('MyBrewer'), norm=norm, orientation='horizontal')
+    # nn     = 5
+    # cc     = bezier([ rgb2rgb01(*i) for i in [(255,255,178), (253,141,60), (189,0,38)] ], nn, cmap='MyBrewer')
+    # norm   = mpl.colors.BoundaryNorm(np.arange(nn+1), nn)
+    # cb     = mpl.colorbar.ColorbarBase(ax5, cmap=mpl.cm.get_cmap('MyBrewer'), norm=norm, orientation='horizontal')
 
-    nn     = 9
-    cc     = bezier(['darkred', 'lightyellow', 'teal'], nn)
-    cmap   = mpl.colors.ListedColormap(cc)
-    norm   = mpl.colors.BoundaryNorm(np.arange(cmap.N+1), cmap.N)
-    cb     = mpl.colorbar.ColorbarBase(ax6, cmap=cmap, norm=norm, orientation='horizontal')
+    # nn     = 9
+    # cc     = bezier(['darkred', 'lightyellow', 'teal'], nn)
+    # cmap   = mpl.colors.ListedColormap(cc)
+    # norm   = mpl.colors.BoundaryNorm(np.arange(cmap.N+1), cmap.N)
+    # cb     = mpl.colorbar.ColorbarBase(ax6, cmap=cmap, norm=norm, orientation='horizontal')
 
-    # L*C*h
-    fig = figure(figsize=(8,6))
-    ax1 = fig.add_axes([0.05, 0.85, 0.9, 0.10])
-    ax2 = fig.add_axes([0.05, 0.70, 0.9, 0.10])
-    ax3 = fig.add_axes([0.05, 0.55, 0.9, 0.10])
-    ax4 = fig.add_axes([0.05, 0.40, 0.9, 0.10])
-    ax5 = fig.add_axes([0.05, 0.25, 0.9, 0.10])
-    ax6 = fig.add_axes([0.05, 0.10, 0.9, 0.10])
+    # # L*C*h
+    # fig = figure(figsize=(8,6))
+    # ax1 = fig.add_axes([0.05, 0.85, 0.9, 0.10])
+    # ax2 = fig.add_axes([0.05, 0.70, 0.9, 0.10])
+    # ax3 = fig.add_axes([0.05, 0.55, 0.9, 0.10])
+    # ax4 = fig.add_axes([0.05, 0.40, 0.9, 0.10])
+    # ax5 = fig.add_axes([0.05, 0.25, 0.9, 0.10])
+    # ax6 = fig.add_axes([0.05, 0.10, 0.9, 0.10])
 
-    nn     = 7
-    cc     = bezier(['black', 'red', 'yellow', 'white'], nn, lch=True)
-    cmap   = mpl.colors.ListedColormap(cc)
-    norm   = mpl.colors.BoundaryNorm(np.arange(cmap.N+1), cmap.N)
-    cb     = mpl.colorbar.ColorbarBase(ax1, cmap=cmap, norm=norm, orientation='horizontal')
+    # nn     = 7
+    # cc     = bezier(['black', 'red', 'yellow', 'white'], nn, lch=True)
+    # cmap   = mpl.colors.ListedColormap(cc)
+    # norm   = mpl.colors.BoundaryNorm(np.arange(cmap.N+1), cmap.N)
+    # cb     = mpl.colorbar.ColorbarBase(ax1, cmap=cmap, norm=norm, orientation='horizontal')
 
-    cc     = bezier(['white', 'yellow', 'red', 'black'], reverse=True, lch=True)
-    cmap   = mpl.colors.ListedColormap(cc)
-    norm   = mpl.colors.BoundaryNorm(np.arange(cmap.N+1), cmap.N)
-    cb     = mpl.colorbar.ColorbarBase(ax2, cmap=cmap, norm=norm, orientation='horizontal')
+    # cc     = bezier(['white', 'yellow', 'red', 'black'], reverse=True, lch=True)
+    # cmap   = mpl.colors.ListedColormap(cc)
+    # norm   = mpl.colors.BoundaryNorm(np.arange(cmap.N+1), cmap.N)
+    # cb     = mpl.colorbar.ColorbarBase(ax2, cmap=cmap, norm=norm, orientation='horizontal')
 
-    nn     = 9
-    cc     = bezier(['darkred', 'deeppink', 'lightyellow', 'lightgreen', 'teal'], nn, lch=True)
-    cmap   = mpl.colors.ListedColormap(cc)
-    norm   = mpl.colors.BoundaryNorm(np.arange(cmap.N+1), cmap.N)
-    cb     = mpl.colorbar.ColorbarBase(ax3, cmap=cmap, norm=norm, orientation='horizontal')
+    # nn     = 9
+    # cc     = bezier(['darkred', 'deeppink', 'lightyellow', 'lightgreen', 'teal'], nn, lch=True)
+    # cmap   = mpl.colors.ListedColormap(cc)
+    # norm   = mpl.colors.BoundaryNorm(np.arange(cmap.N+1), cmap.N)
+    # cb     = mpl.colorbar.ColorbarBase(ax3, cmap=cmap, norm=norm, orientation='horizontal')
 
-    nn     = 9
-    cc     = bezier([ hex2rgb01(i) for i in chroma_brewer['Oranges'][::3] ], nn, lch=True)
-    cmap   = mpl.colors.ListedColormap(cc)
-    norm   = mpl.colors.BoundaryNorm(np.arange(cmap.N+1), cmap.N)
-    cb     = mpl.colorbar.ColorbarBase(ax4, cmap=cmap, norm=norm, orientation='horizontal')
+    # nn     = 9
+    # cc     = bezier([ hex2rgb01(i) for i in chroma_brewer['Oranges'][::3] ], nn, lch=True)
+    # cmap   = mpl.colors.ListedColormap(cc)
+    # norm   = mpl.colors.BoundaryNorm(np.arange(cmap.N+1), cmap.N)
+    # cb     = mpl.colorbar.ColorbarBase(ax4, cmap=cmap, norm=norm, orientation='horizontal')
 
-    nn     = 5
-    cc     = bezier([ rgb2rgb01(*i) for i in [(255,255,178), (253,141,60), (189,0,38)] ], nn, cmap='MyBrewer', lch=True)
-    norm   = mpl.colors.BoundaryNorm(np.arange(nn+1), nn)
-    cb     = mpl.colorbar.ColorbarBase(ax5, cmap=mpl.cm.get_cmap('MyBrewer'), norm=norm, orientation='horizontal')
+    # nn     = 5
+    # cc     = bezier([ rgb2rgb01(*i) for i in [(255,255,178), (253,141,60), (189,0,38)] ], nn, cmap='MyBrewer', lch=True)
+    # norm   = mpl.colors.BoundaryNorm(np.arange(nn+1), nn)
+    # cb     = mpl.colorbar.ColorbarBase(ax5, cmap=mpl.cm.get_cmap('MyBrewer'), norm=norm, orientation='horizontal')
 
-    nn     = 9
-    cc     = bezier(['darkred', 'lightyellow', 'teal'], nn, lch=True)
-    cmap   = mpl.colors.ListedColormap(cc)
-    norm   = mpl.colors.BoundaryNorm(np.arange(cmap.N+1), cmap.N)
-    cb     = mpl.colorbar.ColorbarBase(ax6, cmap=cmap, norm=norm, orientation='horizontal')
+    # nn     = 9
+    # cc     = bezier(['darkred', 'lightyellow', 'teal'], nn, lch=True)
+    # cmap   = mpl.colors.ListedColormap(cc)
+    # norm   = mpl.colors.BoundaryNorm(np.arange(cmap.N+1), cmap.N)
+    # cb     = mpl.colorbar.ColorbarBase(ax6, cmap=cmap, norm=norm, orientation='horizontal')
 
-    show()
+    # show()

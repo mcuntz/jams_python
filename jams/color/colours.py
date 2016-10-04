@@ -14,7 +14,7 @@ __all__ = ['colours', 'colors']
 
 # ---------------------------------------------------------------------
 
-jamsall = ['ufzdarkblue', 'ufzblue', 'ufzlightblue',
+ufzall = ['ufzdarkblue', 'ufzblue', 'ufzlightblue',
           'ufzred', 'ufzorange', 'ufzyellow',
           'ufzdarkgreen', 'ufzgreen', 'ufzlightgreen',
           'ufzgray1', 'ufzgray2', 'ufzgray3',
@@ -62,11 +62,11 @@ def get_colour_tuple(name, rgb256=False):
         Examples
         --------
         >>> print(get_colour_tuple('ufzdarkblue', rgb256=True))
-        (0, 62, 110)
+        (0.0, 62.0, 110.0)
 
         >>> import numpy as np
-        >>> from autostring import astr
-        >>> cc = get_colour_tuple('JAMSDARKBLUE')
+        >>> from jams.autostring import astr
+        >>> cc = get_colour_tuple('UFZDARKBLUE')
         >>> print(astr(np.array(cc), 4))
         ['0.0000' '0.2431' '0.4314']
 
@@ -126,14 +126,14 @@ def colours(name=False, rgb=True, rgb256=False, names=False):
         Examples
         --------
         >>> print(colours('ufzdarkblue', rgb256=True))
-        (0, 62, 110)
+        (0.0, 62.0, 110.0)
 
         >>> print(colours(names=True)[0:3])
         ['ufzdarkblue', 'ufzblue', 'ufzlightblue']
 
         >>> import numpy as np
-        >>> from autostring import astr
-        >>> cc = colours('JAMSDARKBLUE')
+        >>> from jams.autostring import astr
+        >>> cc = colours('UFZDARKBLUE')
         >>> print(astr(np.array(cc), 4))
         ['0.0000' '0.2431' '0.4314']
 
@@ -142,7 +142,7 @@ def colours(name=False, rgb=True, rgb256=False, names=False):
         ['0.0000' '0.2431' '0.4314']
 
         >>> print(colours(['orange','ufzdarkblue'], rgb256=True))
-        [(207, 104, 0), (0, 62, 110)]
+        [(207.0, 104.0, 0.0), (0.0, 62.0, 110.0)]
 
 
         License
@@ -173,13 +173,13 @@ def colours(name=False, rgb=True, rgb256=False, names=False):
                                - added black and white
     """
     if names:
-        return jamsall
+        return ufzall
 
     if name == False:
         raise ValueError('colour must be given.')
 
     if type(name) == type('string'):
-        if name.lower() not in jamsall: raise ValueError('colour not known.')
+        if name.lower() not in ufzall: raise ValueError('colour not known.')
         return get_colour_tuple(name, rgb256=rgb256)
     else:
         try:
@@ -188,7 +188,7 @@ def colours(name=False, rgb=True, rgb256=False, names=False):
             raise TypeError('colours must be string or iterable.')
         out = list()
         for cname in name:
-            if cname.lower() not in jamsall: raise ValueError('colour not known.')
+            if cname.lower() not in ufzall: raise ValueError('colour not known.')
             out += [get_colour_tuple(cname, rgb256=rgb256)]
         return out
 
@@ -203,14 +203,14 @@ def colors(*args, **kwargs):
         Examples
         --------
         >>> print(colors('ufzdarkblue', rgb256=True))
-        (0, 62, 110)
+        (0.0, 62.0, 110.0)
 
         >>> print(colors(names=True)[0:3])
         ['ufzdarkblue', 'ufzblue', 'ufzlightblue']
 
         >>> import numpy as np
-        >>> from autostring import astr
-        >>> cc = colors('JAMSDARKBLUE')
+        >>> from jams.autostring import astr
+        >>> cc = colors('UFZDARKBLUE')
         >>> print(astr(np.array(cc), 4))
         ['0.0000' '0.2431' '0.4314']
 
@@ -219,7 +219,7 @@ def colors(*args, **kwargs):
         ['0.0000' '0.2431' '0.4314']
 
         >>> print(colors(['orange','ufzdarkblue'], rgb256=True))
-        [(207, 104, 0), (0, 62, 110)]
+        [(207.0, 104.0, 0.0), (0.0, 62.0, 110.0)]
     """
     return colours(*args, **kwargs)
 
@@ -234,8 +234,8 @@ if __name__ == '__main__':
     # print(colours(names=True)[0:3])
     # # ['ufzdarkblue', 'ufzblue', 'ufzlightblue']
     # import numpy as np
-    # from autostring import astr
-    # cc = colours('JAMSDARKBLUE')
+    # from jams.autostring import astr
+    # cc = colours('UFZDARKBLUE')
     # print(astr(np.array(cc), 4))
     # # ['0.0000' '0.2431' '0.4314']
     # cc = colours('DarkBlue')

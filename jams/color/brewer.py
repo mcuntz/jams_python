@@ -114,8 +114,13 @@
     # plt.imshow(l, cmap=mpl.cm.get_cmap('hotcold_18lev'))
     # plt.imshow(l, cmap=jams.get_brewer('hotcold_18lev'))
 
-    >>> jams.color.print_brewer('qualitative')[0:7]
-    ['set33', 'set34', 'set35', 'set36', 'set37', 'set38', 'set39']
+    >>> import numpy as np
+    >>> import jams
+    >>> from jams.autostring import astr
+    >>> qua = jams.color.brewer_qualitative.keys()
+    >>> qua.sort()
+    >>> print(qua[0:7])
+    ['accent3', 'accent4', 'accent5', 'accent6', 'accent7', 'accent8', 'dark23']
 
     >>> print(astr(np.array(jams.color.get_brewer('blues4', rgb=True)[0]), 4))
     ['0.9373' '0.9529' '1.0000']
@@ -162,6 +167,7 @@
               ST, Mar 2014 - include NCL color maps; define_brewer -> register_brewer
               MC, MAr 2014 - colour maps in extra file brewer.cmaps
               JM, Sep 2014 - color maps of Mathematica
+              MC, Oct 2016 - print_brewers outputs sorted lists
 """
 from __future__ import print_function
 
@@ -262,48 +268,80 @@ def print_brewer(names='all'):
         Examples
         --------
         >>> print_brewer('qualitative')
-        ['set33', 'set34', 'set35', 'set36', 'set37', 'set38', 'set39', 'set310', 'set311', 'set312', 'pastel13', 'pastel14', 'pastel15', 'pastel16', 'pastel17', 'pastel18', 'pastel19', 'set13', 'set14', 'set15', 'set16', 'set17', 'set18', 'set19', 'pastel23', 'pastel24', 'pastel25', 'pastel26', 'pastel27', 'pastel28', 'set23', 'set24', 'set25', 'set26', 'set27', 'set28', 'dark23', 'dark24', 'dark25', 'dark26', 'dark27', 'dark28', 'paired3', 'paired4', 'paired5', 'paired6', 'paired7', 'paired8', 'paired9', 'paired10', 'paired11', 'paired12', 'accent3', 'accent4', 'accent5', 'accent6', 'accent7', 'accent8']
+        ['accent3', 'accent4', 'accent5', 'accent6', 'accent7', 'accent8', 'dark23', 'dark24', 'dark25', 'dark26', 'dark27', 'dark28', 'paired10', 'paired11', 'paired12', 'paired3', 'paired4', 'paired5', 'paired6', 'paired7', 'paired8', 'paired9', 'pastel13', 'pastel14', 'pastel15', 'pastel16', 'pastel17', 'pastel18', 'pastel19', 'pastel23', 'pastel24', 'pastel25', 'pastel26', 'pastel27', 'pastel28', 'set13', 'set14', 'set15', 'set16', 'set17', 'set18', 'set19', 'set23', 'set24', 'set25', 'set26', 'set27', 'set28', 'set310', 'set311', 'set312', 'set33', 'set34', 'set35', 'set36', 'set37', 'set38', 'set39']
     """
     if names.lower() == 'sequential':
-        print(brewer_sequential.keys())
+        pp = brewer_sequential.keys()
+        pp.sort()
+        print(pp)
     elif names.lower() == 'diverging':
-        print(brewer_diverging.keys())
+        pp = brewer_diverging.keys()
+        pp.sort()
+        print(pp)
     elif names.lower() == 'qualitative':
-        print(brewer_qualitative.keys())
+        pp = brewer_qualitative.keys()
+        pp.sort()
+        print(pp)
     elif names.lower() == 'osu':
         print(oregon.keys())
+        pp.sort()
+        print(pp)
     elif names.lower() == 'ncl_large':
         print(ncl_large.keys())
+        pp.sort()
+        print(pp)
     elif names.lower() == 'ncl_small':
         print(ncl_small.keys())
+        pp.sort()
+        print(pp)
     elif names.lower() == 'ncl_meteo_swiss':
         print(ncl_meteo_swiss.keys())
+        pp.sort()
+        print(pp)
     elif names.lower() == 'mma' or names.lower() == 'mathematica':
         print(mathematica.keys())
+        pp.sort()
+        print(pp)
     else:
         print('Sequential color maps')
-        print(brewer_sequential_maps.keys())
+        pp = brewer_sequential_maps.keys()
+        pp.sort()
+        print(pp)
         print('')
         print('Diverging color maps')
-        print(brewer_diverging_maps.keys())
+        pp = brewer_diverging_maps.keys()
+        pp.sort()
+        print(pp)
         print('')
         print('Qualitative color maps')
-        print(brewer_qualitative_maps.keys())
+        pp = brewer_qualitative_maps.keys()
+        pp.sort()
+        print(pp)
         print('')
         print('Oregon State University color maps')
-        print(oregon.keys())
+        pp = oregon.keys()
+        pp.sort()
+        print(pp)
         print('')
         print('NCL large color maps')
-        print(ncl_large.keys())
+        pp = ncl_large.keys()
+        pp.sort()
+        print(pp)
         print('')
         print('NCL small color maps')
-        print(ncl_small.keys())
+        pp = ncl_small.keys()
+        pp.sort()
+        print(pp)
         print('')
         print('NCL meteo swiss color maps')
-        print(ncl_meteo_swiss.keys())
+        pp = ncl_meteo_swiss.keys()
+        pp.sort()
+        print(pp)
         print('')
         print('Mathematica color maps')
-        print(mathematica.keys())
+        pp = mathematica.keys()
+        pp.sort()
+        print(pp)
 
 # -------------------------------------------------------------------------------------------------
 
@@ -314,7 +352,7 @@ def get_brewer(cname=None, names=False, rgb=False, rgb256=False, reverse=False, 
         Examples
         --------
         >>> import numpy as np
-        >>> from autostring import astr
+        >>> from jams.autostring import astr
         >>> cc = get_brewer('blues4',rgb=True)
         >>> print(astr(np.array(cc[0]), 4))
         ['0.9373' '0.9529' '1.0000']

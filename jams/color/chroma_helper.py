@@ -7,6 +7,7 @@
 
     Example
     -------
+    >>> import jams
     >>> print(jams.color.limit(-1))
     0
 
