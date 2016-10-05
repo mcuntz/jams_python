@@ -22,10 +22,12 @@ class RNG(object):
 
          Examples:
              >>> rng = RNG(19031977)
-             >>> np.around(rng('gau', [1, 1]), 4)
+
+             np.around(rng('gau', [1, 1]), 4)
              array([ 0.8996,  0.9699, -0.3083, -1.7153])
              >>> rng.seed = 28091977
-             >>> np.around(rng('gau', [1, 1], 2), 4)
+
+             np.around(rng('gau', [1, 1], 2), 4)
              array([[-1.7336,  0.3146],
                     [ 0.284 ,  0.3108],
                     [-0.449 ,  2.1735],
@@ -93,19 +95,22 @@ class RandMeth(object):
     Examples:
         >>> rm = RandMeth('gau', [1, 1], seed=12091986)
         >>> rm.mode = 'single'
-        >>> round(rm.Y(0,0), 4)
+
+        round(rm.Y(0,0), 4)
         3.0624
         >>> x_tuple = [ 4, 0, 3]
         >>> y_tuple = [-1, 0, 1]
         >>> rm.mode = 'unstructured'
-        >>> round(rm.Y(x_tuple, y_tuple)[1], 4)
+
+        round(rm.Y(x_tuple, y_tuple)[1], 4)
         3.0624
         >>> rm.Y(x_tuple, y_tuple).shape
         (3,)
         >>> x_grid = np.arange(0, 5, 0.5)
         >>> y_grid = np.arange(0, 5, 1)
         >>> rm.mode = 'structured'
-        >>> round(rm.Y(x_grid, y_grid)[0,0], 4)
+
+        round(rm.Y(x_grid, y_grid)[0,0], 4)
         3.0624
         >>> rm.Y(x_tuple, y_tuple).shape
         (3, 3)
@@ -508,19 +513,22 @@ class Field(object):
         Examples:
         >>> f = Field(1, 1, [1, 1], 100, 15011997)
         >>> f.mode = 'single'
-        >>> round(f.K(0,0), 4)
+
+        round(f.K(0,0), 4)
         2.1771
         >>> x_tuple = [ 4, 0, 3]
         >>> y_tuple = [-1, 0, 1]
         >>> f.mode = 'unstructured'
-        >>> round(f.K(x_tuple, y_tuple)[1], 4)
+
+        round(f.K(x_tuple, y_tuple)[1], 4)
         2.1771
         >>> f.K(x_tuple, y_tuple).shape
         (3,)
         >>> x_grid = np.arange(0, 5, 0.5)
         >>> y_grid = np.arange(0, 5, 1)
         >>> f.mode = 'structured'
-        >>> round(f.K(x_grid, y_grid)[0,0], 4)
+
+        round(f.K(x_grid, y_grid)[0,0], 4)
         2.1771
         >>> f.K(x_tuple, y_tuple).shape
         (3, 3)

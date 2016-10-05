@@ -51,7 +51,6 @@ def kernel_regression(x, y, h=None, silverman=False, xout=None):
         >>> x[:,1] = 1./(np.arange(10,dtype=np.float)/9.+0.1)
         >>> y      = 1. + x[:,0]**2 - np.sin(x[:,1])**2
         >>> h = kernel_regression_h(x,y)
-        >>> from autostring import astr
         >>> print(np.allclose(h, [0.172680, 9.516907], atol=0.0001))
         True
 
@@ -187,12 +186,13 @@ def kernel_regression_h(x, y, silverman=False):
         >>> x[:,0] = np.arange(10,dtype=np.float)/9.
         >>> x[:,1] = 1./(np.arange(10,dtype=np.float)/9.+0.1)
         >>> y      = 1. + x[:,0]**2 - np.sin(x[:,1])**2
-        >>> from autostring import astr
-        >>> print(astr(kernel_regression_h(x,y),5))
-        ['0.17268' '9.51691']
+        >>> h = kernel_regression_h(x,y)
+        >>> print(np.allclose(h, [0.172680, 9.516907], atol=0.0001))
+        True
 
-        >>> print(astr(kernel_regression_h(x,y,silverman=True),5))
-        ['0.22919' '1.90338']
+        >>> h = kernel_regression_h(x,y,silverman=True)
+        >>> print(np.allclose(h, [0.229190, 1.903381], atol=0.0001))
+        True
 
 
         License
