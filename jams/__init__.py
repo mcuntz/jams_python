@@ -25,8 +25,6 @@
     clockplot              The clockplot of mHM.
     closest                Index in array which entry is closest to a given number.
     color                  Module with color functions for plotting.
-    colors                 Wrapper for colour.
-    colours                Define JAMS colours.
     const                  Provides physical, mathematical, computational, and isotope constants.
     convex_hull            Calculate subset of points that make a convex hull around a set of 2D points.
     correlate              Computes the cross-correlation function of two series x and y.
@@ -111,9 +109,6 @@
     readnc                 Wrapper for readnetcdf.
     readnetcdf             Reads variables or information from netcdf file.
     register_brewer        Registers and registers Brewer colormap.
-    rgb_blend              Calculates colour between two given colors in rgb space.
-    rgb_gradient           n interpolated colours in rgb space between several colours changing at certain fractions.
-    rgb_range              n interpolated colours in rgb space between two colours
     river_network          a class for creating a river network from a DEM including flow direction, flow accumulation and channel order
     roman2int              Roman numeral to integer conversion.
     rossner                Wrapper for outlier.
@@ -326,8 +321,6 @@
     abc2plot               Write a, b, c, ... on plots.
     clockplot              The clockplot of mHM.
     color                  Module with color functions for plotting.
-    colors                 Wrapper for colour.
-    colours                Define JAMS colours.
     get_brewer             Registers and returns Brewer colormap.
     lat_fmt                Set lat label string (called by Basemap.drawparallels) if LaTeX package clash.
     lon_fmt                Set lon label string (called by Basemap.drawmeridians) if LaTeX package clash.
@@ -335,9 +328,6 @@
     position               Position arrays of subplots to be used with add_axes.
     print_brewer           Prints available Brewer colormap names.
     register_brewer        Registers and registers Brewer colormap.
-    rgb_blend              Calculates colour between two given colors in rgb space.
-    rgb_gradient           n interpolated colours in rgb space between several colours changing at certain fractions.
-    rgb_range              n interpolated colours in rgb space between two colours
     signature2plot         Write a copyright notice on a plot.
     str2tex                Convert strings to LaTeX strings in math environement used by matplotlib's usetex
     tsym                   Raw unicodes for common symbols.
@@ -506,6 +496,7 @@
               DS, Mar 2016 - added netcdf4
               MC, May 2016 - added qa
               MC, May 2016 - distributions
+              MC, Oct 2016 - rm colours and rgb from main directory
 """
 from __future__ import print_function
 
@@ -533,7 +524,6 @@ except ImportError:
 from .cellarea          import cellarea
 from .clockplot         import clockplot
 from .closest           import closest
-from .colours           import colours, colors
 from .convex_hull       import convex_hull
 from .correlate         import correlate
 from .cuntz_gleixner    import cuntz_gleixner
@@ -605,7 +595,6 @@ try:
     from .readnetcdf        import readnetcdf, netcdfread, ncread, readnc
 except ImportError:
     pass # not installed
-from .rgb               import rgb_blend, rgb_range, rgb_gradient
 from .romanliterals     import int2roman, roman2int
 from .saltelli          import saltelli
 from .samevalue         import samevalue
