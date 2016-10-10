@@ -32,6 +32,7 @@
     dielectric_water       Dielectric constant of liquid water.
     directories_from_gui   Open directory selection dialogs, returns consecutiveley selected directories
     directory_from_gui     Open directory selection dialog, returns selected directory
+    diver_view             GUI for inspecting ground water table data. (not in init file, start from command line)
     dewpoint               Calculates the dew point from ambient humidity.
     date2dec               Converts arrays with calendar date to decimal date.
     dec2date               Converts arrays with decimal date to calendar date.
@@ -245,6 +246,7 @@
     ---------
     baseflow               Calculate baseflow from discharge timeseries
     river_network          a class for creating a river network from a DEM including flow direction, flow accumulation and channel order
+    diver_view             GUI for inspecting ground water table data. (not in init file, start from command line)
     
 
     Isotopes
@@ -497,6 +499,7 @@
               MC, May 2016 - added qa
               MC, May 2016 - distributions
               MC, Oct 2016 - rm colours and rgb from main directory
+              AP, Oct 2016 - added diver_view
 """
 from __future__ import print_function
 
