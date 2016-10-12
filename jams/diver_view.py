@@ -171,8 +171,8 @@ class mainwin(QtGui.QWidget):
 
         # plot data
         for item in keys:
-            ax.plot_date(self.data[item][:,0]-self.date01, self.data[item][:,1], 'b-', label=item)
-            ax2.plot_date(self.data[item][:,0]-self.date01, self.data[item][:,2], 'r-', label=item)
+            ax.plot_date(self.data[item][:,0]-self.date01, self.data[item][:,1], marker=None, ls='-', label=item)
+            ax2.plot_date(self.data[item][:,0]-self.date01, self.data[item][:,2], marker=None, ls='-', label=item)
 
         # modify plot properties
         ax.set_ylabel('Pressure (cmH2O)')
