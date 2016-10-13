@@ -48,6 +48,7 @@
     eng2ascii              Convert date notations to ascii date format DD.MM.YYYY hh:mm:ss.
     errormeasures          Definition of different error measures.
     esat                   Calculates the saturation vapour pressure of water/ice.
+    fftngo                 Fast fourier transformation for dummies (like me)
     Field                  Generates random hydraulic conductivity fields.
     files                  Module with file list function.
     file_from_gui          Open file selection dialog for one single file, returns selected files
@@ -267,6 +268,7 @@
     elementary_effects     Morris measures mu, stddev and mu*
     ellipse_area           Area of ellipse (or circle)
     errormeasures          Definition of different error measures.
+    fftngo                 Fast fourier transformation for dummies (like me)    
     functions              Module with common functions that are used in curve_fit or fmin parameter estimations.
     heaviside              Heaviside (or unit step) operator.
     jab                    Jackknife-after-Bootstrap error.
@@ -500,6 +502,7 @@
               MC, May 2016 - distributions
               MC, Oct 2016 - rm colours and rgb from main directory
               AP, Oct 2016 - added diver_view
+              AP, Oct 2016 - added fftngo
 """
 from __future__ import print_function
 
@@ -538,6 +541,7 @@ from .division          import division, div
 from .ellipse_area      import ellipse_area
 from .errormeasures     import bias, mae, mse, rmse, nse, kge, pear2
 from .esat              import esat
+from .fftngo            import fftngo
 from .fgui              import directories_from_gui, directory_from_gui, file_from_gui, files_from_gui
 from .river_network     import river_network, upscale_fdir
 #from .field_gen         import Field, Incompr_Field, Filtered_Incompr_Field
