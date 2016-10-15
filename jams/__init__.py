@@ -91,6 +91,7 @@
     logtools               Module with control file functions of Logtools, the Logger Tools Software of Olaf Kolle.
     lon_fmt                Set lon label string (called by Basemap.drawmeridians) if LaTeX package clash.
     mad                    Median absolute deviation test.
+    mat2nc                 Converts Matlab file *.mat into NetCDF *.nc.
     means                  Calculate daily, monthly, yearly, etc. means of data depending on date stamp.
     morris_sampling        Sampling of optimised trajectories for Morris measures / elementary effects
     ncread                 Wrapper for readnetcdf.
@@ -345,6 +346,7 @@
     hdfread                Wrapper for readhdf.
     hdf4read               Wrapper for readhdf4.
     hdf5read               Wrapper for readhdf5.
+    mat2nc                 Converts Matlab file *.mat into NetCDF *.nc.
     ncread                 Wrapper for readnetcdf.
     netcdfread             Wrapper for readnetcdf.
     netcdf4                Convenience layer around netCDF4
@@ -503,6 +505,7 @@
               MC, Oct 2016 - rm colours and rgb from main directory
               AP, Oct 2016 - added diver_view
               AP, Oct 2016 - added fftngo
+              JM, Oct 2016 - mat2nc
 """
 from __future__ import print_function
 
@@ -573,6 +576,7 @@ from .line_dev_mask     import line_dev_mask
 from .jab               import jab
 from .mad               import mad
 from .maskgroup         import maskgroup
+from .mat2nc            import mat2nc
 from .means             import means
 from .morris            import morris_sampling, elementary_effects
 try:
