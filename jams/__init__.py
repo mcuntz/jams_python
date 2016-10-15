@@ -29,6 +29,7 @@
     convex_hull            Calculate subset of points that make a convex hull around a set of 2D points.
     correlate              Computes the cross-correlation function of two series x and y.
     cuntz_gleixner         Cuntz-Gleixner model of 13C discrimination.
+    dag                    Generation and plotting of (connected) directed acyclic graphs with one source node.
     dielectric_water       Dielectric constant of liquid water.
     directories_from_gui   Open directory selection dialogs, returns consecutiveley selected directories
     directory_from_gui     Open directory selection dialog, returns selected directory
@@ -263,6 +264,7 @@
     ----
     around                 Round to the passed power of ten.
     correlate              Computes the cross-correlation function of two series x and y.
+    dag                    Generation and plotting of (connected) directed acyclic graphs with one source node.
     distributions          Module for pdfs of additional distributions.
     div                    Wrapper for division.
     division               Divide two arrays, return 'otherwise' if division by 0.
@@ -505,7 +507,8 @@
               MC, Oct 2016 - rm colours and rgb from main directory
               AP, Oct 2016 - added diver_view
               AP, Oct 2016 - added fftngo
-              JM, Oct 2016 - mat2nc
+              JM, Oct 2016 - added mat2nc (matlab to netcdf)
+              JM, Oct 2016 - added dag (directed acyclic graphs)
 """
 from __future__ import print_function
 
@@ -536,6 +539,7 @@ from .closest           import closest
 from .convex_hull       import convex_hull
 from .correlate         import correlate
 from .cuntz_gleixner    import cuntz_gleixner
+from .dag               import create_network, source_nodes, sink_nodes, plot_network
 from .date2dec          import date2dec
 from .dec2date          import dec2date
 from .dewpoint          import dewpoint
