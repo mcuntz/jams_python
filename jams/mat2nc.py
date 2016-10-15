@@ -131,20 +131,20 @@ def mat2nc( fname, overwrite=False, fname_out=None, verbose=True, squeeze=True,
 
         License
         -------
-        This file is part of the UFZ Python package.
+        This file is part of the JAMS Python package.
 
-        The UFZ Python package is free software: you can redistribute it and/or modify
+        The JAMS Python package is free software: you can redistribute it and/or modify
         it under the terms of the GNU Lesser General Public License as published by
         the Free Software Foundation, either version 3 of the License, or
         (at your option) any later version.
 
-        The UFZ Python package is distributed in the hope that it will be useful,
+        The JAMS Python package is distributed in the hope that it will be useful,
         but WITHOUT ANY WARRANTY; without even the implied warranty of
         MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
         GNU Lesser General Public License for more details.
 
         You should have received a copy of the GNU Lesser General Public License
-        along with the UFZ project (cf. gpl.txt and lgpl.txt).
+        along with the JAMS Python package (cf. gpl.txt and lgpl.txt).
         If not, see <http://www.gnu.org/licenses/>.
 
         Copyright 2016-2016 Juliane Mai
