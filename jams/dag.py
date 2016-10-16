@@ -4,10 +4,11 @@ from __future__ import print_function
 import numpy as np
 import networkx as nx
 import random
+import copy
 
 __all__ = ['create_network','source_nodes','sink_nodes','plot_network']
 
-def create_network(nnodes, nedges, maxdegree=None, verbose=False):
+def create_network(nnodes, nedges, maxdegree=None, maxoutdegree=None, maxindegree=None, reverse=False, verbose=False):
     """
         This functions creates a directed acyclic graph with one source node, N nodes and M edges in total.
         Each node of the network is connected to the source node.
@@ -30,8 +31,18 @@ def create_network(nnodes, nedges, maxdegree=None, verbose=False):
                                                    - all other (nnodes-1) nodes have at most maxdegree edges
                                                    - all edges are now count twice because of directed property
                                                 Lower limit is nnodes - 1
-                                                   Due to the fact that source node need to be connected at least to every other node                                    maxdegree        integer                Upper degree of a node to otain not too dense networks. The only node is allowed to
+                                                   Due to the fact that source node need to be connected at least to every other node
+                                                TODO
+                                                   Redo this calculations when maxoutdegree and/or maxindegree are given
+        maxdegree        integer                Upper degree of a node to otain not too dense networks. The only node is allowed to
                                                 have a higher degree is the source node.
+        maxoutdegree     integer                Upper limit of outgoing edges per node (except source node)
+        maxindegree      integer                Upper limit of incoming edges per node (except source node)
+        reverse          bool                   False: source node is the only source
+                                                True:  after generatng the whole network (with one source node and maxdegree settings)
+                                                       all edges are swapped such that one obtain a network with only one sink and multiple sources
+                                                       Note: degree settings are made for one-source networks, i.e maxoutdegree -> maxindegree
+                                                                                                                   maxindegree  -> maxoutdegree
         verbose          bool                   If true print-outs, if false silent
                                                 
 
@@ -97,9 +108,15 @@ def create_network(nnodes, nedges, maxdegree=None, verbose=False):
 
     if maxdegree is None:
         maxdegree = nnodes - 1
+
+    if maxoutdegree is None:
+        maxoutdegree = nnodes - 1
+
+    if maxindegree is None:
+        maxindegree = nnodes - 1
     
-    if (nedges <= nnodes - 1):
-        raise ValueError('Increase number of edges because only one network is possible (star-structure with node 0 as center)')
+    if (nedges < nnodes - 1):
+        raise ValueError('Increase number of edges because no connected network is possible')
 
     if (nedges > int(((maxdegree+1)*nnodes -  maxdegree - 1 ) / 2.0) ):
         raise ValueError('Decrease number of edges because at least one of the nodes will exceed upper limit of degrees')
@@ -131,12 +148,27 @@ def create_network(nnodes, nedges, maxdegree=None, verbose=False):
                 adjacency[row,col] = 1
 
         # calculate degrees of each node
-        degrees = [ np.sum(adjacency[:,ii]) + np.sum(adjacency[ii,:]) for ii in range(nnodes) ]
+        degrees     = [ np.sum(adjacency[:,ii]) + np.sum(adjacency[ii,:]) for ii in range(nnodes) ]
+        degrees_in  = [ np.sum(adjacency[:,ii])                           for ii in range(nnodes) ]
+        degrees_out = [ np.sum(adjacency[ii,:])                           for ii in range(nnodes) ]
 
+        # print('degrees:     ',degrees)
+        # print('degrees_in:  ',degrees_in)
+        # print('degrees_out: ',degrees_out)
+        
         # check if each node of network has degree less equal maxdegree
-        degrees_satisified = all([ degrees[ii] <= maxdegree for ii in range(1,nnodes) ])
+        degrees_satisified = ( all([ degrees[ii]     <= maxdegree    for ii in range(1,nnodes) ]) and
+                               all([ degrees_in[ii]  <= maxindegree  for ii in range(1,nnodes) ]) and
+                               all([ degrees_out[ii] <= maxoutdegree for ii in range(1,nnodes) ])
+                               )
+        
 
         if (degrees_satisified):
+            if reverse:
+                # swap all edges
+                # only sink is last node
+                adjacency = rotate(rotate(np.transpose(adjacency)))
+                
             if verbose: print('degrees:     ', degrees)
             
             # create graph
@@ -155,8 +187,12 @@ def create_network(nnodes, nedges, maxdegree=None, verbose=False):
             edges = G.edges()
             if verbose: print('Added edges: ',edges)
 
-            # check if all are connceted to source node "0"
-            all_connected_to_0 = all([nx.has_path(G,0,ii) for ii in range(1,nnodes)])
+            if reverse:
+                # check if all are connceted to sink node "nnodes-1"
+                all_connected_to_0 = all([nx.has_path(G,ii,nnodes-1) for ii in range(1,nnodes)])
+            else:
+                # check if all are connceted to source node "0"
+                all_connected_to_0 = all([nx.has_path(G,0,ii) for ii in range(1,nnodes)])
 
             if all_connected_to_0:
                 found_network = True
@@ -426,6 +462,16 @@ def plot_network(G, fname_plot):
         plt.axis('off')
         fig.savefig(fname_plot)
         plt.close(fig)
+
+def rotate(matrix):
+    data = copy.deepcopy(matrix)
+    for i in range(len(data)):  
+        for j in range(i+1,len(data[i])):            
+            temp=data[i][j]  
+            data[i][j]=data[j][i]  
+            data[j][i]=temp
+    data = data[::-1]
+    return data
 
 if __name__ == '__main__':
     import doctest
