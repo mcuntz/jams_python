@@ -197,7 +197,7 @@ def writenetcdf(fhandle, vhandle=None, var=None, time=None, isdim=False, name=No
             for i in range(len(dims)):
                 if dims[i] not in keys:
                     raise ValueError('Dimension '+str(dims[i])+' not in file dimensions: '+''.join([i+' ' for i in keys]))
-            hand = fhandle.createVariable(name, typ, (dims), zlib=comp)
+            hand = fhandle.createVariable(name, typ, tuple(dims), zlib=comp)
 
     if attributes is not None:
         if type(attributes) is dict:

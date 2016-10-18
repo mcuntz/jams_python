@@ -86,8 +86,7 @@ def mat2nc( fname, overwrite=False, fname_out=None, verbose=True, squeeze=True,
         # --------------------------------------------
         # Write squeezed arrays (all axis with shape 1 are removed)
         # --------------------------------------------
-        >>> if os.path.isfile('test.nc') :
-        ...     os.remove('test.nc')
+        >>> if os.path.isfile('test.nc'): os.remove('test.nc')
         >>> mat2nc('test.mat')
         writes  'ss'                  shape =  (1,)                  to *.nc
         writes  'tt'                  shape =  (2, 3)                to *.nc
@@ -109,8 +108,7 @@ def mat2nc( fname, overwrite=False, fname_out=None, verbose=True, squeeze=True,
         # --------------------------------------------
         # Write un-squeezed, original arrays (same shape as in Matlab)
         # --------------------------------------------
-        >>> if os.path.isfile('test.nc') :
-        ...     os.remove('test.nc')
+        >>> if os.path.isfile('test.nc'): os.remove('test.nc')
         >>> mat2nc('test.mat',squeeze=False,verbose=False)
         
         >>> readnetcdf('test.nc',var='ss')
@@ -127,6 +125,9 @@ def mat2nc( fname, overwrite=False, fname_out=None, verbose=True, squeeze=True,
                 [  2.]]])
         >>> readnetcdf('test.nc',var='vv')
         array([[ 10.,   1.,   1.,  20.,   2.,   2.]])
+
+        >>> if os.path.isfile('test.nc'): os.remove('test.nc')
+        >>> if os.path.isfile('test.mat'): os.remove('test.mat')
 
 
         License
