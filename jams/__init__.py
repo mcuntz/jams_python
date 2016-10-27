@@ -106,6 +106,7 @@
     plot_brewer            Plots available Brewer color maps in pdf file.
     position               Position arrays of subplots to be used with add_axes.
     print_brewer           Prints available Brewer colormap names.
+    pritay                 Daily reference evapotranspiration after Priestley & Taylor.
     qa                     Module of quality (error) measures.
     readhdf                Reads variables or information from hdf4 and hdf5 files.
     readhdf4               Reads variables or information from hdf4 files.
@@ -292,7 +293,8 @@
     dewpoint               Calculates the dew point from ambient humidity.
     dielectric_water       Dielectric constant of liquid water.
     esat                   Calculates the saturation vapour pressure of water/ice.
-
+    pritay                 Daily reference evapotranspiration after Priestley & Taylor
+    
 
     Miscellaneous
     -------------
@@ -509,6 +511,7 @@
               AP, Oct 2016 - added fftngo
               JM, Oct 2016 - added mat2nc (matlab to netcdf)
               JM, Oct 2016 - added dag (directed acyclic graphs)
+              AP, Oct 2016 - added pritay
 """
 from __future__ import print_function
 
@@ -597,6 +600,7 @@ from .pareto_metrics    import sn, cz, hi, ef, aed, is_dominated, point_to_front
 from .pca               import pca, check_pca
 from .pi                import pi
 from .position          import position
+from .pritay            import pritay
 try:
     from .readhdf           import readhdf,  hdfread
 except ImportError:
