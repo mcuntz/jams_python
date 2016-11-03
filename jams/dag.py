@@ -66,7 +66,7 @@ def create_network(nnodes, nedges, maxdegree=None, maxoutdegree=None, maxindegre
 
         Examples
         --------
-        >>> random.seed(12345)
+        >>> random.seed('12345')
         >>> nnodes = 4
         >>> nedges = 5
         >>> G = create_network(nnodes, nedges, maxdegree=3)
@@ -75,10 +75,10 @@ def create_network(nnodes, nedges, maxdegree=None, maxoutdegree=None, maxindegre
         nodes: [0, 1, 2, 3]
         >>> edges = G.edges()
         >>> print('edges: '+str(edges))
-        edges: [(0, 1), (0, 2), (0, 3), (1, 2), (1, 3)]
+        edges: [(0, 1), (0, 3), (1, 2), (1, 3), (2, 3)]
         >>> degrees = [ G.degree(ii) for ii in G.nodes() ]
         >>> print('degrees of nodes: '+str(degrees))
-        degrees of nodes: [3, 3, 2, 2]
+        degrees of nodes: [2, 3, 2, 3]
         
         License
         -------
@@ -228,7 +228,7 @@ def source_nodes(G):
 
         Examples
         --------
-        >>> random.seed(12345)
+        >>> random.seed('12345')
         >>> nnodes = 4
         >>> nedges = 5
         >>> G = create_network(nnodes, nedges, maxdegree=3)
@@ -288,13 +288,13 @@ def sink_nodes(G):
 
         Examples
         --------
-        >>> random.seed(12345)
+        >>> random.seed('12345')
         >>> nnodes = 4
         >>> nedges = 5
         >>> G = create_network(nnodes, nedges, maxdegree=3)
         >>> sinks = sink_nodes(G)
         >>> print('sink nodes: '+str(sinks))
-        sink nodes: [2 3]
+        sink nodes: [3]
 
         License
         -------
@@ -351,7 +351,7 @@ def plot_network(G, fname_plot):
 
         Examples
         --------
-        >>> random.seed(12345)
+        >>> random.seed('12345')
         >>> nnodes = 4
         >>> nedges = 5
         
