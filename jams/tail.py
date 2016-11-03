@@ -171,9 +171,14 @@ def tail(ifile, n=10, noblank=False, comment='', keepnewline=False):
         History
         -------
         Written,  MC, Dec 2014
+                  MC, Nov 2016 - adapted file handling to Python 2 and 3
     """
-    # Open file
-    f = ifile if isinstance(ifile, file) else open(ifile,"r")
+    import sys
+    if sys.version_info > (3,0):
+        import io
+        f = ifile if isinstance(ifile,io.TextIOWrapper) else open(ifile,"r")
+    else:
+        f = ifile if isinstance(ifile,file) else open(ifile,"r")
 
     # Seek
     bufsize = 8192*n

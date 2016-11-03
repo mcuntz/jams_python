@@ -273,19 +273,19 @@ def _savez(file, args, kwds, compress):
 
     # use compress keyword if given; only active in savez
     if 'compress' in namedict.keys():
-	if namedict['compress']:
-	    compression = zipfile.ZIP_DEFLATED
-	del namedict['compress']
+        if namedict['compress']:
+            compression = zipfile.ZIP_DEFLATED
+        del namedict['compress']
 
     # append or update
     if 'append' in namedict.keys(): 
         appendit = namedict['append']
-	del namedict['append']
+        del namedict['append']
     else:
         appendit = False
     if 'update' in namedict.keys():
         updateit = namedict['update']
-	del namedict['update']
+        del namedict['update']
     else:
         updateit = False
     if appendit and updateit:

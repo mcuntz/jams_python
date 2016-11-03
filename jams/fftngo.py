@@ -97,7 +97,7 @@ def fftngo(t, y, nbins=False, plot=False):
     assert isinstance(nbins, int) | (~nbins),                     'nbins must be integer'
     
     # get half size of samples
-    n = t.size/2
+    n = t.size//2
     
     # get sample frequency 
     dt = t[1] - t[0]

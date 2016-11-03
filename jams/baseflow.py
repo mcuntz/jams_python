@@ -97,7 +97,7 @@ def hollickLyneFilter(data,beta=0.925,invert=True):
     """
     out = data.copy()
     
-    for i in xrange(1,len(data)):
+    for i in range(1,len(data)):
         bflow = beta * out[i-1] + (1 - beta) * .5 * (data[i]+data[i-1])
         out[i] = min(bflow,data[i])
 

@@ -257,7 +257,7 @@ class Concentration(object):
             t = self.__reshape_axis(len(pos)+t_dim, 0, t)
 
         #for more than 1 spatial dimension reshape accordingly
-        for i in xrange(len(pos)):
+        for i in range(len(pos)):
             return_shape.insert(i+1, len(np.atleast_1d(pos[i])))
             pos[i] = self.__reshape_axis(len(pos)+t_dim, i+t_dim, pos[i])
 

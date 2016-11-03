@@ -36,7 +36,7 @@ def spike(datin, thresh=7, toler=0, length=15):
         Restrictions
         ------------
         --
-        
+
 
         Examples
         --------
@@ -84,45 +84,45 @@ def spike(datin, thresh=7, toler=0, length=15):
         History
         -------
         Written,  BD, Sep 2016
+                  MC, Nov 2016 - ported to Python 3
     """
     debug = False
+    cmp = lambda a, b: ((a > b) - (a < b)) # redefine cmp to be available in Python 3
 
-    diff = [datin[k+1]-datin[k] for k in range(len(datin)-1)]   # differences
-    ipos0 = [k for k,a in enumerate(diff) if abs(a) > thresh]      # get index position of spikes  
-    if len(ipos0)>0: 
+    diff = [ datin[k+1]-datin[k] for k in range(len(datin)-1) ]  # differences
+    ipos0 = [ k for k,a in enumerate(diff) if abs(a) > thresh ]  # get index position of spikes
+    if len(ipos0)>0:
         ipos = ipos0[0]                                          # select first spike
-
-        maxlen=length                                                  # set max. length of spike plateau
+        maxlen = length                                          # set max. length of spike plateau
         spike_pos_all = []
         while ipos < len(datin)-1:
-            if debug == True:
-                print('ipos=',ipos)
+            if debug: print('ipos=',ipos)
             for i in range(1,maxlen+1):
-                if debug == True:
-                    print('i=',i)
+                if debug: print('i=',i)
                 spike_pos = []
-                if(ipos+i+1 > len(datin)-1):
-                    ipos=len(datin)
+                if (ipos+i+1) > (len(datin)-1):
+                    ipos = len(datin)
                     break
-                tm = [abs(datin[ipos]-datin[ipos+v]) for v in  list(range(2,i+2))]  #diff between first val before spike and all candidates for first val after spike
-                tms = [datin[ipos]-datin[ipos+v] for v in  list(range(2,i+1))]  #diff between first val before spike and all candidates for first val after spike (with sign)
+                tm = [ abs(datin[ipos]-datin[ipos+v]) for v in  list(range(2,i+2)) ] # diff between first val before spike and all candidates for first val after spike
+                tms = [ datin[ipos]-datin[ipos+v] for v in  list(range(2,i+1)) ] # diff between first val before spike and all candidates for first val after spike (with sign)
                 if len(tm)==1 and tm[0] < toler:
-                    spike_pos = [ipos+1]     
-                    spike_pos_all.append(spike_pos) 
-                    if debug == True:
-                        print('found peak 1',spike_pos)
+                    spike_pos = [ipos+1]
+                    spike_pos_all.append(spike_pos)
+                    if debug: print('found peak 1 ', spike_pos)
                     break
-                elif len(tm)>1 and tm[0:-2] > thresh and [cmp(val,0) for val in tms] == [cmp(datin[ipos] - datin[ipos+1],0) for n in range(len(tms))] and tm[-1] < toler:   # check thresh, tolerance and no switching of sign
+                elif (len(tm)>1 and
+                      all([ tt > thresh for tt in tm[0:-2] ]) and
+                      all([ cmp(val,0) == cmp(datin[ipos]-datin[ipos+1],0) for n, val in enumerate(tms) ]) and
+                      tm[-1] < toler): # check thresh, tolerance and no switching of sign
                     spike_pos = list(range(ipos+1,ipos+i+1))
                     spike_pos_all.append(spike_pos)
-                    if debug == True:
-                        print('found peak 2',spike_pos)
+                    if debug: print('found peak 2',spike_pos)
                     break
             ipos1 = [k for k,a in enumerate(diff) if abs(a) > thresh  and k >= ipos + i +1] # get index position of next spikes
             if len(ipos1)> 0:
                 ipos = ipos1[0]
             else:
-                break 
+                break
 
         print('no. of spikes: '+str(len(spike_pos_all)))
         spike_pos_all = [item for sublist in spike_pos_all for item in sublist]    # create list without sublists

@@ -295,8 +295,8 @@ def date2dec(calendar = 'standard', units=None,
                  MC, Jun 2015 - adapted to new netCDF4/netcdftime (>= v1.0) and datetime (>= Python v2.7.9)
                  MC, Oct 2015 - call date2num with list instead of single netCDF4.datetime objects
                  MC, Oct 2016 - netcdftime provided even with netCDF4 > 1.0.0; make mo for months always integer
+                 MC, Nov 2016 - 00, 01, etc. for integers not accepted by Python3
     """
-
     #
     # Checks
     calendars = ['standard', 'gregorian', 'julian', 'proleptic_gregorian',
@@ -333,7 +333,7 @@ def date2dec(calendar = 'standard', units=None,
         asciifl  = ascii.flatten()
         timeobj  = np.zeros(insize, dtype=object)
         # slicing of ascii strings to implement in datetime object. missing times
-        # will be set to 00.
+        # will be set to 0.
         yr = np.zeros(insize, dtype=np.int)
         mo = np.zeros(insize, dtype=np.int)
         dy = np.zeros(insize, dtype=np.int)
@@ -352,15 +352,15 @@ def date2dec(calendar = 'standard', units=None,
                 if len(tim) > 1:
                     mi[i] = int(tim[1])
                 else:
-                    mi[i] = 00
+                    mi[i] = 0
                 if len(tim) > 2:
                     sc[i] = int(tim[2])
                 else:
-                    sc[i] = 00
+                    sc[i] = 0
             else:
-                hr[i] = 00
-                mi[i] = 00
-                sc[i] = 00
+                hr[i] = 0
+                mi[i] = 0
+                sc[i] = 0
             if ((yr[i]==1900) & (mo[i]==2) & (dy[i]==29)):
                 timeobj[i] = nt.datetime(yr[i], 3, 1, hr[i], mi[i], sc[i])
             else:
@@ -381,7 +381,7 @@ def date2dec(calendar = 'standard', units=None,
         engfl    = eng.flatten()
         timeobj  = np.zeros(insize, dtype=object)
         # slicing of eng strings to implement in datetime object. missing times
-        # will be set to 00.
+        # will be set to 0.
         yr = np.zeros(insize, dtype=np.int)
         mo = np.zeros(insize, dtype=np.int)
         dy = np.zeros(insize, dtype=np.int)
@@ -400,15 +400,15 @@ def date2dec(calendar = 'standard', units=None,
                 if len(tim) > 1:
                     mi[i] = int(tim[1])
                 else:
-                    mi[i] = 00
+                    mi[i] = 0
                 if len(tim) > 2:
                     sc[i] = int(tim[2])
                 else:
-                    sc[i] = 00
+                    sc[i] = 0
             else:
-                hr[i] = 00
-                mi[i] = 00
-                sc[i] = 00
+                hr[i] = 0
+                mi[i] = 0
+                sc[i] = 0
             if ((yr[i]==1900) & (mo[i]==2) & (dy[i]==29)):
                 timeobj[i] = nt.datetime(yr[i], 3, 1, hr[i], mi[i], sc[i])
             else:
@@ -498,8 +498,8 @@ def date2dec(calendar = 'standard', units=None,
     # depending on chosen calendar and optional set of the time units
     # decimal date is calculated
     output = np.zeros(outsize)
-    t0    = nt.datetime(1582, 10, 05, 00, 00, 00)
-    t1    = nt.datetime(1582, 10, 15, 00, 00, 00)
+    t0    = nt.datetime(1582, 10, 5, 0, 0, 0)
+    t1    = nt.datetime(1582, 10, 15, 0, 0, 0)
     is121 = True if (min(timeobj)<t0) and (max(timeobj)>=t1) else False
     if (calendar == 'standard') or (calendar == 'gregorian'):
         if units is None:

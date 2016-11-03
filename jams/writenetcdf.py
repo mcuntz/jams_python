@@ -2,7 +2,7 @@
 from __future__ import print_function
 import numpy as np                       # array manipulation
 import netCDF4 as nc
-from readnetcdf import readnetcdf
+from jams.readnetcdf import readnetcdf
 
 def writenetcdf(fhandle, vhandle=None, var=None, time=None, isdim=False, name=None, dims=None,
                 attributes=None, fileattributes=None, comp=False, vartype=None, create_var=True ):
@@ -271,7 +271,7 @@ def dumpnetcdf( fname, dims=None, fileattributes=None, vnames=None, create=True,
         Input           Format                  Description
         -----           -----                   -----------
         fname           string                  filename of netcdf file
-        dims            1D list of strings      dimension names (e.g., ['time', 'x', 'y']), 
+        dims            1D list of strings      dimension names (e.g., ['time', 'x', 'y']),
                                                 default is [ 'x', 'y', 'z', 'u', 'v' ]
         fileattributes  2D list or dictionary   global attributes of NetCDF file
                                                 (e.g., history, description, ...)
@@ -280,14 +280,14 @@ def dumpnetcdf( fname, dims=None, fileattributes=None, vnames=None, create=True,
                                                 for each given variable
         variables       keyword arguments       keys become variable names, values are either
                                                 numpy arrays to write OR list/tuple of
-                                                [ numpy array, attributes ] where attributes 
+                                                [ numpy array, attributes ] where attributes
                                                 must be a dictionary
 
         Description
         -----------
         write netcdf file in one single line
         dump_netcdf( 'test.nc', dims = [ 'time', 'northing', 'easting' ],
-                     fileattributes 
+                     fileattributes
                      sm = sm_array, smi = [ smi_array, {'long_name': 'soil moisture index'} ] )
 
         Restrictions
@@ -305,8 +305,8 @@ def dumpnetcdf( fname, dims=None, fileattributes=None, vnames=None, create=True,
         >>> dims    = [ 'xx', 'yy' ]
         >>> FiAtt   = ([['description', 'test dump_netcdf'],
         ...             ['history'    , 'Created by Stephan Thober']])
-        >>> dumpnetcdf( 'test_dump.nc', dims = dims, fileattributes = FiAtt, 
-        ...            data = ( dat, {'long_name':'CHS'} ) )
+        >>> dumpnetcdf( 'test_dump.nc', dims = dims, fileattributes = FiAtt,
+        ...            data=( dat, {'long_name':'CHS'} ) )
 
         # check file
         >>> from readnetcdf import readnetcdf
@@ -350,7 +350,11 @@ def dumpnetcdf( fname, dims=None, fileattributes=None, vnames=None, create=True,
                   ST & MZ, Mar 2015 - added flag to append variables
                   ST, Jun 2016 - included dump for single numbers without attributes
                   ST, Aug 2016 - included separate variable names
+                  MC, Nov 2016 - ported to Python 3, mostly dictionary behaviour
     """
+    # check that variables are given
+    if variables == dict():
+        raise ValueError('Variables must be given as keyword arguments.')
     # check if dims are given
     if dims is None:
         dims = [ 'x', 'y', 'z', 'u', 'v' ]
@@ -360,6 +364,12 @@ def dumpnetcdf( fname, dims=None, fileattributes=None, vnames=None, create=True,
             raise ValueError('Variable names must be dictionary with the same keys as given variables')
         if len(vnames) != len(variables):
             raise ValueError('Number of given variable names does not match number of variables')
+    # get dimensions from first variable
+    vv1 = variables[list(variables.keys())[0]]
+    if isinstance(vv1,(tuple,list)):
+        arr_shape = vv1[0].shape
+    else:
+        arr_shape = vv1.shape
     # open netcdf file
     if create:
         fh = nc.Dataset( fname, 'w', 'NETCDF4' )
@@ -369,13 +379,9 @@ def dumpnetcdf( fname, dims=None, fileattributes=None, vnames=None, create=True,
     if fileattributes is not None:
         writenetcdf(fh, fileattributes=fileattributes)
     # create dimensions according to first variable
-    if ( type( variables.values()[0][-1] ) != dict ):
-        arr_shape = variables.values()[ 0 ].shape
-    else:
-        arr_shape = variables.values()[ 0 ][0].shape
     if create:
         for dd in np.arange( len( arr_shape ) ):
-            writenetcdf( fh, name = dims[dd], dims = arr_shape[dd], 
+            writenetcdf( fh, name = dims[dd], dims = arr_shape[dd],
                          var = None, isdim = True, create_var = False )
     else:
         # read dimensions from file
@@ -383,11 +389,12 @@ def dumpnetcdf( fname, dims=None, fileattributes=None, vnames=None, create=True,
         for dd in  np.arange( len( arr_shape ) ):
             # write dimensions if they do not exist
             if not dims[dd] in file_dims:
-                writenetcdf( fh, name = dims[dd], dims = arr_shape[dd], 
+                writenetcdf( fh, name = dims[dd], dims = arr_shape[dd],
                             var = None, isdim = True, create_var = False )
     # loop over variables
     cc = 0
-    for key, value in variables.iteritems():
+    for key in variables:
+        value = variables[key]
         # update vnames if required
         if vnames is not None:
             key = vnames[key]
@@ -413,7 +420,7 @@ def dumpnetcdf( fname, dims=None, fileattributes=None, vnames=None, create=True,
                             vartype=value.dtype, comp = True )
     fh.close()
 
-# returns list of all dimensions given a filename 
+# returns list of all dimensions given a filename
 def get_dims( fname ):
     """
         This functions returns all dimension names contained in a netcdf file as list
@@ -447,13 +454,16 @@ def get_dims( fname ):
         >>> dims    = [ 'xx', 'yy' ]
         >>> FiAtt   = ([['description', 'test dump_netcdf'],
         ...            ['history'    , 'Created by Stephan Thober']])
-        >>> dumpnetcdf( 'test_dump.nc', dims = dims, fileattributes = FiAtt, 
+        >>> dumpnetcdf( 'test_dump.nc', dims = dims, fileattributes = FiAtt,
         ...            data = ( dat, {'long_name':'CHS'} ) )
 
         # check file
+        >>> import sys
+        >>> pyver = sys.version_info
         >>> from readnetcdf import readnetcdf
-        >>> print( get_dims( 'test_dump.nc' ) )
-        [u'xx', u'yy']
+        >>> out = get_dims( 'test_dump.nc' )
+        >>> print(out) if pyver > (3,0) else print([ i.encode('UTF-8') for i in out ])
+        ['xx', 'yy']
 
         >>> import os
         >>> os.remove('test_dump.nc')
@@ -483,6 +493,7 @@ def get_dims( fname ):
         History
         -------
         Written,  ST, Jun 2015
+                  MC, Nov 2016 - adapted docstring to Python 2 and 3
     """
     file_vars = readnetcdf( fname, var = '', variables = True )
     file_dims = []

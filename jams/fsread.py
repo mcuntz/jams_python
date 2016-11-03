@@ -209,10 +209,11 @@ def fsread(file, nc=0, snc=0, skip=0, cskip=0, hskip=0, separator=None,
         History
         -------
         Written,  MC, Feb 2015 - modified fread
+        Modified, MC, Nov 2016 - nc<=-1 does not work in Python 3 if nc is list
     """
 
     # Input error
-    if (nc <= -1) and (snc <= -1):
+    if (nc == -1) and (snc == -1):
         raise ValueError('nc and snc must numbers or list of indices; -1 means read the rest. nc and snc cannot both be -1.')
 
     # wrap to fread/sread

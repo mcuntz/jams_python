@@ -6,17 +6,18 @@ import scipy.io as sio
 import datetime
 import os
 import warnings
+from collections import OrderedDict
 
-from writenetcdf import writenetcdf
-from readnetcdf  import readnetcdf
+from jams.writenetcdf import writenetcdf
+from jams.readnetcdf  import readnetcdf
 
-def mat2nc( fname, overwrite=False, fname_out=None, verbose=True, squeeze=True,
-            varname=None,
-            lat=None, lon=None, lat_file=None, lon_file=None, transposed=False, regular_grid=True,
-            anchor_time=None, data_time=None ):
+def mat2nc(fname, overwrite=False, fname_out=None, verbose=True, squeeze=True,
+           varname=None,
+           lat=None, lon=None, lat_file=None, lon_file=None, transposed=False, regular_grid=True,
+           anchor_time=None, data_time=None):
     """
         This functions writes the content of a Matlab file into a NetCDF file.
-        It allows for specifying longitudes and latitudes as well as a validity time. 
+        It allows for specifying longitudes and latitudes as well as a validity time.
 
         Definition
         ----------
@@ -64,7 +65,7 @@ def mat2nc( fname, overwrite=False, fname_out=None, verbose=True, squeeze=True,
                                                     'hours since YYYY-MM-DD HH:MM:SS'
         data_time       array-like              Time of each data set written, i.e. if there are 4 precipitations fields and
                                                 they are valid 6, 12, 18, 24 hrs after anchor time, data_time=[6,12,18,24].
-                                                
+
 
         Description
         -----------
@@ -94,6 +95,7 @@ def mat2nc( fname, overwrite=False, fname_out=None, verbose=True, squeeze=True,
         writes  'vv'                  shape =  (6,)                  to *.nc
         wrote file  test.nc
 
+        >>> from jams.readnetcdf import readnetcdf
         >>> readnetcdf('test.nc',var='ss')
         array([ 10.])
         >>> readnetcdf('test.nc',var='tt')
@@ -110,7 +112,7 @@ def mat2nc( fname, overwrite=False, fname_out=None, verbose=True, squeeze=True,
         # --------------------------------------------
         >>> if os.path.isfile('test.nc'): os.remove('test.nc')
         >>> mat2nc('test.mat',squeeze=False,verbose=False)
-        
+
         >>> readnetcdf('test.nc',var='ss')
         array([[ 10.]])
         >>> readnetcdf('test.nc',var='tt')
@@ -155,28 +157,31 @@ def mat2nc( fname, overwrite=False, fname_out=None, verbose=True, squeeze=True,
         -------
         Written,  JM, Sep 2016
         Modified, JM, Oct 2016 - add feature xy
+                  MC, Nov 2016 - single file not working in Python 3, Order .mat content by name (for docstrings).
     """
 
     # make sure that fname is an array
-    if hasattr(fname, "__iter__"):
+    import sys
+    if sys.version_info > (3,0): basestring = str
+    if hasattr(fname, "__iter__") and not isinstance(fname, basestring):
         filename_mat = np.array(fname)
     else:
         filename_mat = np.array([fname])
 
     # make sure that varname is an array
-    if ( not (varname is None) ):
+    if varname is not None:
         if hasattr(varname, "__iter__"):
             varname = np.array(varname)
         else:
             varname = np.array([varname])
-            
+
     # make sure that data_time is an array
-    if ( not (data_time is None) ):
+    if data_time is not None:
         if hasattr(data_time, "__iter__"):
             data_time = np.array(data_time)
         else:
             data_time = np.array([data_time])
-        
+
     # make sure that output filename is a valid one
     if fname_out is None:
         filename_nc  = '.'.join(filename_mat[0].split('.')[:-1])+'.nc'
@@ -200,7 +205,7 @@ def mat2nc( fname, overwrite=False, fname_out=None, verbose=True, squeeze=True,
         data_time = data_time[idx]
         filename_mat = filename_mat[idx]
 
-    # checking of input arguments 
+    # checking of input arguments
     if (not(lon is None) and lat is None) or (lon is None and not(lat is None)):
         raise ValueError('mat2nc: either both lat and lon have to be specified or none of it')
 
@@ -236,14 +241,14 @@ def mat2nc( fname, overwrite=False, fname_out=None, verbose=True, squeeze=True,
             # look if longitudes are constant per column
             lon_tmp   = np.round(lon,3)
             lon_const = np.all([ list(lon_tmp[:,ii]).count(lon_tmp[0,ii]) == len(lon_tmp[:,ii]) for ii in range(np.shape(lon_tmp)[1])])
-    
+
             if not lon_const:
                 print('lon[:,0]: ',lon_tmp[:,0])
                 raise ValueError('mat2nc: Longitudes are not constant per column. Use either irregular=True or try transpose=True')
-                
+
     if (cc > 1):
         raise ValueError('mat2nc: More than one variable found in longitude file')
-            
+
 
     # Read latitude info from file
     cc = 0
@@ -263,11 +268,11 @@ def mat2nc( fname, overwrite=False, fname_out=None, verbose=True, squeeze=True,
             # look if longitudes are constant per column
             lat_tmp   = np.round(lat,3)
             lat_const = np.all([ list(lat_tmp[ii,:]).count(lat_tmp[ii,0]) == len(lat_tmp[ii,:]) for ii in range(np.shape(lat_tmp)[0])])
-    
+
             if not lat_const:
                 print('lat[0,:]: ',lat_tmp[0,:])
                 raise ValueError('mat2nc: Latitudes are not constant per row. Use either irregular=True or try transpose=True')
-            
+
     if (cc > 1):
         raise ValueError('mat2nc: More than one variable found in latitude file')
 
@@ -285,19 +290,19 @@ def mat2nc( fname, overwrite=False, fname_out=None, verbose=True, squeeze=True,
         varAtt  = ([['units',    anchor_time],
                     ['calendar', 'gregorian']])
         ntime        = np.shape(np.array(data_time))[0]
-        dims[dd]     = 1 # means that only one time step is written 
+        dims[dd]     = 1 # means that only one time step is written
         dim_name[dd] = varName
         # create dimension
         th = writenetcdf(fh, name=dim_name[dd], dims=None, attributes=varAtt, isdim=True)
         # write values to dimension
         times   = np.array(data_time)
         writenetcdf(fh, th, time=list(range(ntime)), var=times)
-            
+
         dd += 1
 
     # if grid available, write this dimensions and data first
     if (grid_avail):
-        
+
         # (1) check if variable shape matches given grid shape
         arr_shape_1 = np.shape(lat)
         arr_shape_2 = np.shape(lon)
@@ -311,7 +316,7 @@ def mat2nc( fname, overwrite=False, fname_out=None, verbose=True, squeeze=True,
 
         # (2) write dimensions and lat/lon data
         #        lon is x-axis ==> number columns
-        #        lat is y-axis ==> number of rows        
+        #        lat is y-axis ==> number of rows
         varName     = 'nlon'
         varAtt      = ([['units'         , 'degrees_east'],
                     ['standard_name' , 'longitude'   ],
@@ -325,7 +330,7 @@ def mat2nc( fname, overwrite=False, fname_out=None, verbose=True, squeeze=True,
             writenetcdf(fh, name=dim_name[dd], dims=dims[dd], var=var, attributes=varAtt, isdim=True)
         else:
             # just create dimension but don't write variable yet
-            writenetcdf( fh, name = dim_name[dd], dims = dims[dd], 
+            writenetcdf( fh, name = dim_name[dd], dims = dims[dd],
                              var = None, isdim = True, create_var = False )
         dd += 1
         varName     = 'nlat'
@@ -340,36 +345,37 @@ def mat2nc( fname, overwrite=False, fname_out=None, verbose=True, squeeze=True,
             writenetcdf(fh, name=dim_name[dd], dims=dims[dd], var=var, attributes=varAtt, isdim=True)
         else:
             # just create dimension but don't write variable yet
-            writenetcdf( fh, name = dim_name[dd], dims = dims[dd], 
+            writenetcdf( fh, name = dim_name[dd], dims = dims[dd],
                              var = None, isdim = True, create_var = False )
         dd += 1
 
         # now both dimensions exist and grid can be written as extra variable
         if not regular_grid:
             idx=[ np.where(dims==dd)[0][0] for dd in np.shape(lon) ]
-            
+
             attributes = {'standard_name': 'longitude', 'long_name': 'longitudes of irregular grid', 'units': 'degrees_??', 'missing_value': -9.}
             writenetcdf( fh, name = 'lon', dims = dim_name[idx], var = lon,
                                     comp=True, create_var = True,
-                                    attributes=attributes, 
+                                    attributes=attributes,
                                     vartype=lon.dtype )
-            
+
             idx=[ np.where(dims==dd)[0][0] for dd in np.shape(lat) ]
             attributes = {'standard_name': 'latitude', 'long_name': 'latitudes of irregular grid', 'units': 'degrees_??', 'missing_value': -9.}
             writenetcdf( fh, name = 'lat', dims = dim_name[idx], var = lat,
                                     comp=True, create_var = True,
-                                    attributes=attributes, 
+                                    attributes=attributes,
                                     vartype=lat.dtype )
 
-        
+
     tt = 0
     for ff in filename_mat:
         vv = 0
-        
+
         # read content from Matlab file
         mat_contents = sio.loadmat(ff)
+        mat_contents = OrderedDict(sorted(mat_contents.items(), key=lambda t: t[0]))
 
-        for ikey,key in enumerate(mat_contents):
+        for ikey, key in enumerate(mat_contents):
             if key[0:2] != '__':
 
                 key_content = np.array(mat_contents[key])
@@ -394,14 +400,14 @@ def mat2nc( fname, overwrite=False, fname_out=None, verbose=True, squeeze=True,
                     if (squeeze):
                         if  (hasattr(tmp, "__len__")):
                             tmp = np.squeeze(tmp)
-        
+
                             # in case tmp contains only one scalar, make again proper array of it
                             if (tmp.shape == ()):
                                 tmp = np.array([tmp])
 
                 if (not (varname is None)):
                     key = varname[vv]
-                                
+
                 if verbose:
                     print('writes ',repr(key).ljust(35),' shape = ',repr(np.shape(tmp)).ljust(20),' to *.nc')
 
@@ -411,12 +417,12 @@ def mat2nc( fname, overwrite=False, fname_out=None, verbose=True, squeeze=True,
                     if (not arr_shape[dd] in dims) and (not dim_name[idim] in ['nlat','nlon','ntime']):
 
                         dims[idim] = arr_shape[dd]
-                        writenetcdf( fh, name = dim_name[idim], dims = dims[idim], 
+                        writenetcdf( fh, name = dim_name[idim], dims = dims[idim],
                                     var = None, isdim = True, create_var = False )
                         idim +=1
                         if (idim > len( dim_name )):
                             raise ValueError( 'mat2nc: Too many different dimensions found. You may have to increase size of dim_name.' )
-                
+
                 # find matching dim names for current shape
                 idx=[ np.where(dims==arr_shape[dd])[0][0] for dd in np.arange(len(arr_shape)) ]
 
@@ -446,19 +452,19 @@ def mat2nc( fname, overwrite=False, fname_out=None, verbose=True, squeeze=True,
                         attributes = {'long_name': 'U-component of the wind (along the grid X axis)', 'units': 'kts'}
                     elif (varname[vv].lower() == 'vv'):
                         attributes = {'long_name': 'V-component of the wind (along the grid Y axis)', 'units': 'kts'}
-                            
+
                 if (time_avail):
                     if (tt==0):
                         vh   = writenetcdf(fh, name=key, dims=dim_name[idx],
                                               comp=True,
-                                              attributes=attributes, 
+                                              attributes=attributes,
                                               vartype=key_content.dtype)
                     writenetcdf( fh, vh, var = tmp[0], time = tt)
                     tt += 1
                 else:
                     writenetcdf( fh, name = key, dims = dim_name[idx], var = tmp,
                                     comp=True,
-                                    attributes=attributes, 
+                                    attributes=attributes,
                                     vartype=key_content.dtype )
                 vv += 1
 
@@ -474,5 +480,3 @@ if __name__ == '__main__':
         doctest.testmod(optionflags=doctest.NORMALIZE_WHITESPACE)
     except:
         raise IOError('No NetCDF4 support available.')
-
-    

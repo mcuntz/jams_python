@@ -531,10 +531,10 @@ def col2rgb01(color):
         # In any other case, the colour systems are indistinguishable
         if isinstance(color, (list, tuple, np.array)):
             if len(color) > 3:
-                raise ValueError, 'Cannot interpret color (1).'
+                raise ValueError('Cannot interpret color (1).')
             colors = rgb2rgb01(*list(color))
         else:
-            raise ValueError, 'Cannot interpret color (2).'
+            raise ValueError('Cannot interpret color (2).')
     
     return colors
 

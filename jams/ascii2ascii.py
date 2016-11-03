@@ -35,29 +35,39 @@ def ascii2ascii(edate, full=False, eng=False):
 
         Examples
         --------
+        >>> import sys
+        >>> pyver = sys.version_info
         >>> edate = ['2014-11-12 12:00', '01.03.2015 17:56:00', '1990-12-01', '04.05.1786']
-        >>> print(ascii2ascii(edate))
+        >>> out = ascii2ascii(edate)
+        >>> print([ i.decode('UTF-8') for i in out ]) if pyver > (3,0) else print(out)
         ['12.11.2014 12:00', '01.03.2015 17:56:00', '01.12.1990', '04.05.1786']
 
-        >>> print(ascii2ascii(edate, full=True))
+        >>> out = ascii2ascii(edate, full=True)
+        >>> print([ i.decode('UTF-8') for i in out ]) if pyver > (3,0) else print(out)
         ['12.11.2014 12:00:00', '01.03.2015 17:56:00', '01.12.1990 00:00:00', '04.05.1786 00:00:00']
 
-        >>> print(ascii2ascii(edate, eng=True))
+        >>> out = ascii2ascii(edate, eng=True)
+        >>> print([ i.decode('UTF-8') for i in out ]) if pyver > (3,0) else print(out)
         ['2014-11-12 12:00', '2015-03-01 17:56:00', '1990-12-01', '1786-05-04']
 
-        >>> print(ascii2ascii(edate, eng=True, full=True))
+        >>> out = ascii2ascii(edate, eng=True, full=True)
+        >>> print([ i.decode('UTF-8') for i in out ]) if pyver > (3,0) else print(out)
         ['2014-11-12 12:00:00', '2015-03-01 17:56:00', '1990-12-01 00:00:00', '1786-05-04 00:00:00']
 
-        >>> print(ascii2ascii(list(edate)))
+        >>> out = ascii2ascii(list(edate))
+        >>> print([ i.decode('UTF-8') for i in out ]) if pyver > (3,0) else print(out)
         ['12.11.2014 12:00', '01.03.2015 17:56:00', '01.12.1990', '04.05.1786']
 
-        >>> print(ascii2ascii(tuple(edate)))
+        >>> out = ascii2ascii(tuple(edate))
+        >>> print(tuple([ i.decode('UTF-8') for i in out ])) if pyver > (3,0) else print(out)
         ('12.11.2014 12:00', '01.03.2015 17:56:00', '01.12.1990', '04.05.1786')
 
-        >>> print(ascii2ascii(np.array(edate)))
+        >>> out = ascii2ascii(np.array(edate))
+        >>> print(np.array([ i.decode('UTF-8') for i in out ])) if pyver > (3,0) else print(out)
         ['12.11.2014 12:00' '01.03.2015 17:56:00' '01.12.1990' '04.05.1786']
 
-        >>> print(ascii2ascii(edate[0]))
+        >>> out = ascii2ascii(edate[0])
+        >>> print(out.decode('UTF-8')) if pyver > (3,0) else print(out)
         12.11.2014 12:00
 
 
@@ -86,6 +96,7 @@ def ascii2ascii(edate, full=False, eng=False):
         -------
         Written,  MC, Feb 2015
         Modified, MC, Sep 2015 - removed date2dec and dec2date
+                  MC, Nov 2016 - adapted docstring to Python 2 and 3
     """
 
     # Input type and shape
@@ -140,11 +151,15 @@ def eng2ascii(edate, full=False):
 
         Examples
         --------
+        >>> import sys
+        >>> pyver = sys.version_info
         >>> edate = ['2014-11-12 12:00', '01.03.2015 17:56:00', '1990-12-01', '04.05.1786']
-        >>> print(eng2ascii(edate))
+        >>> out = eng2ascii(edate)
+        >>> print([ i.decode('UTF-8') for i in out ]) if pyver > (3,0) else print(out)
         ['12.11.2014 12:00', '01.03.2015 17:56:00', '01.12.1990', '04.05.1786']
 
-        >>> print(eng2ascii(edate, full=True))
+        >>> out = eng2ascii(edate, full=True)
+        >>> print([ i.decode('UTF-8') for i in out ]) if pyver > (3,0) else print(out)
         ['12.11.2014 12:00:00', '01.03.2015 17:56:00', '01.12.1990 00:00:00', '04.05.1786 00:00:00']
     """
     return ascii2ascii(edate, full=full, eng=False)
@@ -158,11 +173,15 @@ def ascii2eng(edate, full=False):
 
         Examples
         --------
+        >>> import sys
+        >>> pyver = sys.version_info
         >>> edate = ['2014-11-12 12:00', '01.03.2015 17:56:00', '1990-12-01', '04.05.1786']
-        >>> print(ascii2eng(edate))
+        >>> out = ascii2eng(edate)
+        >>> print([ i.decode('UTF-8') for i in out ]) if pyver > (3,0) else print(out)
         ['2014-11-12 12:00', '2015-03-01 17:56:00', '1990-12-01', '1786-05-04']
 
-        >>> print(ascii2eng(edate, full=True))
+        >>> out = ascii2eng(edate, full=True)
+        >>> print([ i.decode('UTF-8') for i in out ]) if pyver > (3,0) else print(out)
         ['2014-11-12 12:00:00', '2015-03-01 17:56:00', '1990-12-01 00:00:00', '1786-05-04 00:00:00']
     """
     return ascii2ascii(edate, full=full, eng=True)

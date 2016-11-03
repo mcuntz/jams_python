@@ -85,7 +85,7 @@ def upscale_fdir(sn, factor, print_info=False, return_maxlocs=False, do_co=False
         Upscales a river network by a factor (integer > 1), that has to be a divisible of the
         resolution of the flow direction. Direction is given by the cell with the largest flow
         accumulation. If multiple of these exist, then one is chosen randomly.
-    
+
         Definition
         ----------
         upscale_fdir(sn, factor, print_info=False, return_maxlocs=False, do_co=False, redo_fa=True)
@@ -114,7 +114,7 @@ def upscale_fdir(sn, factor, print_info=False, return_maxlocs=False, do_co=False
         ------------
             Given river_network object sn has to contain flow direction, accumulation and location of
             sink following the convention below.
-            
+
             The origin of the flow direction field is assumed to be located in the upper left corner.
             Then flow directions are following this convention:
 
@@ -131,14 +131,14 @@ def upscale_fdir(sn, factor, print_info=False, return_maxlocs=False, do_co=False
         Examples
         --------
         >>> # Create some data
-        >>> fd = np.ma.array([[  2,   1,   1,   2,   4,   4,   8,  8,  8], 
-        ...                   [  1,   2,   1,   1,   2,   4,   4,  4,  8], 
-        ...                   [128,   1, 128,   1,   1,   2,   4,  4,  4], 
-        ...                   [  1, 128,  64, 128, 128,   2,   4,  4,  8], 
-        ...                   [128,  64,  64,  64,   1,   2,   4,  4,  4], 
-        ...                   [ 64, 128,  64,  32,   1,   1,   2,  2,  4], 
-        ...                   [128,  64,  64,  64,   1,   1,   1,  1,  1], 
-        ...                   [128,  64, 128,  64,  32,   1, 128, 64, 64], 
+        >>> fd = np.ma.array([[  2,   1,   1,   2,   4,   4,   8,  8,  8],
+        ...                   [  1,   2,   1,   1,   2,   4,   4,  4,  8],
+        ...                   [128,   1, 128,   1,   1,   2,   4,  4,  4],
+        ...                   [  1, 128,  64, 128, 128,   2,   4,  4,  8],
+        ...                   [128,  64,  64,  64,   1,   2,   4,  4,  4],
+        ...                   [ 64, 128,  64,  32,   1,   1,   2,  2,  4],
+        ...                   [128,  64,  64,  64,   1,   1,   1,  1,  1],
+        ...                   [128,  64, 128,  64,  32,   1, 128, 64, 64],
         ...                   [ 64, 128,  64,  64,  64, 128,  64, 64, 32]])
         >>> sinks = np.array([[6], [8]])
         >>> sn = river_network(fdir=fd, do_fa=True, do_co=False, sinks=sinks)
@@ -152,8 +152,8 @@ def upscale_fdir(sn, factor, print_info=False, return_maxlocs=False, do_co=False
          [False False False]
          [False False False]],
                fill_value = -9999.0)
-        <BLANKLINE>      
-               
+        <BLANKLINE>
+
         License
         -------
         This file is part of the JAMS Python package.
@@ -178,7 +178,7 @@ def upscale_fdir(sn, factor, print_info=False, return_maxlocs=False, do_co=False
         History
         -------
         Written,  ST, Feb 2016
-        Modified                
+        Modified, MC, Nov 2016 - ported to Python 3
     """
     # consistency checks
     if not np.ma.isMaskedArray(sn.fa):
@@ -186,7 +186,7 @@ def upscale_fdir(sn, factor, print_info=False, return_maxlocs=False, do_co=False
     if any(np.array(sn.fdir.shape) % factor != 0):
         raise ValueError('***ERROR: factor: ' + str(factor) + ' is not a divisible of flow direction shape')
     # create upscaled arrays
-    new_shape = np.array(sn.fdir.shape) / factor
+    new_shape = np.array(sn.fdir.shape) // factor
     new_fd = np.ma.masked_array(np.zeros(new_shape) + missing_value,
                                 mask=np.ones(new_shape), fill_value=missing_value)
     new_fa = np.ma.masked_array(np.zeros(new_shape) + missing_value,
@@ -200,8 +200,7 @@ def upscale_fdir(sn, factor, print_info=False, return_maxlocs=False, do_co=False
             tmp_fa = sn.fa[ii * factor: (ii + 1) * factor, jj * factor: (jj + 1) * factor]
             tmp_fd = sn.fdir[ii * factor: (ii + 1) * factor, jj * factor: (jj + 1) * factor]
             if np.all(tmp_fa.mask):
-                if print_info:
-                    print('cell is masked ', ii, jj)
+                if print_info: print('cell is masked ', ii, jj)
                 # cell is masked
                 new_fd[ii, jj] = -9999.
                 new_fa[ii, jj] = -9999.
@@ -231,7 +230,7 @@ def upscale_fdir(sn, factor, print_info=False, return_maxlocs=False, do_co=False
                 # add to store maximum locations
                 maxlocs.append([maxloc[0] + ii * factor, maxloc[1] + jj * factor])
     # upscale sinks
-    upscale_sinks = tuple(np.array(sn.sinks)/np.int(factor))
+    upscale_sinks = tuple(np.array(sn.sinks)/int(factor))
     # return
     if return_maxlocs:
         if redo_fa:
@@ -244,7 +243,7 @@ def upscale_fdir(sn, factor, print_info=False, return_maxlocs=False, do_co=False
         else:
             return river_network(fdir=new_fd, do_co=do_co, fa=new_fa)
 
-        
+
 class river_network(object):
     def __init__(self, dem=None, fdir=None, co=None, do_co=False, fa=None, do_fa=False, print_info=False, missing_value=-9999., sinks=None):
         """
@@ -279,7 +278,7 @@ class river_network(object):
             Restrictions
             ------------
                 Either dem or fdir has to be provided, both cannot be omitted.
-                
+
                 The origin of the flow direction field is assumed to be located in the upper left corner.
                 Then flow directions are following this convention:
 
@@ -296,14 +295,14 @@ class river_network(object):
             Examples
             --------
             >>> # Create some data
-            >>> fd = np.ma.array([[  2,   1,   1,   2,   4,   4,   8,  8,  8], 
-            ...                   [  1,   2,   1,   1,   2,   4,   4,  4,  8], 
-            ...                   [128,   1, 128,   1,   1,   2,   4,  4,  4], 
-            ...                   [  1, 128,  64, 128, 128,   2,   4,  4,  8], 
-            ...                   [128,  64,  64,  64,   1,   2,   4,  4,  4], 
-            ...                   [ 64, 128,  64,  32,   1,   1,   2,  2,  4], 
-            ...                   [128,  64,  64,  64,   1,   1,   1,  1,  1], 
-            ...                   [128,  64, 128,  64,  32,   1, 128, 64, 64], 
+            >>> fd = np.ma.array([[  2,   1,   1,   2,   4,   4,   8,  8,  8],
+            ...                   [  1,   2,   1,   1,   2,   4,   4,  4,  8],
+            ...                   [128,   1, 128,   1,   1,   2,   4,  4,  4],
+            ...                   [  1, 128,  64, 128, 128,   2,   4,  4,  8],
+            ...                   [128,  64,  64,  64,   1,   2,   4,  4,  4],
+            ...                   [ 64, 128,  64,  32,   1,   1,   2,  2,  4],
+            ...                   [128,  64,  64,  64,   1,   1,   1,  1,  1],
+            ...                   [128,  64, 128,  64,  32,   1, 128, 64, 64],
             ...                   [ 64, 128,  64,  64,  64, 128,  64, 64, 32]])
             >>> sinks = np.array([[6], [8]])
             >>> river_network(fdir=fd, do_fa=True, do_co=False, sinks=sinks).fa
@@ -352,7 +351,7 @@ class river_network(object):
              [False False False False False False False False False]],
                    fill_value = -9999.0)
             <BLANKLINE>
-                   
+
             License
             -------
             This file is part of the JAMS Python package.
@@ -377,7 +376,6 @@ class river_network(object):
             History
             -------
             Written,  ST, Dec 2015
-            Modified                
         """
         # initialize all arrays
         self.dem = None # digital elevation model
@@ -445,7 +443,7 @@ class river_network(object):
                                                   do_fa=do_fa, fa=self.fa,
                                                   missing_value=missing_value,
                                                   print_info=print_info)
-        
+
 
     def flow_direction(self, print_info=False):
         """
@@ -503,7 +501,7 @@ class river_network(object):
              [False False False]
              [False False False]],
                    fill_value = 1e+20)
-                              
+
             License
             -------
             This file is part of the JAMS Python package.
@@ -528,7 +526,6 @@ class river_network(object):
             History
             -------
             Written,  ST & DS, Dec 2015
-            Modified                
         """
         # global variable used: correct_direction
         fd = np.zeros(self.dem.shape)
@@ -578,7 +575,7 @@ class river_network(object):
             do_fa         calculate flow accumulation
             fa            given flow accumulation
             missing_value floating point value for masking
-            
+
             Options
             -------
             print_info   True: write additional information
@@ -640,7 +637,7 @@ class river_network(object):
             History
             -------
             Written,  ST & DS, Dec 2015
-            Modified                
+            Modified, MC, Nov 2016 - ported to Python 3
         """
         if co is None and do_co:
             co = np.ma.masked_array(np.zeros(fd.shape) + missing_value,
@@ -652,7 +649,7 @@ class river_network(object):
         if not do_co and not do_fa:
             raise ValueERROR('***ERROR: neither fa nor co calculated')
         fd_stack = [[yy, xx]] # start at initial sink
-        while fd_stack:        
+        while fd_stack:
             if print_info:
                 print('current flow accumulation stack: ', fd_stack)
             upstream = self._get_upstream(fd, fd_stack[-1])
@@ -660,10 +657,10 @@ class river_network(object):
                 print('upstream locations: ', upstream)
             if do_co:
                 # use co for identifying upstream cells
-                ext = [l for l in upstream if co.data[l[0],l[1]] == missing_value]
+                ext = [l for l in upstream if co.data[int(l[0]),int(l[1])] == missing_value]
             else:
                 # use fa for identifying upstream cells
-                ext = [l for l in upstream if fa.data[l[0],l[1]] == missing_value]
+                ext = [l for l in upstream if fa.data[int(l[0]),int(l[1])] == missing_value]
             if ext:
                 fd_stack.extend(ext)
                 continue
@@ -673,17 +670,17 @@ class river_network(object):
             if do_co:
                 co_upstream = [co[loc[0], loc[1]] for loc in upstream]
                 co_max = np.amax(co_upstream + [1])
-                # if two streams of equal co merge, increment channel order   
+                # if two streams of equal co merge, increment channel order
                 if len(np.where(co_upstream == co_max)[0]) > 1:
                     co_max += 1
-                co.data[cell[0], cell[1]] = co_max
-                co.mask[cell[0], cell[1]] = False
+                co.data[int(cell[0]), int(cell[1])] = co_max
+                co.mask[int(cell[0]), int(cell[1])] = False
                 if print_info:
                     print('co (channel order) of upstream: ', co_upstream)
             if do_fa:
-                fa_upstream = [fa[loc[0], loc[1]] for loc in upstream]        
-                fa.data[cell[0], cell[1]] = np.sum(fa_upstream) + 1
-                fa.mask[cell[0], cell[1]] = False
+                fa_upstream = [fa[loc[0], loc[1]] for loc in upstream]
+                fa.data[int(cell[0]), int(cell[1])] = np.sum(fa_upstream) + 1
+                fa.mask[int(cell[0]), int(cell[1])] = False
                 if print_info:
                     print('sum of upstream: ', np.sum(fa_upstream))
         if do_co and do_fa:
@@ -718,10 +715,10 @@ class river_network(object):
         # get mask of neighbors and y and x locations
         neighbors, yy, xx = self._get_neighbors(fd, loc[0], loc[1])
         # mask inflowing cells
-        upstream_mask = (fd.data[yy, xx] == inflow_direction[neighbors])
+        upstream_mask = (fd.data[yy.astype(np.int), xx.astype(np.int)] == inflow_direction[neighbors])
         yy_upstream = yy[upstream_mask]
         xx_upstream = xx[upstream_mask]
-        return [[yy_upstream[ii], xx_upstream[ii]] for ii in np.arange(np.sum(upstream_mask))]
+        return [ [yy_upstream[ii], xx_upstream[ii]] for ii in range(np.sum(upstream_mask)) ]
 
 
 if __name__ == '__main__':

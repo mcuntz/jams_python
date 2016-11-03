@@ -4,7 +4,7 @@ from __future__ import print_function
 def lif(ifile, noblank=False, comment='', skip=0, maxcol=False):
     """
         Count number of lines in a file.
-        
+
         Blank (only whitespace) and comment lines can be excluded.
 
 
@@ -113,9 +113,14 @@ def lif(ifile, noblank=False, comment='', skip=0, maxcol=False):
         Modified, MC, Nov 2012 - maxcol
                   MC, Feb 2013 - ported to Python 3
                   MC, Dec 2014 - changed similar to elegant code of David for head.py
+                  MC, Nov 2016 - adapted file handling to Python 2 and 3
     """
-    # Open file
-    f = ifile if isinstance(ifile,file) else open(ifile,"r")
+    import sys
+    if sys.version_info > (3,0):
+        import io
+        f = ifile if isinstance(ifile,io.TextIOWrapper) else open(ifile,"r")
+    else:
+        f = ifile if isinstance(ifile,file) else open(ifile,"r")
 
     # consume lines
     for _ in range(skip):

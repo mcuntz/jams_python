@@ -196,12 +196,12 @@ def bezier(icolors, ncol=255, correctlightness=True, reverse=False, cmap=None, l
         if np.all(dlight < 0.) or np.all(dlight >= 0.):
             idiverge = False
             # if icol > 4:
-            #     raise ValueError, 'only diverging colours supported in case of 5 input colours.'
+            #     raise ValueError('only diverging colours supported in case of 5 input colours.')
         else:
             idiverge = True
             if icol == 4:
                 print('ll',lights)
-                raise ValueError, 'colours must have increasing or decreasing lightness in case of even number of colors: '+','+','.join([ str(i) for i in lights ])
+                raise ValueError('colours must have increasing or decreasing lightness in case of even number of colors: '+','+','.join([ str(i) for i in lights ]))
 
     # Interpolate colours
     if icol == 1:

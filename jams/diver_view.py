@@ -71,6 +71,7 @@ class mainwin(QtGui.QWidget):
         -------
         Written,  AP, Jun 2016
         Modified, AP, Sep 2016 - added multiple selection
+                  MC, Nov 2016 - 00, 01, etc. for integers not accepted by Python3
     """
     def __init__(self):
         # constructor of main window
@@ -97,7 +98,7 @@ class mainwin(QtGui.QWidget):
         self.plotbox.setSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding)
         
         # define zero date and empty data dictionary
-        self.date01 = d2d(yr=01, mo=01, dy=02, hr=00, mi=00, sc=00)
+        self.date01 = d2d(yr=1, mo=1, dy=2, hr=0, mi=0, sc=0)
         self.data   = {}
         
     def create_file_select_box(self):

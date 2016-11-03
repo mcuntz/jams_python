@@ -150,9 +150,15 @@ def head(ifile, n=10, noblank=False, comment='', skip=0, keepnewline=False):
         -------
         Written,  MC, Nov 2014
         Modified, DS, Nov 2014
+                  MC, Nov 2016 - adapted file handling to Python 2 and 3
     """
     # Open file
-    f = ifile if isinstance(ifile,file) else open(ifile,"r")
+    import sys
+    if sys.version_info > (3,0):
+        import io
+        f = ifile if isinstance(ifile,io.TextIOWrapper) else open(ifile,"r")
+    else:
+        f = ifile if isinstance(ifile,file) else open(ifile,"r")
 
     # consume lines
     for _ in range(skip):

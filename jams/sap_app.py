@@ -54,19 +54,19 @@ def t2sap(date, data, swd=None, undef=-9999.):
         Examples
         --------
         # normal sapflux conversion
-        >>> data    = np.array([0.434, 0.433, 0.432, 0.431, 0.431, 0.432])
-        >>> date  = np.array(['18.05.2013 08:00', '18.05.2013 08:10', '18.05.2013 08:20',
-        ...                   '18.05.2013 08:30', '18.05.2013 08:40', '18.05.2013 08:50'])
-        >>> SFD     = t2sap(date, data)
+        >>> data = np.array([0.434, 0.433, 0.432, 0.431, 0.431, 0.432])
+        >>> date = ['18.05.2013 08:00', '18.05.2013 08:10', '18.05.2013 08:20',
+        ...         '18.05.2013 08:30', '18.05.2013 08:40', '18.05.2013 08:50']
+        >>> SFD = t2sap(date, data)
         >>> print(np.round(SFD,3))
         [ 0.     0.024  0.057  0.095  0.095  0.057]
 
 
         >>> # sapflux conversion including clearwater correction
-        >>> data    = np.array([0.434, 0.433, 0.432, 0.431, 0.431, 0.432])
-        >>> date  = np.array(['18.05.2013 08:00', '18.05.2013 08:10', '18.05.2013 08:20',
-        ...                   '18.05.2013 08:30', '18.05.2013 08:40', '18.05.2013 08:50'])
-        >>> SFD     = t2sap(date, data, swd=1.5)
+        >>> data = np.array([0.434, 0.433, 0.432, 0.431, 0.431, 0.432])
+        >>> date = ['18.05.2013 08:00', '18.05.2013 08:10', '18.05.2013 08:20',
+        ...         '18.05.2013 08:30', '18.05.2013 08:40', '18.05.2013 08:50']
+        >>> SFD  = t2sap(date, data, swd=1.5)
         >>> print(np.round(SFD,3))
         [ 0.     0.035  0.082  0.135  0.135  0.082]
 
@@ -96,6 +96,7 @@ def t2sap(date, data, swd=None, undef=-9999.):
         Written,  AW, Jun 2014
         Modified, MC, Jun 2014 - sap_app -> t2sap, incl. undef, first date then data
                                - squeeze 1D array, fill undef if not masked
+        Modified, MC, Nov 2016 - ported to Python 3
     """
 
     isvec = False
@@ -109,7 +110,7 @@ def t2sap(date, data, swd=None, undef=-9999.):
     data_masked = np.ma.array(data, mask=(data==undef))
 
     # julian day
-    jd        = np.array(date2dec(ascii = ascii2ascii(date)))
+    jd        = np.array(date2dec(ascii=date))
     # integer julian day 
     jd_int    = jd.astype(np.int)
     # unique days

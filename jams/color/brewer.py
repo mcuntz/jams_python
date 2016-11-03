@@ -117,7 +117,7 @@
     >>> import numpy as np
     >>> import jams
     >>> from jams.autostring import astr
-    >>> qua = jams.color.brewer_qualitative.keys()
+    >>> qua = list(jams.color.brewer_qualitative.keys())
     >>> qua.sort()
     >>> print(qua[0:7])
     ['accent3', 'accent4', 'accent5', 'accent6', 'accent7', 'accent8', 'dark23']
@@ -168,6 +168,7 @@
               MC, MAr 2014 - colour maps in extra file brewer.cmaps
               JM, Sep 2014 - color maps of Mathematica
               MC, Oct 2016 - print_brewers outputs sorted lists
+              MC, Nov 2016 - ported to Python 3, mostly dict.keys() into list(dict.keys())
 """
 from __future__ import print_function
 
@@ -210,9 +211,9 @@ def capitalise(cname):
     if cname in all_maps:
         return cname
     else:
-        lcmaps = [ c.lower() for c in all_maps.keys() ]
+        lcmaps = [ c.lower() for c in list(all_maps.keys()) ]
         if cname.lower() in lcmaps:
-            return all_maps.keys()[lcmaps.index(cname.lower())]
+            return list(all_maps.keys())[lcmaps.index(cname.lower())]
         else:
             raise ValueError('Color map name not known: '+cname)            
 
@@ -271,75 +272,75 @@ def print_brewer(names='all'):
         ['accent3', 'accent4', 'accent5', 'accent6', 'accent7', 'accent8', 'dark23', 'dark24', 'dark25', 'dark26', 'dark27', 'dark28', 'paired10', 'paired11', 'paired12', 'paired3', 'paired4', 'paired5', 'paired6', 'paired7', 'paired8', 'paired9', 'pastel13', 'pastel14', 'pastel15', 'pastel16', 'pastel17', 'pastel18', 'pastel19', 'pastel23', 'pastel24', 'pastel25', 'pastel26', 'pastel27', 'pastel28', 'set13', 'set14', 'set15', 'set16', 'set17', 'set18', 'set19', 'set23', 'set24', 'set25', 'set26', 'set27', 'set28', 'set310', 'set311', 'set312', 'set33', 'set34', 'set35', 'set36', 'set37', 'set38', 'set39']
     """
     if names.lower() == 'sequential':
-        pp = brewer_sequential.keys()
+        pp = list(brewer_sequential.keys())
         pp.sort()
         print(pp)
     elif names.lower() == 'diverging':
-        pp = brewer_diverging.keys()
+        pp = list(brewer_diverging.keys())
         pp.sort()
         print(pp)
     elif names.lower() == 'qualitative':
-        pp = brewer_qualitative.keys()
+        pp = list(brewer_qualitative.keys())
         pp.sort()
         print(pp)
     elif names.lower() == 'osu':
-        print(oregon.keys())
+        pp = list(oregon.keys())
         pp.sort()
         print(pp)
     elif names.lower() == 'ncl_large':
-        print(ncl_large.keys())
+        pp = list(ncl_large.keys())
         pp.sort()
         print(pp)
     elif names.lower() == 'ncl_small':
-        print(ncl_small.keys())
+        pp = list(ncl_small.keys())
         pp.sort()
         print(pp)
     elif names.lower() == 'ncl_meteo_swiss':
-        print(ncl_meteo_swiss.keys())
+        pp = list(ncl_meteo_swiss.keys())
         pp.sort()
         print(pp)
     elif names.lower() == 'mma' or names.lower() == 'mathematica':
-        print(mathematica.keys())
+        pp = list(mathematica.keys())
         pp.sort()
         print(pp)
     else:
         print('Sequential color maps')
-        pp = brewer_sequential_maps.keys()
+        pp = list(brewer_sequential_maps.keys())
         pp.sort()
         print(pp)
         print('')
         print('Diverging color maps')
-        pp = brewer_diverging_maps.keys()
+        pp = list(brewer_diverging_maps.keys())
         pp.sort()
         print(pp)
         print('')
         print('Qualitative color maps')
-        pp = brewer_qualitative_maps.keys()
+        pp = list(brewer_qualitative_maps.keys())
         pp.sort()
         print(pp)
         print('')
         print('Oregon State University color maps')
-        pp = oregon.keys()
+        pp = list(oregon.keys())
         pp.sort()
         print(pp)
         print('')
         print('NCL large color maps')
-        pp = ncl_large.keys()
+        pp = list(ncl_large.keys())
         pp.sort()
         print(pp)
         print('')
         print('NCL small color maps')
-        pp = ncl_small.keys()
+        pp = list(ncl_small.keys())
         pp.sort()
         print(pp)
         print('')
         print('NCL meteo swiss color maps')
-        pp = ncl_meteo_swiss.keys()
+        pp = list(ncl_meteo_swiss.keys())
         pp.sort()
         print(pp)
         print('')
         print('Mathematica color maps')
-        pp = mathematica.keys()
+        pp = list(mathematica.keys())
         pp.sort()
         print(pp)
 
@@ -374,23 +375,23 @@ def get_brewer(cname=None, names=False, rgb=False, rgb256=False, reverse=False, 
     from jams.color import rgb2rgb01, rgb012rgb
     if names:
         if names.lower() == 'sequential':
-            return brewer_sequential.keys()
+            return list(brewer_sequential.keys())
         elif names.lower() == 'diverging':
-            return brewer_diverging.keys()
+            return list(brewer_diverging.keys())
         elif names.lower() == 'qualitative':
-            return brewer_qualitative.keys()
+            return list(brewer_qualitative.keys())
         elif names.lower() == 'osu':
-            return oregon.keys()
+            return list(oregon.keys())
         elif names.lower() == 'ncl_large':
-            return ncl_large.keys()
+            return list(ncl_large.keys())
         elif names.lower() == 'ncl_small':
-            return ncl_small.keys()
+            return list(ncl_small.keys())
         elif names.lower() == 'ncl_meteo_swiss':
-            return ncl_meteo_swiss.keys()
+            return list(ncl_meteo_swiss.keys())
         elif names.lower() == 'mma' or names.lower() == 'mathematica':
-            return mathematica.keys()
+            return list(mathematica.keys())
         else:
-            cmaps = all_maps.keys()
+            cmaps = list(all_maps.keys())
             return cmaps
     else:
         cname = capitalise(cname)

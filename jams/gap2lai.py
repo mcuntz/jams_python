@@ -386,7 +386,7 @@ def leafprojection(alpha, theta, t360=False, kernel=False, min=0., max=90.,
         # kernel h estimation
         if boot:
             G = np.ma.empty(boot)
-            for i in xrange(boot):
+            for i in range(boot):
                 if not h:
                     h = kernel_regression_h(mbins[:,i], hist[:,i])
                 G[i] = G_ker(rad, mbins[:,i], hist[:,i], h)
@@ -407,7 +407,7 @@ def gap2lai_axishist(x, min, max, step, t):
     else:
         bs, xs = inbins.size, x.shape[1]
         hist, bins = np.ma.empty((bs-1, xs)), np.ma.empty((bs, xs))
-        for i in xrange(xs):
+        for i in range(xs):
             hist[:,i], bins[:,i] = np.histogram(t(x[:,i].compressed()), bins=inbins, density=True)
         mbins = bins[:-1,:]+t(step)/2.
                         
@@ -422,7 +422,7 @@ def gap2lai_bootstrap(x, boot):
     assert isinstance(boot, int), "bootstrap: boot must be of type int"
     
     x_boot = np.ma.empty((xs, boot))
-    for j in xrange(boot):
+    for j in range(boot):
         ind = np.random.randint(xs,size=xs)
         x_boot[:,j] = x[ind]
             
@@ -437,7 +437,7 @@ def gap2lai_bootstrap2(x, y, boot):
     assert isinstance(boot, int), "bootstrap: boot must be of type int"
     
     x_boot, y_boot = np.ma.empty(boot), np.ma.empty(boot)
-    for j in xrange(boot):
+    for j in range(boot):
         ind = np.random.randint(xs,size=xs)
         x_boot[j] = np.ma.mean(x[ind])
         y_boot[j] = np.ma.mean(y[ind])

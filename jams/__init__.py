@@ -512,6 +512,7 @@
               JM, Oct 2016 - added mat2nc (matlab to netcdf)
               JM, Oct 2016 - added dag (directed acyclic graphs)
               AP, Oct 2016 - added pritay
+              MC, Nov 2016 - ported to Python 3
 """
 from __future__ import print_function
 
@@ -554,7 +555,7 @@ from .esat              import esat
 from .fftngo            import fftngo
 from .fgui              import directories_from_gui, directory_from_gui, file_from_gui, files_from_gui
 from .river_network     import river_network, upscale_fdir
-#from .field_gen         import Field, Incompr_Field, Filtered_Incompr_Field
+# from .field_gen         import Field, Incompr_Field, Filtered_Incompr_Field
 from .fill_nonfinite    import fill_nonfinite
 from .find_in_path      import find_in_path
 from .fread             import fread
@@ -594,7 +595,7 @@ from .netcdf4 import netcdf4
 try:
     from .outlier       import outlier, rossner
 except:
-    print("No extra statistics in scipy, i.e. in JAMS package. Disabled functions: outlier, rossner.")
+    pass # No extra statistics in scipy and hence in JAMS. Disabled functions: outlier, rossner.
 from .pack              import pack
 from .pareto_metrics    import sn, cz, hi, ef, aed, is_dominated, point_to_front
 from .pca               import pca, check_pca
@@ -657,9 +658,9 @@ from . import logtools
 
 # Information
 __author__   = "Matthias Cuntz"
-__version__  = '4.0.0'
-__revision__ = "Revision: 2877"
-__date__     = 'Date: 04.10.2016'
+__version__  = '4.1.0'
+__revision__ = "Revision: ba3ae6b"
+__date__     = 'Date: 03.11.2016'
 
 # Main
 if __name__ == '__main__':
