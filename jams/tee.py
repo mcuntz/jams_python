@@ -17,14 +17,15 @@ def tee(*args, **kwargs):
 
         Input
         -----
-        all arguments of the print function.
+        All arguments of the print function.
 
 
         Optional Input
         --------------
-        all keyword arguments of the print function.
+        All keyword arguments of the print function.
 
         The file argument must be an object with a write(string) method.
+        If the file argument is None, then there will be no second print.
 
 
         Output
@@ -63,6 +64,11 @@ def tee(*args, **kwargs):
         >>> import os
         >>> os.remove(ff)
 
+        >>> f=None
+        >>> st = 'Output only on screen'
+        >>> tee(st, file=f)
+        Output only on screen
+
 
         License
         -------
@@ -88,11 +94,13 @@ def tee(*args, **kwargs):
         History
         -------
         Written,  MC, Oct 2014
+        Modified, Mc, Nov 2016 - file=None
     """
-    print(*args, **kwargs)
     if 'file' in kwargs:
+        if kwargs['file'] is not None:
+            print(*args, **kwargs) # file
         del kwargs['file']
-        print(*args, **kwargs)
+    print(*args, **kwargs)         # screen
 
 
 if __name__ == '__main__':
