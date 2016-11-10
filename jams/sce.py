@@ -419,7 +419,9 @@ def sce(functn, x0, bl, bu,
         Written,  Q. Duan, Sep 2004
         Modified, S. Van Hoey 2011 - ported to Python
                   MC, Oct 2013 - adapted to JAMS package and sync with JAMS Fortran version
-                  MC, Nov 2016 - can call external program
+                  MC, Nov 2016 - call external programs
+                  MC, Nov 2016 - NaN and Inf
+                  MC, Nov 2016 - mask
     '''
 
     '''
