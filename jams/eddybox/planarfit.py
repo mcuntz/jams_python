@@ -83,7 +83,7 @@ def planarfit(indirpf, rawfile, outfile, pfmat='pfitmatrix.csv',
 
     ############################################################################
     # writing uvw file with wind speed for EDDYPFit
-    file1 = open('%s/%s_uvw.csv' %(indirpf,outfile[:-4]), 'wb')
+    file1 = open('%s/%s_uvw.csv' %(indirpf,outfile[:-4]), 'w')
     output = csv.writer(file1)
     output.writerow(header[0])
     for i in xrange(np.shape(uvw_trans)[0]):

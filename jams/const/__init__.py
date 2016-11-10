@@ -15,7 +15,7 @@
         Isotope
             R13VPDB, R18VSMOW, R2VSMOW
         Computational
-            tiny
+            tiny, huge, eps
         Material
             mmol_co2, mmol_h2o, mmol_air
             density_quartz, cheat_quartz, cheat_water, cheat_air, latentheat_vaporization
@@ -56,7 +56,7 @@ from .const import Gravity, T0, P0, T25, sigma, R, Na, REarth
 from .const import mmol_co2, mmol_h2o, mmol_air
 from .const import density_quartz, cheat_quartz, cheat_water, cheat_air, latentheat_vaporization
 from .const import R13VPDB, R18VSMOW, R2VSMOW
-from .const import tiny, eps
+from .const import tiny, huge, eps
 
 # Information
 __author__   = "Matthias Cuntz"

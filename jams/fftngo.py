@@ -2,7 +2,7 @@
 import numpy             as np
 import matplotlib.pyplot as plt
 import warnings          as wa
-from   jams.const import tiny
+from   jams.const import eps
 
 def fftngo(t, y, nbins=False, plot=False):
     """
@@ -88,12 +88,13 @@ def fftngo(t, y, nbins=False, plot=False):
         History
         -------
         Written,  AP, Oct 2016
+                  MC, Nov 2016 - const.tiny -> const.eps
     """
     # input check
     assert isinstance(t, np.ndarray) & isinstance(y, np.ndarray), 'x and y must be numpy arrays'
     assert (t.ndim == 1) & (y.ndim == 1),                         'x and y must be 1d arrays'
     assert (~np.isnan(t).any()) & (~np.isnan(y).any()),           'no nan allowed in x and y'
-    assert (~(np.abs(np.diff(t,2)) > tiny)).any(),                'x must contain equal time steps'
+    assert (~(np.abs(np.diff(t,2)) > eps)).any(),                'x must contain equal time steps'
     assert isinstance(nbins, int) | (~nbins),                     'nbins must be integer'
     
     # get half size of samples

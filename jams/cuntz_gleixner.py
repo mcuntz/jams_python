@@ -5,11 +5,11 @@ import jams.const as const
 
 def cuntz_gleixner(idecdate, iGPP, iRd, iCa, iRa, igtot, sunrise, Vcyt=None,
                    date0=False,
-                   V0starch=const.tiny,
+                   V0starch=const.eps,
                    R0starch=const.R13VPDB,
                    R0cyt=const.R13VPDB,
                    daynight=None, daylength=57600,
-                   Phi=0.3, s_resid=const.tiny,
+                   Phi=0.3, s_resid=const.eps,
                    betas=None, betap=0.75,
                    epsa=4.4e-3, epsb=29.5e-3,
                    epsg=20.0e-3, epst=-4.4e-3,
@@ -22,7 +22,7 @@ def cuntz_gleixner(idecdate, iGPP, iRd, iCa, iRa, igtot, sunrise, Vcyt=None,
                    Vstarch=False, ass13=False, disc=False,
                    Rnew_starch=False, Rnew_cyt=False,
                    fullmodel=True, julian=True, nocheck=False,
-                   starch_mol2g=None, V0starchg=const.tiny):
+                   starch_mol2g=None, V0starchg=const.eps):
     """
         Calculates the Cuntz-Gleixner steady state and non-steady state models
         of 13C discrimiantion in the Calvin cycle.
@@ -32,10 +32,10 @@ def cuntz_gleixner(idecdate, iGPP, iRd, iCa, iRa, igtot, sunrise, Vcyt=None,
         ----------
         def cuntz_gleixner(idecdate, iGPP, iRd, iCa, iRa, igtot, sunrise, Vcyt=None,
                            date0=False,
-                           V0starch=const.tiny, R0starch=const.R13VPDB,
+                           V0starch=const.eps, R0starch=const.R13VPDB,
                            R0cyt=const.R13VPDB,
                            daynight=None, daylength=57600,
-                           Phi=0.3, s_resid=const.tiny,
+                           Phi=0.3, s_resid=const.eps,
                            betas=None, betap=0.75,
                            epsa=4.4e-3, epsb=29.5e-3,
                            epsg=20.0e-3, epst=-4.4e-3,
@@ -48,7 +48,7 @@ def cuntz_gleixner(idecdate, iGPP, iRd, iCa, iRa, igtot, sunrise, Vcyt=None,
                            Vstarch=False, ass13=False, disc=False,
                            Rnew_starch=False, Rnew_cyt=False,
                            fullmodel=True, julian=True, nocheck=False,
-                           starch_mol2g=None, V0starchg=const.tiny):
+                           starch_mol2g=None, V0starchg=const.eps):
 
 
         Input
@@ -217,8 +217,8 @@ def cuntz_gleixner(idecdate, iGPP, iRd, iCa, iRa, igtot, sunrise, Vcyt=None,
         ...                            epsg=epsg, epst=epst, epss=epss, epsp=epsp,
         ...                            steady=True, Vstarch=True, julian=False)
         >>> from autostring import astr
-        >>> print(astr(Vstarch[0:6],6,pp=True))
-        [' 40532.561477' ' 70158.596466' ' 98220.744290' '124787.716926' '150065.873423' '174445.405117']
+        >>> print(astr(Vstarch[0:6],5,pp=True))
+        [' 40532.56148' ' 70158.59647' ' 98220.74429' '124787.71693' '150065.87342' '174445.40512']
         >>> [Rass,Rm,Rchl,Rcyt,Rstarch,Rpyr,Rbio,Rphloem,Vstarch,ass13,disc,Rnew_starch,Rnew_cyt,Vstarchg] = cuntz_gleixner(
         ...                adecdate[1:], gpp, Rd, CO2air, Ra, gtot, ndecdate,
         ...                date0=adecdate[0], V0starch=V0starch, R0starch=R0starch, daynight=daynight,
@@ -227,32 +227,32 @@ def cuntz_gleixner(idecdate, iGPP, iRd, iCa, iRa, igtot, sunrise, Vcyt=None,
         ...                epsg=epsg, epst=epst, epss=epss, epsp=epsp,
         ...                steady=True, fullmodel=True, julian=False,
         ...                starch_mol2g=1., V0starchg=V0starch)
-        >>> print(astr(Rass[0:6],6,pp=True))
-        ['0.010949' '0.010921' '0.010869' '0.010833' '0.010831' '0.010853']
-        >>> print(astr(Rm[0:6],6,pp=True))
-        ['0.011066' '0.011232' '0.011190' '0.011160' '0.011159' '0.011179']
-        >>> print(astr(Rchl[0:6],6,pp=True))
-        ['0.010949' '0.010916' '0.010870' '0.010838' '0.010839' '0.010861']
-        >>> print(astr(Rcyt[0:6],6,pp=True))
-        ['0.010949' '0.010916' '0.010870' '0.010838' '0.010839' '0.010861']
-        >>> print(astr(Rstarch[0:6],6,pp=True))
-        ['0.010949' '0.010954' '0.010942' '0.010929' '0.010921' '0.010919']
-        >>> print(astr(Rpyr[0:6],6,pp=True))
-        ['0.010949' '0.011026' '0.011000' '0.010967' '0.010966' '0.010987']
-        >>> print(astr(Rbio[0:6],6,pp=True))
-        ['0.010949' '0.010916' '0.010890' '0.010857' '0.010856' '0.010877']
-        >>> print(astr(Rphloem[0:6],6,pp=True))
-        ['0.010949' '0.010893' '0.010859' '0.010824' '0.010820' '0.010842']
-        >>> print(astr(Vstarch[0:6],6,pp=True))
-        [' 40532.561477' ' 70158.596466' ' 98220.744290' '124787.716926' '150065.873423' '174445.405117']
-        >>> print(astr(ass13[0:6],6,pp=True))
-        ['-0.005605' ' 0.233039' ' 0.214183' ' 0.195800' ' 0.181365' ' 0.176307']
-        >>> print(astr(Rnew_starch[0:6],6,pp=True))
-        ['0.010949' '0.010960' '0.010913' '0.010882' '0.010882' '0.010904']
-        >>> print(astr(Rnew_cyt[0:6],6,pp=True))
-        ['0.010949' '0.010916' '0.010870' '0.010838' '0.010839' '0.010861']
-        >>> print(astr(Vstarchg[0:6],6,pp=True))
-        [' 40532.561477' ' 70158.596466' ' 98220.744290' '124787.716926' '150065.873423' '174445.405117']
+        >>> print(astr(Rass[0:6],5,pp=True))
+        ['0.01095' '0.01092' '0.01087' '0.01083' '0.01083' '0.01085']
+        >>> print(astr(Rm[0:6],5,pp=True))
+        ['0.01107' '0.01123' '0.01119' '0.01116' '0.01116' '0.01118']
+        >>> print(astr(Rchl[0:6],5,pp=True))
+        ['0.01095' '0.01092' '0.01087' '0.01084' '0.01084' '0.01086']
+        >>> print(astr(Rcyt[0:6],5,pp=True))
+        ['0.01095' '0.01092' '0.01087' '0.01084' '0.01084' '0.01086']
+        >>> print(astr(Rstarch[0:6],5,pp=True))
+        ['0.01095' '0.01095' '0.01094' '0.01093' '0.01092' '0.01092']
+        >>> print(astr(Rpyr[0:6],5,pp=True))
+        ['0.01095' '0.01105' '0.01100' '0.01097' '0.01097' '0.01099']
+        >>> print(astr(Rbio[0:6],5,pp=True))
+        ['0.01095' '0.01094' '0.01089' '0.01086' '0.01086' '0.01088']
+        >>> print(astr(Rphloem[0:6],5,pp=True))
+        ['0.01095' '0.01091' '0.01086' '0.01082' '0.01082' '0.01084']
+        >>> print(astr(Vstarch[0:6],5,pp=True))
+        [' 40532.56148' ' 70158.59647' ' 98220.74429' '124787.71693' '150065.87342' '174445.40512']
+        >>> print(astr(ass13[0:6],5,pp=True))
+        ['-0.00560' ' 0.23301' ' 0.21418' ' 0.19580' ' 0.18136' ' 0.17631']
+        >>> print(astr(Rnew_starch[0:6],5,pp=True))
+        ['0.01095' '0.01096' '0.01091' '0.01088' '0.01088' '0.01090']
+        >>> print(astr(Rnew_cyt[0:6],5,pp=True))
+        ['0.01095' '0.01092' '0.01087' '0.01084' '0.01084' '0.01086']
+        >>> print(astr(Vstarchg[0:6],5,pp=True))
+        [' 40532.56148' ' 70158.59647' ' 98220.74429' '124787.71693' '150065.87342' '174445.40512']
 
         # non-steady state
         >>> R0cyt = 0.010911449304
@@ -268,30 +268,30 @@ def cuntz_gleixner(idecdate, iGPP, iRd, iCa, iRa, igtot, sunrise, Vcyt=None,
         ...                betas=betas, betap=betap, epsa=epsa, epsb=epsb,
         ...                epsg=epsg, epst=epst, epss=epss, epsp=epsp,
         ...                steady=False, fullmodel=True, julian=False)
-        >>> print(astr(Vstarch[0:6],6,pp=True))
-        [' 40532.561477' ' 70158.596466' ' 98220.744290' '124787.716926' '150065.873423' '174445.405117']
-        >>> print(astr(ass13[0:6],6,pp=True))
-        ['-0.005588' ' 0.233039' ' 0.214133' ' 0.195709' ' 0.181293' ' 0.176292']
-        >>> print(astr(Rass[0:6],6,pp=True))
-        ['0.010917' '0.010921' '0.010866' '0.010828' '0.010826' '0.010852']
-        >>> print(astr(Rm[0:6],6,pp=True))
-        ['0.011066' '0.011232' '0.011192' '0.011162' '0.011161' '0.011179']
-        >>> print(astr(Rchl[0:6],6,pp=True))
-        ['0.010949' '0.010916' '0.010871' '0.010841' '0.010841' '0.010861']
-        >>> print(astr(Rstarch[0:6],6,pp=True))
-        ['0.010949' '0.010954' '0.010943' '0.010930' '0.010922' '0.010920']
-        >>> print(astr(Rcyt[0:6],6,pp=True))
-        ['0.010917' '0.010916' '0.010902' '0.010883' '0.010871' '0.010868']
-        >>> print(astr(Rpyr[0:6],6,pp=True))
-        ['0.010917' '0.011027' '0.011033' '0.011012' '0.010998' '0.010994']
-        >>> print(astr(Rbio[0:6],6,pp=True))
-        ['0.010917' '0.010916' '0.010923' '0.010902' '0.010888' '0.010885']
-        >>> print(astr(Rnew_cyt[0:6],6,pp=True))
-        ['0.010949' '0.010916' '0.010871' '0.010841' '0.010841' '0.010861']
-        >>> print(astr(Rnew_starch[0:6],6,pp=True))
-        ['0.010949' '0.010960' '0.010915' '0.010884' '0.010884' '0.010904']
-        >>> print(astr(Rphloem[0:6],6,pp=True))
-        ['0.010917' '0.010893' '0.010891' '0.010869' '0.010852' '0.010850']
+        >>> print(astr(Vstarch[0:6],5,pp=True))
+        [' 40532.56148' ' 70158.59647' ' 98220.74429' '124787.71693' '150065.87342' '174445.40512']
+        >>> print(astr(ass13[0:6],5,pp=True))
+        ['-0.00559' ' 0.23302' ' 0.21413' ' 0.19571' ' 0.18129' ' 0.17629']
+        >>> print(astr(Rass[0:6],5,pp=True))
+        ['0.01092' '0.01092' '0.01087' '0.01083' '0.01083' '0.01085']
+        >>> print(astr(Rm[0:6],5,pp=True))
+        ['0.01107' '0.01123' '0.01119' '0.01116' '0.01116' '0.01118']
+        >>> print(astr(Rchl[0:6],5,pp=True))
+        ['0.01095' '0.01092' '0.01087' '0.01084' '0.01084' '0.01086']
+        >>> print(astr(Rstarch[0:6],5,pp=True))
+        ['0.01095' '0.01095' '0.01094' '0.01093' '0.01092' '0.01092']
+        >>> print(astr(Rcyt[0:6],5,pp=True))
+        ['0.01092' '0.01092' '0.01090' '0.01088' '0.01087' '0.01087']
+        >>> print(astr(Rpyr[0:6],5,pp=True))
+        ['0.01092' '0.01105' '0.01103' '0.01101' '0.01100' '0.01099']
+        >>> print(astr(Rbio[0:6],5,pp=True))
+        ['0.01092' '0.01094' '0.01092' '0.01090' '0.01089' '0.01088']
+        >>> print(astr(Rnew_cyt[0:6],5,pp=True))
+        ['0.01095' '0.01092' '0.01087' '0.01084' '0.01084' '0.01086']
+        >>> print(astr(Rnew_starch[0:6],5,pp=True))
+        ['0.01095' '0.01096' '0.01091' '0.01088' '0.01088' '0.01090']
+        >>> print(astr(Rphloem[0:6],5,pp=True))
+        ['0.01092' '0.01091' '0.01089' '0.01087' '0.01085' '0.01085']
         >>> from dec2date import dec2date
         >>> from date2dec import date2dec
         >>> aa = dec2date(adecdate, ascii=True, calendar='decimal')
@@ -308,8 +308,8 @@ def cuntz_gleixner(idecdate, iGPP, iRd, iCa, iRa, igtot, sunrise, Vcyt=None,
         ...                epsg=epsg, epst=epst, epss=epss, epsp=epsp,
         ...                steady=False, fullmodel=True, julian=True)
         >>> # There are slight differences due to precision of dates
-        >>> print(astr(Rphloem[0:6],6,pp=True))
-        ['0.010917' '0.010893' '0.010891' '0.010869' '0.010852' '0.010850']
+        >>> print(astr(Rphloem[0:6],5,pp=True))
+        ['0.01092' '0.01091' '0.01089' '0.01087' '0.01085' '0.01085']
         >>> [Rass,Rm,Rchl,Rcyt,Rstarch,Rpyr,Rbio,Rphloem,Vstarch,ass13,disc,Rnew_starch,Rnew_cyt] = cuntz_gleixner(
         ...                jadecdate[1:], gpp, Rd, CO2air, Ra, gtot, jndecdate, Vcyt=Vcyt,
         ...                date0=jadecdate[0], V0starch=V0starch, R0starch=R0starch, R0cyt=R0cyt,
@@ -318,8 +318,8 @@ def cuntz_gleixner(idecdate, iGPP, iRd, iCa, iRa, igtot, sunrise, Vcyt=None,
         ...                betas=betas, betap=2./3.-0.1, epsa=epsa, epsb=epsb,
         ...                epsg=epsg, epst=epst, epss=epss, epsp=epsp,
         ...                steady=False, fullmodel=True, julian=True, nocheck=True)
-        >>> print(astr(Rphloem[0:6],6,pp=True))
-        ['0.010917' '0.009561' '0.009323' '0.009055' '0.008889' '0.009088']
+        >>> print(astr(Rphloem[0:6],5,pp=True))
+        ['0.01092' '0.00956' '0.00932' '0.00906' '0.00889' '0.00909']
 
 
         License
@@ -341,6 +341,7 @@ def cuntz_gleixner(idecdate, iGPP, iRd, iCa, iRa, igtot, sunrise, Vcyt=None,
                   MC, May 2012 - Vcyt, daynight and betas=None default
                   MC, Feb 2013 - starch_mol2g, V0starchg
                   MC, Feb 2013 - ported to Python 3
+                  MC, Nov 2016 - const.tiny -> const.eps
     """
     #
     # Checks
@@ -415,7 +416,7 @@ def cuntz_gleixner(idecdate, iGPP, iRd, iCa, iRa, igtot, sunrise, Vcyt=None,
             raise ValueError('betap must be: 2/3 < betap < 4/5')
     # betas the factor of leaf respiration that is transferred to biosynthesis (default: 3*gpp/max(gpp))
     # betas*(1-betap) <= 1: if betap=2/3 -> betas<3: if betap=5/6 -> betas < 6
-    if not np.any(betas is not None): betas = np.maximum((1./(1.-ibetap) * iGPP/np.amax(iGPP)) - const.tiny, 0.)
+    if not np.any(betas is not None): betas = np.maximum((1./(1.-ibetap) * iGPP/np.amax(iGPP)) - const.eps, 0.)
     isarr = np.ndim(betas)
     if (isarr==0):
         ibetas = np.ones(nd) * betas
@@ -500,7 +501,7 @@ def cuntz_gleixner(idecdate, iGPP, iRd, iCa, iRa, igtot, sunrise, Vcyt=None,
     if not nocheck:
         if np.any(ibetar <= 0.):
             raise ValueError('betar = 1-betas*(1-betap) <= 0.')
-    iepsr  = np.where(ibetar > const.tiny, epss * (1.-ibetar)/ibetar, 1.) # limit to eps=1000 permil
+    iepsr  = np.where(ibetar > const.eps, epss * (1.-ibetar)/ibetar, 1.) # limit to eps=1000 permil
     iepsg1 = epsg*0.5*iPhi + ibigT*(1.-0.5*iPhi)*epst
     iepsp1 = (epss*ibetas + iepsr*ibetar) / (ibetas + ibetar)
     #

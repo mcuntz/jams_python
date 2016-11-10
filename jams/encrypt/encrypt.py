@@ -63,7 +63,7 @@ def set_up_cipher():
             f.close()
 
         # Read encrypted password
-        f = open(pass_file, 'rb')
+        f = open(pass_file, 'r')
         cpass = f.readline()[:-1]
         f.close()
         password = wordDecrypt([ int(c) for c in cpass.split()])
@@ -103,7 +103,7 @@ def set_up_cipher():
 
     if os.path.exists(file_cipher):
         os.remove(file_cipher)
-    f = open(file_cipher, 'wb')
+    f = open(file_cipher, 'w')
     f.write(cipher)
     f.close()
 
@@ -147,7 +147,7 @@ def wordEncrypt(word):
             f.close()
 
         # Read encrypted password
-        f = open(pass_file, 'rb')
+        f = open(pass_file, 'r')
         cpass = f.readline()[:-1]
         f.close()
         password = wordDecrypt([ int(c) for c in cpass.split()])
@@ -229,7 +229,7 @@ def wordDecrypt(encryptedList):
             f.close()
 
         # Read encrypted password
-        f = open(pass_file, 'rb')
+        f = open(pass_file, 'r')
         cpass = f.readline()[:-1]
         f.close()
         password = wordDecrypt([ int(c) for c in cpass.split()])
@@ -325,7 +325,7 @@ def sendfail(subject, message='', sender='jams.encrypt.sendfail'):
         Written,  MC, Dec 2014
         Modified, MC, Oct 2015 - transfer to ufz library; message body
     """
-    f = open(file_pass, 'rb')
+    f = open(file_pass, 'r')
     email = f.readline()[:-1]
     cpass = f.readline()[:-1]
     f.close()

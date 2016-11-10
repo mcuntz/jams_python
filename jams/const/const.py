@@ -17,7 +17,7 @@ import numpy as np
         Isotope
             R13VPDB, R18VSMOW, R2VSMOW
         Computational
-            tiny
+            tiny, huge, eps
         Material
             mmol_co2, mmol_h2o, mmol_air
             density_quartz, cheat_quartz, cheat_water, cheat_air, latentheat_vaporization
@@ -58,13 +58,13 @@ import numpy as np
 
     >>> print(astr(density_quartz,3,pp=True))
     2.650
-    
+
     >>> print(astr(cheat_quartz,3,pp=True))
     800.000
-    
+
     >>> print(astr(cheat_water,3,pp=True))
     4180.000
-    
+
     >>> print(astr(cheat_air,3,pp=True))
     1010.000
 
@@ -103,6 +103,7 @@ import numpy as np
                            - rename heat capacities, molar masses, density of quartz
                            - moved dielH2O to own routine/file
                            - R13VPDB, R18VSMOW, R2VSMOW
+              MC, Nov 2016 - tiny->np.finfo(np.float).tiny, huge
 """
 
 __all__ = ['Pi', 'Pi2', 'Pi3', 'TwoPi', 'Sqrt2',
@@ -110,7 +111,7 @@ __all__ = ['Pi', 'Pi2', 'Pi3', 'TwoPi', 'Sqrt2',
            'mmol_co2', 'mmol_h2o', 'mmol_air',
            'density_quartz', 'cheat_quartz', 'cheat_water', 'cheat_air', 'latentheat_vaporization',
            'R13VPDB', 'R18VSMOW', 'R2VSMOW',
-           'tiny', 'eps']
+           'tiny', 'huge', 'eps']
 
 # Mathematical
 Pi    = 3.141592653589793238462643383279502884197    # Pi
@@ -146,8 +147,10 @@ R18VSMOW = 2005.2e-6     # 18O isotope ratio of VSMOW
 R2VSMOW  = 155.76e-6     # 2H  isotope ratio of VSMOW
 
 # Computational
-tiny = 1e-6
 eps  = np.finfo(np.float).eps
+huge = np.finfo(np.float).max
+tiny = np.finfo(np.float).tiny
+
 
 if __name__ == '__main__':
     import doctest

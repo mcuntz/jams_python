@@ -34,7 +34,7 @@
         f.close()
 
     # Read encrypted password
-    f = open(file_pass, 'rb')
+    f = open(file_pass, 'r')
     cpass = f.readline()[:-1]
     f.close()
     password = wordDecrypt([ int(c) for c in cpass.split()])

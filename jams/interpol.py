@@ -84,6 +84,7 @@ def interpol(xout, xin, yin):
         Written,  MC, Jun 2012
         Modified, MC, Feb 2013 - ported to Python 3
                   MC, Apr 2014 - assert
+                  MC, Nov 2016 - const.tiny -> const.eps
     """
     #
     # If yin 1D-array then call immediately np.interp without check
@@ -100,14 +101,13 @@ def interpol(xout, xin, yin):
     assert np.ndim(xout) <= 1, "x output values not scalar or 1D array"
     #
     # Subscripts
-    #tiny = np.finfo(np.float).eps
-    tiny = const.tiny
+    eps  = const.eps
     s    = np.minimum(np.maximum(np.searchsorted(xin, xout)-1, 0), xin.size-2) # Subscript intervals
     # Distances
     ums1 = xout-xin[s]                                                         # distance from point before
     ums2 = xin[s+1]-xin[s]
     ums  = division(ums1, ums2, 0.)
-    ums  = np.where((np.abs(ums1) < tiny) | (np.abs(ums2) < tiny), 0., ums)    # for numerical stability
+    ums  = np.where((np.abs(ums1) < eps) | (np.abs(ums2) < eps), 0., ums)    # for numerical stability
     # Blow to output shape
     sout = yin.shape[1:][::-1] + (1,)
     ums  = np.transpose(np.tile(ums,sout))

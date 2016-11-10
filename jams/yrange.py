@@ -2,7 +2,7 @@
 from __future__ import print_function
 import numpy as np
 from jams.around import around
-import jams.const as const
+from jams.const  import eps
 
 def yrange(*args, **kwargs):
     """
@@ -93,10 +93,8 @@ def yrange(*args, **kwargs):
                   MC, Nov 2013 - accept more than 1 array as input
                   MC, Nov 2013 - masked arrays
                   MC, Apr 2014 - assert
+                  MC, Nov 2016 - const.tiny -> const.eps
     """
-    #
-    #eps = tiny
-    eps = const.tiny
     # Check input
     assert len(args) > 0, 'no input argument given.'
     counter = 0

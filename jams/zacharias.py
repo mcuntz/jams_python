@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 from __future__ import print_function
 import numpy as np
-import jams.const as const
+from jams.const import eps
 
 def zacharias(h, clay, sand, db, params=None, thetar=False, thetas=False, lnalpha=False, n=False):
     """
@@ -93,18 +93,17 @@ def zacharias(h, clay, sand, db, params=None, thetar=False, thetas=False, lnalph
         -------
         Written,  MC, Jun 2012
         Modified, MC, Feb 2013 - ported to Python 3
+                  MC, Nov 2016 - const.tiny -> const.eps
     """
     #
     # Check input
-    #tiny = np.finfo(np.float).eps
-    tiny = const.tiny
-    ih = np.where(h==0., tiny, h)
+    ih = np.where(h==0., eps, h)
     if np.any(ih < 0.) | np.any(ih > 1e6):
         raise ValueError('h must be >=0 and <= 1e6 (=pf6)')
-    iclay = np.where(clay==0., tiny, clay)
+    iclay = np.where(clay==0., eps, clay)
     if np.any(iclay < 0.) | np.any(iclay > 100.):
         raise ValueError('clay must be >=0 and <= 100.')
-    isand = np.where(sand==0., tiny, sand)
+    isand = np.where(sand==0., eps, sand)
     if np.any(isand < 0.) | np.any(isand > 100.):
         raise ValueError('sand must be >=0 and <= 100.')
     idb = np.array(db)
@@ -192,12 +191,12 @@ def zacharias(h, clay, sand, db, params=None, thetar=False, thetas=False, lnalph
     inn     = par10 + par11*np.exp(par12*np.log(iclay))            + par13*np.exp(par14*np.log(isand))
     imm     = 1. - 1./np.where(inn != 0., inn, 1e-3)
     # van Genuchten sign
-    # limit exp to 600 and log to tiny so that no over- and underflows occur
+    # limit exp to 600 and log to eps so that no over- and underflows occur
     expmax  = 600.
-    lnah    = np.log(np.maximum(np.exp(ilna)*ih, tiny))
+    lnah    = np.log(np.maximum(np.exp(ilna)*ih, eps))
     ahn     = np.exp(np.minimum(inn*lnah, expmax))
-    denom   = np.maximum(np.exp(np.minimum(imm*np.log(1.+ahn), expmax)), tiny)
-    itheta  = np.where(ih <= tiny, ithetas, ithetar + (ithetas-ithetar)/denom)
+    denom   = np.maximum(np.exp(np.minimum(imm*np.log(1.+ahn), expmax)), eps)
+    itheta  = np.where(ih <= eps, ithetas, ithetar + (ithetas-ithetar)/denom)
     # Output
     itheta = np.reshape(itheta, ns)
     if nn==1: itheta = np.float(itheta)
@@ -298,8 +297,6 @@ def zacharias_check(params, sand=None, clay=None):
     """
     #
     # Check input
-    #tiny = np.finfo(np.float).eps
-    tiny = const.tiny
     if params is not None:
         if np.size(params) != 15: raise ValueError('size(params) must be 15.')
     # Check ranges

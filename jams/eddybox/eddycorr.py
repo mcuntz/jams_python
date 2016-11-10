@@ -149,7 +149,7 @@ def eddycorr(indir, sltdir, cfile, hfile, meteofile, outfile, novalue=-9999,
 
     ################################################################################
     # writing output file
-    output = csv.writer(open('%s/%s' %(indir,outfile), 'wb'))
+    output = csv.writer(open('%s/%s' %(indir,outfile), 'w'))
 
     for i in xrange(np.shape(cout)[0]):
         output.writerow([np.abs(cout[i][0].astype(int)), np.abs(hout[i][0].astype(int))])

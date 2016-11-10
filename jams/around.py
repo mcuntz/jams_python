@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 from __future__ import print_function
 import numpy as np
-import jams.const as const
+from jams.const import eps
 
 def around(num, powten, ceil=False, floor=False):
     """
@@ -91,6 +91,7 @@ def around(num, powten, ceil=False, floor=False):
         Written,  MC, Jun 2011
         Modified, MC, Feb 2013 - ported to Python 3
                   MC, Apr 2014 - assert
+                  MC, Nov 2016 - const.tiny -> const.eps
     """
     #
     # Check input
@@ -107,9 +108,6 @@ def around(num, powten, ceil=False, floor=False):
     # Does not work, too imprecise: out = num * np.exp(-ipowten*np.log(10.))
     out = num * 10.**(-ipowten)
     # Round/ceil/floor
-    #eps = np.MachAr().eps
-    #eps = np.finfo(np.float).eps
-    eps = const.tiny
     if (ceil):
         out = np.ceil(out-10.*eps)
     elif (floor):

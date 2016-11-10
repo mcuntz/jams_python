@@ -697,7 +697,7 @@ def write_data_norecord(infiles, sdate, dat, flags, iidate, hdate, hdat, hflags,
 
     # Write individual files
     for cff, ff in enumerate(infiles):
-        f = open(ff, 'wb')
+        f = open(ff, 'w')
         # header
         hstr = hdate
         ihead = iihead[cff]
@@ -822,7 +822,7 @@ def write_data_norecord_dmp(infiles, sdate, dat, flags, iidate, hdate, hdat, hfl
 
     # Write individual files
     for cff, ff in enumerate(infiles):
-        f = open(ff, 'wb')
+        f = open(ff, 'w')
         # header
         hstr = 'timestamp,sensorname,value,quality_flag,quality_cause,quality_comment'
         print(hstr, file=f)
@@ -956,9 +956,9 @@ def write_data_norecord_dmp_size(infiles, sdate, dat, flags, iidate, hdate, hdat
         while start_index < iidate[0][-1]:
             
             if start_index == 0:
-                f = open(ff, 'wb')
+                f = open(ff, 'w')
             else:
-                f = open(ff[0:-12]+'_'+str(k)+ff[-12:], 'wb')
+                f = open(ff[0:-12]+'_'+str(k)+ff[-12:], 'w')
 
             k += 1
             # header
@@ -1069,7 +1069,7 @@ def write_data_norecord_one_file(infile, sdate, dat, flags, hdate, hdat, hflags)
     isdate = jams.ascii2eng(sdate, full=True)
 
     # Write individual files
-    f = open(infile, 'wb')
+    f = open(infile, 'w')
     # header
     hstr = hdate
     for i in range(ncol):
@@ -1177,7 +1177,7 @@ def write_data_record(infiles, sdate, record, dat, flags, iidate, hdate, hrecord
 
     # Write individual files
     for cff, ff in enumerate(infiles):
-        f = open(ff, 'wb')
+        f = open(ff, 'w')
         # header
         hstr = hdate+','+hrecord
         ihead = iihead[cff]
@@ -1279,7 +1279,7 @@ def write_data_record_one_file(infile, sdate, record, dat, flags, hdate, hrecord
     isdate = jams.ascii2eng(sdate, full=True)
 
     # Write individual files
-    f = open(infile, 'wb')
+    f = open(infile, 'w')
     # header
     hstr = hdate+','+hrecord
     for i in range(ncol):
