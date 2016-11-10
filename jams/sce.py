@@ -1,6 +1,10 @@
 #!/usr/bin/env python
 from __future__ import print_function
 import numpy as np
+import subprocess
+from jams.const import huge
+# ToDo: restart
+# ToDo: tmp/population files
 
 def SampleInputMatrix(nrows, npars, bl, bu, distname='randomUniform'):
     '''
@@ -68,34 +72,42 @@ def SampleInputMatrix(nrows, npars, bl, bu, distname='randomUniform'):
     x = np.zeros((nrows,npars))
     bound = bu-bl
     for i in range(nrows):
-##        x[i,:]= bl + DistSelector([0.0,1.0,npars],distname='randomUniform')*bound  #only used in full Vhoeys-framework
+        # x[i,:]= bl + DistSelector([0.0,1.0,npars],distname='randomUniform')*bound # only used in full Vhoeys-framework
         x[i,:]= bl + np.random.rand(1,npars)*bound
     return x
 
 
-def cce(functn, s, sf, bl, bu, icall, maxn, alpha, beta, maxit, printit):
+def cce(functn, s, sf, bl, bu, mask, icall, maxn, alpha, beta, maxit, printit,
+        parameterfile, parameterwriter, objectivefile, objectivereader, shell, debug):
     '''
         Generate a new point in a simplex
 
 
         Definition
         ----------
-        def cce(functn, s, sf, bl, bu, icall, maxn, alpha, beta, maxit, printit):
+        def cce(functn, s, sf, bl, bu, mask, icall, maxn, alpha, beta, maxit, printit):
 
 
         Input
         -----
-        functn            function to minimise
+        functn            function to minimise (python function or string for external executable)
         s                 2D-array, the sorted simplex in order of increasing function values
         sf                1D-array, function values in increasing order
         bl                (npars) lower bounds of parameters
         bu                (npars) upper bounds of parameters
+        mask              (npars) mask to include (1) or exclude (0) parameter from optimisation
         icall             counter of function calls
         maxn              maximum number of function evaluations allowed during optimization
         alpha             parameter for reflection  of points in complex
         beta              parameter for contraction of points in complex
         maxit             if True: maximise instead of minimise functn
         printit           if ==1: print each function evaluation
+        parameterfile     Parameter file for executable; must be given if functn is name of executable
+        parameterwriter   Python function for writing parameter file if functn is name of executable
+        objectivefile     File with objective value from executable; must be given if functn is name of executable
+        objectivereader   Python function for reading objective value if functn is name of executable
+        shell             If True, the specified command will be executed through the shell.
+        debug             If True, model output is displayed for executable.
 
 
         Optional Input
@@ -170,6 +182,7 @@ def cce(functn, s, sf, bl, bu, icall, maxn, alpha, beta, maxit, printit):
 
     # Attempt a reflection point
     snew = ce + alpha*(ce-sw)
+    snew = np.where(mask, snew, sb) # sb should have initial params at mask==False
 
     # Check if is outside the bounds:
     ibound = 0
@@ -182,32 +195,33 @@ def cce(functn, s, sf, bl, bu, icall, maxn, alpha, beta, maxit, printit):
     idx = (s1<0).nonzero()
     if idx[0].size != 0: ibound = 2
 
-    if ibound >= 1: snew = SampleInputMatrix(1,nopt,bl,bu,distname='randomUniform')[0]  #checken!!
+    if ibound >= 1: 
+        snew = SampleInputMatrix(1,nopt,bl,bu,distname='randomUniform')[0]  #checken!!
+        snew = np.where(mask, snew, sb)
 
-    if maxit:
-        fnew = -functn(snew)
-    else:
-        fnew = functn(snew)
+    fuc = call_function(functn, snew, bl, bu, mask,
+                        parameterfile, parameterwriter, objectivefile, objectivereader, shell, debug)
+    fnew = -fuc if maxit else fuc
     if printit==1: print('  f, X: ', fnew, snew)
     icall += 1
 
     # Reflection failed; now attempt a contraction point:
     if fnew > fw:
         snew = sw + beta*(ce-sw)
-        if maxit:
-            fnew = -functn(snew)
-        else:
-            fnew = functn(snew)
+        snew = np.where(mask, snew, sb)
+        fuc = call_function(functn, snew, bl, bu, mask,
+                            parameterfile, parameterwriter, objectivefile, objectivereader, shell, debug)
+        fnew = -fuc if maxit else fuc
         if printit==1: print('  f, X: ', fnew, snew)
         icall += 1
 
     # Both reflection and contraction have failed, attempt a random point;
         if fnew > fw:
             snew = SampleInputMatrix(1,nopt,bl,bu,distname='randomUniform')[0]  #checken!!
-            if maxit:
-                fnew = -functn(snew)
-            else:
-                fnew = functn(snew)
+            snew = np.where(mask, snew, sb)
+            fuc = call_function(functn, snew, bl, bu, mask,
+                                parameterfile, parameterwriter, objectivefile, objectivereader, shell, debug)
+            fnew = -fuc if maxit else fuc
             if printit==1: print('  f, X: ', fnew, snew)
             icall += 1
 
@@ -215,12 +229,63 @@ def cce(functn, s, sf, bl, bu, icall, maxn, alpha, beta, maxit, printit):
     return snew, fnew, icall
 
 
+def call_function(functn, params, bl, bu, mask,
+                  parameterfile, parameterwriter, objectivefile, objectivereader, shell, debug):
+    '''
+        Call python function or external executable
+
+
+        Definition
+        ----------
+        def call_function(functn, params, bl, bu, mask,
+                          parameterfile, parameterwriter, objectivefile, objectivereader, shell, debug):
+
+
+        Input
+        -----
+        functn            function to minimise (python function or string for external executable)
+        params            (npars) parameter set
+        bl                (npars) lower bounds of parameters
+        bu                (npars) upper bounds of parameters
+        mask              (npars) mask to include (1) or exclude (0) parameter from optimisation
+        parameterfile     Parameter file for executable; must be given if functn is name of executable
+        parameterwriter   Python function for writing parameter file if functn is name of executable
+        objectivefile     File with objective value from executable; must be given if functn is name of executable
+        objectivereader   Python function for reading objective value if functn is name of executable
+        shell             If True, the specified command will be executed through the shell.
+        debug             If True, model output is displayed for executable.
+
+        Output
+        ------
+        Function value
+
+
+        History
+        -------
+        Written,  MC, Nov 2016
+    '''
+    if isinstance(functn, (str,list)):
+        parameterwriter(parameterfile, params, bl, bu, mask)
+        if debug:
+            err = subprocess.call(functn, shell=shell)
+        else:
+            err = subprocess.check_output(functn, shell=shell)
+        obj = objectivereader(objectivefile)
+        return obj
+    else:
+        return functn(params)
+    
+
 def sce(functn, x0, bl, bu,
-          maxn=1000, kstop=10, pcento=0.0001,
-          ngs=2, npg=None, nps=None, nspl=None, mings=None,
-          peps=0.001, seed=0, iniflg=True,
-          alpha=0.8, beta=0.45, maxit=False, printit=2,
-          outf=False, outhist=False, outcall=False):
+        mask=None,
+        maxn=1000, kstop=10, pcento=0.0001,
+        ngs=2, npg=None, nps=None, nspl=None, mings=None,
+        peps=0.001, seed=0, iniflg=True,
+        alpha=0.8, beta=0.45, maxit=False, printit=2,
+        outf=False, outhist=False, outcall=False,
+        parameterfile=None, parameterwriter=None,
+        objectivefile=None, objectivereader=None,
+        shell=False, debug=False):
     '''
         Shuffled-Complex-Evolution algorithm for function minimalisation
 
@@ -228,16 +293,20 @@ def sce(functn, x0, bl, bu,
         Definition
         ----------
         def sce(functn, x0, bl, bu,
-                  maxn=1000, kstop=10, pcento=0.0001,
-                  ngs=2, npg=None, nps=None, nspl=None, mings=None,
-                  peps=0.001, seed=0, iniflg=True,
-                  alpha=0.8, beta=0.45, maxit=False, printit=0,
-                  outf=False, outhist=False, outcall=False):
+                mask=None,
+                maxn=1000, kstop=10, pcento=0.0001,
+                ngs=2, npg=None, nps=None, nspl=None, mings=None,
+                peps=0.001, seed=0, iniflg=True,
+                alpha=0.8, beta=0.45, maxit=False, printit=0,
+                outf=False, outhist=False, outcall=False,
+                parameterfile=None, parameterwriter=None,
+                objectivefile=None, objectivereader=None,
+                shell=False, debug=False):
 
 
         Input
         -----
-        functn            function to minimise
+        functn            function to minimise (python function or string for external executable)
         x0                1D-array of size nopt, initial parameter set
         bl                (npars) lower bounds of parameters
         bu                (npars) upper bounds of parameters
@@ -245,6 +314,7 @@ def sce(functn, x0, bl, bu,
 
         Optional Input
         --------------
+        mask              (npars) include (1,True) or exclude (0,False) parameters in optimisation
         maxn              maximum number of function evaluations allowed during optimization (default: 1000)
         kstop             maximum number of evolution loops before convergency (default: 10)
         pcento            the percentage change allowed in kstop loops before convergency (default: 0.0001)
@@ -267,6 +337,12 @@ def sce(functn, x0, bl, bu,
         outf              if True: return best function value (default: False)
         outhist           if True: return parameters and function values of each evolution loop (default: False)
         outcall           if True: return number of function evaluations (default: False)
+        parameterfile     Parameter file for executable; must be given if functn is name of executable
+        parameterwriter   Python function for writing parameter file if functn is name of executable
+        objectivefile     File with objective value from executable; must be given if functn is name of executable
+        objectivereader   Python function for reading objective value if functn is name of executable
+        shell             If True, the specified executable will be executed through the shell (default: False).
+        debug             If True, model output is displayed for executable (default: False).
 
 
         Output
@@ -276,6 +352,8 @@ def sce(functn, x0, bl, bu,
             function value at best parameter set
             vector of best parameters sets per evolution, function values of the best parameter vector
             number of function evaluations
+        If functn is name of executable, parameterwriter will be called at the end,
+        i.e. parameter file contains best parameter set.
 
 
         References
@@ -341,6 +419,7 @@ def sce(functn, x0, bl, bu,
         Written,  Q. Duan, Sep 2004
         Modified, S. Van Hoey 2011 - ported to Python
                   MC, Oct 2013 - adapted to JAMS package and sync with JAMS Fortran version
+                  MC, Nov 2016 - can call external program
     '''
 
     '''
@@ -367,54 +446,82 @@ def sce(functn, x0, bl, bu,
                    10 shuffling loops
     '''
     # Initialize SCE parameters:
-    nopt = x0.size
-    if npg is None: npg = 2*nopt+1
-    if nps is None: nps = nopt+1
-    if nspl is None: nspl = 2*nopt+1
+    nopt = len(x0)
+    if npg   is None: npg   = 2*nopt+1
+    if nps   is None: nps   = nopt+1
+    if nspl  is None: nspl  = 2*nopt+1
     if mings is None: mings = ngs
-    npt=npg*ngs
+    npt = npg*ngs
 
-    bound = bu-bl  #np.array
+    # assure numpy array
+    bl = np.array(bl)
+    bu = np.array(bu)
+
+    bound = bu-bl
 
     if seed>0: np.random.seed(seed)
 
-    # Create an initial population to fill array x(npt,nopt):
-    x = SampleInputMatrix(npt,nopt,bl,bu,distname='randomUniform')
-    if iniflg==1:
-        x[0,:]=x0
+    if mask is None: mask = np.ones(nopt, dtype=np.bool)
 
-    nloop=0
-    icall=0
-    xf=np.zeros(npt)
+    large = -0.5*huge if maxit else 0.5*huge
+
+    # Check parameterfile etc. if functn is name of executable
+    if isinstance(functn, (str,list)):
+        if parameterfile is None:
+            raise IOError('parameterfile must be given if functn is name of executable.')
+        if parameterwriter is None:
+            raise IOError('parameterwrite must be given if functn is name of executable.')
+        if objectivefile is None:
+            raise IOError('objectivefile must be given if functn is name of executable.')
+        if objectivereader is None:
+            raise IOError('objectivereader must be given if functn is name of executable.')
+
+    # Create an initial population to fill array x(npt,nopt):
+    # ToDo: include mask
+    x = SampleInputMatrix(npt, nopt, bl, bu, distname='randomUniform')
+    for i in range(npt):
+        x[i,:] = np.where(mask, x[i,:], x0)
+    if iniflg==1: x[0,:] = x0
+
+    nloop = 0
+    icall = 0
+    xf = np.zeros(npt)
     for i in range (npt):
-        if maxit:
-            xf[i] = -functn(x[i,:])
-        else:
-            xf[i] = functn(x[i,:])
+        fuc = call_function(functn, x[i,:], bl, bu, mask,
+                            parameterfile, parameterwriter, objectivefile, objectivereader, shell, debug)
+        xf[i] = -fuc if maxit else fuc
         if printit==1: print('  f, X: ', xf[i], x[i,:])
         icall += 1
-    f0=xf[0]
+    f0 = xf[0]
+
+    # remember largest for treating of NaNs
+    if maxit:
+        large = xf[np.isfinite(xf)].min()
+        large = 0.9*large if large>0. else 1.1*large
+    else:
+        large = xf[np.isfinite(xf)].max()
+        large = 1.1*large if large>0. else 0.9*large
 
     # Sort the population in order of increasing function values;
+    xf = np.where(np.isfinite(xf), xf, large)
     idx = np.argsort(xf)
-    xf = np.sort(xf)
-    x=x[idx,:]
+    xf  = np.sort(xf)
+    x   = x[idx,:]
 
     # Record the best and worst points;
-    bestx=x[0,:]
-    bestf=xf[0]
-    worstx=x[-1,:]
-    worstf=xf[-1]
+    bestx  = x[0,:]
+    bestf  = xf[0]
+    worstx = x[-1,:]
+    worstf = xf[-1]
 
-    allbestf=bestf
-    allbestx=bestx
-    #ICALL=icall
+    allbestf = bestf
+    allbestx = bestx
 
     # Compute the standard deviation for each parameter
-    xnstd=np.std(x,axis=0)
+    xnstd = np.std(x,axis=0)
 
     # Computes the normalized geometric range of the parameters
-    gnrng=np.exp(np.mean(np.log((np.max(x,axis=0)-np.min(x,axis=0))/bound)))
+    gnrng = np.exp(np.mean(np.log((np.max(x,axis=0)-np.min(x,axis=0))/bound)))
 
     if printit<2:
         print('The Initial Loop: 0. Best f: {:f}, worst f {:f}'.format(bestf, worstf))
@@ -432,89 +539,94 @@ def sce(functn, x0, bl, bu,
             print('The population has converged to a small parameter space {:f} (<{:f}).'.format(gnrng, peps))
 
     # Begin evolution loops:
-    nloop = 0
-    criter=[]
-    criter_change=1e+5
+    nloop  = 0
+    criter = []
+    criter_change = 1e+5
 
     while icall<maxn and gnrng>peps and criter_change>pcento:
-        nloop+=1
+        nloop += 1
 
         # Loop on complexes (sub-populations);
         for igs in range(ngs):
             # Partition the population into complexes (sub-populations);
-            cx=np.zeros((npg,nopt))
-            cf=np.zeros((npg))
+            cx = np.zeros((npg,nopt))
+            cf = np.zeros((npg))
 
-            k1=np.array(range(npg))
-            k2=k1*ngs+igs
+            k1 = np.array(range(npg))
+            k2 = k1*ngs+igs
             cx[k1,:] = x[k2,:]
-            cf[k1] = xf[k2]
+            cf[k1]   = xf[k2]
 
             # Evolve sub-population igs for nspl steps:
             for loop in range(nspl):
 
                 # Select simplex by sampling the complex according to a linear
                 # probability distribution
-                lcs=np.array([0]*nps)
+                lcs    = np.array([0]*nps)
                 lcs[0] = 1
                 for k3 in range(1,nps):
                     for i in range(1000):
-##                        lpos = 1 + int(np.floor(npg+0.5-np.sqrt((npg+0.5)**2 - npg*(npg+1)*random.random())))
+                        # lpos = 1 + int(np.floor(npg+0.5-np.sqrt((npg+0.5)**2 - npg*(npg+1)*random.random())))
                         lpos = int(np.floor(npg+0.5-np.sqrt((npg+0.5)**2 - npg*(npg+1)*np.random.rand())))
-##                        idx=find(lcs(1:k3-1)==lpos)
-                        idx=(lcs[0:k3]==lpos).nonzero()  #check of element al eens gekozen
+                        # idx=find(lcs(1:k3-1)==lpos)
+                        idx = (lcs[0:k3]==lpos).nonzero()  # check of element al eens gekozen
                         if idx[0].size == 0:
                             break
-
                     lcs[k3] = lpos
                 lcs.sort()
 
                 # Construct the simplex:
-                s = np.zeros((nps,nopt))
-                s=cx[lcs,:]
+                s  = np.zeros((nps,nopt))
+                s  = cx[lcs,:]
                 sf = cf[lcs]
 
-                snew, fnew, icall = cce(functn, s, sf, bl, bu, icall, maxn, alpha, beta, maxit, printit)
+                # remember largest for treating of NaNs
+                if maxit:
+                    large = cf[np.isfinite(cf)].min()
+                    large = 0.9*large if large>0. else 1.1*large
+                else:
+                    large = cf[np.isfinite(cf)].max()
+                    large = 1.1*large if large>0. else 0.9*large
 
+                snew, fnew, icall = cce(functn, s, sf, bl, bu, mask, icall, maxn, alpha, beta, maxit, printit,
+                                        parameterfile, parameterwriter, objectivefile, objectivereader, shell, debug)
                 # Replace the worst point in Simplex with the new point:
                 s[-1,:] = snew
-                sf[-1] = fnew
+                sf[-1]  = fnew
 
                 # Replace the simplex into the complex;
                 cx[lcs,:] = s
-                cf[lcs] = sf
+                cf[lcs]   = sf
 
                 # Sort the complex;
+                cf  = np.where(np.isfinite(cf), cf, large)
                 idx = np.argsort(cf)
-                cf = np.sort(cf)
-                cx=cx[idx,:]
-
-            # End of Inner Loop for Competitive Evolution of Simplexes
-            #end of Evolve sub-population igs for nspl steps:
+                cf  = np.sort(cf)
+                cx  = cx[idx,:]
+            # End of Inner Loop for Competitive Evolution of Simplexes: for loop in range(nspl):
+            # i.e. end of evolve sub-population igs for nspl steps
 
             # Replace the complex back into the population;
             x[k2,:] = cx[k1,:]
-            xf[k2] = cf[k1]
-
-        # End of Loop on Complex Evolution;
+            xf[k2]  = cf[k1]
+        # End of Loop on Complex Evolution: for igs in range(ngs):
 
         # Shuffled the complexes;
         idx = np.argsort(xf)
-        xf = np.sort(xf)
-        x=x[idx,:]
+        xf  = np.sort(xf)
+        x   = x[idx,:]
 
-        PX=x
-        PF=xf
+        PX = x
+        PF = xf
 
         # Record the best and worst points;
-        bestx=x[0,:]
-        bestf=xf[0]
-        worstx=x[-1,:]
-        worstf=xf[-1]
+        bestx  = x[0,:]
+        bestf  = xf[0]
+        worstx = x[-1,:]
+        worstf = xf[-1]
 
         allbestx = np.append(allbestx,bestx, axis=0) #appenden en op einde reshapen!!
         allbestf = np.append(allbestf,bestf)
-        #ICALL = np.append(ICALL,icall)
 
         # Compute the standard deviation for each parameter
         xnstd=np.std(x,axis=0)
@@ -537,28 +649,34 @@ def sce(functn, x0, bl, bu,
             if printit<2:
                 print('The population has converged to a small parameter space {:f} (<{:f}).'.format(gnrng, peps))
 
-        criter=np.append(criter,bestf)
+        criter = np.append(criter,bestf)
 
-        if nloop >= kstop: #nodig zodat minimum zoveel doorlopen worden
-            criter_change= np.abs(criter[nloop-1]-criter[nloop-kstop])*100
-            criter_change= criter_change/np.mean(np.abs(criter[nloop-kstop:nloop]))
+        if nloop >= kstop: # nodig zodat minimum zoveel doorlopen worden
+            criter_change = np.abs(criter[nloop-1]-criter[nloop-kstop])*100
+            criter_change = criter_change/np.mean(np.abs(criter[nloop-kstop:nloop]))
             if criter_change < pcento:
                 if printit<2:
                     print('The best point has improved by less then {:f} in the last {:d} loops.'.format(pcento, kstop))
+    # End of the Outer Loop: while icall<maxn and gnrng>peps and criter_change>pcento
 
-    # End of the Outer Loops
     if printit<2:
         print('Search stopped at trial number {:d} with normalized geometric range {:f}. '.format(icall, gnrng))
         print('The best point has improved by {:f} in the last {:d} loops.'.format(criter_change, kstop))
 
-    #reshape allbestx
+    # reshape allbestx
     allbestx = allbestx.reshape(allbestx.size/nopt,nopt)
 
-    # END of Subroutine sce
+    # end of subroutine sce
     out = [bestx]
-    if outf: out += [bestf]
+    if outf:    out += [bestf]
     if outhist: out += [allbestx, allbestf]
     if outcall: out += [icall]
+
+    # write parameter file with best parameters
+    if isinstance(functn, (str,list)):
+        parameterwriter(parameterfile, bestx, bl, bu, mask)
+        
+
     return out
 
 
