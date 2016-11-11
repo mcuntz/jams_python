@@ -6,6 +6,7 @@ import numpy as np
 from jams.const import huge
 from jams import savez_compressed
 # ToDo: tmp/population files
+# ToDo: write also (jams.tee) in logfile if not None
 
 def SampleInputMatrix(nrows, npars, bl, bu, distname='randomUniform'):
     '''
@@ -454,13 +455,13 @@ def sce(functn, x0, bl, bu,
                    10 shuffling loops
     '''
     restartarray  = ['bl', 'bu', 'bound', 'mask',
-                     'gnrng', 'criter',
+                     'criter',
                      'x', 'xf',
                      'bestx', 'worstx', 'allbestf', 'allbestx',
                      'rs2']
     restartint    = ['nopt', 'npg', 'nps', 'nspl', 'mings', 'npt',
                      'nloop', 'icall', 'rs3', 'rs4']
-    restartfloat  = ['criter_change', 'bestf', 'worstf', 'rs5']
+    restartfloat  = ['gnrng', 'criter_change', 'bestf', 'worstf', 'rs5']
     restartbool   = ['maxit']
     restartstring = ['rs1']
     saveargarray = '"'+restartfile1+'"'
@@ -715,7 +716,7 @@ def sce(functn, x0, bl, bu,
     # End of the Outer Loop: while icall<maxn and gnrng>peps and criter_change>pcento
 
     if printit<2:
-        print('Search stopped at trial number {:d} with normalized geometric range {:f}. '.format(icall, gnrng))
+        print('Search stopped at trial number {0:d} with normalized geometric range {1:f}. '.format(icall, gnrng))
         print('The best point has improved by {:f} in the last {:d} loops.'.format(criter_change, kstop))
 
     # reshape allbestx
