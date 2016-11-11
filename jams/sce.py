@@ -1,9 +1,10 @@
 #!/usr/bin/env python
 from __future__ import print_function
-import numpy as np
 import subprocess
+from distutils.util import strtobool
+import numpy as np
 from jams.const import huge
-# ToDo: restart
+from jams import savez_compressed
 # ToDo: tmp/population files
 
 def SampleInputMatrix(nrows, npars, bl, bu, distname='randomUniform'):
@@ -195,7 +196,7 @@ def cce(functn, s, sf, bl, bu, mask, icall, maxn, alpha, beta, maxit, printit,
     idx = (s1<0).nonzero()
     if idx[0].size != 0: ibound = 2
 
-    if ibound >= 1: 
+    if ibound >= 1:
         snew = SampleInputMatrix(1,nopt,bl,bu,distname='randomUniform')[0]  #checken!!
         snew = np.where(mask, snew, sb)
 
@@ -274,15 +275,16 @@ def call_function(functn, params, bl, bu, mask,
         return obj
     else:
         return functn(params)
-    
+
 
 def sce(functn, x0, bl, bu,
         mask=None,
         maxn=1000, kstop=10, pcento=0.0001,
         ngs=2, npg=None, nps=None, nspl=None, mings=None,
-        peps=0.001, seed=0, iniflg=True,
+        peps=0.001, seed=None, iniflg=True,
         alpha=0.8, beta=0.45, maxit=False, printit=2,
         outf=False, outhist=False, outcall=False,
+        restart=False, restartfile1='sce.restart.npz', restartfile2='sce.restart.txt',
         parameterfile=None, parameterwriter=None,
         objectivefile=None, objectivereader=None,
         shell=False, debug=False):
@@ -296,9 +298,10 @@ def sce(functn, x0, bl, bu,
                 mask=None,
                 maxn=1000, kstop=10, pcento=0.0001,
                 ngs=2, npg=None, nps=None, nspl=None, mings=None,
-                peps=0.001, seed=0, iniflg=True,
+                peps=0.001, seed=None, iniflg=True,
                 alpha=0.8, beta=0.45, maxit=False, printit=0,
                 outf=False, outhist=False, outcall=False,
+                restart=False, restartfile1='sce.restart.npz', restartfile2='sce.restart.txt',
                 parameterfile=None, parameterwriter=None,
                 objectivefile=None, objectivereader=None,
                 shell=False, debug=False):
@@ -325,7 +328,7 @@ def sce(functn, x0, bl, bu,
         mings             minimum number of complexes required if the number of complexes is allowed to reduce as the
                           optimization proceeds (default: ngs)
         nspl              number of evolution steps allowed for each complex before complex shuffling (default: 2*nopt+1)
-        seed              if >0, the random number seed (default: 0)
+        seed              Random number generator seed (default: None)
         iniflg            if True: include initial parameter in initial population (default: True)
         alpha             parameter for reflection  of points in complex (default: 0.8)
         beta              parameter for contraction of points in complex (default: 0.45)
@@ -337,6 +340,8 @@ def sce(functn, x0, bl, bu,
         outf              if True: return best function value (default: False)
         outhist           if True: return parameters and function values of each evolution loop (default: False)
         outcall           if True: return number of function evaluations (default: False)
+        restart           if True, continue from saved state in restartfile1/2
+        restartfile1/2    File names for saving state of SCE (default: sce.restart.npz and sce.restart.txt)
         parameterfile     Parameter file for executable; must be given if functn is name of executable
         parameterwriter   Python function for writing parameter file if functn is name of executable
         objectivefile     File with objective value from executable; must be given if functn is name of executable
@@ -422,6 +427,7 @@ def sce(functn, x0, bl, bu,
                   MC, Nov 2016 - call external programs
                   MC, Nov 2016 - NaN and Inf
                   MC, Nov 2016 - mask
+                  MC, Nov 2016 - restart - only Python 2
     '''
 
     '''
@@ -447,25 +453,22 @@ def sce(functn, x0, bl, bu,
        criter(.) = vector containing the best criterion values of the last
                    10 shuffling loops
     '''
-    # Initialize SCE parameters:
-    nopt = len(x0)
-    if npg   is None: npg   = 2*nopt+1
-    if nps   is None: nps   = nopt+1
-    if nspl  is None: nspl  = 2*nopt+1
-    if mings is None: mings = ngs
-    npt = npg*ngs
-
-    # assure numpy array
-    bl = np.array(bl)
-    bu = np.array(bu)
-
-    bound = bu-bl
-
-    if seed>0: np.random.seed(seed)
-
-    if mask is None: mask = np.ones(nopt, dtype=np.bool)
-
-    large = -0.5*huge if maxit else 0.5*huge
+    restartarray  = ['bl', 'bu', 'bound', 'mask',
+                     'gnrng', 'criter',
+                     'x', 'xf',
+                     'bestx', 'worstx', 'allbestf', 'allbestx',
+                     'rs2']
+    restartint    = ['nopt', 'npg', 'nps', 'nspl', 'mings', 'npt',
+                     'nloop', 'icall', 'rs3', 'rs4']
+    restartfloat  = ['criter_change', 'bestf', 'worstf', 'rs5']
+    restartbool   = ['maxit']
+    restartstring = ['rs1']
+    saveargarray = '"'+restartfile1+'"'
+    for j in restartarray: saveargarray = saveargarray + ', '+j+'='+j
+    saveargint    = ','.join(restartint)
+    saveargfloat  = ','.join(restartfloat)
+    saveargbool   = ','.join(restartbool)
+    saveargstring = ','.join(restartstring)
 
     # Check parameterfile etc. if functn is name of executable
     if isinstance(functn, (str,list)):
@@ -478,73 +481,117 @@ def sce(functn, x0, bl, bu,
         if objectivereader is None:
             raise IOError('objectivereader must be given if functn is name of executable.')
 
-    # Create an initial population to fill array x(npt,nopt):
-    # ToDo: include mask
-    x = SampleInputMatrix(npt, nopt, bl, bu, distname='randomUniform')
-    for i in range(npt):
-        x[i,:] = np.where(mask, x[i,:], x0)
-    if iniflg==1: x[0,:] = x0
+    if not restart:
+        # Initialize SCE parameters:
+        nopt = len(x0)
+        if npg   is None: npg   = 2*nopt+1
+        if nps   is None: nps   = nopt+1
+        if nspl  is None: nspl  = 2*nopt+1
+        if mings is None: mings = ngs
+        npt = npg*ngs
 
-    nloop = 0
-    icall = 0
-    xf = np.zeros(npt)
-    for i in range (npt):
-        fuc = call_function(functn, x[i,:], bl, bu, mask,
-                            parameterfile, parameterwriter, objectivefile, objectivereader, shell, debug)
-        xf[i] = -fuc if maxit else fuc
-        if printit==1: print('  f, X: ', xf[i], x[i,:])
-        icall += 1
-    f0 = xf[0]
+        # assure numpy array
+        bl = np.array(bl)
+        bu = np.array(bu)
 
-    # remember largest for treating of NaNs
-    if maxit:
-        large = xf[np.isfinite(xf)].min()
-        large = 0.9*large if large>0. else 1.1*large
-    else:
-        large = xf[np.isfinite(xf)].max()
-        large = 1.1*large if large>0. else 0.9*large
+        bound = bu-bl
 
-    # Sort the population in order of increasing function values;
-    xf = np.where(np.isfinite(xf), xf, large)
-    idx = np.argsort(xf)
-    xf  = np.sort(xf)
-    x   = x[idx,:]
+        np.random.seed(seed=seed)
 
-    # Record the best and worst points;
-    bestx  = x[0,:]
-    bestf  = xf[0]
-    worstx = x[-1,:]
-    worstf = xf[-1]
+        if mask is None: mask = np.ones(nopt, dtype=np.bool)
 
-    allbestf = bestf
-    allbestx = bestx
+        large = -0.5*huge if maxit else 0.5*huge
 
-    # Compute the standard deviation for each parameter
-    xnstd = np.std(x,axis=0)
+        # Create an initial population to fill array x(npt,nopt):
+        x = SampleInputMatrix(npt, nopt, bl, bu, distname='randomUniform')
+        for i in range(npt):
+            x[i,:] = np.where(mask, x[i,:], x0)
+        if iniflg==1: x[0,:] = x0
 
-    # Computes the normalized geometric range of the parameters
-    gnrng = np.exp(np.mean(np.log((np.max(x,axis=0)-np.min(x,axis=0))/bound)))
+        icall = 0
+        xf = np.zeros(npt)
+        for i in range (npt):
+            fuc = call_function(functn, x[i,:], bl, bu, mask,
+                                parameterfile, parameterwriter, objectivefile, objectivereader, shell, debug)
+            xf[i] = -fuc if maxit else fuc
+            if printit==1: print('  f, X: ', xf[i], x[i,:])
+            icall += 1
 
-    if printit<2:
-        print('The Initial Loop: 0. Best f: {:f}, worst f {:f}'.format(bestf, worstf))
-        print('  best X: ', bestx)
-        print('')
+        # remember largest for treating of NaNs
+        if maxit:
+            large = xf[np.isfinite(xf)].min()
+            large = 0.9*large if large>0. else 1.1*large
+        else:
+            large = xf[np.isfinite(xf)].max()
+            large = 1.1*large if large>0. else 0.9*large
 
-    # Check for convergence
-    if icall >= maxn:
+        # Sort the population in order of increasing function values;
+        xf = np.where(np.isfinite(xf), xf, large)
+        idx = np.argsort(xf)
+        xf  = np.sort(xf)
+        x   = x[idx,:]
+
+        # Record the best and worst points;
+        bestx  = x[0,:]
+        bestf  = xf[0]
+        worstx = x[-1,:]
+        worstf = xf[-1]
+
+        allbestf = bestf
+        allbestx = bestx
+
+        # Compute the standard deviation for each parameter
+        xnstd = np.std(x,axis=0)
+
+        # Computes the normalized geometric range of the parameters
+        gnrng = np.exp(np.mean(np.log((np.max(x,axis=0)-np.min(x,axis=0))/bound)))
+
         if printit<2:
-            print('Optimisation terminated because trial number {:d} '
-                  'reached maximum number of trials {:d} at the initial loop.'.format(maxn,icall))
+            print('The Initial Loop: 0. Best f: {:f}, worst f {:f}'.format(bestf, worstf))
+            print('  best X: ', bestx)
+            print('')
 
-    if gnrng < peps:
-        if printit<2:
-            print('The population has converged to a small parameter space {:f} (<{:f}).'.format(gnrng, peps))
+        # Check for convergence
+        if icall >= maxn:
+            if printit<2:
+                print('Optimisation terminated because trial number {:d} '
+                      'reached maximum number of trials {:d} at the initial loop.'.format(maxn,icall))
 
-    # Begin evolution loops:
-    nloop  = 0
-    criter = []
-    criter_change = 1e+5
+        if gnrng < peps:
+            if printit<2:
+                print('The population has converged to a small parameter space {:f} (<{:f}).'.format(gnrng, peps))
 
+        # Begin evolution loops:
+        nloop  = 0
+        criter = []
+        criter_change = 1e+5
+
+        # save restart
+        rs1, rs2, rs3, rs4, rs5 = np.random.get_state()
+        exec("savez_compressed("+saveargarray+")")
+        p = open(restartfile2, 'w')
+        exec("print("+saveargint+", file=p)")
+        exec("print("+saveargfloat+", file=p)")
+        exec("print("+saveargbool+", file=p)")
+        exec("print("+saveargstring+", file=p)")
+        p.close()
+
+    else: # if no restart
+
+        # load restart
+        p1 = open(restartfile1, 'rb')
+        pp = np.load(p1)
+        for i in pp.files: exec(i+" = pp['"+i+"']")
+        p1.close()
+        p2 = open(restartfile2, 'r')
+        for i, pp in enumerate(p2.readline().rstrip().split()): exec(restartint[i]+" = int(pp)")
+        for i, pp in enumerate(p2.readline().rstrip().split()): exec(restartfloat[i]+" = float(pp)")
+        for i, pp in enumerate(p2.readline().rstrip().split()): exec(restartbool[i]+" = bool(strtobool(pp))")
+        for i, pp in enumerate(p2.readline().rstrip().split()): exec(restartstring[i]+" = pp")
+        p2.close()
+        np.random.set_state((rs1, rs2, rs3, rs4, rs5))
+
+    # Outer Loop
     while icall<maxn and gnrng>peps and criter_change>pcento:
         nloop += 1
 
@@ -564,16 +611,15 @@ def sce(functn, x0, bl, bu,
 
                 # Select simplex by sampling the complex according to a linear
                 # probability distribution
-                lcs    = np.array([0]*nps)
+                lcs    = np.zeros(nps, dtype=np.int)
                 lcs[0] = 1
                 for k3 in range(1,nps):
                     for i in range(1000):
-                        # lpos = 1 + int(np.floor(npg+0.5-np.sqrt((npg+0.5)**2 - npg*(npg+1)*random.random())))
+                        # lpos = 1 + int(np.floor(npg+0.5-np.sqrt((npg+0.5)**2 - npg*(npg+1)*np.random.random())))
                         lpos = int(np.floor(npg+0.5-np.sqrt((npg+0.5)**2 - npg*(npg+1)*np.random.rand())))
                         # idx=find(lcs(1:k3-1)==lpos)
                         idx = (lcs[0:k3]==lpos).nonzero()  # check of element al eens gekozen
-                        if idx[0].size == 0:
-                            break
+                        if idx[0].size == 0: break
                     lcs[k3] = lpos
                 lcs.sort()
 
@@ -618,9 +664,6 @@ def sce(functn, x0, bl, bu,
         xf  = np.sort(xf)
         x   = x[idx,:]
 
-        PX = x
-        PF = xf
-
         # Record the best and worst points;
         bestx  = x[0,:]
         bestf  = xf[0]
@@ -637,7 +680,7 @@ def sce(functn, x0, bl, bu,
         gnrng=np.exp(np.mean(np.log((np.max(x,axis=0)-np.min(x,axis=0))/bound)))
 
         if printit<2:
-            print('Evolution loop {:d}, trials {:d}. Best f: {:f}, worst f {:f}'.format(nloop, icall, bestf, worstf))
+            print('Evolution loop {0:d}, trials {1:d}. Best f: {2:f}, worst f {3:f}'.format(nloop, icall, bestf, worstf))
             print('  best X: ', bestx)
             print('')
 
@@ -659,6 +702,16 @@ def sce(functn, x0, bl, bu,
             if criter_change < pcento:
                 if printit<2:
                     print('The best point has improved by less then {:f} in the last {:d} loops.'.format(pcento, kstop))
+
+        # save restart
+        rs1, rs2, rs3, rs4, rs5 = np.random.get_state()
+        exec("savez_compressed("+saveargarray+")")
+        p = open(restartfile2, 'w')
+        exec("print("+saveargint+", file=p)")
+        exec("print("+saveargfloat+", file=p)")
+        exec("print("+saveargbool+", file=p)")
+        exec("print("+saveargstring+", file=p)")
+        p.close()
     # End of the Outer Loop: while icall<maxn and gnrng>peps and criter_change>pcento
 
     if printit<2:
@@ -677,7 +730,6 @@ def sce(functn, x0, bl, bu,
     # write parameter file with best parameters
     if isinstance(functn, (str,list)):
         parameterwriter(parameterfile, bestx, bl, bu, mask)
-        
 
     return out
 
