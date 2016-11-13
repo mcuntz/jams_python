@@ -5,8 +5,9 @@ from distutils.util import strtobool
 import numpy as np
 from jams.const import huge
 from jams import savez_compressed
-# ToDo: tmp/population files
-# ToDo: write also (jams.tee) in logfile if not None
+# ToDo: be able to switch of writing of restart files (e.g. restartfile1=None)
+# ToDo: write tmp/population files (of Fortran)
+# ToDo: write out also in logfile if not None (use jams.tee as in joptimise)
 
 def SampleInputMatrix(nrows, npars, bl, bu, distname='randomUniform'):
     '''
