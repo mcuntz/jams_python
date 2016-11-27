@@ -107,6 +107,7 @@
     position               Position arrays of subplots to be used with add_axes.
     print_brewer           Prints available Brewer colormap names.
     pritay                 Daily reference evapotranspiration after Priestley & Taylor.
+    pso                    Particle swarm optimization
     qa                     Module of quality (error) measures.
     readhdf                Reads variables or information from hdf4 and hdf5 files.
     readhdf4               Reads variables or information from hdf4 files.
@@ -281,6 +282,7 @@
     morris_sampling        Sampling of optimised trajectories for Morris measures / elementary effects
     pareto_metrics         Performance metrics to compare Pareto fronts.
     pi                     Parameter importance index PI or alternatively B index calculation.
+    pso                    Particle swarm optimization
     qa                     Module of quality assessment (error) measures.
     saltelli               Parameter sampling for Sobol indices calculation.
     sce                    Shuffle-Complex-Evolution algorithm for function min(max)imisation
@@ -498,21 +500,22 @@
               AW, Sep 2015 - samevalue
               MC, Oct 2015 - str2tex, lat_fmt, lon_fmt
               MC, Oct 2015 - directories_from_gui
-              ST, Nov 2015 - added kge
-              ST, Dec 2015 - added river_network
-              ST, Feb 2016 - added function for writing 2d arrays to ascii file
-              JM, Feb 2016 - added pareto_metrics
-              ST, Mar 2016 - added smax and smin
-              DS, Mar 2016 - added netcdf4
-              MC, May 2016 - added qa
+              ST, Nov 2015 - kge
+              ST, Dec 2015 - river_network
+              ST, Feb 2016 - function for writing 2d arrays to ascii file
+              JM, Feb 2016 - pareto_metrics
+              ST, Mar 2016 - smax, smin
+              DS, Mar 2016 - netcdf4
+              MC, May 2016 - qa
               MC, May 2016 - distributions
               MC, Oct 2016 - rm colours and rgb from main directory
-              AP, Oct 2016 - added diver_view
-              AP, Oct 2016 - added fftngo
-              JM, Oct 2016 - added mat2nc (matlab to netcdf)
-              JM, Oct 2016 - added dag (directed acyclic graphs)
-              AP, Oct 2016 - added pritay
+              AP, Oct 2016 - diver_view
+              AP, Oct 2016 - fftngo
+              JM, Oct 2016 - mat2nc
+              JM, Oct 2016 - dag
+              AP, Oct 2016 - pritay
               MC, Nov 2016 - ported to Python 3
+              MC, Nov 2016 - pso
 """
 from __future__ import print_function
 
@@ -602,6 +605,7 @@ from .pca               import pca, check_pca
 from .pi                import pi
 from .position          import position
 from .pritay            import pritay
+from .pso               import pso
 try:
     from .readhdf           import readhdf,  hdfread
 except ImportError:
