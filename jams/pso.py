@@ -2,11 +2,11 @@
 from functools import partial
 import numpy as np
 # ToDo:
-#   maximum velocity
 #   LHS / Sobol
 #   local best / topologies
 #   crossover with quadratic function
 #   external function
+#   iPython parallel
 #   MPI
 
 # Function wrappers for objective and constraints
@@ -32,7 +32,7 @@ def _is_feasible_wrapper(func, x):
             _cons_none_wrapper, _cons_ieqcons_wrapper, and _cons_f_ieqcons_wrapper.
 
         This function is partialised:
-            is_feasible = partial(_is_feasible_wrapper, cons)        
+            is_feasible = partial(_is_feasible_wrapper, cons)
         which is unnecessary for now. It could still simply be:
             is_feasible = cons
     '''
@@ -66,13 +66,13 @@ def _cons_f_ieqcons_wrapper(f_ieqcons, args, kwargs, x):
 
 
 # Particle Swarm optimisation
-def pso(func, lb, ub, ieqcons=[], f_ieqcons=None, args=(), kwargs={}, 
+def pso(func, lb, ub, ieqcons=[], f_ieqcons=None, args=(), kwargs={},
         swarmsize=40, omega=0.5, phip=2., phig=2., maxiter=250,
         minstep=1e-8, minfunc=1e-8, debug=False, processes=1,
         particle_output=False):
     """
         Perform a particle swarm optimization (PSO)
-       
+
         Parameters
         ==========
         func : function
@@ -81,21 +81,21 @@ def pso(func, lb, ub, ieqcons=[], f_ieqcons=None, args=(), kwargs={},
             The lower bounds of the design variable(s)
         ub : array
             The upper bounds of the design variable(s)
-       
+
         Optional
         ========
         ieqcons : list
-            A list of functions of length n such that ieqcons[j](x,*args) >= 0.0 in 
+            A list of functions of length n such that ieqcons[j](x,*args) >= 0.0 in
             a successfully optimized problem (Default: [])
         f_ieqcons : function
-            Returns a 1-D array in which each element must be greater or equal 
-            to 0.0 in a successfully optimized problem. If f_ieqcons is specified, 
+            Returns a 1-D array in which each element must be greater or equal
+            to 0.0 in a successfully optimized problem. If f_ieqcons is specified,
             ieqcons is ignored (Default: None)
         args : tuple
             Additional arguments passed to objective and constraint functions
             (Default: empty tuple)
         kwargs : dict
-            Additional keyword arguments passed to objective and constraint 
+            Additional keyword arguments passed to objective and constraint
             functions (Default: empty dict)
         swarmsize : int
             The number of particles in the swarm (Default: 40)
@@ -119,12 +119,12 @@ def pso(func, lb, ub, ieqcons=[], f_ieqcons=None, args=(), kwargs={},
             If True, progress statements will be displayed every iteration
             (Default: False)
         processes : int
-            The number of processes to use to evaluate objective function and 
+            The number of processes to use to evaluate objective function and
             constraints (default: 1)
         particle_output : boolean
             Whether to include the best per-particle position and the objective
             values at those.
-       
+
         Returns
         =======
         g : array
@@ -166,21 +166,24 @@ def pso(func, lb, ub, ieqcons=[], f_ieqcons=None, args=(), kwargs={},
         Modified, MC, Nov 2016 - adapted to JAMS package
                   MC, Nov 2016 - swarmsize=100, omega=0.5, phip=0.5, phig=0.5, maxiter=100
                                  -> swarmsize=40, omega=0.5, phip=2., phig=2., maxiter=250
+                               - include vmax: v.clip(vmin,vmax)
     """
-   
+    # Check arguments
     assert len(lb)==len(ub), 'Lower- and upper-bounds must be the same length'
     assert hasattr(func, '__call__'), 'Invalid function handle'
-    lb = np.array(lb)
+    lb = np.array(lb) # assert ND-array
     ub = np.array(ub)
-    assert np.all(ub>lb), 'All upper-bound values must be greater than lower-bound values'
-   
-    vhigh = np.abs(ub - lb)
-    vlow = -vhigh
+    assert np.all(ub > lb), 'All upper-bound values must be greater than lower-bound values'
+
+    # Maximum velocity
+    vmax   = np.abs(ub - lb)
+    vmin   = -vmax
+    vrange = vmax - vmin
 
     # Initialize objective function
     obj = partial(_obj_wrapper, func, args, kwargs)
-    
-    # Check for constraint function(s) #########################################
+
+    # Check for constraint function(s)
     if f_ieqcons is None:
         if not len(ieqcons):
             if debug:
@@ -200,54 +203,54 @@ def pso(func, lb, ub, ieqcons=[], f_ieqcons=None, args=(), kwargs={},
     if processes > 1:
         import multiprocessing
         mp_pool = multiprocessing.Pool(processes)
-        
-    # Initialize the particle swarm ############################################
-    S = swarmsize
-    D = len(lb)  # the number of dimensions each particle has
-    x = np.random.rand(S, D)  # particle positions
-    v = np.zeros_like(x)  # particle velocities
-    p = np.zeros_like(x)  # best particle positions
-    fx = np.zeros(S)  # current particle function values
-    fs = np.zeros(S, dtype=bool)  # feasibility of each particle
-    fp = np.ones(S)*np.inf  # best particle function values
-    g = []  # best swarm position
-    fg = np.inf  # best swarm position starting value
-    
+
+    # Initialize the particle swarm
+    S  = swarmsize
+    D  = len(lb)                       # dimension of each particle
+    x  = np.random.uniform(size=(S,D)) # current particle positions
+    v  = np.ones((S,D))*np.inf         # current particle velocities
+    fx = np.ones(S)*np.inf             # current particle function values
+    fs = np.zeros(S, dtype=bool)       # current combined feasibility for each particle
+    p  = np.ones((S,D))*np.inf         # particle's individual best positions
+    fp = np.ones(S)*np.inf             # particle's individual best function values
+    g  = np.ones(D)*np.inf             # swarm's best position
+    fg = np.inf                        # swarm's best function value
+
     # Initialize the particle's position
     x = lb + x*(ub - lb)
 
-    # Calculate objective and constraints for each particle
+    # Calculate objective and constraints (may be dummy) for each particle
     if processes > 1:
         fx = np.array(mp_pool.map(obj, x))
         fs = np.array(mp_pool.map(is_feasible, x))
     else:
         for i in range(S):
-            fx[i] = obj(x[i, :])
-            fs[i] = is_feasible(x[i, :])
-       
+            fx[i] = obj(x[i,:])
+            fs[i] = is_feasible(x[i,:])
+
     # Store particle's best position (if constraints are satisfied)
-    i_update = np.logical_and((fx < fp), fs)
-    p[i_update, :] = x[i_update, :].copy()
-    fp[i_update] = fx[i_update]
+    i_update = (fx < fp) & fs
+    if np.any(i_update):
+        p[i_update,:] = x[i_update,:].copy()
+        fp[i_update]  = fx[i_update]
 
     # Update swarm's best position
     i_min = np.argmin(fp)
     if fp[i_min] < fg:
+        g  = p[i_min,:].copy()
         fg = fp[i_min]
-        g = p[i_min, :].copy()
     else:
         # At the start, there may not be any feasible starting point, so just
         # give it a temporary "best" point since it's likely to change
-        g = x[0, :].copy()
-       
+        g  = x[0, :].copy()
+        fg = fp[0]
+
     # Initialize the particle's velocity
-    v = vlow + np.random.rand(S, D)*(vhigh - vlow)
-       
-    # Iterate until termination criterion met ##################################
+    v = vmin + np.random.uniform(size=(S,D))*vrange
+
+    # Iterate until termination criterion met
     it = 1
     while it <= maxiter:
-        rp = np.random.uniform(size=(S, D))
-        rg = np.random.uniform(size=(S, D))
         '''
                         /*-------PSO variant with constriction coefficients------------------------------------*/
 			/*  ''Clerc's analysis of the iterative system led him to propose a strategy for the
@@ -259,7 +262,7 @@ def pso(func, lb, ub, ieqcons=[], f_ieqcons=None, args=(), kwargs={},
 			 *  ''this is the canonical particle swarm algorithm of today.''
 			 *  [Poli et al., 2007] http://dx.doi.org/10.1007/s11721-007-0002-0
 			 *  [Clerc and Kennedy, 2002] http://dx.doi.org/10.1109/4235.985692
-			 *  
+			 *
 			 *  This being the canonical PSO of today, this variant is set as the default in PaGMO.
 			 *-------------------------------------------------------------------------------------*/
 			else if( m_variant == 5 ){
@@ -269,15 +272,23 @@ def pso(func, lb, ub, ieqcons=[], f_ieqcons=None, args=(), kwargs={},
 					V[p][d] = m_omega * ( V[p][d] + m_eta1 * r1 * (lbX[p][d] - X[p][d]) + m_eta2 * r2 * (best_neighb[d] - X[p][d]) );
 				}
         '''
-                                
+        '''
+           Clerc and Kennedy (2000) suggested a more generalized PSO, where a constriction coefficient (Type 1 coefficient) is applied to both terms of the velocity formula. Clerc shows that the constriction PSO can converge without using Vmax: where m_eta1=m_eta2 is a positive number, often set to 2.05; and the constriction factor m_omega set 0.7289 (Clerc and Kennedy 2002). --> pyshoal
+        '''
         # Update the particles velocities
+        rp = np.random.uniform(size=(S,D))
+        rg = np.random.uniform(size=(S,D))
+        #ToDo: change omega going from 0.9 to 0.4 over time
         v = omega*v + phip*rp*(p - x) + phig*rg*(g - x)
-        # Update the particles' positions
+
+        # Limit velocities
+        v.clip(vmin, vmax)
+
+        # Update the particles positions
         x = x + v
-        # Correct for bound violations
-        maskl = x < lb
-        masku = x > ub
-        x = x*(~np.logical_or(maskl, masku)) + lb*maskl + ub*masku
+
+        # Limit to bounds
+        x.clip(lb, ub)
 
         # Update objectives and constraints
         if processes > 1:
@@ -285,24 +296,23 @@ def pso(func, lb, ub, ieqcons=[], f_ieqcons=None, args=(), kwargs={},
             fs = np.array(mp_pool.map(is_feasible, x))
         else:
             for i in range(S):
-                fx[i] = obj(x[i, :])
-                fs[i] = is_feasible(x[i, :])
+                fx[i] = obj(x[i,:])
+                fs[i] = is_feasible(x[i,:])
 
         # Store particle's best position (if constraints are satisfied)
-        i_update = np.logical_and((fx < fp), fs)
-        p[i_update, :] = x[i_update, :].copy()
-        fp[i_update] = fx[i_update]
+        i_update = (fx < fp) & fs
+        if np.any(i_update):
+            p[i_update,:] = x[i_update,:].copy()
+            fp[i_update]  = fx[i_update]
 
         # Compare swarm's best position with global best position
         i_min = np.argmin(fp)
         if fp[i_min] < fg:
-            if debug:
-                print('New best for swarm at iteration {:}: {:} {:}'\
-                    .format(it, p[i_min, :], fp[i_min]))
-
-            p_min = p[i_min, :].copy()
+            if debug: print('New best for swarm at iteration {:}: {:} {:}'.format(it, p[i_min, :], fp[i_min]))
+            p_min = p[i_min,:].copy()
             stepsize = np.sqrt(np.sum((g - p_min)**2))
 
+            # remove
             if np.abs(fg - fp[i_min]) <= minfunc:
                 print('Stopping search: Swarm best objective change less than {:}'\
                     .format(minfunc))
@@ -310,6 +320,7 @@ def pso(func, lb, ub, ieqcons=[], f_ieqcons=None, args=(), kwargs={},
                     return p_min, fp[i_min], p, fp
                 else:
                     return p_min, fp[i_min]
+                # change to kstop of SCE
             elif stepsize <= minstep:
                 print('Stopping search: Swarm best position change less than {:}'\
                     .format(minstep))
@@ -318,27 +329,27 @@ def pso(func, lb, ub, ieqcons=[], f_ieqcons=None, args=(), kwargs={},
                 else:
                     return p_min, fp[i_min]
             else:
-                g = p_min.copy()
+                g  = p_min.copy()
                 fg = fp[i_min]
 
-        if debug:
-            print('Best after iteration {:}: {:} {:}'.format(it, g, fg))
+        if debug: print('Best after iteration {:}: {:} {:}'.format(it, g, fg))
         it += 1
 
     print('Stopping search: maximum iterations reached --> {:}'.format(maxiter))
-    
+
     if not is_feasible(g):
-        print("However, the optimization couldn't find a feasible design. Sorry")
+        print("PSO could not find any feasible point in the search space.")
+
     if particle_output:
-        return g, fg, p, fp
+        return [g, fg, p, fp]
     else:
-        return g, fg
+        return [g, fg]
 
 
 if __name__ == '__main__':
     # import doctest
     # doctest.testmod(optionflags=doctest.NORMALIZE_WHITESPACE)
-    
+
     from functions import goldstein_price, griewank, rastrigin, rosenbrock, six_hump_camelback
     '''
         This is the Griewank Function (2-D or 10-D)
