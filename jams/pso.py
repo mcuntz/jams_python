@@ -125,7 +125,7 @@ def pso(func, lb, ub, ieqcons=[], f_ieqcons=None, args=(), kwargs={},
         minstep     scalar
                     The minimum stepsize of swarm's best position before the search
                     terminates (Default: 1e-8)
-        minobj     scalar
+        minobj      scalar
                     Objective function defining convergence (Default: 1e-8)
         init        string
                     How to sample the initial swarm positions and velocities (Default: 'lhs')
@@ -229,7 +229,7 @@ def pso(func, lb, ub, ieqcons=[], f_ieqcons=None, args=(), kwargs={},
         Modified, MC, Nov 2016 - adapted to JAMS package
                   MC, Nov 2016 - swarmsize=100, omega=0.5, phip=0.5, phig=0.5, maxiter=100
                                  -> swarmsize=40, omega=0.5, phip=2., phig=2., maxiter=250
-                               - include vmax: v.clip(vmin,vmax)
+                               - include vmax: clip(v, vmin, vmax)
                                - Sobol sequences and latin hypercube sampling for initial swarm positions
                                - Different PSO algorithms
                                - minfunc -> minobj
@@ -361,11 +361,12 @@ def pso(func, lb, ub, ieqcons=[], f_ieqcons=None, args=(), kwargs={},
         rg = np.random.uniform(size=(S,D))
         if psotype.lower() == 'original':    # Kennedy & Eberhart, 2001
             v = omega*v + phip*rp*(p - x) + phig*rg*(g - x)
-            v.clip(vmin, vmax)
+            v = np.clip(v, vmin, vmax)
+            v = np.clip(v, vmin, vmax)
         elif psotype.lower() == 'inertia':   # Shi & Eberhart (1998)
             omega = omax - float(it)/float(maxiter-1) * (omax-omin)
             v = omega*v + phip*rp*(p - x) + phig*rg*(g - x)
-            v.clip(vmin, vmax)
+            v = np.clip(v, vmin, vmax)
         elif psotype.lower() == 'canonical': # Clerc & Kennedy (2000)
             v = omega * (v + phip*rp*(p - x) + phig*rg*(g - x))
         elif psotype.lower() == 'fips':      # Mendes & Kennedy (2004)
@@ -378,7 +379,7 @@ def pso(func, lb, ub, ieqcons=[], f_ieqcons=None, args=(), kwargs={},
         x = x + v
 
         # Limit to bounds
-        x.clip(lb, ub)
+        x = np.clip(x, lb, ub)
 
         # Update objectives and constraints
         if processes > 1:
@@ -490,4 +491,3 @@ if __name__ == '__main__':
     bu = 5*np.ones(npara)
     bestx, bestf = pso(six_hump_camelback, bl, bu, processes=4, init='lhs', psotype='fips', verbose=0, maxiter=250)
     print('Six_hump_camelback ', bestx, bestf)
-
