@@ -322,6 +322,8 @@ def pso(func, lb, ub, ieqcons=[], f_ieqcons=None, args=(), kwargs={},
     fp = np.ones(S)*np.inf             # particle's individual best function values
     g  = np.ones(D)*np.inf             # swarm's best position
     fg = np.inf                        # swarm's best function value
+    # n  = np.ones((S,D))*np.inf         # neighbors's best position
+    # ng = np.ones(S)*np.inf             # neighbors's best function value
 
     # Initialize the particles positions and velocities
     x = lb + x*(ub - lb)
@@ -431,6 +433,7 @@ if __name__ == '__main__':
     # import doctest
     # doctest.testmod(optionflags=doctest.NORMALIZE_WHITESPACE)
 
+    algo = 'original'
     from jams.functions import ackley, griewank, goldstein_price, rastrigin, rosenbrock, six_hump_camelback
     '''
     This is the Ackley Function
@@ -439,7 +442,7 @@ if __name__ == '__main__':
     npara = 10
     bl = -10*np.ones(npara)
     bu = 10*np.ones(npara)
-    bestx, bestf = pso(ackley, bl, bu, processes=4, init='lhs', psotype='fips', verbose=0, maxiter=250)
+    bestx, bestf = pso(ackley, bl, bu, processes=4, init='lhs', psotype=algo, verbose=0, maxiter=250)
     print('Ackley ', bestx, bestf)
     '''
         This is the Griewank Function (2-D or 10-D)
@@ -449,7 +452,7 @@ if __name__ == '__main__':
     npara = 10
     bl = -600*np.ones(npara)
     bu = 600*np.ones(npara)
-    bestx, bestf = pso(griewank, bl, bu, processes=4, init='lhs', psotype='fips', verbose=0, maxiter=250)
+    bestx, bestf = pso(griewank, bl, bu, processes=4, init='lhs', psotype=algo, verbose=0, maxiter=250)
     print('Griewank ', bestx, bestf)
     '''
     This is the Goldstein-Price Function
@@ -459,7 +462,7 @@ if __name__ == '__main__':
     npara = 2
     bl = -2*np.ones(npara)
     bu = 2*np.ones(npara)
-    bestx, bestf = pso(goldstein_price, bl, bu, processes=4, init='lhs', psotype='fips', verbose=0, maxiter=250)
+    bestx, bestf = pso(goldstein_price, bl, bu, processes=4, init='lhs', psotype=algo, verbose=0, maxiter=250)
     print('Goldstein ', bestx, bestf)
     '''
     This is the Rastrigin Function
@@ -469,7 +472,7 @@ if __name__ == '__main__':
     npara = 2
     bl = -1*np.ones(npara)
     bu = 1*np.ones(npara)
-    bestx, bestf = pso(rastrigin, bl, bu, processes=4, init='lhs', psotype='fips', verbose=0, maxiter=250)
+    bestx, bestf = pso(rastrigin, bl, bu, processes=4, init='lhs', psotype=algo, verbose=0, maxiter=250)
     print('Rastrigin ', bestx, bestf)
     '''
     This is the Rosenbrock Function
@@ -479,7 +482,7 @@ if __name__ == '__main__':
     npara = 2
     bl = -2*np.ones(npara)
     bu = 5*np.ones(npara)
-    bestx, bestf = pso(rosenbrock, bl, bu, processes=4, init='lhs', psotype='fips', verbose=0, maxiter=250)
+    bestx, bestf = pso(rosenbrock, bl, bu, processes=4, init='lhs', psotype=algo, verbose=0, maxiter=250)
     print('Rosenbrock ', bestx, bestf)
     '''
     This is the Six-hump Camelback Function.
@@ -489,5 +492,5 @@ if __name__ == '__main__':
     npara = 2
     bl = -5*np.ones(npara)
     bu = 5*np.ones(npara)
-    bestx, bestf = pso(six_hump_camelback, bl, bu, processes=4, init='lhs', psotype='fips', verbose=0, maxiter=250)
+    bestx, bestf = pso(six_hump_camelback, bl, bu, processes=4, init='lhs', psotype=algo, verbose=0, maxiter=250)
     print('Six_hump_camelback ', bestx, bestf)
