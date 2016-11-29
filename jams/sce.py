@@ -344,6 +344,7 @@ def sce(functn, x0, bl, bu,
         outcall           if True: return number of function evaluations (default: False)
         restart           if True, continue from saved state in restartfile1/2
         restartfile1/2    File names for saving state of SCE (default: sce.restart.npz and sce.restart.txt)
+                          State will be always written, except if restartfile1=None.
         parameterfile     Parameter file for executable; must be given if functn is name of executable
         parameterwriter   Python function for writing parameter file if functn is name of executable
         objectivefile     File with objective value from executable; must be given if functn is name of executable
@@ -379,7 +380,7 @@ def sce(functn, x0, bl, bu,
         >>> bl = np.array([-5.,-2.])
         >>> bu = np.array([5.,8.])
         >>> x0 = np.array([-2.,7.])
-        >>> bestx, bestf, icall = sce(rosenbrock, x0, bl, bu, seed=1, maxn=1000, outf=True, outcall=True, printit=2)
+        >>> bestx, bestf, icall = sce(rosenbrock, x0, bl, bu, seed=1, maxn=1000, outf=True, outcall=True, printit=2, restartfile1=None)
         >>> print(astr(icall))
         298
         >>> print(astr(bestf,3))
@@ -393,7 +394,7 @@ def sce(functn, x0, bl, bu,
         ...                           maxn=30000, kstop=10, pcento=0.0001, seed=10987,
         ...                           ngs=2, npg=2*nopt+1, nps=nopt+1, nspl=2*nopt+1, mings=2,
         ...                           iniflg=True, printit=2, alpha=0.8, beta=0.45,
-        ...                           outf=True, outcall=True)
+        ...                           outf=True, outcall=True, restartfile1=None)
         >>> print(astr(icall))
         4608
         >>> print(astr(bestf,3))
@@ -430,6 +431,7 @@ def sce(functn, x0, bl, bu,
                   MC, Nov 2016 - NaN and Inf
                   MC, Nov 2016 - mask
                   MC, Nov 2016 - restart - only Python 2
+                  MC, Nov 2016 - restartfile1=None
     '''
 
     '''
@@ -455,22 +457,23 @@ def sce(functn, x0, bl, bu,
        criter(.) = vector containing the best criterion values of the last
                    10 shuffling loops
     '''
-    restartarray  = ['bl', 'bu', 'bound', 'mask',
-                     'criter',
-                     'x', 'xf',
-                     'bestx', 'worstx', 'allbestf', 'allbestx',
-                     'rs2']
-    restartint    = ['nopt', 'npg', 'nps', 'nspl', 'mings', 'npt',
-                     'nloop', 'icall', 'rs3', 'rs4']
-    restartfloat  = ['gnrng', 'criter_change', 'bestf', 'worstf', 'rs5']
-    restartbool   = ['maxit']
-    restartstring = ['rs1']
-    saveargarray = '"'+restartfile1+'"'
-    for j in restartarray: saveargarray = saveargarray + ', '+j+'='+j
-    saveargint    = ','.join(restartint)
-    saveargfloat  = ','.join(restartfloat)
-    saveargbool   = ','.join(restartbool)
-    saveargstring = ','.join(restartstring)
+    if restartfile1 is not None:
+        restartarray  = ['bl', 'bu', 'bound', 'mask',
+                         'criter',
+                         'x', 'xf',
+                         'bestx', 'worstx', 'allbestf', 'allbestx',
+                         'rs2']
+        restartint    = ['nopt', 'npg', 'nps', 'nspl', 'mings', 'npt',
+                         'nloop', 'icall', 'rs3', 'rs4']
+        restartfloat  = ['gnrng', 'criter_change', 'bestf', 'worstf', 'rs5']
+        restartbool   = ['maxit']
+        restartstring = ['rs1']
+        saveargarray = '"'+restartfile1+'"'
+        for j in restartarray: saveargarray = saveargarray + ', '+j+'='+j
+        saveargint    = ','.join(restartint)
+        saveargfloat  = ','.join(restartfloat)
+        saveargbool   = ','.join(restartbool)
+        saveargstring = ','.join(restartstring)
 
     # Check parameterfile etc. if functn is name of executable
     if isinstance(functn, (str,list)):
@@ -569,14 +572,15 @@ def sce(functn, x0, bl, bu,
         criter_change = 1e+5
 
         # save restart
-        rs1, rs2, rs3, rs4, rs5 = np.random.get_state()
-        exec("savez_compressed("+saveargarray+")")
-        p = open(restartfile2, 'w')
-        exec("print("+saveargint+", file=p)")
-        exec("print("+saveargfloat+", file=p)")
-        exec("print("+saveargbool+", file=p)")
-        exec("print("+saveargstring+", file=p)")
-        p.close()
+        if restartfile1 is not None:
+            rs1, rs2, rs3, rs4, rs5 = np.random.get_state()
+            exec("savez_compressed("+saveargarray+")")
+            p = open(restartfile2, 'w')
+            exec("print("+saveargint+", file=p)")
+            exec("print("+saveargfloat+", file=p)")
+            exec("print("+saveargbool+", file=p)")
+            exec("print("+saveargstring+", file=p)")
+            p.close()
 
     else: # if no restart
 
@@ -706,14 +710,15 @@ def sce(functn, x0, bl, bu,
                     print('The best point has improved by less then {:f} in the last {:d} loops.'.format(pcento, kstop))
 
         # save restart
-        rs1, rs2, rs3, rs4, rs5 = np.random.get_state()
-        exec("savez_compressed("+saveargarray+")")
-        p = open(restartfile2, 'w')
-        exec("print("+saveargint+", file=p)")
-        exec("print("+saveargfloat+", file=p)")
-        exec("print("+saveargbool+", file=p)")
-        exec("print("+saveargstring+", file=p)")
-        p.close()
+        if restartfile1 is not None:
+            rs1, rs2, rs3, rs4, rs5 = np.random.get_state()
+            exec("savez_compressed("+saveargarray+")")
+            p = open(restartfile2, 'w')
+            exec("print("+saveargint+", file=p)")
+            exec("print("+saveargfloat+", file=p)")
+            exec("print("+saveargbool+", file=p)")
+            exec("print("+saveargstring+", file=p)")
+            p.close()
     # End of the Outer Loop: while icall<maxn and gnrng>peps and criter_change>pcento
 
     if printit<2:
@@ -736,206 +741,74 @@ def sce(functn, x0, bl, bu,
     return out
 
 
-def griewank(x):
-    '''
-    This is the Griewank Function (2-D or 10-D)
-    Bound: X(i)=[-600,600], for i=1,2,...,10
-    Global Optimum: 0, at origin
-    '''
-    nopt = np.size(x)
-    #if (nopt == 2) | (nopt == 10):
-    xx = x
-    if nopt==2:
-        d = 200.0
-    else:
-        d = 4000.0
-
-    u1 = 0.0
-    u2 = 1.0
-    for j in range(nopt):
-        u1 = u1 + xx[j]**2/d
-        u2 = u2 * np.cos(xx[j]/np.sqrt(float(j+1)))
-
-    f = u1 - u2 + 1
-    return f
-
-
 if __name__ == '__main__':
     import doctest
     doctest.testmod(optionflags=doctest.NORMALIZE_WHITESPACE)
-
-    # #-------------------------------------------------------------------------------
-    # # Name:        Test for Shuffled Complex Evolution Algorithm implementation
-    # # Purpose:      Call one of the example functions to run and find the optimum
-    # #               Visualize the 2D (or 3D) objective function +trace of the allbestx
-    # #
-    # # Author:      VHOEYS
-    # #
-    # # Created:     11/10/2011
-    # # Copyright:   (c) VHOEYS 2011
-    # # Licence:     <your licence>
-    # #-------------------------------------------------------------------------------
-
-    # import os
-    # import sys
-    # import time
-    # from functions import goldstein_price, griewank, rastrigin, rosenbrock, six_hump_camelback
-
-    # # PARAMETERS TO TUNE THE ALGORITHM
-    # # Definition:import doctest
-    # doctest.testmod(optionflags=doctest.NORMALIZE_WHITESPACE)
-
-    # #  seed = the random seed number (for repetetive testing purpose;pos integers)
-    # #  iniflg = flag for initial parameter array (=1, included it in initial
-    # #           population; otherwise, not included)
-    # #  ngs = number of complexes (sub-populations)
-    # #  peps = value of NORMALIZED GEOMETRIC RANGE needed for convergence
-    # #  maxn = maximum number of function evaluations allowed during optimization
-    # #  kstop = maximum number of evolution loops before convergency
-    # #  pcento = the percentage change allowed in kstop loops before convergency
-    # maxn=10000
-
-    # # PARAMETERS FOR OPTIMIZATION PROBLEM
-    # # Definition:
-    # #  x0 = the initial parameter array at the start; np.array
-    # #     = the optimized parameter array at the end;
-    # #  bl = the lower bound of the parameters; np.array
-    # #  bu = the upper bound of the parameters; np.array
-
-    # foo=input('Please enter an Example number (1-5) for example: ')
-    # start = time.clock()
-
-    # if foo==1:
-    #     '''1
-    #      This is the Goldstein-Price Function
-    #      Bound X1=[-2,2], X2=[-2,2]; Global Optimum: 3.0,(0.0,-1.0)
-    #     '''
-    #     bl=np.array([-2,-2])
-    #     bu=np.array([2,2])
-    #     x0=np.array([2,2])
-    #     bestx, allbestx, allbestf = sce(goldstein_price, x0, bl, bu, maxn=maxn, outhist=True)
-
-    # elif foo==2:
-    #     '''2
-    #       This is the Rosenbrock Function
-    #       Bound: X1=[-5,5], X2=[-2,8]; Global Optimum: 0,(1,1)
-    #         bl=[-5 -5]; bu=[5 5]; x0=[1 1];
-    #     '''
-    #     bl=np.array([-5.,-2.])
-    #     bu=np.array([5.,8.])
-    #     x0=np.array([-2.,7.])
-    #     bestx, allbestx, allbestf = sce(rosenbrock, x0, bl, bu, maxn=maxn, outhist=True)
-
-    # elif foo==3:
-    #     '''3
-    #     %  This is the Six-hump Camelback Function.
-    #     %  Bound: X1=[-5,5], X2=[-5,5]
-    #     %  True Optima: -1.031628453489877, (-0.08983,0.7126), (0.08983,-0.7126)
-    #     '''
-
-    #     bl=np.array([-2.,-2.])
-    #     bu=np.array([2.,2.])
-    #     x0=np.array([-1.,1.])
-    #     bestx, allbestx, allbestf = sce(six_hump_camelback, x0, bl, bu, maxn=maxn, outhist=True)
-
-    # elif foo==4:
-    #     '''4
-    #     %  This is the Rastrigin Function
-    #     %  Bound: X1=[-1,1], X2=[-1,1]
-    #     %  Global Optimum: -2, (0,0)
-    #     '''
-    #     bl=np.array([-5.,-5.])
-    #     bu=np.array([5.,5.])
-    #     x0=np.array([-1.,1.])
-    #     bestx, allbestx, allbestf = sce(rastrigin, x0, bl, bu, maxn=maxn, outhist=True, ngs=3, kstop=30, pcento=0.001)
-
-    # elif foo==5:
-    #     '''5
-    #       This is the Griewank Function (2-D or 10-D)
-    #       Bound: X(i)=[-600,600], for i=1,2,...,10  !for visualization only 2!
-    #       Global Optimum: 0, at origin
-    #     '''
-    #     bl=-600*np.ones(2)
-    #     bu=600*np.ones(2)
-    #     x0=np.ones(2)
-    #     bestx, allbestx, allbestf = sce(griewank, x0, bl, bu, maxn=maxn, outhist=True, ngs=3, kstop=30, pcento=0.001)
-
-    # else:
-    #     raise ValueError('Example number > 5')
-
-    # elapsed = (time.clock() - start)
-    # print('The calculation of the SCE algorithm took %f seconds' %elapsed)
-
+    
+    # maxn = 10000
+    # from jams.functions import ackley, griewank, goldstein_price, rastrigin, rosenbrock, six_hump_camelback
     # '''
-    # plot the trace of the parametersvalue
+    # This is the Ackley Function
+    # Global Optimum (n>=2): 0.0 at origin
     # '''
-    # import matplotlib.pyplot as plt
-
-    # fig=plt.figure()
-
-    # ax1 = plt.subplot(121)
-    # ax1.plot(allbestx)
-    # plt.title('Trace of the different parameters')
-    # plt.xlabel('Evolution Loop')
-    # plt.ylabel('Parvalue')
-
-    # '''
-    # Plot the parmaeterspace in 2D with trace of the allbestx
-    # '''
-    # #   make these smaller to increase the resolution
-    # dx, dy = 0.05, 0.05
-    # if foo == 5: dx, dy = 5., 5.
-
-    # x = np.arange(bl[0], bu[0], dx)
-    # y = np.arange(bl[1], bu[1], dy)
-    # X, Y = np.meshgrid(x, y)
-
-    # if foo==1:
-    #     parspace = goldstein_price([X,Y])
-    # elif foo==2:
-    #     parspace = rosenbrock([X,Y])
-    # elif foo==3:
-    #     parspace = six_hump_camelback([X,Y])
-    # elif foo==4:
-    #     parspace = rastrigin([X,Y])
-    # elif foo==5:
-    #     parspace = np.empty((x.size,y.size))
-    #     for i in range(x.size):
-    #         for j in range(y.size):
-    #             parspace[i,j] = griewank([x[i],y[j]])
-
-    # ax2 = plt.subplot(122)
-    # ax2.pcolor(X, Y, parspace)
-    # ##plt.colorbar()
-    # ax2.plot(allbestx[:,0],allbestx[:,1],'*')
-    # plt.title('Trace of the allbestx parameter combinations')
-    # plt.xlabel('PAR 1')
-    # plt.ylabel('PAR 2')
-
-    # # # Plot the parmaeterspace in 3D - commented out
-    # # from mpl_toolkits.mplot3d import Axes3D
-    # # from matplotlib import cm
-    # # from matplotlib.ticker import LinearLocator, FormatStrFormatter
-    # # fig = plt.figure()
-    # # ax = fig.gca(projection='3d')
-    # # surf = ax.plot_surface(X, Y, parspace, rstride=8, cstride=8, cmap=cm.jet,linewidth=0, antialiased=False)
-    # # cset = ax.contourf(X, Y, parspace, zdir='z', offset=-100)
-    # # fig.colorbar(surf, shrink=0.5, aspect=5)
-
-    # plt.show()
-
-
-
-    # from functions import goldstein_price, griewank, rastrigin, rosenbrock, six_hump_camelback
+    # npara = 10
+    # bl = -10*np.ones(npara)
+    # bu = 10*np.ones(npara)
+    # x0 = np.random.rand(npara)*10.
+    # bestx, bestf = sce(ackley, x0, bl, bu, maxn=maxn, outf=True, restartfile1=None)
+    # print('Ackley ', bestx, bestf)
     # '''
     #     This is the Griewank Function (2-D or 10-D)
     #     Bound: X(i)=[-600,600], for i=1,2,...,10  !for visualization only 2!
     #        Global Optimum: 0, at origin
     # '''
-    # maxn  = 30000 # maximum number of function evaluations allowed during optimization (default: 1000)
-    # kstop = 20    # maximum number of evolution loops before convergency (default: 10)
-    # bl = -600*np.ones(10)
-    # bu = 600*np.ones(10)
-    # x0 = np.random.rand(10)*600.
-    # bestx, bestf, numfunccalls = sce(griewank, x0, bl, bu, maxn=maxn, outf=True, outcall=True, kstop=kstop)
-    # print(bestx, bestf, numfunccalls)
+    # npara = 10
+    # bl = -600*np.ones(npara)
+    # bu = 600*np.ones(npara)
+    # x0 = np.random.rand(npara)*600.
+    # bestx, bestf = sce(griewank, x0, bl, bu, maxn=maxn, outf=True, restartfile1=None)
+    # print('Griewank ', bestx, bestf)
+    # '''
+    # This is the Goldstein-Price Function
+    # Bound X1=[-2,2], X2=[-2,2]
+    # Global Optimum: 3.0,(0.0,-1.0)
+    # '''
+    # npara = 2
+    # bl = -2*np.ones(npara)
+    # bu = 2*np.ones(npara)
+    # x0 = np.random.rand(npara)*2.
+    # bestx, bestf = sce(goldstein_price, x0, bl, bu, maxn=maxn, outf=True, restartfile1=None)
+    # print('Goldstein ', bestx, bestf)
+    # '''
+    # This is the Rastrigin Function
+    # Bound: X1=[-1,1], X2=[-1,1]
+    # Global Optimum: -2, (0,0)
+    # '''
+    # npara = 2
+    # bl = -1*np.ones(npara)
+    # bu = 1*np.ones(npara)
+    # x0 = np.random.rand(npara)*1.
+    # bestx, bestf = sce(rastrigin, x0, bl, bu, maxn=maxn, outf=True, restartfile1=None)
+    # print('Rastrigin ', bestx, bestf)
+    # '''
+    # This is the Rosenbrock Function
+    # Bound: X1=[-5,5], X2=[-2,8]; Global Optimum: 0,(1,1)
+    #        bl=[-5 -5]; bu=[5 5]; x0=[1 1];
+    # '''
+    # npara = 2
+    # bl = -2*np.ones(npara)
+    # bu = 5*np.ones(npara)
+    # x0 = np.random.rand(npara)*2.
+    # bestx, bestf = sce(rosenbrock, x0, bl, bu, maxn=maxn, outf=True, restartfile1=None)
+    # print('Rosenbrock ', bestx, bestf)
+    # '''
+    # This is the Six-hump Camelback Function.
+    # Bound: X1=[-5,5], X2=[-5,5]
+    # True Optima: -1.031628453489877, (-0.08983,0.7126), (0.08983,-0.7126)
+    # '''
+    # npara = 2
+    # bl = -5*np.ones(npara)
+    # bu = 5*np.ones(npara)
+    # x0 = np.random.rand(npara)*5.
+    # bestx, bestf = sce(six_hump_camelback, x0, bl, bu, maxn=maxn, outf=True, restartfile1=None)
+    # print('Six_hump_camelback ', bestx, bestf)
