@@ -1,20 +1,24 @@
 #!/usr/bin/env python
 from __future__ import print_function
 from functools import partial
+import subprocess
 import numpy as np
 from jams.const import huge
 # ToDo:
-#   crossover with quadratic function
+#   include x0
+#   seed
+#   restart
+#   crossover with quadratic function (QIPSO)
 #   iPython parallel
 #   MPI
 
-def _ext_obj_wrapper(func, bl, bu, mask,
+def _ext_obj_wrapper(func, lb, ub, mask,
                      parameterfile, parameterwriter, objectivefile, objectivereader, shell, debug,
                      params):
     '''
         Wrapper function for external program to be optimised
         to be used with partial:
-            obj = partial(_ext_obj_wrapper, func, bl, bu, mask,
+            obj = partial(_ext_obj_wrapper, func, lb, ub, mask,
                           parameterfile, parameterwriter, objectivefile, objectivereader, shell, debug)
         This allows then calling obj with only the argument params:
             fx = obj(params)
@@ -22,7 +26,7 @@ def _ext_obj_wrapper(func, bl, bu, mask,
 
         Definition
         ----------
-        def _ext_obj_wrapper(func, bl, bu, mask,
+        def _ext_obj_wrapper(func, lb, ub, mask,
                              parameterfile, parameterwriter, objectivefile, objectivereader, shell, debug,
                              params):
 
@@ -30,8 +34,8 @@ def _ext_obj_wrapper(func, bl, bu, mask,
         Input
         -----
         func              function to minimise (python function or string for external executable)
-        bl                (npars) lower bounds of parameters
-        bu                (npars) upper bounds of parameters
+        lb                (npars) lower bounds of parameters
+        ub                (npars) upper bounds of parameters
         mask              (npars) mask to include (1) or exclude (0) parameter from optimisation
         parameterfile     Parameter file for executable; must be given if functn is name of executable
         parameterwriter   Python function for writing parameter file if functn is name of executable
@@ -52,11 +56,11 @@ def _ext_obj_wrapper(func, bl, bu, mask,
         Written,  MC, Nov 2016
     '''
     if isinstance(func, (str,list)):
-        parameterwriter(parameterfile, params, bl, bu, mask)
+        parameterwriter(parameterfile, params, lb, ub, mask)
         if debug:
-            err = subprocess.call(functn, shell=shell)
+            err = subprocess.call(func, shell=shell)
         else:
-            err = subprocess.check_output(functn, shell=shell)
+            err = subprocess.check_output(func, shell=shell)
         obj = objectivereader(objectivefile)
         return obj
     else:
@@ -238,8 +242,8 @@ def get_neighbor_indeces(n, S, topology, kl=1):
 
 
 # Particle Swarm Optimisation
-def pso(func, lb, ub,
-        mask=None, x0=None,
+def pso(func, x0, lb, ub,
+        mask=None,
         ieqcons=[], f_ieqcons=None,
         args=(), kwargs={},
         swarmsize=None, inertia=None, phip=None, phig=None, maxn=250,
@@ -256,21 +260,30 @@ def pso(func, lb, ub,
 
         Definition
         ----------
-        def pso(func, lb, ub, ieqcons=None, f_ieqcons=None, args=(), kwargs={},
+        def pso(func, x0, lb, ub,
+                mask=None,
+                ieqcons=[], f_ieqcons=None,
+                args=(), kwargs={},
                 swarmsize=None, inertia=None, phip=None, phig=None, maxn=250,
                 minstep=1e-8, minobj=1e-8, maxit=False,
                 init='lhs', strategy='fips', topology='gbest', kl=1,
-                verbose=0, processes=1, pout=False, cout=False):
+                processes=1,
+                verbose=0, pout=False, cout=False,
+                parameterfile=None, parameterwriter=None,
+                objectivefile=None, objectivereader=None,
+                shell=False, debug=False):
 
 
         Input
         -----
         func        python function or string for external executable
-                    The function to be minimized
+                    The function to be minimized.
+        x0          1D-array
+                    Will be taken at dimensions with mask==False.
         lb          1D-array
-                    The lower bounds of the design variable(s)
+                    The lower bounds of the design variable(s).
         ub          1D-array
-                    The upper bounds of the design variable(s)
+                    The upper bounds of the design variable(s).
 
 
         Optional Input
@@ -278,8 +291,6 @@ def pso(func, lb, ub,
         mask        1D-array
                     include (1,True) or exclude (0,False) parameters in optimisation.
                     (Default: include all dimensions)
-        X0          1D-array
-                    If mask=True, then x0 must be given with initial values for the excluded dimensions.
         ieqcons     list
                     A list of functions of length n such that ieqcons[j](x,*args) >= 0.0 in
                     a successfully optimized problem.
@@ -290,7 +301,7 @@ def pso(func, lb, ub,
                     ieqcons is ignored.
                     (Default: None)
         args        tuple
-                    Additional arguments passed to objective and constraint functions
+                    Additional arguments passed to objective and constraint functions.
                     (Default: empty tuple)
         kwargs      dict
                     Additional keyword arguments passed to objective and constraint functions.
@@ -402,10 +413,10 @@ def pso(func, lb, ub,
                     (Default: 1 = ring)
         verbose     integer
                     Controlling amount of print-out.
+                    (Default: 0)
                     0: No print-out.
                     1: Printing convergence criteria, etc.
                     2: Printing after each step.
-                    (Default: 0)
         processes   int
                     The number of processes to use to evaluate objective function and constraints.
                     (Default: 1)
@@ -415,10 +426,10 @@ def pso(func, lb, ub,
         cout        boolean
                     True: include number of function calls in output.
                     (Default: False)
-        parameterfile     Parameter file for executable; must be given if functn is name of executable
-        parameterwriter   Python function for writing parameter file if functn is name of executable
-        objectivefile     File with objective value from executable; must be given if functn is name of executable
-        objectivereader   Python function for reading objective value if functn is name of executable
+        parameterfile     Parameter file for executable; must be given if func is name of executable
+        parameterwriter   Python function for writing parameter file if func is name of executable
+        objectivefile     File with objective value from executable; must be given if func is name of executable
+        objectivereader   Python function for reading objective value if func is name of executable
         shell             If True, the specified executable will be executed through the shell (default: False).
         debug             If True, model output is displayed for executable (default: False).
 
@@ -480,15 +491,12 @@ def pso(func, lb, ub,
     assert len(lb)==len(ub), 'Lower- and upper-bounds must have the same lengths.'
     lb = np.array(lb)
     ub = np.array(ub)
-    assert np.all(ub > lb), 'All upper-bounds must be greater than lower-bounds.'
+    assert np.all(ub >= lb), 'All upper-bounds must be greater than lower-bounds.'
     # Mask
     if mask is not None:
         assert len(mask)==len(ub), 'Mask and bounds must have the same lengths.'
         if not np.all(mask):
-            if x0 is None:
-                raise ValueError('x0 must be given if dimensions are excluded from optimisation')
-            else:
-                assert len(mask)==len(x0), 'Mask and x0 must have the same lengths.'
+            assert len(mask)==len(x0), 'Mask and x0 must have the same lengths.'
     # Initialisation keyword
     inits = ['random', 'lhs', 'sobol']
     assert init.lower() in inits, 'Initialisation {:} not in {:}'.format(init, inits)
@@ -534,9 +542,25 @@ def pso(func, lb, ub,
         if phip  is None: phip=2.05
         if phig  is None: phig=2.05
 
+    # Problem sizes
+    D = len(lb) # dimension of each particle
+    if swarmsize is None:
+        S = max(min(3*D,40),10)
+    else:
+        S = swarmsize
+
+    # Initialise 1D mask
+    if mask is not None:
+        mask1 = mask
+    else:
+        mask1 = np.ones(D, dtype=np.bool)
+    # 2D mask
+    mask2 = np.tile(mask1,S).reshape((S,D))
+    x02   = np.tile(x0,S).reshape((S,D))
+
     # Partialise objective function
     if isinstance(func, (str,list)):
-        obj = partial(_ext_obj_wrapper, func, bl, bu, mask,
+        obj = partial(_ext_obj_wrapper, func, lb, ub, mask1,
                       parameterfile, parameterwriter, objectivefile, objectivereader, shell, debug)
     else:
         obj = partial(_obj_wrapper, func, args, kwargs)
@@ -566,11 +590,6 @@ def pso(func, lb, ub,
     large = 0.5*huge
 
     # Initialize the particle swarm
-    D = len(lb) # dimension of each particle
-    if swarmsize is None:
-        S = max(min(3*D,40),10)
-    else:
-        S = swarmsize
     # current particle positions
     # current particle velocities
     if init.lower() == 'random':
@@ -594,19 +613,14 @@ def pso(func, lb, ub,
     p  = np.ones((S,D))*large          # particles individual best positions
     fp = np.ones(S)*large              # particles individual best function values
 
-    # Initialise mask
-    if mask is not None:
-        imask = np.tile(mask,S).reshape((S,D))
-        ix0   = np.tile(x0,S).reshape((S,D))
-
     # Maximum velocity
     vmax = np.abs(ub - lb)
     vmin = -vmax
 
     # Initialize particle positions and velocities
-    x = lb + x*(ub - lb)
-    if mask is not None: x = np.where(imask, x, ix0)
     v = vmin + v*(vmax-vmin)
+    x = lb + x*(ub - lb)
+    x = np.where(mask2, x, x02)
 
     # Calculate first objective and constraints for each particle
     if processes > 1:
@@ -668,7 +682,7 @@ def pso(func, lb, ub,
 
         # Update the particles positions
         x = x + v
-        if mask is not None: x = np.where(imask, x, ix0)
+        x = np.where(mask2, x, x02)
 
         # Limit to bounds
         x = np.clip(x, lb, ub)
@@ -711,7 +725,7 @@ def pso(func, lb, ub,
 
     # write parameter file with best parameters
     if isinstance(func, (str,list)):
-        parameterwriter(parameterfile, bestx, bl, bu, mask)
+        parameterwriter(parameterfile, bestx, lb, ub, mask1)
 
     out = [bestx, bestf]
     if pout:
@@ -738,9 +752,10 @@ if __name__ == '__main__':
     Global Optimum (n>=2): 0.0 at origin
     '''
     npara = 10
-    bl = -10*np.ones(npara)
-    bu = 10*np.ones(npara)
-    bestx, bestf = pso(ackley, bl, bu, processes=4, init=init, strategy=algo, topology=topology, verbose=0, swarmsize=swarmsize, maxn=maxn)
+    lb = -10*np.ones(npara)
+    ub = 10*np.ones(npara)
+    x0 = np.zeros(npara)
+    bestx, bestf = pso(ackley, x0, lb, ub, processes=4, init=init, strategy=algo, topology=topology, verbose=0, swarmsize=swarmsize, maxn=maxn)
     print('Ackley ', bestx, bestf)
     '''
         This is the Griewank Function (2-D or 10-D)
@@ -748,9 +763,10 @@ if __name__ == '__main__':
            Global Optimum: 0, at origin
     '''
     npara = 10
-    bl = -600*np.ones(npara)
-    bu = 600*np.ones(npara)
-    bestx, bestf = pso(griewank, bl, bu, processes=4, init=init, strategy=algo, topology=topology, verbose=0, swarmsize=swarmsize, maxn=maxn)
+    lb = -600*np.ones(npara)
+    ub = 600*np.ones(npara)
+    x0 = np.zeros(npara)
+    bestx, bestf = pso(griewank, x0, lb, ub, processes=4, init=init, strategy=algo, topology=topology, verbose=0, swarmsize=swarmsize, maxn=maxn)
     print('Griewank ', bestx, bestf)
     '''
     This is the Goldstein-Price Function
@@ -758,9 +774,10 @@ if __name__ == '__main__':
     Global Optimum: 3.0,(0.0,-1.0)
     '''
     npara = 2
-    bl = -2*np.ones(npara)
-    bu = 2*np.ones(npara)
-    bestx, bestf = pso(goldstein_price, bl, bu, processes=4, init=init, strategy=algo, topology=topology, verbose=0, swarmsize=swarmsize, maxn=maxn)
+    lb = -2*np.ones(npara)
+    ub = 2*np.ones(npara)
+    x0 = np.zeros(npara)
+    bestx, bestf = pso(goldstein_price, x0, lb, ub, processes=4, init=init, strategy=algo, topology=topology, verbose=0, swarmsize=swarmsize, maxn=maxn)
     print('Goldstein ', bestx, bestf)
     '''
     This is the Rastrigin Function
@@ -768,19 +785,21 @@ if __name__ == '__main__':
     Global Optimum: -2, (0,0)
     '''
     npara = 2
-    bl = -1*np.ones(npara)
-    bu = 1*np.ones(npara)
-    bestx, bestf = pso(rastrigin, bl, bu, processes=4, init=init, strategy=algo, topology=topology, verbose=0, swarmsize=swarmsize, maxn=maxn)
+    lb = -1*np.ones(npara)
+    ub = 1*np.ones(npara)
+    x0 = np.zeros(npara)
+    bestx, bestf = pso(rastrigin, x0, lb, ub, processes=4, init=init, strategy=algo, topology=topology, verbose=0, swarmsize=swarmsize, maxn=maxn)
     print('Rastrigin ', bestx, bestf)
     '''
     This is the Rosenbrock Function
     Bound: X1=[-5,5], X2=[-2,8]; Global Optimum: 0,(1,1)
-           bl=[-5 -5]; bu=[5 5]; x0=[1 1];
+           lb=[-5 -5]; ub=[5 5]; x0=[1 1];
     '''
     npara = 2
-    bl = -2*np.ones(npara)
-    bu = 5*np.ones(npara)
-    bestx, bestf = pso(rosenbrock, bl, bu, processes=4, init=init, strategy=algo, topology=topology, verbose=0, swarmsize=swarmsize, maxn=maxn)
+    lb = -2*np.ones(npara)
+    ub = 5*np.ones(npara)
+    x0 = np.zeros(npara)
+    bestx, bestf = pso(rosenbrock, x0, lb, ub, processes=4, init=init, strategy=algo, topology=topology, verbose=0, swarmsize=swarmsize, maxn=maxn)
     print('Rosenbrock ', bestx, bestf)
     '''
     This is the Six-hump Camelback Function.
@@ -788,7 +807,8 @@ if __name__ == '__main__':
     True Optima: -1.031628453489877, (-0.08983,0.7126), (0.08983,-0.7126)
     '''
     npara = 2
-    bl = -5*np.ones(npara)
-    bu = 5*np.ones(npara)
-    bestx, bestf = pso(six_hump_camelback, bl, bu, processes=4, init=init, strategy=algo, topology=topology, verbose=0, swarmsize=swarmsize, maxn=maxn)
+    lb = -5*np.ones(npara)
+    ub = 5*np.ones(npara)
+    x0 = np.zeros(npara)
+    bestx, bestf = pso(six_hump_camelback, x0, lb, ub, processes=4, init=init, strategy=algo, topology=topology, verbose=0, swarmsize=swarmsize, maxn=maxn)
     print('Six_hump_camelback ', bestx, bestf)
