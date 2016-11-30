@@ -5,7 +5,6 @@ from distutils.util import strtobool
 import numpy as np
 from jams.const import huge
 from jams import savez_compressed
-# ToDo: be able to switch of writing of restart files (e.g. restartfile1=None)
 # ToDo: write tmp/population files (of Fortran)
 # ToDo: write out also in logfile if not None (use jams.tee as in joptimise)
 
@@ -432,6 +431,7 @@ def sce(functn, x0, bl, bu,
                   MC, Nov 2016 - mask
                   MC, Nov 2016 - restart - only Python 2
                   MC, Nov 2016 - restartfile1=None
+                  MC, Nov 2016 - return -bestf if maxit
     '''
 
     '''
@@ -505,7 +505,7 @@ def sce(functn, x0, bl, bu,
 
         if mask is None: mask = np.ones(nopt, dtype=np.bool)
 
-        large = -0.5*huge if maxit else 0.5*huge
+        large = 0.5*huge
 
         # Create an initial population to fill array x(npt,nopt):
         x = SampleInputMatrix(npt, nopt, bl, bu, distname='randomUniform')
@@ -523,12 +523,8 @@ def sce(functn, x0, bl, bu,
             icall += 1
 
         # remember largest for treating of NaNs
-        if maxit:
-            large = xf[np.isfinite(xf)].min()
-            large = 0.9*large if large>0. else 1.1*large
-        else:
-            large = xf[np.isfinite(xf)].max()
-            large = 1.1*large if large>0. else 0.9*large
+        large = xf[np.isfinite(xf)].max()
+        large = 1.1*large if large>0. else 0.9*large
 
         # Sort the population in order of increasing function values;
         xf = np.where(np.isfinite(xf), xf, large)
@@ -635,12 +631,8 @@ def sce(functn, x0, bl, bu,
                 sf = cf[lcs]
 
                 # remember largest for treating of NaNs
-                if maxit:
-                    large = cf[np.isfinite(cf)].min()
-                    large = 0.9*large if large>0. else 1.1*large
-                else:
-                    large = cf[np.isfinite(cf)].max()
-                    large = 1.1*large if large>0. else 0.9*large
+                large = cf[np.isfinite(cf)].max()
+                large = 1.1*large if large>0. else 0.9*large
 
                 snew, fnew, icall = cce(functn, s, sf, bl, bu, mask, icall, maxn, alpha, beta, maxit, printit,
                                         parameterfile, parameterwriter, objectivefile, objectivereader, shell, debug)
@@ -729,6 +721,9 @@ def sce(functn, x0, bl, bu,
     allbestx = allbestx.reshape(allbestx.size/nopt,nopt)
 
     # end of subroutine sce
+    if maxit:
+        bestf    *= -1.
+        allbestf *= -1.
     out = [bestx]
     if outf:    out += [bestf]
     if outhist: out += [allbestx, allbestf]
