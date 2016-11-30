@@ -9,8 +9,8 @@ from jams.const import huge
 #   seed
 #   restart
 #   crossover with quadratic function (QIPSO)
-#   iPython parallel
 #   MPI
+#   iPython parallel
 
 def _ext_obj_wrapper(func, lb, ub, mask,
                      parameterfile, parameterwriter, objectivefile, objectivereader, shell, debug,
