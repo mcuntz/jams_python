@@ -2,12 +2,66 @@
 from __future__ import print_function
 from functools import partial
 import numpy as np
+from jams.const import huge
 # ToDo:
-#   local best / topologies
 #   crossover with quadratic function
-#   external function
 #   iPython parallel
 #   MPI
+
+def _ext_obj_wrapper(func, bl, bu, mask,
+                     parameterfile, parameterwriter, objectivefile, objectivereader, shell, debug,
+                     params):
+    '''
+        Wrapper function for external program to be optimised
+        to be used with partial:
+            obj = partial(_ext_obj_wrapper, func, bl, bu, mask,
+                          parameterfile, parameterwriter, objectivefile, objectivereader, shell, debug)
+        This allows then calling obj with only the argument params:
+            fx = obj(params)
+
+
+        Definition
+        ----------
+        def _ext_obj_wrapper(func, bl, bu, mask,
+                             parameterfile, parameterwriter, objectivefile, objectivereader, shell, debug,
+                             params):
+
+
+        Input
+        -----
+        func              function to minimise (python function or string for external executable)
+        bl                (npars) lower bounds of parameters
+        bu                (npars) upper bounds of parameters
+        mask              (npars) mask to include (1) or exclude (0) parameter from optimisation
+        parameterfile     Parameter file for executable; must be given if functn is name of executable
+        parameterwriter   Python function for writing parameter file if functn is name of executable
+        objectivefile     File with objective value from executable; must be given if functn is name of executable
+        objectivereader   Python function for reading objective value if functn is name of executable
+        shell             If True, the specified command will be executed through the shell.
+        debug             If True, model output is displayed for executable.
+        params            (npars) parameter set
+
+
+        Output
+        ------
+        Function value
+
+
+        History
+        -------
+        Written,  MC, Nov 2016
+    '''
+    if isinstance(func, (str,list)):
+        parameterwriter(parameterfile, params, bl, bu, mask)
+        if debug:
+            err = subprocess.call(functn, shell=shell)
+        else:
+            err = subprocess.check_output(functn, shell=shell)
+        obj = objectivereader(objectivefile)
+        return obj
+    else:
+        return func(params)
+
 
 # Function wrappers for objective and constraints
 # used with functools.partial
@@ -65,28 +119,153 @@ def _cons_f_ieqcons_wrapper(f_ieqcons, args, kwargs, x):
     return np.array(f_ieqcons(x, *args, **kwargs))
 
 
-# Particle Swarm optimisation
-def pso(func, lb, ub, ieqcons=[], f_ieqcons=None, args=(), kwargs={},
-        swarmsize=40, omega=None, phip=None, phig=None, maxiter=250,
-        minstep=1e-8, minobj=1e-8,
-        init='random', psotype='fips',
-        verbose=0, processes=1, particle_output=False):
+def get_best_neighbor(p, fp, topology, kl=1):
+    '''
+        Get the best neighbor for a given topology
+
+        Input
+        -----
+        p           ND-array
+                    The best known position of each particle.
+        fp          1D-array
+                    The objective values at each position in p.
+        topology    string
+                    Neighborhood topologies. These are rather social than geographical topologies.
+                    All neighborhoods comprise the current particle as well.
+                    [Kennedy & Mendes, 2002] http://dx.doi.org/10.1109/CEC.2002.1004493
+                    'gbest'    Neighborhood is entire swarm.
+                    'lbest'    Partciles aranged in a ring, in which each particle communicates with
+                               kl particles on each side, i.e. particle i has the neighborhood
+                               i-kl, i-kl+1, ..., i, i+1, ..., i+kl-1, i+kl
+                               [Mohais et al., 2005] http://dx.doi.org/10.1007/11589990_80
+                    'ring'     'lbest' with kl=1
+                    'neumann'  Neighborhood of a point including all points at a Hamming distance of 1.
+                               Particles are arranges in a lattice, where each particle interacts with
+                               its immediate 4 neighbors to the N, S, E, and W.
+                               [Kennedy and Mendes, 2006] http://dx.doi.org/10.1109/TSMCC.2006.875410
+                               The von Neumann neighborhood is configured into r rows and c columns,
+                               where r is the highest integer less than or equal to sqrt(n) that evenly
+                               divides n and c = n / r
+                               [Mohais et al., 2005] http://dx.doi.org/10.1007/11589990_80
+
+
+        Optional Input
+        --------------
+        kl          integer
+                    Neighborhood distance in topology 'lbest'.
+                    (Default: 1 = ring)
+    '''
+    if topology.lower() == 'ring': kl=1
+    S = p.shape[0]
+    D = p.shape[1]
+
+    if topology.lower() == 'gbest':
+        i_min = np.argmin(fp)
+        g  = p[i_min,:].copy()         # overall best
+        fg = fp[i_min]
+    elif (topology.lower() == 'lbest') or (topology.lower() == 'ring') or (topology.lower() == 'neumann'):
+        g  = np.ones((S,D))*np.inf
+        fg = np.ones(S)*np.inf
+        for ss in range(S):
+            ii = get_neighbor_indeces(ss, S, topology, kl=kl)
+            pp  = p[ii,:]
+            fpp = fp[ii]
+            i_min = np.argmin(fpp)
+            g[ss,:] = pp[i_min,:].copy()
+            fg[ss]  = fpp[i_min]
+
+    return [g, fg]
+
+
+def get_neighbor_indeces(n, S, topology, kl=1):
+    '''
+        Get the indices of the neighbors for the current particle given the topology.
+
+        Input
+        -----
+        n           integer
+                    Particle index.
+        S           integer
+                    Swarm size.
+        topology    string
+                    Neighborhood topologies. These are rather social than geographical topologies.
+                    All neighborhoods comprise the current particle as well.
+                    [Kennedy & Mendes, 2002] http://dx.doi.org/10.1109/CEC.2002.1004493
+                    'gbest'    Neighborhood is entire swarm.
+                    'lbest'    Partciles aranged in a ring, in which each particle communicates with
+                               kl particles on each side, i.e. particle i has the neighborhood
+                               i-kl, i-kl+1, ..., i, i+1, ..., i+kl-1, i+kl
+                               [Mohais et al., 2005] http://dx.doi.org/10.1007/11589990_80
+                    'ring'     'lbest' with kl=1
+                    'neumann'  Neighborhood of a point including all points at a Hamming distance of 1.
+                               Particles are arranges in a lattice, where each particle interacts with
+                               its immediate 4 neighbors to the N, S, E, and W.
+                               [Kennedy and Mendes, 2006] http://dx.doi.org/10.1109/TSMCC.2006.875410
+                               The von Neumann neighborhood is configured into r rows and c columns,
+                               where r is the highest integer less than or equal to sqrt(n) that evenly
+                               divides n and c = n / r
+                               [Mohais et al., 2005] http://dx.doi.org/10.1007/11589990_80
+
+
+        Optional Input
+        --------------
+        kl          integer
+                    Neighborhood distance in topology 'lbest'.
+                    (Default: 1 = ring)
+    '''
+    if topology.lower() == 'ring': kl=1
+
+    if topology.lower() == 'gbest':
+        ii = list(np.arange(S))
+    elif (topology.lower() == 'lbest') or (topology.lower() == 'ring'):
+        ii = [n]                  # self
+        for kk in range(1,kl+1):
+            ii.append((n-kk) % S) # left
+            ii.append((n+kk) % S) # right
+    elif topology.lower() == 'neumann':
+        rows = int(np.floor(np.sqrt(S)))
+        while (S % rows) != 0: rows -= 1
+        cols = S // rows
+        left  = lambda x, c: (x - 1) % c + x//c * c
+        right = lambda x, c: (x + 1) % c + x//c * c
+        above = (n - rows) % S
+        below = (n + rows) % S
+        ii = [left(above, cols),  above, right(above, cols),
+              left(n, cols),      n,     right(n, cols),
+              left(below, cols),  below, right(below, cols)]
+
+    return ii
+
+
+# Particle Swarm Optimisation
+def pso(func, lb, ub,
+        mask=None, x0=None,
+        ieqcons=[], f_ieqcons=None,
+        args=(), kwargs={},
+        swarmsize=None, inertia=None, phip=None, phig=None, maxn=250,
+        minstep=1e-8, minobj=1e-8, maxit=False,
+        init='lhs', strategy='fips', topology='gbest', kl=1,
+        processes=1,
+        verbose=0, pout=False, cout=False,
+        parameterfile=None, parameterwriter=None,
+        objectivefile=None, objectivereader=None,
+        shell=False, debug=False):
     """
         Particle Swarm Optimization (PSO)
 
 
         Definition
         ----------
-        def pso(func, lb, ub, ieqcons=[], f_ieqcons=None, args=(), kwargs={},
-                swarmsize=40, omega=None, phip=None, phig=None, maxiter=250,
-                minstep=1e-8, minobj=1e-8,
-                init='random', psotype='fips',
-                verbose=0, processes=1, particle_output=False):
+        def pso(func, lb, ub, ieqcons=None, f_ieqcons=None, args=(), kwargs={},
+                swarmsize=None, inertia=None, phip=None, phig=None, maxn=250,
+                minstep=1e-8, minobj=1e-8, maxit=False,
+                init='lhs', strategy='fips', topology='gbest', kl=1,
+                verbose=0, processes=1, pout=False, cout=False):
 
 
         Input
         -----
-        func        function
+        func        python function or string for external executable
                     The function to be minimized
         lb          1D-array
                     The lower bounds of the design variable(s)
@@ -96,57 +275,74 @@ def pso(func, lb, ub, ieqcons=[], f_ieqcons=None, args=(), kwargs={},
 
         Optional Input
         --------------
+        mask        1D-array
+                    include (1,True) or exclude (0,False) parameters in optimisation.
+                    (Default: include all dimensions)
+        X0          1D-array
+                    If mask=True, then x0 must be given with initial values for the excluded dimensions.
         ieqcons     list
                     A list of functions of length n such that ieqcons[j](x,*args) >= 0.0 in
-                    a successfully optimized problem (Default: [])
+                    a successfully optimized problem.
+                    (Default: None)
         f_ieqcons   function
                     Returns a 1-D array in which each element must be greater or equal
                     to 0.0 in a successfully optimized problem. If f_ieqcons is specified,
-                    ieqcons is ignored (Default: None)
+                    ieqcons is ignored.
+                    (Default: None)
         args        tuple
                     Additional arguments passed to objective and constraint functions
                     (Default: empty tuple)
         kwargs      dict
-                    Additional keyword arguments passed to objective and constraint
-                    functions (Default: empty dict)
+                    Additional keyword arguments passed to objective and constraint functions.
+                    (Default: empty dict)
         swarmsize   int
-                    The number of particles in the swarm (Default: 40)
-        omega       scalar
+                    The number of particles in the swarm.
+                    (Default: max(min(3*len(lb),40),10))
+        inertia     scalar
                     Particle velocity scaling factor.
-                    Default depends on algorithm (psotype).
+                    Default depends on algorithm (strategy).
         phip        scalar
                     Scaling factor to search away from the particle's best known position.
-                    Default depends on algorithm (psotype).
+                    Default depends on algorithm (strategy).
         phig        scalar
-                    Scaling factor to search away from the swarm's best known position.
-                    Default depends on algorithm (psotype).
-        maxiter     int
-                    The maximum number of iterations for the swarm to search (Default: 250)
+                    Scaling factor to search away from the swarm's (neighbor's) best known position.
+                    Default depends on algorithm (strategy).
+        maxn        int
+                    The maximum number of iterations for the swarm to search.
+                    (Default: 250)
         minstep     scalar
-                    The minimum stepsize of swarm's best position before the search
-                    terminates (Default: 1e-8)
+                    The minimum stepsize of swarm's best position before the search terminates.
+                    (Default: 1e-8)
         minobj      scalar
-                    Objective function defining convergence (Default: 1e-8)
+                    Objective function defining convergence. Attention at maxit=True.
+                    (Default: 1e-8)
+        maxit       boolean
+                    Minimise or maximise func.
+                    (Default: False)
+                    False: minimise objective function down to minobj
+                    True:  maximise objective function, i.e. minimise -objective function down to minobj
         init        string
-                    How to sample the initial swarm positions and velocities (Default: 'lhs')
+                    How to sample the initial swarm positions and velocities.
+                    (Default: 'lhs')
                     'random': random sampling from uniform distribution
                     'lhs':    latin hypercube sampling from uniform distributions
                     'sobol':  quasirandom Sobol sequence (only up to 40 dimensions)
-        psotype     string
-                    PSO algorithm (Default: 'fips')
+        strategy    string
+                    PSO variants.
+                    (Default: 'fips')
                     'original':   Textbook particle swarm algorithm with inertia weight
                                   x = current position
                                   p = particles best position
                                   g = neighborhood best position
                                   rg, rp = np.random.uniform(size=(S,D))
-                                  omega=0.5, phip=2., phig=2.
-                                  v = omega*v + rp*phip*(p-x) + rg*phig*(g-x)
+                                  inertia=0.5, phip=2., phig=2.
+                                  v = inertia*v + rp*phip*(p-x) + rg*phig*(g-x)
                                   x = x + v
                     'inertia':    Same as 'original' but with inertia weight decreasing from 0.9 to 0.4
                                   over time, i.e. over iterations (it)
-                                  omax = 0.9
-                                  omin = 0.4
-                                  omega = omax - float(it)/float(maxiter-1) * (omax-omin)
+                                  imax = 0.9
+                                  imin = 0.4
+                                  inertia = imax - float(it)/float(maxn-1) * (imax-imin)
                     'canonical':  Clerk & Kennedy (2000) with fixed constriction factor
                                   From PaGMO (esa.github.io/pagmo):
                                   Clerc's analysis of the iterative system led him to propose a strategy for the
@@ -158,8 +354,8 @@ def pso(func, lb, ub, ieqcons=[], f_ieqcons=None, args=(), kwargs={},
                                   "This is the canonical particle swarm algorithm of today."
                                   [Poli et al., 2007] http://dx.doi.org/10.1007/s11721-007-0002-0
                                   [Clerc & Kennedy, 2002] http://dx.doi.org/10.1109/4235.985692
-                                  omega=0.7289, phip=2.05, phig=2.05
-                                  v = omega * (v + phip*rp*(p - x) + phig*rg*(g - x))
+                                  inertia=0.7289, phip=2.05, phig=2.05
+                                  v = inertia * (v + phip*rp*(p - x) + phig*rg*(g - x))
                                   x = x + v
                     'fips':       Fully Informed Particle Swarm
                                   From PaGMO (esa.github.io/pagmo):
@@ -173,31 +369,70 @@ def pso(func, lb, ub, ieqcons=[], f_ieqcons=None, args=(), kwargs={},
                                   [Poli et al., 2007] http://dx.doi.org/10.1007/s11721-007-0002-0
                                   [Mendes et al., 2004] http://dx.doi.org/10.1109/TEVC.2004.826074
                                   ri = np.random.uniform(size=nneighbor)
-                                  omega = 0.7289
+                                  inertia = 0.7289
                                   acc_coeff = phip+phig = 4.1
-                                  v = omega * (v + np.sum(ri*acc_coeff/nneighbor*(p[neighbor[:]]-x)))
+                                  v = inertia * (v + np.sum(ri*acc_coeff/nneighbor*(p[:]-x)))
+                    'nips':       Neighborhood Informed Particle Swarm
+                                  'fips' but particles are not informed by all other particles
+                                  but only the particles in its neighborhood given by topology.
+                                  ri = np.random.uniform(size=nneighbor)
+                                  inertia = 0.7289, acc_coeff = phip+phig = 4.1
+                                  v = inertia * (v + np.sum(ri*acc_coeff/nneighbor*(p[neighbor[:]]-x)))
+        topology    string
+                    Neighborhood topologies. These are rather social than geographical topologies.
+                    All neighborhoods comprise the current particle as well.
+                    [Kennedy & Mendes, 2002] http://dx.doi.org/10.1109/CEC.2002.1004493
+                    (Default: 'gbest')
+                    'gbest'    Neighborhood is entire swarm.
+                    'lbest'    Partciles aranged in a ring, in which each particle communicates with
+                               kl particles on each side, i.e. particle i has the neighborhood
+                               i-kl, i-kl+1, ..., i, i+1, ..., i+kl-1, i+kl
+                               [Mohais et al., 2005] http://dx.doi.org/10.1007/11589990_80
+                    'ring'     'lbest' with kl=1
+                    'neumann'  Neighborhood of a point including all points at a Hamming distance of 1.
+                               Particles are arranges in a lattice, where each particle interacts with
+                               its immediate 4 neighbors to the N, S, E, and W.
+                               [Kennedy and Mendes, 2006] http://dx.doi.org/10.1109/TSMCC.2006.875410
+                               The von Neumann neighborhood is configured into r rows and c columns,
+                               where r is the highest integer less than or equal to sqrt(n) that evenly
+                               divides n and c = n / r
+                               [Mohais et al., 2005] http://dx.doi.org/10.1007/11589990_80
+        kl          integer
+                    Neighborhood distance in topology 'lbest'.
+                    (Default: 1 = ring)
         verbose     integer
-                    Controlling amount of print-out (default: 0)
-                    0: No print-out
+                    Controlling amount of print-out.
+                    0: No print-out.
                     1: Printing convergence criteria, etc.
                     2: Printing after each step.
+                    (Default: 0)
         processes   int
-                    The number of processes to use to evaluate objective function and
-                    constraints (default: 1)
-        particle_output   boolean
-                    Whether to include the best per-particle position and the objective
-                    values at those.
+                    The number of processes to use to evaluate objective function and constraints.
+                    (Default: 1)
+        pout        boolean
+                    True: include best per-particle positions and their objective values in output.
+                    (Default: False)
+        cout        boolean
+                    True: include number of function calls in output.
+                    (Default: False)
+        parameterfile     Parameter file for executable; must be given if functn is name of executable
+        parameterwriter   Python function for writing parameter file if functn is name of executable
+        objectivefile     File with objective value from executable; must be given if functn is name of executable
+        objectivereader   Python function for reading objective value if functn is name of executable
+        shell             If True, the specified executable will be executed through the shell (default: False).
+        debug             If True, model output is displayed for executable (default: False).
+
 
         Output
         ------
         g           1D-array
-                    The swarm's best known position (optimal design)
-        f           scalar
-                    The objective value at ``g``
+                    The swarm's best known position.
+        fg          scalar
+                    The objective value at g.
         p           ND-array
-                    The best known position per particle
-        pf          1D-array
-                    The objective values at each position in p
+                    The best known position of each particle.
+        fp          1D-array
+                    The objective values at each position in p.
 
 
         License
@@ -227,66 +462,98 @@ def pso(func, lb, ub, ieqcons=[], f_ieqcons=None, args=(), kwargs={},
         -------
         Written,  Abraham Lee, 2013 - https://github.com/tisimst/pyswarm
         Modified, MC, Nov 2016 - adapted to JAMS package
-                  MC, Nov 2016 - swarmsize=100, omega=0.5, phip=0.5, phig=0.5, maxiter=100
-                                 -> swarmsize=40, omega=0.5, phip=2., phig=2., maxiter=250
-                               - include vmax: clip(v, vmin, vmax)
+                  MC, Nov 2016 - Changed defaults from swarmsize=100, omega=0.5, phip=0.5, phig=0.5, maxn=100
+                               - Include vmax for original: clip(v, vmin, vmax)
                                - Sobol sequences and latin hypercube sampling for initial swarm positions
-                               - Different PSO algorithms
-                               - minfunc -> minobj
-                               - debug -> verbose
+                               - Different PSO algorithms: original, decreasing inertia weights, constricted
+                                 fully informed
+                               - Stop if function below minobj
+                               - debug -> verbose, maxit, cout
+                               - neighborhoods
+                               - external function - mask, x0, parameterfile, parameterwriter,
+                                                     objectivefile, objectivereader, shell, debug
     """
-    # Check arguments
-    assert len(lb)==len(ub), 'Lower- and upper-bounds must be the same length'
-    assert hasattr(func, '__call__'), 'Invalid function handle'
-    lb = np.array(lb) # assert ND-array
+    # Checks
+    # Function
+    assert hasattr(func, '__call__') or isinstance(func, (str,list)), 'Invalid function handle or external call.'
+    # Bounds
+    assert len(lb)==len(ub), 'Lower- and upper-bounds must have the same lengths.'
+    lb = np.array(lb)
     ub = np.array(ub)
-    assert np.all(ub > lb), 'All upper-bound values must be greater than lower-bound values'
+    assert np.all(ub > lb), 'All upper-bounds must be greater than lower-bounds.'
+    # Mask
+    if mask is not None:
+        assert len(mask)==len(ub), 'Mask and bounds must have the same lengths.'
+        if not np.all(mask):
+            if x0 is None:
+                raise ValueError('x0 must be given if dimensions are excluded from optimisation')
+            else:
+                assert len(mask)==len(x0), 'Mask and x0 must have the same lengths.'
+    # Initialisation keyword
     inits = ['random', 'lhs', 'sobol']
-    assert init.lower() in inits, 'Initialisation not in {:}'.format(inits)
+    assert init.lower() in inits, 'Initialisation {:} not in {:}'.format(init, inits)
     if init.lower() == 'sobol':
         assert len(lb) <= 40, "Sobol' sequences only work up to 40 dimensions."
-    ptypes = ['original', 'inertia', 'canonical', 'fips']
-    assert psotype.lower() in ptypes, 'PSO type not in {:}'.format(ptypes)
+    # Strategy keyword
+    ptypes = ['original', 'inertia', 'canonical', 'fips', 'nips']
+    assert strategy.lower() in ptypes, 'PSO implementation {:} not in {:}'.format(strategy, ptypes)
+    # Topology keyword
+    ttypes = ['gbest', 'lbest', 'ring', 'neumann']
+    assert topology.lower() in ttypes, 'Topology {:} not in {:}'.format(topology, ttypes)
+    # Parameterfile etc. keywords if func is name of executable
+    if isinstance(func, (str,list)):
+        if parameterfile is None:
+            raise IOError('parameterfile must be given if func is name of executable.')
+        if parameterwriter is None:
+            raise IOError('parameterwrite must be given if func is name of executable.')
+        if objectivefile is None:
+            raise IOError('objectivefile must be given if func is name of executable.')
+        if objectivereader is None:
+            raise IOError('objectivereader must be given if func is name of executable.')
 
-    # Defaults
-    if psotype.lower() == 'original':   # Kennedy & Eberhart, 2001
-        if omega is None: omega=0.5
+    # Set defaults per strategy
+    if strategy.lower() == 'original':    # Kennedy & Eberhart, 2001
+        if inertia is None: inertia=0.5
         if phip  is None: phip=2.
         if phig  is None: phig=2.
-    elif psotype.lower() == 'inertia':  # Shi & Eberhart (1998)
-        omax = 0.9
-        omin = 0.4
+    elif strategy.lower() == 'inertia':   # Shi & Eberhart (1998)
+        imax = 0.9
+        imin = 0.4
         if phip is None: phip=2.
         if phig is None: phig=2.
-    elif psotype.lower() == 'canonical': # Clerc & Kennedy (2000)
-        if omega is None: omega=0.7289
+    elif strategy.lower() == 'canonical': # Clerc & Kennedy (2000)
+        if inertia is None: inertia=0.7289
         if phip  is None: phip=2.05
         if phig  is None: phig=2.05
-    elif psotype.lower() == 'fips': # Mendes & Kennedy (2004)
-        if omega is None: omega=0.7289
+    elif strategy.lower() == 'fips':      # Mendes & Kennedy (2004)
+        if inertia is None: inertia=0.7289
+        if phip  is None: phip=2.05
+        if phig  is None: phig=2.05
+    elif strategy.lower() == 'nips':
+        if inertia is None: inertia=0.7289
         if phip  is None: phip=2.05
         if phig  is None: phig=2.05
 
-    # Maximum velocity
-    vmax = np.abs(ub - lb)
-    vmin = -vmax
+    # Partialise objective function
+    if isinstance(func, (str,list)):
+        obj = partial(_ext_obj_wrapper, func, bl, bu, mask,
+                      parameterfile, parameterwriter, objectivefile, objectivereader, shell, debug)
+    else:
+        obj = partial(_obj_wrapper, func, args, kwargs)
 
-    # Initialize objective function
-    obj = partial(_obj_wrapper, func, args, kwargs)
-
-    # Check for constraint function(s)
+    # Check for constraint function(s) and partialise them
     if f_ieqcons is None:
-        if not len(ieqcons):
+        if ieqcons is None:
             if verbose>=1:
                 print('No constraints given.')
             cons = _cons_none_wrapper
         else:
             if verbose>=1:
-                print('Converting ieqcons to a single constraint function')
+                print('Converting ieqcons to a single constraint function.')
             cons = partial(_cons_ieqcons_wrapper, ieqcons, args, kwargs)
     else:
         if verbose>=1:
-            print('Single constraint function given in f_ieqcons')
+            print('Single constraint function given in f_ieqcons.')
         cons = partial(_cons_f_ieqcons_wrapper, f_ieqcons, args, kwargs)
     is_feasible = partial(_is_feasible_wrapper, cons)
 
@@ -295,9 +562,15 @@ def pso(func, lb, ub, ieqcons=[], f_ieqcons=None, args=(), kwargs={},
         import multiprocessing
         mp_pool = multiprocessing.Pool(processes)
 
+    # Deal with NaN and Inf
+    large = 0.5*huge
+
     # Initialize the particle swarm
-    S  = swarmsize
-    D  = len(lb)                       # dimension of each particle
+    D = len(lb) # dimension of each particle
+    if swarmsize is None:
+        S = max(min(3*D,40),10)
+    else:
+        S = swarmsize
     # current particle positions
     # current particle velocities
     if init.lower() == 'random':
@@ -316,20 +589,26 @@ def pso(func, lb, ub, ieqcons=[], f_ieqcons=None, args=(), kwargs={},
         pars = [(0,1) for i in range(D)]
         x    = lhs(dist, pars, S).transpose()
         v    = lhs(dist, pars, S).transpose()
-    fx = np.ones(S)*np.inf             # current particle function values
+    fx = np.ones(S)*large              # current particle function values
     fs = np.zeros(S, dtype=bool)       # current combined feasibility for each particle
-    p  = np.ones((S,D))*np.inf         # particle's individual best positions
-    fp = np.ones(S)*np.inf             # particle's individual best function values
-    g  = np.ones(D)*np.inf             # swarm's best position
-    fg = np.inf                        # swarm's best function value
-    # n  = np.ones((S,D))*np.inf         # neighbors's best position
-    # ng = np.ones(S)*np.inf             # neighbors's best function value
+    p  = np.ones((S,D))*large          # particles individual best positions
+    fp = np.ones(S)*large              # particles individual best function values
 
-    # Initialize the particles positions and velocities
+    # Initialise mask
+    if mask is not None:
+        imask = np.tile(mask,S).reshape((S,D))
+        ix0   = np.tile(x0,S).reshape((S,D))
+
+    # Maximum velocity
+    vmax = np.abs(ub - lb)
+    vmin = -vmax
+
+    # Initialize particle positions and velocities
     x = lb + x*(ub - lb)
+    if mask is not None: x = np.where(imask, x, ix0)
     v = vmin + v*(vmax-vmin)
 
-    # Calculate objective and constraints (may be dummy) for each particle
+    # Calculate first objective and constraints for each particle
     if processes > 1:
         fx = np.array(mp_pool.map(obj, x))
         fs = np.array(mp_pool.map(is_feasible, x))
@@ -337,48 +616,59 @@ def pso(func, lb, ub, ieqcons=[], f_ieqcons=None, args=(), kwargs={},
         for i in range(S):
             fx[i] = obj(x[i,:])
             fs[i] = is_feasible(x[i,:])
+    # maximise
+    if maxit: fx *= -1.
 
-    # Store particle's best position (if constraints are satisfied)
+    # NaN/Inf
+    large = max(fp.max(), fx[np.isfinite(fx)].max())
+    large = 1.1*large if large>0. else 0.9*large
+    fx = np.where(np.isfinite(fx), fx, large)
+
+    # Store particles best positions (if constraints are satisfied)
     i_update = (fx < fp) & fs
     if np.any(i_update):
         p[i_update,:] = x[i_update,:].copy()
         fp[i_update]  = fx[i_update]
-
-    # Update swarm's best position
-    i_min = np.argmin(fp)
-    if fp[i_min] < fg:
-        g  = p[i_min,:].copy()
-        fg = fp[i_min]
-    else:
-        # At the start, there may not be any feasible starting point, so just
-        # give it a temporary "best" point since it's likely to change
-        g  = x[0, :].copy()
-        fg = fp[0]
-
+    
     # Iterate until termination criterion met
     it = 1
-    while (it <= maxiter):
+    while (it < maxn):
+        # Stop if minimum found
+        if fp.min() < minobj:
+            if verbose>=1: print('minobj found.')
+            break
+
+        # Update neighbors best positions
+        g, fg = get_best_neighbor(p, fp, topology, kl=kl)
+
         # Update the particles velocities
         rp = np.random.uniform(size=(S,D))
         rg = np.random.uniform(size=(S,D))
-        if psotype.lower() == 'original':    # Kennedy & Eberhart, 2001
-            v = omega*v + phip*rp*(p - x) + phig*rg*(g - x)
+        if strategy.lower() == 'original':    # Kennedy & Eberhart, 2001
+            v = inertia*v + phip*rp*(p - x) + phig*rg*(g - x)
             v = np.clip(v, vmin, vmax)
             v = np.clip(v, vmin, vmax)
-        elif psotype.lower() == 'inertia':   # Shi & Eberhart (1998)
-            omega = omax - float(it)/float(maxiter-1) * (omax-omin)
-            v = omega*v + phip*rp*(p - x) + phig*rg*(g - x)
+        elif strategy.lower() == 'inertia':   # Shi & Eberhart (1998)
+            inertia = imax - float(it)/float(maxn-1) * (imax-imin)
+            v = inertia*v + phip*rp*(p - x) + phig*rg*(g - x)
             v = np.clip(v, vmin, vmax)
-        elif psotype.lower() == 'canonical': # Clerc & Kennedy (2000)
-            v = omega * (v + phip*rp*(p - x) + phig*rg*(g - x))
-        elif psotype.lower() == 'fips':      # Mendes & Kennedy (2004)
+        elif strategy.lower() == 'canonical': # Clerc & Kennedy (2000)
+            v = inertia * (v + phip*rp*(p - x) + phig*rg*(g - x))
+        elif strategy.lower() == 'fips':      # Mendes & Kennedy (2004)
             acc_coeff = (phip + phig) / float(S)
             for i in range(S):
                 ri = np.random.uniform(size=(S,D))
-                v[i,:] = omega * (v[i,:] + np.sum(ri[:,:]*acc_coeff*(p[:,:]-x[i,:]), axis=0))
+                v[i,:] = inertia * (v[i,:] + np.sum(ri[:,:]*acc_coeff*(p[:,:]-x[i,:]), axis=0))
+        elif strategy.lower() == 'nips':      # Mendes & Kennedy (2004)
+            acc_coeff = (phip + phig) / float(S)
+            for i in range(S):
+                ri = np.random.uniform(size=(S,D))
+                ii = get_neighbor_indeces(i, S, topology, kl=kl)
+                v[i,:] = inertia * (v[i,:] + np.sum(ri[ii,:]*acc_coeff*(p[ii,:]-x[i,:]), axis=0))
 
         # Update the particles positions
         x = x + v
+        if mask is not None: x = np.where(imask, x, ix0)
 
         # Limit to bounds
         x = np.clip(x, lb, ub)
@@ -391,49 +681,57 @@ def pso(func, lb, ub, ieqcons=[], f_ieqcons=None, args=(), kwargs={},
             for i in range(S):
                 fx[i] = obj(x[i,:])
                 fs[i] = is_feasible(x[i,:])
+        if maxit: fx *= -1.
 
-        # Store particle's best position (if constraints are satisfied)
+        # NaN/Inf
+        large = max(fp.max(), fx[np.isfinite(fx)].max())
+        large = 1.1*large if large>0. else 0.9*large
+        fx = np.where(np.isfinite(fx), fx, large)
+
+        # Store particles best positions (if constraints are satisfied)
         i_update = (fx < fp) & fs
         if np.any(i_update):
             p[i_update,:] = x[i_update,:].copy()
             fp[i_update]  = fx[i_update]
 
-        # Compare swarm's best position with global best position
-        i_min = np.argmin(fp)
-        
-        # Stop if minimum found
-        if fp[i_min] < minobj:
-            g  = p[i_min,:].copy()
-            fg = fp[i_min]
-            break
-        
-        # Set new swarm best
-        if fp[i_min] < fg:
-            if verbose>=1: print('New best for swarm at iteration {:}: {:} {:}'.format(it, p[i_min, :], fp[i_min]))
-            g  = p[i_min,:].copy()
-            fg = fp[i_min]
-            # stepsize = np.sqrt(np.sum((g - p_min)**2))
-            # if stepsize <= minstep: break
-            # if np.abs(fg - fp_min) <= minobj: break
-
-        if verbose==2: print('Best after iteration {:}: {:} {:}'.format(it, g, fg))
         it += 1
 
-    if (it == (maxiter+1)) and (verbose>=1): print('Maximum iterations reached --> {:}.'.format(maxiter))
+    if (it == maxn) and (verbose>=1): print('Maximum iterations reached --> {:}.'.format(maxn))
 
-    if not is_feasible(g): print("PSO could not find any feasible point in the search space.")
+    # global best
+    i_min = np.argmin(fp)
+    bestx = p[i_min,:].copy()
+    bestf = fp[i_min]
 
-    if particle_output:
-        return [g, fg, p, fp]
-    else:
-        return [g, fg]
+    if maxit:
+        bestf *= -1.
+        fp    *= -1.
+
+    if not any(map(is_feasible, p)): print("PSO could not find any feasible point in the search space.")
+
+    # write parameter file with best parameters
+    if isinstance(func, (str,list)):
+        parameterwriter(parameterfile, bestx, bl, bu, mask)
+
+    out = [bestx, bestf]
+    if pout:
+        out += [p, fp]
+    if cout:
+        out += [it*S]
+
+    return out
 
 
 if __name__ == '__main__':
     # import doctest
     # doctest.testmod(optionflags=doctest.NORMALIZE_WHITESPACE)
 
-    algo = 'original'
+    algo = 'nips'
+    init = 'lhs'
+    swarmsize = None
+    maxn = 250
+    topology = 'gbest'
+
     from jams.functions import ackley, griewank, goldstein_price, rastrigin, rosenbrock, six_hump_camelback
     '''
     This is the Ackley Function
@@ -442,7 +740,7 @@ if __name__ == '__main__':
     npara = 10
     bl = -10*np.ones(npara)
     bu = 10*np.ones(npara)
-    bestx, bestf = pso(ackley, bl, bu, processes=4, init='lhs', psotype=algo, verbose=0, maxiter=250)
+    bestx, bestf = pso(ackley, bl, bu, processes=4, init=init, strategy=algo, topology=topology, verbose=0, swarmsize=swarmsize, maxn=maxn)
     print('Ackley ', bestx, bestf)
     '''
         This is the Griewank Function (2-D or 10-D)
@@ -452,7 +750,7 @@ if __name__ == '__main__':
     npara = 10
     bl = -600*np.ones(npara)
     bu = 600*np.ones(npara)
-    bestx, bestf = pso(griewank, bl, bu, processes=4, init='lhs', psotype=algo, verbose=0, maxiter=250)
+    bestx, bestf = pso(griewank, bl, bu, processes=4, init=init, strategy=algo, topology=topology, verbose=0, swarmsize=swarmsize, maxn=maxn)
     print('Griewank ', bestx, bestf)
     '''
     This is the Goldstein-Price Function
@@ -462,7 +760,7 @@ if __name__ == '__main__':
     npara = 2
     bl = -2*np.ones(npara)
     bu = 2*np.ones(npara)
-    bestx, bestf = pso(goldstein_price, bl, bu, processes=4, init='lhs', psotype=algo, verbose=0, maxiter=250)
+    bestx, bestf = pso(goldstein_price, bl, bu, processes=4, init=init, strategy=algo, topology=topology, verbose=0, swarmsize=swarmsize, maxn=maxn)
     print('Goldstein ', bestx, bestf)
     '''
     This is the Rastrigin Function
@@ -472,7 +770,7 @@ if __name__ == '__main__':
     npara = 2
     bl = -1*np.ones(npara)
     bu = 1*np.ones(npara)
-    bestx, bestf = pso(rastrigin, bl, bu, processes=4, init='lhs', psotype=algo, verbose=0, maxiter=250)
+    bestx, bestf = pso(rastrigin, bl, bu, processes=4, init=init, strategy=algo, topology=topology, verbose=0, swarmsize=swarmsize, maxn=maxn)
     print('Rastrigin ', bestx, bestf)
     '''
     This is the Rosenbrock Function
@@ -482,7 +780,7 @@ if __name__ == '__main__':
     npara = 2
     bl = -2*np.ones(npara)
     bu = 5*np.ones(npara)
-    bestx, bestf = pso(rosenbrock, bl, bu, processes=4, init='lhs', psotype=algo, verbose=0, maxiter=250)
+    bestx, bestf = pso(rosenbrock, bl, bu, processes=4, init=init, strategy=algo, topology=topology, verbose=0, swarmsize=swarmsize, maxn=maxn)
     print('Rosenbrock ', bestx, bestf)
     '''
     This is the Six-hump Camelback Function.
@@ -492,5 +790,5 @@ if __name__ == '__main__':
     npara = 2
     bl = -5*np.ones(npara)
     bu = 5*np.ones(npara)
-    bestx, bestf = pso(six_hump_camelback, bl, bu, processes=4, init='lhs', psotype=algo, verbose=0, maxiter=250)
+    bestx, bestf = pso(six_hump_camelback, bl, bu, processes=4, init=init, strategy=algo, topology=topology, verbose=0, swarmsize=swarmsize, maxn=maxn)
     print('Six_hump_camelback ', bestx, bestf)
