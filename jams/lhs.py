@@ -50,6 +50,24 @@ def lhs(dist, param, nsample):
         [['52.822' '51.956' '46.710' '50.585']
          [' 4.950' ' 2.492' ' 2.078' ' 4.673']]
 
+        >>> np.random.seed(1)
+        >>> dist = [stats.norm]
+        >>> pars = [(50,2)]
+        >>> c    = lhs(dist, pars, 20)
+        >>> print(c.shape)
+        (1, 20)
+        >>> print(astr(c[0,0:4],3,pp=True))
+        ['51.171' '48.562' '51.683' '50.585']
+
+        >>> np.random.seed(1)
+        >>> dist = stats.norm
+        >>> pars = (50,2)
+        >>> c    = lhs(dist, pars, 20)
+        >>> print(c.shape)
+        (20,)
+        >>> print(astr(c[0:4],3,pp=True))
+        ['51.171' '48.562' '51.683' '50.585']
+
 
         License
         -------
@@ -77,13 +95,16 @@ def lhs(dist, param, nsample):
         Written,  MC, May 2012 - combination of Matlab routines of Budiman (2003)
                                  and Python routines of Flavio Codeco Coelho (2008)
         Modified, MC, Feb 2013 - ported to Python 3
+                      Nov 2016 - preserve shape <- nodim
     """
     #
     # Check input
     if not isinstance(dist,(list,tuple)):
+        nodim = True
         dist  = [dist]
         param = [param]
     else:
+        nodim = False
         assert len(dist) == len(param)
     ndist = len(dist)
 
@@ -99,7 +120,10 @@ def lhs(dist, param, nsample):
         p   = (idx+ran[j,:])/np.float(nsample) # probability of cdf
         lhsout[j,:] = d(*pars).ppf(p)          # inverse of cdf
 
-    return np.squeeze(lhsout)
+    if nodim:
+        return lhsout[0,:]
+    else:
+        return lhsout
 
 
 if __name__ == '__main__':
