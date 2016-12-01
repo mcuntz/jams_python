@@ -5,8 +5,6 @@ import subprocess
 import numpy as np
 from jams.const import huge
 # ToDo:
-#   include x0
-#   seed
 #   restart
 #   crossover with quadratic function (QIPSO)
 #   MPI
@@ -69,17 +67,17 @@ def _ext_obj_wrapper(func, lb, ub, mask,
 
 # Function wrappers for objective and constraints
 # used with functools.partial
-def _obj_wrapper(func, args, kwargs, x):
+def _obj_wrapper(func, arg, kwarg, x):
     '''
         Wrapper function for function to be optimised
         to be used with partial:
-            obj = partial(_obj_wrapper, func, args, kwargs)
+            obj = partial(_obj_wrapper, func, arg, kwarg)
         This allows then calling obj with only the argument x:
             fx = obj(x)
         which translates to:
-            fx = func(x, *args, **kwargs)
+            fx = func(x, *arg, **kwarg)
     '''
-    return func(x, *args, **kwargs)
+    return func(x, *arg, **kwarg)
 
 
 def _is_feasible_wrapper(func, x):
@@ -105,22 +103,22 @@ def _cons_none_wrapper(x):
     return np.array([0])
 
 
-def _cons_ieqcons_wrapper(ieqcons, args, kwargs, x):
+def _cons_ieqcons_wrapper(ieqcons, arg, kwarg, x):
     '''
         Wrapper function for constraints to be used with partial in the case
         that ieqcons is given, i.e. a list of constraint functions, returning
         >=0. if constraints are met.
     '''
-    return np.array([y(x, *args, **kwargs) for y in ieqcons])
+    return np.array([y(x, *arg, **kwarg) for y in ieqcons])
 
 
-def _cons_f_ieqcons_wrapper(f_ieqcons, args, kwargs, x):
+def _cons_f_ieqcons_wrapper(f_ieqcons, arg, kwarg, x):
     '''
         Wrapper function for constraints to be used with partial in the case
         that f_ieqcons is given, i.e. a single function returning an 1-D array
         values >=0. where constraints are met.
     '''
-    return np.array(f_ieqcons(x, *args, **kwargs))
+    return np.array(f_ieqcons(x, *arg, **kwarg))
 
 
 def get_best_neighbor(p, fp, topology, kl=1):
@@ -245,10 +243,11 @@ def get_neighbor_indeces(n, S, topology, kl=1):
 def pso(func, x0, lb, ub,
         mask=None,
         ieqcons=[], f_ieqcons=None,
-        args=(), kwargs={},
+        arg=(), kwarg={},
         swarmsize=None, inertia=None, phip=None, phig=None, maxn=250,
         minstep=1e-8, minobj=1e-8, maxit=False,
         init='lhs', strategy='fips', topology='gbest', kl=1,
+        includex0=False, seed=None,
         processes=1,
         verbose=0, pout=False, cout=False,
         parameterfile=None, parameterwriter=None,
@@ -263,10 +262,11 @@ def pso(func, x0, lb, ub,
         def pso(func, x0, lb, ub,
                 mask=None,
                 ieqcons=[], f_ieqcons=None,
-                args=(), kwargs={},
+                arg=(), kwarg={},
                 swarmsize=None, inertia=None, phip=None, phig=None, maxn=250,
                 minstep=1e-8, minobj=1e-8, maxit=False,
                 init='lhs', strategy='fips', topology='gbest', kl=1,
+                includex0=False,
                 processes=1,
                 verbose=0, pout=False, cout=False,
                 parameterfile=None, parameterwriter=None,
@@ -292,7 +292,7 @@ def pso(func, x0, lb, ub,
                     include (1,True) or exclude (0,False) parameters in optimisation.
                     (Default: include all dimensions)
         ieqcons     list
-                    A list of functions of length n such that ieqcons[j](x,*args) >= 0.0 in
+                    A list of functions of length n such that ieqcons[j](x,*arg) >= 0.0 in
                     a successfully optimized problem.
                     (Default: None)
         f_ieqcons   function
@@ -300,10 +300,10 @@ def pso(func, x0, lb, ub,
                     to 0.0 in a successfully optimized problem. If f_ieqcons is specified,
                     ieqcons is ignored.
                     (Default: None)
-        args        tuple
+        arg        tuple
                     Additional arguments passed to objective and constraint functions.
                     (Default: empty tuple)
-        kwargs      dict
+        kwarg      dict
                     Additional keyword arguments passed to objective and constraint functions.
                     (Default: empty dict)
         swarmsize   int
@@ -417,6 +417,12 @@ def pso(func, x0, lb, ub,
                     0: No print-out.
                     1: Printing convergence criteria, etc.
                     2: Printing after each step.
+        includex0   boolean
+                    True: include x0 in initial swarm
+                    (Default: False)
+        seed        int or array_like
+                    Seed for numpy's random number generator.
+                    (Default: None)
         processes   int
                     The number of processes to use to evaluate objective function and constraints.
                     (Default: 1)
@@ -483,6 +489,7 @@ def pso(func, x0, lb, ub,
                                - neighborhoods
                                - external function - mask, x0, parameterfile, parameterwriter,
                                                      objectivefile, objectivereader, shell, debug
+                  MC, Dec 2016 - includex0
     """
     # Checks
     # Function
@@ -563,7 +570,7 @@ def pso(func, x0, lb, ub,
         obj = partial(_ext_obj_wrapper, func, lb, ub, mask1,
                       parameterfile, parameterwriter, objectivefile, objectivereader, shell, debug)
     else:
-        obj = partial(_obj_wrapper, func, args, kwargs)
+        obj = partial(_obj_wrapper, func, arg, kwarg)
 
     # Check for constraint function(s) and partialise them
     if f_ieqcons is None:
@@ -574,11 +581,11 @@ def pso(func, x0, lb, ub,
         else:
             if verbose>=1:
                 print('Converting ieqcons to a single constraint function.')
-            cons = partial(_cons_ieqcons_wrapper, ieqcons, args, kwargs)
+            cons = partial(_cons_ieqcons_wrapper, ieqcons, arg, kwarg)
     else:
         if verbose>=1:
             print('Single constraint function given in f_ieqcons.')
-        cons = partial(_cons_f_ieqcons_wrapper, f_ieqcons, args, kwargs)
+        cons = partial(_cons_f_ieqcons_wrapper, f_ieqcons, arg, kwarg)
     is_feasible = partial(_is_feasible_wrapper, cons)
 
     # Initialize the multiprocessing module if necessary
@@ -588,6 +595,9 @@ def pso(func, x0, lb, ub,
 
     # Deal with NaN and Inf
     large = 0.5*huge
+
+    # Seed random number generator
+    np.random.seed(seed=seed)
 
     # Initialize the particle swarm
     # current particle positions
@@ -620,6 +630,7 @@ def pso(func, x0, lb, ub,
     # Initialize particle positions and velocities
     v = vmin + v*(vmax-vmin)
     x = lb + x*(ub - lb)
+    if includex0: x[-1,:] = x0
     x = np.where(mask2, x, x02)
 
     # Calculate first objective and constraints for each particle

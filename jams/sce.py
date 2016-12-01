@@ -458,11 +458,13 @@ def sce(functn, x0, bl, bu,
                    10 shuffling loops
     '''
     if restartfile1 is not None:
+        # Only arrays with savez_compressed - restartfile1
         restartarray  = ['bl', 'bu', 'bound', 'mask',
                          'criter',
                          'x', 'xf',
                          'bestx', 'worstx', 'allbestf', 'allbestx',
                          'rs2']
+        # Save scalars in simple text file - restartfile2
         restartint    = ['nopt', 'npg', 'nps', 'nspl', 'mings', 'npt',
                          'nloop', 'icall', 'rs3', 'rs4']
         restartfloat  = ['gnrng', 'criter_change', 'bestf', 'worstf', 'rs5']
@@ -501,6 +503,7 @@ def sce(functn, x0, bl, bu,
 
         bound = bu-bl
 
+        # Seed random number generator
         np.random.seed(seed=seed)
 
         if mask is None: mask = np.ones(nopt, dtype=np.bool)
