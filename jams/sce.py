@@ -457,6 +457,7 @@ def sce(functn, x0, bl, bu,
        criter(.) = vector containing the best criterion values of the last
                    10 shuffling loops
     '''
+    # Different variabels types (array, float, int, ...) for restart
     if restartfile1 is not None:
         # Only arrays with savez_compressed - restartfile1
         restartarray  = ['bl', 'bu', 'bound', 'mask',

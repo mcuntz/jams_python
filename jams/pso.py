@@ -4,8 +4,9 @@ from functools import partial
 import subprocess
 import numpy as np
 from jams.const import huge
+from jams import savez_compressed
 # ToDo:
-#   restart
+#   restart -> test solo and in joptimise
 #   crossover with quadratic function (QIPSO)
 #   MPI
 #   iPython parallel
@@ -250,6 +251,7 @@ def pso(func, x0, lb, ub,
         includex0=False, seed=None,
         processes=1,
         verbose=0, pout=False, cout=False,
+        restart=False, restartfile1='pso.restart.npz', restartfile2='pso.restart.txt',
         parameterfile=None, parameterwriter=None,
         objectivefile=None, objectivereader=None,
         shell=False, debug=False):
@@ -269,6 +271,7 @@ def pso(func, x0, lb, ub,
                 includex0=False,
                 processes=1,
                 verbose=0, pout=False, cout=False,
+                restart=False, restartfile1='pso.restart.npz', restartfile2='pso.restart.txt',
                 parameterfile=None, parameterwriter=None,
                 objectivefile=None, objectivereader=None,
                 shell=False, debug=False):
@@ -432,12 +435,37 @@ def pso(func, x0, lb, ub,
         cout        boolean
                     True: include number of function calls in output.
                     (Default: False)
-        parameterfile     Parameter file for executable; must be given if func is name of executable
-        parameterwriter   Python function for writing parameter file if func is name of executable
-        objectivefile     File with objective value from executable; must be given if func is name of executable
-        objectivereader   Python function for reading objective value if func is name of executable
-        shell             If True, the specified executable will be executed through the shell (default: False).
-        debug             If True, model output is displayed for executable (default: False).
+        restart           boolean
+                          if True, continue from saved state in restartfile1/2.
+                          (Default: False)
+        restartfile1/2    string
+                          File names for saving current state of PSO.
+                          (Default: pso.restart.npz and pso.restart.txt)
+                          State will be always written, except if restartfile1=None.
+        parameterfile     string
+                          Parameter file for executable; must be given if func is name of executable
+                          (Default: None)
+        parameterwriter   function
+                          Python function for writing parameter file if func is name of executable
+                          (Default: None)
+        parameterfile     string
+                          Parameter file for executable; must be given if func is name of executable
+                          (Default: None)
+        parameterwriter   function
+                          Python function for writing parameter file if func is name of executable
+                          (Default: None)
+        objectivefile     string
+                          File with objective value from executable; must be given if func is name of executable
+                          (Default: None)
+        objectivereader   function
+                          Python function for reading objective value if func is name of executable
+                          (Default: None)
+        shell             boolean
+                          If True, the specified executable will be executed through the shell.
+                          (Default: False)
+        debug             boolean
+                          If True, model output is displayed for executable.
+                          (Default: False)
 
 
         Output
@@ -491,6 +519,25 @@ def pso(func, x0, lb, ub,
                                                      objectivefile, objectivereader, shell, debug
                   MC, Dec 2016 - includex0
     """
+    # Different variabels types (array, float, int, ...) for restart
+    if restartfile1 is not None:
+        # Only arrays with savez_compressed - restartfile1
+        restartarray  = ['lb', 'ub', 'mask1', 'mask2', 'x02',
+                         'v', 'x', 'fx', 'fs', 'p', 'fp',
+                         'rs2']
+        # Save scalars in simple text file - restartfile2
+        restartint    = ['D', 'S', 'it',
+                         'rs3', 'rs4']
+        restartfloat  = ['rs5']
+        restartbool   = ['maxit']
+        restartstring = ['rs1']
+        saveargarray = '"'+restartfile1+'"'
+        for j in restartarray: saveargarray = saveargarray + ', '+j+'='+j
+        saveargint    = ','.join(restartint)
+        saveargfloat  = ','.join(restartfloat)
+        saveargbool   = ','.join(restartbool)
+        saveargstring = ','.join(restartstring)
+
     # Checks
     # Function
     assert hasattr(func, '__call__') or isinstance(func, (str,list)), 'Invalid function handle or external call.'
@@ -526,138 +573,194 @@ def pso(func, x0, lb, ub,
         if objectivereader is None:
             raise IOError('objectivereader must be given if func is name of executable.')
 
-    # Set defaults per strategy
-    if strategy.lower() == 'original':    # Kennedy & Eberhart, 2001
-        if inertia is None: inertia=0.5
-        if phip  is None: phip=2.
-        if phig  is None: phig=2.
-    elif strategy.lower() == 'inertia':   # Shi & Eberhart (1998)
-        imax = 0.9
-        imin = 0.4
-        if phip is None: phip=2.
-        if phig is None: phig=2.
-    elif strategy.lower() == 'canonical': # Clerc & Kennedy (2000)
-        if inertia is None: inertia=0.7289
-        if phip  is None: phip=2.05
-        if phig  is None: phig=2.05
-    elif strategy.lower() == 'fips':      # Mendes & Kennedy (2004)
-        if inertia is None: inertia=0.7289
-        if phip  is None: phip=2.05
-        if phig  is None: phig=2.05
-    elif strategy.lower() == 'nips':
-        if inertia is None: inertia=0.7289
-        if phip  is None: phip=2.05
-        if phig  is None: phig=2.05
+    if not restart:
+        # Set defaults per strategy
+        if strategy.lower() == 'original':    # Kennedy & Eberhart, 2001
+            if inertia is None: inertia=0.5
+            if phip  is None: phip=2.
+            if phig  is None: phig=2.
+        elif strategy.lower() == 'inertia':   # Shi & Eberhart (1998)
+            imax = 0.9
+            imin = 0.4
+            if phip is None: phip=2.
+            if phig is None: phig=2.
+        elif strategy.lower() == 'canonical': # Clerc & Kennedy (2000)
+            if inertia is None: inertia=0.7289
+            if phip  is None: phip=2.05
+            if phig  is None: phig=2.05
+        elif strategy.lower() == 'fips':      # Mendes & Kennedy (2004)
+            if inertia is None: inertia=0.7289
+            if phip  is None: phip=2.05
+            if phig  is None: phig=2.05
+        elif strategy.lower() == 'nips':
+            if inertia is None: inertia=0.7289
+            if phip  is None: phip=2.05
+            if phig  is None: phig=2.05
 
-    # Problem sizes
-    D = len(lb) # dimension of each particle
-    if swarmsize is None:
-        S = max(min(3*D,40),10)
-    else:
-        S = swarmsize
+        # Problem sizes
+        D = len(lb) # dimension of each particle
+        if swarmsize is None:
+            S = max(min(3*D,40),10)
+        else:
+            S = swarmsize
 
-    # Initialise 1D mask
-    if mask is not None:
-        mask1 = mask
-    else:
-        mask1 = np.ones(D, dtype=np.bool)
-    # 2D mask
-    mask2 = np.tile(mask1,S).reshape((S,D))
-    x02   = np.tile(x0,S).reshape((S,D))
+        # Initialise 1D mask
+        if mask is not None:
+            mask1 = mask
+        else:
+            mask1 = np.ones(D, dtype=np.bool)
+        # 2D mask
+        mask2 = np.tile(mask1,S).reshape((S,D))
+        x02   = np.tile(x0,S).reshape((S,D))
 
-    # Partialise objective function
-    if isinstance(func, (str,list)):
-        obj = partial(_ext_obj_wrapper, func, lb, ub, mask1,
-                      parameterfile, parameterwriter, objectivefile, objectivereader, shell, debug)
-    else:
-        obj = partial(_obj_wrapper, func, arg, kwarg)
+        # Partialise objective function
+        if isinstance(func, (str,list)):
+            obj = partial(_ext_obj_wrapper, func, lb, ub, mask1,
+                          parameterfile, parameterwriter, objectivefile, objectivereader, shell, debug)
+        else:
+            obj = partial(_obj_wrapper, func, arg, kwarg)
 
-    # Check for constraint function(s) and partialise them
-    if f_ieqcons is None:
-        if ieqcons is None:
-            if verbose>=1:
-                print('No constraints given.')
-            cons = _cons_none_wrapper
+        # Check for constraint function(s) and partialise them
+        if f_ieqcons is None:
+            if ieqcons is None:
+                if verbose>=1:
+                    print('No constraints given.')
+                cons = _cons_none_wrapper
+            else:
+                if verbose>=1:
+                    print('Converting ieqcons to a single constraint function.')
+                cons = partial(_cons_ieqcons_wrapper, ieqcons, arg, kwarg)
         else:
             if verbose>=1:
-                print('Converting ieqcons to a single constraint function.')
-            cons = partial(_cons_ieqcons_wrapper, ieqcons, arg, kwarg)
-    else:
-        if verbose>=1:
-            print('Single constraint function given in f_ieqcons.')
-        cons = partial(_cons_f_ieqcons_wrapper, f_ieqcons, arg, kwarg)
-    is_feasible = partial(_is_feasible_wrapper, cons)
+                print('Single constraint function given in f_ieqcons.')
+            cons = partial(_cons_f_ieqcons_wrapper, f_ieqcons, arg, kwarg)
+        is_feasible = partial(_is_feasible_wrapper, cons)
 
-    # Initialize the multiprocessing module if necessary
-    if processes > 1:
-        import multiprocessing
-        mp_pool = multiprocessing.Pool(processes)
+        # Initialize the multiprocessing module if necessary
+        if processes > 1:
+            import multiprocessing
+            mp_pool = multiprocessing.Pool(processes)
 
-    # Deal with NaN and Inf
-    large = 0.5*huge
+        # Deal with NaN and Inf
+        large = 0.5*huge
 
-    # Seed random number generator
-    np.random.seed(seed=seed)
+        # Seed random number generator
+        np.random.seed(seed=seed)
 
-    # Initialize the particle swarm
-    # current particle positions
-    # current particle velocities
-    if init.lower() == 'random':
-        x  = np.random.uniform(size=(S,D))
-        v  = np.random.uniform(size=(S,D))
-    elif init.lower() == 'sobol':
-        import sobol
-        nskip = D*S
-        x = sobol.i4_sobol_generate(D,S,nskip).transpose()
-        nskip = (D*S)**2
-        v = sobol.i4_sobol_generate(D,S,nskip).transpose()
-    elif init.lower() == 'lhs':
-        import scipy.stats as stats
-        from jams.lhs import lhs
-        dist = [stats.uniform for i in range(D)]
-        pars = [(0,1) for i in range(D)]
-        x    = lhs(dist, pars, S).transpose()
-        v    = lhs(dist, pars, S).transpose()
-    fx = np.ones(S)*large              # current particle function values
-    fs = np.zeros(S, dtype=bool)       # current combined feasibility for each particle
-    p  = np.ones((S,D))*large          # particles individual best positions
-    fp = np.ones(S)*large              # particles individual best function values
+        # Initialize the particle swarm
+        # current particle positions
+        # current particle velocities
+        if init.lower() == 'random':
+            x  = np.random.uniform(size=(S,D))
+            v  = np.random.uniform(size=(S,D))
+        elif init.lower() == 'sobol':
+            import sobol
+            nskip = D*S
+            x = sobol.i4_sobol_generate(D,S,nskip).transpose()
+            nskip = (D*S)**2
+            v = sobol.i4_sobol_generate(D,S,nskip).transpose()
+        elif init.lower() == 'lhs':
+            import scipy.stats as stats
+            from jams.lhs import lhs
+            dist = [stats.uniform for i in range(D)]
+            pars = [(0,1) for i in range(D)]
+            x    = lhs(dist, pars, S).transpose()
+            v    = lhs(dist, pars, S).transpose()
+        fx = np.ones(S)*large              # current particle function values
+        fs = np.zeros(S, dtype=bool)       # current combined feasibility for each particle
+        p  = np.ones((S,D))*large          # particles individual best positions
+        fp = np.ones(S)*large              # particles individual best function values
 
-    # Maximum velocity
-    vmax = np.abs(ub - lb)
-    vmin = -vmax
+        # Maximum velocity
+        vmax = np.abs(ub - lb)
+        vmin = -vmax
 
-    # Initialize particle positions and velocities
-    v = vmin + v*(vmax-vmin)
-    x = lb + x*(ub - lb)
-    if includex0: x[-1,:] = x0
-    x = np.where(mask2, x, x02)
+        # Initialize particle positions and velocities
+        v = vmin + v*(vmax-vmin)
+        x = lb + x*(ub - lb)
+        if includex0: x[-1,:] = x0
+        x = np.where(mask2, x, x02)
 
-    # Calculate first objective and constraints for each particle
-    if processes > 1:
-        fx = np.array(mp_pool.map(obj, x))
-        fs = np.array(mp_pool.map(is_feasible, x))
-    else:
-        for i in range(S):
-            fx[i] = obj(x[i,:])
-            fs[i] = is_feasible(x[i,:])
-    # maximise
-    if maxit: fx *= -1.
+        # Calculate first objective and constraints for each particle
+        if processes > 1:
+            fx = np.array(mp_pool.map(obj, x))
+            fs = np.array(mp_pool.map(is_feasible, x))
+        else:
+            for i in range(S):
+                fx[i] = obj(x[i,:])
+                fs[i] = is_feasible(x[i,:])
+        # maximise
+        if maxit: fx *= -1.
 
-    # NaN/Inf
-    large = max(fp.max(), fx[np.isfinite(fx)].max())
-    large = 1.1*large if large>0. else 0.9*large
-    fx = np.where(np.isfinite(fx), fx, large)
+        # NaN/Inf
+        large = max(fp.max(), fx[np.isfinite(fx)].max())
+        large = 1.1*large if large>0. else 0.9*large
+        fx = np.where(np.isfinite(fx), fx, large)
 
-    # Store particles best positions (if constraints are satisfied)
-    i_update = (fx < fp) & fs
-    if np.any(i_update):
-        p[i_update,:] = x[i_update,:].copy()
-        fp[i_update]  = fx[i_update]
-    
-    # Iterate until termination criterion met
-    it = 1
-    while (it < maxn):
+        # Store particles best positions (if constraints are satisfied)
+        i_update = (fx < fp) & fs
+        if np.any(i_update):
+            p[i_update,:] = x[i_update,:].copy()
+            fp[i_update]  = fx[i_update]
+        
+        # Iterate until termination criterion met
+        it = 1
+
+        # save restart
+        if restartfile1 is not None:
+            rs1, rs2, rs3, rs4, rs5 = np.random.get_state()
+            exec("savez_compressed("+saveargarray+")")
+            p2 = open(restartfile2, 'w')
+            exec("print("+saveargint+", file=p2)")
+            exec("print("+saveargfloat+", file=p2)")
+            exec("print("+saveargbool+", file=p2)")
+            exec("print("+saveargstring+", file=p2)")
+            p2.close()
+
+    else: # if no restart
+
+        # load restart
+        p1 = open(restartfile1, 'rb')
+        pp = np.load(p1)
+        for i in pp.files: exec(i+" = pp['"+i+"']")
+        p1.close()
+        p2 = open(restartfile2, 'r')
+        for i, pp in enumerate(p2.readline().rstrip().split()): exec(restartint[i]+" = int(pp)")
+        for i, pp in enumerate(p2.readline().rstrip().split()): exec(restartfloat[i]+" = float(pp)")
+        for i, pp in enumerate(p2.readline().rstrip().split()): exec(restartbool[i]+" = bool(strtobool(pp))")
+        for i, pp in enumerate(p2.readline().rstrip().split()): exec(restartstring[i]+" = pp")
+        p2.close()
+        np.random.set_state((rs1, rs2, rs3, rs4, rs5))
+
+        # Partialise objective function
+        if isinstance(func, (str,list)):
+            obj = partial(_ext_obj_wrapper, func, lb, ub, mask1,
+                          parameterfile, parameterwriter, objectivefile, objectivereader, shell, debug)
+        else:
+            obj = partial(_obj_wrapper, func, arg, kwarg)
+
+        # Check for constraint function(s) and partialise them
+        if f_ieqcons is None:
+            if ieqcons is None:
+                if verbose>=1:
+                    print('No constraints given.')
+                cons = _cons_none_wrapper
+            else:
+                if verbose>=1:
+                    print('Converting ieqcons to a single constraint function.')
+                cons = partial(_cons_ieqcons_wrapper, ieqcons, arg, kwarg)
+        else:
+            if verbose>=1:
+                print('Single constraint function given in f_ieqcons.')
+            cons = partial(_cons_f_ieqcons_wrapper, f_ieqcons, arg, kwarg)
+        is_feasible = partial(_is_feasible_wrapper, cons)
+
+        if processes > 1:
+            import multiprocessing
+            mp_pool = multiprocessing.Pool(processes)
+        
+
+    while it < maxn:
         # Stop if minimum found
         if fp.min() < minobj:
             if verbose>=1: print('minobj found.')
@@ -720,6 +823,18 @@ def pso(func, x0, lb, ub,
             fp[i_update]  = fx[i_update]
 
         it += 1
+
+        # save restart
+        if restartfile1 is not None:
+            rs1, rs2, rs3, rs4, rs5 = np.random.get_state()
+            exec("savez_compressed("+saveargarray+")")
+            p2 = open(restartfile2, 'w')
+            exec("print("+saveargint+", file=p2)")
+            exec("print("+saveargfloat+", file=p2)")
+            exec("print("+saveargbool+", file=p2)")
+            exec("print("+saveargstring+", file=p2)")
+            p2.close()
+    # end of swarm iteration: while it < maxn:
 
     if (it == maxn) and (verbose>=1): print('Maximum iterations reached --> {:}.'.format(maxn))
 
