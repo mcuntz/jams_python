@@ -2,6 +2,7 @@
 from __future__ import print_function
 from functools import partial
 import subprocess
+from distutils.util import strtobool
 import numpy as np
 from jams.const import huge
 from jams import savez_compressed
@@ -573,30 +574,30 @@ def pso(func, x0, lb, ub,
         if objectivereader is None:
             raise IOError('objectivereader must be given if func is name of executable.')
 
-    if not restart:
-        # Set defaults per strategy
-        if strategy.lower() == 'original':    # Kennedy & Eberhart, 2001
-            if inertia is None: inertia=0.5
-            if phip  is None: phip=2.
-            if phig  is None: phig=2.
-        elif strategy.lower() == 'inertia':   # Shi & Eberhart (1998)
-            imax = 0.9
-            imin = 0.4
-            if phip is None: phip=2.
-            if phig is None: phig=2.
-        elif strategy.lower() == 'canonical': # Clerc & Kennedy (2000)
-            if inertia is None: inertia=0.7289
-            if phip  is None: phip=2.05
-            if phig  is None: phig=2.05
-        elif strategy.lower() == 'fips':      # Mendes & Kennedy (2004)
-            if inertia is None: inertia=0.7289
-            if phip  is None: phip=2.05
-            if phig  is None: phig=2.05
-        elif strategy.lower() == 'nips':
-            if inertia is None: inertia=0.7289
-            if phip  is None: phip=2.05
-            if phig  is None: phig=2.05
+    # Set defaults per strategy
+    if strategy.lower() == 'original':    # Kennedy & Eberhart, 2001
+        if inertia is None: inertia=0.5
+        if phip  is None: phip=2.
+        if phig  is None: phig=2.
+    elif strategy.lower() == 'inertia':   # Shi & Eberhart (1998)
+        imax = 0.9
+        imin = 0.4
+        if phip is None: phip=2.
+        if phig is None: phig=2.
+    elif strategy.lower() == 'canonical': # Clerc & Kennedy (2000)
+        if inertia is None: inertia=0.7289
+        if phip  is None: phip=2.05
+        if phig  is None: phig=2.05
+    elif strategy.lower() == 'fips':      # Mendes & Kennedy (2004)
+        if inertia is None: inertia=0.7289
+        if phip  is None: phip=2.05
+        if phig  is None: phig=2.05
+    elif strategy.lower() == 'nips':
+        if inertia is None: inertia=0.7289
+        if phip  is None: phip=2.05
+        if phig  is None: phig=2.05
 
+    if not restart:
         # Problem sizes
         D = len(lb) # dimension of each particle
         if swarmsize is None:
@@ -866,11 +867,11 @@ if __name__ == '__main__':
     # import doctest
     # doctest.testmod(optionflags=doctest.NORMALIZE_WHITESPACE)
 
-    algo = 'nips'
+    algo = 'fips'
     init = 'lhs'
     swarmsize = None
     maxn = 250
-    topology = 'gbest'
+    topology = 'neumann'
 
     from jams.functions import ackley, griewank, goldstein_price, rastrigin, rosenbrock, six_hump_camelback
     '''
@@ -881,7 +882,9 @@ if __name__ == '__main__':
     lb = -10*np.ones(npara)
     ub = 10*np.ones(npara)
     x0 = np.zeros(npara)
-    bestx, bestf = pso(ackley, x0, lb, ub, processes=4, init=init, strategy=algo, topology=topology, verbose=0, swarmsize=swarmsize, maxn=maxn)
+    bestx, bestf = pso(ackley, x0, lb, ub, processes=4,
+                       init=init, strategy=algo, topology=topology, verbose=0,
+                       swarmsize=swarmsize, maxn=maxn, restartfile1=None)
     print('Ackley ', bestx, bestf)
     '''
         This is the Griewank Function (2-D or 10-D)
@@ -892,7 +895,9 @@ if __name__ == '__main__':
     lb = -600*np.ones(npara)
     ub = 600*np.ones(npara)
     x0 = np.zeros(npara)
-    bestx, bestf = pso(griewank, x0, lb, ub, processes=4, init=init, strategy=algo, topology=topology, verbose=0, swarmsize=swarmsize, maxn=maxn)
+    bestx, bestf = pso(griewank, x0, lb, ub, processes=4,
+                       init=init, strategy=algo, topology=topology, verbose=0,
+                       swarmsize=swarmsize, maxn=maxn, restartfile1=None)
     print('Griewank ', bestx, bestf)
     '''
     This is the Goldstein-Price Function
@@ -903,7 +908,7 @@ if __name__ == '__main__':
     lb = -2*np.ones(npara)
     ub = 2*np.ones(npara)
     x0 = np.zeros(npara)
-    bestx, bestf = pso(goldstein_price, x0, lb, ub, processes=4, init=init, strategy=algo, topology=topology, verbose=0, swarmsize=swarmsize, maxn=maxn)
+    bestx, bestf = pso(goldstein_price, x0, lb, ub, processes=4, init=init, strategy=algo, topology=topology, verbose=0, swarmsize=swarmsize, maxn=maxn, restartfile1=None)
     print('Goldstein ', bestx, bestf)
     '''
     This is the Rastrigin Function
@@ -914,7 +919,7 @@ if __name__ == '__main__':
     lb = -1*np.ones(npara)
     ub = 1*np.ones(npara)
     x0 = np.zeros(npara)
-    bestx, bestf = pso(rastrigin, x0, lb, ub, processes=4, init=init, strategy=algo, topology=topology, verbose=0, swarmsize=swarmsize, maxn=maxn)
+    bestx, bestf = pso(rastrigin, x0, lb, ub, processes=4, init=init, strategy=algo, topology=topology, verbose=0, swarmsize=swarmsize, maxn=maxn, restartfile1=None)
     print('Rastrigin ', bestx, bestf)
     '''
     This is the Rosenbrock Function
@@ -925,7 +930,9 @@ if __name__ == '__main__':
     lb = -2*np.ones(npara)
     ub = 5*np.ones(npara)
     x0 = np.zeros(npara)
-    bestx, bestf = pso(rosenbrock, x0, lb, ub, processes=4, init=init, strategy=algo, topology=topology, verbose=0, swarmsize=swarmsize, maxn=maxn)
+    bestx, bestf = pso(rosenbrock, x0, lb, ub, processes=4,
+                       init=init, strategy=algo, topology=topology, verbose=0,
+                       swarmsize=swarmsize, maxn=maxn, restartfile1=None)
     print('Rosenbrock ', bestx, bestf)
     '''
     This is the Six-hump Camelback Function.
@@ -936,5 +943,35 @@ if __name__ == '__main__':
     lb = -5*np.ones(npara)
     ub = 5*np.ones(npara)
     x0 = np.zeros(npara)
-    bestx, bestf = pso(six_hump_camelback, x0, lb, ub, processes=4, init=init, strategy=algo, topology=topology, verbose=0, swarmsize=swarmsize, maxn=maxn)
+    bestx, bestf = pso(six_hump_camelback, x0, lb, ub, processes=4,
+                       init=init, strategy=algo, topology=topology, verbose=0,
+                       swarmsize=swarmsize, maxn=maxn, restartfile1=None)
     print('Six_hump_camelback ', bestx, bestf)
+
+    # Restart
+    algo = 'fips'
+    init = 'lhs'
+    swarmsize = None
+    maxn = 250
+    topology = 'neumann'
+    from jams.functions import rosenbrock
+    npara = 2
+    lb = -2*np.ones(npara)
+    ub = 5*np.ones(npara)
+    x0 = np.zeros(npara)
+    seed = 1234
+    bestx, bestf = pso(rosenbrock, x0, lb, ub, processes=4,
+                       init=init, strategy=algo, topology=topology, verbose=0,
+                       swarmsize=swarmsize, maxn=maxn, restartfile1=None,
+                       seed=seed, restart=False)
+    print('Rosenbrock Reference - ', bestx, bestf)
+    bestx, bestf = pso(rosenbrock, x0, lb, ub, processes=4,
+                       init=init, strategy=algo, topology=topology, verbose=0,
+                       swarmsize=swarmsize, maxn=maxn//2,
+                       seed=seed, restart=False)
+    print('Rosenbrock Restart 1 - ', bestx, bestf)
+    bestx, bestf = pso(rosenbrock, x0, lb, ub, processes=4,
+                       init=init, strategy=algo, topology=topology, verbose=0,
+                       swarmsize=swarmsize, maxn=maxn,
+                       seed=seed, restart=True)
+    print('Rosenbrock Restart 2 - ', bestx, bestf)
