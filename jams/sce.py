@@ -811,3 +811,21 @@ if __name__ == '__main__':
     # x0 = np.random.rand(npara)*5.
     # bestx, bestf = sce(six_hump_camelback, x0, bl, bu, maxn=maxn, outf=True, restartfile1=None)
     # print('Six_hump_camelback ', bestx, bestf)
+
+    # # Restart
+    # from jams.functions import rosenbrock
+    # maxn = 500
+    # npara = 2
+    # lb = -2*np.ones(npara)
+    # ub = 5*np.ones(npara)
+    # x0 = np.zeros(npara)
+    # seed = 1234
+    # bestx, bestf = sce(rosenbrock, x0, lb, ub, maxn=maxn, outf=True, restartfile1=None,
+    #                    seed=seed, restart=False)
+    # print('Rosenbrock Reference - ', bestx, bestf)
+    # bestx, bestf = sce(rosenbrock, x0, lb, ub, maxn=maxn//2, outf=True,
+    #                    seed=seed, restart=False)
+    # print('Rosenbrock Restart 1 - ', bestx, bestf)
+    # bestx, bestf = sce(rosenbrock, x0, lb, ub, maxn=maxn, outf=True,
+    #                    seed=seed, restart=True)
+    # print('Rosenbrock Restart 2 - ', bestx, bestf)
