@@ -6,20 +6,18 @@ from distutils.util import strtobool
 import numpy as np
 from jams.const import huge
 from jams import savez_compressed
+from mpi4py import MPI
 # ToDo:
-#   restart -> test solo and in joptimise
 #   crossover with quadratic function (QIPSO)
-#   MPI
-#   iPython parallel
 
 def _ext_obj_wrapper(func, lb, ub, mask,
-                     parameterfile, parameterwriter, objectivefile, objectivereader, shell, debug,
+                     parameterfile, parameterwriter, objectivefile, objectivereader, shell, debug, rank,
                      params):
     '''
         Wrapper function for external program to be optimised
         to be used with partial:
             obj = partial(_ext_obj_wrapper, func, lb, ub, mask,
-                          parameterfile, parameterwriter, objectivefile, objectivereader, shell, debug)
+                          parameterfile, parameterwriter, objectivefile, objectivereader, shell, debug, rank)
         This allows then calling obj with only the argument params:
             fx = obj(params)
 
@@ -27,7 +25,7 @@ def _ext_obj_wrapper(func, lb, ub, mask,
         Definition
         ----------
         def _ext_obj_wrapper(func, lb, ub, mask,
-                             parameterfile, parameterwriter, objectivefile, objectivereader, shell, debug,
+                             parameterfile, parameterwriter, objectivefile, objectivereader, shell, debug, rank,
                              params):
 
 
@@ -43,6 +41,7 @@ def _ext_obj_wrapper(func, lb, ub, mask,
         objectivereader   Python function for reading objective value if functn is name of executable
         shell             If True, the specified command will be executed through the shell.
         debug             If True, model output is displayed for executable.
+        rank              Process rank will be given as last argument to external program.
         params            (npars) parameter set
 
 
@@ -57,10 +56,17 @@ def _ext_obj_wrapper(func, lb, ub, mask,
     '''
     if isinstance(func, (str,list)):
         parameterwriter(parameterfile, params, lb, ub, mask)
-        if debug:
-            err = subprocess.call(func, shell=shell)
+        if rank is None:
+            func1 = func
         else:
-            err = subprocess.check_output(func, shell=shell)
+            if isinstance(func, str):
+                func1 = [func, str(rank)]
+            else:
+                func1 = func+[str(rank)]
+        if debug:
+            err = subprocess.call(func1, shell=shell)
+        else:
+            err = subprocess.check_output(func1, shell=shell)
         obj = objectivereader(objectivefile)
         return obj
     else:
@@ -123,64 +129,6 @@ def _cons_f_ieqcons_wrapper(f_ieqcons, arg, kwarg, x):
     return np.array(f_ieqcons(x, *arg, **kwarg))
 
 
-def get_best_neighbor(p, fp, topology, kl=1):
-    '''
-        Get the best neighbor for a given topology
-
-        Input
-        -----
-        p           ND-array
-                    The best known position of each particle.
-        fp          1D-array
-                    The objective values at each position in p.
-        topology    string
-                    Neighborhood topologies. These are rather social than geographical topologies.
-                    All neighborhoods comprise the current particle as well.
-                    [Kennedy & Mendes, 2002] http://dx.doi.org/10.1109/CEC.2002.1004493
-                    'gbest'    Neighborhood is entire swarm.
-                    'lbest'    Partciles aranged in a ring, in which each particle communicates with
-                               kl particles on each side, i.e. particle i has the neighborhood
-                               i-kl, i-kl+1, ..., i, i+1, ..., i+kl-1, i+kl
-                               [Mohais et al., 2005] http://dx.doi.org/10.1007/11589990_80
-                    'ring'     'lbest' with kl=1
-                    'neumann'  Neighborhood of a point including all points at a Hamming distance of 1.
-                               Particles are arranges in a lattice, where each particle interacts with
-                               its immediate 4 neighbors to the N, S, E, and W.
-                               [Kennedy and Mendes, 2006] http://dx.doi.org/10.1109/TSMCC.2006.875410
-                               The von Neumann neighborhood is configured into r rows and c columns,
-                               where r is the highest integer less than or equal to sqrt(n) that evenly
-                               divides n and c = n / r
-                               [Mohais et al., 2005] http://dx.doi.org/10.1007/11589990_80
-
-
-        Optional Input
-        --------------
-        kl          integer
-                    Neighborhood distance in topology 'lbest'.
-                    (Default: 1 = ring)
-    '''
-    if topology.lower() == 'ring': kl=1
-    S = p.shape[0]
-    D = p.shape[1]
-
-    if topology.lower() == 'gbest':
-        i_min = np.argmin(fp)
-        g  = p[i_min,:].copy()         # overall best
-        fg = fp[i_min]
-    elif (topology.lower() == 'lbest') or (topology.lower() == 'ring') or (topology.lower() == 'neumann'):
-        g  = np.ones((S,D))*np.inf
-        fg = np.ones(S)*np.inf
-        for ss in range(S):
-            ii = get_neighbor_indeces(ss, S, topology, kl=kl)
-            pp  = p[ii,:]
-            fpp = fp[ii]
-            i_min = np.argmin(fpp)
-            g[ss,:] = pp[i_min,:].copy()
-            fg[ss]  = fpp[i_min]
-
-    return [g, fg]
-
-
 def get_neighbor_indeces(n, S, topology, kl=1):
     '''
         Get the indices of the neighbors for the current particle given the topology.
@@ -239,6 +187,69 @@ def get_neighbor_indeces(n, S, topology, kl=1):
               left(below, cols),  below, right(below, cols)]
 
     return ii
+
+
+def get_best_neighbor(p, fp, topology, kl=1):
+    '''
+        Get the best neighbor for a given topology
+
+        Input
+        -----
+        p           ND-array
+                    The best known position of each particle.
+        fp          1D-array
+                    The objective values at each position in p.
+        topology    string
+                    Neighborhood topologies. These are rather social than geographical topologies.
+                    All neighborhoods comprise the current particle as well.
+                    [Kennedy & Mendes, 2002] http://dx.doi.org/10.1109/CEC.2002.1004493
+                    'gbest'    Neighborhood is entire swarm.
+                    'lbest'    Partciles aranged in a ring, in which each particle communicates with
+                               kl particles on each side, i.e. particle i has the neighborhood
+                               i-kl, i-kl+1, ..., i, i+1, ..., i+kl-1, i+kl
+                               [Mohais et al., 2005] http://dx.doi.org/10.1007/11589990_80
+                    'ring'     'lbest' with kl=1
+                    'neumann'  Neighborhood of a point including all points at a Hamming distance of 1.
+                               Particles are arranges in a lattice, where each particle interacts with
+                               its immediate 4 neighbors to the N, S, E, and W.
+                               [Kennedy and Mendes, 2006] http://dx.doi.org/10.1109/TSMCC.2006.875410
+                               The von Neumann neighborhood is configured into r rows and c columns,
+                               where r is the highest integer less than or equal to sqrt(n) that evenly
+                               divides n and c = n / r
+                               [Mohais et al., 2005] http://dx.doi.org/10.1007/11589990_80
+
+
+        Optional Input
+        --------------
+        kl          integer
+                    Neighborhood distance in topology 'lbest'.
+                    (Default: 1 = ring)
+    '''
+    if topology.lower() == 'ring': kl=1
+    S = p.shape[0]
+    D = p.shape[1]
+
+    g  = np.ones((S,D))*np.inf
+    fg = np.ones(S)*np.inf
+    if topology.lower() == 'gbest':
+        i_min = np.argmin(fp)
+        ig  = p[i_min,:] # overall best
+        ifg = fp[i_min]
+        for ss in range(S):
+            g[ss,:] = ig
+            fg[ss]  = ifg
+    elif (topology.lower() == 'lbest') or (topology.lower() == 'ring') or (topology.lower() == 'neumann'):
+        g  = np.ones((S,D))*np.inf
+        fg = np.ones(S)*np.inf
+        for ss in range(S):
+            ii = get_neighbor_indeces(ss, S, topology, kl=kl)
+            pp  = p[ii,:]
+            fpp = fp[ii]
+            i_min = np.argmin(fpp)
+            g[ss,:] = pp[i_min,:].copy()
+            fg[ss]  = fpp[i_min]
+
+    return [g, fg]
 
 
 # Particle Swarm Optimisation
@@ -518,20 +529,32 @@ def pso(func, x0, lb, ub,
                                - neighborhoods
                                - external function - mask, x0, parameterfile, parameterwriter,
                                                      objectivefile, objectivereader, shell, debug
-                  MC, Dec 2016 - includex0
+                  MC, Dec 2016 - includex0, restart, mpi
     """
+    # Get MPI communicator
+    comm = MPI.COMM_WORLD
+    csize = comm.Get_size()
+    crank = comm.Get_rank()
+    if csize > 1:
+        passrank = crank
+    else:
+        passrank = None
+
     # Different variabels types (array, float, int, ...) for restart
     if restartfile1 is not None:
         # Only arrays with savez_compressed - restartfile1
         restartarray  = ['lb', 'ub', 'mask1', 'mask2', 'x02',
-                         'v', 'x', 'fx', 'fs', 'p', 'fp',
+                         'v', 'x', 'fx', 'fs', 'p', 'fp', 'gp', 'fgp',
                          'rs2']
         # Save scalars in simple text file - restartfile2
-        restartint    = ['D', 'S', 'it',
+        restartint    = ['D', 'S', 'it', 'iS', 'crank',
                          'rs3', 'rs4']
         restartfloat  = ['rs5']
         restartbool   = ['maxit']
         restartstring = ['rs1']
+        if csize > 1:
+            restartfile1 = restartfile1[0:restartfile1.rfind(".")] + '.' + str(crank) + restartfile1[restartfile1.rfind("."):]
+            restartfile2 = restartfile2[0:restartfile2.rfind(".")] + '.' + str(crank) + restartfile2[restartfile2.rfind("."):]
         saveargarray = '"'+restartfile1+'"'
         for j in restartarray: saveargarray = saveargarray + ', '+j+'='+j
         saveargint    = ','.join(restartint)
@@ -567,10 +590,20 @@ def pso(func, x0, lb, ub,
     if isinstance(func, (str,list)):
         if parameterfile is None:
             raise IOError('parameterfile must be given if func is name of executable.')
+        else:
+            if csize > 1:
+                parameterfile1 = parameterfile + '.' + str(crank)
+            else:
+                parameterfile1 = parameterfile
         if parameterwriter is None:
             raise IOError('parameterwrite must be given if func is name of executable.')
         if objectivefile is None:
             raise IOError('objectivefile must be given if func is name of executable.')
+        else:
+            if csize > 1:
+                objectivefile1 = objectivefile + '.' + str(crank)
+            else:
+                objectivefile1 = objectivefile
         if objectivereader is None:
             raise IOError('objectivereader must be given if func is name of executable.')
 
@@ -602,22 +635,25 @@ def pso(func, x0, lb, ub,
         D = len(lb) # dimension of each particle
         if swarmsize is None:
             S = max(min(3*D,40),10)
+            S = max(min(S//csize*csize, (40//csize+1)*csize), (10//csize+1)*csize)
         else:
             S = swarmsize
+
+        # Local swarmsize
+        if S % csize != 0:
+            raise ValueError("Swarmsize "+str(S)+" must be multiple of number of processes "+str(csize)+".")
+        iS = S//csize # local swarmsize
 
         # Initialise 1D mask
         if mask is not None:
             mask1 = mask
         else:
             mask1 = np.ones(D, dtype=np.bool)
-        # 2D mask
-        mask2 = np.tile(mask1,S).reshape((S,D))
-        x02   = np.tile(x0,S).reshape((S,D))
 
         # Partialise objective function
         if isinstance(func, (str,list)):
             obj = partial(_ext_obj_wrapper, func, lb, ub, mask1,
-                          parameterfile, parameterwriter, objectivefile, objectivereader, shell, debug)
+                          parameterfile1, parameterwriter, objectivefile1, objectivereader, shell, debug, passrank)
         else:
             obj = partial(_obj_wrapper, func, arg, kwarg)
 
@@ -642,35 +678,58 @@ def pso(func, x0, lb, ub,
             import multiprocessing
             mp_pool = multiprocessing.Pool(processes)
 
+        # 2D mask
+        mask2 = np.tile(mask1,iS).reshape((iS,D))
+        x02   = np.tile(x0,iS).reshape((iS,D))
+
         # Deal with NaN and Inf
         large = 0.5*huge
 
         # Seed random number generator
-        np.random.seed(seed=seed)
+        if crank == 0:
+            np.random.seed(seed=seed)
 
         # Initialize the particle swarm
         # current particle positions
         # current particle velocities
         if init.lower() == 'random':
-            x  = np.random.uniform(size=(S,D))
-            v  = np.random.uniform(size=(S,D))
+            # Random numbers only on rank 0 for reproducible results
+            if crank == 0:
+                rand = np.random.uniform(size=(2*S,D))
+            else:
+                rand = np.empty((2*S,D), dtype=np.float)
+            # Scatter has different ordering than needed for reproducible results
+            # Do it manually
+            comm.Bcast(rand, root=0)
+            x = rand[crank*iS:crank*iS+iS,:]
+            v = rand[S+crank*iS:S+crank*iS+iS,:]
         elif init.lower() == 'sobol':
             import sobol
-            nskip = D*S
-            x = sobol.i4_sobol_generate(D,S,nskip).transpose()
-            nskip = (D*S)**2
-            v = sobol.i4_sobol_generate(D,S,nskip).transpose()
+            nskip = D*S + crank*D*iS
+            x = sobol.i4_sobol_generate(D,iS,nskip).transpose()
+            nskip = 2*D*S + crank*D*iS
+            v = sobol.i4_sobol_generate(D,iS,nskip).transpose()
         elif init.lower() == 'lhs':
-            import scipy.stats as stats
-            from jams.lhs import lhs
-            dist = [stats.uniform for i in range(D)]
-            pars = [(0,1) for i in range(D)]
-            x    = lhs(dist, pars, S).transpose()
-            v    = lhs(dist, pars, S).transpose()
-        fx = np.ones(S)*large              # current particle function values
-        fs = np.zeros(S, dtype=bool)       # current combined feasibility for each particle
-        p  = np.ones((S,D))*large          # particles individual best positions
-        fp = np.ones(S)*large              # particles individual best function values
+            x = np.empty((iS,D), dtype=np.float64)
+            v = np.empty((iS,D), dtype=np.float64)
+            if crank == 0:
+                import scipy.stats as stats
+                from jams.lhs import lhs
+                dist = [stats.uniform for i in range(D)]
+                pars = [(0,1) for i in range(D)]
+                gx   = lhs(dist, pars, S).transpose()
+                gv   = lhs(dist, pars, S).transpose()
+            else:
+                gx = np.empty((S,D), dtype=np.float64)
+                gv = np.empty((S,D), dtype=np.float64)
+            comm.Scatter([gx, MPI.DOUBLE], [x, MPI.DOUBLE])
+            comm.Scatter([gv, MPI.DOUBLE], [v, MPI.DOUBLE])
+        fx  = np.ones(iS)*large                       # local current particles function values
+        fs  = np.zeros(iS, dtype=bool)                # current combined feasibility for each local particle
+        p   = np.ones((iS,D), dtype=np.float64)*large # local particles individual best positions
+        fp  = np.ones(iS, dtype=np.float64)*large     # local particles individual best function values
+        gp  = np.ones((S,D), dtype=np.float64)*large  # global particles individual best positions
+        fgp = np.ones(S, dtype=np.float64)*large      # global particles individual best function values
 
         # Maximum velocity
         vmax = np.abs(ub - lb)
@@ -679,7 +738,7 @@ def pso(func, x0, lb, ub,
         # Initialize particle positions and velocities
         v = vmin + v*(vmax-vmin)
         x = lb + x*(ub - lb)
-        if includex0: x[-1,:] = x0
+        if (crank == 0) and includex0: x[-1,:] = x0
         x = np.where(mask2, x, x02)
 
         # Calculate first objective and constraints for each particle
@@ -687,13 +746,13 @@ def pso(func, x0, lb, ub,
             fx = np.array(mp_pool.map(obj, x))
             fs = np.array(mp_pool.map(is_feasible, x))
         else:
-            for i in range(S):
+            for i in range(iS):
                 fx[i] = obj(x[i,:])
                 fs[i] = is_feasible(x[i,:])
         # maximise
         if maxit: fx *= -1.
 
-        # NaN/Inf
+        # NaN/Inf - ToDo: Check
         large = max(fp.max(), fx[np.isfinite(fx)].max())
         large = 1.1*large if large>0. else 0.9*large
         fx = np.where(np.isfinite(fx), fx, large)
@@ -703,13 +762,20 @@ def pso(func, x0, lb, ub,
         if np.any(i_update):
             p[i_update,:] = x[i_update,:].copy()
             fp[i_update]  = fx[i_update]
-        
+
+        # gather local best particles into global best particles
+        comm.Allgather([p, MPI.DOUBLE], [gp, MPI.DOUBLE] )
+        comm.Allgather([fp, MPI.DOUBLE], [fgp, MPI.DOUBLE] )
+
         # Iterate until termination criterion met
         it = 1
 
         # save restart
         if restartfile1 is not None:
-            rs1, rs2, rs3, rs4, rs5 = np.random.get_state()
+            if crank == 0:
+                rs1, rs2, rs3, rs4, rs5 = np.random.get_state()
+            else:
+                rs1, rs2, rs3, rs4, rs5 = 'MT19937', np.array(624, dtype=np.uint), 0, 0, 0.
             exec("savez_compressed("+saveargarray+")")
             p2 = open(restartfile2, 'w')
             exec("print("+saveargint+", file=p2)")
@@ -731,12 +797,13 @@ def pso(func, x0, lb, ub,
         for i, pp in enumerate(p2.readline().rstrip().split()): exec(restartbool[i]+" = bool(strtobool(pp))")
         for i, pp in enumerate(p2.readline().rstrip().split()): exec(restartstring[i]+" = pp")
         p2.close()
-        np.random.set_state((rs1, rs2, rs3, rs4, rs5))
+        if crank == 0:
+            np.random.set_state((rs1, rs2, rs3, rs4, rs5))
 
         # Partialise objective function
         if isinstance(func, (str,list)):
             obj = partial(_ext_obj_wrapper, func, lb, ub, mask1,
-                          parameterfile, parameterwriter, objectivefile, objectivereader, shell, debug)
+                          parameterfile1, parameterwriter, objectivefile1, objectivereader, shell, debug, passrank)
         else:
             obj = partial(_obj_wrapper, func, arg, kwarg)
 
@@ -759,20 +826,37 @@ def pso(func, x0, lb, ub,
         if processes > 1:
             import multiprocessing
             mp_pool = multiprocessing.Pool(processes)
-        
 
+    # Iterate swarm
     while it < maxn:
         # Stop if minimum found
-        if fp.min() < minobj:
+        if fgp.min() < minobj:
             if verbose>=1: print('minobj found.')
             break
 
         # Update neighbors best positions
-        g, fg = get_best_neighbor(p, fp, topology, kl=kl)
+        g  = np.empty((iS,D), dtype=np.float64) # local best neighbors
+        fg = np.empty(iS, dtype=np.float64)
+        if crank == 0:
+            gg, fgg = get_best_neighbor(gp, fgp, topology, kl=kl)  # global best neighbors
+        else:
+            gg  = np.empty((S,D), dtype=np.float64)
+            fgg = np.empty(S, dtype=np.float64)
+        # Scatter global best neighbors into local best neighbors
+        comm.Scatter([gg, MPI.DOUBLE], [g, MPI.DOUBLE])
+        comm.Scatter([fgg, MPI.DOUBLE], [fg, MPI.DOUBLE])
 
         # Update the particles velocities
-        rp = np.random.uniform(size=(S,D))
-        rg = np.random.uniform(size=(S,D))
+        if crank == 0:
+            rand = np.random.uniform(size=(2*S+S*S,D))
+        else:
+            rand = np.empty((2*S+S*S,D), dtype=np.float)
+        # Scatter has different ordering than needed for reproducible results
+        # Do it manually
+        comm.Bcast(rand, root=0)
+
+        rp = rand[crank*iS:crank*iS+iS,:]
+        rg = rand[S+crank*iS:S+crank*iS+iS,:]
         if strategy.lower() == 'original':    # Kennedy & Eberhart, 2001
             v = inertia*v + phip*rp*(p - x) + phig*rg*(g - x)
             v = np.clip(v, vmin, vmax)
@@ -785,15 +869,15 @@ def pso(func, x0, lb, ub,
             v = inertia * (v + phip*rp*(p - x) + phig*rg*(g - x))
         elif strategy.lower() == 'fips':      # Mendes & Kennedy (2004)
             acc_coeff = (phip + phig) / float(S)
-            for i in range(S):
-                ri = np.random.uniform(size=(S,D))
-                v[i,:] = inertia * (v[i,:] + np.sum(ri[:,:]*acc_coeff*(p[:,:]-x[i,:]), axis=0))
+            for i in range(iS):
+                ri = rand[2*S+crank*iS*S+i*S:2*S+crank*iS*S+(i+1)*S,:]
+                v[i,:] = inertia * (v[i,:] + np.sum(ri[:,:]*acc_coeff*(gp[:,:]-x[i,:]), axis=0))
         elif strategy.lower() == 'nips':      # Mendes & Kennedy (2004)
             acc_coeff = (phip + phig) / float(S)
-            for i in range(S):
-                ri = np.random.uniform(size=(S,D))
-                ii = get_neighbor_indeces(i, S, topology, kl=kl)
-                v[i,:] = inertia * (v[i,:] + np.sum(ri[ii,:]*acc_coeff*(p[ii,:]-x[i,:]), axis=0))
+            for i in range(iS):
+                ri = rand[2*S+crank*iS*S+i*S:2*S+crank*iS*S+(i+1)*S,:]
+                ii = get_neighbor_indeces(crank*iS+i, S, topology, kl=kl)
+                v[i,:] = inertia * (v[i,:] + np.sum(ri[ii,:]*acc_coeff*(gp[ii,:]-x[i,:]), axis=0))
 
         # Update the particles positions
         x = x + v
@@ -807,7 +891,7 @@ def pso(func, x0, lb, ub,
             fx = np.array(mp_pool.map(obj, x))
             fs = np.array(mp_pool.map(is_feasible, x))
         else:
-            for i in range(S):
+            for i in range(iS):
                 fx[i] = obj(x[i,:])
                 fs[i] = is_feasible(x[i,:])
         if maxit: fx *= -1.
@@ -823,11 +907,18 @@ def pso(func, x0, lb, ub,
             p[i_update,:] = x[i_update,:].copy()
             fp[i_update]  = fx[i_update]
 
+        # gather local best particles into global best particles
+        comm.Allgather([p, MPI.DOUBLE], [gp, MPI.DOUBLE] )
+        comm.Allgather([fp, MPI.DOUBLE], [fgp, MPI.DOUBLE] )
+
         it += 1
 
         # save restart
         if restartfile1 is not None:
-            rs1, rs2, rs3, rs4, rs5 = np.random.get_state()
+            if crank == 0:
+                rs1, rs2, rs3, rs4, rs5 = np.random.get_state()
+            else:
+                rs1, rs2, rs3, rs4, rs5 = 'MT19937', np.array(624, dtype=np.uint), 0, 0, 0.
             exec("savez_compressed("+saveargarray+")")
             p2 = open(restartfile2, 'w')
             exec("print("+saveargint+", file=p2)")
@@ -837,22 +928,25 @@ def pso(func, x0, lb, ub,
             p2.close()
     # end of swarm iteration: while it < maxn:
 
-    if (it == maxn) and (verbose>=1): print('Maximum iterations reached --> {:}.'.format(maxn))
+    if crank == 0:
+        if (it == maxn) and (verbose>=1): print('Maximum iterations reached --> {:}.'.format(maxn))
 
     # global best
-    i_min = np.argmin(fp)
-    bestx = p[i_min,:].copy()
-    bestf = fp[i_min]
+    i_min = np.argmin(fgp)
+    bestx = gp[i_min,:].copy()
+    bestf = fgp[i_min]
 
     if maxit:
         bestf *= -1.
-        fp    *= -1.
+        fgp   *= -1.
 
-    if not any(map(is_feasible, p)): print("PSO could not find any feasible point in the search space.")
+    if crank == 0:
+        if not any(map(is_feasible, gp)): print("PSO could not find any feasible point in the search space.")
 
     # write parameter file with best parameters
-    if isinstance(func, (str,list)):
-        parameterwriter(parameterfile, bestx, lb, ub, mask1)
+    if crank == 0:
+        if isinstance(func, (str,list)):
+            parameterwriter(parameterfile, bestx, lb, ub, mask1)
 
     out = [bestx, bestf]
     if pout:
@@ -867,11 +961,18 @@ if __name__ == '__main__':
     # import doctest
     # doctest.testmod(optionflags=doctest.NORMALIZE_WHITESPACE)
 
+    comm = MPI.COMM_WORLD
+    csize = comm.Get_size()
+    crank = comm.Get_rank()
+
     algo = 'fips'
     init = 'lhs'
-    swarmsize = None
+    swarmsize = 40
     maxn = 250
     topology = 'neumann'
+
+    if swarmsize % csize != 0:
+        raise ValueError("Swarmsize "+str(swarmsize)+" must be multiple of number of processes "+str(csize)+".")
 
     from jams.functions import ackley, griewank, goldstein_price, rastrigin, rosenbrock, six_hump_camelback
     '''
@@ -885,7 +986,7 @@ if __name__ == '__main__':
     bestx, bestf = pso(ackley, x0, lb, ub, processes=4,
                        init=init, strategy=algo, topology=topology, verbose=0,
                        swarmsize=swarmsize, maxn=maxn, restartfile1=None)
-    print('Ackley ', bestx, bestf)
+    if crank == 0: print('Ackley ', bestx, bestf)
     '''
         This is the Griewank Function (2-D or 10-D)
         Bound: X(i)=[-600,600], for i=1,2,...,10  !for visualization only 2!
@@ -898,7 +999,7 @@ if __name__ == '__main__':
     bestx, bestf = pso(griewank, x0, lb, ub, processes=4,
                        init=init, strategy=algo, topology=topology, verbose=0,
                        swarmsize=swarmsize, maxn=maxn, restartfile1=None)
-    print('Griewank ', bestx, bestf)
+    if crank == 0: print('Griewank ', bestx, bestf)
     '''
     This is the Goldstein-Price Function
     Bound X1=[-2,2], X2=[-2,2]
@@ -909,7 +1010,7 @@ if __name__ == '__main__':
     ub = 2*np.ones(npara)
     x0 = np.zeros(npara)
     bestx, bestf = pso(goldstein_price, x0, lb, ub, processes=4, init=init, strategy=algo, topology=topology, verbose=0, swarmsize=swarmsize, maxn=maxn, restartfile1=None)
-    print('Goldstein ', bestx, bestf)
+    if crank == 0: print('Goldstein ', bestx, bestf)
     '''
     This is the Rastrigin Function
     Bound: X1=[-1,1], X2=[-1,1]
@@ -920,7 +1021,7 @@ if __name__ == '__main__':
     ub = 1*np.ones(npara)
     x0 = np.zeros(npara)
     bestx, bestf = pso(rastrigin, x0, lb, ub, processes=4, init=init, strategy=algo, topology=topology, verbose=0, swarmsize=swarmsize, maxn=maxn, restartfile1=None)
-    print('Rastrigin ', bestx, bestf)
+    if crank == 0: print('Rastrigin ', bestx, bestf)
     '''
     This is the Rosenbrock Function
     Bound: X1=[-5,5], X2=[-2,8]; Global Optimum: 0,(1,1)
@@ -933,7 +1034,7 @@ if __name__ == '__main__':
     bestx, bestf = pso(rosenbrock, x0, lb, ub, processes=4,
                        init=init, strategy=algo, topology=topology, verbose=0,
                        swarmsize=swarmsize, maxn=maxn, restartfile1=None)
-    print('Rosenbrock ', bestx, bestf)
+    if crank == 0: print('Rosenbrock ', bestx, bestf)
     '''
     This is the Six-hump Camelback Function.
     Bound: X1=[-5,5], X2=[-5,5]
@@ -946,14 +1047,16 @@ if __name__ == '__main__':
     bestx, bestf = pso(six_hump_camelback, x0, lb, ub, processes=4,
                        init=init, strategy=algo, topology=topology, verbose=0,
                        swarmsize=swarmsize, maxn=maxn, restartfile1=None)
-    print('Six_hump_camelback ', bestx, bestf)
+    if crank == 0: print('Six_hump_camelback ', bestx, bestf)
 
     # Restart
     algo = 'fips'
     init = 'lhs'
-    swarmsize = None
+    swarmsize = 12
     maxn = 250
     topology = 'neumann'
+    if swarmsize % csize != 0:
+        raise ValueError("Swarmsize "+str(swarmsize)+" must be multiple of number of processes "+str(csize)+".")
     from jams.functions import rosenbrock
     npara = 2
     lb = -2*np.ones(npara)
@@ -964,14 +1067,14 @@ if __name__ == '__main__':
                        init=init, strategy=algo, topology=topology, verbose=0,
                        swarmsize=swarmsize, maxn=maxn, restartfile1=None,
                        seed=seed, restart=False)
-    print('Rosenbrock Reference - ', bestx, bestf)
+    if crank == 0: print('Rosenbrock Reference - ', bestx, bestf)
     bestx, bestf = pso(rosenbrock, x0, lb, ub, processes=4,
                        init=init, strategy=algo, topology=topology, verbose=0,
                        swarmsize=swarmsize, maxn=maxn//2,
                        seed=seed, restart=False)
-    print('Rosenbrock Restart 1 - ', bestx, bestf)
+    if crank == 0: print('Rosenbrock Restart 1 - ', bestx, bestf)
     bestx, bestf = pso(rosenbrock, x0, lb, ub, processes=4,
                        init=init, strategy=algo, topology=topology, verbose=0,
                        swarmsize=swarmsize, maxn=maxn,
                        seed=seed, restart=True)
-    print('Rosenbrock Restart 2 - ', bestx, bestf)
+    if crank == 0: print('Rosenbrock Restart 2 - ', bestx, bestf)
