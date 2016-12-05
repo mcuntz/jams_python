@@ -10,7 +10,7 @@ from mpi4py import MPI
 # ToDo:
 #   write tmp/population files (as in SCE of Fortran)
 #   write out also in logfile if not None (use jams.tee as in joptimise)
-#   crossover with quadratic function (QIPSO)
+#   crossover with quadratic function (QIPSO) ?
 
 def _ext_obj_wrapper(func, lb, ub, mask,
                      parameterfile, parameterwriter, objectivefile, objectivereader, shell, debug, rank,
@@ -102,7 +102,7 @@ def _is_feasible_wrapper(func, x):
         which is unnecessary for now. It could still simply be:
             is_feasible = cons
     '''
-    return np.all(func(x)>=0)
+    return np.all(func(x)>=0.)
 
 
 def _cons_none_wrapper(x):
@@ -129,6 +129,38 @@ def _cons_f_ieqcons_wrapper(f_ieqcons, arg, kwarg, x):
         values >=0. where constraints are met.
     '''
     return np.array(f_ieqcons(x, *arg, **kwarg))
+
+
+def diversity(x, lb, ub, mask):
+    '''
+        Diversity in swarm positions.
+        From [Pant et al., 2009] http://www.iaeng.org/IJCS/issues_v36/issue_2/IJCS_36_2_02.pdf
+        changed to RMSE.
+
+        RMSE is generally about 1/2 or 1/3 of normalized geometric range (SCE).
+    '''
+    # all dimensions [0,1]
+    x01 = np.where(mask, (x-lb)/(ub-lb), x)
+
+    S = float(x01.shape[0])
+    D = float(x01.shape[1])
+
+    # average particle position
+    pmean = np.sum(x01, axis=0)/S
+
+    # # Eq. 5 of Pant et al. (2009)
+    # div = np.sum(np.sqrt(np.sum((x01-pmean)**2,axis=1)),axis=0) / S
+
+    # average RMSE
+    div = np.sum(np.sqrt(np.sum((x01-pmean)**2,axis=1)/D),axis=0) / S
+
+    # # Normalized geometric range of SCE
+    # imax = x01.max(axis=0)
+    # imin = x01.min(axis=0)
+    # imaxmin = np.ma.array(imax-imin, mask=(imax==imin))
+    # div = np.ma.exp(np.ma.mean(np.ma.log(imaxmin)))
+
+    return div
 
 
 def get_neighbor_indeces(n, S, topology, kl=1):
@@ -546,7 +578,7 @@ def pso(func, x0, lb, ub,
     if restartfile1 is not None:
         # Only arrays with savez_compressed - restartfile1
         restartarray  = ['lb', 'ub', 'mask1', 'mask2', 'x02',
-                         'v', 'x', 'fx', 'fs', 'p', 'fp', 'gp', 'fgp',
+                         'v', 'x', 'fx', 'fs', 'p', 'fp', 'gp', 'fgp', #MCdiv 'gx',
                          'rs2']
         # Save scalars in simple text file - restartfile2
         restartint    = ['D', 'S', 'it', 'iS', 'crank',
@@ -685,7 +717,7 @@ def pso(func, x0, lb, ub,
         x02   = np.tile(x0,iS).reshape((iS,D))
 
         # Deal with NaN and Inf
-        large = 0.5*huge
+        large = huge / S
 
         # Seed random number generator
         if crank == 0:
@@ -727,6 +759,7 @@ def pso(func, x0, lb, ub,
             comm.Scatter([gx, MPI.DOUBLE], [x, MPI.DOUBLE])
             comm.Scatter([gv, MPI.DOUBLE], [v, MPI.DOUBLE])
         fx  = np.ones(iS)*large                       # local current particles function values
+        #MCdiv gx  = np.empty((iS,D), dtype=np.float64)      # global current individual particle positions
         fs  = np.zeros(iS, dtype=bool)                # current combined feasibility for each local particle
         p   = np.ones((iS,D), dtype=np.float64)*large # local particles individual best positions
         fp  = np.ones(iS, dtype=np.float64)*large     # local particles individual best function values
@@ -745,12 +778,16 @@ def pso(func, x0, lb, ub,
 
         # Calculate first objective and constraints for each particle
         if processes > 1:
-            fx = np.array(mp_pool.map(obj, x))
             fs = np.array(mp_pool.map(is_feasible, x))
+            ii = np.where(fs)[0]
+            if ii.size > 0:
+                fx[ii] = np.array(mp_pool.map(obj, x[ii,:]))
         else:
             for i in range(iS):
-                fx[i] = obj(x[i,:])
                 fs[i] = is_feasible(x[i,:])
+                if fs[i]:
+                    print(i, x[i:])
+                    fx[i] = obj(x[i,:])
         # maximise
         if maxit: fx *= -1.
 
@@ -759,6 +796,7 @@ def pso(func, x0, lb, ub,
         large = 1.1*large if large>0. else 0.9*large
         fx = np.where(np.isfinite(fx), fx, large)
 
+        # print(1, x[np.where(fs)[0],:])
         # Store particles best positions (if constraints are satisfied)
         i_update = (fx < fp) & fs
         if np.any(i_update):
@@ -766,8 +804,13 @@ def pso(func, x0, lb, ub,
             fp[i_update]  = fx[i_update]
 
         # gather local best particles into global best particles
-        comm.Allgather([p, MPI.DOUBLE], [gp, MPI.DOUBLE] )
-        comm.Allgather([fp, MPI.DOUBLE], [fgp, MPI.DOUBLE] )
+        comm.Allgather([p, MPI.DOUBLE], [gp, MPI.DOUBLE])
+        comm.Allgather([fp, MPI.DOUBLE], [fgp, MPI.DOUBLE])
+
+        #MCdiv comm.Allgather([x, MPI.DOUBLE], [gx, MPI.DOUBLE])
+        #MCdiv gmask = np.tile(mask1,S).reshape((S,D))
+        #MCdiv divers = diversity(gx, lb, ub, gmask)
+        #MCdiv if crank == 0: print(1, divers, fgp.min())
 
         # Iterate until termination criterion met
         it = 1
@@ -890,19 +933,25 @@ def pso(func, x0, lb, ub,
 
         # Update objectives and constraints
         if processes > 1:
-            fx = np.array(mp_pool.map(obj, x))
             fs = np.array(mp_pool.map(is_feasible, x))
+            ii = np.where(fs)[0]
+            if ii.size > 0:
+                fx[ii] = np.array(mp_pool.map(obj, x[ii,:]))
+                if maxit: fx[ii] *= -1.
         else:
             for i in range(iS):
-                fx[i] = obj(x[i,:])
                 fs[i] = is_feasible(x[i,:])
-        if maxit: fx *= -1.
+                if fs[i]:
+                    print(i, x[i:])
+                    fx[i] = obj(x[i,:])
+                    if maxit: fx[i] *= -1.
 
         # NaN/Inf
         large = max(fp.max(), fx[np.isfinite(fx)].max())
         large = 1.1*large if large>0. else 0.9*large
         fx = np.where(np.isfinite(fx), fx, large)
 
+        # print(2, x[np.where(fs)[0],:])
         # Store particles best positions (if constraints are satisfied)
         i_update = (fx < fp) & fs
         if np.any(i_update):
@@ -912,6 +961,11 @@ def pso(func, x0, lb, ub,
         # gather local best particles into global best particles
         comm.Allgather([p, MPI.DOUBLE], [gp, MPI.DOUBLE] )
         comm.Allgather([fp, MPI.DOUBLE], [fgp, MPI.DOUBLE] )
+
+        #MCdiv comm.Allgather([x, MPI.DOUBLE], [gx, MPI.DOUBLE])
+        #MCdiv gmask = np.tile(mask1,S).reshape((S,D))
+        #MCdiv divers = diversity(gx, lb, ub, gmask)
+        #MCdiv if crank == 0: print(2, divers, fgp.min())
 
         it += 1
 
@@ -1009,7 +1063,9 @@ if __name__ == '__main__':
     lb = -2*np.ones(npara)
     ub = 2*np.ones(npara)
     x0 = np.zeros(npara)
-    bestx, bestf = pso(goldstein_price, x0, lb, ub, processes=4, init=init, strategy=algo, topology=topology, verbose=0, swarmsize=swarmsize, maxn=maxn, restartfile1=None)
+    bestx, bestf = pso(goldstein_price, x0, lb, ub, processes=4, minobj=3.+1e-8,
+                       init=init, strategy=algo, topology=topology, verbose=0,
+                       swarmsize=swarmsize, maxn=maxn, restartfile1=None)
     if crank == 0: print('Goldstein ', bestx, bestf)
     '''
     This is the Rastrigin Function
@@ -1020,7 +1076,9 @@ if __name__ == '__main__':
     lb = -1*np.ones(npara)
     ub = 1*np.ones(npara)
     x0 = np.zeros(npara)
-    bestx, bestf = pso(rastrigin, x0, lb, ub, processes=4, init=init, strategy=algo, topology=topology, verbose=0, swarmsize=swarmsize, maxn=maxn, restartfile1=None)
+    bestx, bestf = pso(rastrigin, x0, lb, ub, processes=4, minobj=-2.+1e-8,
+                       init=init, strategy=algo, topology=topology, verbose=0,
+                       swarmsize=swarmsize, maxn=maxn, restartfile1=None)
     if crank == 0: print('Rastrigin ', bestx, bestf)
     '''
     This is the Rosenbrock Function
@@ -1044,7 +1102,7 @@ if __name__ == '__main__':
     lb = -5*np.ones(npara)
     ub = 5*np.ones(npara)
     x0 = np.zeros(npara)
-    bestx, bestf = pso(six_hump_camelback, x0, lb, ub, processes=4,
+    bestx, bestf = pso(six_hump_camelback, x0, lb, ub, processes=4, minobj=-1.031628453489877+1e-8,
                        init=init, strategy=algo, topology=topology, verbose=0,
                        swarmsize=swarmsize, maxn=maxn, restartfile1=None)
     if crank == 0: print('Six_hump_camelback ', bestx, bestf)
@@ -1052,7 +1110,7 @@ if __name__ == '__main__':
     # Restart
     algo = 'fips'
     init = 'lhs'
-    swarmsize = 12
+    swarmsize = 40
     maxn = 250
     topology = 'neumann'
     if swarmsize % csize != 0:
@@ -1078,3 +1136,25 @@ if __name__ == '__main__':
                        swarmsize=swarmsize, maxn=maxn,
                        seed=seed, restart=True)
     if crank == 0: print('Rosenbrock Restart 2 - ', bestx, bestf)
+
+    # Constraints
+    algo = 'fips'
+    init = 'lhs'
+    swarmsize = 40
+    maxn = 250
+    topology = 'neumann'
+    if swarmsize % csize != 0:
+        raise ValueError("Swarmsize "+str(swarmsize)+" must be multiple of number of processes "+str(csize)+".")
+    from jams.functions import rosenbrock
+    npara = 2
+    lb = -2*np.ones(npara)
+    ub = 5*np.ones(npara)
+    x0 = np.zeros(npara)
+    seed = 1234
+    def fcon(x): # feasible = np.all(fcon(x)>=0.)
+        return -np.sign(x)
+    bestx, bestf = pso(rosenbrock, x0, lb, ub, processes=4, f_ieqcons=fcon,
+                       init=init, strategy=algo, topology=topology, verbose=2,
+                       swarmsize=swarmsize, maxn=maxn, restartfile1=None,
+                       seed=seed, restart=False)
+    if crank == 0: print('Rosenbrock constraint - ', bestx, bestf)
