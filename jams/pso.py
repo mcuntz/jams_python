@@ -8,6 +8,8 @@ from jams.const import huge
 from jams import savez_compressed
 from mpi4py import MPI
 # ToDo:
+#   write tmp/population files (as in SCE of Fortran)
+#   write out also in logfile if not None (use jams.tee as in joptimise)
 #   crossover with quadratic function (QIPSO)
 
 def _ext_obj_wrapper(func, lb, ub, mask,
@@ -255,7 +257,7 @@ def get_best_neighbor(p, fp, topology, kl=1):
 # Particle Swarm Optimisation
 def pso(func, x0, lb, ub,
         mask=None,
-        ieqcons=[], f_ieqcons=None,
+        ieqcons=None, f_ieqcons=None,
         arg=(), kwarg={},
         swarmsize=None, inertia=None, phip=None, phig=None, maxn=250,
         minstep=1e-8, minobj=1e-8, maxit=False,
@@ -275,12 +277,12 @@ def pso(func, x0, lb, ub,
         ----------
         def pso(func, x0, lb, ub,
                 mask=None,
-                ieqcons=[], f_ieqcons=None,
+                ieqcons=None, f_ieqcons=None,
                 arg=(), kwarg={},
                 swarmsize=None, inertia=None, phip=None, phig=None, maxn=250,
                 minstep=1e-8, minobj=1e-8, maxit=False,
                 init='lhs', strategy='fips', topology='gbest', kl=1,
-                includex0=False,
+                includex0=False, seed=None,
                 processes=1,
                 verbose=0, pout=False, cout=False,
                 restart=False, restartfile1='pso.restart.npz', restartfile2='pso.restart.txt',
@@ -315,10 +317,10 @@ def pso(func, x0, lb, ub,
                     to 0.0 in a successfully optimized problem. If f_ieqcons is specified,
                     ieqcons is ignored.
                     (Default: None)
-        arg        tuple
+        arg         tuple
                     Additional arguments passed to objective and constraint functions.
                     (Default: empty tuple)
-        kwarg      dict
+        kwarg       dict
                     Additional keyword arguments passed to objective and constraint functions.
                     (Default: empty dict)
         swarmsize   int
@@ -660,15 +662,15 @@ def pso(func, x0, lb, ub,
         # Check for constraint function(s) and partialise them
         if f_ieqcons is None:
             if ieqcons is None:
-                if verbose>=1:
+                if (verbose>=1) and (crank == 0):
                     print('No constraints given.')
                 cons = _cons_none_wrapper
             else:
-                if verbose>=1:
+                if (verbose>=1) and (crank == 0):
                     print('Converting ieqcons to a single constraint function.')
                 cons = partial(_cons_ieqcons_wrapper, ieqcons, arg, kwarg)
         else:
-            if verbose>=1:
+            if (verbose>=1) and (crank == 0):
                 print('Single constraint function given in f_ieqcons.')
             cons = partial(_cons_f_ieqcons_wrapper, f_ieqcons, arg, kwarg)
         is_feasible = partial(_is_feasible_wrapper, cons)
@@ -810,15 +812,15 @@ def pso(func, x0, lb, ub,
         # Check for constraint function(s) and partialise them
         if f_ieqcons is None:
             if ieqcons is None:
-                if verbose>=1:
+                if (verbose>=1) and (crank == 0):
                     print('No constraints given.')
                 cons = _cons_none_wrapper
             else:
-                if verbose>=1:
+                if (verbose>=1) and (crank == 0):
                     print('Converting ieqcons to a single constraint function.')
                 cons = partial(_cons_ieqcons_wrapper, ieqcons, arg, kwarg)
         else:
-            if verbose>=1:
+            if (verbose>=1) and (crank == 0):
                 print('Single constraint function given in f_ieqcons.')
             cons = partial(_cons_f_ieqcons_wrapper, f_ieqcons, arg, kwarg)
         is_feasible = partial(_is_feasible_wrapper, cons)
@@ -831,7 +833,7 @@ def pso(func, x0, lb, ub,
     while it < maxn:
         # Stop if minimum found
         if fgp.min() < minobj:
-            if verbose>=1: print('minobj found.')
+            if (verbose>=1) and (crank == 0): print('minobj found.')
             break
 
         # Update neighbors best positions
@@ -928,8 +930,7 @@ def pso(func, x0, lb, ub,
             p2.close()
     # end of swarm iteration: while it < maxn:
 
-    if crank == 0:
-        if (it == maxn) and (verbose>=1): print('Maximum iterations reached --> {:}.'.format(maxn))
+    if (it == maxn) and (verbose>=1) and (crank == 0): print('Maximum iterations reached --> {:}.'.format(maxn))
 
     # global best
     i_min = np.argmin(fgp)
@@ -940,8 +941,7 @@ def pso(func, x0, lb, ub,
         bestf *= -1.
         fgp   *= -1.
 
-    if crank == 0:
-        if not any(map(is_feasible, gp)): print("PSO could not find any feasible point in the search space.")
+    if not any(map(is_feasible, gp)) and (crank == 0): print("PSO could not find any feasible point in the search space.")
 
     # write parameter file with best parameters
     if crank == 0:
