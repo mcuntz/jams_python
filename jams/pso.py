@@ -8,6 +8,7 @@ from jams.const import huge
 from jams import savez_compressed
 from mpi4py import MPI
 # ToDo:
+#   Handling constraints
 #   write tmp/population files (as in SCE of Fortran)
 #   write out also in logfile if not None (use jams.tee as in joptimise)
 #   crossover with quadratic function (QIPSO) ?
@@ -574,12 +575,15 @@ def pso(func, x0, lb, ub,
     else:
         passrank = None
 
+    dodiv = False
+
     # Different variabels types (array, float, int, ...) for restart
     if restartfile1 is not None:
         # Only arrays with savez_compressed - restartfile1
         restartarray  = ['lb', 'ub', 'mask1', 'mask2', 'x02',
-                         'v', 'x', 'fx', 'fs', 'p', 'fp', 'gp', 'fgp', #MCdiv 'gx',
+                         'v', 'x', 'fx', 'fs', 'p', 'fp', 'gp', 'fgp',
                          'rs2']
+        if dodiv: restartarray.extend(['gx'])
         # Save scalars in simple text file - restartfile2
         restartint    = ['D', 'S', 'it', 'iS', 'crank',
                          'rs3', 'rs4']
@@ -758,13 +762,13 @@ def pso(func, x0, lb, ub,
                 gv = np.empty((S,D), dtype=np.float64)
             comm.Scatter([gx, MPI.DOUBLE], [x, MPI.DOUBLE])
             comm.Scatter([gv, MPI.DOUBLE], [v, MPI.DOUBLE])
-        fx  = np.ones(iS)*large                       # local current particles function values
-        #MCdiv gx  = np.empty((iS,D), dtype=np.float64)      # global current individual particle positions
-        fs  = np.zeros(iS, dtype=bool)                # current combined feasibility for each local particle
-        p   = np.ones((iS,D), dtype=np.float64)*large # local particles individual best positions
-        fp  = np.ones(iS, dtype=np.float64)*large     # local particles individual best function values
-        gp  = np.ones((S,D), dtype=np.float64)*large  # global particles individual best positions
-        fgp = np.ones(S, dtype=np.float64)*large      # global particles individual best function values
+        fx  = np.ones(iS)*large                            # local current particles function values
+        if dodiv: gx  = np.empty((iS,D), dtype=np.float64) # global current individual particle positions
+        fs  = np.zeros(iS, dtype=bool)                     # current combined feasibility for each local particle
+        p   = np.ones((iS,D), dtype=np.float64)*large      # local particles individual best positions
+        fp  = np.ones(iS, dtype=np.float64)*large          # local particles individual best function values
+        gp  = np.ones((S,D), dtype=np.float64)*large       # global particles individual best positions
+        fgp = np.ones(S, dtype=np.float64)*large           # global particles individual best function values
 
         # Maximum velocity
         vmax = np.abs(ub - lb)
@@ -807,10 +811,11 @@ def pso(func, x0, lb, ub,
         comm.Allgather([p, MPI.DOUBLE], [gp, MPI.DOUBLE])
         comm.Allgather([fp, MPI.DOUBLE], [fgp, MPI.DOUBLE])
 
-        #MCdiv comm.Allgather([x, MPI.DOUBLE], [gx, MPI.DOUBLE])
-        #MCdiv gmask = np.tile(mask1,S).reshape((S,D))
-        #MCdiv divers = diversity(gx, lb, ub, gmask)
-        #MCdiv if crank == 0: print(1, divers, fgp.min())
+        if dodiv:
+            comm.Allgather([x, MPI.DOUBLE], [gx, MPI.DOUBLE])
+            gmask = np.tile(mask1,S).reshape((S,D))
+            divers = diversity(gx, lb, ub, gmask)
+            if crank == 0: print(1, divers, fgp.min())
 
         # Iterate until termination criterion met
         it = 1
@@ -962,10 +967,11 @@ def pso(func, x0, lb, ub,
         comm.Allgather([p, MPI.DOUBLE], [gp, MPI.DOUBLE] )
         comm.Allgather([fp, MPI.DOUBLE], [fgp, MPI.DOUBLE] )
 
-        #MCdiv comm.Allgather([x, MPI.DOUBLE], [gx, MPI.DOUBLE])
-        #MCdiv gmask = np.tile(mask1,S).reshape((S,D))
-        #MCdiv divers = diversity(gx, lb, ub, gmask)
-        #MCdiv if crank == 0: print(2, divers, fgp.min())
+        if dodiv:
+            comm.Allgather([x, MPI.DOUBLE], [gx, MPI.DOUBLE])
+            gmask = np.tile(mask1,S).reshape((S,D))
+            divers = diversity(gx, lb, ub, gmask)
+            if crank == 0: print(2, divers, fgp.min())
 
         it += 1
 
@@ -1040,7 +1046,7 @@ if __name__ == '__main__':
     bestx, bestf = pso(ackley, x0, lb, ub, processes=4,
                        init=init, strategy=algo, topology=topology, verbose=0,
                        swarmsize=swarmsize, maxn=maxn, restartfile1=None)
-    if crank == 0: print('Ackley ', bestx, bestf)
+    if crank == 0: print('Ackley 0 at origin ', bestx, bestf)
     '''
         This is the Griewank Function (2-D or 10-D)
         Bound: X(i)=[-600,600], for i=1,2,...,10  !for visualization only 2!
@@ -1053,7 +1059,7 @@ if __name__ == '__main__':
     bestx, bestf = pso(griewank, x0, lb, ub, processes=4,
                        init=init, strategy=algo, topology=topology, verbose=0,
                        swarmsize=swarmsize, maxn=maxn, restartfile1=None)
-    if crank == 0: print('Griewank ', bestx, bestf)
+    if crank == 0: print('Griewank 0 at origin ', bestx, bestf)
     '''
     This is the Goldstein-Price Function
     Bound X1=[-2,2], X2=[-2,2]
@@ -1066,7 +1072,7 @@ if __name__ == '__main__':
     bestx, bestf = pso(goldstein_price, x0, lb, ub, processes=4, minobj=3.+1e-8,
                        init=init, strategy=algo, topology=topology, verbose=0,
                        swarmsize=swarmsize, maxn=maxn, restartfile1=None)
-    if crank == 0: print('Goldstein ', bestx, bestf)
+    if crank == 0: print('Goldstein 3 at (0,-1) ', bestx, bestf)
     '''
     This is the Rastrigin Function
     Bound: X1=[-1,1], X2=[-1,1]
@@ -1079,7 +1085,7 @@ if __name__ == '__main__':
     bestx, bestf = pso(rastrigin, x0, lb, ub, processes=4, minobj=-2.+1e-8,
                        init=init, strategy=algo, topology=topology, verbose=0,
                        swarmsize=swarmsize, maxn=maxn, restartfile1=None)
-    if crank == 0: print('Rastrigin ', bestx, bestf)
+    if crank == 0: print('Rastrigin -2 at origin ', bestx, bestf)
     '''
     This is the Rosenbrock Function
     Bound: X1=[-5,5], X2=[-2,8]; Global Optimum: 0,(1,1)
@@ -1092,7 +1098,7 @@ if __name__ == '__main__':
     bestx, bestf = pso(rosenbrock, x0, lb, ub, processes=4,
                        init=init, strategy=algo, topology=topology, verbose=0,
                        swarmsize=swarmsize, maxn=maxn, restartfile1=None)
-    if crank == 0: print('Rosenbrock ', bestx, bestf)
+    if crank == 0: print('Rosenbrock 0 at (1,1) ', bestx, bestf)
     '''
     This is the Six-hump Camelback Function.
     Bound: X1=[-5,5], X2=[-5,5]
@@ -1105,7 +1111,7 @@ if __name__ == '__main__':
     bestx, bestf = pso(six_hump_camelback, x0, lb, ub, processes=4, minobj=-1.031628453489877+1e-8,
                        init=init, strategy=algo, topology=topology, verbose=0,
                        swarmsize=swarmsize, maxn=maxn, restartfile1=None)
-    if crank == 0: print('Six_hump_camelback ', bestx, bestf)
+    if crank == 0: print('Six_hump_camelback -1.03... +-(-0.08983,0.7126) ', bestx, bestf)
 
     # Restart
     algo = 'fips'
