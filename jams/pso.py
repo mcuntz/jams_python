@@ -8,6 +8,7 @@ from jams.const import huge
 from jams import savez_compressed
 from mpi4py import MPI
 # ToDo:
+#   memetic PSO = MPSO - PSO with local optimisation
 #   Handling constraints
 #   write tmp/population files (as in SCE of Fortran)
 #   write out also in logfile if not None (use jams.tee as in joptimise)
@@ -183,7 +184,6 @@ def get_neighbor_indeces(n, S, topology, kl=1):
                                kl particles on each side, i.e. particle i has the neighborhood
                                i-kl, i-kl+1, ..., i, i+1, ..., i+kl-1, i+kl
                                [Mohais et al., 2005] http://dx.doi.org/10.1007/11589990_80
-                    'ring'     'lbest' with kl=1
                     'neumann'  Neighborhood of a point including all points at a Hamming distance of 1.
                                Particles are arranges in a lattice, where each particle interacts with
                                its immediate 4 neighbors to the N, S, E, and W.
@@ -192,6 +192,7 @@ def get_neighbor_indeces(n, S, topology, kl=1):
                                where r is the highest integer less than or equal to sqrt(n) that evenly
                                divides n and c = n / r
                                [Mohais et al., 2005] http://dx.doi.org/10.1007/11589990_80
+                    'ring'     'lbest' with kl=1
 
 
         Optional Input
@@ -243,7 +244,6 @@ def get_best_neighbor(p, fp, topology, kl=1):
                                kl particles on each side, i.e. particle i has the neighborhood
                                i-kl, i-kl+1, ..., i, i+1, ..., i+kl-1, i+kl
                                [Mohais et al., 2005] http://dx.doi.org/10.1007/11589990_80
-                    'ring'     'lbest' with kl=1
                     'neumann'  Neighborhood of a point including all points at a Hamming distance of 1.
                                Particles are arranges in a lattice, where each particle interacts with
                                its immediate 4 neighbors to the N, S, E, and W.
@@ -252,6 +252,7 @@ def get_best_neighbor(p, fp, topology, kl=1):
                                where r is the highest integer less than or equal to sqrt(n) that evenly
                                divides n and c = n / r
                                [Mohais et al., 2005] http://dx.doi.org/10.1007/11589990_80
+                    'ring'     'lbest' with kl=1
 
 
         Optional Input
@@ -404,7 +405,7 @@ def pso(func, x0, lb, ub,
                                   imax = 0.9
                                   imin = 0.4
                                   inertia = imax - float(it)/float(maxn-1) * (imax-imin)
-                    'canonical':  Clerk & Kennedy (2000) with fixed constriction factor
+                    'canonical':  Clerk & Kennedy (2000) with fixed, clamped constriction factor
                                   From PaGMO (esa.github.io/pagmo):
                                   Clerc's analysis of the iterative system led him to propose a strategy for the
                                   placement of "constriction coefficients" on the terms of the formulas; these
@@ -415,8 +416,22 @@ def pso(func, x0, lb, ub,
                                   "This is the canonical particle swarm algorithm of today."
                                   [Poli et al., 2007] http://dx.doi.org/10.1007/s11721-007-0002-0
                                   [Clerc & Kennedy, 2002] http://dx.doi.org/10.1109/4235.985692
+                                  From F van den Bergh, Diss 2001:
+                                  The probelm [with the constriction factor], according to Eberhart and Shi,
+                                  is that the particles stray too far from the desired region of search space.
+                                  To mitigate this effect they decided to apply clamping to the constriction factor
+                                  implementation as well, setting the vmax parameter equal to xmax, the size of the
+                                  search space. This led to improved performance for almost all the functions they
+                                  used during testing - both in terms of the rate of convergence and the ability of
+                                  the algorithm to reach the error threshold.
+                                  [Eberhardt RC & Shi Y, 2000] Comparing inertia weights and constriction factors
+                                  in particle swarm optimization. In: Proceedings of the Congress on Evolutionary
+                                  Computation (CEC2000), 84-88.
+                                  [van den Bergh F, 2000] An Analysis of Particle Swarm Optimizers, PhD thesis,
+                                  University of Pretoria, South Africa
                                   inertia=0.7289, phip=2.05, phig=2.05
                                   v = inertia * (v + phip*rp*(p - x) + phig*rg*(g - x))
+                                  v = clip(v, lb, ub)
                                   x = x + v
                     'fips':       Fully Informed Particle Swarm
                                   From PaGMO (esa.github.io/pagmo):
@@ -449,7 +464,10 @@ def pso(func, x0, lb, ub,
                                kl particles on each side, i.e. particle i has the neighborhood
                                i-kl, i-kl+1, ..., i, i+1, ..., i+kl-1, i+kl
                                [Mohais et al., 2005] http://dx.doi.org/10.1007/11589990_80
-                    'ring'     'lbest' with kl=1
+                    'mbest'    Neighborhood is entire part of the swarm on the current MPI process.
+                               'mbest' == 'gbest' if run is on one processor.
+                               'mbest' gets a more and more local search when mpi processes increase.
+                               This is more a gimmick than a real topology.
                     'neumann'  Neighborhood of a point including all points at a Hamming distance of 1.
                                Particles are arranges in a lattice, where each particle interacts with
                                its immediate 4 neighbors to the N, S, E, and W.
@@ -458,6 +476,7 @@ def pso(func, x0, lb, ub,
                                where r is the highest integer less than or equal to sqrt(n) that evenly
                                divides n and c = n / r
                                [Mohais et al., 2005] http://dx.doi.org/10.1007/11589990_80
+                    'ring'     'lbest' with kl=1
         kl          integer
                     Neighborhood distance in topology 'lbest'.
                     (Default: 1 = ring)
@@ -622,7 +641,7 @@ def pso(func, x0, lb, ub,
     ptypes = ['original', 'inertia', 'canonical', 'fips', 'nips']
     assert strategy.lower() in ptypes, 'PSO implementation {:} not in {:}'.format(strategy, ptypes)
     # Topology keyword
-    ttypes = ['gbest', 'lbest', 'ring', 'neumann']
+    ttypes = ['gbest', 'lbest', 'mbest', 'neumann', 'ring']
     assert topology.lower() in ttypes, 'Topology {:} not in {:}'.format(topology, ttypes)
     # Parameterfile etc. keywords if func is name of executable
     if isinstance(func, (str,list)):
@@ -738,7 +757,8 @@ def pso(func, x0, lb, ub,
                 rand = np.empty((2*S,D), dtype=np.float)
             # Scatter has different ordering than needed for reproducible results
             # Do it manually
-            comm.Bcast(rand, root=0)
+            if csize > 1:
+                comm.Bcast(rand, root=0)
             x = rand[crank*iS:crank*iS+iS,:]
             v = rand[S+crank*iS:S+crank*iS+iS,:]
         elif init.lower() == 'sobol':
@@ -760,8 +780,12 @@ def pso(func, x0, lb, ub,
             else:
                 gx = np.empty((S,D), dtype=np.float64)
                 gv = np.empty((S,D), dtype=np.float64)
-            comm.Scatter([gx, MPI.DOUBLE], [x, MPI.DOUBLE])
-            comm.Scatter([gv, MPI.DOUBLE], [v, MPI.DOUBLE])
+            if csize > 1:
+                comm.Scatter([gx, MPI.DOUBLE], [x, MPI.DOUBLE])
+                comm.Scatter([gv, MPI.DOUBLE], [v, MPI.DOUBLE])
+            else:
+                x = gx
+                v = gv
         fx  = np.ones(iS)*large                            # local current particles function values
         if dodiv: gx  = np.empty((iS,D), dtype=np.float64) # global current individual particle positions
         fs  = np.zeros(iS, dtype=bool)                     # current combined feasibility for each local particle
@@ -790,7 +814,6 @@ def pso(func, x0, lb, ub,
             for i in range(iS):
                 fs[i] = is_feasible(x[i,:])
                 if fs[i]:
-                    print(i, x[i:])
                     fx[i] = obj(x[i,:])
         # maximise
         if maxit: fx *= -1.
@@ -808,11 +831,18 @@ def pso(func, x0, lb, ub,
             fp[i_update]  = fx[i_update]
 
         # gather local best particles into global best particles
-        comm.Allgather([p, MPI.DOUBLE], [gp, MPI.DOUBLE])
-        comm.Allgather([fp, MPI.DOUBLE], [fgp, MPI.DOUBLE])
+        if csize > 1:
+            comm.Allgather([p, MPI.DOUBLE], [gp, MPI.DOUBLE])
+            comm.Allgather([fp, MPI.DOUBLE], [fgp, MPI.DOUBLE])
+        else:
+            gp  = p
+            fgp = fp
 
         if dodiv:
-            comm.Allgather([x, MPI.DOUBLE], [gx, MPI.DOUBLE])
+            if csize > 1:
+                comm.Allgather([x, MPI.DOUBLE], [gx, MPI.DOUBLE])
+            else:
+                gx = x
             gmask = np.tile(mask1,S).reshape((S,D))
             divers = diversity(gx, lb, ub, gmask)
             if crank == 0: print(1, divers, fgp.min())
@@ -887,14 +917,25 @@ def pso(func, x0, lb, ub,
         # Update neighbors best positions
         g  = np.empty((iS,D), dtype=np.float64) # local best neighbors
         fg = np.empty(iS, dtype=np.float64)
-        if crank == 0:
-            gg, fgg = get_best_neighbor(gp, fgp, topology, kl=kl)  # global best neighbors
+        if topology.lower() == 'mbest':
+            i_min = np.argmin(fp) # overall best on MPI process
+            ig  = p[i_min,:]
+            ifg = fp[i_min]
+            for iis in range(iS): g[iis,:] = ig
+            fg[:] = ifg
         else:
-            gg  = np.empty((S,D), dtype=np.float64)
-            fgg = np.empty(S, dtype=np.float64)
-        # Scatter global best neighbors into local best neighbors
-        comm.Scatter([gg, MPI.DOUBLE], [g, MPI.DOUBLE])
-        comm.Scatter([fgg, MPI.DOUBLE], [fg, MPI.DOUBLE])
+            if crank == 0:
+                gg, fgg = get_best_neighbor(gp, fgp, topology, kl=kl)  # global best neighbors
+            else:
+                gg  = np.empty((S,D), dtype=np.float64)
+                fgg = np.empty(S, dtype=np.float64)
+            # Scatter global best neighbors into local best neighbors
+            if csize > 1:
+                comm.Scatter([gg, MPI.DOUBLE], [g, MPI.DOUBLE])
+                comm.Scatter([fgg, MPI.DOUBLE], [fg, MPI.DOUBLE])
+            else:
+                g  = gg
+                fg = fgg
 
         # Update the particles velocities
         if crank == 0:
@@ -903,8 +944,8 @@ def pso(func, x0, lb, ub,
             rand = np.empty((2*S+S*S,D), dtype=np.float)
         # Scatter has different ordering than needed for reproducible results
         # Do it manually
-        comm.Bcast(rand, root=0)
-
+        if csize > 1:
+            comm.Bcast(rand, root=0)
         rp = rand[crank*iS:crank*iS+iS,:]
         rg = rand[S+crank*iS:S+crank*iS+iS,:]
         if strategy.lower() == 'original':    # Kennedy & Eberhart, 2001
@@ -917,6 +958,11 @@ def pso(func, x0, lb, ub,
             v = np.clip(v, vmin, vmax)
         elif strategy.lower() == 'canonical': # Clerc & Kennedy (2000)
             v = inertia * (v + phip*rp*(p - x) + phig*rg*(g - x))
+            # limit v also to x-bounds
+            # Eberhardt RC & Shi Y (2000)
+            # Comparing inertia weights and constriction factors in particle swarm optimization.
+            # In: Proceedings of the Congress on Evolutionary Computation (CEC2000), 84-88.
+            v = np.clip(v, lb, ub)
         elif strategy.lower() == 'fips':      # Mendes & Kennedy (2004)
             acc_coeff = (phip + phig) / float(S)
             for i in range(iS):
@@ -947,7 +993,6 @@ def pso(func, x0, lb, ub,
             for i in range(iS):
                 fs[i] = is_feasible(x[i,:])
                 if fs[i]:
-                    print(i, x[i:])
                     fx[i] = obj(x[i,:])
                     if maxit: fx[i] *= -1.
 
@@ -964,11 +1009,18 @@ def pso(func, x0, lb, ub,
             fp[i_update]  = fx[i_update]
 
         # gather local best particles into global best particles
-        comm.Allgather([p, MPI.DOUBLE], [gp, MPI.DOUBLE] )
-        comm.Allgather([fp, MPI.DOUBLE], [fgp, MPI.DOUBLE] )
+        if csize > 1:
+            comm.Allgather([p, MPI.DOUBLE], [gp, MPI.DOUBLE])
+            comm.Allgather([fp, MPI.DOUBLE], [fgp, MPI.DOUBLE])
+        else:
+            gp  = p
+            fgp = fp
 
         if dodiv:
-            comm.Allgather([x, MPI.DOUBLE], [gx, MPI.DOUBLE])
+            if csize > 1:
+                comm.Allgather([x, MPI.DOUBLE], [gx, MPI.DOUBLE])
+            else:
+                x = gx
             gmask = np.tile(mask1,S).reshape((S,D))
             divers = diversity(gx, lb, ub, gmask)
             if crank == 0: print(2, divers, fgp.min())
@@ -1025,7 +1077,7 @@ if __name__ == '__main__':
     csize = comm.Get_size()
     crank = comm.Get_rank()
 
-    algo = 'fips'
+    algo = 'canonical'
     init = 'lhs'
     swarmsize = 40
     maxn = 250
@@ -1144,11 +1196,11 @@ if __name__ == '__main__':
     if crank == 0: print('Rosenbrock Restart 2 - ', bestx, bestf)
 
     # Constraints
-    algo = 'fips'
+    algo = 'canonical'
     init = 'lhs'
     swarmsize = 40
     maxn = 250
-    topology = 'neumann'
+    topology = 'gbest'
     if swarmsize % csize != 0:
         raise ValueError("Swarmsize "+str(swarmsize)+" must be multiple of number of processes "+str(csize)+".")
     from jams.functions import rosenbrock
@@ -1158,8 +1210,8 @@ if __name__ == '__main__':
     x0 = np.zeros(npara)
     seed = 1234
     def fcon(x): # feasible = np.all(fcon(x)>=0.)
-        return -np.sign(x)
-    bestx, bestf = pso(rosenbrock, x0, lb, ub, processes=4, f_ieqcons=fcon,
+        return np.sign(x)
+    bestx, bestf = pso(rosenbrock, x0, lb, ub, processes=1, f_ieqcons=fcon,
                        init=init, strategy=algo, topology=topology, verbose=2,
                        swarmsize=swarmsize, maxn=maxn, restartfile1=None,
                        seed=seed, restart=False)
