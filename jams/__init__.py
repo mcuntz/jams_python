@@ -62,6 +62,7 @@
     ftp                    Module with functions for interacting with an open FTP connection.
     functions              Module with common functions that are used in curve_fit or fmin parameter estimations.
     gap2lai                Calculation of leaf area index from gap probability observations.
+    geoarray               Pythonic gdal wrapper
     get_angle              Returns the angle in radiant from each point in xy1 to each point in xy2.
     get_brewer             Registers and returns Brewer colormap.
     get_nearest            Returns a value z for each point in xy near to the xyz field.
@@ -349,6 +350,7 @@
     Special files
     -------------
     dumpnetcdf             Convenience function for writenetcdf
+    geoarray               Pythonic gdal wrapper
     hdfread                Wrapper for readhdf.
     hdf4read               Wrapper for readhdf4.
     hdf5read               Wrapper for readhdf5.
@@ -514,6 +516,7 @@
               JM, Oct 2016 - mat2nc
               JM, Oct 2016 - dag
               AP, Oct 2016 - pritay
+              DS, Oct 2016 - added geoarray
               MC, Nov 2016 - ported to Python 3
               MC, Nov 2016 - pso
 """
@@ -557,7 +560,6 @@ from .errormeasures     import bias, mae, mse, rmse, nse, kge, pear2
 from .esat              import esat
 from .fftngo            import fftngo
 from .fgui              import directories_from_gui, directory_from_gui, file_from_gui, files_from_gui
-from .river_network     import river_network, upscale_fdir
 # from .field_gen         import Field, Incompr_Field, Filtered_Incompr_Field
 from .fill_nonfinite    import fill_nonfinite
 from .find_in_path      import find_in_path
@@ -569,6 +571,10 @@ try:
 except ImportError:
     pass # obsolete
 from .gap2lai           import gap2lai, leafprojection
+try:
+    from .geoarray      import geoarray
+except ImportError:
+    pass
 from .get_angle         import get_angle
 from .get_nearest       import get_nearest
 from .grid_mid2edge     import grid_mid2edge
@@ -619,6 +625,7 @@ try:
     from .readnetcdf        import readnetcdf, netcdfread, ncread, readnc
 except ImportError:
     pass # not installed
+from .river_network     import river_network, upscale_fdir
 from .romanliterals     import int2roman, roman2int
 from .saltelli          import saltelli
 from .samevalue         import samevalue
