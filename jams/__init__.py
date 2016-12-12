@@ -117,6 +117,7 @@
     readnetcdf             Reads variables or information from netcdf file.
     register_brewer        Registers and registers Brewer colormap.
     river_network          a class for creating a river network from a DEM including flow direction, flow accumulation and channel order
+    rolling                Reshape an array in a "rolling window" style.
     roman2int              Roman numeral to integer conversion.
     rossner                Wrapper for outlier.
     t2sap                  Conversion of temperature difference to sap flux density.
@@ -179,6 +180,7 @@
     pack                   Similar to Fortran pack function with mask.
     samevalue              Checks if abs. differences of array values within a certain window are smaller than threshold.
     maskgroup              Masks elements in a 1d array gathered in small groups.
+    rolling                Reshape an array in a "rolling window" style.
     smax                   Calculating smooth maximum of two numbers
     smin                   Calculating smooth minimum of two numbers
     unpack                 Similar to Fortran unpack function with mask.
@@ -519,6 +521,7 @@
               DS, Oct 2016 - added geoarray
               MC, Nov 2016 - ported to Python 3
               MC, Nov 2016 - pso
+              AP, Dec 2016 - rolling
 """
 from __future__ import print_function
 
@@ -626,6 +629,7 @@ try:
 except ImportError:
     pass # not installed
 from .river_network     import river_network, upscale_fdir
+from .rolling           import rolling
 from .romanliterals     import int2roman, roman2int
 from .saltelli          import saltelli
 from .samevalue         import samevalue

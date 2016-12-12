@@ -6,7 +6,10 @@ from distutils.util import strtobool
 import numpy as np
 from jams.const import huge
 from jams import savez_compressed
-from mpi4py import MPI
+try:
+    from mpi4py import MPI
+except ImportError:
+    pass # obsolete
 # ToDo:
 #   memetic PSO = MPSO - PSO with local optimisation
 #   Handling constraints
