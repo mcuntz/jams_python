@@ -6,10 +6,6 @@ from distutils.util import strtobool
 import numpy as np
 from jams.const import huge
 from jams import savez_compressed
-try:
-    from mpi4py import MPI
-except ImportError:
-    pass # obsolete
 # ToDo:
 #   memetic PSO = MPSO - PSO with local optimisation
 #   Handling constraints
@@ -589,9 +585,15 @@ def pso(func, x0, lb, ub,
                   MC, Dec 2016 - includex0, restart, mpi
     """
     # Get MPI communicator
-    comm = MPI.COMM_WORLD
-    csize = comm.Get_size()
-    crank = comm.Get_rank()
+    try:
+        from mpi4py import MPI
+        comm  = MPI.COMM_WORLD
+        csize = comm.Get_size()
+        crank = comm.Get_rank()
+    except ImportError:
+        comm  = None
+        csize = 1
+        crank = 0
     if csize > 1:
         passrank = crank
     else:
@@ -1076,9 +1078,15 @@ if __name__ == '__main__':
     # import doctest
     # doctest.testmod(optionflags=doctest.NORMALIZE_WHITESPACE)
 
-    comm = MPI.COMM_WORLD
-    csize = comm.Get_size()
-    crank = comm.Get_rank()
+    try:
+        from mpi4py import MPI
+        comm  = MPI.COMM_WORLD
+        csize = comm.Get_size()
+        crank = comm.Get_rank()
+    except ImportError:
+        comm  = None
+        csize = 1
+        crank = 0
 
     algo = 'canonical'
     init = 'lhs'
