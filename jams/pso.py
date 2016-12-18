@@ -5,7 +5,7 @@ import subprocess
 from distutils.util import strtobool
 import numpy as np
 from jams.const import huge
-from jams import savez_compressed
+from jams import savez_compressed, closest
 # ToDo:
 #   memetic PSO = MPSO - PSO with local optimisation
 #   Handling constraints
@@ -38,10 +38,10 @@ def _ext_obj_wrapper(func, lb, ub, mask,
         lb                (npars) lower bounds of parameters
         ub                (npars) upper bounds of parameters
         mask              (npars) mask to include (1) or exclude (0) parameter from optimisation
-        parameterfile     Parameter file for executable; must be given if functn is name of executable
-        parameterwriter   Python function for writing parameter file if functn is name of executable
-        objectivefile     File with objective value from executable; must be given if functn is name of executable
-        objectivereader   Python function for reading objective value if functn is name of executable
+        parameterfile     Parameter file for executable; must be given if func is name of executable
+        parameterwriter   Python function for writing parameter file if func is name of executable
+        objectivefile     File with objective value from executable; must be given if func is name of executable
+        objectivereader   Python function for reading objective value if func is name of executable
         shell             If True, the specified command will be executed through the shell.
         debug             If True, model output is displayed for executable.
         rank              Process rank will be given as last argument to external program.
@@ -177,20 +177,20 @@ def get_neighbor_indeces(n, S, topology, kl=1):
         topology    string
                     Neighborhood topologies. These are rather social than geographical topologies.
                     All neighborhoods comprise the current particle as well.
-                    [Kennedy & Mendes, 2002] http://dx.doi.org/10.1109/CEC.2002.1004493
+                    [Kennedy & Mendes, 2002] doi: 10.1109/CEC.2002.1004493
                     'gbest'    Neighborhood is entire swarm.
                     'lbest'    Partciles aranged in a ring, in which each particle communicates with
                                kl particles on each side, i.e. particle i has the neighborhood
                                i-kl, i-kl+1, ..., i, i+1, ..., i+kl-1, i+kl
-                               [Mohais et al., 2005] http://dx.doi.org/10.1007/11589990_80
+                               [Mohais et al., 2005] doi: 10.1007/11589990_80
                     'neumann'  Neighborhood of a point including all points at a Hamming distance of 1.
                                Particles are arranges in a lattice, where each particle interacts with
                                its immediate 4 neighbors to the N, S, E, and W.
-                               [Kennedy and Mendes, 2006] http://dx.doi.org/10.1109/TSMCC.2006.875410
+                               [Kennedy and Mendes, 2006] doi: 10.1109/TSMCC.2006.875410
                                The von Neumann neighborhood is configured into r rows and c columns,
                                where r is the highest integer less than or equal to sqrt(n) that evenly
                                divides n and c = n / r
-                               [Mohais et al., 2005] http://dx.doi.org/10.1007/11589990_80
+                               [Mohais et al., 2005] doi: 10.1007/11589990_80
                     'ring'     'lbest' with kl=1
 
 
@@ -237,20 +237,20 @@ def get_best_neighbor(p, fp, topology, kl=1):
         topology    string
                     Neighborhood topologies. These are rather social than geographical topologies.
                     All neighborhoods comprise the current particle as well.
-                    [Kennedy & Mendes, 2002] http://dx.doi.org/10.1109/CEC.2002.1004493
+                    [Kennedy & Mendes, 2002] doi: 10.1109/CEC.2002.1004493
                     'gbest'    Neighborhood is entire swarm.
                     'lbest'    Partciles aranged in a ring, in which each particle communicates with
                                kl particles on each side, i.e. particle i has the neighborhood
                                i-kl, i-kl+1, ..., i, i+1, ..., i+kl-1, i+kl
-                               [Mohais et al., 2005] http://dx.doi.org/10.1007/11589990_80
+                               [Mohais et al., 2005] doi: 10.1007/11589990_80
                     'neumann'  Neighborhood of a point including all points at a Hamming distance of 1.
                                Particles are arranges in a lattice, where each particle interacts with
                                its immediate 4 neighbors to the N, S, E, and W.
-                               [Kennedy and Mendes, 2006] http://dx.doi.org/10.1109/TSMCC.2006.875410
+                               [Kennedy and Mendes, 2006] doi: 10.1109/TSMCC.2006.875410
                                The von Neumann neighborhood is configured into r rows and c columns,
                                where r is the highest integer less than or equal to sqrt(n) that evenly
                                divides n and c = n / r
-                               [Mohais et al., 2005] http://dx.doi.org/10.1007/11589990_80
+                               [Mohais et al., 2005] doi: 10.1007/11589990_80
                     'ring'     'lbest' with kl=1
 
 
@@ -287,6 +287,58 @@ def get_best_neighbor(p, fp, topology, kl=1):
     return [g, fg]
 
 
+def local_search(func, x, fx, lb, ub, algorithm='RWDE'):
+    '''
+        Perfom local search
+
+
+        Input
+        -----
+        func        objective function warpper
+                    function to mini-/maximise
+        p           ND-array
+                    The best known position of each particle.
+        fp          1D-array
+                    The objective values at each position in p.
+        lb          1D-array
+                    The lower bounds of the particle positions (parameters).
+        ub          1D-array
+                    The upper bounds of the particle positions (parameters).
+        algorithm   string
+                    Local search algorithm.
+                    (Default: 'RWDE')
+                    'RWDE': Random Walk with Direction Exploitation
+                    [Petalas et al. 2007] doi: 10.1007/s10479-007-0224-y
+    '''
+    # constants
+    D = x.shape[0]
+    if algorithm.lower() == 'rwde':
+        lam_init = 1. # inital steapsize
+        tmax     = 5  # # of local searches
+        # local search
+        nlocal = 0
+        t      = 0
+        lam    = lam_init
+        while t < tmax:
+            nlocal += 1
+            t      += 1
+            z       = np.random.uniform(size=D)
+            xnew    = x + lam*z*(ub - lb)
+            fxnew   = func(xnew)
+            if fxnew < fx:
+                x   = xnew
+                fx  = fxnew
+                lam = lam_init
+            elif fxnew > fx:
+                lam *= 0.5
+            else:
+                continue
+    else:
+        raise ValueError('Local search algorithm not know: '+algorithm)
+
+    return x, fx, nlocal
+
+
 # Particle Swarm Optimisation
 def pso(func, x0, lb, ub,
         mask=None,
@@ -295,6 +347,7 @@ def pso(func, x0, lb, ub,
         swarmsize=None, inertia=None, phip=None, phig=None, maxn=250,
         minstep=1e-8, minobj=1e-8, maxit=False,
         init='lhs', strategy='fips', topology='gbest', kl=1,
+        memetic='no', nmemetic=1,
         includex0=False, seed=None,
         processes=1,
         verbose=0, pout=False, cout=False,
@@ -331,9 +384,9 @@ def pso(func, x0, lb, ub,
         x0          1D-array
                     Will be taken at dimensions with mask==False.
         lb          1D-array
-                    The lower bounds of the design variable(s).
+                    The lower bounds of the particle positions (parameters).
         ub          1D-array
-                    The upper bounds of the design variable(s).
+                    The upper bounds of the particle positions (parameters).
 
 
         Optional Input
@@ -351,10 +404,10 @@ def pso(func, x0, lb, ub,
                     ieqcons is ignored.
                     (Default: None)
         arg         tuple
-                    Additional arguments passed to objective and constraint functions.
+                    Additional arguments passed to objective and constraint functions (only for Python functions).
                     (Default: empty tuple)
         kwarg       dict
-                    Additional keyword arguments passed to objective and constraint functions.
+                    Additional keyword arguments passed to objective and constraint functions (only for Python functions).
                     (Default: empty dict)
         swarmsize   int
                     The number of particles in the swarm.
@@ -413,8 +466,8 @@ def pso(func, x0, lb, ub,
                                   eliminating the arbitrary Vmax parameter. The analysis also takes the guesswork
                                   out of setting the values of phi_1 and phi_2.
                                   "This is the canonical particle swarm algorithm of today."
-                                  [Poli et al., 2007] http://dx.doi.org/10.1007/s11721-007-0002-0
-                                  [Clerc & Kennedy, 2002] http://dx.doi.org/10.1109/4235.985692
+                                  [Poli et al., 2007] doi: 10.1007/s11721-007-0002-0
+                                  [Clerc & Kennedy, 2002] doi: 10.1109/4235.985692
                                   From F van den Bergh, Diss 2001:
                                   The probelm [with the constriction factor], according to Eberhart and Shi,
                                   is that the particles stray too far from the desired region of search space.
@@ -441,8 +494,8 @@ def pso(func, x0, lb, ub,
                                   "With good parameters, FIPS appears to find better solutions in fewer iterations
                                   than the canonical algorithm, but it is much more dependent on the population
                                   topology."
-                                  [Poli et al., 2007] http://dx.doi.org/10.1007/s11721-007-0002-0
-                                  [Mendes et al., 2004] http://dx.doi.org/10.1109/TEVC.2004.826074
+                                  [Poli et al., 2007] doi: 10.1007/s11721-007-0002-0
+                                  [Mendes et al., 2004] doi: 10.1109/TEVC.2004.826074
                                   ri = np.random.uniform(size=nneighbor)
                                   inertia = 0.7289
                                   acc_coeff = phip+phig = 4.1
@@ -453,16 +506,24 @@ def pso(func, x0, lb, ub,
                                   ri = np.random.uniform(size=nneighbor)
                                   inertia = 0.7289, acc_coeff = phip+phig = 4.1
                                   v = inertia * (v + np.sum(ri*acc_coeff/nneighbor*(p[neighbor[:]]-x)))
+        memetic     string
+                    Perfom local search at some particle positions
+                    (Default: 'no')
+                    'no':     No local search.
+                    'global': Local search is applied on the overall best position of the swarm.
+        nmemetic    integer
+                    Do local search after each nmemetic swarm iterations.
+                    (Default: 1)
         topology    string
                     Neighborhood topologies. These are rather social than geographical topologies.
                     All neighborhoods comprise the current particle as well.
-                    [Kennedy & Mendes, 2002] http://dx.doi.org/10.1109/CEC.2002.1004493
+                    [Kennedy & Mendes, 2002] doi: 10.1109/CEC.2002.1004493
                     (Default: 'gbest')
                     'gbest'    Neighborhood is entire swarm.
                     'lbest'    Partciles aranged in a ring, in which each particle communicates with
                                kl particles on each side, i.e. particle i has the neighborhood
                                i-kl, i-kl+1, ..., i, i+1, ..., i+kl-1, i+kl
-                               [Mohais et al., 2005] http://dx.doi.org/10.1007/11589990_80
+                               [Mohais et al., 2005] doi: 10.1007/11589990_80
                     'mbest'    Neighborhood is entire part of the swarm on the current MPI process.
                                'mbest' == 'gbest' if run is on one processor.
                                'mbest' gets a more and more local search when mpi processes increase.
@@ -470,11 +531,11 @@ def pso(func, x0, lb, ub,
                     'neumann'  Neighborhood of a point including all points at a Hamming distance of 1.
                                Particles are arranges in a lattice, where each particle interacts with
                                its immediate 4 neighbors to the N, S, E, and W.
-                               [Kennedy and Mendes, 2006] http://dx.doi.org/10.1109/TSMCC.2006.875410
+                               [Kennedy and Mendes, 2006] doi: 10.1109/TSMCC.2006.875410
                                The von Neumann neighborhood is configured into r rows and c columns,
                                where r is the highest integer less than or equal to sqrt(n) that evenly
                                divides n and c = n / r
-                               [Mohais et al., 2005] http://dx.doi.org/10.1007/11589990_80
+                               [Mohais et al., 2005] doi: 10.1007/11589990_80
                     'ring'     'lbest' with kl=1
         kl          integer
                     Neighborhood distance in topology 'lbest'.
@@ -582,7 +643,7 @@ def pso(func, x0, lb, ub,
                                - neighborhoods
                                - external function - mask, x0, parameterfile, parameterwriter,
                                                      objectivefile, objectivereader, shell, debug
-                  MC, Dec 2016 - includex0, restart, mpi
+                  MC, Dec 2016 - includex0, restart, mpi, memetic
     """
     # Get MPI communicator
     try:
@@ -610,7 +671,7 @@ def pso(func, x0, lb, ub,
         if dodiv: restartarray.extend(['gx'])
         # Save scalars in simple text file - restartfile2
         restartint    = ['D', 'S', 'it', 'iS', 'crank',
-                         'rs3', 'rs4']
+                         'rs3', 'rs4', 'ilocal']
         restartfloat  = ['rs5']
         restartbool   = ['maxit']
         restartstring = ['rs1']
@@ -631,7 +692,7 @@ def pso(func, x0, lb, ub,
     assert len(lb)==len(ub), 'Lower- and upper-bounds must have the same lengths.'
     lb = np.array(lb)
     ub = np.array(ub)
-    assert np.all(ub >= lb), 'All upper-bounds must be greater than lower-bounds.'
+    assert np.all(ub >= lb), 'All upper-bounds must be greater or equal than lower-bounds.'
     # Mask
     if mask is not None:
         assert len(mask)==len(ub), 'Mask and bounds must have the same lengths.'
@@ -648,6 +709,9 @@ def pso(func, x0, lb, ub,
     # Topology keyword
     ttypes = ['gbest', 'lbest', 'mbest', 'neumann', 'ring']
     assert topology.lower() in ttypes, 'Topology {:} not in {:}'.format(topology, ttypes)
+    # Mmemetic keyword
+    mtypes = ['no', 'global']
+    assert memetic.lower() in mtypes, 'Memetic implementation {:} not in {:}'.format(memetic, mtypes)
     # Parameterfile etc. keywords if func is name of executable
     if isinstance(func, (str,list)):
         if parameterfile is None:
@@ -854,6 +918,7 @@ def pso(func, x0, lb, ub,
 
         # Iterate until termination criterion met
         it = 1
+        ilocal = 0
 
         # save restart
         if restartfile1 is not None:
@@ -916,8 +981,49 @@ def pso(func, x0, lb, ub,
     while it < maxn:
         # Stop if minimum found
         if fgp.min() < minobj:
-            if (verbose>=1) and (crank == 0): print('minobj found.')
+            if (verbose>=1) and (crank == 0): print('minobj found (1).')
             break
+        
+        # if crank == 0: print(it, fgp.min())
+        if memetic.lower() == 'global':
+            if it % nmemetic == 0:
+                ii0 = fgp.argmin() # gbest
+                xl  = gp[ii0,:]
+                fxl = fgp[ii0]
+                if crank == 0:
+                    allnorm = np.array([ np.linalg.norm(gp[ii,:]-xl) if ii != ii0 else huge for ii in range(S) ])
+                    # # stepsize is lower or equal to furthest particle - almost no improvement
+                    # iib = allnorm.argmax()
+                    # # stepsize is lower or equal to mean particle distance - quite some steps with improvements
+                    # iib = closest(allnorm, allnorm.mean())
+                    # stepsize is lower or equal to closest particle - lots of steps with improvements
+                    iib = allnorm.argmin()
+                    dx = abs(gp[iib,:]-xl)
+                    xnew, fxnew, nlocal = local_search(obj, xl, fxl, xl-dx, xl+dx, algorithm='RWDE')
+                    fxnew  = np.ones(1)*fxnew
+                    nlocal = np.ones(1)*nlocal
+                else:
+                    xnew   = np.empty(D, dtype=np.float64)
+                    fxnew  = np.empty(1, dtype=np.float64)
+                    nlocal = np.empty(1, dtype=np.float64)
+                if csize > 1:
+                    comm.Bcast([nlocal, MPI.INT], root=0)
+                    comm.Bcast([xnew, MPI.INT], root=0)
+                    comm.Bcast([fxnew, MPI.INT], root=0)
+                ilocal += int(nlocal[0])
+                if fxnew < fgp[ii0]:
+                    if crank==0: print(it, fgp[ii0], fxnew)
+                    gp[ii0,:] = xnew
+                    fgp[ii0]  = fxnew
+                if csize > 1:
+                    comm.Scatter([gp, MPI.DOUBLE], [p, MPI.DOUBLE])
+                    comm.Scatter([fgp, MPI.DOUBLE], [fp, MPI.DOUBLE])
+                else:
+                    p  = gp
+                    fp = fgp
+                if fgp.min() < minobj:
+                    if (verbose>=1) and (crank == 0): print('minobj found (2).')
+                    break
 
         # Update neighbors best positions
         g  = np.empty((iS,D), dtype=np.float64) # local best neighbors
@@ -1088,11 +1194,13 @@ if __name__ == '__main__':
         csize = 1
         crank = 0
 
-    algo = 'canonical'
-    init = 'lhs'
+    algo      = 'canonical'
+    init      = 'lhs'
     swarmsize = 40
-    maxn = 250
-    topology = 'neumann'
+    maxn      = 250
+    topology  = 'neumann'
+    memetic   = 'global'
+    nmemetic  = 1
 
     if swarmsize % csize != 0:
         raise ValueError("Swarmsize "+str(swarmsize)+" must be multiple of number of processes "+str(csize)+".")
@@ -1106,8 +1214,9 @@ if __name__ == '__main__':
     lb = -10*np.ones(npara)
     ub = 10*np.ones(npara)
     x0 = np.zeros(npara)
-    bestx, bestf = pso(ackley, x0, lb, ub, processes=4,
+    bestx, bestf = pso(ackley, x0, lb, ub, processes=1,
                        init=init, strategy=algo, topology=topology, verbose=0,
+                       memetic=memetic, nmemetic=nmemetic,
                        swarmsize=swarmsize, maxn=maxn, restartfile1=None)
     if crank == 0: print('Ackley 0 at origin ', bestx, bestf)
     '''
@@ -1119,8 +1228,9 @@ if __name__ == '__main__':
     lb = -600*np.ones(npara)
     ub = 600*np.ones(npara)
     x0 = np.zeros(npara)
-    bestx, bestf = pso(griewank, x0, lb, ub, processes=4,
+    bestx, bestf = pso(griewank, x0, lb, ub, processes=1,
                        init=init, strategy=algo, topology=topology, verbose=0,
+                       memetic=memetic, nmemetic=nmemetic,
                        swarmsize=swarmsize, maxn=maxn, restartfile1=None)
     if crank == 0: print('Griewank 0 at origin ', bestx, bestf)
     '''
@@ -1134,6 +1244,7 @@ if __name__ == '__main__':
     x0 = np.zeros(npara)
     bestx, bestf = pso(goldstein_price, x0, lb, ub, processes=4, minobj=3.+1e-8,
                        init=init, strategy=algo, topology=topology, verbose=0,
+                       memetic=memetic, nmemetic=nmemetic,
                        swarmsize=swarmsize, maxn=maxn, restartfile1=None)
     if crank == 0: print('Goldstein 3 at (0,-1) ', bestx, bestf)
     '''
@@ -1147,6 +1258,7 @@ if __name__ == '__main__':
     x0 = np.zeros(npara)
     bestx, bestf = pso(rastrigin, x0, lb, ub, processes=4, minobj=-2.+1e-8,
                        init=init, strategy=algo, topology=topology, verbose=0,
+                       memetic=memetic, nmemetic=nmemetic,
                        swarmsize=swarmsize, maxn=maxn, restartfile1=None)
     if crank == 0: print('Rastrigin -2 at origin ', bestx, bestf)
     '''
@@ -1160,6 +1272,7 @@ if __name__ == '__main__':
     x0 = np.zeros(npara)
     bestx, bestf = pso(rosenbrock, x0, lb, ub, processes=4,
                        init=init, strategy=algo, topology=topology, verbose=0,
+                       memetic=memetic, nmemetic=nmemetic,
                        swarmsize=swarmsize, maxn=maxn, restartfile1=None)
     if crank == 0: print('Rosenbrock 0 at (1,1) ', bestx, bestf)
     '''
@@ -1173,15 +1286,18 @@ if __name__ == '__main__':
     x0 = np.zeros(npara)
     bestx, bestf = pso(six_hump_camelback, x0, lb, ub, processes=4, minobj=-1.031628453489877+1e-8,
                        init=init, strategy=algo, topology=topology, verbose=0,
+                       memetic=memetic, nmemetic=nmemetic,
                        swarmsize=swarmsize, maxn=maxn, restartfile1=None)
     if crank == 0: print('Six_hump_camelback -1.03... +-(-0.08983,0.7126) ', bestx, bestf)
 
     # Restart
-    algo = 'fips'
-    init = 'lhs'
+    algo      = 'fips'
+    init      = 'lhs'
     swarmsize = 40
-    maxn = 250
-    topology = 'neumann'
+    maxn      = 250
+    topology  = 'neumann'
+    memetic   = 'no' # 'global'
+    nmemetic  = 1
     if swarmsize % csize != 0:
         raise ValueError("Swarmsize "+str(swarmsize)+" must be multiple of number of processes "+str(csize)+".")
     from jams.functions import rosenbrock
@@ -1192,26 +1308,31 @@ if __name__ == '__main__':
     seed = 1234
     bestx, bestf = pso(rosenbrock, x0, lb, ub, processes=4,
                        init=init, strategy=algo, topology=topology, verbose=0,
+                       memetic=memetic, nmemetic=nmemetic,
                        swarmsize=swarmsize, maxn=maxn, restartfile1=None,
                        seed=seed, restart=False)
     if crank == 0: print('Rosenbrock Reference - ', bestx, bestf)
     bestx, bestf = pso(rosenbrock, x0, lb, ub, processes=4,
                        init=init, strategy=algo, topology=topology, verbose=0,
+                       memetic=memetic, nmemetic=nmemetic,
                        swarmsize=swarmsize, maxn=maxn//2,
                        seed=seed, restart=False)
     if crank == 0: print('Rosenbrock Restart 1 - ', bestx, bestf)
     bestx, bestf = pso(rosenbrock, x0, lb, ub, processes=4,
                        init=init, strategy=algo, topology=topology, verbose=0,
+                       memetic=memetic, nmemetic=nmemetic,
                        swarmsize=swarmsize, maxn=maxn,
                        seed=seed, restart=True)
     if crank == 0: print('Rosenbrock Restart 2 - ', bestx, bestf)
 
     # Constraints
-    algo = 'canonical'
-    init = 'lhs'
+    algo      = 'canonical'
+    init      = 'lhs'
     swarmsize = 40
-    maxn = 250
-    topology = 'gbest'
+    maxn      = 250
+    topology  = 'gbest'
+    memetic   = 'no' # 'global'
+    nmemetic  = 1
     if swarmsize % csize != 0:
         raise ValueError("Swarmsize "+str(swarmsize)+" must be multiple of number of processes "+str(csize)+".")
     from jams.functions import rosenbrock
@@ -1224,6 +1345,7 @@ if __name__ == '__main__':
         return np.sign(x)
     bestx, bestf = pso(rosenbrock, x0, lb, ub, processes=1, f_ieqcons=fcon,
                        init=init, strategy=algo, topology=topology, verbose=2,
+                       memetic=memetic, nmemetic=nmemetic,
                        swarmsize=swarmsize, maxn=maxn, restartfile1=None,
                        seed=seed, restart=False)
     if crank == 0: print('Rosenbrock constraint - ', bestx, bestf)
