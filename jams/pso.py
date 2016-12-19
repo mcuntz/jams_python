@@ -297,7 +297,7 @@ def rwde(func, x, fx, xmin, xmax):
 
         Input
         -----
-        func        objective function warpper
+        func        objective function wrapper
                     function to min-/maximise
         x           1D-array
                     Position of one particle in parameter space.
@@ -339,7 +339,7 @@ def cbls(func, x, fx, p, xmin, xmax, lb, ub, x0, mask, inertia, phip, strategy):
 
         Input
         -----
-        func        objective function warpper
+        func        objective function wrapper
                     function to mini-/maximise
         x           1D-array
                     Position of one particle in parameter space.
@@ -392,7 +392,7 @@ def cbls(func, x, fx, p, xmin, xmax, lb, ub, x0, mask, inertia, phip, strategy):
                                   [Poli et al., 2007] doi: 10.1007/s11721-007-0002-0
                                   [Clerc & Kennedy, 2002] doi: 10.1109/4235.985692
                                   From F van den Bergh, Diss 2001:
-                                  The probelm [with the constriction factor], according to Eberhart and Shi,
+                                  The problem [with the constriction factor], according to Eberhart and Shi,
                                   is that the particles stray too far from the desired region of search space.
                                   To mitigate this effect they decided to apply clamping to the constriction factor
                                   implementation as well, setting the vmax parameter equal to xmax, the size of the
@@ -576,7 +576,7 @@ def pso(func, x0, lb, ub,
                                   [Poli et al., 2007] doi: 10.1007/s11721-007-0002-0
                                   [Clerc & Kennedy, 2002] doi: 10.1109/4235.985692
                                   From F van den Bergh, Diss 2001:
-                                  The probelm [with the constriction factor], according to Eberhart and Shi,
+                                  The problem [with the constriction factor], according to Eberhart and Shi,
                                   is that the particles stray too far from the desired region of search space.
                                   To mitigate this effect they decided to apply clamping to the constriction factor
                                   implementation as well, setting the vmax parameter equal to xmax, the size of the
