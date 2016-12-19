@@ -287,56 +287,163 @@ def get_best_neighbor(p, fp, topology, kl=1):
     return [g, fg]
 
 
-def local_search(func, x, fx, lb, ub, algorithm='RWDE'):
+def rwde(func, x, fx, xmin, xmax):
     '''
-        Perfom local search
+        Random Walk with Direction Exploitation
+        [Petalas et al. 2007] doi: 10.1007/s10479-007-0224-y
+        as implemented in
+        [Wang et al. 2012] doi: 10.1016/j.ins.2012.02.016
+
+
+        Input
+        -----
+        func        objective function warpper
+                    function to min-/maximise
+        x           1D-array
+                    Position of one particle in parameter space.
+        fx          scalar
+                    The objective value at position x.
+        xmin        1D-array
+                    Lower bounds of particles search positions (parameters).
+        xmax        1D-array
+                    Upper bounds of particles search positions (parameters).
+    '''
+    # constants
+    D = x.shape[0]
+    lam_init = 1. # inital steapsize
+    tmax     = 5  # # of local searches
+    # local search
+    t   = 0
+    lam = lam_init
+    for t in range(tmax):
+        z       = np.random.uniform(size=D)
+        xnew    = x + lam*z*(xmax - xmin)
+        fxnew   = func(xnew)
+        if fxnew < fx:
+            x   = xnew
+            fx  = fxnew
+            lam = lam_init
+        elif fxnew > fx:
+            lam *= 0.5
+        else:
+            continue
+
+    return x, fx, tmax
+
+
+def cbls(func, x, fx, p, xmin, xmax, lb, ub, x0, mask, inertia, phip, strategy):
+    '''
+        Cognition-Based Local Search
+        [Wang et al. 2012] doi: 10.1016/j.ins.2012.02.016
 
 
         Input
         -----
         func        objective function warpper
                     function to mini-/maximise
-        p           ND-array
-                    The best known position of each particle.
-        fp          1D-array
-                    The objective values at each position in p.
+        x           1D-array
+                    Position of one particle in parameter space.
+        fx          1D-array
+                    The objective value at position x.
+        p           1D-array
+                    Particle x' best position.
+        xmin        1D-array
+                    Lower bounds of particles search positions (parameters).
+        xmax        1D-array
+                    Upper bounds of particles search positions (parameters).
         lb          1D-array
                     The lower bounds of the particle positions (parameters).
         ub          1D-array
                     The upper bounds of the particle positions (parameters).
-        algorithm   string
-                    Local search algorithm.
-                    (Default: 'RWDE')
-                    'RWDE': Random Walk with Direction Exploitation
-                    [Petalas et al. 2007] doi: 10.1007/s10479-007-0224-y
+        x0          1D-array
+                    Will be taken at dimensions with mask==False.
+        mask        1D-array
+                    include (1,True) or exclude (0,False) parameters in optimisation.
+        inertia     scalar
+                    Particle velocity scaling factor.
+                    Default depends on algorithm (strategy).
+        phip        scalar
+                    Scaling factor to search away from the particle's best known position.
+                    Default depends on algorithm (strategy).
+        strategy    string
+                    PSO variants.
+                    'original':   Textbook particle swarm algorithm with inertia weight
+                                  x = current position
+                                  p = particles best position
+                                  g = neighborhood best position
+                                  rg, rp = np.random.uniform(size=(S,D))
+                                  inertia=0.5, phip=2., phig=2.
+                                  v = inertia*v + rp*phip*(p-x) + rg*phig*(g-x)
+                                  x = x + v
+                    'inertia':    Same as 'original' but with inertia weight decreasing from 0.9 to 0.4
+                                  over time, i.e. over iterations (it)
+                                  imax = 0.9
+                                  imin = 0.4
+                                  inertia = imax - float(it)/float(maxn-1) * (imax-imin)
+                    'canonical':  Clerk & Kennedy (2000) with fixed, clamped constriction factor
+                                  From PaGMO (esa.github.io/pagmo):
+                                  Clerc's analysis of the iterative system led him to propose a strategy for the
+                                  placement of "constriction coefficients" on the terms of the formulas; these
+                                  coefficients controlled the convergence of the particle and allowed an elegant and
+                                  well-explained method for preventing explosion, ensuring convergence, and
+                                  eliminating the arbitrary vmax parameter. The analysis also takes the guesswork
+                                  out of setting the values of phi_1 and phi_2.
+                                  "This is the canonical particle swarm algorithm of today."
+                                  [Poli et al., 2007] doi: 10.1007/s11721-007-0002-0
+                                  [Clerc & Kennedy, 2002] doi: 10.1109/4235.985692
+                                  From F van den Bergh, Diss 2001:
+                                  The probelm [with the constriction factor], according to Eberhart and Shi,
+                                  is that the particles stray too far from the desired region of search space.
+                                  To mitigate this effect they decided to apply clamping to the constriction factor
+                                  implementation as well, setting the vmax parameter equal to xmax, the size of the
+                                  search space. This led to improved performance for almost all the functions they
+                                  used during testing - both in terms of the rate of convergence and the ability of
+                                  the algorithm to reach the error threshold.
+                                  [Eberhardt RC & Shi Y, 2000] Comparing inertia weights and constriction factors
+                                  in particle swarm optimization. In: Proceedings of the Congress on Evolutionary
+                                  Computation (CEC2000), 84-88.
+                                  [van den Bergh F, 2000] An Analysis of Particle Swarm Optimizers, PhD thesis,
+                                  University of Pretoria, South Africa
+                                  inertia=0.7289, phip=2.05, phig=2.05
+                                  v = inertia * (v + phip*rp*(p - x) + phig*rg*(g - x))
+                                  v = clip(v, lb, ub)
+                                  x = x + v
     '''
+    # Strategy keyword
+    ptypes = ['original', 'inertia', 'canonical']
+    assert strategy.lower() in ptypes, 'Cognition-Based Local Search not available for strategy {:}'.format(strategy)
     # constants
-    D = x.shape[0]
-    if algorithm.lower() == 'rwde':
-        lam_init = 1. # inital steapsize
-        tmax     = 5  # # of local searches
-        # local search
-        nlocal = 0
-        t      = 0
-        lam    = lam_init
-        while t < tmax:
-            nlocal += 1
-            t      += 1
-            z       = np.random.uniform(size=D)
-            xnew    = x + lam*z*(ub - lb)
-            fxnew   = func(xnew)
-            if fxnew < fx:
-                x   = xnew
-                fx  = fxnew
-                lam = lam_init
-            elif fxnew > fx:
-                lam *= 0.5
-            else:
-                continue
-    else:
-        raise ValueError('Local search algorithm not know: '+algorithm)
+    D    = x.shape[0] # # parameters
+    tmax = 5          # # of local searches
+    
+    large = fx
+    fxnew = fx
+    xnew  = x[:]
+    v     = xmin + np.random.uniform(size=D)*(xmax-xmin)
+    for t in range(tmax):
+        # update velocity with only cognitive and without social component
+        rp = np.random.uniform(size=D)
+        if (strategy.lower() == 'original') or (strategy.lower() == 'inertia'):
+            vnew = inertia*v + phip*rp*(p - xnew)
+        elif strategy.lower() == 'canonical':
+            vnew = inertia * (v + phip*rp*(p - xnew))
+        # new x
+        xnewtest = xnew + vnew                  # tentative update of x
+        xnewtest = np.where(mask, xnewtest, x0) # mask
+        xnewtest = np.clip(xnewtest, lb, ub)    # limit
+        # new fx
+        fs = is_feasible(xnewtest)
+        if fs:
+            fxnewtest = obj(xnewtest)
+            if maxit: fxnewtest *= -1.
+            # NaN/Inf
+            large = 1.1*large if large>0. else 0.9*large
+            fxnewtest = fxnewtest if np.isfinite(fxnewtest) else large
+            if fxnewtest < fx:
+                xnew  = xnewtest
+                fxnew = fxnewtest
 
-    return x, fx, nlocal
+    return xnew, fxnew, tmax
 
 
 # Particle Swarm Optimisation
@@ -346,7 +453,7 @@ def pso(func, x0, lb, ub,
         arg=(), kwarg={},
         swarmsize=None, inertia=None, phip=None, phig=None, maxn=250,
         minstep=1e-8, minobj=1e-8, maxit=False,
-        init='lhs', strategy='fips', topology='gbest', kl=1,
+        init='lhs', strategy='canonical', topology='gbest', kl=1,
         memetic='no', nmemetic=1,
         includex0=False, seed=None,
         processes=1,
@@ -367,7 +474,7 @@ def pso(func, x0, lb, ub,
                 arg=(), kwarg={},
                 swarmsize=None, inertia=None, phip=None, phig=None, maxn=250,
                 minstep=1e-8, minobj=1e-8, maxit=False,
-                init='lhs', strategy='fips', topology='gbest', kl=1,
+                init='lhs', strategy='canonical', topology='gbest', kl=1,
                 includex0=False, seed=None,
                 processes=1,
                 verbose=0, pout=False, cout=False,
@@ -443,7 +550,7 @@ def pso(func, x0, lb, ub,
                     'sobol':  quasirandom Sobol sequence (only up to 40 dimensions)
         strategy    string
                     PSO variants.
-                    (Default: 'fips')
+                    (Default: 'canonical')
                     'original':   Textbook particle swarm algorithm with inertia weight
                                   x = current position
                                   p = particles best position
@@ -463,7 +570,7 @@ def pso(func, x0, lb, ub,
                                   placement of "constriction coefficients" on the terms of the formulas; these
                                   coefficients controlled the convergence of the particle and allowed an elegant and
                                   well-explained method for preventing explosion, ensuring convergence, and
-                                  eliminating the arbitrary Vmax parameter. The analysis also takes the guesswork
+                                  eliminating the arbitrary vmax parameter. The analysis also takes the guesswork
                                   out of setting the values of phi_1 and phi_2.
                                   "This is the canonical particle swarm algorithm of today."
                                   [Poli et al., 2007] doi: 10.1007/s11721-007-0002-0
@@ -665,7 +772,7 @@ def pso(func, x0, lb, ub,
     # Different variabels types (array, float, int, ...) for restart
     if restartfile1 is not None:
         # Only arrays with savez_compressed - restartfile1
-        restartarray  = ['lb', 'ub', 'mask1', 'mask2', 'x02',
+        restartarray  = ['x0', 'lb', 'ub', 'mask1', 'mask2', 'x02',
                          'v', 'x', 'fx', 'fs', 'p', 'fp', 'gp', 'fgp',
                          'rs2']
         if dodiv: restartarray.extend(['gx'])
@@ -999,7 +1106,9 @@ def pso(func, x0, lb, ub,
                     # stepsize is lower or equal to closest particle - lots of steps with improvements
                     iib = allnorm.argmin()
                     dx = abs(gp[iib,:]-xl)
-                    xnew, fxnew, nlocal = local_search(obj, xl, fxl, xl-dx, xl+dx, algorithm='RWDE')
+                    xnew, fxnew, nlocal = rwde(obj, xl, fxl, xl-dx, xl+dx)
+                    # xl and p?
+                    # xnew, fxnew, nlocal = cbls(obj, xl, fxl, p, xl-dx, xl+dx, lb, ub, x0, mask, inertia, phip, strategy)
                     fxnew  = np.ones(1)*fxnew
                     nlocal = np.ones(1)*nlocal
                 else:
@@ -1061,7 +1170,6 @@ def pso(func, x0, lb, ub,
         rg = rand[S+crank*iS:S+crank*iS+iS,:]
         if strategy.lower() == 'original':    # Kennedy & Eberhart, 2001
             v = inertia*v + phip*rp*(p - x) + phig*rg*(g - x)
-            v = np.clip(v, vmin, vmax)
             v = np.clip(v, vmin, vmax)
         elif strategy.lower() == 'inertia':   # Shi & Eberhart (1998)
             inertia = imax - float(it)/float(maxn-1) * (imax-imin)
