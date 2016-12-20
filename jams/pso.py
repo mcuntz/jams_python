@@ -331,7 +331,7 @@ def rwde(func, x, fx, xmin, xmax):
     return x, fx, tmax
 
 
-def cbls(func, x, fx, p, xmin, xmax, lb, ub, x0, mask, inertia, phip, strategy):
+def cbls(func, feasible, x, fx, p, xmin, xmax, lb, ub, x0, mask, inertia, phip, maxit, strategy):
     '''
         Cognition-Based Local Search
         [Wang et al. 2012] doi: 10.1016/j.ins.2012.02.016
@@ -432,9 +432,9 @@ def cbls(func, x, fx, p, xmin, xmax, lb, ub, x0, mask, inertia, phip, strategy):
         xnewtest = np.where(mask, xnewtest, x0) # mask
         xnewtest = np.clip(xnewtest, lb, ub)    # limit
         # new fx
-        fs = is_feasible(xnewtest)
+        fs = feasible(xnewtest)
         if fs:
-            fxnewtest = obj(xnewtest)
+            fxnewtest = func(xnewtest)
             if maxit: fxnewtest *= -1.
             # NaN/Inf
             large = 1.1*large if large>0. else 0.9*large
@@ -1106,9 +1106,21 @@ def pso(func, x0, lb, ub,
                     # stepsize is lower or equal to closest particle - lots of steps with improvements
                     iib = allnorm.argmin()
                     dx = abs(gp[iib,:]-xl)
-                    xnew, fxnew, nlocal = rwde(obj, xl, fxl, xl-dx, xl+dx)
+                    # xnew, fxnew, nlocal = rwde(obj, xl, fxl, xl-dx, xl+dx)
                     # xl and p?
-                    # xnew, fxnew, nlocal = cbls(obj, xl, fxl, p, xl-dx, xl+dx, lb, ub, x0, mask, inertia, phip, strategy)
+                    # xnew, fxnew, nlocal = cbls(obj, is_feasible,
+                    #                            xl, fxl,
+                    #                            p,
+                    #                            xl-dx, xl+dx,
+                    #                            lb, ub, x0, mask,
+                    #                            inertia, phip, maxit, strategy)
+                    # take global minimum for x and p
+                    xnew, fxnew, nlocal = cbls(obj, is_feasible,
+                                               xl, fxl, # x, f(x)
+                                               xl,      # p - particles best
+                                               xl-dx, xl+dx,
+                                               lb, ub, x0, mask,
+                                               inertia, phip, maxit, strategy)
                     fxnew  = np.ones(1)*fxnew
                     nlocal = np.ones(1)*nlocal
                 else:
@@ -1121,7 +1133,7 @@ def pso(func, x0, lb, ub,
                     comm.Bcast([fxnew, MPI.INT], root=0)
                 ilocal += int(nlocal[0])
                 if fxnew < fgp[ii0]:
-                    if crank==0: print(it, fgp[ii0], fxnew)
+                    if crank==0: print('Mememetic global - iteration, old, new: ', it, fgp[ii0], fxnew)
                     gp[ii0,:] = xnew
                     fgp[ii0]  = fxnew
                 if csize > 1:
@@ -1283,7 +1295,7 @@ def pso(func, x0, lb, ub,
     if pout:
         out += [p, fp]
     if cout:
-        out += [it*S]
+        out += [it*S+ilocal]
 
     return out
 
