@@ -128,7 +128,7 @@ def savez(file, *args, **kwds):
 
     >>> import os
     >>> os.remove(outfile)
-    
+
     """
     _savez(file, args, kwds, False)
 
@@ -278,7 +278,7 @@ def _savez(file, args, kwds, compress):
         del namedict['compress']
 
     # append or update
-    if 'append' in namedict.keys(): 
+    if 'append' in namedict.keys():
         appendit = namedict['append']
         del namedict['append']
     else:
@@ -303,7 +303,7 @@ def _savez(file, args, kwds, compress):
         zipf.close()
     allkeys = set(namedict.keys())
     allkeys.update(inzipf)
-    
+
     # append if keyword is True
     if appendit:
         mode = "a"
