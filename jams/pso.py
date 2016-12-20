@@ -287,7 +287,7 @@ def get_best_neighbor(p, fp, topology, kl=1):
     return [g, fg]
 
 
-def rwde(func, x, fx, xmin, xmax):
+def rwde(func, feasible, x, fx, xmin, xmax, lb, ub, x0, mask, maxit):
     '''
         Random Walk with Direction Exploitation
         [Petalas et al. 2007] doi: 10.1007/s10479-007-0224-y
@@ -299,6 +299,7 @@ def rwde(func, x, fx, xmin, xmax):
         -----
         func        objective function wrapper
                     function to min-/maximise
+        feasible    constraint function wrapper
         x           1D-array
                     Position of one particle in parameter space.
         fx          scalar
@@ -307,26 +308,43 @@ def rwde(func, x, fx, xmin, xmax):
                     Lower bounds of particles search positions (parameters).
         xmax        1D-array
                     Upper bounds of particles search positions (parameters).
+        lb          1D-array
+                    The lower bounds of the particle positions (parameters).
+        ub          1D-array
+                    The upper bounds of the particle positions (parameters).
+        x0          1D-array
+                    Will be taken at dimensions with mask==False.
+        mask        1D-array
+                    include (1,True) or exclude (0,False) parameters in optimisation.
     '''
     # constants
     D = x.shape[0]
     lam_init = 1. # inital steapsize
     tmax     = 5  # # of local searches
     # local search
-    t   = 0
-    lam = lam_init
+    large = fx
+    t     = 0
+    lam   = lam_init
     for t in range(tmax):
-        z       = np.random.uniform(size=D)
-        xnew    = x + lam*z*(xmax - xmin)
-        fxnew   = func(xnew)
-        if fxnew < fx:
-            x   = xnew
-            fx  = fxnew
-            lam = lam_init
-        elif fxnew > fx:
-            lam *= 0.5
-        else:
-            continue
+        z    = np.random.uniform(size=D)
+        xnew = x + lam*z*(xmax - xmin)
+        xnew = np.where(mask, xnew, x0) # mask
+        xnew = np.clip(xnew, lb, ub)    # limit
+        fs   = feasible(xnew)
+        if fs:
+            fxnew = func(xnew)
+            if maxit: fxnew *= -1.
+            # NaN/Inf
+            large = 1.1*large if large>0. else 0.9*large
+            fxnew = fxnew if np.isfinite(fxnew) else large
+            if fxnew < fx:
+                x   = xnew
+                fx  = fxnew
+                lam = lam_init
+            elif fxnew > fx:
+                lam *= 0.5
+            else:
+                continue
 
     return x, fx, tmax
 
@@ -341,6 +359,7 @@ def cbls(func, feasible, x, fx, p, xmin, xmax, lb, ub, x0, mask, inertia, phip, 
         -----
         func        objective function wrapper
                     function to mini-/maximise
+        feasible    constraint function wrapper
         x           1D-array
                     Position of one particle in parameter space.
         fx          1D-array
@@ -1106,21 +1125,17 @@ def pso(func, x0, lb, ub,
                     # stepsize is lower or equal to closest particle - lots of steps with improvements
                     iib = allnorm.argmin()
                     dx = abs(gp[iib,:]-xl)
-                    # xnew, fxnew, nlocal = rwde(obj, xl, fxl, xl-dx, xl+dx)
-                    # xl and p?
-                    # xnew, fxnew, nlocal = cbls(obj, is_feasible,
-                    #                            xl, fxl,
-                    #                            p,
-                    #                            xl-dx, xl+dx,
-                    #                            lb, ub, x0, mask,
-                    #                            inertia, phip, maxit, strategy)
-                    # take global minimum for x and p
-                    xnew, fxnew, nlocal = cbls(obj, is_feasible,
-                                               xl, fxl, # x, f(x)
-                                               xl,      # p - particles best
+                    xnew, fxnew, nlocal = rwde(obj, is_feasible,
+                                               xl, fxl,
                                                xl-dx, xl+dx,
-                                               lb, ub, x0, mask,
-                                               inertia, phip, maxit, strategy)
+                                               lb, ub, x0, mask1, maxit)
+                    # # take global minimum for x and p
+                    # xnew, fxnew, nlocal = cbls(obj, is_feasible,
+                    #                            xl, fxl, # x, f(x)
+                    #                            xl,      # p - particles best
+                    #                            xl-dx, xl+dx,
+                    #                            lb, ub, x0, mask1,
+                    #                            inertia, phip, maxit, strategy)
                     fxnew  = np.ones(1)*fxnew
                     nlocal = np.ones(1)*nlocal
                 else:
@@ -1133,7 +1148,7 @@ def pso(func, x0, lb, ub,
                     comm.Bcast([fxnew, MPI.INT], root=0)
                 ilocal += int(nlocal[0])
                 if fxnew < fgp[ii0]:
-                    if crank==0: print('Mememetic global - iteration, old, new: ', it, fgp[ii0], fxnew)
+                    if crank==0: print('Mememetic global - iteration, old, new: ', it, fgp[ii0], fxnew[0])
                     gp[ii0,:] = xnew
                     fgp[ii0]  = fxnew
                 if csize > 1:
