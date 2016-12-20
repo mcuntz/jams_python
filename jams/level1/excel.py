@@ -74,7 +74,8 @@ def get_header_excel(excelfile, sheet):
 
 # --------------------------------------------------------------------
 
-def get_value_excel(excelfile, sheet, variable, column):
+def get_value_excel(excelfile, sheet, variable, column, all_rows=False):
+
     """
         Get a cell in a sheet of an Excel file
         where the column is identified by the name in the first row
@@ -93,12 +94,23 @@ def get_value_excel(excelfile, sheet, variable, column):
         column      Name in header line
 
 
+        Optional Input
+        --------------
+        all_rows    option to return whole column, i.e. all rows (default: False).
+                    Should be chosen if there are/may be duplicates in vars/the "headerout (final)" column;
+                    the result of get_value_excel(file,sheet,vars,col)
+                    if vars = get_value_excel(file,sheet,None,'') is NOT equal to
+                    get_value_excel(file,sheet,None,col,all_rows=True)
+                    as the former cannot deal properly with duplicates in vars.
+
+
         Output
         ------
         content of the desired cell
         if column or variable is iterable, output is list
         if column and variable is iterable, output is list (variable) of list (columns)
         if column and/or variable is not given, then a list of all variable and/or columns is returned
+        if column is iterable and all_rows==True, output is list of list (all rows of all columns)
 
 
         Examples
@@ -145,6 +157,8 @@ def get_value_excel(excelfile, sheet, variable, column):
         Modified, MC, Jul 2015 - column/variable can be iterable
                                - column/variable can None, returning names
                       Aug 2015 - added docu of input variables
+                  BD, Nov 2016 - all_rows option to get the whole column (i.e. all rows)
+                                 in cases where the varnames contain duplicates
     """
     # open Excel file
     wb = xlrd.open_workbook(excelfile)
@@ -156,7 +170,7 @@ def get_value_excel(excelfile, sheet, variable, column):
     variables = sh.col_values(columns.index('headerout (final)'), start_rowx=1, end_rowx=sh.nrows)
     if (variable is None) and (column is None):
         return [variables, columns]
-    elif (variable is None):
+    elif (variable is None) and (not all_rows):
         return variables
     elif (column is None):
         return columns
@@ -170,19 +184,23 @@ def get_value_excel(excelfile, sheet, variable, column):
         if i not in columns:
             raise ValueError('Column '+i+' not found in sheet '+sheet+' of file '+excelfile)
     # check columns
-    if isinstance(variable, (list, tuple, np.ndarray)):
+    if isinstance(variable, (list, tuple, np.ndarray)) and (not all_rows):
         for ivar in variable:
             if ivar not in variables:
                 raise ValueError(ivar+' not in column "headerout (final)" in sheet '+sheet+' of file '+excelfile)
-    else:
+    elif not all_rows:
         if variable not in variables:
             raise ValueError(variable+' not in column "headerout (final)" in sheet '+sheet+' of file '+excelfile)
     # extract cells
-    if isinstance(column, (list, tuple, np.ndarray)) and isinstance(variable, (list, tuple, np.ndarray)):
+    if isinstance(column, (list, tuple, np.ndarray)) and isinstance(variable, (list, tuple, np.ndarray)) and (not all_rows):
         out = list()
         for ivar in variable:
             out.append([ sh.col_values(columns.index(icol),
                                        start_rowx=1, end_rowx=sh.nrows)[variables.index(ivar)] for icol in column ])
+    elif all_rows: # gives all rows for the column if no variable is given and all_rows==True
+        out=[ sh.col_values(columns.index(icol),
+                        start_rowx=1, end_rowx=sh.nrows) for icol in column ]
+
     else:
         if isinstance(column, (list, tuple, np.ndarray)):     # columns
             out = [ sh.col_values(columns.index(icol),
