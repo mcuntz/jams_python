@@ -7,7 +7,6 @@ import numpy as np
 from jams.const import huge
 from jams import savez_compressed, closest
 # ToDo:
-#   memetic PSO = MPSO - PSO with local optimisation
 #   Handling constraints
 #   write tmp/population files (as in SCE of Fortran)
 #   write out also in logfile if not None (use jams.tee as in joptimise)
@@ -132,6 +131,20 @@ def _cons_f_ieqcons_wrapper(f_ieqcons, arg, kwarg, x):
     return np.array(f_ieqcons(x, *arg, **kwarg))
 
 
+def range012range(x, xmin, xmax):
+    '''
+        Convert range between [0,1] to range [xmin,xmax]
+    '''
+    return xmin + x*(xmax-xmin)
+
+
+def range2range01(x, xmin, xmax):
+    '''
+        Convert range between [xmin,xmax] to range [0,1]
+    '''
+    return (x-xmin)/(xmax-xmin)
+
+    
 def diversity(x, lb, ub, mask):
     '''
         Diversity in swarm positions.
@@ -141,7 +154,7 @@ def diversity(x, lb, ub, mask):
         RMSE is generally about 1/2 or 1/3 of normalized geometric range (SCE).
     '''
     # all dimensions [0,1]
-    x01 = np.where(mask, (x-lb)/(ub-lb), x)
+    x01 = np.where(mask, range2range01(x,lb,ub), x)
 
     S = float(x01.shape[0])
     D = float(x01.shape[1])
@@ -287,7 +300,7 @@ def get_best_neighbor(p, fp, topology, kl=1):
     return [g, fg]
 
 
-def rwde(func, feasible, x, fx, xmin, xmax, lb, ub, x0, mask, maxit):
+def rwde(func, feasible, x, fx, xmin, xmax, lb, ub, x0, mask, maxit, nlocal=5):
     '''
         Random Walk with Direction Exploitation
         [Petalas et al. 2007] doi: 10.1007/s10479-007-0224-y
@@ -316,16 +329,21 @@ def rwde(func, feasible, x, fx, xmin, xmax, lb, ub, x0, mask, maxit):
                     Will be taken at dimensions with mask==False.
         mask        1D-array
                     include (1,True) or exclude (0,False) parameters in optimisation.
+
+
+        Optional Input
+        --------------
+        nlocal      numer of local steps (Default: 5)
     '''
     # constants
     D = x.shape[0]
-    lam_init = 1. # inital steapsize
-    tmax     = 5  # # of local searches
+    lam_init = 1. # inital stepsize
     # local search
     large = fx
     t     = 0
     lam   = lam_init
-    for t in range(tmax):
+    ngood = 0
+    for t in range(nlocal):
         z    = np.random.uniform(size=D)
         xnew = x + lam*z*(xmax - xmin)
         xnew = np.where(mask, xnew, x0) # mask
@@ -341,15 +359,16 @@ def rwde(func, feasible, x, fx, xmin, xmax, lb, ub, x0, mask, maxit):
                 x   = xnew
                 fx  = fxnew
                 lam = lam_init
+                ngood += 1
             elif fxnew > fx:
                 lam *= 0.5
             else:
                 continue
 
-    return x, fx, tmax
+    return x, fx, ngood
 
 
-def cbls(func, feasible, x, fx, p, xmin, xmax, lb, ub, x0, mask, inertia, phip, maxit, strategy):
+def cbls(func, feasible, x, fx, p, xmin, xmax, lb, ub, x0, mask, inertia, phip, maxit, strategy, nlocal=5):
     '''
         Cognition-Based Local Search
         [Wang et al. 2012] doi: 10.1016/j.ins.2012.02.016
@@ -427,19 +446,24 @@ def cbls(func, feasible, x, fx, p, xmin, xmax, lb, ub, x0, mask, inertia, phip, 
                                   v = inertia * (v + phip*rp*(p - x) + phig*rg*(g - x))
                                   v = clip(v, lb, ub)
                                   x = x + v
+
+
+        Optional Input
+        --------------
+        nlocal      numer of local steps (Default: 5)
     '''
     # Strategy keyword
     ptypes = ['original', 'inertia', 'canonical']
     assert strategy.lower() in ptypes, 'Cognition-Based Local Search not available for strategy {:}'.format(strategy)
     # constants
-    D    = x.shape[0] # # parameters
-    tmax = 5          # # of local searches
+    D = x.shape[0] # # parameters
     
     large = fx
     fxnew = fx
     xnew  = x[:]
     v     = xmin + np.random.uniform(size=D)*(xmax-xmin)
-    for t in range(tmax):
+    ngood = 0
+    for t in range(nlocal):
         # update velocity with only cognitive and without social component
         rp = np.random.uniform(size=D)
         if (strategy.lower() == 'original') or (strategy.lower() == 'inertia'):
@@ -461,8 +485,9 @@ def cbls(func, feasible, x, fx, p, xmin, xmax, lb, ub, x0, mask, inertia, phip, 
             if fxnewtest < fx:
                 xnew  = xnewtest
                 fxnew = fxnewtest
+                ngood += 1
 
-    return xnew, fxnew, tmax
+    return xnew, fxnew, ngood
 
 
 # Particle Swarm Optimisation
@@ -473,7 +498,7 @@ def pso(func, x0, lb, ub,
         swarmsize=None, inertia=None, phip=None, phig=None, maxn=250,
         minstep=1e-8, minobj=1e-8, maxit=False,
         init='lhs', strategy='canonical', topology='gbest', kl=1,
-        memetic='no', nmemetic=1,
+        memetic='no', nmemetic=1, nlocal=5, rrwde=0.01, pls=0.2,
         includex0=False, seed=None,
         processes=1,
         verbose=0, pout=False, cout=False,
@@ -637,9 +662,27 @@ def pso(func, x0, lb, ub,
                     (Default: 'no')
                     'no':     No local search.
                     'global': Local search is applied on the overall best position of the swarm.
+                    'local':  Local search is applied on each particle with a certain probability.
         nmemetic    integer
                     Do local search after each nmemetic swarm iterations.
                     (Default: 1)
+        nlocal      integer
+                    Number of local searches.
+                    (Default: 5)
+        rrwde       float
+                    Norm below which local search uses Random Walk with Direction Exploitation (RWDE),
+                    otherwise Cognition-Based Local Search (CBLS)
+                    (Default: 0.01)
+        pls         float or None
+                    Probability for each particle to perform local search after nmemetic iterations
+                    (Default: 0.2)
+                    If None or < 0 then pls will be calculated from the success rate of the last local searches.
+                    [Wang et al. 2012] doi: 10.1016/j.ins.2012.02.016
+                    Be ngood the actual number of valid local moving steps (at the memetic step before, t-1)
+                    and ntotal the total local moving steps carried out during iteration t-1, respectively.
+                      rgood = ngood/ntotal
+                      delta = 0.1, beta = 0.5, plsmin = 0.1, plsmax = 1.0
+                      pls = min(max(beta**np.sign(rgood-delta)*pls, plsmin), plsmax)
         topology    string
                     Neighborhood topologies. These are rather social than geographical topologies.
                     All neighborhoods comprise the current particle as well.
@@ -797,8 +840,8 @@ def pso(func, x0, lb, ub,
         if dodiv: restartarray.extend(['gx'])
         # Save scalars in simple text file - restartfile2
         restartint    = ['D', 'S', 'it', 'iS', 'crank',
-                         'rs3', 'rs4', 'ilocal']
-        restartfloat  = ['rs5']
+                         'rs3', 'rs4', 'ilocal', 'nlgood', 'nltotal']
+        restartfloat  = ['rs5', 'ipls']
         restartbool   = ['maxit']
         restartstring = ['rs1']
         if csize > 1:
@@ -836,7 +879,7 @@ def pso(func, x0, lb, ub,
     ttypes = ['gbest', 'lbest', 'mbest', 'neumann', 'ring']
     assert topology.lower() in ttypes, 'Topology {:} not in {:}'.format(topology, ttypes)
     # Mmemetic keyword
-    mtypes = ['no', 'global']
+    mtypes = ['no', 'global', 'local']
     assert memetic.lower() in mtypes, 'Memetic implementation {:} not in {:}'.format(memetic, mtypes)
     # Parameterfile etc. keywords if func is name of executable
     if isinstance(func, (str,list)):
@@ -994,8 +1037,8 @@ def pso(func, x0, lb, ub,
         vmin = -vmax
 
         # Initialize particle positions and velocities
-        v = vmin + v*(vmax-vmin)
-        x = lb + x*(ub - lb)
+        v = range012range(v,vmin,vmax)
+        x = range012range(x,lb,ub)
         if (crank == 0) and includex0: x[-1,:] = x0
         x = np.where(mask2, x, x02)
 
@@ -1044,7 +1087,24 @@ def pso(func, x0, lb, ub,
 
         # Iterate until termination criterion met
         it = 1
-        ilocal = 0
+        ilocal  = 0
+        nlgood  = 0
+        nltotal = nlocal
+        delta   = 0.1
+        beta    = 0.5
+        plsmin  = 0.1
+        plsmax  = 1.0
+        if pls is None:
+            dopls = True
+        else:
+            if pls < 0.:
+                dopls = True
+            else:
+                dopls = False
+        if dopls:
+            ipls = plsmax
+        else:
+            ipls = pls
 
         # save restart
         if restartfile1 is not None:
@@ -1110,56 +1170,119 @@ def pso(func, x0, lb, ub,
             if (verbose>=1) and (crank == 0): print('minobj found (1).')
             break
         
-        # if crank == 0: print(it, fgp.min())
-        if memetic.lower() == 'global':
-            if it % nmemetic == 0:
-                ii0 = fgp.argmin() # gbest
-                xl  = gp[ii0,:]
-                fxl = fgp[ii0]
-                if crank == 0:
-                    allnorm = np.array([ np.linalg.norm(gp[ii,:]-xl) if ii != ii0 else huge for ii in range(S) ])
-                    # # stepsize is lower or equal to furthest particle - almost no improvement
-                    # iib = allnorm.argmax()
-                    # # stepsize is lower or equal to mean particle distance - quite some steps with improvements
-                    # iib = closest(allnorm, allnorm.mean())
-                    # stepsize is lower or equal to closest particle - lots of steps with improvements
-                    iib = allnorm.argmin()
-                    dx = abs(gp[iib,:]-xl)
-                    xnew, fxnew, nlocal = rwde(obj, is_feasible,
-                                               xl, fxl,
-                                               xl-dx, xl+dx,
-                                               lb, ub, x0, mask1, maxit)
-                    # # take global minimum for x and p
-                    # xnew, fxnew, nlocal = cbls(obj, is_feasible,
-                    #                            xl, fxl, # x, f(x)
-                    #                            xl,      # p - particles best
-                    #                            xl-dx, xl+dx,
-                    #                            lb, ub, x0, mask1,
-                    #                            inertia, phip, maxit, strategy)
-                    fxnew  = np.ones(1)*fxnew
-                    nlocal = np.ones(1)*nlocal
-                else:
-                    xnew   = np.empty(D, dtype=np.float64)
-                    fxnew  = np.empty(1, dtype=np.float64)
-                    nlocal = np.empty(1, dtype=np.float64)
+        # Memetic PSO
+        if (memetic.lower() == 'global') and (it % nmemetic == 0):
+            ii0 = fgp.argmin() # gbest
+            xl  = gp[ii0,:]
+            fxl = fgp[ii0]
+            if crank == 0:
+                # calc norm in [0,1] space for all parameters
+                gp01 = range2range01(gp,lb,ub)
+                xl01 = range2range01(xl,lb,ub)
+                allnorm = np.array([ np.linalg.norm(gp01[ii,:]-xl01) if ii != ii0 else huge for ii in range(S) ])
+                # # stepsize is lower or equal to furthest particle - almost no improvement
+                # iib = allnorm.argmax()
+                # # stepsize is lower or equal to mean particle distance - quite some steps with improvements
+                # iib = closest(allnorm, allnorm.mean())
+                # stepsize is lower or equal to closest particle - lots of steps with improvements
+                iib = allnorm.argmin()
+                dx = np.abs(gp[iib,:]-xl)
+                xnew, fxnew, ilgood = rwde(obj, is_feasible,
+                                           xl, fxl,
+                                           xl-dx, xl+dx,
+                                           lb, ub, x0, mask1, maxit, nlocal=nlocal)
+                # # take global minimum for x and p
+                # xnew, fxnew, ilgood = cbls(obj, is_feasible,
+                #                            xl, fxl, # x, f(x)
+                #                            xl,      # p - particles best
+                #                            xl-dx, xl+dx,
+                #                            lb, ub, x0, mask1,
+                #                            inertia, phip, maxit, strategy, nlocal=nlocal)
+                fxnew  = np.ones(1)*fxnew
+            else:
+                xnew   = np.empty(D, dtype=np.float64)
+                fxnew  = np.empty(1, dtype=np.float64)
+            if csize > 1:
+                comm.Bcast([xnew, MPI.INT], root=0)
+                comm.Bcast([fxnew, MPI.INT], root=0)
+            ilocal += nlocal
+            if fxnew < fgp[ii0]:
+                # if crank==0: print('Mememetic global - iteration, old, new: ', it, fgp[ii0], fxnew[0])
+                gp[ii0,:] = xnew
+                fgp[ii0]  = fxnew
+            if csize > 1:
+                comm.Scatter([gp, MPI.DOUBLE], [p, MPI.DOUBLE])
+                comm.Scatter([fgp, MPI.DOUBLE], [fp, MPI.DOUBLE])
+            else:
+                p  = gp
+                fp = fgp
+            if fgp.min() < minobj:
+                if (verbose>=1) and (crank == 0): print('minobj found (2).')
+                break
+
+        elif (memetic.lower() == 'local') and (it % nmemetic == 0):
+            if crank == 0: # for reproducibility between with and without mpi
+                randS = np.random.uniform(size=S)
+            else:
+                randS = np.empty(S, dtype=np.float)
+            if csize > 1:
+                comm.Bcast(randS, root=0)
+            rS = randS[crank*iS:(crank+1)*iS]
+            if dopls:
                 if csize > 1:
-                    comm.Bcast([nlocal, MPI.INT], root=0)
-                    comm.Bcast([xnew, MPI.INT], root=0)
-                    comm.Bcast([fxnew, MPI.INT], root=0)
-                ilocal += int(nlocal[0])
-                if fxnew < fgp[ii0]:
-                    if crank==0: print('Mememetic global - iteration, old, new: ', it, fgp[ii0], fxnew[0])
-                    gp[ii0,:] = xnew
-                    fgp[ii0]  = fxnew
-                if csize > 1:
-                    comm.Scatter([gp, MPI.DOUBLE], [p, MPI.DOUBLE])
-                    comm.Scatter([fgp, MPI.DOUBLE], [fp, MPI.DOUBLE])
+                    nggood  = comm.allreduce(nlgood, op=MPI.SUM)
+                    ngtotal = comm.allreduce(nltotal, op=MPI.SUM)
                 else:
-                    p  = gp
-                    fp = fgp
-                if fgp.min() < minobj:
-                    if (verbose>=1) and (crank == 0): print('minobj found (2).')
-                    break
+                    nggood  = nlgood
+                    ngtotal = nltotal
+                rgood = float(nggood)/float(max(ngtotal,1))
+                ipls  = min(max(beta**np.sign(rgood-delta)*ipls, plsmin), plsmax)
+            nlgood  = 0
+            nltotal = 0
+            for i in range(iS):
+                if rS[i] < ipls:
+                    xl      = x[i,:]
+                    fxl     = fx[i]
+                    x01     = range2range01(x,lb,ub) # norm in [0,1] space
+                    xl01    = x01[i,:]
+                    allnorm = np.array([ np.linalg.norm(x01[ii,:]-xl01) if ii != i else huge for ii in range(iS) ])
+                    iib     = allnorm.argmin()       # stepsize is lower or equal to closest particle
+                    dx      = np.abs(x[iib,:]-xl)    # stepzise in real parameter range
+                    # dx      = np.abs(p[i,:]-xl)      # stepzise in real parameter range
+                    norm    = np.linalg.norm(range2range01(p[i,:],lb,ub)-xl01)
+                    if norm < rrwde:
+                        xnew, fxnew, ilgood = rwde(obj, is_feasible,
+                                                   xl, fxl,
+                                                   xl-dx, xl+dx,
+                                                   lb, ub, x0, mask1, maxit, nlocal=nlocal)
+                    else:
+                        xnew, fxnew, ilgood = cbls(obj, is_feasible,
+                                                   xl, fxl, # x, f(x)
+                                                   p[i,:],  # p - particles best
+                                                   xl-dx, xl+dx,
+                                                   lb, ub, x0, mask1,
+                                                   inertia, phip, maxit, strategy, nlocal=nlocal)
+                    x[i,:] = xnew
+                    fx[i]  = fxnew
+                    nlgood  += ilgood
+                    nltotal += nlocal
+            ilocal += nltotal
+            # Store and scatter particles best positions
+            i_update = fx < fp
+            if np.any(i_update):
+                # print('Mememetic local - it, rank, old, new: ', it, crank, fp[i_update], fx[i_update])
+                p[i_update,:] = x[i_update,:].copy()
+                fp[i_update]  = fx[i_update]
+                # gather local best particles into global best particles
+            if csize > 1:
+                comm.Allgather([p, MPI.DOUBLE], [gp, MPI.DOUBLE])
+                comm.Allgather([fp, MPI.DOUBLE], [fgp, MPI.DOUBLE])
+            else:
+                gp  = p
+                fgp = fp
+            if fgp.min() < minobj:
+                if (verbose>=1) and (crank == 0): print('minobj found (2).')
+                break
 
         # Update neighbors best positions
         g  = np.empty((iS,D), dtype=np.float64) # local best neighbors
@@ -1306,11 +1429,16 @@ def pso(func, x0, lb, ub,
         if isinstance(func, (str,list)):
             parameterwriter(parameterfile, bestx, lb, ub, mask1)
 
+    if csize > 1:
+        tlocal = comm.allreduce(ilocal, op=MPI.SUM)
+    else:
+        tlocal = ilocal
+
     out = [bestx, bestf]
     if pout:
         out += [p, fp]
     if cout:
-        out += [it*S+ilocal]
+        out += [it*S+tlocal]
 
     return out
 
@@ -1334,8 +1462,8 @@ if __name__ == '__main__':
     swarmsize = 40
     maxn      = 250
     topology  = 'neumann'
-    memetic   = 'global'
-    nmemetic  = 1
+    memetic   = 'local'
+    nmemetic  = 2
 
     if swarmsize % csize != 0:
         raise ValueError("Swarmsize "+str(swarmsize)+" must be multiple of number of processes "+str(csize)+".")
@@ -1349,11 +1477,11 @@ if __name__ == '__main__':
     lb = -10*np.ones(npara)
     ub = 10*np.ones(npara)
     x0 = np.zeros(npara)
-    bestx, bestf = pso(ackley, x0, lb, ub, processes=1,
-                       init=init, strategy=algo, topology=topology, verbose=0,
-                       memetic=memetic, nmemetic=nmemetic,
-                       swarmsize=swarmsize, maxn=maxn, restartfile1=None)
-    if crank == 0: print('Ackley 0 at origin ', bestx, bestf)
+    bestx, bestf, nrun = pso(ackley, x0, lb, ub, processes=1,
+                             init=init, strategy=algo, topology=topology, verbose=0,
+                             memetic=memetic, nmemetic=nmemetic,
+                             swarmsize=swarmsize, maxn=maxn, restartfile1=None, cout=True)
+    if crank == 0: print('Ackley 0 at origin ', nrun, bestx, bestf)
     '''
         This is the Griewank Function (2-D or 10-D)
         Bound: X(i)=[-600,600], for i=1,2,...,10  !for visualization only 2!
@@ -1363,11 +1491,11 @@ if __name__ == '__main__':
     lb = -600*np.ones(npara)
     ub = 600*np.ones(npara)
     x0 = np.zeros(npara)
-    bestx, bestf = pso(griewank, x0, lb, ub, processes=1,
-                       init=init, strategy=algo, topology=topology, verbose=0,
-                       memetic=memetic, nmemetic=nmemetic,
-                       swarmsize=swarmsize, maxn=maxn, restartfile1=None)
-    if crank == 0: print('Griewank 0 at origin ', bestx, bestf)
+    bestx, bestf, nrun = pso(griewank, x0, lb, ub, processes=1,
+                             init=init, strategy=algo, topology=topology, verbose=0,
+                             memetic=memetic, nmemetic=nmemetic,
+                             swarmsize=swarmsize, maxn=maxn, restartfile1=None, cout=True)
+    if crank == 0: print('Griewank 0 at origin ', nrun, bestx, bestf)
     '''
     This is the Goldstein-Price Function
     Bound X1=[-2,2], X2=[-2,2]
@@ -1377,11 +1505,11 @@ if __name__ == '__main__':
     lb = -2*np.ones(npara)
     ub = 2*np.ones(npara)
     x0 = np.zeros(npara)
-    bestx, bestf = pso(goldstein_price, x0, lb, ub, processes=4, minobj=3.+1e-8,
-                       init=init, strategy=algo, topology=topology, verbose=0,
-                       memetic=memetic, nmemetic=nmemetic,
-                       swarmsize=swarmsize, maxn=maxn, restartfile1=None)
-    if crank == 0: print('Goldstein 3 at (0,-1) ', bestx, bestf)
+    bestx, bestf, nrun = pso(goldstein_price, x0, lb, ub, processes=4, minobj=3.+1e-8,
+                             init=init, strategy=algo, topology=topology, verbose=0,
+                             memetic=memetic, nmemetic=nmemetic,
+                             swarmsize=swarmsize, maxn=maxn, restartfile1=None, cout=True)
+    if crank == 0: print('Goldstein 3 at (0,-1) ', nrun, bestx, bestf)
     '''
     This is the Rastrigin Function
     Bound: X1=[-1,1], X2=[-1,1]
@@ -1391,11 +1519,11 @@ if __name__ == '__main__':
     lb = -1*np.ones(npara)
     ub = 1*np.ones(npara)
     x0 = np.zeros(npara)
-    bestx, bestf = pso(rastrigin, x0, lb, ub, processes=4, minobj=-2.+1e-8,
-                       init=init, strategy=algo, topology=topology, verbose=0,
-                       memetic=memetic, nmemetic=nmemetic,
-                       swarmsize=swarmsize, maxn=maxn, restartfile1=None)
-    if crank == 0: print('Rastrigin -2 at origin ', bestx, bestf)
+    bestx, bestf, nrun = pso(rastrigin, x0, lb, ub, processes=4, minobj=-2.+1e-8,
+                             init=init, strategy=algo, topology=topology, verbose=0,
+                             memetic=memetic, nmemetic=nmemetic,
+                             swarmsize=swarmsize, maxn=maxn, restartfile1=None, cout=True)
+    if crank == 0: print('Rastrigin -2 at origin ', nrun, bestx, bestf)
     '''
     This is the Rosenbrock Function
     Bound: X1=[-5,5], X2=[-2,8]; Global Optimum: 0,(1,1)
@@ -1405,11 +1533,11 @@ if __name__ == '__main__':
     lb = -2*np.ones(npara)
     ub = 5*np.ones(npara)
     x0 = np.zeros(npara)
-    bestx, bestf = pso(rosenbrock, x0, lb, ub, processes=4,
-                       init=init, strategy=algo, topology=topology, verbose=0,
-                       memetic=memetic, nmemetic=nmemetic,
-                       swarmsize=swarmsize, maxn=maxn, restartfile1=None)
-    if crank == 0: print('Rosenbrock 0 at (1,1) ', bestx, bestf)
+    bestx, bestf, nrun = pso(rosenbrock, x0, lb, ub, processes=4,
+                             init=init, strategy=algo, topology=topology, verbose=0,
+                             memetic=memetic, nmemetic=nmemetic,
+                             swarmsize=swarmsize, maxn=maxn, restartfile1=None, cout=True)
+    if crank == 0: print('Rosenbrock 0 at (1,1) ', nrun, bestx, bestf)
     '''
     This is the Six-hump Camelback Function.
     Bound: X1=[-5,5], X2=[-5,5]
@@ -1419,11 +1547,11 @@ if __name__ == '__main__':
     lb = -5*np.ones(npara)
     ub = 5*np.ones(npara)
     x0 = np.zeros(npara)
-    bestx, bestf = pso(six_hump_camelback, x0, lb, ub, processes=4, minobj=-1.031628453489877+1e-8,
-                       init=init, strategy=algo, topology=topology, verbose=0,
-                       memetic=memetic, nmemetic=nmemetic,
-                       swarmsize=swarmsize, maxn=maxn, restartfile1=None)
-    if crank == 0: print('Six_hump_camelback -1.03... +-(-0.08983,0.7126) ', bestx, bestf)
+    bestx, bestf, nrun = pso(six_hump_camelback, x0, lb, ub, processes=4, minobj=-1.031628453489877+1e-8,
+                             init=init, strategy=algo, topology=topology, verbose=0,
+                             memetic=memetic, nmemetic=nmemetic,
+                             swarmsize=swarmsize, maxn=maxn, restartfile1=None, cout=True)
+    if crank == 0: print('Six_hump_camelback -1.03... +-(-0.08983,0.7126) ', nrun, bestx, bestf)
 
     # Restart
     algo      = 'fips'
