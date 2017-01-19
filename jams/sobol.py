@@ -1125,9 +1125,6 @@ def i4_sobol( dim_num, seed ):
             16225,16259,16265,16273,16299,
             16309,16355,16375,16381])
 
-        np.savetxt('/Users/mai/Desktop/sobol_new_v.out', np.array(v,dtype=int))
-        np.savetxt('/Users/mai/Desktop/sobol_new_poly.out', np.array(poly,dtype=int))
-
         atmost = 2**log_max - 1
 #
 #   Find the number of bits in ATMOST.
