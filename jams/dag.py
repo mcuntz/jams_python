@@ -261,9 +261,9 @@ def source_nodes(G):
         -------
         Written,  JM, Oct 2016
     """
-    nnodes  = G.number_of_nodes()
-    sources = np.where( 0 == np.array([ G.in_degree(ii) for ii in range(nnodes) ]))[0]
-    return sources
+    idx     = np.where( 0 == np.array([ G.in_degree(ii) for ii in G.nodes() ]))[0]
+    sources = np.array(G.nodes())    # all nodes    
+    sources = sources[idx]           # only sources nodes
 
 def sink_nodes(G):
     """
@@ -321,8 +321,9 @@ def sink_nodes(G):
         -------
         Written,  JM, Oct 2016
     """
-    nnodes  = G.number_of_nodes()
-    sinks   = np.where( 0 == np.array([ G.out_degree(ii) for ii in range(nnodes) ]))[0]
+    idx     = np.where( 0 == np.array([ G.out_degree(ii) for ii in G.nodes() ]))[0]
+    sinks   = np.array(G.nodes())      # all nodes
+    sinks   = sinks[idx]               # only sink nodes
     return sinks
 
 def plot_network(G, fname_plot):
