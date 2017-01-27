@@ -6,6 +6,7 @@ from jams.fread import fread
 from scipy import interpolate
 import csv
 import sys
+import os
 import time as t
 import math as m
 import shutil as sh
@@ -75,20 +76,20 @@ def eddycorr(indir, sltdir, cfile, hfile, meteofile, outfile, novalue=-9999,
 
     ############################################################################
     # move correlation files from sltdir to indir
-    sh.copy('%s\%s' %(sltdir, cfile), indir)
-    sh.copy('%s\%s' %(sltdir, hfile), indir)
+    sh.copy(os.path.join(sltdir, cfile), indir)
+    sh.copy(os.path.join(sltdir, hfile), indir)
 
     ############################################################################
     # reading input file
-    header = sread('%s/%s' %(indir,cfile))[0]
-    doys   = np.array(sread('%s/%s' %(indir,cfile), nc=1, skip=1), dtype='|S16')
+    header = sread(os.path.join(indir,cfile))[0]
+    doys   = np.array(sread(os.path.join(indir,cfile), nc=1, skip=1), dtype='|S16')
     #doys   = np.array([x[5:12] for x in doys.flatten()], dtype = '|S7')
     day    = np.array([x[5:8] for x in doys.flatten()], dtype = '|S7').astype(float)
     hour   = np.array([x[8:10] for x in doys.flatten()], dtype = '|S2').astype(float)
     min    = np.array([x[10:12] for x in doys.flatten()], dtype = '|S2').astype(float)
     doysfloat   = day + (hour + min/60.)/24.
-    c      = np.array(fread('%s/%s' %(indir,cfile), skip=1, cskip=1))
-    h      = np.array(fread('%s/%s' %(indir,hfile), skip=1, cskip=1))
+    c      = np.array(fread(os.path.join(indir,cfile), skip=1, cskip=1))
+    h      = np.array(fread(os.path.join(indir,hfile), skip=1, cskip=1))
     try:
         m      = np.array(fread(meteofile, cskip=2, nc=1))
         m      = np.where(m.astype(int) == novalue, np.NaN, m)
@@ -149,7 +150,7 @@ def eddycorr(indir, sltdir, cfile, hfile, meteofile, outfile, novalue=-9999,
 
     ################################################################################
     # writing output file
-    output = csv.writer(open('%s/%s' %(indir,outfile), 'w'))
+    output = csv.writer(open(os.path.join(indir,outfile), 'w'))
 
     for i in xrange(np.shape(cout)[0]):
         output.writerow([np.abs(cout[i][0].astype(int)), np.abs(hout[i][0].astype(int))])
@@ -188,8 +189,8 @@ def eddycorr(indir, sltdir, cfile, hfile, meteofile, outfile, novalue=-9999,
 
         ############################################################################
         # save figures
-        pp1 = pdf.PdfPages('%s/c_lags%s.pdf' %(indir,outfile[4:-4]))
-        pp2 = pdf.PdfPages('%s/h_lags%s.pdf' %(indir,outfile[4:-4]))
+        pp1 = pdf.PdfPages(os.path.join(indir,'c_lags%s.pdf'%(outfile[4:-4])))
+        pp2 = pdf.PdfPages(os.path.join(indir,'h_lags%s.pdf' %(outfile[4:-4])))
         fig1.savefig(pp1, format='pdf')
         fig2.savefig(pp2, format='pdf')
         pp1.close()
@@ -329,10 +330,10 @@ def calc(c, h, m, doys, histstep, indir, plot=False):
 
     ################################################################################
     # writing log file
-    log = open('%s/lag_%i_%02i_%02i_%02i_%02i_%02i.log' %(indir,
+    log = open(os.path.join(indir,'lag_%i_%02i_%02i_%02i_%02i_%02i.log' %(
                                                     t.localtime()[0], t.localtime()[1],
                                                     t.localtime()[2], t.localtime()[3],
-                                                    t.localtime()[4], t.localtime()[5],)
+                                                    t.localtime()[4], t.localtime()[5],))
                                                     , 'w')
     log.write('From doy %s %s:%s to doy %s %s:%s: \n' %(doys.flatten()[0][5:8], doys.flatten()[0][8:10], doys.flatten()[0][10:12], doys.flatten()[-1][5:8], doys.flatten()[-1][8:10], doys.flatten()[-1][10:12]))
     log.write('Top of CO2 lag range: %i\n' %(int(ctop)))

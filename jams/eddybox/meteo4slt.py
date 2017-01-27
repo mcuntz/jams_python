@@ -112,7 +112,19 @@ def meteo4slt(sltdir, metfile, p_t_rh, outfile,
         metdates = np.array(['%04i%03i%02i%02i'%(fulldate[0][i], doy[i],
                                                 fulldate[3][i], fulldate[4][i])
                              for i in range(jd.size)])
-    
+    elif format == 'eng':
+        # shift met dates one half hour back since slt time stamp marks half
+        # hour start but meteo date mark half hour end
+        jd = date2dec(eng=metdata[:,0]) - halfhjd
+        fulldate = dec2date(jd, fulldate=True)
+        adate    = dec2date(jd, ascii=True)
+        doy  = np.ceil(date2dec(ascii=adate)-
+                       date2dec(yr=fulldate[0][0],
+                                mo=1,dy=1,hr=0,mi=0, sc=0)).astype(int)
+        doy = np.where((fulldate[3]==0) & (fulldate[4]==0), doy+1, doy)
+        metdates = np.array(['%04i%03i%02i%02i'%(fulldate[0][i], doy[i],
+                                                fulldate[3][i], fulldate[4][i])
+                             for i in range(jd.size)])
     else:
         raise ValueError('meteo4slt: unknown format!')
     

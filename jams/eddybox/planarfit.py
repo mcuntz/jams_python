@@ -143,9 +143,9 @@ def planarfit(indirpf, rawfile, outfile, pfmat='pfitmatrix.csv',
                          np.max(np.maximum(uvw2_trans[:,0],uvw2_trans[:,1])),500)
 
         # grid the data.
-        z0 = griddata(uvw0_trans[:,0],uvw0_trans[:,1],uvw0_trans[:,2],x0,y0, interp='nn')
-        z1 = griddata(uvw1_trans[:,0],uvw1_trans[:,1],uvw1_trans[:,2],x1,y1, interp='nn')
-        z2 = griddata(uvw2_trans[:,0],uvw2_trans[:,1],uvw2_trans[:,2],x2,y2, interp='nn')
+        z0 = griddata(uvw0_trans[:,0],uvw0_trans[:,1],uvw0_trans[:,2],x0,y0, interp='linear')
+        z1 = griddata(uvw1_trans[:,0],uvw1_trans[:,1],uvw1_trans[:,2],x1,y1, interp='linear')
+        z2 = griddata(uvw2_trans[:,0],uvw2_trans[:,1],uvw2_trans[:,2],x2,y2, interp='linear')
 
         # plotting contours
         fig1 = plt.figure(1, figsize=(6,13))

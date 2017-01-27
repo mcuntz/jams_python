@@ -95,16 +95,19 @@ def fluxfill(fluxfile, metfile, outdir, rg, tair, rh, delimiter=[',',','],
     # assign variables
     if (d.shape[1]==11):
         data      = val[:,0::2] # corr. H, corr. LE, corr. E, corr. C, tau
-        data_flag = val[:,1::2]>1
+        data_flag = (val[:,1::2]>1) | (val[:,0::2]==undef)
     else:
         data      = val[:,[0,1, 3,4, 6,7, 9,10, 12]] # corr. H, corr. H+s, corr. LE, corr. LE+s, corr. E, corr. E+s, corr. C, corr. C+s, tau
-        data_flag = np.repeat(val[:,[2,5,8,11,13]]>1, 2, axis=1)[:,:-1]
+        data_flag = np.repeat((val[:,[2,5,8,11,13]]>1) | (val[:,[0,1, 3,4, 6,7, 9,10, 12]]==undef), 2, axis=1)[:,:-1]
     rg        = met[:,rg]
     rg_flag   = rg==undef
     tair      = met[:,tair]
     tair_flag = tair==undef
     rh        = met[:,rh]
-    vpd       = (1.-rh/100.)*esat(tair+273.14)    
+    rh_flag   = rh==undef
+    vpd       = np.empty_like(tair)
+    vpd[tair_flag | rh_flag]    = undef
+    vpd[~(tair_flag | rh_flag)] = (1.-rh[~(tair_flag | rh_flag)]/100.)*esat(tair[~(tair_flag | rh_flag)]+273.14)
     vpd_flag  = vpd==undef
     
     flux = np.zeros_like(data)
@@ -120,7 +123,7 @@ def fluxfill(fluxfile, metfile, outdir, rg, tair, rh, delimiter=[',',','],
     ###########################################################################
     # do gapfill
     for i in range(data.shape[1]):
-        flux[:,i], flag[:,i] = gapfill(datev, data[:,i], rg, tair, vpd,
+        flux[:,i], flag[:,i] = gapfill.gapfill(datev, data[:,i], rg, tair, vpd,
                                        data_flag[:,i], rg_flag, tair_flag,
                                        vpd_flag, rg_dev=50., tair_dev=2.5,
                                        vpd_dev=5., longgap=60, fullday=False,
@@ -170,10 +173,10 @@ def fluxfill(fluxfile, metfile, outdir, rg, tair, rh, delimiter=[',',','],
                                    '          C', '       C+sC', '   Cflag', '     Cgf',
                                    '        TAU',    ' TAUflag',             '   TAUgf',
                                    '         sT', '        sLE', '         sE', '         sC'])    
-    output                   = np.hstack((d[:,0:1], np.insert(flux_str, [2,2,4,4,6,6,8,8], flux_str[:,:-1], axis=1),
-                                          flux_str[:,-1:].repeat(2, axis=1), d[:,-4:]))
-    output[:,[3,7,11,15,18]] = astr(val[:,[2,5,8,11,13]].astype(int), prec=8)
-    output[:,[4,8,12,16,19]] = astr(flag[:,[0,2,4,6,8]], prec=8)
+        output                   = np.hstack((d[:,0:1], np.insert(flux_str, [2,2,4,4,6,6,8,8], flux_str[:,:-1], axis=1),
+                                              flux_str[:,-1:].repeat(2, axis=1), d[:,-4:]))
+        output[:,[3,7,11,15,18]] = astr(val[:,[2,5,8,11,13]].astype(int), prec=8)
+        output[:,[4,8,12,16,19]] = astr(flag[:,[0,2,4,6,8]], prec=8)
     
     np.savetxt('%s/fluxfilled.csv'%outdir,
                np.vstack((np.concatenate((['            date'], header))[np.newaxis,:],

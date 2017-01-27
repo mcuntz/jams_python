@@ -92,7 +92,7 @@ def eddyspec(indir, cfile, hfile, rawfile, sltdir, tspfile='34_specmean.csv',
     fluxdate = date2dec(ascii = np.array(sread('%s' %(rawfile), nc=1, skip=1), dtype='|S16'))
     year     = np.array(sread('%s' %(rawfile), nc=1, skip=1), dtype='|S16')
     year     = np.array([x[6:10] for x in year.flatten()], dtype = '|S4').astype(int)
-    fluxdate = fluxdate.flatten() - date2dec(yr = year, mo = 1, dy = 0, hr = 0, mi = 0, sc = 0)
+    fluxdate = fluxdate.flatten() - date2dec(yr = year, mo = 1, dy = 1, hr = 0, mi = 0, sc = 0)
     cf       = np.array(fread('%s' %(rawfile), skip=1, cskip=4, nc=1))
     cf       = np.where(cf == novalue, np.nan, cf).flatten()
     hf       = np.array(fread('%s' %(rawfile), skip=1, cskip=1, nc=1))
