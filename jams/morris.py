@@ -457,7 +457,7 @@ def Optimized_Groups(NumFact, LB, UB, N=500, p=4, r=10, GroupMat=np.array([]), D
 
                     #compute distance
                     for k in range(z):
-                        New_Dist_Diff = New_Dist_Diff + (Dist_Diff[Traj_Vec[m, k],j])**2
+                        New_Dist_Diff = New_Dist_Diff + (Dist_Diff[np.int(Traj_Vec[m, k]),j])**2
 
                     # Check if the distance is greater than the old one
                     if New_Dist_Diff**0.5 > Max_New_Dist_Diff:
@@ -478,8 +478,8 @@ def Optimized_Groups(NumFact, LB, UB, N=500, p=4, r=10, GroupMat=np.array([]), D
     OptOutVec = np.zeros(((sizeb)*r,1))
 
     for k in range(r):
-        OptMatrix[k*(sizeb):k*(sizeb)+(sizeb),:]= New_OutMatrix[(sizeb)*(Opt_Traj_Vec[k]):(sizeb)*(Opt_Traj_Vec[k]) + sizeb,:]
-        OptOutVec[k*(sizeb):k*(sizeb)+(sizeb)]= New_OutFact[(sizeb)*(Opt_Traj_Vec[k]):(sizeb)*(Opt_Traj_Vec[k])+ sizeb,:]
+        OptMatrix[k*(sizeb):k*(sizeb)+(sizeb),:]= New_OutMatrix[(sizeb)*(np.int(Opt_Traj_Vec[k])):(sizeb)*(np.int(Opt_Traj_Vec[k])) + sizeb,:]
+        OptOutVec[k*(sizeb):k*(sizeb)+(sizeb)]= New_OutFact[(sizeb)*(np.int(Opt_Traj_Vec[k])):(sizeb)*(np.int(Opt_Traj_Vec[k]))+ sizeb,:]
 
     #----------------------------------------------------------------------
     # Compute values in the original intervals
