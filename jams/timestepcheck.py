@@ -86,8 +86,10 @@ def timestepcheck(indir, pat, outfile, begin, end, numhead=1, timeint=30,
     ###########################################################################
     # time interval list
     interval = range(0,60,timeint)
-    jdint    = date2dec(yr=-4712,mo=1,dy=1,hr=12,mi=timeint)
-    jdmin    = date2dec(yr=-4712,mo=1,dy=1,hr=12,mi=0,sc=30)# (=precision)
+    #jdint    = date2dec(yr=-4712,mo=1,dy=1,hr=12,mi=timeint)
+    #jdmin    = date2dec(yr=-4712,mo=1,dy=1,hr=12,mi=0,sc=30)# (=precision)
+    jdint    = date2dec(yr=1,mo=1,dy=1,hr=12,mi=timeint) % 1
+    jdmin    = date2dec(yr=1,mo=1,dy=1,hr=12,mi=0,sc=30) % 1# (=precision)
     if format == 'ascii':
         jdbegin  = date2dec(ascii = np.array([begin]))
         jdend    = date2dec(ascii = np.array([end]))
@@ -101,7 +103,7 @@ def timestepcheck(indir, pat, outfile, begin, end, numhead=1, timeint=30,
     new = True
     
     filelist = os.listdir(indir)
-    for file in filelist: 
+    for file in filelist:
         if re.search(pat, file):
             if new:
                 data = np.loadtxt('./%s/%s'%(indir, file), dtype='|S21',\
@@ -127,15 +129,20 @@ def timestepcheck(indir, pat, outfile, begin, end, numhead=1, timeint=30,
     ###########################################################################
     # sternchen check :-D
     # replace with regular expression check
-    #data[data=='***********'] = empty #!!! uberprufen auf lange und re
-    #data[data=='********'] = empty #!!! uberprufen auf lange und re
+    data[data=='***********'] = empty #!!! uberprufen auf lange und re
+    data[data=='********'] = empty #!!! uberprufen auf lange und re
     
     ###########################################################################
     # tuedelchen check :-D
     # replace with regular expression check
-    #if data[numhead,0][0] == '"':
-    #    data[numhead:,0] = np.array([x[1:-1] for x in data[numhead:,0]])
-
+    if data[numhead,0][0] == '"':
+        data[numhead:,0] = np.array([x[1:-1] for x in data[numhead:,0]])
+    
+    ###########################################################################
+    # "NAN" check :-D
+    # replace with regular expression check
+    data[data=='"NAN"'] = empty #!!! uberprufen auf lange und re
+    
     ###########################################################################
     # leerzeilen check
     blankline = np.where(data[0:2,0]=='')[0]
@@ -144,6 +151,7 @@ def timestepcheck(indir, pat, outfile, begin, end, numhead=1, timeint=30,
     ###########################################################################
     # missing values check
     data[data==''] = empty
+    data[data=='""'] = empty
 
     columns = np.shape(data)[1]-1
 
@@ -242,10 +250,10 @@ def timestepcheck(indir, pat, outfile, begin, end, numhead=1, timeint=30,
         what  = np.array([x[:-3] for x in what])
         where = np.ones(tofill, dtype=int)*numhead # tofill+1 weggenommen!!!
 
-        if doidate:
-            miss    = np.empty((tofill,columns-2), dtype='|S11') # tofill+1 weggenommen!!!
-        else:
-            miss    = np.empty((tofill,columns), dtype='|S11') # tofill+1 weggenommen!!!
+        #if doidate:
+        #    miss    = np.empty((tofill,columns-2), dtype='|S11') # tofill+1 weggenommen!!!
+        #else:
+        miss    = np.empty((tofill,columns), dtype='|S11') # tofill+1 weggenommen!!!
         miss[:] = empty
         what    = np.append(np.reshape(what, (-1,1)), miss, 1)
         data    = np.insert(data, where, what, 0)
@@ -267,10 +275,10 @@ def timestepcheck(indir, pat, outfile, begin, end, numhead=1, timeint=30,
             what   = dec2date(span.astype('|S16').astype(float), eng=True)
 
         what  = np.array([x[:-3] for x in what])
-        if doidate:
-            miss    = np.empty((tofill,columns-2), dtype='|S11')
-        else:
-            miss    = np.empty((tofill,columns), dtype='|S11')
+        #if doidate:
+        #    miss    = np.empty((tofill,columns-2), dtype='|S11')
+        #else:
+        miss    = np.empty((tofill,columns), dtype='|S11')
         miss[:] = empty
         what    = np.append(np.reshape(what, (-1,1)), miss, 1)
         data    = np.append(data, what, 0)

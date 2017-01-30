@@ -160,13 +160,13 @@ def fluxflag(fluxfile, metfile, outdir, swdr, T, lat, delimiter=[',',','],
                               np.where(val[:,11] > 10, 1, 0))
         co2exvar3  = np.where(np.isnan(val[:,10]), np.NaN,
                               np.where(val[:,10] > 3, 1, 0))
-    elif analyzer=='LI75000':
-        h2oexvar3  = np.where(np.isnan(values[:,11]), pl.NaN,
-                              np.where(values[:,11] > 5000, 1, 0))
-        h2oexvar10 = np.where(np.isnan(values[:,11]), pl.NaN,
-                              np.where(values[:,11] > 17300, 1, 0))
-        co2exvar3  = np.where(np.isnan(values[:,10]), pl.NaN,
-                              np.where(values[:,10] > 0.005, 1, 0))
+    elif analyzer=='LI7500':
+        h2oexvar3  = np.where(np.isnan(val[:,11]), np.NaN,
+                              np.where(val[:,11] > 5000, 1, 0))
+        h2oexvar10 = np.where(np.isnan(val[:,11]), np.NaN,
+                              np.where(val[:,11] > 17300, 1, 0))
+        co2exvar3  = np.where(np.isnan(val[:,10]), np.NaN,
+                              np.where(val[:,10] > 0.005, 1, 0))
     else:
         raise ValueError('fluxflag: unknown analyzer')
     wvar0    = np.where(np.isnan(val[:,8]), np.NaN,
@@ -180,7 +180,7 @@ def fluxflag(fluxfile, metfile, outdir, swdr, T, lat, delimiter=[',',','],
     ###########################################################################
     # itc flag calculation
     if itc_f:
-        itcu, itcw, itct = itc(H, zeta, ustar, varu, varw, vart, rho, lat,
+        itcu, itcw, itct = itc.itc(H, zeta, ustar, varu, varw, vart, rho, lat,
                                limit, '%s/itc'%outdir, plot=plot)
         print('ITC CALCUATION COMPLETED')
     else:
@@ -211,7 +211,7 @@ def fluxflag(fluxfile, metfile, outdir, swdr, T, lat, delimiter=[',',','],
     #inflag = np.zeros_like(fluxes, dtype=np.int)
     inflag = np.vstack((Hflag, LEflag, Eflag, Cflag, Tauflag)).transpose()
     if spike_f:
-        spikef = spikeflag(datev, fluxes, inflag, isday, '%s/spike'%outdir, z=7,
+        spikef = spikeflag.spikeflag(datev, fluxes, inflag, isday, '%s/spike'%outdir, z=7,
                            deriv=1, udef=np.NaN, spike_v=2, plot=plot)
         print('SPIKE DETECTION COMPLETED')
     else:
@@ -225,7 +225,7 @@ def fluxflag(fluxfile, metfile, outdir, swdr, T, lat, delimiter=[',',','],
         C_ustar_T             = np.vstack((fluxes[:,3], ustar, T)).transpose()
         C_ustar_T_flags       = np.isnan(C_ustar_T).astype(np.int)
         C_ustar_T_flags[:,0] += inflag[:,3]
-        ustarf = ustarflag(datev, C_ustar_T, C_ustar_T_flags, isday,
+        ustarf = ustarflag.ustarflag(datev, C_ustar_T, C_ustar_T_flags, isday,
                            '%s/ustar'%outdir, ustar_v=2, plot=plot)
         print('USTAR FLAGGING COMPLETED')
     else:

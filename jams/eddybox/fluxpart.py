@@ -82,7 +82,7 @@ def fluxpart(fluxfile, metfile, outdir, swdr, tair, rh, method='local',
     d = np.loadtxt(fluxfile, dtype='|S100', delimiter=delimiter[0], skiprows=skiprows[0])
     m = np.loadtxt(metfile,  dtype='|S100', delimiter=delimiter[1], skiprows=skiprows[1])
     
-    assert (d.shape[1]==16) | (d.shape[1]==24), 'fluxfill: fluxfile must be from fluxfill and have 16 or 19 cols'
+    assert (d.shape[1]==16) | (d.shape[1]==24), 'fluxfill: fluxfile must be from fluxfill and have 16 or 24 cols'
     
     if format[0]=='ascii':
         datev   = date2dec(ascii=d[:,0])
@@ -102,7 +102,7 @@ def fluxpart(fluxfile, metfile, outdir, swdr, tair, rh, method='local',
     
     ###########################################################################
     # assign variables
-    if (d.shape[1]==11):
+    if (d.shape[1]==16):
         nee       = val[:,9] #corr. C
     else:
         nee       = val[:,12] # oder 13 #corr. C
@@ -111,16 +111,25 @@ def fluxpart(fluxfile, metfile, outdir, swdr, tair, rh, method='local',
     isday     = swdr>0.
     tair      = met[:,tair]+273.15
     rh        = met[:,rh]
-    vpd       = (1.-rh/100.)*esat(tair)    
+    #vpd       = (1.-rh/100.)*esat(tair)
+    vpd       = np.empty_like(tair)
+    vpd[(tair==undef) | (rh==undef)]   = undef
+    vpd[~((tair==undef) | (rh==undef))] = (1.-rh[~((tair==undef) | (rh==undef))]/100.)*esat(tair[~((tair==undef) | (rh==undef))])
+    
     
     ###########################################################################
     # do partitioning
-    gpp, reco           = nee2gpp(datev, nee,      tair, isday, rg=swdr,
-                                  vpd=vpd, undef=undef, method=method,
-                                  shape=False, masked=False, nogppnight=nogppnight)
-    gpp_stor, reco_stor = nee2gpp(datev, nee_stor, tair, isday, rg=swdr,
-                                  vpd=vpd, undef=undef, method=method,
-                                  shape=False, masked=False, nogppnight=nogppnight)
+    if (d.shape[1]==16):
+        gpp, reco           = nee2gpp.nee2gpp(datev, nee,      tair, isday, rg=swdr,
+                                      vpd=vpd, undef=undef, method=method,
+                                      shape=False, masked=False, nogppnight=nogppnight)
+    else:
+        gpp, reco           = nee2gpp.nee2gpp(datev, nee,      tair, isday, rg=swdr,
+                                      vpd=vpd, undef=undef, method=method,
+                                      shape=False, masked=False, nogppnight=nogppnight)
+        gpp_stor, reco_stor = nee2gpp.nee2gpp(datev, nee_stor, tair, isday, rg=swdr,
+                                      vpd=vpd, undef=undef, method=method,
+                                      shape=False, masked=False, nogppnight=nogppnight)
     
     #######################################################################
     # plot
@@ -135,7 +144,7 @@ def fluxpart(fluxfile, metfile, outdir, swdr, tair, rh, method='local',
         date01 = date2dec(yr=1, mo=1, dy=2, hr=0, mi=0, sc=0)
         
         fig1 = plt.figure(1)
-        if (d.shape[1]==11):
+        if (d.shape[1]==16):
             sub1 = fig1.add_subplot(111)
         else:
             sub1 = fig1.add_subplot(211)
@@ -143,7 +152,7 @@ def fluxpart(fluxfile, metfile, outdir, swdr, tair, rh, method='local',
         l1 =sub1.plot(datev-date01, nee, '-k', label='nee')
         l2 =sub1.plot(datev-date01, gpp, '-g', label='gpp')
         l3 =sub1.plot(datev-date01, reco, '-r', label='reco')
-        if (d.shape[1]!=11):
+        if (d.shape[1]!=16):
             l4 =sub2.plot(datev-date01, nee_stor, '-k', label='nee')
             l5 =sub2.plot(datev-date01, gpp_stor, '-g', label='gpp')
             l6 =sub2.plot(datev-date01, reco_stor, '-r', label='reco')
@@ -151,7 +160,7 @@ def fluxpart(fluxfile, metfile, outdir, swdr, tair, rh, method='local',
         sub1.set_xlim(datev[0]-date01,datev[-1]-date01)
         sub1.xaxis.set_major_locator(majticks)
         sub1.xaxis.set_major_formatter(mpl.dates.DateFormatter(format_str))
-        if (d.shape[1]!=11):
+        if (d.shape[1]!=16):
             sub2.set_xlim(datev[0]-date01,datev[-1]-date01)
             sub2.xaxis.set_major_locator(majticks)
             sub2.xaxis.set_major_formatter(mpl.dates.DateFormatter(format_str))
@@ -164,7 +173,7 @@ def fluxpart(fluxfile, metfile, outdir, swdr, tair, rh, method='local',
     
     ###########################################################################
     # prepare output and save file
-    if (d.shape[1]==11):
+    if (d.shape[1]==16):
         header         = np.array(['          H', '   Hflag', '     Hgf',
                                    '         LE', '  LEflag', '    LEgf',
                                    '          E', '   Eflag', '     Egf',
