@@ -264,6 +264,7 @@ def source_nodes(G):
     idx     = np.where( 0 == np.array([ G.in_degree(ii) for ii in G.nodes() ]))[0]
     sources = np.array(G.nodes())    # all nodes    
     sources = sources[idx]           # only sources nodes
+    return sources
 
 def sink_nodes(G):
     """
