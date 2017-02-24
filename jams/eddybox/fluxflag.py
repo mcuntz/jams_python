@@ -200,7 +200,7 @@ def fluxflag(fluxfile, metfile, outdir, swdr, T, lat, delimiter=[',',','],
                                    h2oexvar3, wvar0, h2ovar0)).transpose(), 1).astype(int)
     Eflag[Eflag>1]=2
     Cflag   = np.nansum(np.vstack((sttest2[:,4], itcw, c02exli, co2excr, wexvar,
-                                   h2oexvar10, co2exvar3, wvar0, co2var0)).transpose(), 1).astype(int)
+                                   h2oexvar10, wvar0, co2var0)).transpose(), 1).astype(int) #, co2exvar3
     Cflag[Cflag>1]=2
     Tauflag = np.nansum(np.vstack((sttest2[:,3], itcu, itcw, tauexcr, wexvar,
                                    wvar0)).transpose(), 1).astype(int)
