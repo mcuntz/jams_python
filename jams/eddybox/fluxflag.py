@@ -166,7 +166,7 @@ def fluxflag(fluxfile, metfile, outdir, swdr, T, lat, delimiter=[',',','],
         h2oexvar10 = np.where(np.isnan(val[:,11]), np.NaN,
                               np.where(val[:,11] > 17300, 1, 0))
         co2exvar3  = np.where(np.isnan(val[:,10]), np.NaN,
-                              np.where(val[:,10] > 0.005, 1, 0))
+                              np.where(val[:,10] > 3.5, 1, 0))
     else:
         raise ValueError('fluxflag: unknown analyzer')
     wvar0    = np.where(np.isnan(val[:,8]), np.NaN,
