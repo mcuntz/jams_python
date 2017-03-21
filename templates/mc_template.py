@@ -342,7 +342,7 @@ if __name__ == '__main__':
         pass
 
     if (outtype == 'plotly'):
-        pass
+        htmlfiles = []
 
     ifig = 0
 
@@ -427,6 +427,7 @@ if __name__ == '__main__':
         htmlfile = plotfile+"{0:04d}".format(ifig)+".html"
         plotly_fig = plotly.tools.mpl_to_plotly(fig)
         ff = plotly.offline.plot(plotly_fig, filename=htmlfile, auto_open=False)
+        htmlfiles.append(htmlfile)
     plt.close(fig)
 
     # -------------------------------------------------------------------------
@@ -501,6 +502,7 @@ if __name__ == '__main__':
         htmlfile = plotfile+"{0:04d}".format(ifig)+".html"
         plotly_fig = plotly.tools.mpl_to_plotly(fig)
         ff = plotly.offline.plot(plotly_fig, filename=htmlfile, auto_open=False)
+        htmlfiles.append(htmlfile)
     plt.close(fig)
 
     # -------------------------------------------------------------------------
@@ -518,7 +520,14 @@ if __name__ == '__main__':
     elif (outtype == 'bokeh'):
         pass
     elif (outtype == 'plotly'):
-        pass
+        if ifig > 1:
+            import fileinput
+            htmlfile = plotfile+"0001-{0:04d}".format(ifig)+".html"
+            with open(htmlfile, 'w') as fout:
+                fin = fileinput.input(htmlfiles)
+                for line in fin:
+                    fout.write(line)
+                fin.close()
     else:
         plt.show()
 
