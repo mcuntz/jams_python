@@ -181,6 +181,8 @@ if __name__ == '__main__':
         except:
             print("No plotly found. Use output type html instead.")
             outtype = 'html'
+        if (outtype == 'plotly') and (plotname != ''):
+            assert plotname.endswith('html'), 'Plotly plotnames must end with .html'
 
 
     # -------------------------------------------------------------------------
@@ -429,7 +431,7 @@ if __name__ == '__main__':
         bokeh.io.save(bk, filename=htmlfile, title=htmlfile)
         plt.close(fig)
     elif (outtype == 'plotly'):
-        htmlfile = plotfile+"{0:04d}".format(ifig)+".html"
+        htmlfile = "_{0:04d}_".format(ifig)+plotfile
         plotly_fig = plotly.tools.mpl_to_plotly(fig)
         ff = plotly.offline.plot(plotly_fig, filename=htmlfile, auto_open=False)
         htmlfiles.append(htmlfile)
@@ -487,28 +489,32 @@ if __name__ == '__main__':
     # save pages
     if (outtype == 'pdf'):
         pdf_pages.savefig(fig)
+        plt.close(fig)
     elif (outtype == 'png'):
         pngfile = plotfile+"{0:04d}".format(ifig)+".png"
         fig.savefig(pngfile, transparent=transparent, bbox_inches=bbox_inches, pad_inches=pad_inches)
+        plt.close(fig)
     elif (outtype == 'html'):
-        pngfile = plotfile[0:plotfile.rfind(".")] + "_" + "{0:04d}".format(ifig)+".png"
+        pngfile = filebase(plotfile) + "_" + "{0:04d}".format(ifig)+".png"
         fig.savefig(pngfile, transparent=transparent, bbox_inches=bbox_inches, pad_inches=pad_inches)
         print('<p><img src='+pngfile+'/></p>', file=fhtml)
+        plt.close(fig)
     elif (outtype == 'd3'):
-        #Does not work mpld3.plugins.connect(fig, mpld3.plugins.LinkedBrush(line1))
-        #mpld3.save_html(fig, d3file)
+        #Does not work: mpld3.plugins.connect(fig, mpld3.plugins.LinkedBrush(line1))
         d3str = mpld3.fig_to_html(fig)
         print(d3str, file=fhtml)
+        plt.close(fig)
     elif (outtype == 'bokeh'):
         htmlfile = plotfile+"{0:04d}".format(ifig)+".html"
         bk = bokeh.mpl.to_bokeh(fig)
         bokeh.io.save(bk, filename=htmlfile, title=htmlfile)
+        plt.close(fig)
     elif (outtype == 'plotly'):
         htmlfile = plotfile+"{0:04d}".format(ifig)+".html"
         plotly_fig = plotly.tools.mpl_to_plotly(fig)
         ff = plotly.offline.plot(plotly_fig, filename=htmlfile, auto_open=False)
         htmlfiles.append(htmlfile)
-    plt.close(fig)
+        plt.close(fig)
 
     # -------------------------------------------------------------------------
     # Finished
@@ -525,16 +531,18 @@ if __name__ == '__main__':
     elif (outtype == 'bokeh'):
         pass
     elif (outtype == 'plotly'):
+        import os
         if ifig > 1:
             import fileinput
-            htmlfile = plotfile+"0001-{0:04d}".format(ifig)+".html"
+            htmlfile = plotfile
             with open(htmlfile, 'w') as fout:
                 fin = fileinput.input(htmlfiles)
                 for line in fin:
                     fout.write(line)
                 fin.close()
-            import os
             for ff in htmlfiles: os.remove(ff)
+        else:
+            os.rename(htmlfiles[0], plotfile)
     else:
         plt.show()
 
