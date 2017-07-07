@@ -131,6 +131,7 @@ def timestepcheck(indir, pat, outfile, begin, end, numhead=1, timeint=30,
     # replace with regular expression check
     data[data=='***********'] = empty #!!! uberprufen auf lange und re
     data[data=='********'] = empty #!!! uberprufen auf lange und re
+    data[data=='*********'] = empty
     
     ###########################################################################
     # tuedelchen check :-D
@@ -216,7 +217,7 @@ def timestepcheck(indir, pat, outfile, begin, end, numhead=1, timeint=30,
     ###########################################################################
     # insert missing time steps
     for i in range(np.size(ingap))[::-1]:
-        where = np.ones(nugap[i], dtype=int)*(ingap[i]+1+numhead)
+        where = np.ones(int(nugap[i]), dtype=int)*(ingap[i]+1+numhead)
         if format == 'ascii':
             span  = np.arange(1,nugap[i]+1)*jdint + jd[ingap[i]]
             what  = dec2date(span.astype('|S16').astype(float), ascii=True)
@@ -225,7 +226,7 @@ def timestepcheck(indir, pat, outfile, begin, end, numhead=1, timeint=30,
             what  = dec2date(span.astype('|S16').astype(float), eng=True)
         what    = np.array([x[:-3] for x in what])
         
-        miss    = np.empty((nugap[i],columns), dtype='|S11')
+        miss    = np.empty((int(nugap[i]),columns), dtype='|S11')
         miss[:] = empty
         what    = np.append(np.reshape(what, (-1,1)), miss, 1)
         data    = np.insert(data, where, what, 0)
@@ -263,7 +264,8 @@ def timestepcheck(indir, pat, outfile, begin, end, numhead=1, timeint=30,
     if stop == maxind:
         pass
     elif stop < maxind:
-        data = data[:stop+1,:]
+        #data = data[:stop+1,:]
+        data = data[:stop[0]+1,:]
     else:
         if format == 'ascii':
             tofill = int((jdend - date2dec(ascii = data[-1,0]))/jdint)

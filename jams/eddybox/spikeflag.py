@@ -81,7 +81,7 @@ def spikeflag(date, data, inflag, isday, outdir, window=13, iter=1,
     # calculate dusk and dawn times and separate in day and night
     isdawn      = np.zeros(rows,dtype=np.bool)
     isdusk      = np.zeros(rows,dtype=np.bool)
-    dis         = isday - np.roll(isday,-1)
+    dis         = (isday.astype(int) - np.roll(isday,-1).astype(int)).astype(bool)
     isdawn[:-1] = np.where(dis[:-1] == -1, True, False)
     isdusk[:-1] = np.where(dis[:-1] == 1, True, False)
     isddday     = isdawn
