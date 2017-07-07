@@ -23,6 +23,7 @@ def rainbow(x):
     b = 1.0 / (1.97 + 3.54*x - 68.5*x**2 + 243.*x**3 - 297.*x**4 + 125.*x**5)
     return r, g, b
 
+""" Fig. 3 of sron_colourschemes.pdf """
 palette1        = [['#4477AA'],
                    ['#4477AA', '#CC6677'],
                    ['#4477AA', '#DDCC77', '#CC6677'],
@@ -40,10 +41,15 @@ palette1        = [['#4477AA'],
                     '#661100', '#CC6677', '#882255', '#AA4499'],
                    ['#332288', '#6699CC', '#88CCEE', '#44AA99', '#117733', '#999933', '#DDCC77',
                     '#661100', '#CC6677', '#AA4466', '#882255', '#AA4499']]
+""" Fig. 2 upper row of sron_colourschemes.pdf """
 palette2_light  = ['#77AADD', '#77CCCC', '#88CCAA', '#DDDD77', '#DDAA77', '#DD7788', '#CC99BB']
+""" Fig. 2 middle row of sron_colourschemes.pdf """
 palette2_medium = ['#4477AA', '#44AAAA', '#44AA77', '#AAAA44', '#AA7744', '#AA4455', '#AA4488']
+""" Fig. 2 lower row of sron_colourschemes.pdf """
 palette2_dark   = ['#114477', '#117777', '#117744', '#777711', '#774411', '#771122', '#771155']
+""" Fig. 4 of sron_colourschemes.pdf """
 greysafe        = ['#809BC8', '#FF6666', '#FFCC66', '#64C204']
+""" Fig. 7 of sron_colourschemes.pdf """
 palette_ylorbr  = [['#FFF7BC', '#FEC44F', '#D95F0E'],
                    ['#FFFBD5', '#FED98E', '#FB9A29', '#CC4C02'],
                    ['#FFFBD5', '#FED98E', '#FB9A29', '#D95F0E', '#993404'],
@@ -53,6 +59,7 @@ palette_ylorbr  = [['#FFF7BC', '#FEC44F', '#D95F0E'],
                     '#8C2D04'],
                    ['#FFFFE5', '#FFF7BC', '#FEE391', '#FEC44F', '#FB9A29', '#EC7014', '#CC4C02',
                     '#993404', '#662506']]
+""" Fig. 8 of sron_colourschemes.pdf """
 palette_buylrd  = [['#99C7EC', '#FFFAD2', '#F5A275'],
                    ['#008BCE', '#B4DDF7', '#F9BD7E', '#D03232'],
                    ['#008BCE', '#B4DDF7', '#FFFAD2', '#F9BD7E', '#D03232'],
@@ -66,6 +73,7 @@ palette_buylrd  = [['#99C7EC', '#FFFAD2', '#F5A275'],
                     '#ED875E', '#D24D3E', '#AE1C3E'],
                    ['#3D52A1', '#3A89C9', '#77B7E5', '#B4DDF7', '#E6F5FE', '#FFFAD2', '#FFE3AA',
                     '#F9BD7E', '#ED875E', '#D24D3E', '#AE1C3E']]
+""" Fig. 13 of sron_colourschemes.pdf """
 palette_rainbow = [['#404096', '#57A3AD', '#DEA73A', '#D92120'],
                    ['#404096', '#529DB7', '#7DB874', '#E39C37', '#D92120'],
                    ['#404096', '#498CC2', '#63AD99', '#BEBC48', '#E68B33', '#D92120'],
@@ -80,7 +88,7 @@ palette_rainbow = [['#404096', '#57A3AD', '#DEA73A', '#D92120'],
                     '#D3B33F', '#E59435', '#E6682D', '#D92120'],
                    ['#781C81', '#413B93', '#4065B1', '#488BC2', '#55A1B1', '#63AD99', '#7FB972',
                     '#B5BD4C', '#D9AD3C', '#E68E34', '#E6642C', '#D92120']]
-                                                                    
+""" Fig. 14 of sron_colourschemes.pdf """
 palette_rainbow_band = [['#882E72', '#B178A6', '#D6C1DE', '#1965B0', '#5289C7', '#7BAFDE', '#4EB265',
                          '#90C987', '#CAE0AB', '#F7EE55', '#F6C141', '#F1932D', '#E8601C', '#DC050C'],
                         ['#114477', '#4477AA', '#77AADD', '#117755', '#44AA88', '#99CCBB', '#777711',

@@ -11,11 +11,11 @@ positional arguments:
 optional arguments:
   -h, --help            show this help message and exit
   -p plotname, --plotname plotname
-                        Name of plot output file for types pdf, html or d3,
+                        Name of plot output file for types pdf, html, d3, bokeh, or plotly,
                         and name basis for type png (default: mc_template).
   -s, --serif           Use serif font; default sans serif.
   -t outtype, --type outtype
-                        Output type is pdf, png, html, or d3 (default: open
+                        Output type is pdf, png, html, d3, bokeh, or plotly (default: open
                         screen windows).
   -u, --usetex          Use LaTeX to render text in pdf, png and html.
   -w, --white           White lines on transparent or black background; default: black lines on transparent or white background.
@@ -52,6 +52,7 @@ Modified, MC, Jul 2013 - optparse->argparse
                        - pdf, png, html, or d3
           MC, Sep 2015 - Serif and sans serif fonts
           MC, Dec 2015 - white lines on black or transparent background
+          MC, Mar 2017 - bokeh, plotly
 """
 
 # -------------------------------------------------------------------------
@@ -85,17 +86,18 @@ if __name__ == '__main__':
                                        description='''This is the Python template for any new program of Matthias Cuntz.''')
     parser.add_argument('-p', '--plotname', action='store',
                         default=plotname, dest='plotname', metavar='plotname',
-                        help='Name of plot output file for types pdf, html or d3, '
+                        help='Name of plot output file for types pdf, html, d3, bokeh, or plotly, '
                         'and name basis for type png (default: '+filebase(__file__)+').')
-    parser.add_argument('-s', '--serif', action='store_true', default=serif, dest="serif",
-                        help="Use serif font; default sans serif.")
+    parser.add_argument('-s', '--serif', action='store_true', default=serif, dest='serif',
+                        help='Use serif font; default sans serif.')
     parser.add_argument('-t', '--type', action='store',
                         default=outtype, dest='outtype', metavar='outtype',
-                        help='Output type is pdf, png, html, or d3 (default: open screen windows).')
-    parser.add_argument('-u', '--usetex', action='store_true', default=usetex, dest="usetex",
-                        help="Use LaTeX to render text in pdf, png and html.")
-    parser.add_argument('-w', '--white', action='store_true', default=dowhite, dest="dowhite",
-                        help="White lines on transparent or black background; default: black lines on transparent or white background.")
+                        help='Output type is pdf, png, html, d3, bokeh, or plotly (default: open screen windows).')
+    parser.add_argument('-u', '--usetex', action='store_true', default=usetex, dest='usetex',
+                        help='Use LaTeX to render text in pdf, png and html.')
+    parser.add_argument('-w', '--white', action='store_true', default=dowhite, dest='dowhite',
+                        help='White lines on transparent or black background; '
+                        'default: black lines on transparent or white background.')
     parser.add_argument('file', nargs='?', default=None, metavar='infile',
                         help='Mandatory input file.')
 
@@ -125,11 +127,11 @@ if __name__ == '__main__':
 #     optional arguments:
 #       -h, --help            show this help message and exit
 #       -p plotname, --plotname plotname
-#                             Name of plot output file for types pdf, html or d3,
+#                             Name of plot output file for types pdf, html, d3, bokeh, or plotly,
 #                             and name basis for type png (default: mc_template).
 #       -s, --serif           Use serif font; default sans serif.
 #       -t outtype, --type outtype
-#                             Output type is pdf, png, html, or d3 (default: open
+#                             Output type is pdf, png, html, d3, bokeh, or plotly (default: open
 #                             screen windows).
 #       -u, --usetex          Use LaTeX to render text in pdf, png and html.
 #       -w, --white           White lines on transparent or black background; default: black lines on transparent or white background.
@@ -141,7 +143,7 @@ if __name__ == '__main__':
         raise IOError('\nInput file must be given.\n')
 
     outtype = outtype.lower()
-    outtypes = ['', 'pdf', 'png', 'html', 'd3']
+    outtypes = ['', 'pdf', 'png', 'html', 'd3', 'bokeh', 'plotly']
     if outtype not in outtypes:
         raise IOError('\nOutput '+outype+' type must be in: {:s}'.format(outtypes))
 
@@ -150,19 +152,37 @@ if __name__ == '__main__':
     import time
     t1 = time.time()
 
-    if (outtype == 'd3'):
-        try:
-            import mpld3
-        except:
-            print("No mpld3 found. Use output type html instead of d3.")
-            outtype = 'html'
-
     if dowhite:
         fgcolor = 'white'
         bgcolor = 'black'
     else:
         fgcolor = 'black'
         bgcolor = 'white'
+
+    if (outtype == 'd3'):
+        try:
+            import mpld3
+        except:
+            print("No mpld3 found. Use output type html instead.")
+            outtype = 'html'
+
+    if (outtype == 'bokeh'):
+        try:
+            import bokeh.io
+            import bokeh.mpl
+        except:
+            print("No bokeh found. Use output type html instead.")
+            outtype = 'html'
+
+    if (outtype == 'plotly'):
+        try:
+            import plotly.tools
+            import plotly.offline
+        except:
+            print("No plotly found. Use output type html instead.")
+            outtype = 'html'
+        if (outtype == 'plotly') and (plotname != ''):
+            assert plotname.endswith('html'), 'Plotly plotnames must end with .html'
 
 
     # -------------------------------------------------------------------------
@@ -240,7 +260,7 @@ if __name__ == '__main__':
             else:
                 mpl.rcParams['font.family']     = 'sans-serif'
                 mpl.rcParams['font.sans-serif'] = 'Arial'       # Arial, Verdana
-    elif (outtype == 'png') or (outtype == 'html') or (outtype == 'd3'):
+    elif (outtype == 'png') or (outtype == 'html') or (outtype == 'd3') or (outtype == 'bokeh') or (outtype == 'plotly'):
         mpl.use('Agg') # set directly after import matplotlib
         import matplotlib.pyplot as plt
         mpl.rc('figure', figsize=(8.27,11.69)) # a4 portrait
@@ -286,6 +306,13 @@ if __name__ == '__main__':
 
 
     # -------------------------------------------------------------------------
+    # Data
+    #
+
+    pass
+
+
+    # -------------------------------------------------------------------------
     # Plot
     #
 
@@ -313,7 +340,16 @@ if __name__ == '__main__':
         print("</head>", file=fhtml)
         print("<body>", file=fhtml)
 
+    if (outtype == 'bokeh'):
+        pass
+
+    if (outtype == 'plotly'):
+        htmlfiles = []
+
     ifig = 0
+
+    # Uncomment for xkcd-style
+    # plt.xkcd()
 
     # -------------------------------------------------------------------------
     # Fig 1
@@ -331,8 +367,12 @@ if __name__ == '__main__':
     # ylim = [-0.4,0.4]
 
     iplot += 1
-    xlab   = jams.str2tex('f(x) (0,100)', usetex=usetex)
-    ylab   = jams.str2tex(r'$\delta \Delta \sin(x)$', usetex=usetex)
+    if outtype in ['d3', 'bokeh', 'plotly']:
+        xlab   = 'f(x) (0,100)'
+        ylab   = 'delta Delta sin(x)'
+    else:
+        xlab   = jams.str2tex('f(x) (0,100)', usetex=usetex)
+        ylab   = jams.str2tex(r'$\delta \Delta \sin(x)$', usetex=usetex)
     # if (iplot == 0) | (outtype == 'pdf') | (outtype == 'png') | (outtype == 'html'):
     #     sub  = fig.add_axes(jams.position(nrow,ncol,iplot,hspace=hspace,vspace=vspace))
     #     sub1 = sub
@@ -342,7 +382,7 @@ if __name__ == '__main__':
     sub    = fig.add_axes(jams.position(nrow,ncol,iplot,hspace=hspace,vspace=vspace))
 
     mark1  = sub.plot(np.sin(np.arange(100)))
-    plt.setp(mark1, linestyle='none', marker='o', markeredgecolor=mcol1, markerfacecolor='none',
+    plt.setp(mark1, linestyle='None', marker='o', markeredgecolor=mcol1, markerfacecolor=None,
              markersize=msize, markeredgewidth=mwidth)
 
     plt.setp(sub, xlabel=xlab)
@@ -353,13 +393,19 @@ if __name__ == '__main__':
     if ylim != None: plt.setp(sub, ylim=ylim)
 
     larr = mark1
-    tarr = [jams.str2tex(r'$\sin(x)$ sin Nothing 100', usetex=usetex)]
+    if outtype in ['d3', 'bokeh', 'plotly']:
+        tarr = ['sin(x) sin Nothing 100']
+    else:
+        tarr = [jams.str2tex(r'$\sin(x)$ sin Nothing 100', usetex=usetex)]
     ll = sub.legend(larr, tarr, frameon=frameon, ncol=1,
                     labelspacing=llrspace, handletextpad=llhtextpad, handlelength=llhlength,
                     loc='upper left', bbox_to_anchor=(llxbbox,llybbox), scatterpoints=1, numpoints=1)
     plt.setp(ll.get_texts(), fontsize='small')
 
-    jams.abc2plot(sub, dxabc, dyabc, iplot, lower=True, bold=True, usetex=usetex, mathrm=True, parenthesis='close')
+    if outtype in ['d3', 'bokeh', 'plotly']:
+        jams.abc2plot(sub, dxabc, dyabc, iplot, lower=True, bold=True, usetex=False, mathrm=True, parenthesis='close')
+    else:
+        jams.abc2plot(sub, dxabc, dyabc, iplot, lower=True, bold=True, usetex=usetex, mathrm=True, parenthesis='close')
 
     # save pages
     if (outtype == 'pdf'):
@@ -372,13 +418,24 @@ if __name__ == '__main__':
     elif (outtype == 'html'):
         pngfile = filebase(plotfile) + "_" + "{0:04d}".format(ifig)+".png"
         fig.savefig(pngfile, transparent=transparent, bbox_inches=bbox_inches, pad_inches=pad_inches)
-        plt.close(fig)
         print('<p><img src='+pngfile+'/></p>', file=fhtml)
+        plt.close(fig)
     elif (outtype == 'd3'):
         #Does not work: mpld3.plugins.connect(fig, mpld3.plugins.LinkedBrush(line1))
         d3str = mpld3.fig_to_html(fig)
-        plt.close(fig)
         print(d3str, file=fhtml)
+        plt.close(fig)
+    elif (outtype == 'bokeh'):
+        htmlfile = plotfile+"{0:04d}".format(ifig)+".html"
+        bk = bokeh.mpl.to_bokeh(fig)
+        bokeh.io.save(bk, filename=htmlfile, title=htmlfile)
+        plt.close(fig)
+    elif (outtype == 'plotly'):
+        htmlfile = "_{0:04d}_".format(ifig)+plotfile
+        plotly_fig = plotly.tools.mpl_to_plotly(fig)
+        ff = plotly.offline.plot(plotly_fig, filename=htmlfile, auto_open=False)
+        htmlfiles.append(htmlfile)
+        plt.close(fig)
 
     # -------------------------------------------------------------------------
     # Fig 2
@@ -396,8 +453,12 @@ if __name__ == '__main__':
     # ylim = [-0.4,0.4]
 
     iplot += 1
-    xlab   = jams.str2tex('(0,10)', usetex=usetex)
-    ylab   = jams.str2tex(r'2$\sin(x)$', usetex=usetex)
+    if outtype in ['d3', 'bokeh', 'plotly']:
+        xlab   = '(0,10)'
+        ylab   = '2sin(x)'
+    else:
+        xlab   = jams.str2tex('(0,10)', usetex=usetex)
+        ylab   = jams.str2tex(r'2$\sin(x)$', usetex=usetex)
     sub    = fig.add_axes(jams.position(nrow,ncol,iplot,hspace=hspace,vspace=vspace))
 
     line1 = sub.plot(2.*np.sin(np.arange(100)))
@@ -411,13 +472,19 @@ if __name__ == '__main__':
     if ylim != None: plt.setp(sub, ylim=ylim)
 
     larr = line1
-    tarr = [jams.str2tex(r'$\sin$ Nothing', usetex=usetex)]
+    if outtype in ['d3', 'bokeh', 'plotly']:
+        tarr = ['sin Nothing']
+    else:
+        tarr = [jams.str2tex(r'$\sin$ Nothing', usetex=usetex)]
     ll = sub.legend(larr, tarr, frameon=frameon, ncol=1,
                     labelspacing=llrspace, handletextpad=llhtextpad, handlelength=llhlength,
                     loc='upper left', bbox_to_anchor=(llxbbox,llybbox), scatterpoints=1, numpoints=1)
     plt.setp(ll.get_texts(), fontsize='small')
 
-    jams.abc2plot(sub, dxabc, dyabc, iplot, lower=True, bold=True, usetex=usetex, mathrm=True, parenthesis='close')
+    if outtype in ['d3', 'bokeh', 'plotly']:
+        jams.abc2plot(sub, dxabc, dyabc, iplot, lower=True, bold=True, usetex=False, mathrm=True, parenthesis='close')
+    else:
+        jams.abc2plot(sub, dxabc, dyabc, iplot, lower=True, bold=True, usetex=usetex, mathrm=True, parenthesis='close')
 
     # save pages
     if (outtype == 'pdf'):
@@ -428,16 +495,26 @@ if __name__ == '__main__':
         fig.savefig(pngfile, transparent=transparent, bbox_inches=bbox_inches, pad_inches=pad_inches)
         plt.close(fig)
     elif (outtype == 'html'):
-        pngfile = plotfile[0:plotfile.rfind(".")] + "_" + "{0:04d}".format(ifig)+".png"
+        pngfile = filebase(plotfile) + "_" + "{0:04d}".format(ifig)+".png"
         fig.savefig(pngfile, transparent=transparent, bbox_inches=bbox_inches, pad_inches=pad_inches)
-        plt.close(fig)
         print('<p><img src='+pngfile+'/></p>', file=fhtml)
-    elif (outtype == 'd3'):
-        #Does not work mpld3.plugins.connect(fig, mpld3.plugins.LinkedBrush(line1))
-        #mpld3.save_html(fig, d3file)
-        d3str = mpld3.fig_to_html(fig)
         plt.close(fig)
+    elif (outtype == 'd3'):
+        #Does not work: mpld3.plugins.connect(fig, mpld3.plugins.LinkedBrush(line1))
+        d3str = mpld3.fig_to_html(fig)
         print(d3str, file=fhtml)
+        plt.close(fig)
+    elif (outtype == 'bokeh'):
+        htmlfile = plotfile+"{0:04d}".format(ifig)+".html"
+        bk = bokeh.mpl.to_bokeh(fig)
+        bokeh.io.save(bk, filename=htmlfile, title=htmlfile)
+        plt.close(fig)
+    elif (outtype == 'plotly'):
+        htmlfile = plotfile+"{0:04d}".format(ifig)+".html"
+        plotly_fig = plotly.tools.mpl_to_plotly(fig)
+        ff = plotly.offline.plot(plotly_fig, filename=htmlfile, auto_open=False)
+        htmlfiles.append(htmlfile)
+        plt.close(fig)
 
     # -------------------------------------------------------------------------
     # Finished
@@ -451,6 +528,21 @@ if __name__ == '__main__':
     elif (outtype == 'html') or (outtype == 'd3'):
         print("</body>\n</html>", file=fhtml)
         fhtml.close()
+    elif (outtype == 'bokeh'):
+        pass
+    elif (outtype == 'plotly'):
+        import os
+        if ifig > 1:
+            import fileinput
+            htmlfile = plotfile
+            with open(htmlfile, 'w') as fout:
+                fin = fileinput.input(htmlfiles)
+                for line in fin:
+                    fout.write(line)
+                fin.close()
+            for ff in htmlfiles: os.remove(ff)
+        else:
+            os.rename(htmlfiles[0], plotfile)
     else:
         plt.show()
 
@@ -477,13 +569,13 @@ if __name__ == '__main__':
 #                                        description='''This is the Python template for any new program of Matthias Cuntz.''')
 #     parser.add_argument('-p', '--plotname', action='store',
 #                         default=plotname, dest='plotname', metavar='plotname',
-#                         help='Name of plot output file for types pdf, html or d3, '
+#                         help='Name of plot output file for types pdf, html, d3, bokeh, or plotly, '
 #                         'and name basis for type png (default: '+filebase(__file__)+').')
 #     parser.add_argument('-s', '--serif', action='store_true', default=serif, dest="serif",
 #                         help="Use serif font; default sans serif.")
 #     parser.add_argument('-t', '--type', action='store',
 #                         default=outtype, dest='outtype', metavar='outtype',
-#                         help='Output type is pdf, png, html, or d3 (default: open screen windows).')
+#                         help='Output type is pdf, png, html, d3, bokeh, or plotly (default: open screen windows).')
 #     parser.add_argument('-u', '--usetex', action='store_true', default=usetex, dest="usetex",
 #                         help="Use LaTeX to render text in pdf, png and html.")
 #     parser.add_argument('-w', '--white', action='store_true', default=dowhite, dest="dowhite",
