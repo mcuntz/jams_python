@@ -549,7 +549,10 @@ from .closest           import closest
 from .convex_hull       import convex_hull
 from .correlate         import correlate
 from .cuntz_gleixner    import cuntz_gleixner
-from .dag               import create_network, source_nodes, sink_nodes, plot_network
+try:
+    from .dag               import create_network, source_nodes, sink_nodes, plot_network
+except ImportError:
+    pass # networkx not installed
 from .date2dec          import date2dec
 from .dec2date          import dec2date
 from .dewpoint          import dewpoint
