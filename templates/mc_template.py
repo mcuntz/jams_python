@@ -149,8 +149,8 @@ if __name__ == '__main__':
 
     import numpy as np
     import jams
-    import time
-    t1 = time.time()
+    import time as ptime
+    t1 = ptime.time()
 
     if dowhite:
         fgcolor = 'white'
@@ -546,10 +546,9 @@ if __name__ == '__main__':
     else:
         plt.show()
 
-    t2    = time.time()
-    strin = '[m]: '+jams.astr((t2-t1)/60.,1) if (t2-t1)>60. else '[s]: '+jams.astr(t2-t1,0)
-    print('Time ', strin)
-
+    t2    = ptime.time()
+    strin = '[m]: {:.1f}'.format((t2-t1)/60.) if (t2-t1)>60. else '[s]: {:d}'.format(int(t2-t1))
+    print('Time elapsed: ', strin)
 
 # -------------------------------------------------------------------------
 # Command line usage if function
