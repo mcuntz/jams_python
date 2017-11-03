@@ -289,14 +289,16 @@ def fsread(file, nc=0, snc=0, skip=0, cskip=0, hskip=0, separator=None,
         iisnc = snc
     elif isinstance(nc, (list, tuple, np.ndarray)):
         iinc   = nc
-        iirest = list(np.delete(np.arange(nres), iinc))
+        iirest = range(nres)
+        for ii in iinc[::-1]: del iirest[ii]
         if snc <= -1:
             iisnc = iirest
         else:
             iisnc = iirest[:snc]
     elif isinstance(snc, (list, tuple, np.ndarray)):
         iisnc  = snc
-        iirest = list(np.delete(np.arange(nres), iisnc))
+        iirest = range(nres)
+        for ii in iisnc[::-1]: del iirest[ii]
         if nc <= -1:
             iinc = iirest
         else:
@@ -308,8 +310,8 @@ def fsread(file, nc=0, snc=0, skip=0, cskip=0, hskip=0, separator=None,
             iinc  = range(snc,nres)
         else:
             if snc <= -1:
-                iinc = range(nc)
-                iisnc  = range(nc,nres)
+                iinc  = range(nc)
+                iisnc = range(nc,nres)
             else:
                 # red snc first then nc
                 iisnc = range(snc)

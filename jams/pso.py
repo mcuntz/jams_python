@@ -192,7 +192,7 @@ def get_neighbor_indeces(n, S, topology, kl=1):
                     All neighborhoods comprise the current particle as well.
                     [Kennedy & Mendes, 2002] doi: 10.1109/CEC.2002.1004493
                     'gbest'    Neighborhood is entire swarm.
-                    'lbest'    Partciles aranged in a ring, in which each particle communicates with
+                    'lbest'    Partciles arranged in a ring, in which each particle communicates with
                                kl particles on each side, i.e. particle i has the neighborhood
                                i-kl, i-kl+1, ..., i, i+1, ..., i+kl-1, i+kl
                                [Mohais et al., 2005] doi: 10.1007/11589990_80
@@ -216,7 +216,7 @@ def get_neighbor_indeces(n, S, topology, kl=1):
     if topology.lower() == 'ring': kl=1
 
     if topology.lower() == 'gbest':
-        ii = list(np.arange(S))
+        ii = range(S)
     elif (topology.lower() == 'lbest') or (topology.lower() == 'ring'):
         ii = [n]                  # self
         for kk in range(1,kl+1):
@@ -252,7 +252,7 @@ def get_best_neighbor(p, fp, topology, kl=1):
                     All neighborhoods comprise the current particle as well.
                     [Kennedy & Mendes, 2002] doi: 10.1109/CEC.2002.1004493
                     'gbest'    Neighborhood is entire swarm.
-                    'lbest'    Partciles aranged in a ring, in which each particle communicates with
+                    'lbest'    Partciles arranged in a ring, in which each particle communicates with
                                kl particles on each side, i.e. particle i has the neighborhood
                                i-kl, i-kl+1, ..., i, i+1, ..., i+kl-1, i+kl
                                [Mohais et al., 2005] doi: 10.1007/11589990_80
@@ -689,7 +689,7 @@ def pso(func, x0, lb, ub,
                     [Kennedy & Mendes, 2002] doi: 10.1109/CEC.2002.1004493
                     (Default: 'gbest')
                     'gbest'    Neighborhood is entire swarm.
-                    'lbest'    Partciles aranged in a ring, in which each particle communicates with
+                    'lbest'    Partciles arranged in a ring, in which each particle communicates with
                                kl particles on each side, i.e. particle i has the neighborhood
                                i-kl, i-kl+1, ..., i, i+1, ..., i+kl-1, i+kl
                                [Mohais et al., 2005] doi: 10.1007/11589990_80

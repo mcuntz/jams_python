@@ -161,7 +161,7 @@ def homo_sampling(p1, p2, n, func=None, plot=False, maxit=1000):
         sub1.set_ylabel('Y')
 
         sub2 = fig.add_subplot(121)
-        sub2.plot(np.arange(maxit),conv)
+        sub2.plot(range(maxit),conv)
         sub2.plot(np.argmax(conv),np.amax(conv),'o')
         sub2.set_xlabel('iterations')
         sub2.set_ylabel('minimum distance between points')

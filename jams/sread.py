@@ -305,15 +305,15 @@ def sread(file, nc=0, skip=0, cskip=0, hskip=0, separator=None,
     #
     # Determine indices
     if isinstance(nc, (list, tuple, np.ndarray)):
-        nnc = len(nc)
-        iinc = nc
+        nnc  = len(nc)
+        iinc = tuple(nc)
     else:
         if nc <= 0:
-            nnc = nres-cskip
-            iinc = np.arange(nnc, dtype='int') + cskip
+            iinc = range(cskip,nres)
+            nnc  = nres-cskip
         else:
+            iinc = range(cskip,cskip+nc)
             nnc = nc
-            iinc = np.arange(nnc, dtype='int') + cskip
     miinc = max(iinc)
     #
     # Header

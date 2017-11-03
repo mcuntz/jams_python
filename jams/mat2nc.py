@@ -296,7 +296,7 @@ def mat2nc(fname, overwrite=False, fname_out=None, verbose=True, squeeze=True,
         th = writenetcdf(fh, name=dim_name[dd], dims=None, attributes=varAtt, isdim=True)
         # write values to dimension
         times   = np.array(data_time)
-        writenetcdf(fh, th, time=list(range(ntime)), var=times)
+        writenetcdf(fh, th, time=range(ntime), var=times)
 
         dd += 1
 
@@ -319,8 +319,8 @@ def mat2nc(fname, overwrite=False, fname_out=None, verbose=True, squeeze=True,
         #        lat is y-axis ==> number of rows
         varName     = 'nlon'
         varAtt      = ([['units'         , 'degrees_east'],
-                    ['standard_name' , 'longitude'   ],
-                    ['missing_value' , -9.]])
+                        ['standard_name' , 'longitude'   ],
+                        ['missing_value' , -9.]])
         nlon         = np.shape(lon)[1]
         dims[dd]     = nlon
         dim_name[dd] = varName
@@ -330,13 +330,13 @@ def mat2nc(fname, overwrite=False, fname_out=None, verbose=True, squeeze=True,
             writenetcdf(fh, name=dim_name[dd], dims=dims[dd], var=var, attributes=varAtt, isdim=True)
         else:
             # just create dimension but don't write variable yet
-            writenetcdf( fh, name = dim_name[dd], dims = dims[dd],
-                             var = None, isdim = True, create_var = False )
+            writenetcdf(fh, name=dim_name[dd], dims=dims[dd],
+                        var=None, isdim=True, create_var=False )
         dd += 1
         varName     = 'nlat'
         varAtt      = ([['units'         , 'degrees_north'],
-                    ['standard_name' , 'latitude'     ],
-                    ['missing_value' , -9.]])
+                        ['standard_name' , 'latitude'     ],
+                        ['missing_value' , -9.]])
         nlat         = np.shape(lat)[0]
         dims[dd]     = nlat
         dim_name[dd] = varName
@@ -345,8 +345,8 @@ def mat2nc(fname, overwrite=False, fname_out=None, verbose=True, squeeze=True,
             writenetcdf(fh, name=dim_name[dd], dims=dims[dd], var=var, attributes=varAtt, isdim=True)
         else:
             # just create dimension but don't write variable yet
-            writenetcdf( fh, name = dim_name[dd], dims = dims[dd],
-                             var = None, isdim = True, create_var = False )
+            writenetcdf(fh, name=dim_name[dd], dims=dims[dd],
+                        var=None, isdim=True, create_var=False )
         dd += 1
 
         # now both dimensions exist and grid can be written as extra variable
@@ -354,17 +354,17 @@ def mat2nc(fname, overwrite=False, fname_out=None, verbose=True, squeeze=True,
             idx=[ np.where(dims==dd)[0][0] for dd in np.shape(lon) ]
 
             attributes = {'standard_name': 'longitude', 'long_name': 'longitudes of irregular grid', 'units': 'degrees_??', 'missing_value': -9.}
-            writenetcdf( fh, name = 'lon', dims = dim_name[idx], var = lon,
-                                    comp=True, create_var = True,
-                                    attributes=attributes,
-                                    vartype=lon.dtype )
+            writenetcdf(fh, name='lon', dims=dim_name[idx], var=lon,
+                        comp=True, create_var=True,
+                        attributes=attributes,
+                        vartype=lon.dtype )
 
             idx=[ np.where(dims==dd)[0][0] for dd in np.shape(lat) ]
             attributes = {'standard_name': 'latitude', 'long_name': 'latitudes of irregular grid', 'units': 'degrees_??', 'missing_value': -9.}
-            writenetcdf( fh, name = 'lat', dims = dim_name[idx], var = lat,
-                                    comp=True, create_var = True,
-                                    attributes=attributes,
-                                    vartype=lat.dtype )
+            writenetcdf(fh, name='lat', dims=dim_name[idx], var=lat,
+                        comp=True, create_var=True,
+                        attributes=attributes,
+                        vartype=lat.dtype )
 
 
     tt = 0
@@ -413,18 +413,18 @@ def mat2nc(fname, overwrite=False, fname_out=None, verbose=True, squeeze=True,
 
                 # write (missing) dimensions
                 arr_shape = np.shape(tmp)
-                for dd in  np.arange( len( arr_shape ) ):
+                for dd in range(len(arr_shape)):
                     if (not arr_shape[dd] in dims) and (not dim_name[idim] in ['nlat','nlon','ntime']):
 
                         dims[idim] = arr_shape[dd]
-                        writenetcdf( fh, name = dim_name[idim], dims = dims[idim],
-                                    var = None, isdim = True, create_var = False )
+                        writenetcdf(fh, name=dim_name[idim], dims=dims[idim],
+                                    var=None, isdim=True, create_var=False )
                         idim +=1
                         if (idim > len( dim_name )):
                             raise ValueError( 'mat2nc: Too many different dimensions found. You may have to increase size of dim_name.' )
 
                 # find matching dim names for current shape
-                idx=[ np.where(dims==arr_shape[dd])[0][0] for dd in np.arange(len(arr_shape)) ]
+                idx=[ np.where(dims==arr_shape[dd])[0][0] for dd in range(len(arr_shape)) ]
 
                 if (grid_avail):
                     # check if dimension matching lon and lat are found for this variable
@@ -456,16 +456,16 @@ def mat2nc(fname, overwrite=False, fname_out=None, verbose=True, squeeze=True,
                 if (time_avail):
                     if (tt==0):
                         vh   = writenetcdf(fh, name=key, dims=dim_name[idx],
-                                              comp=True,
-                                              attributes=attributes,
-                                              vartype=key_content.dtype)
-                    writenetcdf( fh, vh, var = tmp[0], time = tt)
+                                           comp=True,
+                                           attributes=attributes,
+                                           vartype=key_content.dtype)
+                    writenetcdf(fh, vh, var = tmp[0], time = tt)
                     tt += 1
                 else:
-                    writenetcdf( fh, name = key, dims = dim_name[idx], var = tmp,
-                                    comp=True,
-                                    attributes=attributes,
-                                    vartype=key_content.dtype )
+                    writenetcdf(fh, name=key, dims=dim_name[idx], var=tmp,
+                                comp=True,
+                                attributes=attributes,
+                                vartype=key_content.dtype )
                 vv += 1
 
     fh.close()

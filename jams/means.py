@@ -390,8 +390,8 @@ def means(date, dat, year=False, month=False, day=False, hour=False, minute=Fals
 
         # Mean daily
         if meanday:
-            hrs  = np.arange(24)
-            nout = hrs.size
+            nout = 24
+            hrs  = range(nout)
             dout = np.ones(nout)*myundef
             if ismasked:
                 out  = np.ma.ones([nout]+list(dat.shape[1:]))*myundef
@@ -416,8 +416,8 @@ def means(date, dat, year=False, month=False, day=False, hour=False, minute=Fals
 
         # Mean monthly
         if meanmonth:
-            mos  = np.arange(12)+1
-            nout = mos.size
+            nout = 12
+            mos  = range(1,nout+1)
             dout = np.ones(nout)*myundef
             if ismasked:
                 out  = np.ma.ones([nout]+list(dat.shape[1:]))*myundef
