@@ -3,6 +3,8 @@ from __future__ import print_function
 import numpy as np
 import xlrd
 
+__all__ = ['xread']
+
 def xread(file, sheet=None, nc=0, cname=None, snc=0, sname=None, skip=0, cskip=0, hskip=0,
           squeeze=False, reform=False, transpose=False,
           fill=False, fill_value=0, sfill_value='', header=False):
@@ -199,15 +201,12 @@ def xread(file, sheet=None, nc=0, cname=None, snc=0, sname=None, skip=0, cskip=0
 
     # Determine indices
     if nc != 0 and cname is not None:
-        f.close()
         raise ValueError('nc and cname are mutually exclusive.')
     if snc != 0 and sname is not None:
-        f.close()
         raise ValueError('snc and sname are mutually exclusive.')
     if (cname is not None) or (sname is not None):
         # from first header line
         if (skip-hskip) <= 0:
-            f.close()
             raise IOError('No header line left for choosing columns by name.')
         hres = head[0]
     if cname is not None:

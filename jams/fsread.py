@@ -4,6 +4,8 @@ import numpy as np
 from jams.fread import fread
 from jams.sread import sread
 
+__all__ = ['fsread']
+
 def fsread(file, nc=0, cname=None, snc=0, sname=None, skip=0, cskip=0, hskip=0, separator=None,
            squeeze=False, reform=False, skip_blank=False, comment=None,
            fill=False, fill_value=0, sfill_value='', strip=None,

@@ -2,6 +2,8 @@
 from __future__ import print_function
 import numpy as np
 
+__all__ = ['fread']
+
 def fread(file, nc=0, cname=None, skip=0, cskip=0, hskip=0, separator=None,
           squeeze=False, reform=False, skip_blank=False, comment=None,
           fill=False, fill_value=0, strip=None,
