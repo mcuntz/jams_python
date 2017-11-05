@@ -1612,3 +1612,8 @@ if __name__ == '__main__':
                        swarmsize=swarmsize, maxn=maxn, restartfile1=None,
                        seed=seed, restart=False)
     if crank == 0: print('Rosenbrock constraint - ', bestx, bestf)
+
+    # Clean up doctest
+    import os
+    os.remove('pso.restart.npz')
+    os.remove('pso.restart.txt')
