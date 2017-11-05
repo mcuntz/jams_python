@@ -2,7 +2,7 @@
 from __future__ import print_function
 import numpy as np
 
-def sread(file, nc=0, skip=0, cskip=0, hskip=0, separator=None,
+def sread(file, nc=0, cname=None, skip=0, cskip=0, hskip=0, separator=None,
           squeeze=False, reform=False, skip_blank=False, comment=None,
           fill=False, fill_value='', strip=None,
           header=False, full_header=False,
@@ -20,7 +20,7 @@ def sread(file, nc=0, skip=0, cskip=0, hskip=0, separator=None,
 
         Definition
         ----------
-        def sread(file, nc=0, skip=0, cskip=0, hskip=0, separator=None,
+        def sread(file, nc=0, cname=None, skip=0, cskip=0, hskip=0, separator=None,
                   squeeze=False, reform=False, skip_blank=False, comment=None,
                   fill=False, fill_value='', strip=None,
                   header=False, full_header=False,
@@ -37,6 +37,8 @@ def sread(file, nc=0, skip=0, cskip=0, hskip=0, separator=None,
         nc           number of columns to be read (default: all (nc<=0))
                      nc can be a vector of column indeces,
                      starting with 0; cskip will be ignored then.
+        cname        columns can alternatively be chosen by the values in the first header line;
+                     must be iterable with strings.
         skip         number of lines to skip at the beginning of file (default: 0)
         cskip        number of columns to skip at the beginning of each line (default: 0)
         hskip        number of lines in skip that do not belong to header (default: 0)
@@ -215,6 +217,16 @@ def sread(file, nc=0, skip=0, cskip=0, hskip=0, separator=None,
         >>> print(sread(filename4, skip=2, fill=True, fill_value='-1'))
         [['1.1', '1.2', '1.3', '1.4'], ['2.1', '-1', '2.3', '2.4']]
 
+        >>> # cname
+        >>> print(sread(filename, cname='head2', skip=1, skip_blank=True, comment='#!', squeeze=True))
+        ['1.2', '2.2', '3.2', '4.2']
+        >>> print(sread(filename, cname=['head1','head2'], skip=1, skip_blank=True, comment='#!'))
+        [['1.1', '1.2'], ['2.1', '2.2'], ['3.1', '3.2'], ['4.1', '4.2']]
+        >>> print(sread(filename, cname=['head1','head2'], skip=1, skip_blank=True, comment='#!', header=True))
+        ['head1', 'head2']
+        >>> print(sread(filename, cname=['head1','head2'], skip=1, skip_blank=True, comment='#!', header=True, full_header=True))
+        ['head1 head2 head3 head4']
+
         >>> # Clean up doctest
         >>> import os
         >>> os.remove(filename)
@@ -253,6 +265,8 @@ def sread(file, nc=0, skip=0, cskip=0, hskip=0, separator=None,
                   MC, Nov 2014 - hskip
                   MC, Feb 2015 - no lif, nc can be tuple
                                - large re-write
+                  MC, Nov 2017 - use range instead of np.arange for producing indexes
+                  MC, Nov 2017 - cname, sname
     """
     #
     # Open file
@@ -304,16 +318,32 @@ def sread(file, nc=0, skip=0, cskip=0, hskip=0, separator=None,
         nres = len(res)
     #
     # Determine indices
-    if isinstance(nc, (list, tuple, np.ndarray)):
-        nnc  = len(nc)
-        iinc = tuple(nc)
+    if nc != 0 and cname is not None:
+        f.close()
+        raise ValueError('nc and cname are mutually exclusive.')
+    if cname is not None:
+        # from first header line
+        if (skip-hskip) <= 0:
+            f.close()
+            raise IOError('No header line left for choosing columns by name.')
+        if not isinstance(cname, (list, tuple, np.ndarray)): cname = [cname]
+        hres = head[0].split(sep)
+        iinc = []
+        for k in range(len(hres)):
+            if hres[k] in cname: iinc.append(k)
+        nnc = len(iinc)
     else:
-        if nc <= 0:
-            iinc = range(cskip,nres)
-            nnc  = nres-cskip
+        # from nc keyword
+        if isinstance(nc, (list, tuple, np.ndarray)):
+            nnc  = len(nc)
+            iinc = tuple(nc)
         else:
-            iinc = range(cskip,cskip+nc)
-            nnc = nc
+            if nc <= 0:
+                iinc = range(cskip,nres)
+                nnc  = nres-cskip
+            else:
+                iinc = range(cskip,cskip+nc)
+                nnc = nc
     miinc = max(iinc)
     #
     # Header
