@@ -2,7 +2,7 @@
 from __future__ import print_function
 import numpy as np
 
-def fread(file, nc=0, skip=0, cskip=0, hskip=0, separator=None,
+def fread(file, nc=0, cname=None, skip=0, cskip=0, hskip=0, separator=None,
           squeeze=False, reform=False, skip_blank=False, comment=None,
           fill=False, fill_value=0, strip=None,
           header=False, full_header=False,
@@ -16,7 +16,7 @@ def fread(file, nc=0, skip=0, cskip=0, hskip=0, separator=None,
 
         Definition
         ----------
-        def fread(file, nc=0, skip=0, cskip=0, hskip=0, separator=None,
+        def fread(file, nc=0, cname=None, skip=0, cskip=0, hskip=0, separator=None,
                   squeeze=False, reform=False, skip_blank=False, comment=None,
                   fill=False, fill_value=0, strip=None,
                   header=False, full_header=False,
@@ -31,8 +31,10 @@ def fread(file, nc=0, skip=0, cskip=0, hskip=0, separator=None,
         Optional Input Parameters
         -------------------------
         nc           number of columns to be read (default: all (nc<=0))
-                     nc can be a vector of column indeces,
+                     nc can be a vector of column indexes,
                      starting with 0; cskip will be ignored then.
+        cname        columns can alternatively be chosen by the values in the first header line;
+                     must be iterable with strings.
         skip         number of lines to skip at the beginning of file (default: 0)
         cskip        number of columns to skip at the beginning of each line (default: 0)
         hskip        number of lines in skip that do not belong to header (default: 0)
@@ -249,6 +251,20 @@ def fread(file, nc=0, skip=0, cskip=0, hskip=0, separator=None,
         >>> print(fread(filename3, nc=2, skip=2, hskip=1, header=True))
         ['head1', 'head2']
 
+        >>> # cname
+        >>> print(astr(fread(filename, cname='head2', skip=1, skip_blank=True, comment='#!', squeeze=True), 1, pp=True))
+        ['1.2' '2.2' '3.2' '4.2' '5.2']
+        >>> print(astr(fread(filename, cname=['head1','head2'], skip=1, skip_blank=True, comment='#!'), 1, pp=True))
+        [['1.1' '1.2']
+         ['2.1' '2.2']
+         ['3.1' '3.2']
+         ['4.1' '4.2']
+         ['5.1' '5.2']]
+        >>> print(fread(filename, cname=['head1','head2'], skip=1, skip_blank=True, comment='#!', header=True))
+        ['head1', 'head2']
+        >>> print(fread(filename, cname=['head1','head2'], skip=1, skip_blank=True, comment='#!', header=True, full_header=True))
+        ['head1 head2 head3 head4']
+
         >>> # Clean up doctest
         >>> import os
         >>> os.remove(filename)
@@ -286,6 +302,8 @@ def fread(file, nc=0, skip=0, cskip=0, hskip=0, separator=None,
                   MC, Nov 2014 - bug when nc is list and contains 0
                   MC, Nov 2014 - hskip
                   MC, Feb 2015 - speed: everything list until very end
+                  MC, Nov 2017 - use range instead of np.arange for producing indexes
+                  MC, Nov 2017 - cname, sname
     """
     #
     # Open file
@@ -337,16 +355,32 @@ def fread(file, nc=0, skip=0, cskip=0, hskip=0, separator=None,
         nres = len(res)
     #
     # Determine indices
-    if isinstance(nc, (list, tuple, np.ndarray)):
-        nnc  = len(nc)
-        iinc = tuple(nc)
+    if nc != 0 and cname is not None:
+        f.close()
+        raise ValueError('nc and cname are mutually exclusive.')
+    if cname is not None:
+        # from first header line
+        if (skip-hskip) <= 0:
+            f.close()
+            raise IOError('No header line left for choosing columns by name.')
+        if not isinstance(cname, (list, tuple, np.ndarray)): cname = [cname]
+        hres = head[0].split(sep)
+        iinc = []
+        for k in range(len(hres)):
+            if hres[k] in cname: iinc.append(k)
+        nnc = len(iinc)
     else:
-        if nc <= 0:
-            iinc = range(cskip,nres)
-            nnc  = nres-cskip
+        # from nc keyword
+        if isinstance(nc, (list, tuple, np.ndarray)):
+            nnc  = len(nc)
+            iinc = tuple(nc)
         else:
-            iinc = range(cskip,cskip+nc)
-            nnc = nc
+            if nc <= 0:
+                iinc = range(cskip,nres)
+                nnc  = nres-cskip
+            else:
+                iinc = range(cskip,cskip+nc)
+                nnc = nc
     miinc = max(iinc)
     #
     # Header
@@ -368,7 +402,11 @@ def fread(file, nc=0, skip=0, cskip=0, hskip=0, separator=None,
                     null = line2var(hres, var, iinc, strip)
                     k += 1
                 if (skip-hskip) == 1: var = var[0]
-        f.close()
+            f.close()
+        else:
+            var = None
+            f.close()
+            return var
         if strarr:
             var = np.array(var, dtype=np.str)
             if transpose: var = var.T
@@ -381,7 +419,7 @@ def fread(file, nc=0, skip=0, cskip=0, hskip=0, separator=None,
                 maxi = max([ len(i) for i in var])
                 if maxi==1: var = [ i[0] for i in var ]
             if transpose and isinstance(var[0], list):
-                var = [list(i) for i in zip(*var)] # transpose
+                var = [ list(i) for i in zip(*var) ] # transpose
         return var
     #
     # Values - first line
@@ -451,7 +489,10 @@ if __name__ == '__main__':
     # file.writelines('! Second 2 comment\n')
     # file.writelines('4.1 4.2 4.3 4.4\n')
     # file.close()
-    # # print(astr(fread(filename, skip=1), 1, pp=True))
-    # # print(astr(fread(filename, skip=1, nc=[2], skip_blank=True, comment='#'), 1, pp=T
-    #            rue))
+    # print(astr(fread(filename, skip=1), 1, pp=True))
+    # print(astr(fread(filename, skip=1, nc=[2], skip_blank=True, comment='#'), 1, pp=True))
     # print(astr(fread(filename, skip=1, skip_blank=True, comment='#!'), 1, pp=True))
+    # print(astr(fread(filename, cname='head2', skip=1, skip_blank=True, comment='#!'), 1, pp=True))
+    # print(astr(fread(filename, cname=['head1','head2'], skip=1, skip_blank=True, comment='#!'), 1, pp=True))
+    # print(fread(filename, cname=['head1','head2'], skip=1, skip_blank=True, comment='#!', header=True))
+    # print(fread(filename, cname=['head1','head2'], skip=1, skip_blank=True, comment='#!', header=True, full_header=True))
