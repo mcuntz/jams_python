@@ -4,7 +4,7 @@ import numpy as np
 
 __all__ = ['sread']
 
-def sread(file, nc=0, cname=None, skip=0, cskip=0, hskip=0, separator=None,
+def sread(infile, nc=0, cname=None, skip=0, cskip=0, hskip=0, hstrip=True, separator=None,
           squeeze=False, reform=False, skip_blank=False, comment=None,
           fill=False, fill_value='', strip=None,
           header=False, full_header=False,
@@ -22,7 +22,7 @@ def sread(file, nc=0, cname=None, skip=0, cskip=0, hskip=0, separator=None,
 
         Definition
         ----------
-        def sread(file, nc=0, cname=None, skip=0, cskip=0, hskip=0, separator=None,
+        def sread(infile, nc=0, cname=None, skip=0, cskip=0, hskip=0, hstrip=True, separator=None,
                   squeeze=False, reform=False, skip_blank=False, comment=None,
                   fill=False, fill_value='', strip=None,
                   header=False, full_header=False,
@@ -31,7 +31,7 @@ def sread(file, nc=0, cname=None, skip=0, cskip=0, hskip=0, separator=None,
 
         Input
         -----
-        file         source file name
+        infile         source file name
 
 
         Optional Input Parameters
@@ -44,6 +44,7 @@ def sread(file, nc=0, cname=None, skip=0, cskip=0, hskip=0, separator=None,
         skip         number of lines to skip at the beginning of file (default: 0)
         cskip        number of columns to skip at the beginning of each line (default: 0)
         hskip        number of lines in skip that do not belong to header (default: 0)
+        hstrip       If true strip header cells to match with cname (default: True)
         separator    column separator
                      If not given, columns separator are (in order):
                      comma, semi-colon, whitespace
@@ -101,11 +102,11 @@ def sread(file, nc=0, cname=None, skip=0, cskip=0, hskip=0, separator=None,
         --------
         >>> # Create some data
         >>> filename = 'test.dat'
-        >>> file = open(filename, 'w')
-        >>> file.writelines('head1 head2 head3 head4\\n')
-        >>> file.writelines('1.1 1.2 1.3 1.4\\n')
-        >>> file.writelines('2.1 2.2 2.3 2.4\\n')
-        >>> file.close()
+        >>> ff = open(filename, 'w')
+        >>> ff.writelines('head1 head2 head3 head4\\n')
+        >>> ff.writelines('1.1 1.2 1.3 1.4\\n')
+        >>> ff.writelines('2.1 2.2 2.3 2.4\\n')
+        >>> ff.close()
 
         >>> # Read sample file in different ways
         >>> # data
@@ -139,10 +140,10 @@ def sread(file, nc=0, cname=None, skip=0, cskip=0, hskip=0, separator=None,
         ['head1', '1.1']
 
         >>> # skip blank lines
-        >>> file = open(filename, 'a')
-        >>> file.writelines('\\n')
-        >>> file.writelines('3.1 3.2 3.3 3.4\\n')
-        >>> file.close()
+        >>> ff = open(filename, 'a')
+        >>> ff.writelines('\\n')
+        >>> ff.writelines('3.1 3.2 3.3 3.4\\n')
+        >>> ff.close()
         >>> print(sread(filename, skip=1))
         [['1.1', '1.2', '1.3', '1.4'], ['2.1', '2.2', '2.3', '2.4']]
         >>> print(sread(filename, skip=1, skip_blank=True))
@@ -160,11 +161,11 @@ def sread(file, nc=0, cname=None, skip=0, cskip=0, hskip=0, separator=None,
         [['1.1', '2.1'], ['1.2', '2.2'], ['1.3', '2.3'], ['1.4', '2.4']]
 
         >>> # skip comment lines
-        >>> file = open(filename, 'a')
-        >>> file.writelines('# First\\n')
-        >>> file.writelines('! Second second comment\\n')
-        >>> file.writelines('4.1 4.2 4.3 4.4\\n')
-        >>> file.close()
+        >>> ff = open(filename, 'a')
+        >>> ff.writelines('# First\\n')
+        >>> ff.writelines('! Second second comment\\n')
+        >>> ff.writelines('4.1 4.2 4.3 4.4\\n')
+        >>> ff.close()
         >>> print(sread(filename, skip=1))
         [['1.1', '1.2', '1.3', '1.4'], ['2.1', '2.2', '2.3', '2.4']]
         >>> print(sread(filename, skip=1, skip_blank=True, comment='#'))
@@ -178,11 +179,11 @@ def sread(file, nc=0, cname=None, skip=0, cskip=0, hskip=0, separator=None,
 
         >>> # Create some more data with escaped numbers
         >>> filename2 = 'test2.dat'
-        >>> file = open(filename2, 'w')
-        >>> file.writelines('"head1" "head2" "head3" "head4"\\n')
-        >>> file.writelines('"1.1" "1.2" "1.3" "1.4"\\n')
-        >>> file.writelines('2.1 nan Inf "NaN"\\n')
-        >>> file.close()
+        >>> ff = open(filename2, 'w')
+        >>> ff.writelines('"head1" "head2" "head3" "head4"\\n')
+        >>> ff.writelines('"1.1" "1.2" "1.3" "1.4"\\n')
+        >>> ff.writelines('2.1 nan Inf "NaN"\\n')
+        >>> ff.close()
         >>> print(sread(filename2, skip=1, strarr=True, transpose=True, strip='"'))
         [['1.1' '2.1']
          ['1.2' 'nan']
@@ -191,12 +192,12 @@ def sread(file, nc=0, cname=None, skip=0, cskip=0, hskip=0, separator=None,
 
         >>> # Create some more data with an extra (shorter) header line
         >>> filename3 = 'test3.dat'
-        >>> file = open(filename3, 'w')
-        >>> file.writelines('Extra header\\n')
-        >>> file.writelines('head1 head2 head3 head4\\n')
-        >>> file.writelines('1.1 1.2 1.3 1.4\\n')
-        >>> file.writelines('2.1 2.2 2.3 2.4\\n')
-        >>> file.close()
+        >>> ff = open(filename3, 'w')
+        >>> ff.writelines('Extra header\\n')
+        >>> ff.writelines('head1 head2 head3 head4\\n')
+        >>> ff.writelines('1.1 1.2 1.3 1.4\\n')
+        >>> ff.writelines('2.1 2.2 2.3 2.4\\n')
+        >>> ff.close()
 
         >>> print(sread(filename3, skip=2))
         [['1.1', '1.2', '1.3', '1.4'], ['2.1', '2.2', '2.3', '2.4']]
@@ -207,12 +208,12 @@ def sread(file, nc=0, cname=None, skip=0, cskip=0, hskip=0, separator=None,
 
         >>> # Create some more data with missing values
         >>> filename4 = 'test4.dat'
-        >>> file = open(filename4, 'w')
-        >>> file.writelines('Extra header\\n')
-        >>> file.writelines('head1,head2,head3,head4\\n')
-        >>> file.writelines('1.1,1.2,1.3,1.4\\n')
-        >>> file.writelines('2.1,,2.3,2.4\\n')
-        >>> file.close()
+        >>> ff = open(filename4, 'w')
+        >>> ff.writelines('Extra header\\n')
+        >>> ff.writelines('head1,head2,head3,head4\\n')
+        >>> ff.writelines('1.1,1.2,1.3,1.4\\n')
+        >>> ff.writelines('2.1,,2.3,2.4\\n')
+        >>> ff.close()
 
         >>> print(sread(filename4, skip=2))
         [['1.1', '1.2', '1.3', '1.4'], ['2.1', '', '2.3', '2.4']]
@@ -228,6 +229,8 @@ def sread(file, nc=0, cname=None, skip=0, cskip=0, hskip=0, separator=None,
         ['head1', 'head2']
         >>> print(sread(filename, cname=['head1','head2'], skip=1, skip_blank=True, comment='#!', header=True, full_header=True))
         ['head1 head2 head3 head4']
+        >>> print(sread(filename, cname=['  head1','head2'], skip=1, skip_blank=True, comment='#!', hstrip=False))
+        [['1.2'], ['2.2'], ['3.2'], ['4.2']]
 
         >>> # Clean up doctest
         >>> import os
@@ -268,14 +271,14 @@ def sread(file, nc=0, cname=None, skip=0, cskip=0, hskip=0, separator=None,
                   MC, Feb 2015 - no lif, nc can be tuple
                                - large re-write
                   MC, Nov 2017 - use range instead of np.arange for producing indexes
-                  MC, Nov 2017 - cname, sname
+                  MC, Nov 2017 - cname, sname, file->infile, hstrip
     """
     #
     # Open file
     try:
-        f = open(file, 'r')
+        f = open(infile, 'r')
     except IOError:
-        raise IOError('Cannot open file '+file)
+        raise IOError('Cannot open file '+infile)
     #
     # Read header and Skip lines
     if hskip > 0:
@@ -329,7 +332,9 @@ def sread(file, nc=0, cname=None, skip=0, cskip=0, hskip=0, separator=None,
             f.close()
             raise IOError('No header line left for choosing columns by name.')
         if not isinstance(cname, (list, tuple, np.ndarray)): cname = [cname]
+        if hstrip: cname = [ h.strip() for h in cname ]
         hres = head[0].split(sep)
+        if hstrip: hres = [ h.strip() for h in hres ]
         iinc = []
         for k in range(len(hres)):
             if hres[k] in cname: iinc.append(k)

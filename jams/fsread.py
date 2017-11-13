@@ -6,7 +6,7 @@ from jams.sread import sread
 
 __all__ = ['fsread']
 
-def fsread(file, nc=0, cname=None, snc=0, sname=None, skip=0, cskip=0, hskip=0, separator=None,
+def fsread(infile, nc=0, cname=None, snc=0, sname=None, skip=0, cskip=0, hskip=0, hstrip=True, separator=None,
            squeeze=False, reform=False, skip_blank=False, comment=None,
            fill=False, fill_value=0, sfill_value='', strip=None,
            header=False, full_header=False,
@@ -17,7 +17,7 @@ def fsread(file, nc=0, cname=None, snc=0, sname=None, skip=0, cskip=0, hskip=0, 
 
         Definition
         ----------
-        def fsread(file, nc=0, cname=None, snc=0, sname=None, skip=0, cskip=0, hskip=0, separator=None,
+        def fsread(infile, nc=0, cname=None, snc=0, sname=None, skip=0, cskip=0, hskip=0, hstrip=True, separator=None,
                    squeeze=False, reform=False, skip_blank=False, comment=None,
                    fill=False, fill_value=0, sfill_value='', strip=None,
                    header=False, full_header=False,
@@ -26,7 +26,7 @@ def fsread(file, nc=0, cname=None, snc=0, sname=None, skip=0, cskip=0, hskip=0, 
 
         Input
         -----
-        file         source file name
+        infile         source file name
 
 
         Optional Input Parameters
@@ -46,6 +46,7 @@ def fsread(file, nc=0, cname=None, snc=0, sname=None, skip=0, cskip=0, hskip=0, 
         skip         number of lines to skip at the beginning of file (default: 0)
         cskip        number of columns to skip at the beginning of each line (default: 0)
         hskip        number of lines in skip that do not belong to header (default: 0)
+        hstrip       If true strip header cells to match with cname and sname (default: True)
         separator    column separator
                      If not given, columns separator are (in order):
                      comma, semi-colon, whitespace
@@ -110,11 +111,11 @@ def fsread(file, nc=0, cname=None, snc=0, sname=None, skip=0, cskip=0, hskip=0, 
         --------
         >>> # Create some data
         >>> filename = 'test.dat'
-        >>> file = open(filename,'w')
-        >>> file.writelines('head1 head2 head3 head4\\n')
-        >>> file.writelines('1.1 1.2 1.3 1.4\\n')
-        >>> file.writelines('2.1 2.2 2.3 2.4\\n')
-        >>> file.close()
+        >>> ff = open(filename,'w')
+        >>> ff.writelines('head1 head2 head3 head4\\n')
+        >>> ff.writelines('1.1 1.2 1.3 1.4\\n')
+        >>> ff.writelines('2.1 2.2 2.3 2.4\\n')
+        >>> ff.close()
 
         >>> # Read sample with fread - see fread for more examples
         >>> from autostring import astr
@@ -129,11 +130,11 @@ def fsread(file, nc=0, cname=None, snc=0, sname=None, skip=0, cskip=0, hskip=0, 
         [['1.2', '1.4'], ['2.2', '2.4']]
 
         >>> # Some mixed data
-        >>> file = open(filename,'w')
-        >>> file.writelines('head1 head2 head3 head4\\n')
-        >>> file.writelines('01.12.2012 1.2 name1 1.4\\n')
-        >>> file.writelines('01.01.2013 2.2 name2 2.4\\n')
-        >>> file.close()
+        >>> ff = open(filename,'w')
+        >>> ff.writelines('head1 head2 head3 head4\\n')
+        >>> ff.writelines('01.12.2012 1.2 name1 1.4\\n')
+        >>> ff.writelines('01.01.2013 2.2 name2 2.4\\n')
+        >>> ff.close()
 
         >>> # Read columns
         >>> print(astr(fsread(filename, nc=[1,3], skip=1), 1, pp=True))
@@ -176,11 +177,11 @@ def fsread(file, nc=0, cname=None, snc=0, sname=None, skip=0, cskip=0, hskip=0, 
         ['head1', 'head3']
 
         >>> # Some mixed data with missing values
-        >>> file = open(filename,'w')
-        >>> file.writelines('head1,head2,head3,head4\\n')
-        >>> file.writelines('01.12.2012,1.2,name1,1.4\\n')
-        >>> file.writelines('01.01.2013,,name2,2.4\\n')
-        >>> file.close()
+        >>> ff = open(filename,'w')
+        >>> ff.writelines('head1,head2,head3,head4\\n')
+        >>> ff.writelines('01.12.2012,1.2,name1,1.4\\n')
+        >>> ff.writelines('01.01.2013,,name2,2.4\\n')
+        >>> ff.close()
 
         >>> print(astr(fsread(filename, nc=[1,3], skip=1, fill=True, fill_value=-1), 1, pp=True))
         [[' 1.2' ' 1.4']
@@ -209,6 +210,10 @@ def fsread(file, nc=0, cname=None, snc=0, sname=None, skip=0, cskip=0, hskip=0, 
         ['head1,head2,head3,head4']
         >>> print(fsread(filename, cname=['head2','head4'], snc=-1, skip=1, fill=True, fill_value=-1, header=True, full_header=True))
         ['head1,head2,head3,head4']
+        >>> a, sa = fsread(filename, cname=['  head2','head4'], snc=-1, skip=1, fill=True, fill_value=-1, hstrip=False)
+        >>> print(astr(a, 1, pp=True))
+        [['1.4']
+         ['2.4']]
 
         >>> # Clean up doctest
         >>> import os
@@ -242,7 +247,7 @@ def fsread(file, nc=0, cname=None, snc=0, sname=None, skip=0, cskip=0, hskip=0, 
         Modified, MC, Nov 2016 - nc<=-1 does not work in Python 3 if nc is list
                   MC, Nov 2017 - use range instead of np.arange for producing indexes
                   MC, Nov 2017 - full_header=True returns on vector of strings
-                               - cname, sname
+                               - cname, sname, file->infile, hstrip
     """
 
     # Input error
@@ -252,7 +257,8 @@ def fsread(file, nc=0, cname=None, snc=0, sname=None, skip=0, cskip=0, hskip=0, 
     # wrap to fread/sread
     if (not isinstance(snc, (list, tuple, np.ndarray))) and (sname is None):
         if snc==0:
-            return fread(file, nc=nc, cname=cname, skip=skip, cskip=cskip, hskip=hskip, separator=separator,
+            return fread(infile, nc=nc, cname=cname, skip=skip, cskip=cskip, hskip=hskip, hstrip=hstrip,
+                         separator=separator,
                          squeeze=squeeze, reform=reform, skip_blank=skip_blank, comment=comment,
                          fill=fill, fill_value=fill_value, strip=strip,
                          header=header, full_header=full_header,
@@ -260,7 +266,8 @@ def fsread(file, nc=0, cname=None, snc=0, sname=None, skip=0, cskip=0, hskip=0, 
     # snc!=0
     if (not isinstance(nc, (list, tuple, np.ndarray))) and (cname is None):
         if nc==0:
-            return sread(file, nc=snc, cname=sname, skip=skip, cskip=cskip, hskip=hskip, separator=separator,
+            return sread(infile, nc=snc, cname=sname, skip=skip, cskip=cskip, hskip=hskip, hstrip=hstrip,
+                         separator=separator,
                          squeeze=squeeze, reform=reform, skip_blank=skip_blank, comment=comment,
                          fill=fill, fill_value=sfill_value, strip=strip,
                          header=header, full_header=full_header,
@@ -268,9 +275,9 @@ def fsread(file, nc=0, cname=None, snc=0, sname=None, skip=0, cskip=0, hskip=0, 
 
     # Open file
     try:
-        f = open(file, 'r')
+        f = open(infile, 'r')
     except IOError:
-        raise IOError('Cannot open file '+file)
+        raise IOError('Cannot open file '+infile)
 
     # Read header and Skip lines
     if hskip > 0:
@@ -327,13 +334,16 @@ def fsread(file, nc=0, cname=None, snc=0, sname=None, skip=0, cskip=0, hskip=0, 
             f.close()
             raise IOError('No header line left for choosing columns by name.')
         hres = head[0].split(sep)
+        if hstrip: hres = [ h.strip() for h in hres ]
     if cname is not None:
         if not isinstance(cname, (list, tuple, np.ndarray)): cname = [cname]
+        if hstrip: cname = [ h.strip() for h in cname ]
         nc = []
         for k in range(len(hres)):
             if hres[k] in cname: nc.append(k)
     if sname is not None:
         if not isinstance(sname, (list, tuple, np.ndarray)): sname = [sname]
+        if hstrip: sname = [ h.strip() for h in sname ]
         snc = []
         for k in range(len(hres)):
             if hres[k] in sname: snc.append(k)
@@ -526,16 +536,16 @@ if __name__ == '__main__':
 
     # from autostring import astr
     # filename = 'test.dat'
-    # file = open(filename,'w')
-    # file.writelines('head1 head2 head3 head4\n')
-    # file.writelines('1.1 1.2 1.3 1.4\n')
-    # file.writelines('2.1 2.2 2.3 2.4\n')
-    # file.writelines('\n')
-    # file.writelines('3.1 3.2 3.3 3.4\n')
-    # file.writelines('# First comment\n')
-    # file.writelines('! Second 2 comment\n')
-    # file.writelines('4.1 4.2 4.3 4.4\n')
-    # file.close()
+    # ff = open(filename,'w')
+    # ff.writelines('head1 head2 head3 head4\n')
+    # ff.writelines('1.1 1.2 1.3 1.4\n')
+    # ff.writelines('2.1 2.2 2.3 2.4\n')
+    # ff.writelines('\n')
+    # ff.writelines('3.1 3.2 3.3 3.4\n')
+    # ff.writelines('# First comment\n')
+    # ff.writelines('! Second 2 comment\n')
+    # ff.writelines('4.1 4.2 4.3 4.4\n')
+    # ff.close()
     # # print(astr(fread(filename, skip=1), 1, pp=True))
     # # print(astr(fread(filename, skip=1, nc=[2], skip_blank=True, comment='#'), 1, pp=True))
     # print('#1: ', astr(fread(filename, skip=1, skip_blank=True, comment='#!'), 1, pp=True))
@@ -550,11 +560,11 @@ if __name__ == '__main__':
     # print(sa)
 
     # # Some mixed data with missing values
-    # file = open(filename,'w')
-    # file.writelines('head1,head2,head3,head4\n')
-    # file.writelines('01.12.2012,1.2,name1,1.4\n')
-    # file.writelines('01.01.2013,,name2,2.4\n')
-    # file.close()
+    # ff = open(filename,'w')
+    # ff.writelines('head1,head2,head3,head4\n')
+    # ff.writelines('01.12.2012,1.2,name1,1.4\n')
+    # ff.writelines('01.01.2013,,name2,2.4\n')
+    # ff.close()
 
     # print('#5: ', astr(fsread(filename, nc=[1,3], skip=1, fill=True, fill_value=-1), 1, pp=True))
 

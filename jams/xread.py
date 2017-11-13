@@ -5,7 +5,7 @@ import xlrd
 
 __all__ = ['xread']
 
-def xread(file, sheet=None, nc=0, cname=None, snc=0, sname=None, skip=0, cskip=0, hskip=0,
+def xread(infile, sheet=None, nc=0, cname=None, snc=0, sname=None, skip=0, cskip=0, hskip=0, hstrip=True,
           squeeze=False, reform=False, transpose=False,
           fill=False, fill_value=0, sfill_value='', header=False):
     """
@@ -16,14 +16,14 @@ def xread(file, sheet=None, nc=0, cname=None, snc=0, sname=None, skip=0, cskip=0
 
         Definition
         ----------
-        def xread(file, sheet=None, nc=0, cname=None, snc=0, sname=None, skip=0, cskip=0, hskip=0,
+        def xread(infile, sheet=None, nc=0, cname=None, snc=0, sname=None, skip=0, cskip=0, hskip=0, hstrip=True,
                   squeeze=False, reform=False, transpose=False,
                   fill=False, fill_value=0, sfill_value='', header=False):
 
 
         Input
         -----
-        file         source file name
+        infile         source file name
 
 
         Optional Input Parameters
@@ -44,6 +44,7 @@ def xread(file, sheet=None, nc=0, cname=None, snc=0, sname=None, skip=0, cskip=0
         skip         number of lines to skip at the beginning of file (default: 0)
         cskip        number of columns to skip at the beginning of each line (default: 0)
         hskip        number of lines in skip that do not belong to header (default: 0)
+        hstrip       If true strip header cells to match with cname and sname (default: True)
         fill_value   value to fill float arry in empty cells or if not enough columns per line
                      and fill=True (default 0)
         sfill_value  value to fill in header and in string array in empty cells
@@ -103,18 +104,18 @@ def xread(file, sheet=None, nc=0, cname=None, snc=0, sname=None, skip=0, cskip=0
         >>> print(astr(a, 1, pp=True))
         ['1.2' '2.2' '3.2' '4.2']
         >>> print(sa)
-        [['name1' 'name2' 'name3'
-          'name4']
-         ['name5' 'name6' 'name7'
-          'name8']]
+        [['name1' 'name5']
+         ['name2' 'name6']
+         ['name3' 'name7']
+         ['name4' 'name8']]
         >>> a, sa = xread(filename, sheet=2, cname='head2', snc=[0,2], skip=1, squeeze=True)
         >>> print(astr(a, 1, pp=True))
         ['1.2' '2.2' '3.2' '4.2']
         >>> print(sa)
-        [['name1' 'name2' 'name3'
-          'name4']
-         ['name5' 'name6' 'name7'
-          'name8']]
+        [['name1' 'name5']
+         ['name2' 'name6']
+         ['name3' 'name7']
+         ['name4' 'name8']]
         >>> a, sa = xread(filename, sheet='Sheet2', cname=['head2','head4'], snc=[0,2], skip=1, fill=True, fill_value=-9, sfill_value='-8')
         >>> print(astr(a, 1, pp=True))
         [['-9.0' ' 1.4']
@@ -122,10 +123,10 @@ def xread(file, sheet=None, nc=0, cname=None, snc=0, sname=None, skip=0, cskip=0
          [' 3.2' ' 3.4']
          [' 4.2' ' 4.4']]
         >>> print(sa)
-        [['1.1' '2.1'
-          '3.1' '4.1']
-         ['1.3' '2.3'
-          '-8' '4.3']]
+        [['1.1' '1.3']
+         ['2.1' '2.3']
+         ['3.1' '-8']
+         ['4.1' '4.3']]
         >>> a, sa = xread(filename, sheet='Sheet2', cname=['head2','head4'], snc=[0,2], skip=1, header=True)
         >>> print(a)
         ['head2' 'head4']
@@ -133,6 +134,12 @@ def xread(file, sheet=None, nc=0, cname=None, snc=0, sname=None, skip=0, cskip=0
         ['head1' 'head3']
         >>> print(xread(filename, sheet='Sheet2', skip=1, header=True))
         ['head1' 'head2' 'head3' 'head4']
+        >>> a, sa = xread(filename, sheet='Sheet2', cname=[' head2','head4'], snc=[0,2], skip=1, fill=True, fill_value=-9, sfill_value='-8',hstrip=False)
+        >>> print(astr(a, 1, pp=True))
+        [['1.4']
+         ['2.4']
+         ['3.4']
+         ['4.4']]
 
 
         License
@@ -153,12 +160,13 @@ def xread(file, sheet=None, nc=0, cname=None, snc=0, sname=None, skip=0, cskip=0
         along with the JAMS Python package (cf. gpl.txt and lgpl.txt).
         If not, see <http://www.gnu.org/licenses/>.
 
-        Copyright 2009-2015 Matthias Cuntz
+        Copyright 2009-2017 Matthias Cuntz
 
 
         History
         -------
-        Written,  MC, Feb 2015 - modified fsread
+        Written,  MC, Feb 2017 - modified fsread
+        Modified, MC, Nov 2017 - file->infile, hstrip
     """
 
     # Input error
@@ -170,9 +178,9 @@ def xread(file, sheet=None, nc=0, cname=None, snc=0, sname=None, skip=0, cskip=0
 
     # Open file
     try:
-        wb = xlrd.open_workbook(file)
+        wb = xlrd.open_workbook(infile)
     except IOError:
-        raise IOError('Cannot open file '+file)
+        raise IOError('Cannot open file '+infile)
 
     # Get Sheet
     if sheet is None:
@@ -182,10 +190,10 @@ def xread(file, sheet=None, nc=0, cname=None, snc=0, sname=None, skip=0, cskip=0
             try:
                 sh = wb.sheet_by_name(sheet)
             except IOError:
-                raise IOError('Sheet '+sheet+' not in Excel file '+file)
+                raise IOError('Sheet '+sheet+' not in Excel file '+infile)
         else:
             if sheet > wb.nsheets:
-                raise IOError('Error extracting sheet '+str(sheet)+'. Only '+str(wb.nsheets)+' in Excel file '+file)
+                raise IOError('Error extracting sheet '+str(sheet)+'. Only '+str(wb.nsheets)+' in Excel file '+infile)
             sh = wb.sheet_by_index(sheet)
     ncol = sh.ncols
     nrow = sh.nrows - skip
@@ -209,13 +217,16 @@ def xread(file, sheet=None, nc=0, cname=None, snc=0, sname=None, skip=0, cskip=0
         if (skip-hskip) <= 0:
             raise IOError('No header line left for choosing columns by name.')
         hres = head[0]
+        if hstrip: hres = [ h.strip() for h in hres ]
     if cname is not None:
         if not isinstance(cname, (list, tuple, np.ndarray)): cname = [cname]
+        if hstrip: cname = [ h.strip() for h in cname ]
         nc = []
         for k in range(len(hres)):
             if hres[k] in cname: nc.append(k)
     if sname is not None:
         if not isinstance(sname, (list, tuple, np.ndarray)): sname = [sname]
+        if hstrip: sname = [ h.strip() for h in sname ]
         snc = []
         for k in range(len(hres)):
             if hres[k] in sname: snc.append(k)
@@ -317,7 +328,7 @@ def xread(file, sheet=None, nc=0, cname=None, snc=0, sname=None, skip=0, cskip=0
             if fill: ilist = [ sfill_value if iv=='' else iv for iv in ilist ]
             svar.append(ilist)
             k += 1
-        svar = np.array(svar, dtype=np.str)
+        svar = np.array(svar, dtype=np.str).T
     if transpose:
         if nnc > 0: var = var.T
         if nsnc > 0: svar = svar.T
