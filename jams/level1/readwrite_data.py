@@ -103,19 +103,21 @@ def read_data(files, undef=-9999., strip=None, norecord=False, nofill=False):
                                - strip
                                - norecord
                                - nofill
+                  MC, Nov 2017 - assert files is iterable except string
     """
 
     debug = False
     iundef = np.int(undef)
+    if not isinstance(files, (list, tuple, np.ndarray)): files = [files]
 
     # Get unique header and time stamps of all input file
     for cff, ff in enumerate(files):
-        ihead      = jams.fread(ff, skip=1, strip=strip, header=True)        # head with TIMESTAMP and RECORD
+        ihead = jams.fread(ff, skip=1, strip=strip, header=True)        # head with TIMESTAMP and RECORD
         if not norecord:
             if (ihead[1].split()[0]).lower() != 'record':
                 raise ValueError('Assume the following structure: Date, Record, data, flag, data, flag, ...')
-        idate      = jams.sread(ff, skip=1, nc=1, squeeze=True, strip=strip) # TIMESTAMP
-        idate      = jams.ascii2eng(idate, full=True)
+        idate = jams.sread(ff, skip=1, nc=1, squeeze=True, strip=strip) # TIMESTAMP
+        idate = jams.ascii2eng(idate, full=True)
         if cff == 0:
             if norecord:
                 hdat   = ihead[1::2]
