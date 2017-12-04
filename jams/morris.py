@@ -100,6 +100,10 @@
         http://sensitivity-analysis.jrc.ec.europa.eu/software/index.htm
     Modified, S. Van Hoey, May 2012 - ported to Python
               MC, Oct 2013 - adapted to JAMS Python package and ported to Python 3
+              MC, Dec 2017 - from exponential time increase with number of trajectories to linear increase
+                           - by using in Optimised_Groups one call to cdist from scipy.spatial.distance
+                             and removed one loop in a loop over total number of trajectories
+                           - several little improvements on speed
 """
 from __future__ import print_function
 import numpy as np
@@ -374,9 +378,12 @@ def Optimized_Groups(NumFact, LB, UB, N=500, p=4, r=10, GroupMat=np.array([]), D
         Modified, S. Van Hoey, May 2012 - ported to Python
                   MC, Oct 2013 - adapted to JAMS Python package and ported to Python 3
     """
+    from scipy.spatial import distance
+
     LBt = np.zeros(NumFact)
     UBt = np.ones(NumFact)
 
+    np.random.seed(seed=1025)
     OutMatrix, OutFact = Sampling_Function_2(p, NumFact, N, LBt, UBt, GroupMat)     #Version with Groups
 
     try:
@@ -389,97 +396,75 @@ def Optimized_Groups(NumFact, LB, UB, N=500, p=4, r=10, GroupMat=np.array([]), D
     else:
         sizeb = NumFact + 1
 
-    Dist = np.zeros((N,N))
-    Diff_Traj = np.arange(0.0,N,1.0)
-
     # Compute the distance between all pair of trajectories (sum of the distances between points)
     # The distance matrix is a matrix N*N
     # The distance is defined as the sum of the distances between all pairs of points
-    # if the two trajectories differ, 0 otherwise
-    for j in range(N):   #combine all trajectories: eg N=3: 0&1; 0&2; 1&2 (is not dependent from sequence)
+    #   if the two trajectories differ, 0 otherwise
+    Dist = np.zeros((N,N))
+    Diff_Traj = np.arange(0.0,N,1.0)
+    MyDistall = distance.cdist(OutMatrix,OutMatrix)
+    for j in range(N):   # combine all trajectories: eg N=3: 0&1; 0&2; 1&2 (is not dependent from sequence)
         for z in range(j+1,N):
-            MyDist = np.zeros((sizeb,sizeb))
-            for i in range(sizeb):
-                for k in range(sizeb):
-                    MyDist[i,k] = (np.sum((OutMatrix[sizeb*(j)+i,:]-OutMatrix[sizeb*(z)+k,:])**2))**0.5 #indices aan te passen
-            if np.where(MyDist==0)[0].size == sizeb:
+            MyDist = MyDistall[sizeb*j:sizeb*(j+1),sizeb*z:sizeb*(z+1)]
+            if np.where(MyDist==0.)[0].size == sizeb:
                 # Same trajectory. If the number of zeros in Dist matrix is equal to
-                # (NumFact+1) then the trajectory is a replica. In fact (NumFact+1) is the maximum numebr of
+                # (NumFact+1) then the trajectory is a replica. In fact (NumFact+1) is the maximum number of
                 # points that two trajectories can have in common
                 Dist[j,z] = 0.
                 Dist[z,j] = 0.
-
                 # Memorise the replicated trajectory
                 Diff_Traj[z] = -1.  #the z value identifies the duplicate
             else:
                 # Define the distance between two trajectories as
                 # the minimum distance among their points
-                Dist[j,z] = np.sum(MyDist)
-                Dist[z,j] = np.sum(MyDist)
+                dd = np.sum(MyDist)
+                Dist[j,z] = dd
+                Dist[z,j] = dd
 
-    #prepare array with excluded duplicates (alternative would be deleting rows)
-    dupli=np.where(Diff_Traj==-1)[0].size
-    New_OutMatrix = np.zeros(((sizeb)*(N-dupli),NumFact))
-    New_OutFact = np.zeros(((sizeb)*(N-dupli),1))
+    # prepare array with excluded duplicates (alternative would be deleting rows)
+    iidup = np.where(Diff_Traj==-1.)[0]
+    dupli = iidup.size
+    iiind = np.where(Diff_Traj!=-1.)[0]
+    New_N = iiind.size # N - iidup.size
+    New_OutMatrix = np.zeros((sizeb*New_N,NumFact))
+    New_OutFact   = np.zeros((sizeb*New_N,1))
 
     # Eliminate replicated trajectories in the sampled matrix
     ID=0
     for i in range(N):
         if Diff_Traj[i] != -1.:
-            New_OutMatrix[ID*sizeb:ID*sizeb+sizeb,:] = OutMatrix[i*(sizeb) : i*(sizeb) + sizeb,:]
-            New_OutFact[ID*sizeb:ID*sizeb+sizeb,:] = OutFact[i*(sizeb) : i*(sizeb) + sizeb,:]
+            New_OutMatrix[ID*sizeb:(ID+1)*sizeb,:] = OutMatrix[i*sizeb:(i+1)*sizeb,:]
+            New_OutFact[ID*sizeb:(ID+1)*sizeb,:] = OutFact[i*sizeb:(i+1)*sizeb,:]
             ID+=1
 
     # Select in the distance matrix only the rows and columns of different trajectories
-    Dist_Diff = Dist[np.where(Diff_Traj != -1)[0],:] #moet 2D matrix zijn... wis rijen ipv hou bij
-    Dist_Diff = Dist_Diff[:,np.where(Diff_Traj != -1)[0]] #moet 2D matrix zijn... wis rijen ipv hou bij
-    #    Dist_Diff = np.delete(Dist_Diff,np.where(Diff_Traj==-1.)[0])
-    New_N = np.size(np.where(Diff_Traj != -1)[0])
+    #   Dist_Diff = np.delete(Dist_Diff,np.where(Diff_Traj==-1.)[0])
+    Dist_Diff = Dist[iiind,:] #moet 2D matrix zijn... wis rijen ipv hou bij
+    Dist_Diff = Dist_Diff[:,iiind] #moet 2D matrix zijn... wis rijen ipv hou bij
 
     # Select the optimal set of trajectories
-    Traj_Vec = np.zeros((New_N, r))
-    OptDist = np.zeros((New_N, r))
-    for m in range(New_N):                  #each row in Traj_Vec
-        Traj_Vec[m,0]=m
-
-        for z in range(1,r):              #elements in columns after first
-            Max_New_Dist_Diff = 0.0
-
-            for j in range(New_N):
-                # Check that trajectory j is not already in
-                Is_done = False
-                for h in range(z):
-                    if j == Traj_Vec[m,h]:
-                        Is_done=True
-
-                if Is_done==False:
-                    New_Dist_Diff = 0.0
-
-                    #compute distance
-                    for k in range(z):
-                        New_Dist_Diff = New_Dist_Diff + (Dist_Diff[np.int(Traj_Vec[m, k]),j])**2
-
-                    # Check if the distance is greater than the old one
-                    if New_Dist_Diff**0.5 > Max_New_Dist_Diff:
-                        Max_New_Dist_Diff = New_Dist_Diff**0.5
-                        Pippo = j
-
-            # Set the new trajectory
-            Traj_Vec[m,z] = Pippo
-            OptDist[m,z] = Max_New_Dist_Diff
+    Traj_Vec = np.zeros((New_N,r), dtype=np.int)
+    OptDist  = np.zeros((New_N,r))
+    for m in range(New_N):                # each row in Traj_Vec
+        Traj_Vec[m,0]  = m
+        for z in range(1,r):              # elements in columns after first
+            New_Dist_Diff = np.sqrt(np.sum(Dist_Diff[Traj_Vec[m,:z],:]**2, axis=0))
+            ii            = New_Dist_Diff.argmax()
+            Traj_Vec[m,z] = ii
+            OptDist[m,z]  = New_Dist_Diff[ii]
 
     # Construct optimal matrix
     SumOptDist = np.sum(OptDist, axis=1)
     # Find the maximum distance
-    Pluto = np.where(SumOptDist == np.max(SumOptDist))[0]
+    Pluto = np.where(SumOptDist == SumOptDist.max())[0]
     Opt_Traj_Vec = Traj_Vec[Pluto[0],:]
 
-    OptMatrix = np.zeros(((sizeb)*r,NumFact))
-    OptOutVec = np.zeros(((sizeb)*r,1))
+    OptMatrix = np.zeros((sizeb*r,NumFact))
+    OptOutVec = np.zeros((sizeb*r,1))
 
     for k in range(r):
-        OptMatrix[k*(sizeb):k*(sizeb)+(sizeb),:]= New_OutMatrix[(sizeb)*(np.int(Opt_Traj_Vec[k])):(sizeb)*(np.int(Opt_Traj_Vec[k])) + sizeb,:]
-        OptOutVec[k*(sizeb):k*(sizeb)+(sizeb)]= New_OutFact[(sizeb)*(np.int(Opt_Traj_Vec[k])):(sizeb)*(np.int(Opt_Traj_Vec[k]))+ sizeb,:]
+        OptMatrix[k*sizeb:(k+1)*sizeb,:] = New_OutMatrix[sizeb*Opt_Traj_Vec[k]:sizeb*(Opt_Traj_Vec[k]+1),:]
+        OptOutVec[k*sizeb:(k+1)*sizeb] = New_OutFact[sizeb*Opt_Traj_Vec[k]:sizeb*(Opt_Traj_Vec[k]+1),:]
 
     #----------------------------------------------------------------------
     # Compute values in the original intervals
@@ -487,7 +472,7 @@ def Optimized_Groups(NumFact, LB, UB, N=500, p=4, r=10, GroupMat=np.array([]), D
     # To obtain values in the original intervals [LB, UB] we compute
     # LB(j) + x(i,j)*(UB(j)-LB(j))
     OptMatrix_b = OptMatrix.copy()
-    OptMatrix=np.tile(LB, (sizeb*r,1)) + OptMatrix*np.tile((UB-LB), (sizeb*r,1))
+    OptMatrix = np.tile(LB, (sizeb*r,1)) + OptMatrix*np.tile((UB-LB), (sizeb*r,1))
 
     if Diagnostic==True:
         # Clean the trajectories from repetitions and plot the histograms
@@ -504,11 +489,12 @@ def Optimized_Groups(NumFact, LB, UB, N=500, p=4, r=10, GroupMat=np.array([]), D
                         kk = 1
                         hplot[j*2+kk,i] = OptMatrix_b[j*sizeb+ii,i]
 
+        import matplotlib.pyplot as plt
         fig=plt.figure()
         fig.suptitle('New Strategy')
         DimPlots = np.round(NumFact/2)
         for i in range(NumFact):
-            ax=fig.add_subplot(DimPlots,2,i)
+            ax=fig.add_subplot(DimPlots,2,i+1)
             ax.hist(hplot[:,i],p)
 
         # Plot the histogram for the original samplng strategy
@@ -533,7 +519,7 @@ def Optimized_Groups(NumFact, LB, UB, N=500, p=4, r=10, GroupMat=np.array([]), D
         fig.suptitle('Old Strategy')
         DimPlots = np.round(NumFact/2)
         for i in range(NumFact):
-            ax=fig.add_subplot(DimPlots,2,i)
+            ax=fig.add_subplot(DimPlots,2,i+1)
             ax.hist(Orihplot[:,i],p)
             #        plt.title('Old Strategy')
         print('hplotten')
@@ -696,7 +682,7 @@ def Morris_Measure_Groups(NumFact, Sample, OutFact, Output, p=4, Group=[], Diagn
             A = (Single_Sample[1:sizeb,:]-Single_Sample[:sizea,:]).transpose()
             Delta=A[np.where(A)] #AAN TE PASSEN?
 
-            if Diagnostic: 
+            if Diagnostic:
                 print(A)
                 print(Delta)
                 print(Single_Facts)
@@ -769,3 +755,12 @@ def elementary_effects(NumFact, Sample, OutFact, Output, p=4, Group=[]):
 if __name__ == '__main__':
     import doctest
     doctest.testmod(optionflags=doctest.NORMALIZE_WHITESPACE)
+
+    # NumFact = 2
+    # LB = np.array([0., 1.])
+    # UB = np.array([2., 4.])
+    # N = 30
+    # p = 5
+    # r = 3
+    # Diagnostic = 0
+    # print(Optimized_Groups(NumFact, LB, UB, N=N, p=p, r=r, Diagnostic=Diagnostic))

@@ -380,13 +380,13 @@ def dumpnetcdf( fname, dims=None, fileattributes=None, vnames=None, create=True,
         writenetcdf(fh, fileattributes=fileattributes)
     # create dimensions according to first variable
     if create:
-        for dd in np.arange( len( arr_shape ) ):
+        for dd in range(len(arr_shape)):
             writenetcdf( fh, name = dims[dd], dims = arr_shape[dd],
                          var = None, isdim = True, create_var = False )
     else:
         # read dimensions from file
         file_dims = get_dims( fname )
-        for dd in  np.arange( len( arr_shape ) ):
+        for dd in range(len(arr_shape)):
             # write dimensions if they do not exist
             if not dims[dd] in file_dims:
                 writenetcdf( fh, name = dims[dd], dims = arr_shape[dd],

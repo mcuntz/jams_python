@@ -38,7 +38,7 @@ def yrange(*args, **kwargs):
         Examples
         --------
         >>> import numpy as np
-        >>> print(yrange(np.arange(102)))
+        >>> print(yrange(range(102)))
         [0.0, 101.0]
 
         >>> print(yrange(np.arange(102)-10.))
@@ -47,7 +47,7 @@ def yrange(*args, **kwargs):
         >>> print(yrange(np.arange(102)-10., symmetric=True))
         [-91.0, 91.0]
 
-        >>> print(yrange(np.arange(102), np.arange(1002), np.arange(10002)))
+        >>> print(yrange(range(102), range(1002), np.arange(10002)))
         [0.0, 10001.0]
 
         >>> print(yrange(-np.arange(102), np.arange(1002), np.arange(10002)))

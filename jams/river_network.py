@@ -52,7 +52,7 @@ def cal_fdir(locs, fdir, factor):
     # loc = [nrow, ncol]
     nloc = locs[0].shape[0]
     fds = np.zeros((nloc))
-    for kk in np.arange(nloc):
+    for kk in range(nloc):
         # loop over all locations having maximum flow direction
         loc = [locs[0][kk], locs[1][kk]]
         fd = fdir[loc[0], loc[1]]
@@ -194,8 +194,8 @@ def upscale_fdir(sn, factor, print_info=False, return_maxlocs=False, do_co=False
 
     # create maxlocs list
     maxlocs = []
-    for ii in np.arange(new_fd.shape[0]):
-        for jj in np.arange(new_fd.shape[1]):
+    for ii in range(new_fd.shape[0]):
+        for jj in range(new_fd.shape[1]):
             # extract part of map evaluated
             tmp_fa = sn.fa[ii * factor: (ii + 1) * factor, jj * factor: (jj + 1) * factor]
             tmp_fd = sn.fdir[ii * factor: (ii + 1) * factor, jj * factor: (jj + 1) * factor]
@@ -419,7 +419,7 @@ class river_network(object):
                                          mask=np.ones(self.fdir.shape), fill_value=missing_value)
             self.fa = np.ma.masked_array(np.zeros(self.fdir.shape) + missing_value,
                                          mask=np.ones(self.fdir.shape), fill_value=missing_value)
-            for ii in np.arange(self.sinks[0].shape[0]):
+            for ii in range(self.sinks[0].shape[0]):
                 self.co, self.fa = self.network_properties(self.fdir, self.sinks[0][ii], self.sinks[1][ii],
                                                            do_co=do_co, co=self.co,
                                                            do_fa=do_fa, fa=self.fa,
@@ -428,7 +428,7 @@ class river_network(object):
         elif do_co and not do_fa:
             self.co = np.ma.masked_array(np.zeros(self.fdir.shape) + missing_value,
                                          mask=np.ones(self.fdir.shape), fill_value=missing_value)
-            for ii in np.arange(self.sinks[0].shape[0]):
+            for ii in range(self.sinks[0].shape[0]):
                 self.co = self.network_properties(self.fdir, self.sinks[0][ii], self.sinks[1][ii],
                                                   do_co=do_co, co=self.co,
                                                   do_fa=do_fa,
@@ -437,7 +437,7 @@ class river_network(object):
         elif not do_co and do_fa:
             self.fa = np.ma.masked_array(np.zeros(self.fdir.shape) + missing_value,
                                          mask=np.ones(self.fdir.shape), fill_value=missing_value)
-            for ii in np.arange(self.sinks[0].shape[0]):
+            for ii in range(self.sinks[0].shape[0]):
                 self.fa = self.network_properties(self.fdir, self.sinks[0][ii], self.sinks[1][ii],
                                                   do_co=do_co,
                                                   do_fa=do_fa, fa=self.fa,
@@ -530,8 +530,8 @@ class river_network(object):
         # global variable used: correct_direction
         fd = np.zeros(self.dem.shape)
         #
-        for ii in np.arange(self.dem.shape[0]):
-            for jj in np.arange(self.dem.shape[1]):
+        for ii in range(self.dem.shape[0]):
+            for jj in range(self.dem.shape[1]):
                 if self.dem.mask[ii, jj]:
                     continue
                 if print_info:

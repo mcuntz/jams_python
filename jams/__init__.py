@@ -150,6 +150,7 @@
     volume_poly            Volume of function above a polygon
     writenetcdf            Write netCDF4 file.
     xkcd                   Make plot look handdrawn.
+    xread                  Simultaneous read of float and string array from Excel file.
     yrange                 Calculates plot range from input array.
     zacharias              Soil water content with van Genuchten and Zacharias et al. (2007).
     zacharias_check        Checks validity of parameter set for Zacharias et al. (2007).
@@ -366,6 +367,7 @@
     savez                  Save several numpy arrays into a single file in uncompressed ``.npz`` format.
     savez_compressed       Save several arrays into a single file in compressed ``.npz`` format.
     writenetcdf            Write netCDF4 file.
+    xread                  Simultaneous read of float and string array from Excel file.
 
 
     License
@@ -519,6 +521,7 @@
               MC, Nov 2016 - ported to Python 3
               MC, Nov 2016 - pso
               AP, Dec 2016 - rolling
+              MC, Nov 2017 - xread
 """
 from __future__ import print_function
 
@@ -658,6 +661,10 @@ try:
 except ImportError:
     pass # not installed
 from .xkcd              import xkcd
+try:
+    from .xread             import xread
+except ImportError:
+    pass # not installed
 from .yrange            import yrange
 from .zacharias         import zacharias, zacharias_check
 
