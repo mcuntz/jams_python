@@ -177,9 +177,10 @@ from .opti_test_functions import ackley, griewank, goldstein_price
 from .opti_test_functions import rastrigin, rosenbrock, six_hump_camelback
 
 from .sa_test_functions   import B, g, G, Gstar, K, morris, oakley_ohagan, ishigami_homma
+from .sa_test_functions   import linear, product, ratio, ishigami_homma_easy
 
 # Information
 __author__   = "Matthias Cuntz"
 __version__  = '1.1'
-__revision__ = "Revision: 2071"
-__date__     = 'Date: 25.03.2015'
+__revision__ = "Revision: 2017"
+__date__     = 'Date: 04.12.2017'

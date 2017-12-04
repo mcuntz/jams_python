@@ -222,6 +222,188 @@ def Gstar(X, alpha, delta, a):
 
 # -----------------------------------------------------------
 
+def linear(X, a, b):
+    """
+        Julie's own creation to test properly PAWN method
+
+        Y = a X + b
+
+        
+        Input
+        -----
+        X    (nX,) or (nX,npoints) array of floats
+        a    (nX,) array of floats
+        b    (nX,) array of floats
+
+
+        Output
+        ------
+        float or (npoints,) array of floats
+
+        
+        History
+        -------
+        Written,  JM, Dec 2017
+    """
+    # Model output for given parameter set(s) is returned
+    # X:    dim1 = # of parameters = 1
+    #       dim2 = # of parameter sets
+    X = np.array(X)
+    if X.ndim == 1:
+        isone = True
+        iX = X[:,np.newaxis]
+    else:
+        isone = False
+        iX = X
+
+    assert iX.shape[0] == 1, 'X.shape[0] must 1.'
+
+    y = a * iX[0,:] + b
+    
+    if isone:
+        return y[0]
+    else:
+        return y
+    
+# -----------------------------------------------------------
+
+def product(X):
+    """
+        Julie's own creation to test properly PAWN method
+
+        Y = X1 * X2
+
+        
+        Input
+        -----
+        X    (nX,) or (nX,npoints) array of floats
+
+
+        Output
+        ------
+        float or (npoints,) array of floats
+
+        
+        History
+        -------
+        Written,  JM, Dec 2017
+    """
+    # Model output for given parameter set(s) is returned
+    # X:    dim1 = # of parameters = 2
+    #       dim2 = # of parameter sets
+    X = np.array(X)
+    if X.ndim == 1:
+        isone = True
+        iX = X[:,np.newaxis]
+    else:
+        isone = False
+        iX = X
+
+    assert iX.shape[0] == 2, 'X.shape[0] must 2.'
+
+    y = iX[0,:] * iX[1,:]
+    
+    if isone:
+        return y[0]
+    else:
+        return y
+
+# -----------------------------------------------------------
+
+def ratio(X):
+    """
+        Simple nonlinear model proposed by Liu et al. (2006)
+              Liu, H., Sudjianto, A., Chen, W., 2006. 
+              Relative entropy based method for probabilistic sensitivity analysis in engineering design. 
+              J. Mech. Des. 128, 326-336.
+        Used by Pianosi & Wagener, Environmental Modelling & Software (2015)
+              Pianosi, F. & Wagener T., 2015
+              A simple and efficient method for global sensitivity analysis based on cumulative distribution functions.
+              Environmental Modelling & Software 67, 1-11.
+
+        
+        Input
+        -----
+        X    (nX,) or (nX,npoints) array of floats
+
+
+        Output
+        ------
+        float or (npoints,) array of floats
+
+        
+        History
+        -------
+        Written,  JM, Dec 2017
+    """
+    # Model output for given parameter set(s) is returned
+    # X:    dim1 = # of parameters = 2
+    #       dim2 = # of parameter sets
+    X = np.array(X)
+    if X.ndim == 1:
+        isone = True
+        iX = X[:,np.newaxis]
+    else:
+        isone = False
+        iX = X
+
+    assert iX.shape[0] == 2, 'X.shape[0] must 2.'
+
+    y = iX[0,:] / iX[1,:]
+    
+    if isone:
+        return y[0]
+    else:
+        return y
+
+# -----------------------------------------------------------
+
+def ishigami_homma_easy(X, a, b):
+    """
+        Simplified Ishigami and Homma function 
+        Created by Juliane Mai to properly test PAWN method
+        Ishigami and Homma (1990), given by Saltelli et al. (2008, page 179)
+
+        
+        Input
+        -----
+        X    (nX,) or (nX,npoints) array of floats
+        a    (nX,) array of floats
+        b    (nX,) array of floats
+
+
+        Output
+        ------
+        float or (npoints,) array of floats
+
+        
+        History
+        -------
+        Written,  MC & JM, Mar 2015
+    """
+    # Model output for given parameter set(s) is returned
+    # X: dim1 = # of parameters = 3
+    #       dim2 = # of parameter sets
+    X = np.array(X)
+    if X.ndim == 1:
+        isone = True
+        iX = X[:,np.newaxis]
+    else:
+        isone = False
+        iX = X
+
+    assert iX.shape[0] == 3, 'X.shape[0] must 3.'
+
+    y = np.sin(iX[0,:])  + a*(np.sin(iX[1,:]))**2  + b*iX[2,:]**4  * np.sin(iX[0,:])
+    
+    if isone:
+        return y[0]
+    else:
+        return y
+
+
+# -----------------------------------------------------------
+
 def ishigami_homma(X, a, b):
     """
         Ishigami and Homma (1990), given by Saltelli et al. (2008, page 179)

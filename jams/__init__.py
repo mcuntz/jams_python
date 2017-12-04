@@ -610,6 +610,7 @@ except:
     pass # No extra statistics in scipy and hence in JAMS. Disabled functions: outlier, rossner.
 from .pack              import pack
 from .pareto_metrics    import sn, cz, hi, ef, aed, is_dominated, point_to_front
+from .pawn_index        import pawn_index
 from .pca               import pca, check_pca
 from .pi                import pi
 from .position          import position
