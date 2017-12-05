@@ -383,7 +383,7 @@ def Optimized_Groups(NumFact, LB, UB, N=500, p=4, r=10, GroupMat=np.array([]), D
     LBt = np.zeros(NumFact)
     UBt = np.ones(NumFact)
 
-    np.random.seed(seed=1025)
+    # np.random.seed(seed=1025)
     OutMatrix, OutFact = Sampling_Function_2(p, NumFact, N, LBt, UBt, GroupMat)     #Version with Groups
 
     try:
@@ -464,7 +464,7 @@ def Optimized_Groups(NumFact, LB, UB, N=500, p=4, r=10, GroupMat=np.array([]), D
 
     for k in range(r):
         OptMatrix[k*sizeb:(k+1)*sizeb,:] = New_OutMatrix[sizeb*Opt_Traj_Vec[k]:sizeb*(Opt_Traj_Vec[k]+1),:]
-        OptOutVec[k*sizeb:(k+1)*sizeb] = New_OutFact[sizeb*Opt_Traj_Vec[k]:sizeb*(Opt_Traj_Vec[k]+1),:]
+        OptOutVec[k*sizeb:(k+1)*sizeb,:] = New_OutFact[sizeb*Opt_Traj_Vec[k]:sizeb*(Opt_Traj_Vec[k]+1),:]
 
     #----------------------------------------------------------------------
     # Compute values in the original intervals
@@ -551,7 +551,7 @@ def Optimized_Groups(NumFact, LB, UB, N=500, p=4, r=10, GroupMat=np.array([]), D
         print('The quality of the sampling strategy changed from {:f} with the old strategy to {:f} '
                'for the optimized strategy'.format(QualOriMeasure,QualMeasure))
 
-    return OptMatrix, OptOutVec
+    return OptMatrix, OptOutVec[:,0]
 
 
 def Morris_Measure_Groups(NumFact, Sample, OutFact, Output, p=4, Group=[], Diagnostic=False):
@@ -645,7 +645,7 @@ def Morris_Measure_Groups(NumFact, Sample, OutFact, Output, p=4, Group=[], Diagn
         if Diagnostic: print(NumGroups)
     else:
         sizea = NumFact
-        sizeb=sizea+1
+        sizeb = sizea+1
 
     r = Sample.shape[0]/(sizea+1)
 
@@ -658,17 +658,17 @@ def Morris_Measure_Groups(NumFact, Sample, OutFact, Output, p=4, Group=[], Diagn
 
     # For each Output
     if NumGroups == 0:
-        OutMatrix=np.zeros((NumOutp*NumFact,3)) #for every output: every factor is a line, columns are mu*,mu and std
+        OutMatrix=np.zeros((NumOutp*NumFact,3)) # for every output: every factor is a line, columns are mu*, mu and std
     else:
-        OutMatrix=np.zeros((NumOutp*NumFact,1)) #for every output: every factor is a line, column is mu*
+        OutMatrix=np.zeros((NumOutp*NumFact,1)) # for every output: every factor is a line, column is mu*
 
     SAmeas_out=np.zeros((NumOutp*NumFact,r))
 
     for k in range(NumOutp):
-        OutValues=Output[:,k]
+        OutValues = Output[:,k]
 
-        #For each trajectory
-        SAmeas=np.zeros((NumFact,r)) #vorm afhankelijk maken van group of niet...
+        # For each trajectory
+        SAmeas = np.zeros((NumFact,r)) #vorm afhankelijk maken van group of niet...
         for i in range(r):
             # For each step j in the trajectory
             # Read the orientation matrix fact for the r-th sampling
@@ -756,11 +756,14 @@ if __name__ == '__main__':
     import doctest
     doctest.testmod(optionflags=doctest.NORMALIZE_WHITESPACE)
 
-    # NumFact = 2
-    # LB = np.array([0., 1.])
-    # UB = np.array([2., 4.])
-    # N = 30
-    # p = 5
-    # r = 3
+    # NumFact = 15
+    # LB = np.arange(NumFact)
+    # UB = 2.*LB + 1.
+    # N = 100
+    # p = 6
+    # r = 10
     # Diagnostic = 0
-    # print(Optimized_Groups(NumFact, LB, UB, N=N, p=p, r=r, Diagnostic=Diagnostic))
+    # out = np.random.random(r*(NumFact+1))
+    # mat, vec = morris_sampling(NumFact, LB, UB, N=N, p=p, r=r, Diagnostic=Diagnostic)
+    # sa, res = elementary_effects(NumFact, mat, vec, out, p=p)
+    # print(res) # (NumFact,3) = AbsMu, Mu, Stddev
