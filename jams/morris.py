@@ -767,3 +767,17 @@ if __name__ == '__main__':
     # mat, vec = morris_sampling(NumFact, LB, UB, N=N, p=p, r=r, Diagnostic=Diagnostic)
     # sa, res = elementary_effects(NumFact, mat, vec, out, p=p)
     # print(res) # (NumFact,3) = AbsMu, Mu, Stddev
+    # print(sa) #  (NumFact,r) individual elementary effects for all parameters
+
+    # NumFact = 15
+    # LB = np.arange(NumFact)
+    # UB = 2.*LB + 1.
+    # N = 10
+    # p = 6
+    # r = 1
+    # Diagnostic = 0
+    # out = np.random.random(r*(NumFact+1))
+    # mat, vec = morris_sampling(NumFact, LB, UB, N=N, p=p, r=r, Diagnostic=Diagnostic)
+    # sa, res = elementary_effects(NumFact, mat, vec, out, p=p)
+    # print(res) # (NumFact,3) = AbsMu, Mu, Stddev
+    # print(sa) #  (NumFact,1)

@@ -124,6 +124,7 @@
     savitzky_golay2d       Smooth (and optionally differentiate) 2D data with a Savitzky-Golay filter.
     saltelli               Parameter sampling for Sobol indices calculation.
     sce                    Shuffle-Complex-Evolution algorithm for function min(max)imisation
+    screening              Samples trajectories, runs model and returns measures of Morris Elemenary Effects
     semivariogram          Calculates semivariogram from spatial data.
     sendmail               Send an e-mail.
     sg                     Wrapper savitzky_golay.
@@ -288,6 +289,7 @@
     qa                     Module of quality assessment (error) measures.
     saltelli               Parameter sampling for Sobol indices calculation.
     sce                    Shuffle-Complex-Evolution algorithm for function min(max)imisation
+    screening              Samples trajectories, runs model and returns measures of Morris Elemenary Effects
     sobol                  Generates Sobol sequences
     sobol_index            Calculates the first-order and total variance-based sensitivity indices.
 
@@ -522,6 +524,8 @@
               MC, Nov 2016 - pso
               AP, Dec 2016 - rolling
               MC, Nov 2017 - xread
+              JM, Dec 2017 - pawn_index
+              MC, Dec 2017 - screening
 """
 from __future__ import print_function
 
@@ -640,6 +644,7 @@ from .samevalue         import samevalue
 from .sap_app           import t2sap
 from .savitzky_golay    import savitzky_golay, sg, savitzky_golay2d, sg2d
 from .sce               import sce
+from .screening         import screening
 from .semivariogram     import semivariogram
 from .sendmail          import sendmail
 from .sigma_filter      import sigma_filter
