@@ -436,7 +436,7 @@ def ishigami_homma(X, a, b):
         isone = False
         iX = X
 
-    assert iX.shape[0] == 3, 'X.shape[0] must 3.'
+    assert iX.shape[0] == 3, 'X.shape[0] must be 3.'
 
     y = np.sin(iX[0,:])  + a*(np.sin(iX[1,:]))**2  + b*iX[2,:]**4  * np.sin(iX[0,:])
     

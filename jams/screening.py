@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 from __future__ import print_function
 from functools import partial
+import os
 import subprocess
 import numpy as np
 from jams import morris_sampling, elementary_effects
@@ -49,20 +50,24 @@ def _ext_obj_wrapper(func, lb, ub, mask,
         -------
         Written,  MC, Nov 2016
     '''
+    # For multiprocess but not MPI: pid = mp.current_process()._identity[0]
+    # seed uses global variables so all processes will produce same random numbers
+    # use np.random.RandomState() for each processes for individual seeds in each process
+    # pid = str(np.random.randint(2147483647))
+    randst = np.random.RandomState()#pid)
+    pid = str(randst.randint(2147483647))
     if isinstance(func, (str,list)):
-        parameterwriter(parameterfile, params, lb, ub, mask)
-        if rank is None:
-            func1 = func
+        parameterwriter(parameterfile+'.'+pid, params, lb, ub, mask)
+        if isinstance(func, str):
+            func1 = [func, pid]
         else:
-            if isinstance(func, str):
-                func1 = [func, str(rank)]
-            else:
-                func1 = func+[str(rank)]
+            func1 = func+[pid]
         if debug:
             err = subprocess.call(func1, shell=shell)
         else:
-            err = subprocess.check_output(func1, shell=shell)
-        obj = objectivereader(objectivefile)
+            err = subprocess.check_output(func1, shell=shell)            
+        obj = objectivereader(objectivefile+'.'+pid)
+        os.remove(objectivefile+'.'+pid)
         return obj
     else:
         return func(params)
@@ -160,14 +165,17 @@ def screening(func, x0, lb, ub, mask=None,
 
         Output
         ------
-        if nt==1:
-            1D-array - (nparameter,) with elementary effects of each parameter
-
+        2D-array - (nparameter,3)
         if nt>1:
             2D-array - (nparameter,3) with per parameter
                        1. mean of absolute elementary effects over all nt trajectories (mu*)
                        2. mean of elementary effects over all nt trajectories (mu)
                        3. standard deviation of elementary effects over all nt trajectories (sigma)
+        else:
+            2D-array - (nparameter,3) with per parameter
+                       1. absolute elementary effect of each parameter
+                       2. elementary effect of each parameter
+                       2. zeros
 
 
         License
@@ -194,7 +202,7 @@ def screening(func, x0, lb, ub, mask=None,
         History
         -------
         Written,  MC, Dec 2017
-        Modified, MC, Jan 2018
+        Modified, MC, Dec 2017 - output for nt=1 also (npara,3)
     """
     # Get MPI communicator
     try:
@@ -232,20 +240,10 @@ def screening(func, x0, lb, ub, mask=None,
     if isinstance(func, (str,list)):
         if parameterfile is None:
             raise IOError('parameterfile must be given if func is name of executable.')
-        else:
-            if csize > 1:
-                parameterfile1 = parameterfile + '.' + str(crank)
-            else:
-                parameterfile1 = parameterfile
         if parameterwriter is None:
             raise IOError('parameterwrite must be given if func is name of executable.')
         if objectivefile is None:
             raise IOError('objectivefile must be given if func is name of executable.')
-        else:
-            if csize > 1:
-                objectivefile1 = objectivefile + '.' + str(crank)
-            else:
-                objectivefile1 = objectivefile
         if objectivereader is None:
             raise IOError('objectivereader must be given if func is name of executable.')
 
@@ -264,7 +262,7 @@ def screening(func, x0, lb, ub, mask=None,
     # Partialise objective function
     if isinstance(func, (str,list)):
         obj = partial(_ext_obj_wrapper, func, lb, ub, imask,
-                      parameterfile1, parameterwriter, objectivefile1, objectivereader, shell, debug, passrank)
+                      parameterfile, parameterwriter, objectivefile, objectivereader, shell, debug, passrank)
     else:
         obj = partial(_obj_wrapper, func, arg, kwarg)
 
@@ -298,8 +296,9 @@ def screening(func, x0, lb, ub, mask=None,
 
     # Output with zero for all masked parameters
     if nt == 1:
-        out = np.zeros(npara)
-        out[imask] = sa[:,0]
+        out = np.zeros((npara,3))
+        out[imask,0] = np.abs(sa[:,0])
+        out[imask,1] = sa[:,0]
     else:
         out = np.zeros((npara,3))
         out[imask,:] = res
@@ -387,7 +386,7 @@ if __name__ == '__main__':
     #     beta4              = np.zeros((npars,npars,npars,npars))
     #     beta4[:4,:4,:4,:4] = 5.
     #     args = [beta0, beta1, beta2, beta3, beta4] # Morris
-    #     nt = 19
+    #     nt = 20
     #     ntotal  = 10*nt
     #     nsteps = 6
     #     verbose = 1
@@ -425,7 +424,7 @@ if __name__ == '__main__':
     #     beta4              = np.zeros((npars,npars,npars,npars))
     #     beta4[:4,:4,:4,:4] = 5.
     #     args = [beta0, beta1, beta2, beta3, beta4] # Morris
-    #     nt = 19
+    #     nt = 20
     #     ntotal  = 10*nt
     #     nsteps = 6
     #     verbose = 1
