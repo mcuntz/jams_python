@@ -626,6 +626,7 @@ def Morris_Measure_Groups(NumFact, Sample, OutFact, Output, p=4, Group=[], Diagn
             http://sensitivity-analysis.jrc.ec.europa.eu/software/index.htm
         Modified, S. Van Hoey, May 2012 - ported to Python
                   MC, Oct 2013 - adapted to JAMS Python package and ported to Python 3
+                  MC, Dec 2017 - deal with single trajectories
     """
 
     try:
@@ -704,33 +705,39 @@ def Morris_Measure_Groups(NumFact, Sample, OutFact, Output, p=4, Group=[], Diagn
 
         # Compute Mu AbsMu and StDev
         if np.isnan(SAmeas).any():
-            AbsMu=np.zeros(NumFact)
-            Stdev=np.zeros(NumFact)
-            Mu=np.zeros(NumFact)
+            AbsMu = np.zeros(NumFact)
+            Mu    = np.zeros(NumFact)
+            Stdev = np.zeros(NumFact)
 
             for j in range(NumFact):
-                SAm=SAmeas[j,:]
-                SAm=SAm[~np.isnan(SAm)]
-                rr=np.float(SAm.size)
+                SAm = SAmeas[j,:]
+                SAm = SAm[~np.isnan(SAm)]
+                rr  = np.float(SAm.size)
                 AbsMu[j] = np.sum(np.abs(SAm))/rr
                 if NumGroups == 0:
                     Mu[j] = SAm.mean()
-                    Stdev[j] = np.std(SAm, dtype=np.float64,ddof=1) #ddof: /N-1 instead of /N
+                    if SAm.size > 1:
+                        Stdev[j] = np.std(SAm, dtype=np.float64, ddof=1) #ddof: /N-1 instead of /N
+                    else:
+                        Stdev[j] = 0.
         else:
-            AbsMu = np.sum(np.abs(SAmeas),axis=1)/r
+            AbsMu = np.sum(np.abs(SAmeas), axis=1)/r
             if NumGroups == 0:
                 Mu = SAmeas.mean(axis=1)
-                Stdev = np.std(SAmeas, dtype=np.float64, ddof=1,axis=1) #ddof: /N-1 instead of /N
+                if SAmeas.shape[1] > 1:
+                    Stdev = np.std(SAmeas, dtype=np.float64, ddof=1, axis=1) #ddof: /N-1 instead of /N
+                else:
+                    Stdev = np.zeros(SAmeas.shape[0])
             else:
-                Stdev=np.zeros(NumFact)
-                Mu=np.zeros(NumFact)
+                Mu    = np.zeros(NumFact)
+                Stdev = np.zeros(NumFact)
 
-        OutMatrix[k*NumFact:k*NumFact+NumFact,0]=AbsMu
+        OutMatrix[k*NumFact:k*NumFact+NumFact,0] = AbsMu
         if NumGroups == 0:
-            OutMatrix[k*NumFact:k*NumFact+NumFact,1]=Mu
-            OutMatrix[k*NumFact:k*NumFact+NumFact,2]=Stdev
+            OutMatrix[k*NumFact:k*NumFact+NumFact,1] = Mu
+            OutMatrix[k*NumFact:k*NumFact+NumFact,2] = Stdev
 
-        SAmeas_out[k*NumFact:k*NumFact+NumFact,:]=SAmeas
+        SAmeas_out[k*NumFact:k*NumFact+NumFact,:] = SAmeas
 
 
     return SAmeas_out, OutMatrix
