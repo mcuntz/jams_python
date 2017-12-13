@@ -63,9 +63,9 @@ def _ext_obj_wrapper(func, lb, ub, mask,
         else:
             func1 = func+[pid]
         if debug:
-            err = subprocess.call(func1, shell=shell)
+            err = subprocess.check_call(func1, stderr=subprocess.STDOUT, shell=shell)
         else:
-            err = subprocess.check_output(func1, shell=shell)            
+            err = subprocess.check_output(func1, stderr=subprocess.STDOUT, shell=shell)
         obj = objectivereader(objectivefile+'.'+pid)
         os.remove(objectivefile+'.'+pid)
         return obj
@@ -148,7 +148,7 @@ def screening(func, x0, lb, ub, mask=None,
                     The pool will be chosen automatically if pool is None.
                     MPI pools can only be opened and closed once. So if you want to use screening several
                     times in one program, then you have to choose the pool and later close the pool in the
-                    wrapping progam and pass it to screening.                    
+                    wrapping progam and pass it to screening.
         parameterfile     string (Default: None)
                           Parameter file for executable; must be given if func is name of executable
         parameterwriter   function (Default: None)
@@ -233,19 +233,14 @@ def screening(func, x0, lb, ub, mask=None,
         assert np.all(ub >= lb), 'All upper-bounds must be greater or equal than lower-bounds.'
     else:
         assert len(mask)==len(ub), 'Mask and bounds must have the same lengths.'
-        if not np.all(mask):
-            assert len(mask)==len(x0), 'Mask and x0 must have the same lengths.'
+        if not np.all(mask): assert len(mask)==len(x0), 'Mask and x0 must have the same lengths.'
         assert np.all(ub[mask] >= lb[mask]), 'All unmasked upper-bounds must be greater or equal than lower-bounds.'
     # Parameterfile etc. keywords if func is name of executable
     if isinstance(func, (str,list)):
-        if parameterfile is None:
-            raise IOError('parameterfile must be given if func is name of executable.')
-        if parameterwriter is None:
-            raise IOError('parameterwrite must be given if func is name of executable.')
-        if objectivefile is None:
-            raise IOError('objectivefile must be given if func is name of executable.')
-        if objectivereader is None:
-            raise IOError('objectivereader must be given if func is name of executable.')
+        if parameterfile is None: raise IOError('parameterfile must be given if func is name of executable.')
+        if parameterwriter is None: raise IOError('parameterwrite must be given if func is name of executable.')
+        if objectivefile is None: raise IOError('objectivefile must be given if func is name of executable.')
+        if objectivereader is None: raise IOError('objectivereader must be given if func is name of executable.')
 
     # Set defaults
     npara = len(lb)
@@ -267,9 +262,8 @@ def screening(func, x0, lb, ub, mask=None,
         obj = partial(_obj_wrapper, func, arg, kwarg)
 
     # Sample trajectories
-    if (crank==0) and (verbose > 0):
-        print('Sample trajectories')
-    tmatrix, tvec = morris_sampling(nmask, lb[imask], ub[imask], N=ntotal, p=nsteps, r=nt)
+    if (crank==0) and (verbose > 0): print('Sample trajectories')
+    tmatrix, tvec = morris_sampling(nmask, lb[imask], ub[imask], N=ntotal, p=nsteps, r=nt, Diagnostic=False)
 
     # Set input vector to trajectories and masked elements = x0
     x = np.tile(x0,tvec.size).reshape(tvec.size,npara) # default to x0
@@ -283,16 +277,13 @@ def screening(func, x0, lb, ub, mask=None,
         ipool = pool
 
     # Calculate all model runs
-    if (crank==0) and (verbose > 0):
-        print('Calculate objective functions')
+    if (crank==0) and (verbose > 0): print('Calculate objective functions')
     fx = np.array(ipool.map(obj, x))
-    if pool is None:
-        ipool.close()
+    if pool is None: ipool.close()
 
     # Calc elementary effects
-    if (crank==0) and (verbose > 0):
-        print('Calculate elementary effects')
-    sa, res = elementary_effects(nmask, tmatrix, tvec, fx, p=nsteps)
+    if (crank==0) and (verbose > 0): print('Calculate elementary effects')
+    sa, res = elementary_effects(nmask, tmatrix, tvec, fx, p=nsteps, Diagnostic=False)
 
     # Output with zero for all masked parameters
     if nt == 1:
@@ -314,7 +305,7 @@ if __name__ == '__main__':
 
     # import time as ptime
     # t1 = ptime.time()
-    
+
     # try:
     #     from mpi4py import MPI
     #     comm  = MPI.COMM_WORLD
@@ -357,7 +348,7 @@ if __name__ == '__main__':
     #     out = screening(func, x0, lb, ub, mask=None, nt=nt, nsteps=nsteps, ntotal=ntotal, processes=4, verbose=1)
 
     #     t2    = ptime.time()
-        
+
     #     if crank == 0:
     #         strin = '[m]: {:.1f}'.format((t2-t1)/60.) if (t2-t1)>60. else '[s]: {:d}'.format(int(t2-t1))
     #         print('Time elapsed: ', strin)
@@ -393,7 +384,7 @@ if __name__ == '__main__':
 
     #     out = screening(func, x0, lb, ub, arg=args, mask=None, nt=nt, nsteps=nsteps, ntotal=ntotal, processes=4, verbose=1)
     #     t2    = ptime.time()
-        
+
     #     if crank == 0:
     #         strin = '[m]: {:.1f}'.format((t2-t1)/60.) if (t2-t1)>60. else '[s]: {:d}'.format(int(t2-t1))
     #         print('Time elapsed: ', strin)
@@ -432,7 +423,7 @@ if __name__ == '__main__':
     #     out = screening(func, x0, lb, ub, arg=args, mask=None, nt=nt, nsteps=nsteps, ntotal=ntotal,
     #                     processes=processes, pool=pool, verbose=1)
     #     t2    = ptime.time()
-        
+
     #     if crank == 0:
     #         strin = '[m]: {:.1f}'.format((t2-t1)/60.) if (t2-t1)>60. else '[s]: {:d}'.format(int(t2-t1))
     #         print('Time elapsed: ', strin)
