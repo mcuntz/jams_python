@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 import numpy             as np
-import matplotlib.pyplot as plt
 import warnings          as wa
 from   jams.const import eps
 
@@ -133,6 +132,7 @@ def fftngo(t, y, nbins=False, plot=False):
         binm, mv = 10**binm, 10**mv
     
     if plot:
+        import matplotlib.pyplot as plt
         fig, ax = plt.subplots(2, 1)
         ax[0].plot(t,y)
         ax[0].set_xlabel('t')
