@@ -43,9 +43,11 @@
     Current general functionsare:
     curvature             Curvature of function f: f''/(1+f'^2)^3/2
     logistic              logistic function L/(1+exp(-k(x-x0)))
+    logistic_p
     dlogistic             First derivative of logistic function
     d2logistic            Second derivative of logistic function
     logistic_offset       logistic function with offset L/(1+exp(-k(x-x0))) + a
+    logistic_offset_p
     dlogistic_offset      First derivative of logistic function with offset
     d2logistic_offset     Second derivative of logistic function with offset
 
@@ -65,8 +67,6 @@
         line              2 params: Straight line: a + b*x
         lloyd_fix         2 params: Lloyd & Taylor (1994) Arrhenius type with T0=-46.02 degC and Tref=10 degC
         lloyd_only_rref   1 param:  Lloyd & Taylor (1994) Arrhenius type with fixed exponential term
-        logistic          3 params: Logistic function: a/(1+exp(-b(x-c)))
-        logistic_offset   4 params: Logistic function with offset: a/(1+exp(-b(x-c))) + d
         poly              n params: General polynomial: c0 + c1*x + c2*x**2 + ... + cn*x**n
         sabx              2 params: sqrt(f1x), i.e. general sqrt(1/x) function: sqrt(a + b/x)
         see               3 params: Sequential Elementary Effects fitting function: a*(x-b)**c
@@ -153,8 +153,8 @@
 """
 
 from .general_functions   import curvature
-from .general_functions   import logistic, dlogistic, d2logistic
-from .general_functions   import logistic_offset, dlogistic_offset, d2logistic_offset
+from .general_functions   import logistic, logistic_p, dlogistic, d2logistic
+from .general_functions   import logistic_offset, logistic_offset_p, dlogistic_offset, d2logistic_offset
 
 from .fit_functions       import cost_abs, cost_square
 from .fit_functions       import arrhenius, arrhenius_p, cost_arrhenius, cost2_arrhenius
@@ -169,8 +169,8 @@ from .fit_functions       import lloyd_only_rref, lloyd_only_rref_p, cost_lloyd_
 from .fit_functions       import multiline_p
 from .fit_functions       import sabx, sabx_p, cost_sabx, cost2_sabx
 from .fit_functions       import poly, poly_p, cost_poly, cost2_poly
-from .fit_functions       import logistic_p, cost_logistic, cost2_logistic
-from .fit_functions       import logistic_offset_p, cost_logistic_offset, cost2_logistic_offset
+from .fit_functions       import cost_logistic, cost2_logistic
+from .fit_functions       import cost_logistic_offset, cost2_logistic_offset
 from .fit_functions       import see, see_p, cost_see, cost2_see
 
 from .opti_test_functions import ackley, griewank, goldstein_price
