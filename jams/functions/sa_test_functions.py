@@ -358,9 +358,9 @@ def ratio(X):
 
 # -----------------------------------------------------------
 
-def ishigami_homma_easy(X, a, b):
+def ishigami_homma_easy(X):
     """
-        Simplified Ishigami and Homma function 
+        Simplified Ishigami and Homma function: y = sin(x1) + x2, x1,x2 ~ Uni[-Pi,Pi]
         Created by Juliane Mai to properly test PAWN method
         Ishigami and Homma (1990), given by Saltelli et al. (2008, page 179)
 
@@ -368,8 +368,6 @@ def ishigami_homma_easy(X, a, b):
         Input
         -----
         X    (nX,) or (nX,npoints) array of floats
-        a    (nX,) array of floats
-        b    (nX,) array of floats
 
 
         Output
@@ -382,7 +380,7 @@ def ishigami_homma_easy(X, a, b):
         Written,  MC & JM, Mar 2015
     """
     # Model output for given parameter set(s) is returned
-    # X: dim1 = # of parameters = 3
+    # X:    dim1 = # of parameters = 2
     #       dim2 = # of parameter sets
     X = np.array(X)
     if X.ndim == 1:
@@ -392,9 +390,9 @@ def ishigami_homma_easy(X, a, b):
         isone = False
         iX = X
 
-    assert iX.shape[0] == 3, 'X.shape[0] must 3.'
+    assert iX.shape[0] == 2, 'X.shape[0] must 2.'
 
-    y = np.sin(iX[0,:])  + a*(np.sin(iX[1,:]))**2  + b*iX[2,:]**4  * np.sin(iX[0,:])
+    y = np.sin(iX[0,:])  + iX[1,:]
     
     if isone:
         return y[0]
