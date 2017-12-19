@@ -9,9 +9,11 @@
 
     curvature             Curvature of function f: f''/(1+f'^2)^3/2
     logistic              logistic function L/(1+exp(-k(x-x0)))
+    logistic_p
     dlogistic             First derivative of logistic function
     d2logistic            Second derivative of logistic function
     logistic_offset       logistic function with offset L/(1+exp(-k(x-x0))) + a
+    logistic_offset_p
     dlogistic_offset      First derivative of logistic function with offset
     d2logistic_offset     Second derivative of logistic function with offset
 
@@ -50,14 +52,15 @@
     History
     -------
     Written,  MC, Mar 2015
+    Modified, MC, Dec 2017 - logistic_p, logistic_offset_p
 """
 from __future__ import print_function
 import numpy as np
 import scipy.special as sp
 
 __all__ = ['curvature',
-           'logistic', 'dlogistic', 'd2logistic',
-           'logistic_offset', 'dlogistic_offset', 'd2logistic_offset']
+           'logistic', 'dlogistic', 'd2logistic', 'logistic_p',
+           'logistic_offset', 'dlogistic_offset', 'd2logistic_offset', 'logistic_offset_p']
 
 # -----------------------------------------------------------
 # curvature of function
@@ -81,6 +84,13 @@ def logistic(x, L, k, x0):
           x0        inflection point
     """
     return L*sp.expit(k*(x-x0))
+
+def logistic_p(x, p):
+  """ logistic function p[0]/(1+exp(-p[1](x-p[2])))
+        x        independent variable
+        p        array of size 3, parameters
+  """
+  return logistic(x, p[0], p[1], p[2])
 
 # -----------------------------------------------------------
 # 1st derivative of logistic functions
@@ -115,6 +125,13 @@ def logistic_offset(x, L, k, x0, a):
           a         offset
     """
     return L*sp.expit(k*(x-x0)) + a
+
+def logistic_offset_p(x, p):
+  """ logistic function with offset p[0]/(1+exp(-p[1](x-p[2]))) + p[3]
+        x    independent variable
+        p    4D-array of parameters
+  """
+  return logistic_offset(x, p[0], p[1], p[2], p[3])
 
 # -----------------------------------------------------------
 # 1st derivative of logistic functions with offset

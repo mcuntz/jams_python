@@ -98,6 +98,7 @@
     Written original Matlab code by F. Campolongo, J. Cariboni, JRC - IPSC Ispra, Varese, IT
         Last Update: 15 November 2005 by J.Cariboni
         http://sensitivity-analysis.jrc.ec.europa.eu/software/index.htm
+        now at: https://ec.europa.eu/jrc/en/samo/simlab
     Modified, S. Van Hoey, May 2012 - ported to Python
               MC, Oct 2013 - adapted to JAMS Python package and ported to Python 3
               MC, Dec 2017 - from exponential time increase with number of trajectories to linear increase
@@ -217,6 +218,7 @@ def  Sampling_Function_2(p, k, r, LB, UB, GroupMat=np.array([])):
         Written original Matlab code by F. Campolongo, J. Cariboni, JRC - IPSC Ispra, Varese, IT
             Last Update: 15 November 2005 by J.Cariboni
             http://sensitivity-analysis.jrc.ec.europa.eu/software/index.htm
+            now at: https://ec.europa.eu/jrc/en/samo/simlab
         Modified, S. Van Hoey, May 2012 - ported to Python
                   MC, Oct 2013 - adapted to JAMS Python package and ported to Python 3
     """
@@ -375,6 +377,7 @@ def Optimized_Groups(NumFact, LB, UB, N=500, p=4, r=10, GroupMat=np.array([]), D
         Written original Matlab code by F. Campolongo, J. Cariboni, JRC - IPSC Ispra, Varese, IT
             Last Update: 15 November 2005 by J.Cariboni
             http://sensitivity-analysis.jrc.ec.europa.eu/software/index.htm
+            now at: https://ec.europa.eu/jrc/en/samo/simlab
         Modified, S. Van Hoey, May 2012 - ported to Python
                   MC, Oct 2013 - adapted to JAMS Python package and ported to Python 3
     """
@@ -383,7 +386,7 @@ def Optimized_Groups(NumFact, LB, UB, N=500, p=4, r=10, GroupMat=np.array([]), D
     LBt = np.zeros(NumFact)
     UBt = np.ones(NumFact)
 
-    np.random.seed(seed=1025)
+    # np.random.seed(seed=1025)
     OutMatrix, OutFact = Sampling_Function_2(p, NumFact, N, LBt, UBt, GroupMat)     #Version with Groups
 
     try:
@@ -464,7 +467,7 @@ def Optimized_Groups(NumFact, LB, UB, N=500, p=4, r=10, GroupMat=np.array([]), D
 
     for k in range(r):
         OptMatrix[k*sizeb:(k+1)*sizeb,:] = New_OutMatrix[sizeb*Opt_Traj_Vec[k]:sizeb*(Opt_Traj_Vec[k]+1),:]
-        OptOutVec[k*sizeb:(k+1)*sizeb] = New_OutFact[sizeb*Opt_Traj_Vec[k]:sizeb*(Opt_Traj_Vec[k]+1),:]
+        OptOutVec[k*sizeb:(k+1)*sizeb,:] = New_OutFact[sizeb*Opt_Traj_Vec[k]:sizeb*(Opt_Traj_Vec[k]+1),:]
 
     #----------------------------------------------------------------------
     # Compute values in the original intervals
@@ -492,7 +495,7 @@ def Optimized_Groups(NumFact, LB, UB, N=500, p=4, r=10, GroupMat=np.array([]), D
         import matplotlib.pyplot as plt
         fig=plt.figure()
         fig.suptitle('New Strategy')
-        DimPlots = np.round(NumFact/2)
+        DimPlots = NumFact//2 + (1 if NumFact%2 > 0 else 0)
         for i in range(NumFact):
             ax=fig.add_subplot(DimPlots,2,i+1)
             ax.hist(hplot[:,i],p)
@@ -517,7 +520,7 @@ def Optimized_Groups(NumFact, LB, UB, N=500, p=4, r=10, GroupMat=np.array([]), D
 
         fig=plt.figure()
         fig.suptitle('Old Strategy')
-        DimPlots = np.round(NumFact/2)
+        DimPlots = NumFact//2 + (1 if NumFact%2 > 0 else 0)
         for i in range(NumFact):
             ax=fig.add_subplot(DimPlots,2,i+1)
             ax.hist(Orihplot[:,i],p)
@@ -551,7 +554,9 @@ def Optimized_Groups(NumFact, LB, UB, N=500, p=4, r=10, GroupMat=np.array([]), D
         print('The quality of the sampling strategy changed from {:f} with the old strategy to {:f} '
                'for the optimized strategy'.format(QualOriMeasure,QualMeasure))
 
-    return OptMatrix, OptOutVec
+        plt.show()
+
+    return OptMatrix, OptOutVec[:,0]
 
 
 def Morris_Measure_Groups(NumFact, Sample, OutFact, Output, p=4, Group=[], Diagnostic=False):
@@ -561,7 +566,7 @@ def Morris_Measure_Groups(NumFact, Sample, OutFact, Output, p=4, Group=[], Diagn
 
         Definition
         ----------
-        def Morris_Measure_Groups(NumFact, Sample, OutFact, Output, p=4, Group=[]):
+        def Morris_Measure_Groups(NumFact, Sample, OutFact, Output, p=4, Group=[], Diagnostic=False):
 
 
         Input
@@ -624,8 +629,11 @@ def Morris_Measure_Groups(NumFact, Sample, OutFact, Output, p=4, Group=[], Diagn
         Written original Matlab code by F. Campolongo, J. Cariboni, JRC - IPSC Ispra, Varese, IT
             Last Update: 15 November 2005 by J.Cariboni
             http://sensitivity-analysis.jrc.ec.europa.eu/software/index.htm
+            now at: https://ec.europa.eu/jrc/en/samo/simlab
         Modified, S. Van Hoey, May 2012 - ported to Python
                   MC, Oct 2013 - adapted to JAMS Python package and ported to Python 3
+                  MC, Dec 2017 - deal with single trajectories
+                  MC, Dec 2017 - set Delta=A and not A[np.where(A)]; deal with Delta==0.
     """
 
     try:
@@ -638,16 +646,15 @@ def Morris_Measure_Groups(NumFact, Sample, OutFact, Output, p=4, Group=[], Diagn
     Delt = p/(2.*(p-1.))
 
     if NumGroups != 0:
-        sizea=NumGroups
-        sizeb=sizea+1
-        GroupMat=Group
+        sizea = NumGroups
+        GroupMat = Group
         GroupMat = GroupMat.transpose()
         if Diagnostic: print(NumGroups)
     else:
         sizea = NumFact
-        sizeb=sizea+1
+    sizeb = sizea+1
 
-    r = Sample.shape[0]/(sizea+1)
+    r = Sample.shape[0]/sizeb
 
     try:
         NumOutp = Output.shape[1]
@@ -658,79 +665,82 @@ def Morris_Measure_Groups(NumFact, Sample, OutFact, Output, p=4, Group=[], Diagn
 
     # For each Output
     if NumGroups == 0:
-        OutMatrix=np.zeros((NumOutp*NumFact,3)) #for every output: every factor is a line, columns are mu*,mu and std
+        OutMatrix=np.zeros((NumOutp*NumFact,3)) # for every output: every factor is a line, columns are mu*, mu and std
     else:
-        OutMatrix=np.zeros((NumOutp*NumFact,1)) #for every output: every factor is a line, column is mu*
+        OutMatrix=np.zeros((NumOutp*NumFact,1)) # for every output: every factor is a line, column is mu*
 
     SAmeas_out=np.zeros((NumOutp*NumFact,r))
 
     for k in range(NumOutp):
-        OutValues=Output[:,k]
+        OutValues = Output[:,k]
 
-        #For each trajectory
-        SAmeas=np.zeros((NumFact,r)) #vorm afhankelijk maken van group of niet...
+        # For each trajectory
+        SAmeas = np.zeros((NumFact,r)) #vorm afhankelijk maken van group of niet...
         for i in range(r):
             # For each step j in the trajectory
             # Read the orientation matrix fact for the r-th sampling
             # Read the corresponding output values
-            # read the line of changing factors
-
-            Single_Sample = Sample[i*(sizeb):i*(sizeb)+(sizeb),:]
-            Single_OutValues = OutValues[i*(sizeb):i*(sizeb)+(sizeb)]
-            Single_Facts = OutFact[i*(sizeb):i*(sizeb)+(sizeb)] #gives factor in change (or group)
+            # Read the line of changing factors
+            Single_Sample    = Sample[i*sizeb:(i+1)*sizeb,:]
+            Single_OutValues = OutValues[i*sizeb:(i+1)*sizeb]
+            Single_Facts     = np.array(OutFact[i*sizeb:(i+1)*sizeb], dtype=np.int) # gives factor in change (or group)
 
             A = (Single_Sample[1:sizeb,:]-Single_Sample[:sizea,:]).transpose()
-            Delta=A[np.where(A)] #AAN TE PASSEN?
+            Delta=A[np.where(A)] # AAN TE PASSEN?
 
             if Diagnostic:
-                print(A)
-                print(Delta)
-                print(Single_Facts)
+                print('A: ', A)
+                print('Delta: ', Delta)
+                print('Single_Facts: ', Single_Facts)
 
-            # For each point of the fixed trajectory compute the values of the Morris function.
+            # For each point of the fixed trajectory, i.e. for each factor, compute the values of the Morris function.
             for j in range(sizea):
                 if NumGroups != 0:  #work with groups
                     Auxfind=A[:,j]
                     Change_factor = np.where(np.abs(Auxfind)>1e-010)[0]
                     for gk in Change_factor:
                         SAmeas[gk,i] = np.abs((Single_OutValues[j] - Single_OutValues[j+1])/Delt)   #nog niet volledig goe
-
                 else:
-                    if Delta[j]> 0.0:
-                        SAmeas[int(Single_Facts[j]),i] = (Single_OutValues[j+1] - Single_OutValues[j])/Delt
+                    if Delta[j] > 0.0:
+                        SAmeas[Single_Facts[j],i] = (Single_OutValues[j+1] - Single_OutValues[j])/Delt
                     else:
-                        SAmeas[int(Single_Facts[j]),i] = (Single_OutValues[j] - Single_OutValues[j+1])/Delt
-
+                        SAmeas[Single_Facts[j],i] = (Single_OutValues[j] - Single_OutValues[j+1])/Delt
 
         # Compute Mu AbsMu and StDev
         if np.isnan(SAmeas).any():
-            AbsMu=np.zeros(NumFact)
-            Stdev=np.zeros(NumFact)
-            Mu=np.zeros(NumFact)
+            AbsMu = np.zeros(NumFact)
+            Mu    = np.zeros(NumFact)
+            Stdev = np.zeros(NumFact)
 
             for j in range(NumFact):
-                SAm=SAmeas[j,:]
-                SAm=SAm[~np.isnan(SAm)]
-                rr=np.float(SAm.size)
+                SAm = SAmeas[j,:]
+                SAm = SAm[~np.isnan(SAm)]
+                rr  = np.float(SAm.size)
                 AbsMu[j] = np.sum(np.abs(SAm))/rr
                 if NumGroups == 0:
                     Mu[j] = SAm.mean()
-                    Stdev[j] = np.std(SAm, dtype=np.float64,ddof=1) #ddof: /N-1 instead of /N
+                    if SAm.size > 1:
+                        Stdev[j] = np.std(SAm, dtype=np.float64, ddof=1) #ddof: /N-1 instead of /N
+                    else:
+                        Stdev[j] = 0.
         else:
-            AbsMu = np.sum(np.abs(SAmeas),axis=1)/r
+            AbsMu = np.sum(np.abs(SAmeas), axis=1)/r
             if NumGroups == 0:
                 Mu = SAmeas.mean(axis=1)
-                Stdev = np.std(SAmeas, dtype=np.float64, ddof=1,axis=1) #ddof: /N-1 instead of /N
+                if SAmeas.shape[1] > 1:
+                    Stdev = np.std(SAmeas, dtype=np.float64, ddof=1, axis=1) #ddof: /N-1 instead of /N
+                else:
+                    Stdev = np.zeros(SAmeas.shape[0])
             else:
-                Stdev=np.zeros(NumFact)
-                Mu=np.zeros(NumFact)
+                Mu    = np.zeros(NumFact)
+                Stdev = np.zeros(NumFact)
 
-        OutMatrix[k*NumFact:k*NumFact+NumFact,0]=AbsMu
+        OutMatrix[k*NumFact:k*NumFact+NumFact,0] = AbsMu
         if NumGroups == 0:
-            OutMatrix[k*NumFact:k*NumFact+NumFact,1]=Mu
-            OutMatrix[k*NumFact:k*NumFact+NumFact,2]=Stdev
+            OutMatrix[k*NumFact:k*NumFact+NumFact,1] = Mu
+            OutMatrix[k*NumFact:k*NumFact+NumFact,2] = Stdev
 
-        SAmeas_out[k*NumFact:k*NumFact+NumFact,:]=SAmeas
+        SAmeas_out[k*NumFact:k*NumFact+NumFact,:] = SAmeas
 
 
     return SAmeas_out, OutMatrix
@@ -744,23 +754,40 @@ def morris_sampling(NumFact, LB, UB, N=500, p=4, r=10, GroupMat=np.array([]), Di
     return Optimized_Groups(NumFact, LB, UB, N, p, r, GroupMat, Diagnostic)
 
 
-def elementary_effects(NumFact, Sample, OutFact, Output, p=4, Group=[]):
+def elementary_effects(NumFact, Sample, OutFact, Output, p=4, Group=[], Diagnostic=False):
     """
         Wrapper function for Morris_Measure_Groups.
-        def Morris_Measure_Groups(NumFact, Sample, OutFact, Output, p=4, Group=[]):
+        def Morris_Measure_Groups(NumFact, Sample, OutFact, Output, p=4, Group=[], Diagnostic=False):
     """
-    return Morris_Measure_Groups(NumFact, Sample, OutFact, Output, p, Group)
+    return Morris_Measure_Groups(NumFact, Sample, OutFact, Output, p, Group, Diagnostic)
 
 
 if __name__ == '__main__':
     import doctest
     doctest.testmod(optionflags=doctest.NORMALIZE_WHITESPACE)
 
-    # NumFact = 2
-    # LB = np.array([0., 1.])
-    # UB = np.array([2., 4.])
-    # N = 30
-    # p = 5
-    # r = 3
+    # NumFact = 15
+    # LB = np.arange(NumFact)
+    # UB = 2.*LB + 1.
+    # N = 100
+    # p = 6
+    # r = 10
     # Diagnostic = 0
-    # print(Optimized_Groups(NumFact, LB, UB, N=N, p=p, r=r, Diagnostic=Diagnostic))
+    # out = np.random.random(r*(NumFact+1))
+    # mat, vec = morris_sampling(NumFact, LB, UB, N=N, p=p, r=r, Diagnostic=Diagnostic)
+    # sa, res = elementary_effects(NumFact, mat, vec, out, p=p)
+    # print(res) # (NumFact,3) = AbsMu, Mu, Stddev
+    # print(sa) #  (NumFact,r) individual elementary effects for all parameters
+
+    # NumFact = 15
+    # LB = np.arange(NumFact)
+    # UB = 2.*LB + 1.
+    # N = 10
+    # p = 6
+    # r = 1
+    # Diagnostic = 0
+    # out = np.random.random(r*(NumFact+1))
+    # mat, vec = morris_sampling(NumFact, LB, UB, N=N, p=p, r=r, Diagnostic=Diagnostic)
+    # sa, res = elementary_effects(NumFact, mat, vec, out, p=p)
+    # print(res) # (NumFact,3) = AbsMu, Mu, Stddev
+    # print(sa) #  (NumFact,1)

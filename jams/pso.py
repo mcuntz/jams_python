@@ -743,12 +743,6 @@ def pso(func, x0, lb, ub,
         parameterwriter   function
                           Python function for writing parameter file if func is name of executable
                           (Default: None)
-        parameterfile     string
-                          Parameter file for executable; must be given if func is name of executable
-                          (Default: None)
-        parameterwriter   function
-                          Python function for writing parameter file if func is name of executable
-                          (Default: None)
         objectivefile     string
                           File with objective value from executable; must be given if func is name of executable
                           (Default: None)
