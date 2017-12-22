@@ -10,6 +10,9 @@
     exponential Exponential
     gauss       Gauss (Normal)
     laplace     Laplace
+    multigauss  Multivariate Gauss (Normal) probability density function (pdf).
+    multinorm   Multivariate normal (Gauss) probability density function (pdf).
+    multinormal Multivariate normal (Gauss) probability density function (pdf).
     norm        Normal (Gauss)
     normal      Normal (Gauss)
     sep         Skew Exponential Power
@@ -61,12 +64,14 @@
 
     History
     -------
-    Written,  MC,    May 2016
-    Modified, JM+DK, May 2016  - sampling from distributions
+    Written,  MC,       May 2016
+    Modified, JM+DK+MC, May 2016  - sampling from distributions
+    Modified, MC,       Dec 2017  - multinormal
 """
 
 from .distributions        import exponential, laplace
 from .distributions        import gauss, normal, norm
+from .distributions        import multigauss, multinormal, multinorm
 from .distributions        import ep, sep, sep_fs, sep_fs_mean, sep_fs_std
 from .distributions        import st, st_fs, st_fs_mean, st_fs_std, t
 
@@ -75,6 +80,6 @@ from .sample_distributions import sample_st, sample_st_fs, sample_t
 
 # Information
 __author__   = "Matthias Cuntz"
-__version__  = '1.1'
-__revision__ = "Revision: 2740"
-__date__     = 'Date: 11.06.2016'
+__version__  = '1.2'
+__revision__ = "Revision: 20171222"
+__date__     = 'Date: 22.12.2017'

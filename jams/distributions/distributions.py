@@ -20,11 +20,14 @@ import numpy as np
     along with the JAMS Python package (cf. gpl.txt and lgpl.txt).
     If not, see <http://www.gnu.org/licenses/>.
 
-    Copyright 2016 Matthias Cuntz
+    Copyright 2016-2017 Matthias Cuntz
+
+    Modified, MC, Dec 2017 - multinormal
 """
 
 __all__ = ['exponential', 'laplace',
            'gauss', 'norm', 'normal',                           # Normal (Gauss)
+           'multigauss', 'multinorm', 'multinormal',            # Multivariate Normal (Gauss)
            'ep', 'sep', 'sep_fs', 'sep_fs_mean', 'sep_fs_std',  # (Skew) Exponential Power
            'st', 'st_fs', 'st_fs_mean', 'st_fs_std', 't']       # (Skew) Student-t
 
@@ -319,6 +322,103 @@ def laplace01(x):
     """
 
     return 0.5 * np.exp(-np.abs(x))
+
+
+# --------------------------------------------------------------------
+
+
+def multigauss(*args, **kwargs):
+    """
+        Wrapper for multinormal
+
+        def multinormal(x, loc=0., sca=1., sig=None):
+    """
+    return multinormal(*args, **kwargs)
+
+
+# --------------------------------------------------------------------
+
+
+def multinorm(*args, **kwargs):
+    """
+        Wrapper for multinormal
+
+        def multinormal(x, loc=0., sca=1., sig=None):
+    """
+    return multinormal(*args, **kwargs)
+
+
+# --------------------------------------------------------------------
+
+
+def multinormal(x, loc=0., sca=1., cov=None):
+    """
+        Multivariate normal (Gauss) probability density function (pdf).
+
+
+        Definition
+        ----------
+        def multinormal(x, loc=0., sca=1., sig=None):
+
+
+        Input
+        -----
+        x          array_like quantiles
+
+
+        Optional Input
+        --------------
+        loc        array_like location
+        sca        array_like scale
+                   Scalar: single variance for all dimensions
+                   1D: variances for all dimensions
+                   2D: covariance matrix
+        cov        array_like standard deviation, overwrites scale
+
+
+        Output
+        ------
+        Multivariate normal (Gauss) pdf at x
+
+
+        Examples
+        --------
+        >>> print(np.allclose(multinormal(0.), 1./np.sqrt(2.*np.pi)))
+        True
+
+        >>> print(np.allclose(multinormal(1.), 1./np.sqrt(2.*np.pi*np.e)))
+        True
+
+        >>> print(np.allclose(multinormal(0., 0., 2.), 0.5/np.sqrt(2.*np.pi)))
+        True
+
+        >>> print(np.allclose(multinormal(0., np.sqrt(2.), 1.)*np.sqrt(2.*np.pi), 1./np.e))
+        True
+
+        >>> print(np.allclose(multinormal(1., 2., 2.), multinormal((1.-2.)/2.)/2.))
+        True
+
+
+        History
+        -------
+        Written,  MC, Dec 2017
+    """
+
+    if cov is not None: sca = cov
+    k = len(x)
+    if np.ndim(sca) == 0:
+        icov = np.full((k,k), sca)
+    elif np.ndim(sca) == 1:
+        icov = np.diag(sca)
+    elif np.ndim(sca) == 2:
+        icov = sca
+    detcov = np.linalg.det(icov)
+    assert detcov != 0., 'Degenerate case: determinant of covariance matrix == 0.'
+    part1 = np.sqrt((2.*np.pi)**k * detcov)
+    # transpose different to matrix formula because of broadcasting rules in Python
+    # x (ndim,) or (nsample,ndim); loc scalar or (ndim,); cov (ndim,ndim)
+    part2 = -0.5 * np.dot(np.dot((x-loc).T, np.linalg.inv(icov)), (x-loc))
+    return np.exp(part2)/part1
 
 
 # --------------------------------------------------------------------
