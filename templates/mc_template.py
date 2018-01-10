@@ -548,7 +548,7 @@ if __name__ == '__main__':
 
     t2    = ptime.time()
     strin = '[m]: {:.1f}'.format((t2-t1)/60.) if (t2-t1)>60. else '[s]: {:d}'.format(int(t2-t1))
-    print('Time elapsed: ', strin)
+    print('Time elapsed', strin)
 
 # -------------------------------------------------------------------------
 # Command line usage if function

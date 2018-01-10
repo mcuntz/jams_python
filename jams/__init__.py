@@ -53,7 +53,7 @@
     files                  Module with file list function.
     file_from_gui          Open file selection dialog for one single file, returns selected files
     files_from_gui         Open file selection dialog, returns selected files
-    fill_nonfinite         Fill missing values by linear interpolation.
+    fill_nonfinite         Fill missing values by interpolation.
     find_in_path           Look for file in system path.
     Filtered_Incompr_Field Generates random filtered velocity fields.
     fread                  Reads in float array from ascii file.
@@ -202,7 +202,7 @@
     convex_hull            Calculate subset of points that make a convex hull around a set of 2D points.
     eddybox                Module containing Eddy Covaraince utilities, see eddybox folder for details
     eddysuite              Example file for processing Eddy data with eddybox and EddySoft
-    fill_nonfinite         Fill missing values by linear interpolation.
+    fill_nonfinite         Fill missing values by interpolation.
     gap2lai                Calculation of leaf projection and leaf area index from gap probability observations.
     interpol               One-dimensional linear interpolation on first dimension.
     kriging                Krig a surface from a set of 2D points.
