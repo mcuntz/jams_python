@@ -139,6 +139,8 @@ def str2tex(strin, space2linebreak=False, bold=False, italic=False, usetex=True)
                     if '^' in ss[ii]:  ss[ii] = rep_up(ss[ii])
                     # escape #
                     if '#' in ss[ii]:  ss[ii] = rep_hash(ss[ii])
+                    # escape %
+                    if ('%' in ss[ii]) and not ('\%' in ss[ii]) : ss[ii] = rep_percent(ss[ii])
                 istrin[j] = '$'.join(ss)
                 if s[0] == '$': istrin[j] = istrin[j][11:] # remove leading $\mathrm{}$ if started with $
             else:
@@ -155,9 +157,9 @@ def str2tex(strin, space2linebreak=False, bold=False, italic=False, usetex=True)
                 if '^' in istrin[j]:  istrin[j] = rep_up(istrin[j])
                 # escape #
                 if '#' in istrin[j]:  istrin[j] = rep_hash(istrin[j])
+                # escape %
+                if ('%' in istrin[j]) and not ('\%' in istrin[j]): istrin[j] = rep_percent(istrin[j])
 
-            # escape %
-            if '%' in istrin[j]: istrin[j] = rep_percent(istrin[j])
             # escape space or linebreak at space
             if ' ' in istrin[j]:
                 if space2linebreak:
@@ -174,6 +176,8 @@ def str2tex(strin, space2linebreak=False, bold=False, italic=False, usetex=True)
             # rm ascii character 0 around linebreaks introduced above
             if a0 in istrin[j]: istrin[j] = rep_a02space(istrin[j])
     else:
+        # escape %
+        if ('%' in istrin) and not ('\%' in istrin): istrin = rep_percent(istrin)
         if space2linebreak: istrin = [ rep_space2n(i) for i in istrin ]
 
     # Return right type
