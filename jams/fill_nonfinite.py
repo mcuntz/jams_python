@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 from __future__ import print_function
 import numpy as np
+from jams.kernel_regression import kernel_regression
 
 def nan_helper(y, nan=False, inf=False, undef=None):
     """
@@ -28,7 +29,7 @@ def nan_helper(y, nan=False, inf=False, undef=None):
         Output
         ------
         ind      logical indices of missing values
-        find     function, with signature indices= find(ind),
+        find     function, with signature indices = find(ind),
                  to convert logical indices of NaNs to 'equivalent' indices
 
 
@@ -59,11 +60,12 @@ def nan_helper(y, nan=False, inf=False, undef=None):
     return out, lambda ind: ind.nonzero()[0]
 
 
-def fill_nonfinite(xin, nan=None, inf=None, undef=None):
+def fill_nonfinite(xin, yin=None, nan=None, inf=None, undef=None, method='interp', **kwargs):
     """
-        Fill missing values by linear interpolation.
+        Fill missing values by interpolation.
 
         Checks for NaN and Inf in xin and interpolates along column (1st dim).
+        If yin is None, then interpolation distance is determined by index number.
         If undef=number is given, it will be interpolated as well.
         If one of nan of inf is given, then only that will be checked,
         i.e. no keyword or only undef given: nan=True, inf=True.
@@ -72,7 +74,7 @@ def fill_nonfinite(xin, nan=None, inf=None, undef=None):
 
         Definition
         ----------
-        def fill_nonfinite(xin, nan=None, inf=None, undef=None):
+        def fill_nonfinite(xin, yin=None, nan=None, inf=None, undef=None, method='interp', **kwargs):
 
 
         Input
@@ -82,9 +84,16 @@ def fill_nonfinite(xin, nan=None, inf=None, undef=None):
 
         Optional Input
         --------------
-        nan        if True, interpolate NaN.
-        inf        if True, interpolate Inf.
-        undef      if given, interpolate xin==undef.
+        yin        ND array (default: None)
+                   If not given, then y=xin and x=np.arange(len(xin[:,0]))
+        nan        if True, interpolate NaN (default: None, see above).
+        inf        if True, interpolate Inf (default: None, see above).
+        undef      if given, interpolate xin==undef (default: None).
+        method     Interpolation method (default: 'interp'):
+                   'interp': linear interpolation with np.interp.
+                   'linear': same as 'interp'
+                   'kernel_regression': non-linear interpolation with jams.kernel_regression.
+        **kwargs   All other keyword arguments will be passed to interpolation routine.
 
 
         Output
@@ -95,21 +104,35 @@ def fill_nonfinite(xin, nan=None, inf=None, undef=None):
         Examples
         --------
         >>> from autostring import astr
-        >>> a = np.array([1, 2, 3])
+
+        >>> a = np.arange(3)+1.
         >>> print(astr(fill_nonfinite(a),1,pp=True))
         ['1.0' '2.0' '3.0']
 
-        >>> a = np.array([1, np.nan, 3])
+        >>> a[1] = np.nan
         >>> print(astr(fill_nonfinite(a),1,pp=True))
         ['1.0' '2.0' '3.0']
 
-        >>> a = np.array([1, np.inf, 3])
+        >>> a[1] = np.inf
         >>> print(astr(fill_nonfinite(a,inf=True),1,pp=True))
         ['1.0' '2.0' '3.0']
 
-        >>> a = np.array([1, 2, 3])
+        >>> a = np.arange(3)+1.
         >>> print(astr(fill_nonfinite(a,undef=2),1,pp=True))
         ['1.0' '2.0' '3.0']
+
+        >>> print(astr(fill_nonfinite(a,undef=2,method='Kernel_regression'),1,pp=True))
+        ['1.0' '2.0' '3.0']
+        >>> print(astr(fill_nonfinite(a,undef=2,method='Kernel_regression',silverman=True),1,pp=True))
+        ['1.0' '2.0' '3.0']
+
+        >>> a = np.arange(10)+1.
+        >>> x = a[:]
+        >>> x[1::3] -= 0.5
+        >>> print(astr(fill_nonfinite(x,a,undef=2),1,pp=True))
+        [' 1.0' ' 1.5' ' 3.0' ' 4.0' ' 4.5' ' 6.0' ' 7.0' ' 7.5' ' 9.0' '10.0']
+        >>> print(astr(fill_nonfinite(x,a,undef=2,method='Kernel_regression',silverman=True),1,pp=True))
+        [' 1.0' ' 1.5' ' 3.0' ' 4.0' ' 4.5' ' 6.0' ' 7.0' ' 7.5' ' 9.0' '10.0']
 
 
         License
@@ -130,19 +153,41 @@ def fill_nonfinite(xin, nan=None, inf=None, undef=None):
         along with the JAMS Python package (cf. gpl.txt and lgpl.txt).
         If not, see <http://www.gnu.org/licenses/>.
 
-        Copyright 2013 Matthias Cuntz
+        Copyright 2013-2018 Matthias Cuntz
 
 
         History
         -------
         Written,  MC, Jul 2013
+        Modified, MC, Jan 2018 - yin
+                  MC, Jan 2018 - added kernel_regression and **kwargs
     """
+    #
+    # yin
+    if yin is not None:
+        xx = xin
+        yy = yin
+    else:
+        xx = None
+        yy = xin
     #
     # Assure ND-array
     isone = False
-    if np.ndim(xin) == 1:
+    if np.ndim(yy) == 1:
         isone = True
-        xin = xin[:,np.newaxis]
+        yy = yy[:,np.newaxis]
+        ny = 1
+    else:
+        ny = yy.shape[1]
+    if xx is None:
+        nx = 0
+    else:
+        if np.ndim(xx) == 1:
+            xx = xx[:,np.newaxis]
+            nx = 1
+        else:
+            nx = xx.shape[1]
+            assert nx == ny, 'x and y ND-arrays must have same dimensions if x is not 1D-array.'
     #
     # Check options - if none given then nan and inf are True
     inan = False
@@ -155,18 +200,31 @@ def fill_nonfinite(xin, nan=None, inf=None, undef=None):
         if (inf!=None): iinf=inf
 
     # interpolate along each column
-    xin = xin.astype(np.float) # np.interp always returns float
-    for i in range(xin.shape[1]):
-        yy = xin[:,i]
-        nans, ind = nan_helper(yy, nan=inan, inf=iinf, undef=undef)
-        if ind(nans).size > 0:
-            yy[nans] = np.interp(ind(nans), ind(~nans), yy[~nans])
-            xin[:,i] = yy
+    yout = yy.astype(np.float) # np.interp always returns float
+    for i in range(ny):
+        yy1 = yout[:,i]
+        if xx is not None:
+            xx1 = xx[:,min(i,nx-1)].astype(np.float)
+        nans, ind = nan_helper(yy1, nan=inan, inf=iinf, undef=undef)            
+        if np.sum(nans) > 0:
+            if (method.lower() == 'interp') or (method.lower() == 'linear'):
+                if xx is None:
+                    yy1[nans] = np.interp(ind(nans), ind(~nans), yy1[~nans], **kwargs)
+                else:
+                    yy1[nans] = np.interp(xx1[nans], xx1[~nans], yy1[~nans], **kwargs)
+            elif method.lower() == 'kernel_regression':
+                if xx is None:
+                    yy1[nans] = kernel_regression(ind(~nans), yy1[~nans], xout=ind(nans), **kwargs)
+                else:
+                    yy1[nans] = kernel_regression(xx1[~nans], yy1[~nans], xout=xx1[nans], **kwargs)
+            else:
+                raise ValueError('Interpolation method unknown:', method)
+            yout[:,i] = yy1
 
     if isone:
-        return np.squeeze(xin)
+        return np.squeeze(yout)
     else:
-        return xin
+        return yout
 
 
 if __name__ == '__main__':
@@ -174,15 +232,26 @@ if __name__ == '__main__':
     doctest.testmod(optionflags=doctest.NORMALIZE_WHITESPACE)
 
     # from autostring import astr
-    # a = np.array([1, 2, 3])
+    # a = np.arange(3)+1.
     # print(astr(fill_nonfinite(a),1,pp=True))
     # #['1.0' '2.0' '3.0']
-    # a = np.array([1, np.nan, 3])
+    # a[1] = np.nan
     # print(astr(fill_nonfinite(a),1,pp=True))
     # #['1.0' '2.0' '3.0']
-    # a = np.array([1, np.inf, 3])
+    # a[1] = np.inf
     # print(astr(fill_nonfinite(a,inf=True),1,pp=True))
     # #['1.0' '2.0' '3.0']
-    # a = np.array([1, 2, 3])
+    # a = np.arange(3)+1.
     # print(astr(fill_nonfinite(a,undef=2),1,pp=True))
     # #['1.0' '2.0' '3.0']
+    # print(astr(fill_nonfinite(a,undef=2,method='Kernel_regression'),1,pp=True))
+    # #['1.0' '2.0' '3.0']
+    # print(astr(fill_nonfinite(a,undef=2,method='Kernel_regression',silverman=True),1,pp=True))
+    # #['1.0' '2.0' '3.0']
+    # a = np.arange(10)+1.
+    # x = a[:]
+    # x[1::3] -= 0.5
+    # print(astr(fill_nonfinite(x,a,undef=2),1,pp=True))
+    # #[' 1.0' ' 1.5' ' 3.0' ' 4.0' ' 4.5' ' 6.0' ' 7.0' ' 7.5' ' 9.0' '10.0']
+    # print(astr(fill_nonfinite(x,a,undef=2,method='Kernel_regression',silverman=True),1,pp=True))
+    # #[' 1.0' ' 1.5' ' 3.0' ' 4.0' ' 4.5' ' 6.0' ' 7.0' ' 7.5' ' 9.0' '10.0']
