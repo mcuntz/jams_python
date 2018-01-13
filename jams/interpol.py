@@ -107,7 +107,7 @@ def interpol(xout, xin, yin):
     ums1 = xout-xin[s]                                                         # distance from point before
     ums2 = xin[s+1]-xin[s]
     ums  = division(ums1, ums2, 0.)
-    ums  = np.where((np.abs(ums1) < eps) | (np.abs(ums2) < eps), 0., ums)    # for numerical stability
+    ums  = np.where((np.abs(ums1) < eps) | (np.abs(ums2) < eps), 0., ums)      # for numerical stability
     # Blow to output shape
     sout = yin.shape[1:][::-1] + (1,)
     ums  = np.transpose(np.tile(ums,sout))

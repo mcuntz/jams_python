@@ -13,6 +13,7 @@
     abc2plot               Write a, b, c, ... on plots.
     alpha_equ_h2o          Equilibrium fractionation between liquid water and vapour.
     alpha_kin_h2o          Kinetic fractionation of molecular diffusion of water vapour.
+    apply_undef            Use a function on masked arguments.
     area_poly              Area of a polygon.
     argsort                Wrapper for numpy.argsort, numpy.ma.argsort, and using sorted for Python iterables.
     around                 Round to the passed power of ten.
@@ -91,6 +92,7 @@
     line_dev_mask          Maskes elements of an array deviating from a line fit.
     logtools               Module with control file functions of Logtools, the Logger Tools Software of Olaf Kolle.
     lon_fmt                Set lon label string (called by Basemap.drawmeridians) if LaTeX package clash.
+    lowess                 Locally linear regression in n dimensions.
     mad                    Median absolute deviation test.
     mat2nc                 Converts Matlab file *.mat into NetCDF *.nc.
     means                  Calculate daily, monthly, yearly, etc. means of data depending on date stamp.
@@ -212,6 +214,7 @@
     level1                 Module with functions dealing with CHS level1 data files, data and flags.
     line_dev_mask          Maskes elements of an array deviating from a line fit.
     logtools               Module with control file functions of Logtools, the Logger Tools Software of Olaf Kolle.
+    lowess                 Locally linear regression in n dimensions.
     mad                    Median absolute deviation test.
     means                  Calculate daily, monthly, yearly, etc. means of data depending on date stamp.
     outlier                Rossner''s extreme standardized deviate outlier test.
@@ -304,6 +307,7 @@
 
     Miscellaneous
     -------------
+    apply_undef            Use a function on masked arguments.
     astr                   Wrapper for autostring.
     autostring             Format number (array) with given decimal precision.
     const                  Provides physical, mathematical, computational, and isotope constants.
@@ -526,6 +530,8 @@
               MC, Nov 2017 - xread
               JM, Dec 2017 - pawn_index
               MC, Dec 2017 - screening
+              MC, Jan 2018 - lowess
+              MC, Jan 2018 - apply_undef
 """
 from __future__ import print_function
 
@@ -539,6 +545,7 @@ from . import qa
 from .abc2plot          import abc2plot
 from .alpha_equ_h2o     import alpha_equ_h2o
 from .alpha_kin_h2o     import alpha_kin_h2o
+from .apply_undef       import apply_undef
 from .area_poly         import area_poly
 from .argsort           import argsort
 from .around            import around
@@ -593,6 +600,7 @@ from .heaviside         import heaviside
 from .homo_sampling     import homo_sampling
 from .in_poly           import in_poly, inpoly
 from .interpol          import interpol
+from .jab               import jab
 from .kernel_regression import kernel_regression, kernel_regression_h
 from .kriging           import kriging
 from .lagcorr           import lagcorr
@@ -600,7 +608,7 @@ from .latlon_fmt        import lat_fmt, lon_fmt
 from .lhs               import lhs
 from .lif               import lif
 from .line_dev_mask     import line_dev_mask
-from .jab               import jab
+from .lowess            import lowess
 from .mad               import mad
 from .maskgroup         import maskgroup
 from .mat2nc            import mat2nc
