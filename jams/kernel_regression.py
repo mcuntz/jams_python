@@ -137,7 +137,7 @@ def kernel_regression(x, y, h=None, silverman=False, xout=None):
     # Loop through each regression point
     for i in range(nout):
         # scaled deference from regression point
-        z      = (xx - xxout[i,:]) / hh
+        z = (xx - xxout[i,:]) / hh
         # nadaraya-watson estimator of gaussian multivariate kernel
         out[i] = nadaraya_watson(z, y)
     #
@@ -222,6 +222,7 @@ def kernel_regression_h(x, y, silverman=False):
                                  of Yingying Dong, Boston College and Yi Cao, Cranfield University
         Modified, MC, Feb 2013 - ported to Python 3
                   MC, Apr 2014 - assert
+                  MC, Jan 2018 - bug in boot_h: x.size->x.shape[0]
     """
     #
     # Check input
@@ -282,7 +283,7 @@ def boot_h(h, x, y):
         This does basically cross_valid_h for 100 random points.
     """
     n   = 100
-    ind = np.random.randint(x.size,size=n)
+    ind = np.random.randint(x.shape[0],size=n)
     # allocate output
     out = np.empty(n)
     # Loop through each bootstrap point
@@ -312,22 +313,23 @@ def nadaraya_watson(z, y):
 if __name__ == '__main__':
     import doctest
     doctest.testmod(optionflags=doctest.NORMALIZE_WHITESPACE)
-    # x = np.zeros((10,2))
-    # x[:,0] = np.arange(10,dtype=np.float)/9.
-    # x[:,1] = 1./(np.arange(10,dtype=np.float)/9.+0.1)
+    # nn = 1000
+    # x = np.zeros((nn,2))
+    # x[:,0] = np.arange(nn,dtype=np.float)/float(nn-1)
+    # x[:,1] = 1./(x[:,0]+0.1)
     # y      = 1. + x[:,0]**2 - np.sin(x[:,1])**2
-    # print y
     # h = kernel_regression_h(x,y)
-    # print h
-    # print kernel_regression(x,y,h)
-    # print kernel_regression(x,y)
+    # print(h)
+    # yy = kernel_regression(x,y,h,xout=x)
+    # print(yy[0], yy[-1])
+    # print(kernel_regression(x,y))
     # h = kernel_regression_h(x,y,silverman=True)
-    # print h
-    # print kernel_regression(x,y,h)
+    # print(h)
+    # print(kernel_regression(x,y,h))
     # ss = np.shape(x)
     # nn = 5
     # xx = np.empty((nn,ss[1]))
     # xx[:,0] = np.amin(x[:,0]) + (np.amax(x[:,0])-np.amin(x[:,0])) * np.arange(nn,dtype=np.float)/np.float(nn)
     # xx[:,1] = np.amin(x[:,1]) + (np.amax(x[:,1])-np.amin(x[:,1])) * np.arange(nn,dtype=np.float)/np.float(nn)
-    # print kernel_regression(x,y,h,xout=xx)
+    # print(kernel_regression(x,y,h,xout=xx))
 
