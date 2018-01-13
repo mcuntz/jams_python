@@ -6,17 +6,17 @@ __all__ = ['apply_undef']
 
 def apply_undef(func, undef, *args, **kwargs):
     """
-        Use function on masked arguments.
+        Use a function on arguments masked with undef.
 
-        Arguments will be masked with undef (masked arrays).
-        They can either be passed and passed to the function. The return value will be
-        filled with undef at the masked entries.
+        Arguments will be masked with undef (masked arrays) and then
+        passed to the function. The return value will be filled with
+        undef at the masked entries.
 
         For example, using np.ma.add two arrays a and b with undef
             c = apply_undef(np.ma.add, undef, a, b)
         is equivalent to
             c = (np.ma.array(a, mask=(a==undef)) + np.ma.array(b, mask=(a==undef))).filled(undef)
-        
+
 
         Definition
         ----------
@@ -49,24 +49,26 @@ def apply_undef(func, undef, *args, **kwargs):
         Examples
         --------
         >>> undef = -999
+
+        # test scalars
+        >>> print(apply_undef(np.ma.add, undef, 1, 2))
+        3
+        >>> print(apply_undef(np.ma.add, undef, undef, 2))
+        -999.0
+        
+        # test iterables: can be list or tuple as well
         >>> a = np.array([1, 2, 3])
         >>> b = [2, undef, 4]
         >>> print(apply_undef(np.ma.add, undef, a, b))
         [   3 -999    7]
-        >>> print(apply_undef(np.add, undef, a, b))
+        >>> print(apply_undef(np.add, undef, a, b)) # numpy functions are mostly masked-aware now
         [   3 -999    7]
 
-        >>> print(apply_undef(np.mean, undef, b))
-        3.0
-
+        # test function keywords
+        >>> print(apply_undef(np.mean, undef, np.vstack([a, b])))
+        2.4
         >>> print(apply_undef(np.mean, undef, np.vstack([a, b]), axis=0))
         [ 1.5  2.   3.5]
-
-        >>> print(apply_undef(np.ma.add, undef, 1, 2))
-        3
-
-        >>> print(apply_undef(np.ma.add, undef, undef, 2))
-        -999.0
 
 
         License
