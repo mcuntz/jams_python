@@ -14,13 +14,13 @@
         p, cov  = opt.curve_fit(jams.functions.f1x, x, y, p0=[p0,p1])
 
     Defines also two cost functions, one with absolute sum, one with squared sum of deviations.
-        3. cost_func    sum(abs(obs-func))
-        4. cost2_func   sum((obs-func)**2)
+        3. cost_func    sum(abs(obs-func(x,p)))
+        4. cost2_func   sum((obs-func(x,p))**2)
     These cost functions can be used for example with fmin
-        p = opt.fmin(jams.functions.cost_f1x, np.array([p1,p2]), args=(x,y), disp=False)
+        p = opt.fmin(jams.functions.cost_f1x, np.array([p1,p2]), args=(x,obs), disp=False)
     or
         p, nfeval, rc = opt.fmin_tnc(jams.functions.cost_f1x, [p1,p2], bounds=[[None,None],[None,None]],
-                                     args=(x,y), approx_grad=True, disp=False)
+                                     args=(x,obs), approx_grad=True, disp=False)
 
     Note the different argument orders:
     curvefit wants f(x,*args) with the independent variable as the first argument
@@ -29,13 +29,13 @@
 
     There are also two common cost functions (absolute and squared deviations) where any function
     in the form func(x, p) can be used as second argument:
-        5. cost_abs(p, func, x, y)
-        6. cost_square(p, func, x, y)
+        5. cost_abs(p, func, x, obs)
+        6. cost_square(p, func, x, obs)
     Used for example as
-        p = opt.fmin(jams.functions.cost_abs, np.array([p1,p2]), args=(jams.functions.f1x_p,x,y), disp=False)
+        p = opt.fmin(jams.functions.cost_abs, np.array([p1,p2]), args=(jams.functions.f1x_p,x,obs), disp=False)
     or
         p, nfeval, rc = opt.fmin_tnc(jams.functions.cost_square, [p1,p2], bounds=[[None,None],[None,None]],
-                                     args=(jams.functions.f1x_p,x,y), approx_grad=True, disp=False)
+                                     args=(jams.functions.f1x_p,x,obs), approx_grad=True, disp=False)
 
 
     Definition
