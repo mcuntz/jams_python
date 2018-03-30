@@ -2,21 +2,26 @@
 from __future__ import print_function
 import numpy as np
 
-__all__ = ['ascii2ascii', 'eng2ascii', 'ascii2eng']
+__all__ = ['ascii2ascii',
+           'ascii2en', 'ascii2fr', 'ascii2us', 'ascii2eng',
+           'en2ascii', 'fr2ascii', 'us2ascii', 'eng2ascii']
 
-def ascii2ascii(edate, full=False, eng=False):
+def ascii2ascii(edate, full=False, en=False, fr=False, us=False, eng=False):
     """
-        Convert date notationas between English YYYY-MM-DD hh:mm:ss and ascii DD.MM.YYYY hh:mm:ss.
+        Convert date notationas between ascii DD.MM.YYYY hh:mm:ss, English YYYY-MM-DD hh:mm:ss,
+        and American MM/DD/YYYY hh:mm:ss.
+        Input can only be ascii, English and American. Output can also be French DD/MM/YYYY hh:mm:ss.
+        Use fr2ascii first for French input formats.
 
 
         Definition
         ----------
-        def ascii2ascii(edate, full=False, eng=False, ascii=None):
+        def ascii2ascii(edate, full=False, en=False, fr=False, us=False):
 
 
         Input
         -----
-        list/ND-array of date strings
+        list/ND-array of date strings in ascii, English or American format.
 
 
         Optional Input
@@ -24,8 +29,13 @@ def ascii2ascii(edate, full=False, eng=False):
         full    True:  output dates arr all in full format DD.MM.YYYY hh:mm:ss; missing time inputs are 00 on output
                 False: output dates are as long as input dates,
                 e.g. [YYYY-MM-DD, YYYY-MM-DD hh:mm] gives [DD.MM.YYYY, DD.MM.YYYY hh:mm]
-        eng     True:  output format is English YYYY-MM-DD hh:mm:ss
+        en      True:  output format is English YYYY-MM-DD hh:mm:ss
                 False: output format is ascii DD.MM.YYYY hh:mm:ss (default)
+        fr      True:  output format is French DD/MM/YYYY hh:mm:ss
+                False: output format is ascii DD.MM.YYYY hh:mm:ss (default)
+        us      True:  output format is American MM/DD/YYYY hh:mm:ss
+                False: output format is ascii DD.MM.YYYY hh:mm:ss (default)
+        eng     Same as en: obsolete.
 
 
         Output
@@ -46,11 +56,11 @@ def ascii2ascii(edate, full=False, eng=False):
         >>> print([ i.decode('UTF-8') for i in out ]) if pyver > (3,0) else print(out)
         ['12.11.2014 12:00:00', '01.03.2015 17:56:00', '01.12.1990 00:00:00', '04.05.1786 00:00:00']
 
-        >>> out = ascii2ascii(edate, eng=True)
+        >>> out = ascii2ascii(edate, en=True)
         >>> print([ i.decode('UTF-8') for i in out ]) if pyver > (3,0) else print(out)
         ['2014-11-12 12:00', '2015-03-01 17:56:00', '1990-12-01', '1786-05-04']
 
-        >>> out = ascii2ascii(edate, eng=True, full=True)
+        >>> out = ascii2ascii(edate, en=True, full=True)
         >>> print([ i.decode('UTF-8') for i in out ]) if pyver > (3,0) else print(out)
         ['2014-11-12 12:00:00', '2015-03-01 17:56:00', '1990-12-01 00:00:00', '1786-05-04 00:00:00']
 
@@ -67,6 +77,283 @@ def ascii2ascii(edate, full=False, eng=False):
         ['12.11.2014 12:00' '01.03.2015 17:56:00' '01.12.1990' '04.05.1786']
 
         >>> out = ascii2ascii(edate[0])
+        >>> print(out.decode('UTF-8')) if pyver > (3,0) else print(out)
+        12.11.2014 12:00
+
+        >>> out = ascii2ascii(edate, us=True)
+        >>> print([ i.decode('UTF-8') for i in out ]) if pyver > (3,0) else print(out)
+        ['11/12/2014 12:00', '03/01/2015 17:56:00', '12/01/1990', '05/04/1786']
+
+        >>> out = ascii2ascii(ascii2ascii(edate, en=True), us=True, full=True)
+        >>> print([ i.decode('UTF-8') for i in out ]) if pyver > (3,0) else print(out)
+        ['11/12/2014 12:00:00', '03/01/2015 17:56:00', '12/01/1990 00:00:00', '05/04/1786 00:00:00']
+
+        >>> out = ascii2ascii(edate, fr=True)
+        >>> print([ i.decode('UTF-8') for i in out ]) if pyver > (3,0) else print(out)
+        ['12/11/2014 12:00', '01/03/2015 17:56:00', '01/12/1990', '04/05/1786']
+
+        >>> out = ascii2ascii(edate, fr=True, full=True)
+        >>> print([ i.decode('UTF-8') for i in out ]) if pyver > (3,0) else print(out)
+        ['12/11/2014 12:00:00', '01/03/2015 17:56:00', '01/12/1990 00:00:00', '04/05/1786 00:00:00']
+
+
+        License
+        -------
+        This file is part of the JAMS Python package.
+
+        The JAMS Python package is free software: you can redistribute it and/or modify
+        it under the terms of the GNU Lesser General Public License as published by
+        the Free Software Foundation, either version 3 of the License, or
+        (at your option) any later version.
+
+        The JAMS Python package is distributed in the hope that it will be useful,
+        but WITHOUT ANY WARRANTY; without even the implied warranty of
+        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+        GNU Lesser General Public License for more details.
+
+        You should have received a copy of the GNU Lesser General Public License
+        along with the JAMS Python package (cf. gpl.txt and lgpl.txt).
+        If not, see <http://www.gnu.org/licenses/>.
+
+        Copyright 2014-2018 Matthias Cuntz
+
+
+        History
+        -------
+        Written,  MC, Feb 2015
+        Modified, MC, Sep 2015 - removed date2dec and dec2date
+                  MC, Nov 2016 - adapted docstring to Python 2 and 3
+                  MC, Mar 2018 - us, eng->en, fr
+    """
+    assert (en+fr+us <= 1), 'en, fr and us keywords mutually exclusive.'
+
+    # Input type and shape
+    if isinstance(edate, list):
+        idate  = np.array(edate)
+    elif isinstance(edate, tuple):
+        idate  = np.array(edate)
+    elif isinstance(edate, np.ndarray):
+        idate   = edate.flatten()
+    else:
+        idate  = np.array([edate])
+    ndate = idate.size
+
+    # Convert to given output type
+    odate = np.zeros((ndate,), dtype='|S19') # 'DD.MM.YYYY hh:mm:ss' are 19 characters
+    for i, d in enumerate(idate):
+        if en:
+            if '-' in d:
+                dd = d                                    # en -> en
+            elif '/' in d:
+                dd = d[6:10]+'-'+d[0:2]+'-'+d[3:5]+d[10:] # us -> en
+            else:
+                dd = d[6:10]+'-'+d[3:5]+'-'+d[0:2]+d[10:] # ascii -> en
+        elif fr:
+            if '-' in d:
+                dd = d[8:10]+'/'+d[5:7]+'/'+d[0:4]+d[10:] # en -> fr
+            elif '/' in d:
+                dd = d[3:5]+'/'+d[0:2]+'/'+d[6:10]+d[10:] # us -> fr
+            else:
+                dd = d[0:2]+'/'+d[3:5]+'/'+d[6:10]+d[10:] # ascii -> fr
+        elif us:
+            if '-' in d:
+                dd = d[5:7]+'/'+d[8:10]+'/'+d[0:4]+d[10:] # en -> us
+            elif '/' in d:
+                dd = d                                    # us -> us
+            else:
+                dd = d[3:5]+'/'+d[0:2]+'/'+d[6:10]+d[10:] # ascii -> us
+        else:
+            if '-' in d:
+                dd = d[8:10]+'.'+d[5:7]+'.'+d[0:4]+d[10:] # en -> ascii
+            elif '/' in d:
+                dd = d[3:5]+'.'+d[0:2]+'.'+d[6:10]+d[10:] # us -> ascii
+            else:
+                dd = d                                    # ascii -> ascii
+        if not full:
+            odate[i] = dd
+        else:
+            if len(d) < 11:
+                dd += ' 00:00:00'
+            else:
+                dd += ':00:00'
+            odate[i] = dd[:19]
+
+    # Return right type
+    if isinstance(edate, list):
+        return list(odate)
+    elif isinstance(edate, tuple):
+        return tuple(odate)
+    elif isinstance(edate, np.ndarray):
+        return odate.reshape(edate.shape)
+    else:
+        return odate[0]
+
+
+def ascii2en(edate, full=False):
+    """
+        Wrapper function for ascii2ascii with English date format output, i.e. en=True.
+        def ascii2ascii(edate, full=False, en=False, us=False):
+
+
+        Examples
+        --------
+        >>> import sys
+        >>> pyver = sys.version_info
+        >>> edate = ['2014-11-12 12:00', '01.03.2015 17:56:00', '1990-12-01', '04.05.1786']
+        >>> out = ascii2en(edate)
+        >>> print([ i.decode('UTF-8') for i in out ]) if pyver > (3,0) else print(out)
+        ['2014-11-12 12:00', '2015-03-01 17:56:00', '1990-12-01', '1786-05-04']
+
+        >>> out = ascii2en(edate, full=True)
+        >>> print([ i.decode('UTF-8') for i in out ]) if pyver > (3,0) else print(out)
+        ['2014-11-12 12:00:00', '2015-03-01 17:56:00', '1990-12-01 00:00:00', '1786-05-04 00:00:00']
+    """
+    return ascii2ascii(edate, full=full, en=True)
+
+
+def ascii2fr(edate, full=False):
+    """
+        Wrapper function for ascii2ascii with French date format output, i.e. fr=True.
+        def ascii2ascii(edate, full=False, en=False, us=False):
+
+
+        Examples
+        --------
+        >>> import sys
+        >>> pyver = sys.version_info
+        >>> edate = ['2014-11-12 12:00', '01.03.2015 17:56:00', '1990-12-01', '04.05.1786']
+        >>> out = ascii2fr(edate)
+        >>> print([ i.decode('UTF-8') for i in out ]) if pyver > (3,0) else print(out)
+        ['12/11/2014 12:00', '01/03/2015 17:56:00', '01/12/1990', '04/05/1786']
+
+        >>> out = ascii2fr(edate, full=True)
+        >>> print([ i.decode('UTF-8') for i in out ]) if pyver > (3,0) else print(out)
+        ['12/11/2014 12:00:00', '01/03/2015 17:56:00', '01/12/1990 00:00:00', '04/05/1786 00:00:00']
+    """
+    return ascii2ascii(edate, full=full, fr=True)
+
+
+def ascii2us(edate, full=False):
+    """
+        Wrapper function for ascii2ascii with American date format output, i.e. us=True.
+        def ascii2ascii(edate, full=False, en=False, us=False):
+
+
+        Examples
+        --------
+        >>> import sys
+        >>> pyver = sys.version_info
+        >>> edate = ['2014-11-12 12:00', '01.03.2015 17:56:00', '1990-12-01', '04.05.1786']
+        >>> out = ascii2ascii(edate, us=True)
+        >>> print([ i.decode('UTF-8') for i in out ]) if pyver > (3,0) else print(out)
+        ['11/12/2014 12:00', '03/01/2015 17:56:00', '12/01/1990', '05/04/1786']
+
+        >>> out = ascii2ascii(ascii2ascii(edate, en=True), us=True, full=True)
+        >>> print([ i.decode('UTF-8') for i in out ]) if pyver > (3,0) else print(out)
+        ['11/12/2014 12:00:00', '03/01/2015 17:56:00', '12/01/1990 00:00:00', '05/04/1786 00:00:00']
+    """
+    return ascii2ascii(edate, full=full, us=True)
+
+
+def ascii2eng(edate, full=False):
+    """
+        Wrapper function for ascii2ascii with English date format output, i.e. en=True.
+        def ascii2ascii(edate, full=False, en=False, us=False):
+
+
+        Examples
+        --------
+        >>> import sys
+        >>> pyver = sys.version_info
+        >>> edate = ['2014-11-12 12:00', '01.03.2015 17:56:00', '1990-12-01', '04.05.1786']
+        >>> out = ascii2eng(edate)
+        >>> print([ i.decode('UTF-8') for i in out ]) if pyver > (3,0) else print(out)
+        ['2014-11-12 12:00', '2015-03-01 17:56:00', '1990-12-01', '1786-05-04']
+
+        >>> out = ascii2eng(edate, full=True)
+        >>> print([ i.decode('UTF-8') for i in out ]) if pyver > (3,0) else print(out)
+        ['2014-11-12 12:00:00', '2015-03-01 17:56:00', '1990-12-01 00:00:00', '1786-05-04 00:00:00']
+    """
+    return ascii2ascii(edate, full=full, en=True)
+
+
+def en2ascii(edate, full=False):
+    """
+        Wrapper function for ascii2ascii with ascii date format output.
+        def ascii2ascii(edate, full=False, en=False, us=False):
+
+
+        Examples
+        --------
+        >>> import sys
+        >>> pyver = sys.version_info
+        >>> edate = ['2014-11-12 12:00', '01.03.2015 17:56:00', '1990-12-01', '04.05.1786']
+        >>> edate = ascii2ascii(edate, en=True)
+        >>> out = en2ascii(edate)
+        >>> print([ i.decode('UTF-8') for i in out ]) if pyver > (3,0) else print(out)
+        ['12.11.2014 12:00', '01.03.2015 17:56:00', '01.12.1990', '04.05.1786']
+
+        >>> out = en2ascii(edate, full=True)
+        >>> print([ i.decode('UTF-8') for i in out ]) if pyver > (3,0) else print(out)
+        ['12.11.2014 12:00:00', '01.03.2015 17:56:00', '01.12.1990 00:00:00', '04.05.1786 00:00:00']
+    """
+    return ascii2ascii(edate, full=full)
+
+
+def fr2ascii(edate, full=False):
+    """
+        Convert French date notation DD/MM/YYYY hh:mm:ss to ascii notation DD.MM.YYYY hh:mm:ss.
+        Simply replaces / with ., assuring iterable type
+
+
+        Definition
+        ----------
+        def fr2ascii(edate, full=False):
+
+
+        Input
+        -----
+        list/ND-array of date strings in French format DD/MM/YYYY hh:mm:ss
+
+
+        Optional Input
+        --------------
+        full    True:  output dates arr all in full format DD.MM.YYYY hh:mm:ss; missing time inputs are 00 on output
+                False: output dates are as long as input dates,
+                e.g. [DD/MM/YYYY, DD/MM/YYYY hh:mm] gives [DD.MM.YYYY, DD.MM.YYYY hh:mm]
+
+
+        Output
+        ------
+        list/ND-array of date strings in ascii format DD.MM.YYYY hh:mm:ss
+
+
+        Examples
+        --------
+        >>> import sys
+        >>> pyver = sys.version_info
+        >>> edate = ['12/11/2014 12:00', '01/03/2015 17:56:00', '01/12/1990', '04/05/1786']
+        >>> out = fr2ascii(edate)
+        >>> print([ i.decode('UTF-8') for i in out ]) if pyver > (3,0) else print(out)
+        ['12.11.2014 12:00', '01.03.2015 17:56:00', '01.12.1990', '04.05.1786']
+
+        >>> out = fr2ascii(edate, full=True)
+        >>> print([ i.decode('UTF-8') for i in out ]) if pyver > (3,0) else print(out)
+        ['12.11.2014 12:00:00', '01.03.2015 17:56:00', '01.12.1990 00:00:00', '04.05.1786 00:00:00']
+
+        >>> out = fr2ascii(list(edate))
+        >>> print([ i.decode('UTF-8') for i in out ]) if pyver > (3,0) else print(out)
+        ['12.11.2014 12:00', '01.03.2015 17:56:00', '01.12.1990', '04.05.1786']
+
+        >>> out = fr2ascii(tuple(edate))
+        >>> print(tuple([ i.decode('UTF-8') for i in out ])) if pyver > (3,0) else print(out)
+        ('12.11.2014 12:00', '01.03.2015 17:56:00', '01.12.1990', '04.05.1786')
+
+        >>> out = fr2ascii(np.array(edate))
+        >>> print(np.array([ i.decode('UTF-8') for i in out ])) if pyver > (3,0) else print(out)
+        ['12.11.2014 12:00' '01.03.2015 17:56:00' '01.12.1990' '04.05.1786']
+
+        >>> out = fr2ascii(edate[0])
         >>> print(out.decode('UTF-8')) if pyver > (3,0) else print(out)
         12.11.2014 12:00
 
@@ -89,64 +376,48 @@ def ascii2ascii(edate, full=False, eng=False):
         along with the JAMS Python package (cf. gpl.txt and lgpl.txt).
         If not, see <http://www.gnu.org/licenses/>.
 
-        Copyright 2014 Matthias Cuntz
+        Copyright 2018 Matthias Cuntz
 
 
         History
         -------
-        Written,  MC, Feb 2015
-        Modified, MC, Sep 2015 - removed date2dec and dec2date
-                  MC, Nov 2016 - adapted docstring to Python 2 and 3
+        Written,  MC, Mar 2018
     """
 
     # Input type and shape
     if isinstance(edate, list):
-        idate  = np.array(edate)
+        idate  = edate
     elif isinstance(edate, tuple):
-        idate  = np.array(edate)
+        idate  = list(edate)
     elif isinstance(edate, np.ndarray):
-        idate   = edate.flatten()
+        idate   = list(edate.flatten())
     else:
-        idate  = np.array([edate])
-    ndate = idate.size
+        idate  = [edate]
+    odate = [ d.replace('/','.') for d in idate ]
 
-    # Convert to given output type
-    odate = np.zeros((ndate,), dtype='|S19') # 'DD.MM.YYYY hh:mm:ss' are 19 characters
-    for i, d in enumerate(idate):
-        if eng:
-            if '-' in d:
-                dd = d
-            else:
-                dd = d[6:10]+'-'+d[3:5]+'-'+d[0:2]+d[10:] # ascii -> eng
-        else:
-            if '-' not in d:
-                dd = d
-            else:
-                dd = d[8:10]+'.'+d[5:7]+'.'+d[0:4]+d[10:] # eng -> ascii
-        if not full:
-            odate[i] = dd
-        else:
+    if full:
+        for i, d in enumerate(odate):
             if len(d) < 11:
-                dd += ' 00:00:00'
+                d += ' 00:00:00'
             else:
-                dd += ':00:00'
-            odate[i] = dd[:19]
+                d += ':00:00'
+            odate[i] = d[:19]
 
     # Return right type
     if isinstance(edate, list):
-        return list(odate)
+        return odate
     elif isinstance(edate, tuple):
         return tuple(odate)
     elif isinstance(edate, np.ndarray):
-        return odate.reshape(edate.shape)
+        return np.array(odate).reshape(edate.shape)
     else:
         return odate[0]
 
 
-def eng2ascii(edate, full=False):
+def us2ascii(edate, full=False):
     """
-        Wrapper function for ascii2ascii with ascii date format output, i.e. eng=False.
-        def ascii2ascii(edate, full=False, eng=False):
+        Wrapper function for ascii2ascii with ascii date format output.
+        def ascii2ascii(edate, full=False, en=False, us=False):
 
 
         Examples
@@ -154,6 +425,30 @@ def eng2ascii(edate, full=False):
         >>> import sys
         >>> pyver = sys.version_info
         >>> edate = ['2014-11-12 12:00', '01.03.2015 17:56:00', '1990-12-01', '04.05.1786']
+        >>> edate = ascii2ascii(edate, us=True)
+        >>> out = us2ascii(edate)
+        >>> print([ i.decode('UTF-8') for i in out ]) if pyver > (3,0) else print(out)
+        ['12.11.2014 12:00', '01.03.2015 17:56:00', '01.12.1990', '04.05.1786']
+
+        >>> out = us2ascii(edate, full=True)
+        >>> print([ i.decode('UTF-8') for i in out ]) if pyver > (3,0) else print(out)
+        ['12.11.2014 12:00:00', '01.03.2015 17:56:00', '01.12.1990 00:00:00', '04.05.1786 00:00:00']
+    """
+    return ascii2ascii(edate, full=full)
+
+
+def eng2ascii(edate, full=False):
+    """
+        Wrapper function for ascii2ascii with ascii date format output.
+        def ascii2ascii(edate, full=False, en=False, us=False):
+
+
+        Examples
+        --------
+        >>> import sys
+        >>> pyver = sys.version_info
+        >>> edate = ['2014-11-12 12:00', '01.03.2015 17:56:00', '1990-12-01', '04.05.1786']
+        >>> edate = ascii2ascii(edate, en=True)
         >>> out = eng2ascii(edate)
         >>> print([ i.decode('UTF-8') for i in out ]) if pyver > (3,0) else print(out)
         ['12.11.2014 12:00', '01.03.2015 17:56:00', '01.12.1990', '04.05.1786']
@@ -162,48 +457,32 @@ def eng2ascii(edate, full=False):
         >>> print([ i.decode('UTF-8') for i in out ]) if pyver > (3,0) else print(out)
         ['12.11.2014 12:00:00', '01.03.2015 17:56:00', '01.12.1990 00:00:00', '04.05.1786 00:00:00']
     """
-    return ascii2ascii(edate, full=full, eng=False)
-
-
-def ascii2eng(edate, full=False):
-    """
-        Wrapper function for ascii2ascii with english date format output, i.e. eng=True.
-        def ascii2ascii(edate, full=False, eng=False):
-
-
-        Examples
-        --------
-        >>> import sys
-        >>> pyver = sys.version_info
-        >>> edate = ['2014-11-12 12:00', '01.03.2015 17:56:00', '1990-12-01', '04.05.1786']
-        >>> out = ascii2eng(edate)
-        >>> print([ i.decode('UTF-8') for i in out ]) if pyver > (3,0) else print(out)
-        ['2014-11-12 12:00', '2015-03-01 17:56:00', '1990-12-01', '1786-05-04']
-
-        >>> out = ascii2eng(edate, full=True)
-        >>> print([ i.decode('UTF-8') for i in out ]) if pyver > (3,0) else print(out)
-        ['2014-11-12 12:00:00', '2015-03-01 17:56:00', '1990-12-01 00:00:00', '1786-05-04 00:00:00']
-    """
-    return ascii2ascii(edate, full=full, eng=True)
+    return ascii2ascii(edate, full=full)
 
 
 if __name__ == '__main__':
     import doctest
     doctest.testmod(optionflags=doctest.NORMALIZE_WHITESPACE)
 
-    # edate = ['2014-11-12 12:00', '01.03.2015 17:56:00', '1990-12-01', '04.05.1786']
-    # print(edate)
-    # print(ascii2ascii(edate))
-    # print(ascii2ascii(edate, full=True))
-    # print(ascii2ascii(edate, eng=True))
-    # print(ascii2ascii(edate, eng=True, full=True))
-    # print(type(ascii2ascii(edate)))
-    # print(type(ascii2ascii(list(edate))))
-    # print(type(ascii2ascii(tuple(edate))))
-    # print(type(ascii2ascii(np.array(edate))))
-    # print(type(ascii2ascii(edate[0])))
-    # print(ascii2ascii(edate))
-    # print(ascii2ascii(list(edate)))
-    # print(ascii2ascii(tuple(edate)))
-    # print(ascii2ascii(np.array(edate)))
-    # print(ascii2ascii(edate[0]))
+    # import sys
+    # pyver = sys.version_info
+    # edate = ['12/11/2014 12:00', '01/03/2015 17:56:00', '01/12/1990', '04/05/1786']
+    # out = fr2ascii(edate)
+    # print([ i.decode('UTF-8') for i in out ]) if pyver > (3,0) else print(out)
+    # # ['12.11.2014 12:00', '01.03.2015 17:56:00', '01.12.1990', '04.05.1786']
+
+    # out = fr2ascii(list(edate))
+    # print([ i.decode('UTF-8') for i in out ]) if pyver > (3,0) else print(out)
+    # # ['12.11.2014 12:00', '01.03.2015 17:56:00', '01.12.1990', '04.05.1786']
+
+    # out = fr2ascii(tuple(edate))
+    # print(tuple([ i.decode('UTF-8') for i in out ])) if pyver > (3,0) else print(out)
+    # # ('12.11.2014 12:00', '01.03.2015 17:56:00', '01.12.1990', '04.05.1786')
+
+    # out = fr2ascii(np.array(edate))
+    # print(np.array([ i.decode('UTF-8') for i in out ])) if pyver > (3,0) else print(out)
+    # # ['12.11.2014 12:00' '01.03.2015 17:56:00' '01.12.1990' '04.05.1786']
+
+    # out = fr2ascii(edate[0])
+    # print(out.decode('UTF-8')) if pyver > (3,0) else print(out)
+    # # 12.11.2014 12:00

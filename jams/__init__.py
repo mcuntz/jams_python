@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+s#!/usr/bin/env python
 """
     JAMS Python Utilities
 
@@ -17,8 +17,10 @@
     area_poly              Area of a polygon.
     argsort                Wrapper for numpy.argsort, numpy.ma.argsort, and using sorted for Python iterables.
     around                 Round to the passed power of ten.
-    ascii2ascii            Convert date notations between English and ascii formats.
-    ascii2eng              Convert date notations to English date format YYYY-MM-DD hh:mm:ss.
+    ascii2ascii            Convert date notations between to ascii date format DD.MM.YYYY hh:mm:ss.
+    ascii2en               Convert date notations to English date format YYYY-MM-DD hh:mm:ss.
+    ascii2fr               Convert date notations to French date format DD/MM/YYYY hh:mm:ss.
+    ascii2us               Convert date notations to American date format MM/DD/YYYY hh:mm:ss.
     astr                   Wrapper for autostring.
     autostring             Format number (array) with given decimal precision.
     baseflow               Calculate baseflow from discharge timeseries
@@ -46,7 +48,7 @@
     elementary_effects     Morris measures mu, stddev and mu*
     ellipse_area           Area of ellipse (or circle)
     encrypt                Module to encrypt and decrypt text using a key system as well as a cipher.
-    eng2ascii              Convert date notations to ascii date format DD.MM.YYYY hh:mm:ss.
+    en2ascii               Convert date notations from English YYYY-MM-DD to ascii date format DD.MM.YYYY hh:mm:ss.
     errormeasures          Definition of different error measures.
     esat                   Calculates the saturation vapour pressure of water/ice.
     fftngo                 Fast fourier transformation for dummies (like me)
@@ -57,6 +59,7 @@
     fill_nonfinite         Fill missing values by interpolation.
     find_in_path           Look for file in system path.
     Filtered_Incompr_Field Generates random filtered velocity fields.
+    fr2ascii               Convert date notations from French DD/MM/YYYT to ascii date format DD.MM.YYYY hh:mm:ss.
     fread                  Reads in float array from ascii file.
     fsread                 Simultaneous read of float and string array from ascii file.
     ftp                    Module with functions for interacting with an open FTP connection.
@@ -134,6 +137,7 @@
     sigma_filter           Mask values deviating more than z standard deviations from a given function.
     signature2plot         Write a copyright notice on a plot.
     str2tex                Convert strings to LaTeX strings in math environement used by matplotlib's usetex
+    us2ascii               Convert date notations from American MM/DD/YYYY to ascii format DD.MM.YYYY hh:mm:ss.
     tail                   Return list with last n lines of file.
     maskgroup              Masks elements in a 1d array gathered in small groups.
     samevalue              Checks if abs. differences of array values within a certain window are smaller than threshold.
@@ -234,11 +238,15 @@
 
     Date & Time
     -----------
-    ascii2ascii            Convert date notations between English and ascii formats.
-    ascii2eng              Convert date notations to English date format YYYY-MM-DD hh:mm:ss.
+    ascii2ascii            Convert date notations to ascii date format DD.MM.YYYY hh:mm:ss
+    ascii2en               Convert date notations to English date format YYYY-MM-DD hh:mm:ss.
+    ascii2fr               Convert date notations to French date format DD/MM/YYYY hh:mm:ss.
+    ascii2us               Convert date notations to American date format MM/DD/YYYY hh:mm:ss.
     date2dec               Converts arrays with calendar date to decimal date.
     dec2date               Converts arrays with decimal date to calendar date.
-    eng2ascii              Convert date notations to ascii date format DD.MM.YYYY hh:mm:ss.
+    en2ascii               Convert date notations from English YYYY-MM-DD to ascii date format DD.MM.YYYY hh:mm:ss.
+    fr2ascii               Convert date notations from French DD/MM/YYYY to ascii date format DD.MM.YYYY hh:mm:ss.
+    us2ascii               Convert date notations from American MM/DD/YYYY to ascii format DD.MM.YYYY hh:mm:ss.
 
 
     Grids / Polygons
@@ -532,6 +540,7 @@
               MC, Dec 2017 - screening
               MC, Jan 2018 - lowess
               MC, Jan 2018 - apply_undef
+              MC, Mar 2015 - ascii2en, en2ascii, ascii2us, us2ascii
 """
 from __future__ import print_function
 
@@ -549,7 +558,7 @@ from .apply_undef       import apply_undef
 from .area_poly         import area_poly
 from .argsort           import argsort
 from .around            import around
-from .ascii2ascii       import ascii2ascii, ascii2eng, eng2ascii
+from .ascii2ascii       import ascii2ascii, ascii2en, ascii2fr, ascii2us, ascii2eng, en2ascii, fr2ascii, us2ascii, eng2ascii
 from .autostring        import autostring, astr
 from .baseflow          import hollickLyneFilter
 from .brewer            import register_brewer, get_brewer, plot_brewer, print_brewer
@@ -564,7 +573,7 @@ from .convex_hull       import convex_hull
 from .correlate         import correlate
 from .cuntz_gleixner    import cuntz_gleixner
 try:
-    from .dag               import create_network, source_nodes, sink_nodes, plot_network
+    from .dag           import create_network, source_nodes, sink_nodes, plot_network
 except ImportError:
     pass # networkx not installed
 from .date2dec          import date2dec
@@ -632,7 +641,7 @@ from .position          import position
 from .pritay            import pritay
 from .pso               import pso
 try:
-    from .readhdf           import readhdf,  hdfread
+    from .readhdf       import readhdf,  hdfread
 except ImportError:
     pass # not installed
 try:
@@ -641,7 +650,7 @@ except ImportError:
     pass # not installed
 from .readhdf5          import readhdf5, hdf5read
 try:
-    from .readnetcdf        import readnetcdf, netcdfread, ncread, readnc
+    from .readnetcdf    import readnetcdf, netcdfread, ncread, readnc
 except ImportError:
     pass # not installed
 from .river_network     import river_network, upscale_fdir
@@ -670,12 +679,12 @@ from .tsym              import tsym
 from .unpack            import unpack
 from .volume_poly       import volume_poly
 try:
-    from .writenetcdf       import writenetcdf, dumpnetcdf
+    from .writenetcdf   import writenetcdf, dumpnetcdf
 except ImportError:
     pass # not installed
 from .xkcd              import xkcd
 try:
-    from .xread             import xread
+    from .xread         import xread
 except ImportError:
     pass # not installed
 from .yrange            import yrange
