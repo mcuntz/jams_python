@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 from __future__ import print_function
 import numpy as np
-from jams.dec2date import dec2date
+import netCDF4 as nc
 
 def gapfill(date, data, rg, tair, vpd,
             data_flag=None, rg_flag=None, tair_flag=None, vpd_flag=None,
@@ -50,11 +50,11 @@ def gapfill(date, data, rg, tair, vpd,
         rg_dev               threshold for maximum deviation of global radiation (default: 50)
         tair_dev             threshold for maximum deviation of air Temperature (default: 2.5)
         vpd_dev              threshold for maximum deviation of vpd (default: 5)
-        longgap   avoid extraploation into a gap longer than longgap days (default: 60)
-        fullday              If True, move beginning of large gap to start of next day
+        longgap              avoid extraploation into a gap longer than longgap days (default: 60)
+        fullday              if True, move beginning of large gap to start of next day
                                       and move end of large gap to end of last day (default: False)
         undef                undefined values in data  (default: -9999, np.nan not allowed)
-        ddof                 Degrees of freedom to use in calculation of standard deviation
+        ddof                 degrees of freedom to use in calculation of standard deviation
                              for error estimate (default: 1)
         err                  if True, fill every data point, i.e. used for error generation (default: False)
         shape                if False then outputs are 1D arrays;
@@ -232,10 +232,13 @@ def gapfill(date, data, rg, tair, vpd,
         raise ValueError('dates must be equally spaced.')
     week    = np.int(np.around(7./ddate[0]))
     nperday = week // 7
-    #hour    = (np.array(np.floor((date-np.trunc(date))*24.), dtype=np.int) + 12) % 24
-    hour, mi = dec2date(date, hr=True, mi=True)
-    hour    = hour + mi/60.
-    day     = np.floor(date-0.5).astype(np.int)
+    # hour = (np.array(np.floor((date-np.trunc(date))*24.), dtype=np.int) + 12) % 24
+    # hour, mi = dec2date(date, hr=True, mi=True)
+    tobj = nc.num2date(date-1721424., 'days since 0001-01-01 12:00:00', calendar='gregorian')
+    hour = np.array([ i.hour for i in tobj ], dtype=np.int)
+    mi   = np.array([ i.minute for i in tobj ], dtype=np.int)
+    hour = hour + mi/60.
+    day  = np.floor(date-0.5).astype(np.int)
 
     if err:
         # error estimate

@@ -1,4 +1,4 @@
-s#!/usr/bin/env python
+#!/usr/bin/env python
 """
     JAMS Python Utilities
 
@@ -540,7 +540,7 @@ s#!/usr/bin/env python
               MC, Dec 2017 - screening
               MC, Jan 2018 - lowess
               MC, Jan 2018 - apply_undef
-              MC, Mar 2015 - ascii2en, en2ascii, ascii2us, us2ascii
+              MC, Mar 2015 - ascii2en, en2ascii, ascii2fr, fr2ascii, ascii2us, us2ascii
 """
 from __future__ import print_function
 
