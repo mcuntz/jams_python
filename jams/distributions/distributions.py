@@ -1,4 +1,6 @@
 #!/usr/bin/env python
+from __future__ import absolute_import
+from __future__ import division
 from __future__ import print_function
 import numpy as np
 """
@@ -389,13 +391,13 @@ def multinormal(x, loc=0., sca=1., cov=None):
         >>> print(np.allclose(multinormal(1.), 1./np.sqrt(2.*np.pi*np.e)))
         True
 
-        >>> print(np.allclose(multinormal(0., 0., 2.), 0.5/np.sqrt(2.*np.pi)))
+        >>> print(np.allclose(multinormal(0., 0., 2.), 1./np.sqrt(2.*np.pi)/np.sqrt(2.)))
         True
 
         >>> print(np.allclose(multinormal(0., np.sqrt(2.), 1.)*np.sqrt(2.*np.pi), 1./np.e))
         True
 
-        >>> print(np.allclose(multinormal(1., 2., 2.), multinormal((1.-2.)/2.)/2.))
+        >>> print(np.allclose(multinormal(1., 2., 3.), multinormal((1.-2.)/np.sqrt(3.))/np.sqrt(3.)))
         True
 
 
@@ -405,9 +407,18 @@ def multinormal(x, loc=0., sca=1., cov=None):
     """
 
     if cov is not None: sca = cov
-    k = len(x)
+    k = np.size(x)
+    if k==1:
+        ix = np.array([x])
+    else:
+        ix = np.array(x)
+    l = np.size(loc)
+    if l==1:
+        iloc = np.array([loc])
+    else:
+        iloc = np.array(loc)
     if np.ndim(sca) == 0:
-        icov = np.full((k,k), sca)
+        icov = np.diag(np.full(k, sca)) # np.full((k,k), sca)
     elif np.ndim(sca) == 1:
         icov = np.diag(sca)
     elif np.ndim(sca) == 2:
@@ -417,7 +428,7 @@ def multinormal(x, loc=0., sca=1., cov=None):
     part1 = np.sqrt((2.*np.pi)**k * detcov)
     # transpose different to matrix formula because of broadcasting rules in Python
     # x (ndim,) or (nsample,ndim); loc scalar or (ndim,); cov (ndim,ndim)
-    part2 = -0.5 * np.dot(np.dot((x-loc).T, np.linalg.inv(icov)), (x-loc))
+    part2 = -0.5 * np.dot(np.dot((ix-iloc).T, np.linalg.inv(icov)), (ix-iloc))
     return np.exp(part2)/part1
 
 
@@ -477,7 +488,7 @@ def normal(x, loc=0., sca=1., sig=None):
         >>> print(np.allclose(normal(0., np.sqrt(2.), 1.)*np.sqrt(2.*np.pi), 1./np.e))
         True
 
-        >>> print(np.allclose(normal(1., 2., 2.), normal((1.-2.)/2.)/2.))
+        >>> print(np.allclose(normal(1., 2., 3.), normal((1.-2.)/3.)/3.))
         True
 
 
