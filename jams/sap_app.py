@@ -1,4 +1,6 @@
 #!/usr/bin/env python
+from __future__ import absolute_import
+from __future__ import division
 from __future__ import print_function
 import numpy as np
 from jams.date2dec import date2dec
@@ -59,7 +61,7 @@ def t2sap(date, data, swd=None, undef=-9999.):
         ...         '18.05.2013 08:30', '18.05.2013 08:40', '18.05.2013 08:50']
         >>> SFD = t2sap(date, data)
         >>> print(np.round(SFD,3))
-        [ 0.     0.024  0.057  0.095  0.095  0.057]
+        [0.    0.024 0.057 0.095 0.095 0.057]
 
 
         >>> # sapflux conversion including clearwater correction
@@ -68,7 +70,7 @@ def t2sap(date, data, swd=None, undef=-9999.):
         ...         '18.05.2013 08:30', '18.05.2013 08:40', '18.05.2013 08:50']
         >>> SFD  = t2sap(date, data, swd=1.5)
         >>> print(np.round(SFD,3))
-        [ 0.     0.035  0.082  0.135  0.135  0.082]
+        [0.    0.035 0.082 0.135 0.135 0.082]
 
 
         License

@@ -1,4 +1,6 @@
 #!/usr/bin/env python
+from __future__ import absolute_import
+from __future__ import division
 from __future__ import print_function
 import numpy as np
 from scipy.spatial.distance import cdist
@@ -43,7 +45,7 @@ def get_nearest(xy, xyz):
         # get z values at the points xy
         >>> z = get_nearest(xy, xyz)
         >>> print(np.round(z,2))
-        [ 0.25  0.7   0.28]
+        [0.25 0.7  0.28]
 
 
         License

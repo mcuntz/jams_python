@@ -1,4 +1,6 @@
 #!/usr/bin/env python
+from __future__ import absolute_import
+from __future__ import division
 from __future__ import print_function
 import numpy as np
 from jams.fread import fread
@@ -354,7 +356,7 @@ def fsread(infile, nc=0, cname=None, snc=0, sname=None, skip=0, cskip=0, hskip=0
         iisnc = snc
     elif isinstance(nc, (list, tuple, np.ndarray)):
         iinc   = nc
-        iirest = range(nres)
+        iirest = list(range(nres))
         for ii in iinc[::-1]: del iirest[ii]
         if snc <= -1:
             iisnc = iirest
@@ -362,7 +364,7 @@ def fsread(infile, nc=0, cname=None, snc=0, sname=None, skip=0, cskip=0, hskip=0
             iisnc = iirest[:snc]
     elif isinstance(snc, (list, tuple, np.ndarray)):
         iisnc  = snc
-        iirest = range(nres)
+        iirest = list(range(nres))
         for ii in iisnc[::-1]: del iirest[ii]
         if nc <= -1:
             iinc = iirest

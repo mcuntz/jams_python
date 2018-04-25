@@ -1,4 +1,7 @@
 #!/usr/bin/env python
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
 """
     Defines general functions, derivatives, etc.
 
@@ -54,7 +57,6 @@
     Written,  MC, Mar 2015
     Modified, MC, Dec 2017 - logistic_p, logistic_offset_p
 """
-from __future__ import print_function
 import numpy as np
 import scipy.special as sp
 

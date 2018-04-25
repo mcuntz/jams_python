@@ -1,4 +1,7 @@
 #!/usr/bin/env python
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
 """
     Provide UFZ colours.
 
@@ -74,7 +77,6 @@
     -------
     Written,  MC, Mar 2015
 """
-from __future__ import print_function
 
 __all__ = ['ufzdarkblue', 'ufzblue', 'ufzlightblue',
            'ufzred', 'ufzorange', 'ufzyellow',

@@ -146,6 +146,8 @@
               MC, MAr 2014 - colour maps in extra file brewer.cmaps
               JM, Sep 2014 - color maps of Mathematica
 """
+from __future__ import absolute_import
+from __future__ import division
 from __future__ import print_function
 
 # Define colormaps

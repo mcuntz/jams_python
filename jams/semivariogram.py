@@ -1,4 +1,6 @@
 #!/usr/bin/env python
+from __future__ import absolute_import
+from __future__ import division
 from __future__ import print_function
 import numpy as np
 
@@ -244,7 +246,7 @@ def semivariogram(x, y, v, nL, di, td, stype='omnidirectional', negscat=0.,
         >>> print(astr(sill, 1))
         ['1.1']
         >>> print(np.around(irange, -1))
-        [ 80.]
+        [80.]
 
         # directional semivariogram with spherical model and fifty lags
         >>> td = 45

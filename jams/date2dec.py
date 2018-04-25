@@ -1,4 +1,6 @@
 #!/usr/bin/env python
+from __future__ import absolute_import
+from __future__ import division
 from __future__ import print_function
 import numpy as np
 
@@ -156,14 +158,14 @@ def date2dec(calendar = 'standard', units=None,
         >>> decimal = date2dec(calendar = 'standard', yr=year, mo=month, dy=day, hr=hour, mi=minute, sc=second)
         >>> from autostring import astr
         >>> nn = year.size
-        >>> print(astr(decimal[:nn/2], 14, pp=True))
+        >>> print(astr(decimal[:nn//2], 14, pp=True))
         ['2.45154902100694e+06' '2.38226217719907e+06' '2.31660093101852e+06' '2.27284810821759e+06']
-        >>> print(astr(decimal[nn/2:nn-2], 14,pp=True))
+        >>> print(astr(decimal[nn//2:nn-2], 14,pp=True))
         ['2.18536732053241e+06' '1.94738596431713e+06']
         >>> decimal = date2dec(calendar='standard', yr=year, mo=6, dy=15, hr=12, mi=minute, sc=second)
-        >>> print(astr(decimal[:nn/2],14,pp=True))
+        >>> print(astr(decimal[:nn//2],14,pp=True))
         ['2.45171102100694e+06' '2.38231401053241e+06' '2.31657101435185e+06' '2.27275102488426e+06']
-        >>> print(astr(decimal[nn/2:nn-2],14,pp=True))
+        >>> print(astr(decimal[nn//2:nn-2],14,pp=True))
         ['2.18545602886574e+06' '1.94731300598380e+06']
 
         # ascii input
@@ -175,23 +177,23 @@ def date2dec(calendar = 'standard', units=None,
         ...                   '18.03.1271 19:41:34', '27.08. 619 11:08:37', '23.08.-1579 20:03:41', '01.01.-4712 12:00:00'])
         >>> decimal = date2dec(calendar='standard', ascii=a)
         >>> nn = a.size
-        >>> print(astr(decimal[:nn/2],14,pp=True))
+        >>> print(astr(decimal[:nn//2],14,pp=True))
         ['2.45154902100694e+06' '2.38226217719907e+06' '2.31660093101852e+06' '2.27284810821759e+06']
-        >>> print(astr(decimal[nn/2:nn-2],14,pp=True))
+        >>> print(astr(decimal[nn//2:nn-2],14,pp=True))
         ['2.18536732053241e+06' '1.94738596431713e+06']
 
         # calendar = 'julian'
         >>> decimal = date2dec(calendar='julian', ascii=a)
-        >>> print(astr(decimal[:nn/2],14,pp=True))
+        >>> print(astr(decimal[:nn//2],14,pp=True))
         ['2.45156202100694e+06' '2.38227417719907e+06' '2.31661093101852e+06' '2.27284810821759e+06']
-        >>> print(astr(decimal[nn/2:nn-2],14,pp=True))
+        >>> print(astr(decimal[nn//2:nn-2],14,pp=True))
         ['2.18536732053241e+06' '1.94738596431713e+06']
 
         # calendar = 'proleptic_gregorian'
         >>> decimal = date2dec(calendar='proleptic_gregorian', ascii=a)
-        >>> print(astr(decimal[:nn/2], 7, pp=True))
+        >>> print(astr(decimal[:nn//2], 7, pp=True))
         ['730123.5210069' '660836.6771991' '595175.4310185' '551412.6082176']
-        >>> print(astr(decimal[nn/2:nn-2], 7, pp=True))
+        >>> print(astr(decimal[nn//2:nn-2], 7, pp=True))
         ['463934.8205324' '225957.4643171']
 
         # calendar = 'excel1900' WITH excelerr=True -> 1900 considered as leap year
@@ -200,21 +202,21 @@ def date2dec(calendar = 'standard', units=None,
         ...               '01.01.1900 00:00:00'])
         >>> decimal = date2dec(calendar='excel1900', ascii=d)
         >>> nn = d.size
-        >>> print(astr(decimal[:nn/2], 7, pp=True))
+        >>> print(astr(decimal[:nn//2], 7, pp=True))
         ['36530.5210069' '18410.6841435' ' 3878.4450810']
-        >>> print(astr(decimal[nn/2:],14,pp=True))
+        >>> print(astr(decimal[nn//2:],14,pp=True))
         ['61.00000000000000' '60.00000000000000' '59.00000000000000' ' 1.00000000000000']
 
         # calendar = 'excel1900' WITH excelerr = False -> 1900 is NO leap year
         >>> decimal = date2dec(calendar='excel1900', ascii=d, excelerr=False)
-        >>> print(astr(decimal[:nn/2], 7, pp=True))
+        >>> print(astr(decimal[:nn//2], 7, pp=True))
         ['36529.5210069' '18409.6841435' ' 3877.4450810']
-        >>> print(astr(decimal[nn/2:],14,pp=True))
+        >>> print(astr(decimal[nn//2:],14,pp=True))
         ['60.00000000000000' '60.00000000000000' '59.00000000000000' ' 1.00000000000000']
 
         # calendar = 'excel1904'
-        >>> decimal = date2dec(calendar='excel1904', ascii=d[:nn/2])
-        >>> print(astr(decimal[:nn/2], 7, pp=True))
+        >>> decimal = date2dec(calendar='excel1904', ascii=d[:nn//2])
+        >>> print(astr(decimal[:nn//2], 7, pp=True))
         ['35069.5210069' '16949.6841435' ' 2417.4450810']
 
         # calendar = '365_day'

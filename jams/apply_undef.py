@@ -1,4 +1,6 @@
 #!/usr/bin/env python
+from __future__ import absolute_import
+from __future__ import division
 from __future__ import print_function
 import numpy as np
 
@@ -68,7 +70,7 @@ def apply_undef(func, undef, *args, **kwargs):
         >>> print(apply_undef(np.mean, undef, np.vstack([a, b])))
         2.4
         >>> print(apply_undef(np.mean, undef, np.vstack([a, b]), axis=0))
-        [ 1.5  2.   3.5]
+        [1.5 2.  3.5]
 
 
         License

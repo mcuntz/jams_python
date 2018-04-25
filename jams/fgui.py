@@ -1,4 +1,6 @@
 #!/usr/bin/env python
+from __future__ import absolute_import
+from __future__ import division
 from __future__ import print_function
 
 __all__ = ['directory_from_gui', 'directories_from_gui', 'file_from_gui', 'files_from_gui']

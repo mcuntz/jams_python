@@ -1,4 +1,6 @@
 #!/usr/bin/env python
+from __future__ import absolute_import
+from __future__ import division
 from __future__ import print_function
 import numpy as np
 
@@ -48,52 +50,40 @@ def ascii2ascii(edate, full=False, en=False, fr=False, us=False, eng=False):
         >>> import sys
         >>> pyver = sys.version_info
         >>> edate = ['2014-11-12 12:00', '01.03.2015 17:56:00', '1990-12-01', '04.05.1786']
-        >>> out = ascii2ascii(edate)
-        >>> print([ i.decode('UTF-8') for i in out ]) if pyver > (3,0) else print(out)
+        >>> print(ascii2ascii(edate))
         ['12.11.2014 12:00', '01.03.2015 17:56:00', '01.12.1990', '04.05.1786']
 
-        >>> out = ascii2ascii(edate, full=True)
-        >>> print([ i.decode('UTF-8') for i in out ]) if pyver > (3,0) else print(out)
+        >>> print(ascii2ascii(edate, full=True))
         ['12.11.2014 12:00:00', '01.03.2015 17:56:00', '01.12.1990 00:00:00', '04.05.1786 00:00:00']
 
-        >>> out = ascii2ascii(edate, en=True)
-        >>> print([ i.decode('UTF-8') for i in out ]) if pyver > (3,0) else print(out)
+        >>> print(ascii2ascii(edate, en=True))
         ['2014-11-12 12:00', '2015-03-01 17:56:00', '1990-12-01', '1786-05-04']
 
-        >>> out = ascii2ascii(edate, en=True, full=True)
-        >>> print([ i.decode('UTF-8') for i in out ]) if pyver > (3,0) else print(out)
+        >>> print(ascii2ascii(edate, en=True, full=True))
         ['2014-11-12 12:00:00', '2015-03-01 17:56:00', '1990-12-01 00:00:00', '1786-05-04 00:00:00']
 
-        >>> out = ascii2ascii(list(edate))
-        >>> print([ i.decode('UTF-8') for i in out ]) if pyver > (3,0) else print(out)
+        >>> print(ascii2ascii(list(edate)))
         ['12.11.2014 12:00', '01.03.2015 17:56:00', '01.12.1990', '04.05.1786']
 
-        >>> out = ascii2ascii(tuple(edate))
-        >>> print(tuple([ i.decode('UTF-8') for i in out ])) if pyver > (3,0) else print(out)
+        >>> print(ascii2ascii(tuple(edate)))
         ('12.11.2014 12:00', '01.03.2015 17:56:00', '01.12.1990', '04.05.1786')
 
-        >>> out = ascii2ascii(np.array(edate))
-        >>> print(np.array([ i.decode('UTF-8') for i in out ])) if pyver > (3,0) else print(out)
+        >>> print(ascii2ascii(np.array(edate)))
         ['12.11.2014 12:00' '01.03.2015 17:56:00' '01.12.1990' '04.05.1786']
 
-        >>> out = ascii2ascii(edate[0])
-        >>> print(out.decode('UTF-8')) if pyver > (3,0) else print(out)
+        >>> print(ascii2ascii(edate[0]))
         12.11.2014 12:00
 
-        >>> out = ascii2ascii(edate, us=True)
-        >>> print([ i.decode('UTF-8') for i in out ]) if pyver > (3,0) else print(out)
+        >>> print(ascii2ascii(edate, us=True))
         ['11/12/2014 12:00', '03/01/2015 17:56:00', '12/01/1990', '05/04/1786']
 
-        >>> out = ascii2ascii(ascii2ascii(edate, en=True), us=True, full=True)
-        >>> print([ i.decode('UTF-8') for i in out ]) if pyver > (3,0) else print(out)
+        >>> print(ascii2ascii(ascii2ascii(edate, en=True), us=True, full=True))
         ['11/12/2014 12:00:00', '03/01/2015 17:56:00', '12/01/1990 00:00:00', '05/04/1786 00:00:00']
 
-        >>> out = ascii2ascii(edate, fr=True)
-        >>> print([ i.decode('UTF-8') for i in out ]) if pyver > (3,0) else print(out)
+        >>> print(ascii2ascii(edate, fr=True))
         ['12/11/2014 12:00', '01/03/2015 17:56:00', '01/12/1990', '04/05/1786']
 
-        >>> out = ascii2ascii(edate, fr=True, full=True)
-        >>> print([ i.decode('UTF-8') for i in out ]) if pyver > (3,0) else print(out)
+        >>> print(ascii2ascii(edate, fr=True, full=True))
         ['12/11/2014 12:00:00', '01/03/2015 17:56:00', '01/12/1990 00:00:00', '04/05/1786 00:00:00']
 
 
@@ -139,7 +129,7 @@ def ascii2ascii(edate, full=False, en=False, fr=False, us=False, eng=False):
     ndate = idate.size
 
     # Convert to given output type
-    odate = np.zeros((ndate,), dtype='|S19') # 'DD.MM.YYYY hh:mm:ss' are 19 characters
+    odate = np.zeros((ndate,), dtype='|U19') # 'DD.MM.YYYY hh:mm:ss' are 19 characters
     for i, d in enumerate(idate):
         if en:
             if '-' in d:
@@ -200,12 +190,10 @@ def ascii2en(edate, full=False):
         >>> import sys
         >>> pyver = sys.version_info
         >>> edate = ['2014-11-12 12:00', '01.03.2015 17:56:00', '1990-12-01', '04.05.1786']
-        >>> out = ascii2en(edate)
-        >>> print([ i.decode('UTF-8') for i in out ]) if pyver > (3,0) else print(out)
+        >>> print(ascii2en(edate))
         ['2014-11-12 12:00', '2015-03-01 17:56:00', '1990-12-01', '1786-05-04']
 
-        >>> out = ascii2en(edate, full=True)
-        >>> print([ i.decode('UTF-8') for i in out ]) if pyver > (3,0) else print(out)
+        >>> print(ascii2en(edate, full=True))
         ['2014-11-12 12:00:00', '2015-03-01 17:56:00', '1990-12-01 00:00:00', '1786-05-04 00:00:00']
     """
     return ascii2ascii(edate, full=full, en=True)
@@ -222,12 +210,10 @@ def ascii2fr(edate, full=False):
         >>> import sys
         >>> pyver = sys.version_info
         >>> edate = ['2014-11-12 12:00', '01.03.2015 17:56:00', '1990-12-01', '04.05.1786']
-        >>> out = ascii2fr(edate)
-        >>> print([ i.decode('UTF-8') for i in out ]) if pyver > (3,0) else print(out)
+        >>> print(ascii2fr(edate))
         ['12/11/2014 12:00', '01/03/2015 17:56:00', '01/12/1990', '04/05/1786']
 
-        >>> out = ascii2fr(edate, full=True)
-        >>> print([ i.decode('UTF-8') for i in out ]) if pyver > (3,0) else print(out)
+        >>> print(ascii2fr(edate, full=True))
         ['12/11/2014 12:00:00', '01/03/2015 17:56:00', '01/12/1990 00:00:00', '04/05/1786 00:00:00']
     """
     return ascii2ascii(edate, full=full, fr=True)
@@ -244,12 +230,10 @@ def ascii2us(edate, full=False):
         >>> import sys
         >>> pyver = sys.version_info
         >>> edate = ['2014-11-12 12:00', '01.03.2015 17:56:00', '1990-12-01', '04.05.1786']
-        >>> out = ascii2ascii(edate, us=True)
-        >>> print([ i.decode('UTF-8') for i in out ]) if pyver > (3,0) else print(out)
+        >>> print(ascii2ascii(edate, us=True))
         ['11/12/2014 12:00', '03/01/2015 17:56:00', '12/01/1990', '05/04/1786']
 
-        >>> out = ascii2ascii(ascii2ascii(edate, en=True), us=True, full=True)
-        >>> print([ i.decode('UTF-8') for i in out ]) if pyver > (3,0) else print(out)
+        >>> print(ascii2ascii(ascii2ascii(edate, en=True), us=True, full=True))
         ['11/12/2014 12:00:00', '03/01/2015 17:56:00', '12/01/1990 00:00:00', '05/04/1786 00:00:00']
     """
     return ascii2ascii(edate, full=full, us=True)
@@ -266,12 +250,10 @@ def ascii2eng(edate, full=False):
         >>> import sys
         >>> pyver = sys.version_info
         >>> edate = ['2014-11-12 12:00', '01.03.2015 17:56:00', '1990-12-01', '04.05.1786']
-        >>> out = ascii2eng(edate)
-        >>> print([ i.decode('UTF-8') for i in out ]) if pyver > (3,0) else print(out)
+        >>> print(ascii2eng(edate))
         ['2014-11-12 12:00', '2015-03-01 17:56:00', '1990-12-01', '1786-05-04']
 
-        >>> out = ascii2eng(edate, full=True)
-        >>> print([ i.decode('UTF-8') for i in out ]) if pyver > (3,0) else print(out)
+        >>> print(ascii2eng(edate, full=True))
         ['2014-11-12 12:00:00', '2015-03-01 17:56:00', '1990-12-01 00:00:00', '1786-05-04 00:00:00']
     """
     return ascii2ascii(edate, full=full, en=True)
@@ -289,12 +271,10 @@ def en2ascii(edate, full=False):
         >>> pyver = sys.version_info
         >>> edate = ['2014-11-12 12:00', '01.03.2015 17:56:00', '1990-12-01', '04.05.1786']
         >>> edate = ascii2ascii(edate, en=True)
-        >>> out = en2ascii(edate)
-        >>> print([ i.decode('UTF-8') for i in out ]) if pyver > (3,0) else print(out)
+        >>> print(en2ascii(edate))
         ['12.11.2014 12:00', '01.03.2015 17:56:00', '01.12.1990', '04.05.1786']
 
-        >>> out = en2ascii(edate, full=True)
-        >>> print([ i.decode('UTF-8') for i in out ]) if pyver > (3,0) else print(out)
+        >>> print(en2ascii(edate, full=True))
         ['12.11.2014 12:00:00', '01.03.2015 17:56:00', '01.12.1990 00:00:00', '04.05.1786 00:00:00']
     """
     return ascii2ascii(edate, full=full)
@@ -333,28 +313,22 @@ def fr2ascii(edate, full=False):
         >>> import sys
         >>> pyver = sys.version_info
         >>> edate = ['12/11/2014 12:00', '01/03/2015 17:56:00', '01/12/1990', '04/05/1786']
-        >>> out = fr2ascii(edate)
-        >>> print([ i.decode('UTF-8') for i in out ]) if pyver > (3,0) else print(out)
+        >>> print(fr2ascii(edate))
         ['12.11.2014 12:00', '01.03.2015 17:56:00', '01.12.1990', '04.05.1786']
 
-        >>> out = fr2ascii(edate, full=True)
-        >>> print([ i.decode('UTF-8') for i in out ]) if pyver > (3,0) else print(out)
+        >>> print(fr2ascii(edate, full=True))
         ['12.11.2014 12:00:00', '01.03.2015 17:56:00', '01.12.1990 00:00:00', '04.05.1786 00:00:00']
 
-        >>> out = fr2ascii(list(edate))
-        >>> print([ i.decode('UTF-8') for i in out ]) if pyver > (3,0) else print(out)
+        >>> print(fr2ascii(list(edate)))
         ['12.11.2014 12:00', '01.03.2015 17:56:00', '01.12.1990', '04.05.1786']
 
-        >>> out = fr2ascii(tuple(edate))
-        >>> print(tuple([ i.decode('UTF-8') for i in out ])) if pyver > (3,0) else print(out)
+        >>> print(fr2ascii(tuple(edate)))
         ('12.11.2014 12:00', '01.03.2015 17:56:00', '01.12.1990', '04.05.1786')
 
-        >>> out = fr2ascii(np.array(edate))
-        >>> print(np.array([ i.decode('UTF-8') for i in out ])) if pyver > (3,0) else print(out)
+        >>> print(fr2ascii(np.array(edate)))
         ['12.11.2014 12:00' '01.03.2015 17:56:00' '01.12.1990' '04.05.1786']
 
-        >>> out = fr2ascii(edate[0])
-        >>> print(out.decode('UTF-8')) if pyver > (3,0) else print(out)
+        >>> print(fr2ascii(edate[0]))
         12.11.2014 12:00
 
 
@@ -426,12 +400,10 @@ def us2ascii(edate, full=False):
         >>> pyver = sys.version_info
         >>> edate = ['2014-11-12 12:00', '01.03.2015 17:56:00', '1990-12-01', '04.05.1786']
         >>> edate = ascii2ascii(edate, us=True)
-        >>> out = us2ascii(edate)
-        >>> print([ i.decode('UTF-8') for i in out ]) if pyver > (3,0) else print(out)
+        >>> print(us2ascii(edate))
         ['12.11.2014 12:00', '01.03.2015 17:56:00', '01.12.1990', '04.05.1786']
 
-        >>> out = us2ascii(edate, full=True)
-        >>> print([ i.decode('UTF-8') for i in out ]) if pyver > (3,0) else print(out)
+        >>> print(us2ascii(edate, full=True))
         ['12.11.2014 12:00:00', '01.03.2015 17:56:00', '01.12.1990 00:00:00', '04.05.1786 00:00:00']
     """
     return ascii2ascii(edate, full=full)
@@ -449,12 +421,10 @@ def eng2ascii(edate, full=False):
         >>> pyver = sys.version_info
         >>> edate = ['2014-11-12 12:00', '01.03.2015 17:56:00', '1990-12-01', '04.05.1786']
         >>> edate = ascii2ascii(edate, en=True)
-        >>> out = eng2ascii(edate)
-        >>> print([ i.decode('UTF-8') for i in out ]) if pyver > (3,0) else print(out)
+        >>> print(eng2ascii(edate))
         ['12.11.2014 12:00', '01.03.2015 17:56:00', '01.12.1990', '04.05.1786']
 
-        >>> out = eng2ascii(edate, full=True)
-        >>> print([ i.decode('UTF-8') for i in out ]) if pyver > (3,0) else print(out)
+        >>> print(eng2ascii(edate, full=True))
         ['12.11.2014 12:00:00', '01.03.2015 17:56:00', '01.12.1990 00:00:00', '04.05.1786 00:00:00']
     """
     return ascii2ascii(edate, full=full)
@@ -466,23 +436,39 @@ if __name__ == '__main__':
 
     # import sys
     # pyver = sys.version_info
-    # edate = ['12/11/2014 12:00', '01/03/2015 17:56:00', '01/12/1990', '04/05/1786']
-    # out = fr2ascii(edate)
-    # print([ i.decode('UTF-8') for i in out ]) if pyver > (3,0) else print(out)
+    # edate = ['2014-11-12 12:00', '01.03.2015 17:56:00', '1990-12-01', '04.05.1786']
+    # print(ascii2ascii(edate))
     # # ['12.11.2014 12:00', '01.03.2015 17:56:00', '01.12.1990', '04.05.1786']
 
-    # out = fr2ascii(list(edate))
-    # print([ i.decode('UTF-8') for i in out ]) if pyver > (3,0) else print(out)
+    # print(ascii2ascii(edate, full=True))
+    # # ['12.11.2014 12:00:00', '01.03.2015 17:56:00', '01.12.1990 00:00:00', '04.05.1786 00:00:00']
+
+    # print(ascii2ascii(edate, en=True))
+    # # ['2014-11-12 12:00', '2015-03-01 17:56:00', '1990-12-01', '1786-05-04']
+
+    # print(ascii2ascii(edate, en=True, full=True))
+    # # ['2014-11-12 12:00:00', '2015-03-01 17:56:00', '1990-12-01 00:00:00', '1786-05-04 00:00:00']
+
+    # print(ascii2ascii(list(edate)))
     # # ['12.11.2014 12:00', '01.03.2015 17:56:00', '01.12.1990', '04.05.1786']
 
-    # out = fr2ascii(tuple(edate))
-    # print(tuple([ i.decode('UTF-8') for i in out ])) if pyver > (3,0) else print(out)
+    # print(ascii2ascii(tuple(edate)))
     # # ('12.11.2014 12:00', '01.03.2015 17:56:00', '01.12.1990', '04.05.1786')
 
-    # out = fr2ascii(np.array(edate))
-    # print(np.array([ i.decode('UTF-8') for i in out ])) if pyver > (3,0) else print(out)
+    # print(ascii2ascii(np.array(edate)))
     # # ['12.11.2014 12:00' '01.03.2015 17:56:00' '01.12.1990' '04.05.1786']
 
-    # out = fr2ascii(edate[0])
-    # print(out.decode('UTF-8')) if pyver > (3,0) else print(out)
+    # print(ascii2ascii(edate[0]))
     # # 12.11.2014 12:00
+
+    # print(ascii2ascii(edate, us=True))
+    # # ['11/12/2014 12:00', '03/01/2015 17:56:00', '12/01/1990', '05/04/1786']
+
+    # print(ascii2ascii(ascii2ascii(edate, en=True), us=True, full=True))
+    # # ['11/12/2014 12:00:00', '03/01/2015 17:56:00', '12/01/1990 00:00:00', '05/04/1786 00:00:00']
+
+    # print(ascii2ascii(edate, fr=True))
+    # # ['12/11/2014 12:00', '01/03/2015 17:56:00', '01/12/1990', '04/05/1786']
+
+    # print(ascii2ascii(edate, fr=True, full=True))
+    # # ['12/11/2014 12:00:00', '01/03/2015 17:56:00', '01/12/1990 00:00:00', '04/05/1786 00:00:00']

@@ -1,4 +1,7 @@
 #!/usr/bin/env python
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
 """
     Common test functions for parameter estimation and optimisation algorithms
     such as Rosenbrock and Griewank functions.
@@ -53,7 +56,6 @@
     Written,  MC, Oct 2013 - test functions such as Rosenbrock, Griewank, etc.
     Modified, MC, Mar 2015 - in separate file
 """
-from __future__ import print_function
 import numpy as np
 
 __all__ = ['ackley', 'griewank', 'goldstein_price', 'rastrigin', 'rosenbrock', 'six_hump_camelback']

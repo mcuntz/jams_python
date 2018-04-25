@@ -1,4 +1,7 @@
 #!/usr/bin/env python
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
 import numpy as np
 from jams.date2dec import date2dec
 from jams.const import cheat_quartz, cheat_water, cheat_air, density_quartz

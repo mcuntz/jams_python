@@ -1,4 +1,6 @@
 #!/usr/bin/env python
+from __future__ import absolute_import
+from __future__ import division
 from __future__ import print_function
 import subprocess
 from distutils.util import strtobool
@@ -722,7 +724,7 @@ def sce(functn, x0, bl, bu,
         print('The best point has improved by {:f} in the last {:d} loops.'.format(criter_change, kstop))
 
     # reshape allbestx
-    allbestx = allbestx.reshape(allbestx.size/nopt,nopt)
+    allbestx = allbestx.reshape(allbestx.size//nopt,nopt)
 
     # end of subroutine sce
     if maxit:

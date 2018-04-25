@@ -1,4 +1,7 @@
 #!/usr/bin/env python
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
 """
     Interpolate between colours in RGB space; make continuous colour maps.
 
@@ -95,7 +98,6 @@
     -------
     Written,  MC, Apr 2013
 """
-from __future__ import print_function
 import numpy as np
 import jams.const as const
 

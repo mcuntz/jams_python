@@ -1,4 +1,7 @@
 #!/usr/bin/env python
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
 """
     Defines common functions that are used in curve_fit or fmin parameter estimations.
 
@@ -114,7 +117,6 @@
               MC, Feb 2014 - line0
               MC, Mar 2015 - separate file
 """
-from __future__ import print_function
 import numpy as np
 import scipy.special as sp
 import jams.const as const

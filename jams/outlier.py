@@ -1,4 +1,6 @@
 #!/usr/bin/env python
+from __future__ import absolute_import
+from __future__ import division
 from __future__ import print_function
 import numpy as np
 import scipy.stats as s
@@ -58,7 +60,7 @@ def outlier(y, alpha=0.01, k=-1, quiet=True):
         # of outliers
         1
         outliers
-        [ 8.01]
+        [8.01]
         indeces
         [25]
         [25]
@@ -73,7 +75,7 @@ def outlier(y, alpha=0.01, k=-1, quiet=True):
         # of outliers
         3
         outliers
-        [ 5.34  5.42  6.01]
+        [5.34 5.42 6.01]
         indeces
         [51 52 53]
         [51 52 53]
@@ -81,7 +83,7 @@ def outlier(y, alpha=0.01, k=-1, quiet=True):
         # of outliers
         3
         outliers
-        [ 5.34  5.42  6.01]
+        [5.34 5.42 6.01]
         indeces
         [51 52 53]
         [51 52 53]
@@ -219,7 +221,7 @@ def rossner(*args, **kwargs):
         # of outliers
         1
         outliers
-        [ 8.01]
+        [8.01]
         indeces
         [25]
         [25]
@@ -234,7 +236,7 @@ def rossner(*args, **kwargs):
         # of outliers
         3
         outliers
-        [ 5.34  5.42  6.01]
+        [5.34 5.42 6.01]
         indeces
         [51 52 53]
         [51 52 53]
@@ -242,7 +244,7 @@ def rossner(*args, **kwargs):
         # of outliers
         3
         outliers
-        [ 5.34  5.42  6.01]
+        [5.34 5.42 6.01]
         indeces
         [51 52 53]
         [51 52 53]

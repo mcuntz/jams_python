@@ -1,4 +1,7 @@
 #!/usr/bin/env python
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
 """
     Register colourmaps with Matplotlib or return RGB values.
     Colour maps include Cynthia Brewer's colour maps,
@@ -170,8 +173,6 @@
               MC, Oct 2016 - print_brewers outputs sorted lists
               MC, Nov 2016 - ported to Python 3, mostly dict.keys() into list(dict.keys())
 """
-from __future__ import print_function
-
 from jams.color import brewer_sequential, brewer_diverging, brewer_qualitative
 from jams.color import oregon_sequential, oregon_diverging, oregon_qualitative
 from jams.color import ncl_large, ncl_small, ncl_meteo_swiss, mathematica

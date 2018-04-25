@@ -1,4 +1,7 @@
 #!/usr/bin/env python
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
 """
     Python port of conversions of chroma.js: https://github.com/gka/chroma.js
     a JavaScript library for color conversions:

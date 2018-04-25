@@ -1,12 +1,12 @@
 #!/usr/bin/env python2
 # -*- coding: utf-8 -*-
+from __future__ import absolute_import
 from __future__ import division
-
+from __future__ import print_function
 
 import numpy as np
 from numpy import sqrt, pi, exp
 from scipy.integrate import quad
-
 
 """
 License:
@@ -45,11 +45,11 @@ def gyration(t, t0, D_local):
         >>> print(np.around(gyration(100, 10, 0.01), 4))
         1.4832
         >>> print(np.around(gyration(100, 10, (0.01, 0.01)), 4))
-        [ 1.4832  1.4832]
+        [1.4832 1.4832]
         >>> print(np.around(gyration(100, (10, 100), (0.01, 0.01)), 4))
-        [ 1.4832  2.    ]
+        [1.4832 2.    ]
         >>> print(np.around(gyration(100, 10, (0.01, 0.01, 0.01)), 4))
-        [ 1.4832  1.4832  1.4832]
+        [1.4832 1.4832 1.4832]
         >>> print(np.around(gyration(100, 0, 0.01), 4))
         1.4142
         >>> print(np.around(gyration(100, 10, 0), 4))
@@ -76,7 +76,7 @@ def initial_dilation_time(R0, D_local):
         10.0
         >>> print(np.around(initial_dilation_time(
         ... gyration(0, 10, (0.01, 0.01)), 0.01), 4))
-        [ 10.  10.]
+        [10. 10.]
     """
     R0 = np.array(R0)
     D_local = np.array(D_local)

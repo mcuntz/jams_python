@@ -1,6 +1,7 @@
 #!/usr/bin/env python
+from __future__ import absolute_import
+from __future__ import division
 from __future__ import print_function
-
 
 def smax(x, y, eta=1. - 1.e-5):
     """

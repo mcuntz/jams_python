@@ -1,4 +1,7 @@
 #!/usr/bin/env python
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
 import numpy as np
 
 def pritay(T, Rg, elev, a=1.12):
@@ -39,7 +42,7 @@ def pritay(T, Rg, elev, a=1.12):
         >>> Rg   = np.array([8143., 24296.]) # [kJ m-2]
         >>> elev = 89.5 # [m] above sea level
         >>> print(np.round(pritay(T, Rg, elev), 2))
-        [ 2.24  7.3 ]
+        [2.24 7.3 ]
 
 
         Literature

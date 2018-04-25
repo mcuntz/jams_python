@@ -1,4 +1,6 @@
 #!/usr/bin/env python
+from __future__ import absolute_import
+from __future__ import division
 from __future__ import print_function
 import numpy as np
 
@@ -40,11 +42,11 @@ def pack(array, mask):
         # Create some data
         # for example an island in the middle of an ocean
         >>> import numpy as np
-        >>> a = np.array([[ 0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.],
-        ...               [ 0.,  0.,  0.,  1.,  1.,  1.,  0.,  0.,  0.,  0.],
-        ...               [ 0.,  0.,  0.,  1.,  1.,  1.,  0.,  0.,  0.,  0.],
-        ...               [ 0.,  0.,  0.,  1.,  1.,  1.,  0.,  0.,  0.,  0.],
-        ...               [ 0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.]])
+        >>> a = np.array([[0., 0., 0., 0., 0., 0., 0., 0., 0., 0.],
+        ...               [0., 0., 0., 1., 1., 1., 0., 0., 0., 0.],
+        ...               [0., 0., 0., 1., 1., 1., 0., 0., 0., 0.],
+        ...               [0., 0., 0., 1., 1., 1., 0., 0., 0., 0.],
+        ...               [0., 0., 0., 0., 0., 0., 0., 0., 0., 0.]])
         >>> nn = list(np.shape(a))
         >>> nn.insert(0,2)
         >>> a3 = np.empty(nn)
@@ -59,15 +61,15 @@ def pack(array, mask):
         >>> print(a.sum())
         9.0
         >>> print(b)
-        [ 1.  1.  1.  1.  1.  1.  1.  1.  1.]
+        [1. 1. 1. 1. 1. 1. 1. 1. 1.]
         >>> b3 = pack(a3, mask)
         >>> print(a3.sum())
         18.0
         >>> print(b3.sum())
         18.0
         >>> print(b3)
-        [[ 1.  1.  1.  1.  1.  1.  1.  1.  1.]
-         [ 1.  1.  1.  1.  1.  1.  1.  1.  1.]]
+        [[1. 1. 1. 1. 1. 1. 1. 1. 1.]
+         [1. 1. 1. 1. 1. 1. 1. 1. 1.]]
 
 
         License
@@ -137,6 +139,7 @@ def pack(array, mask):
 if __name__ == '__main__':
     import doctest
     doctest.testmod(optionflags=doctest.NORMALIZE_WHITESPACE)
+
     # a = np.array([[ 0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.],
     #               [ 0.,  0.,  0.,  1.,  1.,  1.,  0.,  0.,  0.,  0.],
     #               [ 0.,  0.,  0.,  1.,  1.,  1.,  0.,  0.,  0.,  0.],

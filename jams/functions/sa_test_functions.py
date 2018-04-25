@@ -1,4 +1,7 @@
 #!/usr/bin/env python
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
 """
     Test functions for parameter sensitivity analysis from
         Ishigami and Homma (1990) An importance qualification technique in uncertainty analysis for computer models,
@@ -71,7 +74,6 @@
     -------
     Written,  MC, Mar 2015
 """
-from __future__ import print_function
 
 __all__ = ['B', 'g', 'G', 'Gstar', 'K', 'morris', 'oakley_ohagan', 'ishigami_homma']
 

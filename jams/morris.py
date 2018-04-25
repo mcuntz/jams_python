@@ -1,4 +1,7 @@
 #!/usr/bin/env python
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
 """
     Morris Method / Elementary Effects
     It includes optimised sampling of trajectories including optional groups
@@ -106,7 +109,6 @@
                              and removed one loop in a loop over total number of trajectories
                            - several little improvements on speed
 """
-from __future__ import print_function
 import numpy as np
 
 

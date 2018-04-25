@@ -1,4 +1,7 @@
 #!/usr/bin/env python
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
 '''
     leafmodel: contains routines to model photosynthesis and stomatal conductance
     of canopies or leaves.

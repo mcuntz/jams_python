@@ -1,7 +1,9 @@
 #!/usr/bin/env python
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
 # MC, May 2012 - removed math
 #              - from numpy import *  -> import numpy as np
-from __future__ import print_function
 import numpy as np
 
 def i4_bit_hi1( n ):

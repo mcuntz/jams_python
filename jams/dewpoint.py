@@ -1,4 +1,6 @@
 #!/usr/bin/env python
+from __future__ import absolute_import
+from __future__ import division
 from __future__ import print_function
 import numpy as np
 
@@ -41,7 +43,7 @@ def dewpoint(pres, Celsius=False):
         Examples
         --------
         >>> Ta = 20. + 273.15
-        >>> from esat import esat # from jams
+        >>> from jams.esat import esat # from jams
         >>> es = esat(Ta, formula='Buck_original')
         >>> from autostring import astr
         >>> print(astr(dewpoint(es),3,pp=True))

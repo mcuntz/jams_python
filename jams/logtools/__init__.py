@@ -1,4 +1,7 @@
 #!/usr/bin/env python
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
 """
     Almost all control file functions of Logtools, the Logger Tools Software of
     Olaf Kolle, MPI-BGC Jena, (c) 2012.

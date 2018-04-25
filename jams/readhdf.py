@@ -1,4 +1,6 @@
 #!/usr/bin/env python
+from __future__ import absolute_import
+from __future__ import division
 from __future__ import print_function
 import numpy as np
 import os
@@ -56,7 +58,7 @@ def readhdf(fName, var='', reform=False, squeeze=False, variables=False,
         >>> print([ str(i) for i in sorted(list(a.keys())) ])
         ['Double', 'Inttest', 'LLLLLL', 'What the hell']
         >>> print(a['Double'])
-        [ 1.1]
+        [1.1]
 
         >>> from autostring import astr
         >>> print(astr(readhdf('test_readhdf5.hdf5', var='chs'),3,pp=True))

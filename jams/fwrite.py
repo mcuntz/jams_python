@@ -1,4 +1,6 @@
 #!/usr/bin/env python
+from __future__ import absolute_import
+from __future__ import division
 from __future__ import print_function
 import numpy as np
 
@@ -39,8 +41,8 @@ def fwrite(fname, arr, header=None, precision='10.0'):
         >>> fread(filename, nc=2, skip=2, header=True)
         [['Description', 'testing'], ['author', 'ST']]
         >>> fread(filename, skip=2)
-        array([[ 0.,  1.,  2.,  3.,  4.],
-               [ 5.,  6.,  7.,  8.,  9.]])
+        array([[0., 1., 2., 3., 4.],
+               [5., 6., 7., 8., 9.]])
 
         >>> import os
         >>> os.remove(filename)

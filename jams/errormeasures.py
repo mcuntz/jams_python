@@ -1,4 +1,6 @@
 #!/usr/bin/env python
+from __future__ import absolute_import
+from __future__ import division
 from __future__ import print_function
 import numpy as np
 from scipy.stats import t
@@ -322,7 +324,7 @@ def confint(y_obs, p=0.95):
     >>> y_obs = np.array([12.7867, 13.465, 14.1433, 15.3733, 16.6033])
     >>> # calculate confident interval
     >>> print(np.round(confint(y_obs)))
-    [ 13.  16.]
+    [13. 16.]
 
     """
     s = y_obs.size

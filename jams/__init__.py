@@ -542,6 +542,8 @@
               MC, Jan 2018 - apply_undef
               MC, Mar 2015 - ascii2en, en2ascii, ascii2fr, fr2ascii, ascii2us, us2ascii
 """
+from __future__ import absolute_import
+from __future__ import division
 from __future__ import print_function
 
 # sub-packages without dependencies to rest of jams

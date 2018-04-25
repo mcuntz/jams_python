@@ -1,4 +1,6 @@
 #!/usr/bin/env python
+from __future__ import absolute_import
+from __future__ import division
 from __future__ import print_function
 import numpy as np
 import netCDF4 as nc
@@ -97,15 +99,15 @@ def mat2nc(fname, overwrite=False, fname_out=None, verbose=True, squeeze=True,
 
         >>> from jams.readnetcdf import readnetcdf
         >>> readnetcdf('test.nc',var='ss')
-        array([ 10.])
+        array([10.])
         >>> readnetcdf('test.nc',var='tt')
-        array([[ 10.,   1.,   1.],
-               [ 20.,   2.,   2.]])
+        array([[10.,  1.,  1.],
+               [20.,  2.,  2.]])
         >>> readnetcdf('test.nc',var='uu')
-        array([[ 10.,   1.,   1.],
-               [ 20.,   2.,   2.]])
+        array([[10.,  1.,  1.],
+               [20.,  2.,  2.]])
         >>> readnetcdf('test.nc',var='vv')
-        array([ 10.,   1.,   1.,  20.,   2.,   2.])
+        array([10.,  1.,  1., 20.,  2.,  2.])
 
         # --------------------------------------------
         # Write un-squeezed, original arrays (same shape as in Matlab)
@@ -114,19 +116,19 @@ def mat2nc(fname, overwrite=False, fname_out=None, verbose=True, squeeze=True,
         >>> mat2nc('test.mat',squeeze=False,verbose=False)
 
         >>> readnetcdf('test.nc',var='ss')
-        array([[ 10.]])
+        array([[10.]])
         >>> readnetcdf('test.nc',var='tt')
-        array([[ 10.,   1.,   1.],
-               [ 20.,   2.,   2.]])
+        array([[10.,  1.,  1.],
+               [20.,  2.,  2.]])
         >>> readnetcdf('test.nc',var='uu')
-        array([[[ 10.],
-                [  1.],
-                [  1.]],
-               [[ 20.],
-                [  2.],
-                [  2.]]])
+        array([[[10.],
+                [ 1.],
+                [ 1.]],
+               [[20.],
+                [ 2.],
+                [ 2.]]])
         >>> readnetcdf('test.nc',var='vv')
-        array([[ 10.,   1.,   1.,  20.,   2.,   2.]])
+        array([[10.,  1.,  1., 20.,  2.,  2.]])
 
         >>> if os.path.isfile('test.nc'): os.remove('test.nc')
         >>> if os.path.isfile('test.mat'): os.remove('test.mat')

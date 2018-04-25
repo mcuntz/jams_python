@@ -1,4 +1,6 @@
 #!/usr/bin/env python
+from __future__ import absolute_import
+from __future__ import division
 from __future__ import print_function
 import numpy as np
 
@@ -63,11 +65,11 @@ def readnetcdf(file, var='', code=-1, reform=False, squeeze=False,
         --------
         # Read varibale or code
         >>> print(readnetcdf('test_readnetcdf.nc',var='is1'))
-        [[ 1.  1.  1.  1.]
-         [ 1.  1.  1.  1.]]
+        [[1. 1. 1. 1.]
+         [1. 1. 1. 1.]]
         >>> print(readnetcdf('test_readnetcdf.nc',code=129))
-        [[ 2.  2.  2.  2.]
-         [ 2.  2.  2.  2.]]
+        [[2. 2. 2. 2.]
+         [2. 2. 2. 2.]]
 
         # Get variable names
         >>> print([str(i) for i in readnetcdf('test_readnetcdf.nc',variables=True)])
@@ -79,7 +81,7 @@ def readnetcdf(file, var='', code=-1, reform=False, squeeze=False,
         >>> print(readnetcdf('test_readnetcdf.nc',codes=True))
         [  -1.   -1.  128.  129.]
         >>> print(readnetcdf('test_readnetcdf.nc',codes=True,reform=True))
-        [ 128.  129.]
+        [128. 129.]
         >>> print(readnetcdf('test_readnetcdf.nc',codes=True,sort=True))
         [128.0, 129.0, -1.0, -1.0]
 
@@ -110,20 +112,20 @@ def readnetcdf(file, var='', code=-1, reform=False, squeeze=False,
         >>> print( var.shape )
         (2, 4)
         >>> print( var[:] )
-        [[ 1.  1.  1.  1.]
-         [ 1.  1.  1.  1.]]
+        [[1. 1. 1. 1.]
+         [1. 1. 1. 1.]]
         >>> fh.close()
         
         # Change a variable in a file
         >>> print(readnetcdf('test_readnetcdf1.nc', var='is1'))
-        [[ 1.  1.  1.  1.]
-         [ 1.  1.  1.  1.]]
+        [[1. 1. 1. 1.]
+         [1. 1. 1. 1.]]
         >>> fh, var = readnetcdf('test_readnetcdf1.nc', var='is1', overwrite=True)
         >>> var[:] *= 2.
         >>> fh.close()
         >>> print(readnetcdf('test_readnetcdf1.nc', var='is1'))
-        [[ 2.  2.  2.  2.]
-         [ 2.  2.  2.  2.]]
+        [[2. 2. 2. 2.]
+         [2. 2. 2. 2.]]
         >>> fh, var = readnetcdf('test_readnetcdf1.nc', var='is1', overwrite=True)
         >>> var[:] *= 0.5
         >>> fh.close()
@@ -179,7 +181,7 @@ def readnetcdf(file, var='', code=-1, reform=False, squeeze=False,
         else:
             f = nc.Dataset(file, 'r')
     except IOError:
-        raise IOError('Cannot open file for reading.'+file)
+        raise IOError('Cannot open file for reading: '+file)
     # Variables
     vars = list(f.variables.keys())
     nvars = len(vars)
@@ -323,11 +325,11 @@ def netcdfread(*args, **kwargs):
         Examples
         --------
         >>> print(netcdfread('test_readnetcdf.nc',var='is1'))
-        [[ 1.  1.  1.  1.]
-         [ 1.  1.  1.  1.]]
+        [[1. 1. 1. 1.]
+         [1. 1. 1. 1.]]
         >>> print(netcdfread('test_readnetcdf.nc',code=129))
-        [[ 2.  2.  2.  2.]
-         [ 2.  2.  2.  2.]]
+        [[2. 2. 2. 2.]
+         [2. 2. 2. 2.]]
         >>> print([str(i) for i in netcdfread('test_readnetcdf.nc',variables=True)])
         ['x', 'y', 'is1', 'is2']
         >>> print([str(i) for i in netcdfread('test_readnetcdf.nc',variables=True,sort=True)])
@@ -349,7 +351,7 @@ def netcdfread(*args, **kwargs):
         >>> print(netcdfread('test_readnetcdf.nc',codes=True))
         [  -1.   -1.  128.  129.]
         >>> print(netcdfread('test_readnetcdf.nc',codes=True,reform=True))
-        [ 128.  129.]
+        [128. 129.]
         >>> print(netcdfread('test_readnetcdf.nc',codes=True,sort=True))
         [128.0, 129.0, -1.0, -1.0]
     """
@@ -367,11 +369,11 @@ def ncread(*args, **kwargs):
         Examples
         --------
         >>> print(ncread('test_readnetcdf.nc',var='is1'))
-        [[ 1.  1.  1.  1.]
-         [ 1.  1.  1.  1.]]
+        [[1. 1. 1. 1.]
+         [1. 1. 1. 1.]]
         >>> print(ncread('test_readnetcdf.nc',code=129))
-        [[ 2.  2.  2.  2.]
-         [ 2.  2.  2.  2.]]
+        [[2. 2. 2. 2.]
+         [2. 2. 2. 2.]]
         >>> print([str(i) for i in ncread('test_readnetcdf.nc',variables=True)])
         ['x', 'y', 'is1', 'is2']
         >>> print([str(i) for i in ncread('test_readnetcdf.nc',variables=True,sort=True)])
@@ -393,7 +395,7 @@ def ncread(*args, **kwargs):
         >>> print(ncread('test_readnetcdf.nc',codes=True))
         [  -1.   -1.  128.  129.]
         >>> print(ncread('test_readnetcdf.nc',codes=True,reform=True))
-        [ 128.  129.]
+        [128. 129.]
         >>> print(ncread('test_readnetcdf.nc',codes=True,sort=True))
         [128.0, 129.0, -1.0, -1.0]
     """
@@ -411,11 +413,11 @@ def readnc(*args, **kwargs):
         Examples
         --------
         >>> print(readnc('test_readnetcdf.nc',var='is1'))
-        [[ 1.  1.  1.  1.]
-         [ 1.  1.  1.  1.]]
+        [[1. 1. 1. 1.]
+         [1. 1. 1. 1.]]
         >>> print(readnc('test_readnetcdf.nc',code=129))
-        [[ 2.  2.  2.  2.]
-         [ 2.  2.  2.  2.]]
+        [[2. 2. 2. 2.]
+         [2. 2. 2. 2.]]
         >>> print([str(i) for i in readnc('test_readnetcdf.nc',variables=True)])
         ['x', 'y', 'is1', 'is2']
         >>> print([str(i) for i in readnc('test_readnetcdf.nc',variables=True,sort=True)])
@@ -437,7 +439,7 @@ def readnc(*args, **kwargs):
         >>> print(readnc('test_readnetcdf.nc',codes=True))
         [  -1.   -1.  128.  129.]
         >>> print(readnc('test_readnetcdf.nc',codes=True,reform=True))
-        [ 128.  129.]
+        [128. 129.]
         >>> print(readnc('test_readnetcdf.nc',codes=True,sort=True))
         [128.0, 129.0, -1.0, -1.0]
     """
