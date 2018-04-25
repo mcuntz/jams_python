@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-from __future__ import print_function
+from __future__ import division, absolute_import, print_function
 """
 usage: mc_plot_template.py [-h] [-f flag] [-g pngbase] [-p pdffile] [-t]
                            [additional_args [additional_args ...]]

@@ -1,7 +1,5 @@
 #!/usr/bin/env python
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
+from __future__ import division, absolute_import, print_function
 import numpy as np
 from jams.date2dec import date2dec
 from jams.const import mmol_co2, mmol_h2o, mmol_air, cheat_air, latentheat_vaporization, T0

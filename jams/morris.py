@@ -1,7 +1,5 @@
 #!/usr/bin/env python
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
+from __future__ import division, absolute_import, print_function
 """
     Morris Method / Elementary Effects
     It includes optimised sampling of trajectories including optional groups

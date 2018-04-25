@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-from __future__ import print_function
+from __future__ import division, absolute_import, print_function
 """
 usage: mc_map.py [-h] [-g pngbase] [-p pdffile] [-t] [Input file]
 

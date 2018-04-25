@@ -1,7 +1,5 @@
 #!/usr/bin/env python
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
+from __future__ import division, absolute_import, print_function
 """
     Test functions for parameter sensitivity analysis from
         Ishigami and Homma (1990) An importance qualification technique in uncertainty analysis for computer models,
