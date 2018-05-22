@@ -305,12 +305,16 @@ def date2dec(calendar = 'standard', units=None,
     import netCDF4 as nt
     try:
         tst = nt.date2num
+        tst = nt.datetime
     except:
-        import netcdftime as nt
-        if ((nt.__version__ <= '0.9.2') & (calendar == '360_day')):
-            raise ValueError("date2dec error: Your version of netcdftime.py is equal"
-                             " or below 0.9.2. The 360_day calendar does not work with"
-                             " arrays here. Please download a newer one.")
+        try:
+            import netcdftime as nt
+            if ((nt.__version__ <= '0.9.2') & (calendar == '360_day')):
+                raise ValueError("date2dec error: Your version of netcdftime.py is equal"
+                                 " or below 0.9.2. The 360_day calendar does not work with"
+                                 " arrays here. Please download a newer one.")
+        except:
+            import cftime as nt
     #
     calendar = calendar.lower()
     if (calendar not in calendars):
