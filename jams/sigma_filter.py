@@ -4,7 +4,7 @@ import numpy as np
 import scipy.optimize as opt
 import jams.functions as functions
 
-def sigma_filter(x, y, z=3, func=functions.line_p, p=[0.,1.], plot=False):
+def sigma_filter(x, y, z=3, func=functions.line_p, p=[0.,1.], plot=False, popt=False):
     
     """
         Checks a 1D-array for points deviating more than z standard deviations
@@ -20,7 +20,7 @@ def sigma_filter(x, y, z=3, func=functions.line_p, p=[0.,1.], plot=False):
 
         Input
         -----
-        x            1D-array
+        x            1D-array, or ND-array, which is filtered in the last dimension, i.e. x.shape[-1] == y.size
         y            1D-(masked) array
         
         
@@ -32,11 +32,16 @@ def sigma_filter(x, y, z=3, func=functions.line_p, p=[0.,1.], plot=False):
         func         func object. Default: functions.line_p
         p            initial function parameters, Default: [0,1]
         plot         True: plot iterative fits; Default: False
+        popt         True: output also optimal parameters after filtering; False: output only mask
+                     Default: False
 
 
         Output
         ------
-        new_mask     mask of y where y deviates more than z*std from fitted function
+        if popt:
+            new_mask, popt    mask of y where y deviates more than z*std from fitted function, optimal parameters
+        else:
+            new_mask          mask of y where y deviates more than z*std from fitted function
 
 
         Examples
@@ -76,8 +81,11 @@ def sigma_filter(x, y, z=3, func=functions.line_p, p=[0.,1.], plot=False):
         >>> y[10] *= 10.
         >>> y[20] *= 10.
         >>> # detect outliers
-        >>> print(sigma_filter(x, y, z=5, p=[2.1,1.4,3.1], func=fun2, plot=False)[0:12])
+        >>> s, p = sigma_filter(x, y, z=5, p=[2.1,1.4,3.1], func=fun2, plot=False, popt=True)
+        >>> print(s[0:12])
         [False False  True False False False False False False False  True False]
+        >>> print(astr(p, 1))
+        ['2.0' '1.5' '3.0']
 
         
         License
@@ -98,13 +106,14 @@ def sigma_filter(x, y, z=3, func=functions.line_p, p=[0.,1.], plot=False):
         along with the JAMS Python package (cf. gpl.txt and lgpl.txt).
         If not, see <http://www.gnu.org/licenses/>.
 
-        Copyright 2014 Matthias Cuntz
+        Copyright 2014-2018 Matthias Cuntz
 
 
         History
         -------
         Written,  MC, Feb 2014 - changed line_dev_mask
         Modified, MC, Dec 2014 - x.compressed error because x is non-masked
+                  MC, May 2018 - pout, x ND-array
     """
     if plot:
         import matplotlib.pyplot as plt
@@ -120,7 +129,10 @@ def sigma_filter(x, y, z=3, func=functions.line_p, p=[0.,1.], plot=False):
     while go_on:
         # fit function to data
         mm = np.where(~y_new.mask)[0]
-        xx = x[mm]
+        if x.ndim == 1:
+            xx = x[mm]
+        else:
+            xx = x[...,mm]
         yy = y_new.compressed()
         p_opt = opt.fmin(functions.cost_abs, p_opt, args=(func,xx,yy), disp=False)
 
@@ -133,9 +145,10 @@ def sigma_filter(x, y, z=3, func=functions.line_p, p=[0.,1.], plot=False):
             fig = plt.figure('sigma_filter')
             sub = fig.add_subplot(111)
             sub.plot(x, y_new, 'ko-')
-            sub.plot(x, func(x,p_opt), 'k--')
-            sub.plot(x, func(x,p_opt)-z*sdev, 'r--')
-            sub.plot(x, func(x,p_opt)+z*sdev, 'r--')
+            iix = np.argsort(x)
+            sub.plot(x[iix], func(x[iix],p_opt), 'b--')
+            sub.plot(x[iix], func(x[iix],p_opt)-z*sdev, 'r--')
+            sub.plot(x[iix], func(x[iix],p_opt)+z*sdev, 'r--')
             plt.show()
 
         if ii.size>0:
@@ -144,7 +157,10 @@ def sigma_filter(x, y, z=3, func=functions.line_p, p=[0.,1.], plot=False):
             go_on = False
 
     # return mask where outliers are masked
-    return y_new.mask
+    if popt:
+        return y_new.mask, p_opt
+    else:
+        return y_new.mask
 
 
 if __name__ == '__main__':
