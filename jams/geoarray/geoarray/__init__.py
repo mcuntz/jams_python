@@ -1,15 +1,26 @@
-#!/usr/bin/env python
-from __future__ import division, absolute_import, print_function
+#! /usr/bin/env python
+# -*- coding: utf-8 -*-
 
-from geoarray import (
+from .wrapper import (
     array,
     zeros,
     ones,
     full,
     empty,
+    zeros_like,
+    ones_like,
+    full_like,
     fromfile,
+    fromdataset,
 )
 
-from gdalfuncs import (
-    _DRIVER_DICT
+from .gdalfuncs import (
+    resample,
+    project,
+    rescale,
+)
+
+from .gdalio import (
+    _DRIVER_DICT,
+    # fromfile,
 )

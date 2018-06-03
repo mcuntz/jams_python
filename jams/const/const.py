@@ -13,7 +13,7 @@ import numpy as np
         Mathematical
             Pi, Pi2, Pi3, TwoPi, Sqrt2
         Physical
-            Gravity, T0, P0, T25, sigma, R, Na, REarth
+            Gravity, T0, P0, T25, sigma, R, R_air, R_H2O, Na, REarth
         Isotope
             R13VPDB, R18VSMOW, R2VSMOW
         Computational
@@ -104,10 +104,11 @@ import numpy as np
                            - moved dielH2O to own routine/file
                            - R13VPDB, R18VSMOW, R2VSMOW
               MC, Nov 2016 - tiny->np.finfo(np.float).tiny, huge
+              RL, May 2017 - gas constants for dry air and water vapour
 """
 
 __all__ = ['Pi', 'Pi2', 'Pi3', 'TwoPi', 'Sqrt2',
-           'Gravity', 'T0', 'P0', 'T25', 'sigma', 'R', 'Na', 'REarth',
+           'Gravity', 'T0', 'P0', 'T25', 'sigma', 'R','R_air', 'R_H2O', 'Na', 'REarth',
            'mmol_co2', 'mmol_h2o', 'mmol_air',
            'density_quartz', 'cheat_quartz', 'cheat_water', 'cheat_air', 'latentheat_vaporization',
            'R13VPDB', 'R18VSMOW', 'R2VSMOW',
@@ -127,6 +128,8 @@ P0       = 101325.       # Standard pressure [Pa]
 T25      = 298.15        # Standard ambient temperature [K]
 sigma    = 5.67e-08      # Stefan-Boltzmann constant [W m^-2 K^-4]
 R        = 8.3144621     # Ideal gas constant [J K^-1 mol^-1]
+R_air    = 287.06        # gas constant of dry air [J K^-1 kg^-1]
+R_H2O    = 461.4         # gas constant of water vapour [J K^-1 kg^-1]
 Na       = 6.02214129e23 # Avogrado number [mol^-1]
 REarth   = 6371009.      # Radius of Earth [m]
 

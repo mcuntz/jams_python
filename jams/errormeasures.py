@@ -69,6 +69,7 @@ from scipy.stats import t
     Modified MC, Dec 2014 - use simple formulas that work with normal and masked arrays but do not deal with NaN
     Modified AP, Sep 2015 - add confidence interval
     Modified ST, Nov 2015 - added KGE
+    Modified ST, Jan 2017 - added components for KGE
 """
 
 def bias(y_obs,y_mod):
@@ -238,12 +239,13 @@ def nse(y_obs,y_mod):
     return 1. - ((y_obs-y_mod)**2).sum()/((y_obs-y_obs.mean())**2).sum()
 
 
-def kge(y_obs,y_mod):
+def kge(y_obs,y_mod,components=False):
     """
     calculates Kling-Gupta-Efficiency = 1 - sqrt((1-r)**2 + (1-a)**2 + (1-b)**2),
     where r is the Pearson correlation of y_obs and y_mod,
           a is mean(y_mod) / mean(y_obs), and
           b is std(y_mod) / std(y_obs)
+    if components is True, then r, a, and b are (in this order) additionally returned to the KGE
        
     Examples
     --------
@@ -275,7 +277,13 @@ def kge(y_obs,y_mod):
     #     a = np.ma.mean(y_modr) / np.ma.mean(y_obsr)
     #     b = np.ma.std(y_modr) / np.ma.std(y_obsr)
     # return 1. - np.sqrt((1 - r)**2 + (1 - a)**2 + (1 - b)**2)
-    return 1. - np.sqrt((1 - np.corrcoef(y_obs, y_mod)[0, 1])**2 + (1 - np.mean(y_mod) / np.mean(y_obs))**2 + (1 - np.std(y_mod) / np.std(y_obs))**2)
+    r = np.corrcoef(y_obs, y_mod)[0, 1]
+    alpha = np.std(y_mod) / np.std(y_obs)
+    beta = np.mean(y_mod) / np.mean(y_obs)
+    if components:
+        return 1. - np.sqrt((1 - r)**2 + (1 - beta)**2 + (1 - alpha)**2), r, alpha, beta
+    else:
+        return 1. - np.sqrt((1 - r)**2 + (1 - beta)**2 + (1 - alpha)**2)
 
 
 def pear2(y_obs,y_mod):

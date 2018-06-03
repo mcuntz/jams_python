@@ -1,5 +1,5 @@
-#!/usr/bin/env python
-from __future__ import division, absolute_import, print_function
+#! /usr/bin/env python
+# -*- coding: utf-8 -*-
 
 """
 Author
@@ -12,22 +12,23 @@ This module provides initializer function for core.GeoArray
 """
 
 import numpy as np
-from gdalfuncs import _fromFile
-from core import GeoArray
-from typing import Optional, Union, Tuple, Any, Mapping, AnyStr
+from .core import GeoArray
+from .gdalio import _fromFile, _fromDataset
+# from typing import Optional, Union, Tuple, Any, Mapping, AnyStr
 
-def array(data,              # type: Union[np.ndarray, GeoArray]       
-          dtype      = None, # type: Optional[Union[AnyStr, np.dtype]]
-          yorigin    = None, # type: Optional[float]
-          xorigin    = None, # type: Optional[float]
-          origin     = None, # type: Optional[AnyStr]
-          fill_value = None, # type: Optional[float]
-          cellsize   = None, # type: Optional[Union[float, Tuple[float, float]]]
-          proj       = None, # type: Mapping[AnyStr, Union[AnyStr, float]]
-          mode       = None, # type: AnyStr
-          copy       = False # type: bool
-):
-    # type: (...) -> GeoArray
+
+def array(data,               # type: Union[np.ndarray, GeoArray]       
+          dtype      = None,  # type: Optional[Union[AnyStr, np.dtype]]
+          yorigin    = None,  # type: Optional[float]
+          xorigin    = None,  # type: Optional[float]
+          origin     = None,  # type: Optional[AnyStr]
+          fill_value = None,  # type: Optional[float]
+          cellsize   = None,  # type: Optional[Union[float, Tuple[float, float]]]
+          proj       = None,  # type: Mapping[AnyStr, Union[AnyStr, float]]
+          mode       = None,  # type: AnyStr
+          copy       = False, # type: bool
+          fobj       = None,  # type: Optional[osgeo.gdal.Dataset]
+):                            # type: (...) -> GeoArray
     """
     Arguments
     ---------
@@ -58,7 +59,6 @@ def array(data,              # type: Union[np.ndarray, GeoArray]
     """
 
     if isinstance(data, GeoArray):
-        data       = data.data
         dtype      = dtype or data.dtype
         yorigin    = yorigin or data.yorigin
         xorigin    = xorigin or data.xorigin
@@ -67,8 +67,9 @@ def array(data,              # type: Union[np.ndarray, GeoArray]
         cellsize   = cellsize or data.cellsize
         proj       = proj or data.proj
         mode       = mode or data.mode
+        fobj       = data.fobj
+        data       = data.data
         
-
     return GeoArray(
         data       = np.array(data, dtype=dtype, copy=copy), 
         yorigin    = yorigin or 0,
@@ -78,7 +79,39 @@ def array(data,              # type: Union[np.ndarray, GeoArray]
         cellsize   = cellsize or (1,1),
         proj       = proj,
         mode       = mode,
+        fobj       = fobj,
     )
+
+
+def _likeArgs(arr):
+
+    out = {}
+    if isinstance(arr, GeoArray):
+        out["yorigin"]    = arr.yorigin
+        out["xorigin"]     = arr.xorigin
+        out["origin"]     = arr.origin
+        out["fill_value"] = arr.fill_value
+        out["cellsize"]   = arr.cellsize
+        out["proj"]       = arr.proj
+        out["mode"]       = arr.mode
+
+    return out
+    
+
+def zeros_like(arr, dtype=None):
+    args = _likeArgs(arr)
+    return zeros(shape=arr.shape, dtype=dtype or arr.dtype, **args)
+    
+
+def ones_like(arr, dtype=None):
+    args = _likeArgs(arr)
+    return ones(shape=arr.shape, dtype=dtype or arr.dtype, **args)
+ 
+
+def full_like(arr, value, dtype=None):
+    args = _likeArgs(arr)
+    return full(shape=arr.shape, value=value, dtype=dtype or arr.dtype, **args)
+
 
 def zeros(shape, dtype=np.float64, yorigin=0, xorigin=0, origin="ul",
           fill_value=None, cellsize=1, proj=None, mode=None):
@@ -121,6 +154,7 @@ def zeros(shape, dtype=np.float64, yorigin=0, xorigin=0, origin="ul",
         mode       = mode,
     )
 
+
 def ones(shape, dtype=np.float64, yorigin=0, xorigin=0, origin="ul",
          fill_value=None, cellsize=1, proj=None, mode=None):
     """
@@ -158,6 +192,7 @@ def ones(shape, dtype=np.float64, yorigin=0, xorigin=0, origin="ul",
         mode       = mode,
     )
 
+
 def full(shape, value, dtype=np.float64, yorigin=0, xorigin=0, origin="ul",
          fill_value=None, cellsize=1, proj=None, mode=None):
     """
@@ -193,8 +228,8 @@ def full(shape, value, dtype=np.float64, yorigin=0, xorigin=0, origin="ul",
         fill_value = fill_value,
         cellsize   = cellsize,
         proj       = proj,
-        mode       = mode,
-    )
+        mode       = mode)
+
 
 def empty(shape, dtype=np.float64, yorigin=0, xorigin=0, origin="ul",
           fill_value=None, cellsize=1, proj=None, mode=None):
@@ -233,6 +268,11 @@ def empty(shape, dtype=np.float64, yorigin=0, xorigin=0, origin="ul",
         mode       = mode,
     )
 
+
+def fromdataset(ds):
+    return array(**_fromDataset(ds))
+
+
 def fromfile(fname):
     """
     Arguments
@@ -248,4 +288,6 @@ def fromfile(fname):
     Create GeoArray from file
 
     """
-    return GeoArray(**_fromFile(fname))
+    
+    return array(**_fromFile(fname))
+

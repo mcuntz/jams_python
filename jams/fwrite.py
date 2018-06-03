@@ -2,7 +2,7 @@
 from __future__ import division, absolute_import, print_function
 import numpy as np
 
-def fwrite(fname, arr, header=None, precision='10.0'):
+def fwrite(fname, arr, header=None, precision='10.0', delimiter=' '):
     """
         Write numbers of 2D-array to a file.
 
@@ -25,6 +25,7 @@ def fwrite(fname, arr, header=None, precision='10.0'):
         header       list of header elements: a header element is a list of two strings:
                      the first entry is the header argument, the second the value
         precision    floating point precision of array to write
+        delimiter    delimiter to separate values, default ' '
 
         
         Examples
@@ -70,7 +71,7 @@ def fwrite(fname, arr, header=None, precision='10.0'):
         History
         -------
         Written,  ST, Feb 2016
-        Modified, 
+        Modified, ST, Aug 2017 - delimiter
     """
     if not type(arr) is np.ndarray:
         raise ValueError('function fwrite: argument arr must be numpy.ndarray')
@@ -83,7 +84,7 @@ def fwrite(fname, arr, header=None, precision='10.0'):
     # write arr
     for ll in np.arange(arr.shape[0]):
         # format is mRM compatible
-        write_str = ' '.join(['{:' + precision + 'f}'] * arr.shape[1]).format(*arr[ll, :]) + '\n'
+        write_str = delimiter.join(['{:' + precision + 'f}'] * arr.shape[1]).format(*arr[ll, :]) + '\n'
         fo.write(write_str)
     fo.close()    
 

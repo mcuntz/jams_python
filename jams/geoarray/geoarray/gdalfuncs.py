@@ -1,201 +1,64 @@
-#!/usr/bin/env python
-from __future__ import division, absolute_import, print_function
+#! /usr/bin/env python
+# -*- coding: utf-8 -*-
 
-import re, os
 import gdal, osr
 import numpy as np
-# import geoarray as ga
+from .wrapper import array, full
+from .gdalio import _getDataset, _fromDataset
+from .gdaltrans import _Projection, _Transformer
 
-
-# should be extended, for available options see:
-# http://www.gdal.org/formats_list.html
-_DRIVER_DICT = {
-    ".tif" : "GTiff",
-    ".asc" : "AAIGrid",
-    ".img" : "HFA",
-    ".png" : "PNG",
-}
-
-# type mapping: there is no boolean data type in GDAL
-TYPEMAP = {
-    "uint8"      : 1,
-    "int8"       : 1,
-    "uint16"     : 2,
-    "int16"      : 3,
-    "uint32"     : 4,
-    "int32"      : 5,
-    "float32"    : 6,
-    "float64"    : 7,
-    "complex64"  : 10,
-    "complex128" : 11,
-    1            : "int8",
-    2            : "uint16",
-    3            : "int16",
-    4            : "uint32",
-    5            : "int32",
-    6            : "float32",
-    7            : "float64",
-    10           : "complex64",
-    11           : "complex128",
-    
-}
-
-COLOR_DICT = {
-    1 : "L",
-    2 : "P",
-    3 : "R",
-    4 : "G",
-    5 : "B",
-    6 : "A",
-    7 : "H",
-    8 : "S",
-    9 : "V",
-    10 : "C",
-    11 : "M",
-    12 : "Y",
-    13 : "K",
-    14 : "Y",
-    15 : "Cb",
-    16 : "Cr",
-}
-
-COLOR_MODE_LIST = (
-    "L", "P", "RGB", "RGBA", "CMYK", "HSV", "YCbCr"
-)
- 
 gdal.UseExceptions()
 gdal.PushErrorHandler('CPLQuietErrorHandler')
 
-class _Projection(object):
-    def __init__(self, arg):
-        """
-        Arguments:
-        arg can be:
-        1. int  : EPSG code
-        2. dict : pyproj compatable dictionary
-        3. str  : WKT string
-        4. _Projection
-        """
-        self._srs = osr.SpatialReference()
-        self._import(arg)
-        
-    def _import(self, value):
-        if isinstance(value, _Projection):
-            self._srs = value._srs
-        elif isinstance(value, int):
-            self._srs.ImportFromProj4("+init=epsg:{:}".format(value))
-        elif isinstance(value, dict):
-            params =  "+{:}".format(" +".join(
-                ["=".join(map(str, pp)) for pp in value.items()])
-            )
-            self._srs.ImportFromProj4(params)
-        elif isinstance(value, str):
-            self._srs.ImportFromWkt(value)
-            
-    def get(self):
-        out = self._srs.ExportToWkt()
-        return out or None
+_RESAMPLING = {
+    # A documentation would be nice.
+    # There seem to be more functions in GDAL > 2
+    "average"     : gdal.GRA_Average,
+    "bilinear"    : gdal.GRA_Bilinear,
+    "cubic"       : gdal.GRA_Cubic,
+    "cubicspline" : gdal.GRA_CubicSpline,
+    "lanczos"     : gdal.GRA_Lanczos,
+    "mode"        : gdal.GRA_Mode,
+    "nearest"     : gdal.GRA_NearestNeighbour,
+    # only available in GDAL > 2
+    "max"         : getattr(gdal, "GRA_Max", None),
+    "min"         : getattr(gdal, "GRA_Min", None),
+}
 
-    def set(self, val):
-        self._import(val)
-   
-class _Transformer(object):
-    def __init__(self, sproj, tproj):
-        """
-        Arguments
-        ---------
-        sproj, tproj : Projection
-        
-        Purpose
-        -------
-        Encapsulates the osr Cordinate Transformation functionality
-        """
-        self._tx = osr.CoordinateTransformation(
-            sproj._srs, tproj._srs
+def _warpTo(source, target, func, max_error=0.125):
+
+    if func is None:
+        raise TypeError("Resampling method {} not available in your GDAL version".format(func))
+
+    target = np.atleast_2d(target)
+    if target.ndim < source.ndim:
+        target = np.broadcast_to(
+            target, source.shape[:-len(target.shape)]+target.shape, subok=True
         )
 
-    def __call__(self, y, x):
-        try:
-            xt, yt, _ = self._tx.TransformPoint(x, y)
-        except NotImplementedError:
-            raise AttributeError("Projections not correct or given!")
-        return yt, xt
-
-def _fromFile(fname):
-    """
-    Parameters
-    ----------
-    fname : str  # file name
-    
-    Returns
-    -------
-    GeoArray
-
-    Purpose
-    -------
-    Create GeoArray from file
-
-    """
-    
-    fobj = gdal.OpenShared(fname)
-    if fobj:
-        return _fromDataset(fobj)
-    raise IOError("Could not open file: {:}".format(fname))
-
-def _getColorMode(fobj):
-    tmp = []
-    for i in xrange(fobj.RasterCount):
-        color = fobj.GetRasterBand(i+1).GetColorInterpretation() 
-        tmp.append(COLOR_DICT.get(color, "L"))
-    return ''.join(sorted(set(tmp), key=tmp.index))
-   
-def _fromDataset(fobj):
-    
-    # check the bands have different datatypes and raise
-    rasterband = fobj.GetRasterBand(1)
-    geotrans   = fobj.GetGeoTransform()
-    
-    return {
-        "data"       : fobj.ReadAsArray(),
-        "yorigin"    : geotrans[3],
-        "xorigin"    : geotrans[0],
-        "origin"     : "ul",
-        "fill_value" : rasterband.GetNoDataValue(),
-        "cellsize"   : (geotrans[5], geotrans[1]),
-        "proj"       : _Projection(fobj.GetProjection()),
-        "mode"       : _getColorMode(fobj),
-        "fobj"       : fobj,
-    }
-
-def _getDataset(grid, mem=False):
-    
-    # Returns an gdal memory dataset created from the given grid
-    
-    if grid._fobj and not mem:
-        return grid._fobj
-    
-    driver = gdal.GetDriverByName("MEM")
-        
-    out = driver.Create(
-        "", grid.ncols, grid.nrows, grid.nbands, TYPEMAP[str(grid.dtype)]
+    target = np.ma.array(
+        target,
+        mask  = target==target.fill_value,
+        dtype = source.dtype,
+        copy  = True,
+        subok = True
     )
 
-    out.SetGeoTransform(
-        (
-            grid.bbox["xmin"], abs(grid.cellsize[1]), 0,
-            grid.bbox["ymax"], 0, abs(grid.cellsize[0])*-1)
-    )
-    if grid.proj:
-        out.SetProjection(grid.proj)
+    target[target.mask] = source.fill_value
+    target.fill_value = source.fill_value
 
-    for n in xrange(grid.nbands):
-        band = out.GetRasterBand(n+1)
-        band.SetNoDataValue(float(grid.fill_value))
-        band.WriteArray(grid[n] if grid.ndim > 2 else grid)
-            
-    return out
+    out = _getDataset(target, True)
 
-def _warp(grid, proj, max_error=0.125):
+    gdal.ReprojectImage(
+        _getDataset(source), out,
+        None, None,
+        _RESAMPLING[func],
+        0.0, max_error)
+
+    return _fromDataset(out)
+
+
+def project(grid, proj, cellsize=None, func="nearest", max_error=0.125):
 
     bbox = grid.bbox
     proj = _Projection(proj)
@@ -206,96 +69,49 @@ def _warp(grid, proj, max_error=0.125):
     lly, llx = trans(bbox["ymin"], bbox["xmin"])
 
     # Calculate cellsize, i.e. same number of cells along the diagonal.
-    sdiag = np.sqrt(grid.nrows**2 + grid.ncols**2)
-    # tdiag = np.sqrt((uly - lry)**2 + (lrx - ulx)**2)
-    tdiag = np.sqrt((lly - ury)**2 + (llx - urx)**2)
-    tcellsize = tdiag/sdiag
-    
+    if not cellsize:
+        src_diag = np.sqrt(grid.nrows**2 + grid.ncols**2)
+        # trg_diag = np.sqrt((uly - lry)**2 + (lrx - ulx)**2)
+        trg_diag = np.sqrt((lly - ury)**2 + (llx - urx)**2)
+        cellsize = trg_diag/src_diag
+
     # number of cells
-    ncols = int(abs(round((max(urx, lrx) - min(ulx, llx))/tcellsize)))
-    nrows = int(abs(round((max(ury, lry) - min(uly, lly))/tcellsize)))
-    
-    return {
-        "data"       : np.full((grid.nbands, nrows, ncols), grid.fill_value, grid.dtype),
-        "fill_value" : grid.fill_value,
-        "dtype"      : grid.dtype,
-        "yorigin"    : max(uly, ury, lly, lry),
-        "xorigin"    : min(ulx, urx, llx, lrx),
-        "origin"     : "ul",
-        "cellsize"   : (-tcellsize, tcellsize),
-        "proj"       : proj,
-        "mode"       : grid.mode, 
-    }
+    ncols = int(abs(round((max(urx, lrx) - min(ulx, llx))/cellsize)))
+    nrows = int(abs(round((max(ury, lry) - min(uly, lly))/cellsize)))
 
-def _warpTo(source, target, max_error=0.125):
-
-    if target.ndim == 1:
-        target = target[None,:]
-    if target.ndim < source.ndim:
-        target = np.broadcast_to(
-            target, source.shape[:-len(target.shape)]+target.shape, subok=True
-        )
-       
-    target = np.ma.array(
-        target,
-        mask=target==target.fill_value,
-        dtype=source.dtype,
-        copy=True,
-        subok=True
+    target = array(
+        data       = np.full((grid.nbands, nrows, ncols), grid.fill_value, grid.dtype),
+        fill_value = grid.fill_value,
+        dtype      = grid.dtype,
+        yorigin    = max(uly, ury, lly, lry),
+        xorigin    = min(ulx, urx, llx, lrx),
+        origin     = "ul",
+        cellsize   = (-cellsize, cellsize),
+        proj       = proj,
+        mode       = grid.mode,
     )
-    target[target.mask] = source.fill_value
-    target.fill_value = source.fill_value
 
-    out = _getDataset(target, True)
-    resampling = gdal.GRA_NearestNeighbour
-    
-    gdal.ReprojectImage(
-        _getDataset(source), out,
-        None, None,
-        resampling, 
-        0.0, max_error
-    )
-    return _fromDataset(out)
+    return resample(
+        source    = grid,
+        target    = target,
+        func      = func,
+        max_error = max_error)
 
-def _toFile(geoarray, fname):
-    """
-    Arguments
-    ---------
-    fname : str  # file name
-    
-    Returns
-    -------
-    None
-    
-    Purpose
-    -------
-    Write GeoArray to file. The output dataset type is derived from
-    the file name extension. See _DRIVER_DICT for implemented formats.
-    """
- 
-    def _fnameExtension(fname):
-        return os.path.splitext(fname)[-1].lower()
 
-    def _getDriver(fext):
-        """
-        Guess driver from file name extension
-        """
-        if fext in _DRIVER_DICT:
-            driver = gdal.GetDriverByName(_DRIVER_DICT[fext])
-            metadata = driver.GetMetadata_Dict()
-            if "YES" == metadata.get("DCAP_CREATE", metadata.get("DCAP_CREATECOPY")):
-                return driver
-            raise IOError("Datatype cannot be written")
-        raise IOError("No driver found for filename extension '{:}'".format(fext))
+def resample(source, target, func="nearest", max_error=0.125):
+    return array(
+        **_warpTo(
+            source    = source,
+            target    = target,
+            func      = func,
+            max_error = max_error))
 
-    def _getDatatype(driver):
-        tnames = tuple(driver.GetMetadata_Dict()["DMD_CREATIONDATATYPES"].split(" "))
-        types = tuple(gdal.GetDataTypeByName(t) for t in tnames)
-        tdict = tuple((gdal.GetDataTypeSize(t), t) for t in types)
-        otype = max(tdict, key=lambda x: x[0])[-1]
-        return np.dtype(TYPEMAP[otype])
 
-        
-    dataset = _getDataset(geoarray)
-    driver = _getDriver(_fnameExtension(fname))
-    driver.CreateCopy(fname, dataset, 0)
+def rescale(source, scaling_factor, func="nearest"):
+    shape = (list(source.shape[:-2]) +
+             [int(s / scaling_factor) for s in source.shape[-2:]])
+    cellsize = [c * scaling_factor for c in source.cellsize]
+    scaled_grid = full(shape, source.fill_value,
+                       xorigin=source.xorigin, yorigin=source.yorigin,
+                       cellsize=cellsize, dtype=source.dtype)
+    return resample(source, scaled_grid, func=func)

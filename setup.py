@@ -15,7 +15,7 @@ readme = open('README').read()
 
 import sys
 if sys.version_info[:2] < (2, 6) or (3, 0) <= sys.version_info[0:2] < (3, 2):
-    raise RuntimeError("Python version 2.6 or >= 3.2 required.")
+    raise RuntimeError("Python version 2.6, 2.7 or >= 3.2 required.")
 
 CLASSIFIERS = """\
 Development Status :: 5 - Production/Stable

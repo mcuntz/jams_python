@@ -65,6 +65,7 @@ from __future__ import division, absolute_import, print_function
     fsread                 Simultaneous read of float and string array from ascii file.
     ftp                    Module with functions for interacting with an open FTP connection.
     functions              Module with common functions that are used in curve_fit or fmin parameter estimations.
+    fwrite                 Writes an array to ascii file
     gap2lai                Calculation of leaf area index from gap probability observations.
     geoarray               Pythonic gdal wrapper
     get_angle              Returns the angle in radiant from each point in xy1 to each point in xy2.
@@ -198,6 +199,7 @@ from __future__ import division, absolute_import, print_function
     -----------
     fread                  Reads in float array from ascii file.
     fsread                 Simultaneous read of float and string array from ascii file.
+    fwrite                 Writes an array to ascii file
     head                   Return list with first n lines of file.
     lif                    Count number of lines in file.
     sread                  Reads in string array from ascii file.
@@ -536,12 +538,13 @@ from __future__ import division, absolute_import, print_function
               MC, Nov 2016 - ported to Python 3
               MC, Nov 2016 - pso
               AP, Dec 2016 - rolling
+              ST, Aug 2017 - added fwrite
               MC, Nov 2017 - xread
               JM, Dec 2017 - pawn_index
               MC, Dec 2017 - screening
               MC, Jan 2018 - lowess
               MC, Jan 2018 - apply_undef
-              MC, Mar 2015 - ascii2en, en2ascii, ascii2fr, fr2ascii, ascii2us, us2ascii
+              MC, Mar 2018 - ascii2en, en2ascii, ascii2fr, fr2ascii, ascii2us, us2ascii
 """
 
 # sub-packages without dependencies to rest of jams

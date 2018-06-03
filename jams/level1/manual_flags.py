@@ -74,13 +74,16 @@ def get_manual_flags(flagfile, variable, dendro=None, julian=True):
         Written,  MC, Aug 2015
         Modified, AW, Aug 2015, optional readout of dendrometer-data:  DBH and Dini
         Modified, MC, Jan 2016, igrnore leading and trailing balnk in variable ids
+        Modified, BD, Oct 2016, corrected and improved error message if flag missing; introduced error messages if sdate or edate are not in the correct format
     """
     # Default dates
     sdef = "01.01.1900 00:00:00"
     edef = "01.01.2099 23:59:59"
 
     # Read manual flag file
-    sdat    = jams.sread(flagfile, comment="#", strarr=True, skip=1)
+    sdat    = jams.sread(flagfile, comment="#", strarr=True, skip=0)
+    sdat1 = sdat[0,:]      #header   
+    sdat = sdat[1:,:]      # get rid of header for the rest
     var_id  = np.array([ i.strip() for i in sdat[:,0] ])
     start   = sdat[:,1]
     end     = sdat[:,2]
@@ -102,9 +105,13 @@ def get_manual_flags(flagfile, variable, dendro=None, julian=True):
         try:
             mflag   = flag[ii].astype(np.int)
         except:
+            miss_ind = [ind for ind,fl in enumerate(flag[ii]) if fl == ''][0]
+            comm_col = [m for m,com in enumerate(sdat1) if com[0:7] == 'comment']
+            comm = sdat[ii,comm_col][miss_ind]
+            print('get_manual_flags: forgotten flag in file '+flagfile+' - var/start/end: '+variable+'/'+str(sdate[miss_ind])+'/'+str(edate[miss_ind])+' - comment: '+comm)
             jams.encrypt.sendfail(
-                'get_manual_flags: forgotten flag in file '+flagfile+' - var/start/end: '+variable+'/'+sdate+'/'+edate,
-                sender='matthias.cuntz@ufz.de')
+                'get_manual_flags: forgotten flag in file '+flagfile+' - var/start/end: '+variable+'/'+str(sdate[miss_ind])+'/'+str(edate[miss_ind])+' - comment: '+comm,
+                sender='benjamin.dechant@ufz.de')
         if dendro:
             l_dbh   = dbh[ii].astype(np.float)
             l_d_ini = d_ini[ii].astype(np.float)
@@ -115,8 +122,38 @@ def get_manual_flags(flagfile, variable, dendro=None, julian=True):
         if jj.size > 0: edate[jj] = edef
         # Julian or ascii
         if julian:
-            sdate = jams.date2dec(ascii=sdate)
-            edate = jams.date2dec(ascii=edate)
+            try:
+                sdate = jams.date2dec(ascii=sdate)
+            except Exception as e:
+                for sda_ind,sda in enumerate(sdate):
+                    try:
+                        sdate = jams.date2dec(ascii=sda)
+                    except: 
+                        pb_ind = sda_ind
+                comm_col = [m for m,com in enumerate(sdat1) if com[0:7] == 'comment']
+                comm = sdat[ii,comm_col][pb_ind]
+                print('get_manual_flags: invalid start date in file '+flagfile+' - var/start: '+variable+'/'+str(e)[-19:-1]+' - comment: '+comm)
+                jams.encrypt.sendfail(
+                    'get_manual_flags: invalid start date in file '+flagfile+' - var/start: '+variable+'/'+str(e)[-19:-1]+' - comment: '+comm,
+                    sender='benjamin.dechant@ufz.de')
+                raise ValueError
+
+            try:
+                edate = jams.date2dec(ascii=edate)
+            except Exception as e:
+                for sda_ind,sda in enumerate(edate):
+                    try:
+                        sdate = jams.date2dec(ascii=sda)
+                    except: 
+                        pb_ind = sda_ind
+                comm_col = [m for m,com in enumerate(sdat1) if com[0:7] == 'comment']
+                comm = sdat[ii,comm_col][pb_ind]
+                print('get_manual_flags: invalid end date in file '+flagfile+' - var/end: '+variable+'/'+str(e)[-19:-1]+' - comment: '+comm)
+                jams.encrypt.sendfail(
+                    'get_manual_flags: invalid end date in file '+flagfile+' - var/end: '+variable+'/'+str(e)[-19:-1]+' - comment: '+comm,
+                    sender='benjamin.dechant@ufz.de')
+                raise ValueError                        # maybe not necessary
+
     else:
         # return empty lists if variable not in manual flag file
         sdate = list()

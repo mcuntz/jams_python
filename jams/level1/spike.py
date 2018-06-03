@@ -84,6 +84,8 @@ def spike(datin, thresh=7, toler=0, length=15):
         -------
         Written,  BD, Sep 2016
                   MC, Nov 2016 - ported to Python 3
+                  DS, Aug 2017 - reduced verbosity 
+
     """
     debug = False
     cmp = lambda a, b: ((a > b) - (a < b)) # redefine cmp to be available in Python 3
@@ -95,9 +97,9 @@ def spike(datin, thresh=7, toler=0, length=15):
         maxlen = length                                          # set max. length of spike plateau
         spike_pos_all = []
         while ipos < len(datin)-1:
-            if debug: print('ipos=',ipos)
+            # if debug: print('ipos=',ipos)
             for i in range(1,maxlen+1):
-                if debug: print('i=',i)
+                # if debug: print('i=',i)
                 spike_pos = []
                 if (ipos+i+1) > (len(datin)-1):
                     ipos = len(datin)
@@ -107,7 +109,7 @@ def spike(datin, thresh=7, toler=0, length=15):
                 if len(tm)==1 and tm[0] < toler:
                     spike_pos = [ipos+1]
                     spike_pos_all.append(spike_pos)
-                    if debug: print('found peak 1 ', spike_pos)
+                    # if debug: print('found peak 1 ', spike_pos)
                     break
                 elif (len(tm)>1 and
                       all([ tt > thresh for tt in tm[0:-2] ]) and
@@ -115,7 +117,7 @@ def spike(datin, thresh=7, toler=0, length=15):
                       tm[-1] < toler): # check thresh, tolerance and no switching of sign
                     spike_pos = list(range(ipos+1,ipos+i+1))
                     spike_pos_all.append(spike_pos)
-                    if debug: print('found peak 2',spike_pos)
+                    # if debug: print('found peak 2',spike_pos)
                     break
             ipos1 = [k for k,a in enumerate(diff) if abs(a) > thresh  and k >= ipos + i +1] # get index position of next spikes
             if len(ipos1)> 0:
@@ -123,9 +125,9 @@ def spike(datin, thresh=7, toler=0, length=15):
             else:
                 break
 
-        print('no. of spikes: '+str(len(spike_pos_all)))
+        # print('no. of spikes: '+str(len(spike_pos_all)))
         spike_pos_all = [item for sublist in spike_pos_all for item in sublist]    # create list without sublists
-        print('no. of data points: '+str(len(spike_pos_all)))
+        # print('no. of data points: '+str(len(spike_pos_all)))
         return spike_pos_all
 
     else:

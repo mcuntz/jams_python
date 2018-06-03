@@ -9,7 +9,7 @@ David Schaefer
 Purpose
 -------
 A sanitizing layer for the netCDF4 library. Adds a number of convenince methods
-and aims for a cleaner user interface. All classes avaliable are children of their
+and aims for a cleaner user interface. All classes available are children of their
 associated netCDF4 counterparts.
 """
 
@@ -25,7 +25,9 @@ def _tupelize(arg):
     except TypeError:
         return (arg,)
 
-def copyGroup(ncin, group, skipdims=None, skipgroups=None, skipvars=None, skipattrs=None):
+
+def copyGroup(ncin, group, skipdims=None, skipgroups=None, skipvars=None,
+              skipattrs=None, fixdims=False, vardata=False, varparams=None):
     """
     Arguments
     ---------
@@ -41,6 +43,10 @@ def copyGroup(ncin, group, skipdims=None, skipgroups=None, skipvars=None, skipat
                             Name(s) of variable(s) to skip
     skipattrs (optinal)   : string or list/tuple of strings
                             Name(s) of attribute(s) to skip
+    fixdims (optional)    : convert unlimited dimensions to fixed size dimensions
+    vardata (optional)    : boolean, copy variable data
+    varparams(optional)   : dict, variable paramaters will be passed to
+                            createVariable (i.e. zlib, complevel, chunksizes, ...)
 
     Return
     ------
@@ -52,13 +58,17 @@ def copyGroup(ncin, group, skipdims=None, skipgroups=None, skipvars=None, skipat
     """
     out = ncin.createGroup(group.name)
     out.set_fill_off()
-    out.copyDimensions(group.dimensions, skipdims)
-    out.copyVariables(group.variables, skipvars)
+    out.copyDimensions(group.dimensions, skip=skipdims, fix=fixdims)
+    out.copyVariables(
+        group.variables, skip=skipvars, data=vardata, varparams=varparams
+    )
     out.copyAttributes(group.attributes, skipattrs)
     out.copyGroups(group.groups, skipgroups)
     return out
 
-def copyDataset(ncin, group, skipdims=None, skipgroups=None, skipvars=None, skipattrs=None):
+
+def copyDataset(ncin, group, skipdims=None, skipgroups=None, skipvars=None,
+                skipattrs=None, fixdims=False, vardata=False, varparams=None):
     """
     Arguments
     ---------
@@ -74,6 +84,11 @@ def copyDataset(ncin, group, skipdims=None, skipgroups=None, skipvars=None, skip
                             Name(s) of variable(s) to skip
     skipattrs (optinal)   : string or list/tuple of strings
                             Name(s) of attribute(s) to skip
+    fixdims (optional)    : convert unlimited dimensions to fixed size dimensions
+    vardata (optional)    : boolean, copy variable data
+    varparams(optional)   : dict, variable paramaters will be passed to
+                            createVariable (i.e. zlib, complevel, chunksizes, ...)
+
 
     Return
     ------
@@ -84,8 +99,10 @@ def copyDataset(ncin, group, skipdims=None, skipgroups=None, skipvars=None, skip
     Copy the content of given group to ncin
     """
     ncin.set_fill_off()
-    ncin.copyDimensions(group.dimensions, skipdims)
-    ncin.copyVariables(group.variables, skipvars)
+    ncin.copyDimensions(group.dimensions, skip=skipdims, fix=fixdims)
+    ncin.copyVariables(
+        group.variables, skip=skipvars, data=vardata, varparams=varparams
+    )
     ncin.copyAttributes(group.attributes, skipattrs)
     ncin.copyGroups(group.groups, skipgroups)
     return ncin
@@ -114,14 +131,17 @@ def copyGroups(ncin, groups, skip=None):
         if g.name not in _tupelize(skip):
             ncin.copyGroup(g)
 
-def copyDimension(ncin, dim):
+
+def copyDimension(ncin, dim, fix=False, fail=True):
     """
     Arguments
     ---------
-    ncin  : Instance of an object with a createDimension method
-            (i.e. NcDataset, NcGroup)
-    group : Instance of NcDimension 
-    
+    ncin            : Instance of an object with a createDimension method
+                      (i.e. NcDataset, NcGroup)
+    group           : Instance of NcDimension
+    fix (optional)  : convert an unlimited dimension to a fixed size dimension
+    fail (Optional[bool]): raise an exception if dimension already exists
+
     Return
     ------
     netCDF4.Dimension
@@ -130,9 +150,16 @@ def copyDimension(ncin, dim):
     -------
     Copy the given dimension to ncin
     """
-    return ncin.createDimension(dim.name, None if dim.isunlimited() else len(dim))
+    length = None if dim.isunlimited() and not fix else len(dim)
+    try:
+        return ncin.createDimension(dim.name, length)
+    except Exception:
+        if fail:
+            raise
+        return ncin.dimensions[dim.name]
 
-def copyDimensions(ncin, dimensions, skip=None):
+
+def copyDimensions(ncin, dimensions, skip=None, fix=False, fail=True):
     """
     Arguments
     ---------
@@ -143,7 +170,9 @@ def copyDimensions(ncin, dimensions, skip=None):
                       value : instance of NcDimension
     skip (optional) : string or list/tuple of strings
                       Name(s) of dimension(s) to skip
-    
+    fix (optional)  : convert unlimited dimensions to fixed size dimensions
+    fail (Optional[bool]): raise exception if dimension already exists
+
     Return
     ------
     None
@@ -154,7 +183,8 @@ def copyDimensions(ncin, dimensions, skip=None):
     """
     for d in dimensions.values():
         if d.name not in _tupelize(skip):
-            ncin.copyDimension(d)
+            ncin.copyDimension(d, fix=fix, fail=fail)
+
 
 def copyAttributes(ncin, attributes, skip=None):
     """
@@ -184,16 +214,18 @@ def copyAttributes(ncin, attributes, skip=None):
                 except Exception:
                     pass
             ncin.createAttribute(k, v)
-            
-           
-def copyVariable(ncin, var, data=True, **kwargs):
+
+
+def copyVariable(ncin, var, data=True, dims=False, fail=True, **kwargs):
     """
     Arguments
     ---------
     ncin            : Instance of an object with a createCopy method
                       (i.e. NcDataset, NcGroup, NcVariable)
     var             : Instance of NcVariable
-    data (optional) : boolean
+    data (optional) : boolean, copy variable data
+    dims (Optional[bool]): copy missing dimensions
+    fail (Optional[bool]): raise an exception if variable exists, ignored at the moment
     kwargs          : will be passed to createVariable. Allows to set
                       parameters like chunksizes, deflate_level, ...
     
@@ -206,30 +238,54 @@ def copyVariable(ncin, var, data=True, **kwargs):
     Copy the given variables to ncin. Copy the data if data=True
     """
     invardef = var.definition
-    if data is False:
+    
+    if data is not True:
         invardef["chunksizes"] = None
     invardef.update(kwargs)
 
-    invar = ncin.createVariable(
-        invardef.pop("name"), invardef.pop("dtype"), **invardef
-    )
+    if dims:
+        nc = var.parent
+        try:
+            shape = data.shape
+        except AttributeError:
+            shape = var.shape
+        for name, length in zip(var.dimensions, shape):
+            l = None if nc.dimensions[name].isunlimited() else length
+            ncin.createDimension(name, l, fail=fail)
+
+    vname = invardef.pop("name")
+    try:
+        invar = ncin.createVariable(vname, invardef.pop("dtype"), **invardef)
+    except RuntimeError:
+        if fail:
+            raise
+        invar = ncin.variables[vname]
+
     invar.copyAttributes(var.attributes)
-    if data and var.shape:
-        invar[:] = var[:] 
+    if data is True and var.shape:
+        invar[:] = var[:]
+    elif data is not False:
+        # i.e. if an array is given
+        invar[:] = data
     return invar
 
-def copyVariables(ncin, variables, skip=None, data=True):
+
+def copyVariables(ncin, variables, skip=None, data=True, dims=False, fail=True, varparams=None):
     """
     Arguments
     ---------
-    ncin            : Instance of an object with a createCopy method
-                      (i.e. NcDataset, NcGroup, NcVariable)
-    variables       : Dictionary
-                      key   : variables name (string)
-                      value : instance of NcVariable
-    skip (optional) : string or list/tuple of strings
-                      Name(s) of variable(s) to skip
-    data (optional) : boolean
+    ncin                    : Instance of an object with a createCopy method
+                              (i.e. NcDataset, NcGroup, NcVariable)
+    variables               : Dictionary
+                              key   : variables name (string)
+                              value : instance of NcVariable
+    skip (optional)         : string or list/tuple of strings
+                              Name(s) of variable(s) to skip
+    data (optional)         : boolean
+    dims (Optional[bool])   : copy nonexisting dimensions
+    fail (Optional[bool])   : raise an exception if a variable already exists
+    varparams(optional)     : dict, variable paramaters will be passed to
+                              createVariable (i.e. zlib, complevel, chunksizes, ...)
 
     Return
     ------
@@ -239,13 +295,18 @@ def copyVariables(ncin, variables, skip=None, data=True):
     -------
     Copy the given variables to ncin. Copy the data if data=True
     """
+
+    if varparams is None:
+        varparams = dict()
     for v in variables.values():
         if v.name not in _tupelize(skip):
-            ncin.copyVariable(v, data)
+            ncin.copyVariable(v, data, dims, fail, **varparams)
 
-def createDimensions(ncin, dim_dict):
+
+def createDimensions(ncin, dim_dict, fail=True):
     for name, length in dim_dict.items():
-        ncin.createDimension(name, length)
+        ncin.createDimension(name, length, fail=fail)
+
 
         
         
@@ -454,12 +515,26 @@ def getVariables(ncin):
         out[v.name] = NcVariable(ncin, v.name, v.dtype, v.dimensions, id=v._varid)
     return out
 
+
+def getDimensions(ncin):
+    
+    out = OrderedDict()
+    for dim in getattr(ncin, "dimensions").values():
+        out[dim.name] = NcDimension(ncin, dim.name, id=dim._dimid)
+    return out
+
+
 def getAttributes(ncin):
     out = OrderedDict()
     for k in ncin.ncattrs():
         if not k.startswith("_"):
             out[k] = ncin.getncattr(k)
     return out
+
+
+def getParent(ncin):
+    return ncin._grp
+
 
 def attributeSetter(ncin, name, value):
     ncin.__dict__[name] = value
@@ -471,12 +546,35 @@ def attributeGetter(ncin, name):
         try:
             return getattr(super(ncin.__class__, ncin), name)
         except KeyError:
-            raise AttributeError("'{:}' object has no attribute '{:}'".format(ncin.__class__, name))
+            raise AttributeError(
+                "'{:}' object has no attribute '{:}'".format(ncin.__class__, name)
+            )
+
+def createGroup(ncin, name):
+    grp = NcGroup(ncin, name)
+    ncin.groups[name] = grp
+    return grp
+
+def createVariable(ncin, *args, **kwargs):
+    var = NcVariable(ncin, *args, **kwargs)
+    ncin.variables[var.name] = var
+    return var
+
+def createDimension(ncin, name, length, fail=True):
+    try:
+        dim = NcDimension(ncin, name, length)
+        ncin.dimensions[dim.name] = dim
+    except Exception:
+        if fail:
+            raise
+        dim = ncin.dimensions[name]
+    return dim
+
 
 class NcDataset(Dataset):
     def __init__(
             self,
-            filename,
+            filename = None,
             mode     = "r",
             clobber  = True,
             diskless = False,
@@ -484,11 +582,13 @@ class NcDataset(Dataset):
             weakref  = False,
             format   = "NETCDF4",
     ):
+
         if filename is None:
             # in memory dataset
-            filename = uuid.uuid4()
+            filename = str(uuid.uuid4())
+            mode = "w"
             diskless = True
-            
+
         super(NcDataset, self).__init__(
             filename = filename,
             mode     = mode,
@@ -498,32 +598,26 @@ class NcDataset(Dataset):
             weakref  = weakref,
             format   = format,
         )
-        for k, v in zip(self.groups, getGroups(self).values()):
-            self.groups[k] = v 
-        for k, v in zip(self.variables, getVariables(self).values()):
-            self.variables[k] = v 
-         
-    def createGroup(self, name):
-        grp = NcGroup(self, name)
-        self.groups[name] = grp
-        return grp
 
-    def createVariable(self, *args, **kwargs):
-        var = NcVariable(self, *args, **kwargs)
-        self.variables[var.name] = var
-        return var
+        self.fname = filename
+        for k, v in zip(self.groups, getGroups(self).values()):
+            self.groups[k] = v
+        for k, v in zip(self.dimensions, getDimensions(self).values()):
+            self.dimensions[k] = v
+        for k, v in zip(self.variables, getVariables(self).values()):
+            self.variables[k] = v
 
     def tofile(self, fname):
         # preserve dataset options
         with NcDataset(fname, "w") as out:
-            out.copyDataset(self)
+            out.copyDataset(self, vardata=True)
 
-    def __enter__(self):
-        return self
-    
-    def __exit__(self, *args, **kwargs):
-        self.close()
-            
+    # def __enter__(self):
+    #     return self
+
+    # def __exit__(self, *args, **kwargs):
+    #     self.close()
+
     copyDataset      = copyDataset
     copyDimension    = copyDimension
     copyDimensions   = copyDimensions
@@ -535,32 +629,28 @@ class NcDataset(Dataset):
     createAttribute  = setAttribute
     createAttributes = setAttributes
     createDimensions = createDimensions
+    createVariable   = createVariable
+    createGroup      = createGroup
+    createDimension  = createDimension
     filterVariables  = filterVariables
     filterDimensions = filterDimensions
     getDates         = getDates
     attributes       = property(fget=getAttributes)
     # restore a "normal" attribute access behaviour
-    # __setattr__      = attributeSetter
-    # __getattr__      = attributeGetter
+    __setattr__      = attributeSetter
+    __getattr__      = attributeGetter
+
 
 class NcGroup(Group):
     def __init__(self, *args, **kwargs):
         super(NcGroup,self).__init__(*args, **kwargs)
         for k, v in zip(self.groups, getGroups(self).values()):
-            self.groups[k] = v 
+            self.groups[k] = v
+        for k, v in zip(self.dimensions, getDimensions(self).values()):
+            self.dimensions[k] = v
         for k,v in zip(self.variables, getVariables(self).values()):
-            self.variables[k] = v 
-      
-    def createGroup(self, name):
-        grp = NcGroup(self, name)
-        self.groups[name] = grp
-        return grp
+            self.variables[k] = v
 
-    def createVariable(self, *args, **kwargs):
-        var = NcVariable(self, *args, **kwargs)
-        self.variables[var.name] = var
-        return var
-    
     copyDimension    = copyDimension
     copyDimensions   = copyDimensions
     copyAttributes   = copyAttributes
@@ -571,17 +661,22 @@ class NcGroup(Group):
     createAttribute  = setAttribute
     createAttributes = setAttributes
     createDimensions = createDimensions
+    createVariable   = createVariable
+    createGroup      = createGroup
+    createDimension  = createDimension
     filterVariables  = filterVariables
     filterDimensions = filterDimensions
     getDates         = getDates
     attributes       = property(fget=getAttributes)
+    parent           = property(fget=getParent)
     # restore a "normal" attribute access behaviour
-    # __setattr__      = attributeSetter
-    # __getattr__      = attributeGetter
-         
+    __setattr__      = attributeSetter
+    __getattr__      = attributeGetter
+
+
 class NcVariable(Variable):
-    def __init__(self,*args,**kwargs):
-        super(NcVariable,self).__init__(*args,**kwargs)
+    def __init__(self, *args, **kwargs):
+        super(NcVariable, self).__init__(*args, **kwargs)
 
     copyAttributes   = copyAttributes
     createAttribute  = setAttribute
@@ -589,13 +684,15 @@ class NcVariable(Variable):
     attributes       = property(fget=getAttributes)
     definition       = property(fget=getVariableDefinition)
     fill_value       = property(fget=getFillValue, fset=setFillValue)
+    parent           = property(fget=getParent)
     # restore a "normal" attribute access behaviour
-    # __setattr__      = attributeSetter
-    # __getattr__      = attributeGetter
-    
+    __setattr__      = attributeSetter
+    __getattr__      = attributeGetter
+
 
 # Just to be consistent...
-NcDimension = Dimension
-
-if __name__ == "__main__":
-    pass
+class NcDimension(Dimension):
+    def __init__(self, *args, **kwargs):
+        super(NcDimension, self).__init__(*args, **kwargs)
+    
+    parent = property(fget=getParent)
