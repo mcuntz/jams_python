@@ -325,7 +325,8 @@ if __name__ == '__main__':
     else:
         jams.abc2plot(sub, dxabc, dyabc, iplot, lower=True, bold=True, usetex=usetex, mathrm=True, parenthesis='close')
 
-    exec(jams.plot.plot_save)
+    import re
+    exec(re.sub("pngfile = .*", "pngfile = pngfile.replace('0','_')+'.png'", jams.plot.plot_save))
 
     
     # -------------------------------------------------------------------------
