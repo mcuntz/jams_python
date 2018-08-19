@@ -110,6 +110,7 @@ from __future__ import division, absolute_import, print_function
     pareto_metrics         Performance metrics to compare Pareto fronts.
     pca                    Principal component analysis (PCA) upon the first dimension of an 2D-array.
     pi                     Parameter importance index PI or alternatively B index calculation.
+    plot                   Module with code snippets for plotting.
     plot_brewer            Plots available Brewer color maps in pdf file.
     position               Position arrays of subplots to be used with add_axes.
     print_brewer           Prints available Brewer colormap names.
@@ -354,6 +355,7 @@ from __future__ import division, absolute_import, print_function
     get_brewer             Registers and returns Brewer colormap.
     lat_fmt                Set lat label string (called by Basemap.drawparallels) if LaTeX package clash.
     lon_fmt                Set lon label string (called by Basemap.drawmeridians) if LaTeX package clash.
+    plot                   Module with code snippets for plotting.
     plot_brewer            Plots available Brewer color maps in pdf file.
     position               Position arrays of subplots to be used with add_axes.
     print_brewer           Prints available Brewer colormap names.
@@ -545,12 +547,14 @@ from __future__ import division, absolute_import, print_function
               MC, Jan 2018 - lowess
               MC, Jan 2018 - apply_undef
               MC, Mar 2018 - ascii2en, en2ascii, ascii2fr, fr2ascii, ascii2us, us2ascii
+              MC, Jul 2018 - plot
 """
 
 # sub-packages without dependencies to rest of jams
 from . import const
 from . import encrypt
 from . import functions
+from . import plot
 from . import qa
 
 # Routines
@@ -706,9 +710,9 @@ from . import logtools
 
 # Information
 __author__   = "Matthias Cuntz"
-__version__  = '4.1.0'
+__version__  = '4.2.0'
 __revision__ = "Revision: ba3ae6b"
-__date__     = 'Date: 03.11.2016'
+__date__     = 'Date: 25.07.2018'
 
 # Main
 if __name__ == '__main__':
