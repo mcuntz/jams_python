@@ -148,7 +148,7 @@ if __name__ == '__main__':
     import time as ptime
     t1 = ptime.time()
 
-    exec(jams.plot.set_outtype)
+    exec(jams.plot.mc_set_outtype)
 
     
     # -------------------------------------------------------------------------
@@ -197,7 +197,7 @@ if __name__ == '__main__':
     bbox_inches = 'tight'
     pad_inches  = 0.035
 
-    exec(jams.plot.set_matplotlib)
+    exec(jams.plot.mc_set_matplotlib)
 
 
     # -------------------------------------------------------------------------
@@ -211,7 +211,7 @@ if __name__ == '__main__':
     # Plot
     #
 
-    exec(jams.plot.plot_begin)
+    exec(jams.plot.mc_plot_begin)
 
     # Uncomment for xkcd-style
     # plt.xkcd()
@@ -273,7 +273,7 @@ if __name__ == '__main__':
     else:
         jams.abc2plot(sub, dxabc, dyabc, iplot, lower=True, bold=True, usetex=usetex, mathrm=True, parenthesis='close')
 
-    exec(jams.plot.plot_save)
+    exec(jams.plot.mc_plot_save)
 
     
     # -------------------------------------------------------------------------
@@ -326,14 +326,14 @@ if __name__ == '__main__':
         jams.abc2plot(sub, dxabc, dyabc, iplot, lower=True, bold=True, usetex=usetex, mathrm=True, parenthesis='close')
 
     import re
-    exec(re.sub("pngfile = .*", "pngfile = pngfile.replace('0','_')+'.png'", jams.plot.plot_save))
+    exec(re.sub("pngfile = .*", "pngfile = pngfile.replace('0','_')+'.png'", jams.plot.mc_plot_save))
 
     
     # -------------------------------------------------------------------------
     # Finished
     #
 
-    exec(jams.plot.plot_end)
+    exec(jams.plot.mc_plot_end)
 
     t2    = ptime.time()
     strin = '[m]: {:.1f}'.format((t2-t1)/60.) if (t2-t1)>60. else '[s]: {:d}'.format(int(t2-t1))

@@ -240,8 +240,8 @@ from __future__ import division, absolute_import, print_function
 """
 
 # UFZ colours
-from .plot_snippets import set_outtype, set_matplotlib
-from .plot_snippets import plot_begin, plot_start, plot_save, plot_end, plot_stop
+from .mc_plot_snippets import mc_set_outtype, mc_set_matplotlib
+from .mc_plot_snippets import mc_plot_begin, mc_plot_start, mc_plot_save, mc_plot_end, mc_plot_stop
 
 # Information
 __author__   = "Matthias Cuntz"

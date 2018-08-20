@@ -1,10 +1,10 @@
 #!/usr/bin/env python
 from __future__ import division, absolute_import, print_function
 
-__all__ = ['set_outtype', 'set_matplotlib',
-           'plot_begin', 'plot_start', 'plot_save', 'plot_end', 'plot_stop']
+__all__ = ['mc_set_outtype', 'mc_set_matplotlib',
+           'mc_plot_begin', 'mc_plot_start', 'mc_plot_save', 'mc_plot_end', 'mc_plot_stop']
 
-set_outtype = '''
+mc_set_outtype = '''
 outtype = outtype.lower()
 outtypes = ['', 'pdf', 'png', 'html', 'd3', 'bokeh', 'plotly']
 if outtype not in outtypes:
@@ -43,7 +43,7 @@ if (outtype == 'plotly'):
         assert plotname.endswith('html'), 'Plotly plotnames must end with .html'
 '''
 
-set_matplotlib = '''
+mc_set_matplotlib = '''
 import matplotlib as mpl
 if (outtype == 'pdf'):
     mpl.use('PDF') # set directly after import matplotlib
@@ -118,7 +118,7 @@ mpl.rc('xtick', color=fgcolor)
 mpl.rc('ytick', color=fgcolor)
 '''
 
-plot_begin = '''
+mc_plot_begin = '''
 outtype_ends = ['', '.pdf', '_', '.html', '.html']
 if plotname == '':
     plotfile = filebase(__file__) + outtype_ends[outtypes.index(outtype)]
@@ -152,9 +152,9 @@ if (outtype == 'plotly'):
 ifig = 0
 '''
 
-plot_start = plot_begin
+mc_plot_start = mc_plot_begin
 
-plot_save = '''
+mc_plot_save = '''
 # save pages
 if (outtype == 'pdf'):
     pdf_pages.savefig(fig)
@@ -186,7 +186,7 @@ elif (outtype == 'plotly'):
     plt.close(fig)
 '''
         
-plot_end = '''
+mc_plot_end = '''
 # close files or show windows
 if (outtype == 'pdf'):
     pdf_pages.close()
@@ -214,4 +214,4 @@ else:
     plt.show()
 '''
 
-plot_stop = plot_end
+mc_plot_stop = mc_plot_end
