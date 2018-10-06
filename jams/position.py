@@ -2,6 +2,8 @@
 from __future__ import division, absolute_import, print_function
 import numpy as np
 
+__all__ = ['position']
+
 def position(row=1, col=1, num=1,
              left=0.125, right=0.9, bottom=0.1, top=0.9,
              hspace=0.1, vspace=None, wspace=None,

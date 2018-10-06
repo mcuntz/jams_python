@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 from __future__ import division, absolute_import, print_function
-from jams.romanliterals import int2roman
+from lib.romanliterals import int2roman
+
+__all__ = ['abc2plot']
 
 def abc2plot(handle, dx, dy, iplot,
              integer=False, roman=False, lower=False,

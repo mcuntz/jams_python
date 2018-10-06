@@ -43,6 +43,9 @@ import numpy as np
         Modified, MC, Feb 2013 - ported to Python 3
                   MC, Apr 2014 - assert
 """
+
+__all__ = ['int2roman', 'roman2int']
+
 numeral_map = list(zip((1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1),
                   ('M', 'CM', 'D', 'CD', 'C', 'XC', 'L', 'XL', 'X', 'IX', 'V', 'IV', 'I')))
 
