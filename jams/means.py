@@ -5,7 +5,8 @@ from jams.date2dec import date2dec
 from jams.dec2date import dec2date
 
 def means(date, dat, year=False, month=False, day=False, hour=False, minute=False,
-          meanday=False, meanmonth=False, sum=False, max=False, min=False, onlydat=False):
+          meanday=False, meanmonth=False, seasonal=False,
+          sum=False, max=False, min=False, onlydat=False):
     """
         Calculate daily, monthly, yearly, etc. means of data depending on date stamp.
 
@@ -20,12 +21,14 @@ def means(date, dat, year=False, month=False, day=False, hour=False, minute=Fals
             Minutely dates are centred at 30 sec.
             Mean daily dates centred on 30 min of 01. January of first year.
             Mean monthly dates centred on 15th of month, 12:00h of first year.
+            Seasonal dates are centred at 12:00h of each day of first (leap) year.
 
 
         Definition
         ----------
         def means(date, dat, year=False, month=False, day=False, hour=False, minute=False,
-                  meanday=False, meanmonth=False, sum=False, max=False, min=False, onlydat=False):
+                  meanday=False, meanmonth=False, seasonal=False,
+                  sum=False, max=False, min=False, onlydat=False):
 
 
         Input
@@ -43,6 +46,7 @@ def means(date, dat, year=False, month=False, day=False, hour=False, minute=Fals
         minute    if True, minutely means.
         meanday   if True, mean daily cycle.
         meanmonth if True, mean monthly cycle.
+        seasonal  if True, seasonal cycle.
         sum       if True, calculate sums instead of means.
         max       if True, calculate maxima instead of means.
         min       if True, calculate minima instead of means.
@@ -55,6 +59,8 @@ def means(date, dat, year=False, month=False, day=False, hour=False, minute=Fals
 
         If meanday==True, then all hours will be written; as a masked-array if hours are missing.
         If meanmonth==True, then all months will be written; as a masked-array if months are missing.
+        If seasonal==True: input data has to be spaced <= days, otherwise consider meanmonth.
+        If seasonal==True, then all days will be written; as a masked-array if days are missing.
 
 
         Examples
@@ -88,6 +94,10 @@ def means(date, dat, year=False, month=False, day=False, hour=False, minute=Fals
         >>> odates, xout = means(jdates, x, meanmonth=True)
         >>> print(astr(xout[0:5], 3, pp=True))
         ['4.000' '2.000' '3.000' '--   ' '--   ']
+
+        >>> odates, xout = means(jdates, x, seasonal=True)
+        >>> print(astr(xout[0:5], 3, pp=True))
+        ['4.000' '--   ' '--   ' '--   ' '--   ']
 
         >>> print(astr(means(jdates, x, month=True, onlydat=True), 3, pp=True))
         ['4.000' '2.000' '3.000']
@@ -202,6 +212,7 @@ def means(date, dat, year=False, month=False, day=False, hour=False, minute=Fals
         Modified, MC, Jul 2013 - meanday
                   MC, Apr 2014 - max, min
                   MC, Jun 2015 - onlydat, meanmonth
+                  MC, Oct 2018 - seasonal
     """
     # Constants
     myundef  = 9e33
@@ -217,7 +228,7 @@ def means(date, dat, year=False, month=False, day=False, hour=False, minute=Fals
         dat = dat[:,np.newaxis]
 
     # Check options
-    allopts = day+month+year+hour+minute+meanday+meanmonth
+    allopts = day+month+year+hour+minute+meanday+meanmonth+seasonal
     assert allopts <= 1, "only one averaging option day, month, year, etc. possible"
 
     # Check aggregation
@@ -437,6 +448,39 @@ def means(date, dat, year=False, month=False, day=False, hour=False, minute=Fals
                     else:
                         out[zahl,:] = np.ma.mean(dat[ii,:],0)
                 zahl += 1
+            if np.any(out==myundef):
+                out = np.ma.array(out, mask=(out==myundef), keep_mask=True)
+
+        # Seasonal
+        if seasonal:
+            dim = np.array([[-9,31,28,31,30,31,30,31,31,30,31,30,31],
+                            [-9,31,29,31,30,31,30,31,31,30,31,30,31]])
+            leap = np.any(np.array((((yr%4)==0) & ((yr%100)!=0)) | ((yr%400)==0)).astype(np.int))
+            if leap:
+                nout = 366
+            else:
+                nout = 365
+            dys = range(1,nout+1)
+            dout = np.ones(nout)*myundef
+            if ismasked:
+                out  = np.ma.ones([nout]+list(dat.shape[1:]))*myundef
+            else:
+                out  = np.ones([nout]+list(dat.shape[1:]))*myundef
+            zahl = 0
+            for i in range(1,13):
+                for j in range(1,dim[int(leap),i]+1):
+                    dout[zahl] = date2dec(yr=yr[0], mo=i, dy=j, hr=12, mi=0)
+                    ii = np.where((mo==i) & (dy==j))[0]
+                    if np.size(ii) > 0:
+                        if sum:
+                            out[zahl,:] = np.ma.sum(dat[ii,:],0)
+                        elif max:
+                            out[zahl,:] = np.ma.amax(dat[ii,:],0)
+                        elif min:
+                            out[zahl,:] = np.ma.amin(dat[ii,:],0)
+                        else:
+                            out[zahl,:] = np.ma.mean(dat[ii,:],0)
+                    zahl += 1
             if np.any(out==myundef):
                 out = np.ma.array(out, mask=(out==myundef), keep_mask=True)
 
