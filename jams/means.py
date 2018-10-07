@@ -455,10 +455,15 @@ def means(date, dat, year=False, month=False, day=False, hour=False, minute=Fals
         if seasonal:
             dim = np.array([[-9,31,28,31,30,31,30,31,31,30,31,30,31],
                             [-9,31,29,31,30,31,30,31,31,30,31,30,31]])
-            leap = np.any(np.array((((yr%4)==0) & ((yr%100)!=0)) | ((yr%400)==0)).astype(np.int))
+            # leaps = np.array((((yr%4)==0) & ((yr%100)!=0)) | ((yr%400)==0)).astype(np.int)
+            leaps = (((yr%4)==0) & ((yr%100)!=0)) | ((yr%400)==0)
+            leap  = np.any(leaps)
+            ileap = int(leap)
             if leap:
+                iileap = np.argmax(leaps)
                 nout = 366
             else:
+                iileap = 0
                 nout = 365
             dys = range(1,nout+1)
             dout = np.ones(nout)*myundef
@@ -468,8 +473,8 @@ def means(date, dat, year=False, month=False, day=False, hour=False, minute=Fals
                 out  = np.ones([nout]+list(dat.shape[1:]))*myundef
             zahl = 0
             for i in range(1,13):
-                for j in range(1,dim[int(leap),i]+1):
-                    dout[zahl] = date2dec(yr=yr[0], mo=i, dy=j, hr=12, mi=0)
+                for j in range(1,dim[ileap,i]+1):
+                    dout[zahl] = date2dec(yr=yr[iileap], mo=i, dy=j, hr=12, mi=0)
                     ii = np.where((mo==i) & (dy==j))[0]
                     if np.size(ii) > 0:
                         if sum:
