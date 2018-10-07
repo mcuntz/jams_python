@@ -5,7 +5,8 @@ import subprocess
 from distutils.util import strtobool
 import numpy as np
 from jams.const import huge
-from jams import savez_compressed, closest
+from jams.npyio import savez_compressed
+from jams.closest import closest
 # ToDo:
 #   Handling constraints
 #   write tmp/population files (as in SCE of Fortran)
@@ -1438,176 +1439,176 @@ def pso(func, x0, lb, ub,
 
 
 if __name__ == '__main__':
-    # import doctest
-    # doctest.testmod(optionflags=doctest.NORMALIZE_WHITESPACE)
+    import doctest
+    doctest.testmod(optionflags=doctest.NORMALIZE_WHITESPACE)
 
-    try:
-        from mpi4py import MPI
-        comm  = MPI.COMM_WORLD
-        csize = comm.Get_size()
-        crank = comm.Get_rank()
-    except ImportError:
-        comm  = None
-        csize = 1
-        crank = 0
+    # try:
+    #     from mpi4py import MPI
+    #     comm  = MPI.COMM_WORLD
+    #     csize = comm.Get_size()
+    #     crank = comm.Get_rank()
+    # except ImportError:
+    #     comm  = None
+    #     csize = 1
+    #     crank = 0
 
-    algo      = 'canonical'
-    init      = 'lhs'
-    swarmsize = 40
-    maxn      = 250
-    topology  = 'neumann'
-    memetic   = 'local'
-    nmemetic  = 2
+    # algo      = 'canonical'
+    # init      = 'lhs'
+    # swarmsize = 40
+    # maxn      = 250
+    # topology  = 'neumann'
+    # memetic   = 'local'
+    # nmemetic  = 2
 
-    if swarmsize % csize != 0:
-        raise ValueError("Swarmsize "+str(swarmsize)+" must be multiple of number of processes "+str(csize)+".")
+    # if swarmsize % csize != 0:
+    #     raise ValueError("Swarmsize "+str(swarmsize)+" must be multiple of number of processes "+str(csize)+".")
 
-    from jams.functions import ackley, griewank, goldstein_price, rastrigin, rosenbrock, six_hump_camelback
-    '''
-    This is the Ackley Function
-    Global Optimum (n>=2): 0.0 at origin
-    '''
-    npara = 10
-    lb = -10*np.ones(npara)
-    ub = 10*np.ones(npara)
-    x0 = np.zeros(npara)
-    bestx, bestf, nrun = pso(ackley, x0, lb, ub, processes=1,
-                             init=init, strategy=algo, topology=topology, verbose=0,
-                             memetic=memetic, nmemetic=nmemetic,
-                             swarmsize=swarmsize, maxn=maxn, restartfile1=None, cout=True)
-    if crank == 0: print('Ackley 0 at origin ', nrun, bestx, bestf)
-    '''
-        This is the Griewank Function (2-D or 10-D)
-        Bound: X(i)=[-600,600], for i=1,2,...,10  !for visualization only 2!
-           Global Optimum: 0, at origin
-    '''
-    npara = 10
-    lb = -600*np.ones(npara)
-    ub = 600*np.ones(npara)
-    x0 = np.zeros(npara)
-    bestx, bestf, nrun = pso(griewank, x0, lb, ub, processes=1,
-                             init=init, strategy=algo, topology=topology, verbose=0,
-                             memetic=memetic, nmemetic=nmemetic,
-                             swarmsize=swarmsize, maxn=maxn, restartfile1=None, cout=True)
-    if crank == 0: print('Griewank 0 at origin ', nrun, bestx, bestf)
-    '''
-    This is the Goldstein-Price Function
-    Bound X1=[-2,2], X2=[-2,2]
-    Global Optimum: 3.0,(0.0,-1.0)
-    '''
-    npara = 2
-    lb = -2*np.ones(npara)
-    ub = 2*np.ones(npara)
-    x0 = np.zeros(npara)
-    bestx, bestf, nrun = pso(goldstein_price, x0, lb, ub, processes=4, minobj=3.+1e-8,
-                             init=init, strategy=algo, topology=topology, verbose=0,
-                             memetic=memetic, nmemetic=nmemetic,
-                             swarmsize=swarmsize, maxn=maxn, restartfile1=None, cout=True)
-    if crank == 0: print('Goldstein 3 at (0,-1) ', nrun, bestx, bestf)
-    '''
-    This is the Rastrigin Function
-    Bound: X1=[-1,1], X2=[-1,1]
-    Global Optimum: -2, (0,0)
-    '''
-    npara = 2
-    lb = -1*np.ones(npara)
-    ub = 1*np.ones(npara)
-    x0 = np.zeros(npara)
-    bestx, bestf, nrun = pso(rastrigin, x0, lb, ub, processes=4, minobj=-2.+1e-8,
-                             init=init, strategy=algo, topology=topology, verbose=0,
-                             memetic=memetic, nmemetic=nmemetic,
-                             swarmsize=swarmsize, maxn=maxn, restartfile1=None, cout=True)
-    if crank == 0: print('Rastrigin -2 at origin ', nrun, bestx, bestf)
-    '''
-    This is the Rosenbrock Function
-    Bound: X1=[-5,5], X2=[-2,8]; Global Optimum: 0,(1,1)
-           lb=[-5 -5]; ub=[5 5]; x0=[1 1];
-    '''
-    npara = 2
-    lb = -2*np.ones(npara)
-    ub = 5*np.ones(npara)
-    x0 = np.zeros(npara)
-    bestx, bestf, nrun = pso(rosenbrock, x0, lb, ub, processes=4,
-                             init=init, strategy=algo, topology=topology, verbose=0,
-                             memetic=memetic, nmemetic=nmemetic,
-                             swarmsize=swarmsize, maxn=maxn, restartfile1=None, cout=True)
-    if crank == 0: print('Rosenbrock 0 at (1,1) ', nrun, bestx, bestf)
-    '''
-    This is the Six-hump Camelback Function.
-    Bound: X1=[-5,5], X2=[-5,5]
-    True Optima: -1.031628453489877, (-0.08983,0.7126), (0.08983,-0.7126)
-    '''
-    npara = 2
-    lb = -5*np.ones(npara)
-    ub = 5*np.ones(npara)
-    x0 = np.zeros(npara)
-    bestx, bestf, nrun = pso(six_hump_camelback, x0, lb, ub, processes=4, minobj=-1.031628453489877+1e-8,
-                             init=init, strategy=algo, topology=topology, verbose=0,
-                             memetic=memetic, nmemetic=nmemetic,
-                             swarmsize=swarmsize, maxn=maxn, restartfile1=None, cout=True)
-    if crank == 0: print('Six_hump_camelback -1.03... +-(-0.08983,0.7126) ', nrun, bestx, bestf)
+    # from jams.functions import ackley, griewank, goldstein_price, rastrigin, rosenbrock, six_hump_camelback
+    # '''
+    # This is the Ackley Function
+    # Global Optimum (n>=2): 0.0 at origin
+    # '''
+    # npara = 10
+    # lb = -10*np.ones(npara)
+    # ub = 10*np.ones(npara)
+    # x0 = np.zeros(npara)
+    # bestx, bestf, nrun = pso(ackley, x0, lb, ub, processes=1,
+    #                          init=init, strategy=algo, topology=topology, verbose=0,
+    #                          memetic=memetic, nmemetic=nmemetic,
+    #                          swarmsize=swarmsize, maxn=maxn, restartfile1=None, cout=True)
+    # if crank == 0: print('Ackley 0 at origin ', nrun, bestx, bestf)
+    # '''
+    #     This is the Griewank Function (2-D or 10-D)
+    #     Bound: X(i)=[-600,600], for i=1,2,...,10  !for visualization only 2!
+    #        Global Optimum: 0, at origin
+    # '''
+    # npara = 10
+    # lb = -600*np.ones(npara)
+    # ub = 600*np.ones(npara)
+    # x0 = np.zeros(npara)
+    # bestx, bestf, nrun = pso(griewank, x0, lb, ub, processes=1,
+    #                          init=init, strategy=algo, topology=topology, verbose=0,
+    #                          memetic=memetic, nmemetic=nmemetic,
+    #                          swarmsize=swarmsize, maxn=maxn, restartfile1=None, cout=True)
+    # if crank == 0: print('Griewank 0 at origin ', nrun, bestx, bestf)
+    # '''
+    # This is the Goldstein-Price Function
+    # Bound X1=[-2,2], X2=[-2,2]
+    # Global Optimum: 3.0,(0.0,-1.0)
+    # '''
+    # npara = 2
+    # lb = -2*np.ones(npara)
+    # ub = 2*np.ones(npara)
+    # x0 = np.zeros(npara)
+    # bestx, bestf, nrun = pso(goldstein_price, x0, lb, ub, processes=4, minobj=3.+1e-8,
+    #                          init=init, strategy=algo, topology=topology, verbose=0,
+    #                          memetic=memetic, nmemetic=nmemetic,
+    #                          swarmsize=swarmsize, maxn=maxn, restartfile1=None, cout=True)
+    # if crank == 0: print('Goldstein 3 at (0,-1) ', nrun, bestx, bestf)
+    # '''
+    # This is the Rastrigin Function
+    # Bound: X1=[-1,1], X2=[-1,1]
+    # Global Optimum: -2, (0,0)
+    # '''
+    # npara = 2
+    # lb = -1*np.ones(npara)
+    # ub = 1*np.ones(npara)
+    # x0 = np.zeros(npara)
+    # bestx, bestf, nrun = pso(rastrigin, x0, lb, ub, processes=4, minobj=-2.+1e-8,
+    #                          init=init, strategy=algo, topology=topology, verbose=0,
+    #                          memetic=memetic, nmemetic=nmemetic,
+    #                          swarmsize=swarmsize, maxn=maxn, restartfile1=None, cout=True)
+    # if crank == 0: print('Rastrigin -2 at origin ', nrun, bestx, bestf)
+    # '''
+    # This is the Rosenbrock Function
+    # Bound: X1=[-5,5], X2=[-2,8]; Global Optimum: 0,(1,1)
+    #        lb=[-5 -5]; ub=[5 5]; x0=[1 1];
+    # '''
+    # npara = 2
+    # lb = -2*np.ones(npara)
+    # ub = 5*np.ones(npara)
+    # x0 = np.zeros(npara)
+    # bestx, bestf, nrun = pso(rosenbrock, x0, lb, ub, processes=4,
+    #                          init=init, strategy=algo, topology=topology, verbose=0,
+    #                          memetic=memetic, nmemetic=nmemetic,
+    #                          swarmsize=swarmsize, maxn=maxn, restartfile1=None, cout=True)
+    # if crank == 0: print('Rosenbrock 0 at (1,1) ', nrun, bestx, bestf)
+    # '''
+    # This is the Six-hump Camelback Function.
+    # Bound: X1=[-5,5], X2=[-5,5]
+    # True Optima: -1.031628453489877, (-0.08983,0.7126), (0.08983,-0.7126)
+    # '''
+    # npara = 2
+    # lb = -5*np.ones(npara)
+    # ub = 5*np.ones(npara)
+    # x0 = np.zeros(npara)
+    # bestx, bestf, nrun = pso(six_hump_camelback, x0, lb, ub, processes=4, minobj=-1.031628453489877+1e-8,
+    #                          init=init, strategy=algo, topology=topology, verbose=0,
+    #                          memetic=memetic, nmemetic=nmemetic,
+    #                          swarmsize=swarmsize, maxn=maxn, restartfile1=None, cout=True)
+    # if crank == 0: print('Six_hump_camelback -1.03... +-(-0.08983,0.7126) ', nrun, bestx, bestf)
 
-    # Restart
-    algo      = 'fips'
-    init      = 'lhs'
-    swarmsize = 40
-    maxn      = 250
-    topology  = 'neumann'
-    memetic   = 'no' # 'global'
-    nmemetic  = 1
-    if swarmsize % csize != 0:
-        raise ValueError("Swarmsize "+str(swarmsize)+" must be multiple of number of processes "+str(csize)+".")
-    from jams.functions import rosenbrock
-    npara = 2
-    lb = -2*np.ones(npara)
-    ub = 5*np.ones(npara)
-    x0 = np.zeros(npara)
-    seed = 1234
-    bestx, bestf = pso(rosenbrock, x0, lb, ub, processes=4,
-                       init=init, strategy=algo, topology=topology, verbose=0,
-                       memetic=memetic, nmemetic=nmemetic,
-                       swarmsize=swarmsize, maxn=maxn, restartfile1=None,
-                       seed=seed, restart=False)
-    if crank == 0: print('Rosenbrock Reference - ', bestx, bestf)
-    bestx, bestf = pso(rosenbrock, x0, lb, ub, processes=4,
-                       init=init, strategy=algo, topology=topology, verbose=0,
-                       memetic=memetic, nmemetic=nmemetic,
-                       swarmsize=swarmsize, maxn=maxn//2,
-                       seed=seed, restart=False)
-    if crank == 0: print('Rosenbrock Restart 1 - ', bestx, bestf)
-    bestx, bestf = pso(rosenbrock, x0, lb, ub, processes=4,
-                       init=init, strategy=algo, topology=topology, verbose=0,
-                       memetic=memetic, nmemetic=nmemetic,
-                       swarmsize=swarmsize, maxn=maxn,
-                       seed=seed, restart=True)
-    if crank == 0: print('Rosenbrock Restart 2 - ', bestx, bestf)
+    # # Restart
+    # algo      = 'fips'
+    # init      = 'lhs'
+    # swarmsize = 40
+    # maxn      = 250
+    # topology  = 'neumann'
+    # memetic   = 'no' # 'global'
+    # nmemetic  = 1
+    # if swarmsize % csize != 0:
+    #     raise ValueError("Swarmsize "+str(swarmsize)+" must be multiple of number of processes "+str(csize)+".")
+    # from jams.functions import rosenbrock
+    # npara = 2
+    # lb = -2*np.ones(npara)
+    # ub = 5*np.ones(npara)
+    # x0 = np.zeros(npara)
+    # seed = 1234
+    # bestx, bestf = pso(rosenbrock, x0, lb, ub, processes=4,
+    #                    init=init, strategy=algo, topology=topology, verbose=0,
+    #                    memetic=memetic, nmemetic=nmemetic,
+    #                    swarmsize=swarmsize, maxn=maxn, restartfile1=None,
+    #                    seed=seed, restart=False)
+    # if crank == 0: print('Rosenbrock Reference - ', bestx, bestf)
+    # bestx, bestf = pso(rosenbrock, x0, lb, ub, processes=4,
+    #                    init=init, strategy=algo, topology=topology, verbose=0,
+    #                    memetic=memetic, nmemetic=nmemetic,
+    #                    swarmsize=swarmsize, maxn=maxn//2,
+    #                    seed=seed, restart=False)
+    # if crank == 0: print('Rosenbrock Restart 1 - ', bestx, bestf)
+    # bestx, bestf = pso(rosenbrock, x0, lb, ub, processes=4,
+    #                    init=init, strategy=algo, topology=topology, verbose=0,
+    #                    memetic=memetic, nmemetic=nmemetic,
+    #                    swarmsize=swarmsize, maxn=maxn,
+    #                    seed=seed, restart=True)
+    # if crank == 0: print('Rosenbrock Restart 2 - ', bestx, bestf)
 
-    # Constraints
-    algo      = 'canonical'
-    init      = 'lhs'
-    swarmsize = 40
-    maxn      = 250
-    topology  = 'gbest'
-    memetic   = 'no' # 'global'
-    nmemetic  = 1
-    if swarmsize % csize != 0:
-        raise ValueError("Swarmsize "+str(swarmsize)+" must be multiple of number of processes "+str(csize)+".")
-    from jams.functions import rosenbrock
-    npara = 2
-    lb = -2*np.ones(npara)
-    ub = 5*np.ones(npara)
-    x0 = np.zeros(npara)
-    seed = 1234
-    def fcon(x): # feasible = np.all(fcon(x)>=0.)
-        return np.sign(x)
-    bestx, bestf = pso(rosenbrock, x0, lb, ub, processes=1, f_ieqcons=fcon,
-                       init=init, strategy=algo, topology=topology, verbose=2,
-                       memetic=memetic, nmemetic=nmemetic,
-                       swarmsize=swarmsize, maxn=maxn, restartfile1=None,
-                       seed=seed, restart=False)
-    if crank == 0: print('Rosenbrock constraint - ', bestx, bestf)
+    # # Constraints
+    # algo      = 'canonical'
+    # init      = 'lhs'
+    # swarmsize = 40
+    # maxn      = 250
+    # topology  = 'gbest'
+    # memetic   = 'no' # 'global'
+    # nmemetic  = 1
+    # if swarmsize % csize != 0:
+    #     raise ValueError("Swarmsize "+str(swarmsize)+" must be multiple of number of processes "+str(csize)+".")
+    # from jams.functions import rosenbrock
+    # npara = 2
+    # lb = -2*np.ones(npara)
+    # ub = 5*np.ones(npara)
+    # x0 = np.zeros(npara)
+    # seed = 1234
+    # def fcon(x): # feasible = np.all(fcon(x)>=0.)
+    #     return np.sign(x)
+    # bestx, bestf = pso(rosenbrock, x0, lb, ub, processes=1, f_ieqcons=fcon,
+    #                    init=init, strategy=algo, topology=topology, verbose=2,
+    #                    memetic=memetic, nmemetic=nmemetic,
+    #                    swarmsize=swarmsize, maxn=maxn, restartfile1=None,
+    #                    seed=seed, restart=False)
+    # if crank == 0: print('Rosenbrock constraint - ', bestx, bestf)
 
-    # Clean up doctest
-    import os
-    os.remove('pso.restart.npz')
-    os.remove('pso.restart.txt')
+    # # Clean up doctest
+    # import os
+    # os.remove('pso.restart.npz')
+    # os.remove('pso.restart.txt')

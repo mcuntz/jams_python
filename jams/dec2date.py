@@ -143,24 +143,24 @@ def dec2date(indata, calendar='standard', refdate=None, units=None,
         >>> second = np.array([15,10,40,50,34,37,0])
         >>> from date2dec import date2dec
         >>> decimal = date2dec(calendar='standard', yr=year, mo=month, dy=day, hr=hour, mi=minute, sc=second)
-        >>> year, month, day, hour, minute, second = dec2date(decimal, calendar= 'standard', fulldate=True)
-        >>> print(year)
+        >>> year1, month1, day1, hour1, minute1, second1 = dec2date(decimal, calendar= 'standard', fulldate=True)
+        >>> print(year1)
         [2000 1810 1630 1510 1271  619    1]
-        >>> print(month)
+        >>> print(month1)
         [1 4 7 9 3 8 1]
-        >>> print(day)
+        >>> print(day1)
         [ 5 24 15 20 18 27  1]
-        >>> print(hour)
+        >>> print(hour1)
         [12 16 10 14 19 11 12]
-        >>> print(minute)
+        >>> print(minute1)
         [30 15 20 35 41  8  0]
-        >>> print(second)
+        >>> print(second1)
         [15 10 40 50 34 37  0]
 
         # calendar = 'julian'
         >>> decimal = date2dec(calendar='julian', yr=year, mo=month, dy=day, hr=hour, mi=minute, sc=second)
-        >>> year = dec2date(decimal, calendar='julian', yr=True)
-        >>> print(year)
+        >>> year1 = dec2date(decimal, calendar='julian', yr=True)
+        >>> print(year1)
         [2000 1810 1630 1510 1271  619    1]
 
         # calendar = 'proleptic_gregorian'
@@ -171,10 +171,10 @@ def dec2date(indata, calendar='standard', refdate=None, units=None,
 
         # calendar = 'excel1900' WITH excelerr = True -> 1900 considered as leap year
         >>> decimal = date2dec(calendar='excel1900', yr=year, mo=month, dy=day, hr=hour, mi=minute, sc=second)
-        >>> year, day = dec2date(decimal, calendar='excel1900', yr=True, dy=True)
-        >>> print(year)
+        >>> year1, day1 = dec2date(decimal, calendar='excel1900', yr=True, dy=True)
+        >>> print(year1)
         [2000 1810 1630 1510 1271  619    1]
-        >>> print(day)
+        >>> print(day1)
         [ 5 24 15 20 18 27  1]
 
         # calendar = 'excel1900' WITH excelerr = False -> 1900 considered as NO leap year

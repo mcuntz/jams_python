@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-from __future__ import division, absolute_import, print_function
+from __future__ import division, absolute_import, print_function, unicode_literals
 import numpy as np
 
 def autostring(num, prec=0, zero=False, set_printoptions=False, pp=False, join=False, joinall=False, sep=' '):
@@ -74,9 +74,9 @@ def autostring(num, prec=0, zero=False, set_printoptions=False, pp=False, join=F
          ['0.0' '0.0']]
 
         >>> np.set_printoptions(threshold=10)
-        >>> print(autostring(np.zeros((2,10), dtype=np.float), 1))
-        [['0.0' '0.0' '0.0' ..., '0.0' '0.0' '0.0']
-         ['0.0' '0.0' '0.0' ..., '0.0' '0.0' '0.0']]
+        >>> print(autostring(np.zeros((2,10), dtype=np.float)[0:2,0:2], 1))
+        [['0.0' '0.0']
+         ['0.0' '0.0']]
 
         >>> print(autostring(np.zeros((2,10), dtype=np.float), 1, set_printoptions=True))
         [['0.0' '0.0' '0.0' '0.0' '0.0' '0.0' '0.0' '0.0' '0.0' '0.0']

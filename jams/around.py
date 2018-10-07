@@ -45,7 +45,7 @@ def around(num, powten, ceil=False, floor=False):
 
         Examples
         --------
-        >>> from jams.autostring import astr
+        >>> from jams import astr
         >>> print(astr(around(np.array([3.5967,345.5967]), -3),3,pp=True))
         ['  3.597' '345.597']
 

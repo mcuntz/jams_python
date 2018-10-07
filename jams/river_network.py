@@ -142,17 +142,11 @@ def upscale_fdir(sn, factor, print_info=False, return_maxlocs=False, do_co=False
         ...                   [ 64, 128,  64,  64,  64, 128,  64, 64, 32]])
         >>> sinks = np.array([[6], [8]])
         >>> sn = river_network(fdir=fd, do_fa=True, do_co=False, sinks=sinks)
-        >>> upscale_fdir(sn, 3).fdir
-        masked_array(data =
-         [[1.0 2.0 4.0]
+        >>> print(upscale_fdir(sn, 3).fdir)
+        [[1.0 2.0 4.0]
          [64.0 16.0 4.0]
-         [64.0 64.0 1.0]],
-                     mask =
-         [[False False False]
-         [False False False]
-         [False False False]],
-               fill_value = -9999.0)
-        <BLANKLINE>
+         [64.0 64.0 1.0]]
+
 
         License
         -------
@@ -305,9 +299,8 @@ class river_network(object):
             ...                   [128,  64, 128,  64,  32,   1, 128, 64, 64],
             ...                   [ 64, 128,  64,  64,  64, 128,  64, 64, 32]])
             >>> sinks = np.array([[6], [8]])
-            >>> river_network(fdir=fd, do_fa=True, do_co=False, sinks=sinks).fa
-            masked_array(data =
-             [[1.0 1.0 2.0 3.0 1.0 1.0 1.0 1.0 1.0]
+            >>> print(river_network(fdir=fd, do_fa=True, do_co=False, sinks=sinks).fa)
+            [[1.0 1.0 2.0 3.0 1.0 1.0 1.0 1.0 1.0]
              [1.0 4.0 1.0 32.0 37.0 3.0 2.0 2.0 1.0]
              [1.0 1.0 30.0 1.0 4.0 46.0 3.0 4.0 1.0]
              [1.0 5.0 19.0 2.0 1.0 1.0 50.0 5.0 2.0]
@@ -315,22 +308,9 @@ class river_network(object):
              [1.0 6.0 2.0 9.0 1.0 2.0 57.0 9.0 2.0]
              [1.0 4.0 1.0 8.0 1.0 2.0 3.0 68.0 81.0]
              [2.0 1.0 3.0 2.0 2.0 1.0 4.0 3.0 1.0]
-             [1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0]],
-                         mask =
-             [[False False False False False False False False False]
-             [False False False False False False False False False]
-             [False False False False False False False False False]
-             [False False False False False False False False False]
-             [False False False False False False False False False]
-             [False False False False False False False False False]
-             [False False False False False False False False False]
-             [False False False False False False False False False]
-             [False False False False False False False False False]],
-                   fill_value = -9999.0)
-            <BLANKLINE>
-            >>> river_network(fdir=fd, do_fa=False, do_co=True, sinks=sinks).co
-            masked_array(data =
-             [[1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0]
+             [1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0]]
+            >>> print(river_network(fdir=fd, do_fa=False, do_co=True, sinks=sinks).co)
+            [[1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0]
              [1.0 2.0 1.0 3.0 3.0 2.0 1.0 1.0 1.0]
              [1.0 1.0 3.0 1.0 2.0 3.0 1.0 2.0 1.0]
              [1.0 2.0 3.0 1.0 1.0 1.0 3.0 2.0 1.0]
@@ -338,19 +318,8 @@ class river_network(object):
              [1.0 2.0 1.0 2.0 1.0 1.0 3.0 2.0 1.0]
              [1.0 2.0 1.0 2.0 1.0 1.0 1.0 3.0 3.0]
              [1.0 1.0 2.0 1.0 1.0 1.0 2.0 2.0 1.0]
-             [1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0]],
-                         mask =
-             [[False False False False False False False False False]
-             [False False False False False False False False False]
-             [False False False False False False False False False]
-             [False False False False False False False False False]
-             [False False False False False False False False False]
-             [False False False False False False False False False]
-             [False False False False False False False False False]
-             [False False False False False False False False False]
-             [False False False False False False False False False]],
-                   fill_value = -9999.0)
-            <BLANKLINE>
+             [1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0]]
+
 
             License
             -------
@@ -491,16 +460,11 @@ class river_network(object):
             ...                    [  5,  10,  25],
             ...                    [ 15,  23,  24]])
             >>> dem.mask = np.zeros(dem.shape, dtype='bool')
-            >>> river_network(dem=dem, do_fa=False, do_co=False, sinks=np.array([[0], [2]])).fdir
-            masked_array(data =
-             [[1.0 1.0 -1.0]
+            >>> print(river_network(dem=dem, do_fa=False, do_co=False, sinks=np.array([[0], [2]])).fdir)
+            [[1.0 1.0 -1.0]
              [128.0 128.0 64.0]
-             [64.0 32.0 32.0]],
-                         mask =
-             [[False False False]
-             [False False False]
-             [False False False]],
-                   fill_value = 1e+20)
+             [64.0 32.0 32.0]]
+
 
             License
             -------
@@ -638,6 +602,7 @@ class river_network(object):
             -------
             Written,  ST & DS, Dec 2015
             Modified, MC, Nov 2016 - ported to Python 3
+                      MC, Oct 2018 - int indices in fa[]
         """
         if co is None and do_co:
             co = np.ma.masked_array(np.zeros(fd.shape) + missing_value,
@@ -678,7 +643,7 @@ class river_network(object):
                 if print_info:
                     print('co (channel order) of upstream: ', co_upstream)
             if do_fa:
-                fa_upstream = [fa[loc[0], loc[1]] for loc in upstream]
+                fa_upstream = [ fa[int(loc[0]), int(loc[1])] for loc in upstream ]
                 fa.data[int(cell[0]), int(cell[1])] = np.sum(fa_upstream) + 1
                 fa.mask[int(cell[0]), int(cell[1])] = False
                 if print_info:

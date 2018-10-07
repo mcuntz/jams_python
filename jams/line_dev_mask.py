@@ -47,11 +47,8 @@ def line_dev_mask(x, y, z, p_guess=[1.,0.], plot=False):
         >>> # detect outliers
         >>> new_mask = line_dev_mask(x,y,0.5,plot=False)
         >>> # apply new mask to x
-        >>> np.ma.array(y.data, mask=new_mask)
-        masked_array(data = [1.0 -- 2.0 2.5 3.0 -- -- 4.5 5.0 5.5],
-                     mask = [False  True False False False  True  True False False False],
-               fill_value = 1e+20)
-        <BLANKLINE>
+        >>> print(np.ma.array(y.data, mask=new_mask))
+        [1.0 -- 2.0 2.5 3.0 -- -- 4.5 5.0 5.5]
 
         
         License

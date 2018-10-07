@@ -149,7 +149,7 @@
 from __future__ import division, absolute_import, print_function
 
 # Define colormaps
-# from .find_in_path import find_in_path
+# from jams.find_in_path import find_in_path
 # cmapfile = find_in_path('brewer.cmaps') # in jams_python
 import os
 cmapfile = os.path.join(os.path.dirname(__file__), 'brewer.cmaps') # in jams_python/jams

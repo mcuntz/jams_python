@@ -41,7 +41,7 @@ def dewpoint(pres, Celsius=False):
         Examples
         --------
         >>> Ta = 20. + 273.15
-        >>> from jams.esat import esat # from jams
+        >>> from jams import esat
         >>> es = esat(Ta, formula='Buck_original')
         >>> from autostring import astr
         >>> print(astr(dewpoint(es),3,pp=True))

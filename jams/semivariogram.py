@@ -268,7 +268,7 @@ def semivariogram(x, y, v, nL, di, td, stype='omnidirectional', negscat=0.,
         ...     x, y, v, nL, di, td, stype='directional+orientational',
         ...     negscat=0., model='spherical', graph=False, lunit='m',
         ...     p0=(0.5,0.5,100), runtimediag=False)
-        >>> soll = [0.36, 0.40, 0.55, 0.50, 0.00, 0.60, 0.63, 0.45]
+        >>> soll = [0.36, 0.42, 0.54, 0.50, 0.20, 0.57, 0.65, 0.45]
         >>> print(np.allclose(nugget, soll, atol=0.1))
         True
         >>> print(astr(sill, 1))

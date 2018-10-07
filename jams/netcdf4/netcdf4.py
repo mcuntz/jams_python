@@ -106,7 +106,7 @@ def copyDataset(ncin, group, skipdims=None, skipgroups=None, skipvars=None,
     ncin.copyAttributes(group.attributes, skipattrs)
     ncin.copyGroups(group.groups, skipgroups)
     return ncin
- 
+
 def copyGroups(ncin, groups, skip=None):
     """
     Arguments

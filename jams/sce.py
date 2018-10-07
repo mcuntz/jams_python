@@ -4,7 +4,7 @@ import subprocess
 from distutils.util import strtobool
 import numpy as np
 from jams.const import huge
-from jams import savez_compressed
+from jams.npyio import savez_compressed
 # ToDo: write tmp/population files (of Fortran)
 # ToDo: write out also in logfile if not None (use jams.tee as in joptimise)
 

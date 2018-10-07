@@ -4,7 +4,7 @@ from functools import partial
 import os
 import subprocess
 import numpy as np
-from jams import morris_sampling, elementary_effects
+from jams.morris import morris_sampling, elementary_effects
 
 def _ext_obj_wrapper(func, lb, ub, mask,
                      parameterfile, parameterwriter, objectivefile, objectivereader, shell, debug, rank,
