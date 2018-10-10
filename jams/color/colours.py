@@ -179,7 +179,7 @@ def colours(name=False, rgb=True, rgb256=False, names=False):
         raise ValueError('colour must be given.')
 
     if type(name) == type('string'):
-        if name.lower() not in ufzall: raise ValueError('colour not known.')
+        if name.lower() not in ufzall: return name # raise ValueError('colour not known.')
         return get_colour_tuple(name, rgb256=rgb256)
     else:
         try:
@@ -188,8 +188,10 @@ def colours(name=False, rgb=True, rgb256=False, names=False):
             raise TypeError('colours must be string or iterable.')
         out = list()
         for cname in name:
-            if cname.lower() not in ufzall: raise ValueError('colour not known.')
-            out += [get_colour_tuple(cname, rgb256=rgb256)]
+            if cname.lower() not in ufzall:
+                out += [cname] # raise ValueError('colour not known.')
+            else:
+                out += [get_colour_tuple(cname, rgb256=rgb256)]
         return out
 
 # ---------------------------------------------------------------------
