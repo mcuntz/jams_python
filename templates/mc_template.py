@@ -248,7 +248,7 @@ if __name__ == '__main__':
     sub    = fig.add_axes(jams.position(nrow,ncol,iplot,hspace=hspace,vspace=vspace))
 
     mark1  = sub.plot(np.sin(np.arange(100)))
-    plt.setp(mark1, linestyle='None', marker='o', markeredgecolor=mcol1, markerfacecolor=None,
+    plt.setp(mark1, linestyle='None', marker='o', markeredgecolor=mcol1, markerfacecolor='None',
              markersize=msize, markeredgewidth=mwidth)
 
     plt.setp(sub, xlabel=xlab)
