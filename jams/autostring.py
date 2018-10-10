@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-from __future__ import division, absolute_import, print_function, unicode_literals
+from __future__ import division, absolute_import, print_function
 import numpy as np
 
 def autostring(num, prec=0, zero=False, set_printoptions=False, pp=False, join=False, joinall=False, sep=' '):
