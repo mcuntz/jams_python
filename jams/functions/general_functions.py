@@ -17,6 +17,10 @@ from __future__ import division, absolute_import, print_function
     logistic_offset_p
     dlogistic_offset      First derivative of logistic function with offset
     d2logistic_offset     Second derivative of logistic function with offset
+    logistic2_offset      Double logistic function with offset L1/(1+exp(-k1(x-x01))) - L2/(1+exp(-k2(x-x02))) + a2
+    logistic2_offset_p
+    dlogistic2_offset     First derivative of double logistic function with offset
+    d2logistic2_offset    Second derivative of double logistic function with offset
 
 
     Input / Output
@@ -60,7 +64,8 @@ import scipy.special as sp
 
 __all__ = ['curvature',
            'logistic', 'dlogistic', 'd2logistic', 'logistic_p',
-           'logistic_offset', 'dlogistic_offset', 'd2logistic_offset', 'logistic_offset_p']
+           'logistic_offset', 'dlogistic_offset', 'd2logistic_offset', 'logistic_offset_p',
+           'logistic2_offset', 'dlogistic2_offset', 'd2logistic2_offset', 'logistic2_offset_p']
 
 # -----------------------------------------------------------
 # curvature of function
@@ -156,6 +161,60 @@ def d2logistic_offset(x, L, k, x0, a):
           a         offset
     """
     return -k**2 * L * np.sinh(k*(x-x0))/(2.*(np.cosh(k*(x-x0))+1.)**2)
+
+# -----------------------------------------------------------
+# L/(1+exp(-k(x-x0))) + a - logistic function with offset
+def logistic2_offset(x, L1, k1, x01, L2, k2, x02, a):
+    """ double logistic function with offset L1/(1+exp(-k1(x-x01))) - L2/(1+exp(-k2(x-x02))) + a2
+          x         independent variable
+          L1        maximum 1st logistic function
+          k1        steepness 1st logistic function
+          x01       inflection point 1st logistic function
+          L2        maximum 2nd logistic function
+          k2        steepness 2nd logistic function
+          x02       inflection point 2nd logistic function
+          a         offset
+    """
+    return L1*sp.expit(k1*(x-x01)) - L2*sp.expit(k2*(x-x02)) + a
+
+def logistic2_offset_p(x, p):
+  """ double logistic function with offset p[0]/(1+exp(-p[1](x-p[2]))) - p[3]/(1+exp(-p[4](x-p[5]))) + p[6]
+        x    independent variable
+        p    4D-array of parameters
+  """
+  return logistic2_offset(x, p[0], p[1], p[2], p[3], p[4], p[5], p[6])
+
+# -----------------------------------------------------------
+# 1st derivative of logistic functions with offset
+def dlogistic2_offset(x, L1, k1, x01, L2, k2, x02, a):
+    """ First derivative of double logistic function L1/(1+exp(-k1(x-x01))) - L2/(1+exp(-k2(x-x02))) + a2
+          x         independent variable
+          L1        maximum 1st logistic function
+          k1        steepness 1st logistic function
+          x01       inflection point 1st logistic function
+          L2        maximum 2nd logistic function
+          k2        steepness 2nd logistic function
+          x02       inflection point 2nd logistic function
+          a         offset
+    """
+    return ( k1*L1/(2.*(np.cosh(k1*(x-x01))+1.)) -
+             k2*L2/(2.*(np.cosh(k2*(x-x02))+1.)) )
+
+# -----------------------------------------------------------
+# 2nd derivative of logistic functions with offset
+def d2logistic2_offset(x, L1, k1, x01, L2, k2, x02, a):
+    """ Second derivative of logistic function L1/(1+exp(-k1(x-x01))) - L2/(1+exp(-k2(x-x02))) + a2
+          x         independent variable
+          L1        maximum 1st logistic function
+          k1        steepness 1st logistic function
+          x01       inflection point 1st logistic function
+          L2        maximum 2nd logistic function
+          k2        steepness 2nd logistic function
+          x02       inflection point 2nd logistic function
+          a         offset
+    """
+    return ( -k1**2 * L1 * np.sinh(k1*(x-x01))/(2.*(np.cosh(k1*(x-x01))+1.)**2)
+             +k2**2 * L2 * np.sinh(k2*(x-x02))/(2.*(np.cosh(k2*(x-x02))+1.)**2) )
 
 # -----------------------------------------------------------
 

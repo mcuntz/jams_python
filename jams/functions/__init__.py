@@ -51,6 +51,10 @@ from __future__ import division, absolute_import, print_function
     logistic_offset_p
     dlogistic_offset      First derivative of logistic function with offset
     d2logistic_offset     Second derivative of logistic function with offset
+    logistic2_offset      Double logistic function with offset L1/(1+exp(-k1(x-x01))) - L2/(1+exp(-k2(x-x02))) + a2
+    logistic2_offset_p
+    dlogistic2_offset     First derivative of double logistic function with offset
+    d2logistic2_offset    Second derivative of double logistic function with offset
 
 
     Current fitting functions are (there is always the second form with the name appended by _p;
@@ -156,6 +160,7 @@ from __future__ import division, absolute_import, print_function
 from .general_functions   import curvature
 from .general_functions   import logistic, logistic_p, dlogistic, d2logistic
 from .general_functions   import logistic_offset, logistic_offset_p, dlogistic_offset, d2logistic_offset
+from .general_functions   import logistic2_offset, logistic2_offset_p, dlogistic2_offset, d2logistic2_offset
 
 from .fit_functions       import cost_abs, cost_square
 from .fit_functions       import arrhenius, arrhenius_p, cost_arrhenius, cost2_arrhenius
@@ -172,6 +177,7 @@ from .fit_functions       import sabx, sabx_p, cost_sabx, cost2_sabx
 from .fit_functions       import poly, poly_p, cost_poly, cost2_poly
 from .fit_functions       import cost_logistic, cost2_logistic
 from .fit_functions       import cost_logistic_offset, cost2_logistic_offset
+from .fit_functions       import cost_logistic2_offset, cost2_logistic2_offset
 from .fit_functions       import see, see_p, cost_see, cost2_see
 
 from .opti_test_functions import ackley, griewank, goldstein_price

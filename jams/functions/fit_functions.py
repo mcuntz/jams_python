@@ -53,6 +53,8 @@ from __future__ import division, absolute_import, print_function
         lloyd_only_rref   1 param:  Lloyd & Taylor (1994) Arrhenius type with fixed exponential term
         logistic          3 params: Logistic function: a/(1+exp(-b(x-c)))
         logistic_offset   4 params: Logistic function with offset: a/(1+exp(-b(x-c))) + d
+        logistic2_offset  7 params: Double logistic function with offset L1/(1+exp(-k1(x-x01))) - L2/(1+exp(-k2(x-x02))) + a2
+
         poly              n params: General polynomial: c0 + c1*x + c2*x**2 + ... + cn*x**n
         sabx              2 params: sqrt(f1x), i.e. general sqrt(1/x) function: sqrt(a + b/x)
         see               3 params: Sequential Elementary Effects fitting function: a*(x-b)**c
@@ -118,7 +120,7 @@ from __future__ import division, absolute_import, print_function
 import numpy as np
 import scipy.special as sp
 import jams.const as const
-from jams.functions import logistic_p, logistic_offset_p
+from jams.functions import logistic_p, logistic_offset_p, logistic2_offset_p
 
 __all__ = ['cost_abs', 'cost_square',
            'arrhenius', 'arrhenius_p', 'cost_arrhenius', 'cost2_arrhenius',
@@ -135,6 +137,7 @@ __all__ = ['cost_abs', 'cost_square',
            'poly', 'poly_p', 'cost_poly', 'cost2_poly',
            'cost_logistic', 'cost2_logistic',
            'cost_logistic_offset', 'cost2_logistic_offset',
+           'cost_logistic2_offset', 'cost2_logistic2_offset',
            'see', 'see_p', 'cost_see', 'cost2_see']
 
 # -----------------------------------------------------------
@@ -572,6 +575,25 @@ def cost2_logistic_offset(p,x,y):
         y    dependent variable to optimise
   '''
   return np.sum((y-logistic_offset_p(x,p))**2)
+
+
+# -----------------------------------------------------------
+# L1/(1+exp(-k1(x-x01))) - L2/(1+exp(-k2(x-x02))) + a2 - double logistic function with offset
+def cost_logistic2_offset(p, x, y):
+  ''' Cost function for double logistic function with offset fitting function with sum of absolute deviations
+        p    4D-array of parameters
+        x    independent variable
+        y    dependent variable to optimise
+  '''
+  return np.sum(np.abs(y-logistic2_offset_p(x,p)))
+
+def cost2_logistic2_offset(p,x,y):
+  ''' Cost function for double logistic function with offset fitting function with sum of squared deviations
+        p    4D-array of parameters
+        x    independent variable
+        y    dependent variable to optimise
+  '''
+  return np.sum((y-logistic2_offset_p(x,p))**2)
 
 
 # -----------------------------------------------------------
