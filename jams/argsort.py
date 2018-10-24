@@ -115,7 +115,7 @@ def argsort(a, *args, **kwargs):
 # same numpy.argsort but for python iterables
 def iargsort(seq, *args, **kwargs):
     if 'key' in kwargs:
-        raise KeyError('keyword key cannot be given argsort.')
+        raise KeyError('keyword key cannot be given to argsort.')
     return sorted(range(len(seq)), *args, key=seq.__getitem__, **kwargs)
 
 

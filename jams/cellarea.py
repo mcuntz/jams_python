@@ -74,11 +74,13 @@ def cellarea(lat, lon, globe=False):
         Written,  MC, Jul 2009
         Modified, MC, Feb 2013 - ported to Python 3
                   MC, Apr 2014 - assert
+                  MC, Oct 2018 - clip lat because -90,90 give negative area
     """
     nlat = len(lat)
     assert nlat >= 2, 'at least 2 latitudes must be given'
     nlon = len(lon)
     assert nlon >= 2, 'at least 2 longitudes must be given'
+    assert np.abs(lat).max() <= 90., 'probably swapped lat and lon in call: def cellarea(lat, lon, globe=False):'
     #
     # cell sizes in degrees # still + or -
     dlat = lat-np.roll(lat,1)
@@ -112,6 +114,7 @@ def cellarea(lat, lon, globe=False):
     #
     area = np.empty([nlat,nlon])
     dlat = np.abs(dlat[:])
+    lat = np.clip(lat, -89.99999, 89.99999) # -90, 90 give negative np.cos(lat*d2r)
     for i in range(nlon):
         area[:,i] = 2.*(ae**2) * dlon[i]*d2r * np.sin(0.5*dlat*d2r) * np.cos(lat*d2r)
     #
