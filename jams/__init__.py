@@ -83,6 +83,7 @@ from __future__ import division, absolute_import, print_function
     inpoly                 Wrapper for in_poly.
     int2roman              Integer to roman numeral conversion.
     interpol               One-dimensional linear interpolation on first dimension.
+    intersection           Intersection of two curves from x,y coordinates.
     jab                    Jackknife-after-Bootstrap error.
     kernel_regression      Multi-dimensional non-parametric regression.
     kernel_regression_h    Optimal bandwidth for kernel regression.
@@ -294,6 +295,7 @@ from __future__ import division, absolute_import, print_function
     fftngo                 Fast fourier transformation for dummies (like me)    
     functions              Module with common functions that are used in curve_fit or fmin parameter estimations.
     heaviside              Heaviside (or unit step) operator.
+    intersection           Intersection of two curves from x,y coordinates.
     jab                    Jackknife-after-Bootstrap error.
     lagcorr                Calculate time lag of maximum or minimum correlation of two arrays.
     lhs                    Latin Hypercube Sampling of any distribution without correlations.
@@ -548,6 +550,7 @@ from __future__ import division, absolute_import, print_function
               MC, Jan 2018 - apply_undef
               MC, Mar 2018 - ascii2en, en2ascii, ascii2fr, fr2ascii, ascii2us, us2ascii
               MC, Jul 2018 - plot
+              MC, Nov 2018 - intersection
 """
 
 # sub-packages without dependencies to rest of jams
@@ -616,6 +619,7 @@ from .heaviside         import heaviside
 from .homo_sampling     import homo_sampling
 from .in_poly           import in_poly, inpoly
 from .interpol          import interpol
+from .intersection      import intersection
 from .jab               import jab
 from .kernel_regression import kernel_regression, kernel_regression_h
 from .kriging           import kriging
