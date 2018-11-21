@@ -85,6 +85,7 @@ from __future__ import division, absolute_import, print_function
     interpol               One-dimensional linear interpolation on first dimension.
     intersection           Intersection of two curves from x,y coordinates.
     jab                    Jackknife-after-Bootstrap error.
+    jConfigParser          Extended Python ConfigParser.
     kernel_regression      Multi-dimensional non-parametric regression.
     kernel_regression_h    Optimal bandwidth for kernel regression.
     kriging                Krig a surface from a set of 2D points.
@@ -376,6 +377,7 @@ from __future__ import division, absolute_import, print_function
     hdfread                Wrapper for readhdf.
     hdf4read               Wrapper for readhdf4.
     hdf5read               Wrapper for readhdf5.
+    jConfigParser          Extended Python ConfigParser.
     mat2nc                 Converts Matlab file *.mat into NetCDF *.nc.
     ncread                 Wrapper for readnetcdf.
     netcdfread             Wrapper for readnetcdf.
@@ -550,7 +552,7 @@ from __future__ import division, absolute_import, print_function
               MC, Jan 2018 - apply_undef
               MC, Mar 2018 - ascii2en, en2ascii, ascii2fr, fr2ascii, ascii2us, us2ascii
               MC, Jul 2018 - plot
-              MC, Nov 2018 - intersection
+              MC, Nov 2018 - intersection, jConfigParser
 """
 
 # sub-packages without dependencies to rest of jams
@@ -621,6 +623,7 @@ from .in_poly           import in_poly, inpoly
 from .interpol          import interpol
 from .intersection      import intersection
 from .jab               import jab
+from .jconfigparser     import jConfigParser
 from .kernel_regression import kernel_regression, kernel_regression_h
 from .kriging           import kriging
 from .lagcorr           import lagcorr

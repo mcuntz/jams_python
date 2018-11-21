@@ -4,6 +4,8 @@ import numpy as np
 import scipy.optimize as opt # fmin_tnc
 from jams.division import division
 
+__all__ = ['kernel_regression', 'kernel_regression_h']
+
 def kernel_regression(x, y, h=None, silverman=False, xout=None):
     """
         Multi-dimensional non-parametric kernel regression.
