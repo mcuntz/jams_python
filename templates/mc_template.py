@@ -54,6 +54,7 @@ Modified, MC, Jul 2013 - optparse->argparse
           MC, Dec 2015 - white lines on black or transparent background
           MC, Mar 2017 - bokeh, plotly
           MC, Aug 2018 - use jams.plot snippets
+          MC, Nov 2018 - label=str(iplot) to each add_axes to suppress warning about future changes
 """
 
 # -------------------------------------------------------------------------
@@ -240,12 +241,12 @@ if __name__ == '__main__':
         xlab   = jams.str2tex('f(x) (0,100)', usetex=usetex)
         ylab   = jams.str2tex(r'$\delta \Delta \sin(x)$', usetex=usetex)
     # if (iplot == 0) | (outtype == 'pdf') | (outtype == 'png') | (outtype == 'html'):
-    #     sub  = fig.add_axes(jams.position(nrow,ncol,iplot,hspace=hspace,vspace=vspace))
+    #     sub  = fig.add_axes(jams.position(nrow,ncol,iplot,hspace=hspace,vspace=vspace), label=str(iplot))
     #     sub1 = sub
     # else:
     #     # special if windows or d3: zoom one panel zooms all panels
-    #     sub = fig.add_axes(jams.position(nrow,ncol,iplot,hspace=hspace,vspace=vspace), sharex=sub1)
-    sub    = fig.add_axes(jams.position(nrow,ncol,iplot,hspace=hspace,vspace=vspace))
+    #     sub = fig.add_axes(jams.position(nrow,ncol,iplot,hspace=hspace,vspace=vspace), sharex=sub1, label=str(iplot))
+    sub    = fig.add_axes(jams.position(nrow,ncol,iplot,hspace=hspace,vspace=vspace), label=str(iplot))
 
     mark1  = sub.plot(np.sin(np.arange(100)))
     plt.setp(mark1, linestyle='None', marker='o', markeredgecolor=mcol1, markerfacecolor='None',
@@ -298,7 +299,7 @@ if __name__ == '__main__':
     else:
         xlab   = jams.str2tex('(0,10)', usetex=usetex)
         ylab   = jams.str2tex(r'2$\sin(x)$', usetex=usetex)
-    sub    = fig.add_axes(jams.position(nrow,ncol,iplot,hspace=hspace,vspace=vspace))
+    sub    = fig.add_axes(jams.position(nrow,ncol,iplot,hspace=hspace,vspace=vspace), label=str(iplot))
 
     line1 = sub.plot(2.*np.sin(np.arange(100)))
     plt.setp(line1, linestyle='-', linewidth=lwidth, marker=None, color=lcol1)
