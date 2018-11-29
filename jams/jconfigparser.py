@@ -26,19 +26,19 @@ from __future__ import division, absolute_import, print_function
     >>> from jconfigparser import jConfigParser
     >>> jconfig = jConfigParser()
     >>> jconfig.read('myconfig.ini')
-    >>> jconfig.getlist('params', 'years')
+    >>> jconfig.getiter('params', 'years')
     <filter at 0x19ef8641128>
 
-    >>> list(jconfig.getlist('params', 'years'))
+    >>> jconfig.getlist('params', 'years')
     ['08', '09', '10', '11', '12', '13', '14', '15', '16']
 
-    >>> list(map(int, jconfig.getlist('params', 'categories')))
+    >>> list(map(int, jconfig.getiter('params', 'categories')))
     [5000, 12500, 17500, 22500]
 
-    >>> list(jconfig.getlist('params', 'names'))
+    >>> jconfig.getlist('params', 'names')
     ['Steve', 'John', 'Brian']
 
-    >>> list(jconfig.getlist('params', 'years and names'))
+    >>> jconfig.getlist('params', 'years and names')
     ['08', '09', '10', '11', '12', '13', '14', '15', '16', 'Steve', 'John', 'Brian']
 
 
@@ -65,7 +65,9 @@ from __future__ import division, absolute_import, print_function
 
     History
     -------
-    Written, Matthias Cuntz, Nov 2018
+    Written,  Matthias Cuntz, Nov 2018
+    Modified, Matthias Cuntz, Nov 2018 - getlist, getiter
+                                       - sep
 '''
 try:    # Python 2
     from ConfigParser import ConfigParser
@@ -76,11 +78,26 @@ import re
 
 __all__ = ['jConfigParser']
 
-class jConfigParser(ConfigParser):
+# https://stackoverflow.com/questions/1713038/super-fails-with-error-typeerror-argument-1-must-be-type-not-classobj-when
+class jConfigParser(ConfigParser, object):
     def __init__(self, *args, **kwargs):
         super(jConfigParser, self).__init__(*args, **kwargs)
 
     # https://gist.github.com/NoahTheDuke/e6d282b421f6a126062e81696e4cfc2a
-    def getlist(self, section, option):
+    def getiter(self, section, option, sep='[ ,\[\]]'):
+        ''' Return an iterator over the splitted option.
+            Separator sep can be given, otherwise pattern '[ ,\[\]]' will be used. '''
         lines = self.get(section, option).splitlines()
-        return filter(None, it.chain.from_iterable(map(lambda x: re.split('[ ,\[\]]', x), lines)))
+        if len(lines) == 1:
+            return filter(None, re.split(sep, lines[0]))
+        else:
+            return filter(None, it.chain.from_iterable(map(lambda x: re.split(sep, x), lines)))
+
+    def getlist(self, section, option, sep='[ ,\[\]]'):
+        ''' Return a list of the splitted option.
+            Separator sep can be given, otherwise pattern '[ ,\[\]]' will be used. '''
+        lines = self.get(section, option).splitlines()
+        if len(lines) == 1:
+            return re.split(sep, lines[0])
+        else:
+            return list(map(lambda x: re.split(sep, x), lines))
