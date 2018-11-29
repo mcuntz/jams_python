@@ -6,7 +6,7 @@ __all__ = ['ascii2ascii',
            'ascii2en', 'ascii2fr', 'ascii2us', 'ascii2eng',
            'en2ascii', 'fr2ascii', 'us2ascii', 'eng2ascii']
 
-def ascii2ascii(edate, full=False, en=False, fr=False, us=False, eng=False):
+def ascii2ascii(edate, full=False, en=False, fr=False, us=False, eng=False, YY=False):
     """
         Convert date notationas between ascii DD.MM.YYYY hh:mm:ss, English YYYY-MM-DD hh:mm:ss,
         and American MM/DD/YYYY hh:mm:ss.
@@ -36,6 +36,8 @@ def ascii2ascii(edate, full=False, en=False, fr=False, us=False, eng=False):
         us      True:  output format is American MM/DD/YYYY hh:mm:ss
                 False: output format is ascii DD.MM.YYYY hh:mm:ss (default)
         eng     Same as en: obsolete.
+        YY      boolean (default: False)
+                Year in input file is 2-digit year. Every year above current year will be taken in 1900.
 
 
         Output
@@ -45,8 +47,6 @@ def ascii2ascii(edate, full=False, en=False, fr=False, us=False, eng=False):
 
         Examples
         --------
-        >>> import sys
-        >>> pyver = sys.version_info
         >>> edate = ['2014-11-12 12:00', '01.03.2015 17:56:00', '1990-12-01', '04.05.1786']
         >>> print(" ".join(ascii2ascii(edate)))
         12.11.2014 12:00 01.03.2015 17:56:00 01.12.1990 04.05.1786
@@ -84,7 +84,20 @@ def ascii2ascii(edate, full=False, en=False, fr=False, us=False, eng=False):
         >>> print(" ".join(ascii2ascii(edate, fr=True, full=True)))
         12/11/2014 12:00:00 01/03/2015 17:56:00 01/12/1990 00:00:00 04/05/1786 00:00:00
 
+        # YY=True
+        >>> edate = ['14-11-12 12:00', '01.03.15 17:56:00', '90-12-01']
+        >>> print(" ".join(ascii2ascii(edate, YY=True)))
+        12.11.2014 12:00 01.03.2015 17:56:00 01.12.1990
+        >>> print(" ".join(ascii2ascii(edate, en=True, YY=True)))
+        2014-11-12 12:00 2015-03-01 17:56:00 1990-12-01
+        >>> print(" ".join(ascii2ascii(edate, us=True, YY=True)))
+        11/12/2014 12:00 03/01/2015 17:56:00 12/01/1990
+        >>> print(" ".join(ascii2ascii(ascii2ascii(edate, en=True, YY=True), us=True, full=True)))
+        11/12/2014 12:00:00 03/01/2015 17:56:00 12/01/1990 00:00:00
+        >>> print(" ".join(ascii2ascii(edate, fr=True, full=True, YY=True)))
+        12/11/2014 12:00:00 01/03/2015 17:56:00 01/12/1990 00:00:00
 
+        
         License
         -------
         This file is part of the JAMS Python package.
@@ -112,6 +125,7 @@ def ascii2ascii(edate, full=False, en=False, fr=False, us=False, eng=False):
         Modified, MC, Sep 2015 - removed date2dec and dec2date
                   MC, Nov 2016 - adapted docstring to Python 2 and 3
                   MC, Mar 2018 - us, eng->en, fr
+                  MC, Nov 2018 - YY
     """
     assert (en+fr+us <= 1), 'en, fr and us keywords mutually exclusive.'
 
@@ -127,57 +141,124 @@ def ascii2ascii(edate, full=False, en=False, fr=False, us=False, eng=False):
     ndate = idate.size
 
     # Convert to given output type
-    odate = np.zeros((ndate,), dtype='|U19') # 'DD.MM.YYYY hh:mm:ss' are 19 characters
-    for i, d in enumerate(idate):
-        if en:
-            if '-' in d:
-                dd = d                                    # en -> en
-            elif '/' in d:
-                dd = d[6:10]+'-'+d[0:2]+'-'+d[3:5]+d[10:] # us -> en
+    odate = list()
+    if YY:
+        import time as ptime
+        iyr2 = int(ptime.asctime()[-2:])
+        for i, d in enumerate(idate):
+            if en:
+                if '-' in d:
+                    if int(d[0:2]) > iyr2:
+                        dd = '19'+d                                  # en -> en
+                    else:
+                        dd = '20'+d
+                elif '/' in d:
+                    if int(d[6:8]) > iyr2:
+                        dd = '19'+d[6:8]+'-'+d[0:2]+'-'+d[3:5]+d[8:] # us -> en
+                    else:
+                        dd = '20'+d[6:8]+'-'+d[0:2]+'-'+d[3:5]+d[8:]
+                else:
+                    if int(d[6:8]) > iyr2:
+                        dd = '19'+d[6:8]+'-'+d[3:5]+'-'+d[0:2]+d[8:] # ascii -> en
+                    else:
+                        dd = '20'+d[6:8]+'-'+d[3:5]+'-'+d[0:2]+d[8:]
+            elif fr:
+                if '-' in d:
+                    if int(d[0:2]) > iyr2:
+                        dd = d[6:8]+'/'+d[3:5]+'/19'+d[0:2]+d[8:] # en -> fr
+                    else:
+                        dd = d[6:8]+'/'+d[3:5]+'/20'+d[0:2]+d[8:]
+                elif '/' in d:
+                    if int(d[6:8]) > iyr2:
+                        dd = d[3:5]+'/'+d[0:2]+'/19'+d[6:8]+d[8:] # us -> fr
+                    else:
+                        dd = d[3:5]+'/'+d[0:2]+'/20'+d[6:8]+d[8:]
+                else:
+                    if int(d[6:8]) > iyr2:
+                        dd = d[0:2]+'/'+d[3:5]+'/19'+d[6:8]+d[8:] # ascii -> fr
+                    else:
+                        dd = d[0:2]+'/'+d[3:5]+'/20'+d[6:8]+d[8:]
+            elif us:
+                if '-' in d:
+                    if int(d[0:2]) > iyr2:
+                        dd = d[3:5]+'/'+d[6:8]+'/19'+d[0:2]+d[8:] # en -> us
+                    else:
+                        dd = d[3:5]+'/'+d[6:8]+'/20'+d[0:2]+d[8:]
+                elif '/' in d:
+                    if int(d[6:8]) > iyr2:
+                        dd = d[0:6]+'19'+d[6:]                    # us -> us
+                    else:
+                        dd = d[0:6]+'20'+d[6:]
+                else:
+                    if int(d[6:8]) > iyr2:
+                        dd = d[3:5]+'/'+d[0:2]+'/19'+d[6:8]+d[8:] # ascii -> us
+                    else:
+                        dd = d[3:5]+'/'+d[0:2]+'/20'+d[6:8]+d[8:]
             else:
-                dd = d[6:10]+'-'+d[3:5]+'-'+d[0:2]+d[10:] # ascii -> en
-        elif fr:
-            if '-' in d:
-                dd = d[8:10]+'/'+d[5:7]+'/'+d[0:4]+d[10:] # en -> fr
-            elif '/' in d:
-                dd = d[3:5]+'/'+d[0:2]+'/'+d[6:10]+d[10:] # us -> fr
+                if '-' in d:
+                    if int(d[0:2]) > iyr2:
+                        dd = d[6:8]+'.'+d[3:5]+'.19'+d[0:2]+d[8:] # en -> ascii
+                    else:
+                        dd = d[6:8]+'.'+d[3:5]+'.20'+d[0:2]+d[8:]
+                elif '/' in d:
+                    if int(d[6:8]) > iyr2:
+                        dd = d[3:5]+'.'+d[0:2]+'.19'+d[6:8]+d[8:] # us -> ascii
+                    else:
+                        dd = d[3:5]+'.'+d[0:2]+'.20'+d[6:8]+d[8:] # us -> ascii
+                else:
+                    if int(d[6:8]) > iyr2:
+                        dd = d[0:6]+'19'+d[6:]                    # ascii -> ascii
+                    else:
+                        dd = d[0:6]+'20'+d[6:]
+            odate.append(dd)
+    else:
+        for i, d in enumerate(idate):
+            if en:
+                if '-' in d:
+                    dd = d                                    # en -> en
+                elif '/' in d:
+                    dd = d[6:10]+'-'+d[0:2]+'-'+d[3:5]+d[10:] # us -> en
+                else:
+                    dd = d[6:10]+'-'+d[3:5]+'-'+d[0:2]+d[10:] # ascii -> en
+            elif fr:
+                if '-' in d:
+                    dd = d[8:10]+'/'+d[5:7]+'/'+d[0:4]+d[10:] # en -> fr
+                elif '/' in d:
+                    dd = d[3:5]+'/'+d[0:2]+'/'+d[6:10]+d[10:] # us -> fr
+                else:
+                    dd = d[0:2]+'/'+d[3:5]+'/'+d[6:10]+d[10:] # ascii -> fr
+            elif us:
+                if '-' in d:
+                    dd = d[5:7]+'/'+d[8:10]+'/'+d[0:4]+d[10:] # en -> us
+                elif '/' in d:
+                    dd = d                                    # us -> us
+                else:
+                    dd = d[3:5]+'/'+d[0:2]+'/'+d[6:10]+d[10:] # ascii -> us
             else:
-                dd = d[0:2]+'/'+d[3:5]+'/'+d[6:10]+d[10:] # ascii -> fr
-        elif us:
-            if '-' in d:
-                dd = d[5:7]+'/'+d[8:10]+'/'+d[0:4]+d[10:] # en -> us
-            elif '/' in d:
-                dd = d                                    # us -> us
-            else:
-                dd = d[3:5]+'/'+d[0:2]+'/'+d[6:10]+d[10:] # ascii -> us
-        else:
-            if '-' in d:
-                dd = d[8:10]+'.'+d[5:7]+'.'+d[0:4]+d[10:] # en -> ascii
-            elif '/' in d:
-                dd = d[3:5]+'.'+d[0:2]+'.'+d[6:10]+d[10:] # us -> ascii
-            else:
-                dd = d                                    # ascii -> ascii
-        if not full:
-            odate[i] = dd
-        else:
-            if len(d) < 11:
-                dd += ' 00:00:00'
-            else:
-                dd += ':00:00'
-            odate[i] = dd[:19]
+                if '-' in d:
+                    dd = d[8:10]+'.'+d[5:7]+'.'+d[0:4]+d[10:] # en -> ascii
+                elif '/' in d:
+                    dd = d[3:5]+'.'+d[0:2]+'.'+d[6:10]+d[10:] # us -> ascii
+                else:
+                    dd = d                                    # ascii -> ascii
+            odate.append(dd)
+
+    if full:
+        odate = [ (d+' 00:00:00')[:19] if len(d) < 11 else (d+':00:00')[:19] for d in odate ]
+
 
     # Return right type
     if isinstance(edate, list):
-        return list(odate)
+        return odate
     elif isinstance(edate, tuple):
         return tuple(odate)
     elif isinstance(edate, np.ndarray):
-        return odate.reshape(edate.shape)
+        return np.array(odate).reshape(edate.shape)
     else:
         return odate[0]
 
 
-def ascii2en(edate, full=False):
+def ascii2en(edate, **kwarg):
     """
         Wrapper function for ascii2ascii with English date format output, i.e. en=True.
         def ascii2ascii(edate, full=False, en=False, us=False):
@@ -185,19 +266,21 @@ def ascii2en(edate, full=False):
 
         Examples
         --------
-        >>> import sys
-        >>> pyver = sys.version_info
         >>> edate = ['2014-11-12 12:00', '01.03.2015 17:56:00', '1990-12-01', '04.05.1786']
         >>> print(" ".join(ascii2en(edate)))
         2014-11-12 12:00 2015-03-01 17:56:00 1990-12-01 1786-05-04
 
         >>> print(" ".join(ascii2en(edate, full=True)))
         2014-11-12 12:00:00 2015-03-01 17:56:00 1990-12-01 00:00:00 1786-05-04 00:00:00
+
+        >>> edate = ['14-11-12 12:00', '01.03.15 17:56:00', '90-12-01']
+        >>> print(" ".join(ascii2en(edate, full=True, YY=True)))
+        2014-11-12 12:00:00 2015-03-01 17:56:00 1990-12-01 00:00:00
     """
-    return ascii2ascii(edate, full=full, en=True)
+    return ascii2ascii(edate, en=True, **kwarg)
 
 
-def ascii2fr(edate, full=False):
+def ascii2fr(edate, **kwarg):
     """
         Wrapper function for ascii2ascii with French date format output, i.e. fr=True.
         def ascii2ascii(edate, full=False, en=False, us=False):
@@ -205,19 +288,21 @@ def ascii2fr(edate, full=False):
 
         Examples
         --------
-        >>> import sys
-        >>> pyver = sys.version_info
         >>> edate = ['2014-11-12 12:00', '01.03.2015 17:56:00', '1990-12-01', '04.05.1786']
         >>> print(" ".join(ascii2fr(edate)))
         12/11/2014 12:00 01/03/2015 17:56:00 01/12/1990 04/05/1786
 
         >>> print(" ".join(ascii2fr(edate, full=True)))
         12/11/2014 12:00:00 01/03/2015 17:56:00 01/12/1990 00:00:00 04/05/1786 00:00:00
+
+        >>> edate = ['14-11-12 12:00', '01.03.15 17:56:00', '90-12-01']
+        >>> print(" ".join(ascii2fr(edate, full=True, YY=True)))
+        12/11/2014 12:00:00 01/03/2015 17:56:00 01/12/1990 00:00:00
     """
-    return ascii2ascii(edate, full=full, fr=True)
+    return ascii2ascii(edate, fr=True, **kwarg)
 
 
-def ascii2us(edate, full=False):
+def ascii2us(edate, **kwarg):
     """
         Wrapper function for ascii2ascii with American date format output, i.e. us=True.
         def ascii2ascii(edate, full=False, en=False, us=False):
@@ -225,19 +310,22 @@ def ascii2us(edate, full=False):
 
         Examples
         --------
-        >>> import sys
-        >>> pyver = sys.version_info
         >>> edate = ['2014-11-12 12:00', '01.03.2015 17:56:00', '1990-12-01', '04.05.1786']
         >>> print(" ".join(ascii2ascii(edate, us=True)))
         11/12/2014 12:00 03/01/2015 17:56:00 12/01/1990 05/04/1786
 
         >>> print(" ".join(ascii2ascii(ascii2ascii(edate, en=True), us=True, full=True)))
         11/12/2014 12:00:00 03/01/2015 17:56:00 12/01/1990 00:00:00 05/04/1786 00:00:00
+
+        >>> edate = ['14-11-12 12:00', '01.03.15 17:56:00', '90-12-01']
+        >>> print(" ".join(ascii2ascii(ascii2ascii(edate, en=True, YY=True), us=True, full=True)))
+        11/12/2014 12:00:00 03/01/2015 17:56:00 12/01/1990 00:00:00
+
     """
-    return ascii2ascii(edate, full=full, us=True)
+    return ascii2ascii(edate, us=True, **kwarg)
 
 
-def ascii2eng(edate, full=False):
+def ascii2eng(edate, **kwarg):
     """
         Wrapper function for ascii2ascii with English date format output, i.e. en=True.
         def ascii2ascii(edate, full=False, en=False, us=False):
@@ -245,19 +333,21 @@ def ascii2eng(edate, full=False):
 
         Examples
         --------
-        >>> import sys
-        >>> pyver = sys.version_info
         >>> edate = ['2014-11-12 12:00', '01.03.2015 17:56:00', '1990-12-01', '04.05.1786']
         >>> print(" ".join(ascii2eng(edate)))
         2014-11-12 12:00 2015-03-01 17:56:00 1990-12-01 1786-05-04
 
         >>> print(" ".join(ascii2eng(edate, full=True)))
         2014-11-12 12:00:00 2015-03-01 17:56:00 1990-12-01 00:00:00 1786-05-04 00:00:00
+
+        >>> edate = ['14-11-12 12:00', '01.03.15 17:56:00', '90-12-01']
+        >>> print(" ".join(ascii2eng(edate, full=True, YY=True)))
+        2014-11-12 12:00:00 2015-03-01 17:56:00 1990-12-01 00:00:00
     """
-    return ascii2ascii(edate, full=full, en=True)
+    return ascii2ascii(edate, en=True, **kwarg)
 
 
-def en2ascii(edate, full=False):
+def en2ascii(edate, **kwarg):
     """
         Wrapper function for ascii2ascii with ascii date format output.
         def ascii2ascii(edate, full=False, en=False, us=False):
@@ -265,8 +355,6 @@ def en2ascii(edate, full=False):
 
         Examples
         --------
-        >>> import sys
-        >>> pyver = sys.version_info
         >>> edate = ['2014-11-12 12:00', '01.03.2015 17:56:00', '1990-12-01', '04.05.1786']
         >>> edate = ascii2ascii(edate, en=True)
         >>> print(" ".join(en2ascii(edate)))
@@ -274,11 +362,16 @@ def en2ascii(edate, full=False):
 
         >>> print(" ".join(en2ascii(edate, full=True)))
         12.11.2014 12:00:00 01.03.2015 17:56:00 01.12.1990 00:00:00 04.05.1786 00:00:00
+
+        >>> edate = ['14-11-12 12:00', '01.03.15 17:56:00', '90-12-01']
+        >>> edate = ascii2ascii(edate, en=True, YY=True)
+        >>> print(" ".join(en2ascii(edate, full=True)))
+        12.11.2014 12:00:00 01.03.2015 17:56:00 01.12.1990 00:00:00
     """
-    return ascii2ascii(edate, full=full)
+    return ascii2ascii(edate, **kwarg)
 
 
-def fr2ascii(edate, full=False):
+def fr2ascii(edate, full=False, YY=False):
     """
         Convert French date notation DD/MM/YYYY hh:mm:ss to ascii notation DD.MM.YYYY hh:mm:ss.
         Simply replaces / with ., assuring iterable type
@@ -299,6 +392,8 @@ def fr2ascii(edate, full=False):
         full    True:  output dates arr all in full format DD.MM.YYYY hh:mm:ss; missing time inputs are 00 on output
                 False: output dates are as long as input dates,
                 e.g. [DD/MM/YYYY, DD/MM/YYYY hh:mm] gives [DD.MM.YYYY, DD.MM.YYYY hh:mm]
+        YY      boolean (default: False)
+                Year in input file is 2-digit year. Every year above current year will be taken in 1900.
 
 
         Output
@@ -308,8 +403,6 @@ def fr2ascii(edate, full=False):
 
         Examples
         --------
-        >>> import sys
-        >>> pyver = sys.version_info
         >>> edate = ['12/11/2014 12:00', '01/03/2015 17:56:00', '01/12/1990', '04/05/1786']
         >>> print(" ".join(fr2ascii(edate)))
         12.11.2014 12:00 01.03.2015 17:56:00 01.12.1990 04.05.1786
@@ -328,6 +421,14 @@ def fr2ascii(edate, full=False):
 
         >>> print(fr2ascii(edate[0]))
         12.11.2014 12:00
+
+        # YY=True
+        >>> edate = ['12/11/14 12:00', '01/03/15 17:56:00', '01/12/90']
+        >>> print(" ".join(fr2ascii(edate, YY=True)))
+        12.11.2014 12:00 01.03.2015 17:56:00 01.12.1990
+
+        >>> print(" ".join(fr2ascii(edate, full=True, YY=True)))
+        12.11.2014 12:00:00 01.03.2015 17:56:00 01.12.1990 00:00:00
 
 
         License
@@ -354,6 +455,7 @@ def fr2ascii(edate, full=False):
         History
         -------
         Written,  MC, Mar 2018
+        Modified, MC, Nov 2018 - YY
     """
 
     # Input type and shape
@@ -367,13 +469,13 @@ def fr2ascii(edate, full=False):
         idate  = [edate]
     odate = [ d.replace('/','.') for d in idate ]
 
+    if YY:
+        import time as ptime
+        iyr2 = int(ptime.asctime()[-2:])
+        odate = [ d[0:6]+'19'+d[6:] if int(d[6:8]) > iyr2 else d[0:6]+'20'+d[6:] for d in odate ] # ascii -> ascii  
+
     if full:
-        for i, d in enumerate(odate):
-            if len(d) < 11:
-                d += ' 00:00:00'
-            else:
-                d += ':00:00'
-            odate[i] = d[:19]
+        odate = [ (d+' 00:00:00')[:19] if len(d) < 11 else (d+':00:00')[:19] for d in odate ]
 
     # Return right type
     if isinstance(edate, list):
@@ -386,7 +488,7 @@ def fr2ascii(edate, full=False):
         return odate[0]
 
 
-def us2ascii(edate, full=False):
+def us2ascii(edate, **kwarg):
     """
         Wrapper function for ascii2ascii with ascii date format output.
         def ascii2ascii(edate, full=False, en=False, us=False):
@@ -394,8 +496,6 @@ def us2ascii(edate, full=False):
 
         Examples
         --------
-        >>> import sys
-        >>> pyver = sys.version_info
         >>> edate = ['2014-11-12 12:00', '01.03.2015 17:56:00', '1990-12-01', '04.05.1786']
         >>> edate = ascii2ascii(edate, us=True)
         >>> print(" ".join(us2ascii(edate)))
@@ -403,11 +503,16 @@ def us2ascii(edate, full=False):
 
         >>> print(" ".join(us2ascii(edate, full=True)))
         12.11.2014 12:00:00 01.03.2015 17:56:00 01.12.1990 00:00:00 04.05.1786 00:00:00
+
+        >>> edate = ['14-11-12 12:00', '01.03.15 17:56:00', '90-12-01']
+        >>> edate = ascii2ascii(edate, us=True, YY=True)
+        >>> print(" ".join(us2ascii(edate, full=True)))
+        12.11.2014 12:00:00 01.03.2015 17:56:00 01.12.1990 00:00:00
     """
-    return ascii2ascii(edate, full=full)
+    return ascii2ascii(edate, **kwarg)
 
 
-def eng2ascii(edate, full=False):
+def eng2ascii(edate, **kwarg):
     """
         Wrapper function for ascii2ascii with ascii date format output.
         def ascii2ascii(edate, full=False, en=False, us=False):
@@ -415,8 +520,6 @@ def eng2ascii(edate, full=False):
 
         Examples
         --------
-        >>> import sys
-        >>> pyver = sys.version_info
         >>> edate = ['2014-11-12 12:00', '01.03.2015 17:56:00', '1990-12-01', '04.05.1786']
         >>> edate = ascii2ascii(edate, en=True)
         >>> print(" ".join(eng2ascii(edate)))
@@ -424,16 +527,19 @@ def eng2ascii(edate, full=False):
 
         >>> print(" ".join(eng2ascii(edate, full=True)))
         12.11.2014 12:00:00 01.03.2015 17:56:00 01.12.1990 00:00:00 04.05.1786 00:00:00
+
+        >>> edate = ['14-11-12 12:00', '01.03.15 17:56:00', '90-12-01']
+        >>> edate = ascii2ascii(edate, en=True, YY=True)
+        >>> print(" ".join(eng2ascii(edate, full=True)))
+        12.11.2014 12:00:00 01.03.2015 17:56:00 01.12.1990 00:00:00
     """
-    return ascii2ascii(edate, full=full)
+    return ascii2ascii(edate, **kwarg)
 
 
 if __name__ == '__main__':
     import doctest
     doctest.testmod(optionflags=doctest.NORMALIZE_WHITESPACE)
 
-    # import sys
-    # pyver = sys.version_info
     # edate = ['2014-11-12 12:00', '01.03.2015 17:56:00', '1990-12-01', '04.05.1786']
     # print(" ".join(ascii2ascii(edate)))
     # # 12.11.2014 12:00 01.03.2015 17:56:00 01.12.1990 04.05.1786
