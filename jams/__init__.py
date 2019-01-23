@@ -40,6 +40,7 @@ from __future__ import division, absolute_import, print_function
     dewpoint               Calculates the dew point from ambient humidity.
     date2dec               Converts arrays with calendar date to decimal date.
     dec2date               Converts arrays with decimal date to calendar date.
+    dfgui                  A minimalistic GUI for analyzing Pandas DataFrames based on wxPython.
     distributions          Module for pdfs of additional distributions.
     div                    Wrapper for division.
     division               Divide two arrays, return 'otherwise' if division by 0.
@@ -355,6 +356,7 @@ from __future__ import division, absolute_import, print_function
     abc2plot               Write a, b, c, ... on plots.
     clockplot              The clockplot of mHM.
     color                  Module with color functions for plotting.
+    dfgui                  A minimalistic GUI for analyzing Pandas DataFrames based on wxPython.
     get_brewer             Registers and returns Brewer colormap.
     lat_fmt                Set lat label string (called by Basemap.drawparallels) if LaTeX package clash.
     lon_fmt                Set lon label string (called by Basemap.drawmeridians) if LaTeX package clash.
@@ -553,6 +555,7 @@ from __future__ import division, absolute_import, print_function
               MC, Mar 2018 - ascii2en, en2ascii, ascii2fr, fr2ascii, ascii2us, us2ascii
               MC, Jul 2018 - plot
               MC, Nov 2018 - intersection, jConfigParser
+              MC, Jan 2019 - dfgui
 """
 
 # sub-packages without dependencies to rest of jams
@@ -714,12 +717,14 @@ from . import ftp
 from . import leafmodel
 from . import level1
 from . import logtools
+# import dfgui
+
 
 # Information
 __author__   = "Matthias Cuntz"
-__version__  = '4.2.0'
+__version__  = '4.2.1'
 __revision__ = "Revision: ba3ae6b"
-__date__     = 'Date: 25.07.2018'
+__date__     = 'Date: 23.01.2019'
 
 # Main
 if __name__ == '__main__':
