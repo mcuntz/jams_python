@@ -11,6 +11,7 @@ from __future__ import absolute_import, division, print_function
     import numpy as np
     import pandas as pd
     filename = 'Hesse_DB2_1997-2011.csv'
+    filename = '1.csv'
     parser = lambda date: pd.datetime.strptime(date, '%Y-%m-%d %H:%M') # not needed for US format
     names = ['Date', 'FCO2 H1 (umol/m2.s)', 'FCO2_cor H1 (umol/m2.s)', 'FH2O H1 (mmol/m2.s)', 'H H1 (W/m2)',
              'Rg_Kipp H1 (W/m2)', 'alb H1 (-)', 'Rnet_CNR1 H1 (W/m2)', 'NDVI H1 (-)', 'Patm (hPa)',
@@ -24,6 +25,25 @@ from __future__ import absolute_import, division, print_function
     dfgui.show(df)
 
     
+    # or using jams
+    import numpy as np
+    import pandas as pd
+    import jams
+    filename = 'Hesse_DB2_1997-2011.csv'
+    filename = '1.csv'
+    names = ['FCO2 H1 (umol/m2.s)', 'FCO2_cor H1 (umol/m2.s)', 'FH2O H1 (mmol/m2.s)', 'H H1 (W/m2)',
+             'Rg_Kipp H1 (W/m2)', 'alb H1 (-)', 'Rnet_CNR1 H1 (W/m2)', 'NDVI H1 (-)', 'Patm (hPa)',
+             'T_Vais H1 (degC)', 'WS_EC H1 (m/s)', 'Prec H1 (mm/30min)']
+    date = jams.ascii2eng(jams.sread(filename, skip=1, nc=1, squeeze=True, strarr=True))
+    head = jams.fread(filename, skip=1, cname=names, header=True)
+    dat  = jams.fread(filename, skip=1, cname=names)
+    df = pd.DataFrame(dat, pd.to_datetime(date), head)
+    df.replace(-9999., np.nan, inplace=True)
+
+    from jams import dfgui
+    dfgui.show(df)
+
+    
     Features
     --------
     - Tabular view of data frame
@@ -32,9 +52,12 @@ from __future__ import absolute_import, division, print_function
     - Columns can be rearranged (right click drag on 'Columns' tab)
     - Generic filtering: Write arbitrary Python expression to filter rows.
       *Warning:* Uses Python's `eval` -- use with care.
+      Select column. Use filter like:
+          _ > 0.
+          _ > datetime.datetime(1998,1,1)
     - Histogram plots
     - Scatter plots
-    - Line plots
+    - Timeseries plots
 
     
     Dependencies
@@ -72,7 +95,8 @@ from __future__ import absolute_import, division, print_function
     -------
     Written, Fabian Keller (fabian.keller@blue-yonder.com), 2014, http://github.com/bluenote10/PandasDataFrameGUI
     Modified, Matthias Cuntz, Jan 2019 - exclude NaN in histograms
-                                       - added line plot
+                                       - added time series plot
+                                       - add index as 'Date' column automatically
 '''
 # pip install wxpython
 
@@ -120,10 +144,8 @@ class ListCtrlDataFrame(wx.ListCtrl):
     TMP_SELECTION_COLUMN = 'tmp_selection_column'
 
     def __init__(self, parent, df, status_bar_callback):
-        wx.ListCtrl.__init__(
-            self, parent, -1,
-            style=wx.LC_REPORT | wx.LC_VIRTUAL | wx.LC_HRULES | wx.LC_VRULES | wx.LB_MULTIPLE
-        )
+        wx.ListCtrl.__init__(self, parent, -1,
+            style=wx.LC_REPORT | wx.LC_VIRTUAL | wx.LC_HRULES | wx.LC_VRULES | wx.LB_MULTIPLE)
         self.status_bar_callback = status_bar_callback
 
         self.df_orig = df
@@ -615,29 +637,28 @@ class ScatterPlot(wx.Panel):
     def redraw(self):
         column_index1 = self.combo_box1.GetSelection()
         column_index2 = self.combo_box2.GetSelection()
-        if column_index1 != wx.NOT_FOUND and column_index1 != 0 and \
-           column_index2 != wx.NOT_FOUND and column_index2 != 0:
-            # subtract one to remove the neutral selection index
-            column_index1 -= 1
-            column_index2 -= 1
+        if (column_index1 != wx.NOT_FOUND and column_index2 != wx.NOT_FOUND and
+            column_index1 != 0 and column_index2 != 0):
             df = self.df_list_ctrl.get_filtered_df()
-
-            # It looks like using pandas dataframe.plot causes something weird to
-            # crash in wx internally. Therefore we use plain axes.plot functionality.
-            # column_name1 = self.columns[column_index1]
-            # column_name2 = self.columns[column_index2]
-            # df.plot(kind='scatter', x=column_name1, y=column_name2)
-
             if len(df) > 0:
+                # subtract one to remove the neutral selection index
+                column_index1 -= 1
+                x = df.iloc[:, column_index1].values
+                column_index2 -= 1
+                y = df.iloc[:, column_index2].values
+                # It looks like using pandas dataframe.plot causes something weird to
+                # crash in wx internally. Therefore we use plain axes.plot functionality.
+                # column_name1 = self.columns[column_index1]
+                # column_name2 = self.columns[column_index2]
+                # df.plot(kind='scatter', x=column_name1, y=column_name2)
                 self.axes.clear()
-                self.axes.plot(df.iloc[:, column_index1].values, df.iloc[:, column_index2].values, 'o', clip_on=False)
-
+                self.axes.plot(x, y, 'o', markersize=1.0, clip_on=False)
                 self.canvas.draw()
 
 
-class LinePlot(wx.Panel):
+class TimeSeriesPlot(wx.Panel):
     """
-    Panel providing a line plot.
+    Panel providing a time series line plot.
     """
     def __init__(self, parent, columns, df_list_ctrl):
         wx.Panel.__init__(self, parent)
@@ -671,14 +692,12 @@ class LinePlot(wx.Panel):
     def redraw(self):
         column_index1 = self.combo_box1.GetSelection()
         if column_index1 != wx.NOT_FOUND and column_index1 != 0:
+            df = self.df_list_ctrl.get_filtered_df()
             # subtract one to remove the neutral selection index
             column_index1 -= 1
-
-            df = self.df_list_ctrl.get_filtered_df()
-
             if len(df) > 0:
                 self.axes.clear()
-                self.axes.plot(df[df.columns[column_index1]], clip_on=False)
+                self.axes.plot(df[df.columns[column_index1]])
 
                 self.canvas.draw()
 
@@ -695,6 +714,9 @@ class MainFrame(wx.Frame):
         nb = wx.Notebook(p)
         self.nb = nb
 
+        # add index as Date column
+        df.insert(0, 'Date', pd.Series(pd.to_datetime(df.index), index=df.index))
+
         columns = df.columns[:]
 
         self.CreateStatusBar(2, style=0)
@@ -706,7 +728,7 @@ class MainFrame(wx.Frame):
         self.page3 = FilterPanel(nb, columns, self.page1.df_list_ctrl, self.selection_change_callback)
         self.page4 = HistogramPlot(nb, columns, self.page1.df_list_ctrl)
         self.page5 = ScatterPlot(nb, columns, self.page1.df_list_ctrl)
-        self.page6 = LinePlot(nb, columns, self.page1.df_list_ctrl)
+        self.page6 = TimeSeriesPlot(nb, columns, self.page1.df_list_ctrl)
 
         # add the pages to the notebook with the label to show on the tab
         nb.AddPage(self.page1, "Data Frame")
@@ -714,7 +736,7 @@ class MainFrame(wx.Frame):
         nb.AddPage(self.page3, "Filters")
         nb.AddPage(self.page4, "Histogram")
         nb.AddPage(self.page5, "Scatter Plot")
-        nb.AddPage(self.page6, "Line Plot")
+        nb.AddPage(self.page6, "Time Series Plot")
 
         nb.Bind(wx.EVT_NOTEBOOK_PAGE_CHANGED, self.on_tab_change)
 
@@ -747,13 +769,13 @@ class MainFrame(wx.Frame):
     def selection_change_callback(self):
         self.page4.redraw()
         self.page5.redraw()
+        self.page6.redraw()
 
 
 def show(df):
     """
     The main function to start the data frame GUI.
     """
-
     app = wx.App(False)
     frame = MainFrame(df)
     frame.Show()
