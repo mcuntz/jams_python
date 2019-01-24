@@ -5,45 +5,35 @@ from __future__ import absolute_import, division, print_function
 
     A minimalistic GUI for analyzing Pandas DataFrames based on wxPython.
 
-    
+
     Usage
     -----
     import numpy as np
     import pandas as pd
     filename = 'Hesse_DB2_1997-2011.csv'
-    filename = '1.csv'
+    # filename = '1.csv'
     parser = lambda date: pd.datetime.strptime(date, '%Y-%m-%d %H:%M') # not needed for US format
     names = ['Date', 'FCO2 H1 (umol/m2.s)', 'FCO2_cor H1 (umol/m2.s)', 'FH2O H1 (mmol/m2.s)', 'H H1 (W/m2)',
              'Rg_Kipp H1 (W/m2)', 'alb H1 (-)', 'Rnet_CNR1 H1 (W/m2)', 'NDVI H1 (-)', 'Patm (hPa)',
              'T_Vais H1 (degC)', 'WS_EC H1 (m/s)', 'Prec H1 (mm/30min)']
+
+    # pandas
     df = pd.read_csv(filename, ';', parse_dates=[0], date_parser=parser, index_col=0, header=0, usecols=names)
-    df.replace(-9999., np.nan, inplace=True)
+
+    # jams
+    from jams import fread, fsread, ascii2eng
+    names = names[1:]
+    head = fread(filename, skip=1, cname=names, header=True)
+    dat, date = fsread(filename, skip=1, cname=names, sname=['Date'], squeeze=True, strarr=True, strip=False)
+    df = pd.DataFrame(dat, pd.to_datetime(ascii2eng(date)), head)
 
     # This must be before any other call to matplotlib because it use the wxAgg backend.
     # This means, do not use --pylab with ipython.
-    from jams import dfgui
-    dfgui.show(df)
-
-    
-    # or using jams
-    import numpy as np
-    import pandas as pd
-    import jams
-    filename = 'Hesse_DB2_1997-2011.csv'
-    filename = '1.csv'
-    names = ['FCO2 H1 (umol/m2.s)', 'FCO2_cor H1 (umol/m2.s)', 'FH2O H1 (mmol/m2.s)', 'H H1 (W/m2)',
-             'Rg_Kipp H1 (W/m2)', 'alb H1 (-)', 'Rnet_CNR1 H1 (W/m2)', 'NDVI H1 (-)', 'Patm (hPa)',
-             'T_Vais H1 (degC)', 'WS_EC H1 (m/s)', 'Prec H1 (mm/30min)']
-    date = jams.ascii2eng(jams.sread(filename, skip=1, nc=1, squeeze=True, strarr=True))
-    head = jams.fread(filename, skip=1, cname=names, header=True)
-    dat  = jams.fread(filename, skip=1, cname=names)
-    df = pd.DataFrame(dat, pd.to_datetime(date), head)
     df.replace(-9999., np.nan, inplace=True)
-
     from jams import dfgui
     dfgui.show(df)
 
-    
+
     Features
     --------
     - Tabular view of data frame
@@ -57,19 +47,18 @@ from __future__ import absolute_import, division, print_function
           _ > datetime.datetime(1998,1,1)
     - Histogram plots
     - Scatter plots
-    - Timeseries plots
 
-    
+
     Dependencies
     ------------
-    Needs wxpython
+    Needs wxpython.
 
 
     License
     -------
     The MIT License (MIT)
 
-    Copyright (c) 2015 
+    Copyright (c) 2015
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"), to deal
@@ -95,19 +84,27 @@ from __future__ import absolute_import, division, print_function
     -------
     Written, Fabian Keller (fabian.keller@blue-yonder.com), 2014, http://github.com/bluenote10/PandasDataFrameGUI
     Modified, Matthias Cuntz, Jan 2019 - exclude NaN in histograms
-                                       - added time series plot
                                        - add index as 'Date' column automatically
+                                       - plot controls
 '''
+# --------------------------------------------------------------------
+# import
+#
+
 # pip install wxpython
+import numpy as np
+import pandas as pd
+# unused import required to allow 'eval' of date filters
+import datetime
+from datetime import date
+from bisect import bisect
 
 try:
     import wx
 except ImportError:
     import sys
-    sys.path += [
-        "/usr/lib/python2.7/dist-packages/wx-2.8-gtk2-unicode",
-        "/usr/lib/python2.7/dist-packages"
-    ]
+    sys.path += ["/usr/lib/python2.7/dist-packages/wx-2.8-gtk2-unicode",
+                 "/usr/lib/python2.7/dist-packages"]
     import wx
 
 import matplotlib
@@ -115,14 +112,6 @@ matplotlib.use('WXAgg')
 from matplotlib.backends.backend_wxagg import FigureCanvasWxAgg as FigureCanvas
 from matplotlib.backends.backend_wx import NavigationToolbar2Wx
 from matplotlib.figure import Figure
-from bisect import bisect
-
-import numpy as np
-import pandas as pd
-
-# unused import required to allow 'eval' of date filters
-import datetime
-from datetime import date
 
 # try to get nicer plotting styles
 try:
@@ -135,7 +124,9 @@ except ImportError:
     except AttributeError:
         pass
 
-
+# --------------------------------------------------------------------
+# Basic List Class
+#
 class ListCtrlDataFrame(wx.ListCtrl):
 
     # TODO: we could do something more sophisticated to come
@@ -353,6 +344,9 @@ class ListCtrlDataFrame(wx.ListCtrl):
             return None
 
 
+# --------------------------------------------------------------------
+# Date table panel
+#
 class DataframePanel(wx.Panel):
     """
     Panel providing the main data frame table view.
@@ -462,6 +456,9 @@ class ListBoxDraggable(wx.ListBox):
         return selected
 
 
+# --------------------------------------------------------------------
+# Column selection panel
+#
 class ColumnSelectionPanel(wx.Panel):
     """
     Panel for selecting and re-arranging columns.
@@ -485,6 +482,9 @@ class ColumnSelectionPanel(wx.Panel):
         self.df_list_ctrl.set_columns(selected)
 
 
+# --------------------------------------------------------------------
+# Filter panel
+#
 class FilterPanel(wx.Panel):
     """
     Panel for defining filter expressions.
@@ -543,6 +543,9 @@ class FilterPanel(wx.Panel):
         # print("Num matching:", num_matching)
 
 
+# --------------------------------------------------------------------
+# Histogram plot panel
+#
 class HistogramPlot(wx.Panel):
     """
     Panel providing a histogram plot.
@@ -599,6 +602,9 @@ class HistogramPlot(wx.Panel):
                 self.canvas.draw()
 
 
+# --------------------------------------------------------------------
+# Scatter plot panel
+#
 class ScatterPlot(wx.Panel):
     """
     Panel providing a scatter plot.
@@ -621,22 +627,74 @@ class ScatterPlot(wx.Panel):
 
         self.Bind(wx.EVT_COMBOBOX, self.on_combo_box_select)
 
-        row_sizer = wx.BoxSizer(wx.HORIZONTAL)
-        row_sizer.Add(self.combo_box1, 0, wx.ALL | wx.ALIGN_CENTER, 5)
-        row_sizer.Add(self.combo_box2, 0, wx.ALL | wx.ALIGN_CENTER, 5)
-        row_sizer.Add(chart_toolbar, 0, wx.ALL, 5)
+        self.linestyle_label = wx.StaticText(self, wx.ID_ANY, label="linestyle", size=wx.Size(60, 20))
+        self.linestyle = wx.TextCtrl(self, wx.ID_ANY, value="-", size=wx.Size(40, 20))
+        self.linewidth_label = wx.StaticText(self, wx.ID_ANY, label="linewidth", size=wx.Size(60, 20))
+        self.linewidth = wx.TextCtrl(self, wx.ID_ANY, value="1", size=wx.Size(25, 20))
+        self.linecolor_label = wx.StaticText(self, wx.ID_ANY, label="linecolor", size=wx.Size(60, 20))
+        self.linecolor = wx.TextCtrl(self, wx.ID_ANY, value="b", size=wx.Size(40, 20))
+        self.marker_label = wx.StaticText(self, wx.ID_ANY, label="marker", size=wx.Size(50, 20))
+        self.marker = wx.TextCtrl(self, wx.ID_ANY, value="None", size=wx.Size(40, 20))
+        self.markersize_label = wx.StaticText(self, wx.ID_ANY, label="markersize", size=wx.Size(70, 20))
+        self.markersize = wx.TextCtrl(self, wx.ID_ANY, value="1", size=wx.Size(25, 20))
+        self.markerfacecolor_label = wx.StaticText(self, wx.ID_ANY, label="markerfacecolor", size=wx.Size(100, 20))
+        self.markerfacecolor = wx.TextCtrl(self, wx.ID_ANY, value="b", size=wx.Size(40, 20))
+        self.markeredgecolor_label = wx.StaticText(self, wx.ID_ANY, label="markeredgecolor", size=wx.Size(110, 20))
+        self.markeredgecolor = wx.TextCtrl(self, wx.ID_ANY, value="b", size=wx.Size(40, 20))
+        self.markeredgewidth_label = wx.StaticText(self, wx.ID_ANY, label="markeredgewidth", size=wx.Size(110, 20))
+        self.markeredgewidth = wx.TextCtrl(self, wx.ID_ANY, value="1", size=wx.Size(25, 20))
+
+        self.Bind(wx.EVT_TEXT, self.on_text_change)
+
+        row_sizer1 = wx.BoxSizer(wx.HORIZONTAL)
+        row_sizer1.Add(self.combo_box1, 0, wx.ALL | wx.ALIGN_CENTER, 5)
+        row_sizer1.Add(self.combo_box2, 0, wx.ALL | wx.ALIGN_CENTER, 5)
+        row_sizer1.Add(chart_toolbar, 0, wx.ALL, 5)
+
+        row_sizer2 = wx.BoxSizer(wx.HORIZONTAL)
+        row_sizer2.Add(self.linestyle_label, 0, wx.ALL | wx.ALIGN_CENTER, 1)
+        row_sizer2.Add(self.linestyle, 0, wx.ALL | wx.ALIGN_CENTER, 5)
+        row_sizer2.Add(self.linewidth_label, 0, wx.ALL | wx.ALIGN_CENTER, 1)
+        row_sizer2.Add(self.linewidth, 0, wx.ALL | wx.ALIGN_CENTER, 5)
+        row_sizer2.Add(self.linecolor_label, 0, wx.ALL | wx.ALIGN_CENTER, 1)
+        row_sizer2.Add(self.linecolor, 0, wx.ALL | wx.ALIGN_CENTER, 5)
+
+        row_sizer3 = wx.BoxSizer(wx.HORIZONTAL)
+        row_sizer3.Add(self.marker_label, 0, wx.ALL | wx.ALIGN_CENTER, 1)
+        row_sizer3.Add(self.marker, 0, wx.ALL | wx.ALIGN_CENTER, 5)
+        row_sizer3.Add(self.markersize_label, 0, wx.ALL | wx.ALIGN_CENTER, 1)
+        row_sizer3.Add(self.markersize, 0, wx.ALL | wx.ALIGN_CENTER, 5)
+        row_sizer3.Add(self.markerfacecolor_label, 0, wx.ALL | wx.ALIGN_CENTER, 1)
+        row_sizer3.Add(self.markerfacecolor, 0, wx.ALL | wx.ALIGN_CENTER, 5)
+        row_sizer3.Add(self.markeredgecolor_label, 0, wx.ALL | wx.ALIGN_CENTER, 1)
+        row_sizer3.Add(self.markeredgecolor, 0, wx.ALL | wx.ALIGN_CENTER, 5)
+        row_sizer3.Add(self.markeredgewidth_label, 0, wx.ALL | wx.ALIGN_CENTER, 1)
+        row_sizer3.Add(self.markeredgewidth, 0, wx.ALL | wx.ALIGN_CENTER, 5)
 
         sizer = wx.BoxSizer(wx.VERTICAL)
         sizer.Add(self.canvas, 1, flag=wx.EXPAND, border=5)
-        sizer.Add(row_sizer)
+        sizer.Add(row_sizer1)
+        sizer.Add(row_sizer2)
+        sizer.Add(row_sizer3)
         self.SetSizer(sizer)
 
     def on_combo_box_select(self, event):
         self.redraw()
 
+    def on_text_change(self, event):
+        self.redraw()
+
     def redraw(self):
         column_index1 = self.combo_box1.GetSelection()
         column_index2 = self.combo_box2.GetSelection()
+        linestyle = self.linestyle.GetLineText(0)
+        linewidth = float(self.linewidth.GetLineText(0))
+        linecolor = self.linecolor.GetLineText(0)
+        marker          = self.marker.GetLineText(0)
+        markersize      = float(self.markersize.GetLineText(0))
+        markerfacecolor = self.markerfacecolor.GetLineText(0)
+        markeredgecolor = self.markeredgecolor.GetLineText(0)
+        markeredgewidth = float(self.markeredgewidth.GetLineText(0))
         if (column_index1 != wx.NOT_FOUND and column_index2 != wx.NOT_FOUND and
             column_index1 != 0 and column_index2 != 0):
             df = self.df_list_ctrl.get_filtered_df()
@@ -652,56 +710,16 @@ class ScatterPlot(wx.Panel):
                 # column_name2 = self.columns[column_index2]
                 # df.plot(kind='scatter', x=column_name1, y=column_name2)
                 self.axes.clear()
-                self.axes.plot(x, y, 'o', markersize=1.0, clip_on=False)
+                self.axes.plot(x, y,
+                               linestyle=linestyle, linewidth=linewidth, color=linecolor,
+                               marker=marker, markersize=markersize, markerfacecolor=markerfacecolor,
+                               markeredgecolor=markeredgecolor, markeredgewidth=markeredgewidth)
                 self.canvas.draw()
 
 
-class TimeSeriesPlot(wx.Panel):
-    """
-    Panel providing a time series line plot.
-    """
-    def __init__(self, parent, columns, df_list_ctrl):
-        wx.Panel.__init__(self, parent)
-
-        columns_with_neutral_selection = [''] + list(columns)
-        self.columns = columns
-        self.df_list_ctrl = df_list_ctrl
-
-        self.figure = Figure(facecolor="white", figsize=(1, 1))
-        self.axes = self.figure.add_subplot(111)
-        self.canvas = FigureCanvas(self, -1, self.figure)
-
-        chart_toolbar = NavigationToolbar2Wx(self.canvas)
-
-        self.combo_box1 = wx.ComboBox(self, choices=columns_with_neutral_selection, style=wx.CB_READONLY)
-
-        self.Bind(wx.EVT_COMBOBOX, self.on_combo_box_select)
-
-        row_sizer = wx.BoxSizer(wx.HORIZONTAL)
-        row_sizer.Add(self.combo_box1, 0, wx.ALL | wx.ALIGN_CENTER, 5)
-        row_sizer.Add(chart_toolbar, 0, wx.ALL, 5)
-
-        sizer = wx.BoxSizer(wx.VERTICAL)
-        sizer.Add(self.canvas, 1, flag=wx.EXPAND, border=5)
-        sizer.Add(row_sizer)
-        self.SetSizer(sizer)
-
-    def on_combo_box_select(self, event):
-        self.redraw()
-
-    def redraw(self):
-        column_index1 = self.combo_box1.GetSelection()
-        if column_index1 != wx.NOT_FOUND and column_index1 != 0:
-            df = self.df_list_ctrl.get_filtered_df()
-            # subtract one to remove the neutral selection index
-            column_index1 -= 1
-            if len(df) > 0:
-                self.axes.clear()
-                self.axes.plot(df[df.columns[column_index1]])
-
-                self.canvas.draw()
-
-
+# --------------------------------------------------------------------
+# Main window
+#
 class MainFrame(wx.Frame):
     """
     The main GUI window.
@@ -728,7 +746,6 @@ class MainFrame(wx.Frame):
         self.page3 = FilterPanel(nb, columns, self.page1.df_list_ctrl, self.selection_change_callback)
         self.page4 = HistogramPlot(nb, columns, self.page1.df_list_ctrl)
         self.page5 = ScatterPlot(nb, columns, self.page1.df_list_ctrl)
-        self.page6 = TimeSeriesPlot(nb, columns, self.page1.df_list_ctrl)
 
         # add the pages to the notebook with the label to show on the tab
         nb.AddPage(self.page1, "Data Frame")
@@ -736,7 +753,6 @@ class MainFrame(wx.Frame):
         nb.AddPage(self.page3, "Filters")
         nb.AddPage(self.page4, "Histogram")
         nb.AddPage(self.page5, "Scatter Plot")
-        nb.AddPage(self.page6, "Time Series Plot")
 
         nb.Bind(wx.EVT_NOTEBOOK_PAGE_CHANGED, self.on_tab_change)
 
@@ -769,9 +785,11 @@ class MainFrame(wx.Frame):
     def selection_change_callback(self):
         self.page4.redraw()
         self.page5.redraw()
-        self.page6.redraw()
 
 
+# --------------------------------------------------------------------
+# Calling function
+#
 def show(df):
     """
     The main function to start the data frame GUI.
