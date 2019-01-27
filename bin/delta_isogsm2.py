@@ -1,0 +1,1 @@
+../jams/delta_isogsm2.py

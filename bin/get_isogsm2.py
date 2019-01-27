@@ -1,0 +1,1 @@
+../jams/get_isogsm2.py

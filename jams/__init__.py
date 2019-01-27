@@ -35,8 +35,9 @@ from __future__ import division, absolute_import, print_function
     cuntz_gleixner         Cuntz-Gleixner model of 13C discrimination.
     dag                    Generation and plotting of (connected) directed acyclic graphs with one source node.
     dielectric_water       Dielectric constant of liquid water.
-    directories_from_gui   Open directory selection dialogs, returns consecutiveley selected directories
-    directory_from_gui     Open directory selection dialog, returns selected directory
+    directories_from_gui   Open directory selection dialogs, returns consecutiveley selected directories.
+    directory_from_gui     Open directory selection dialog, returns selected directory.
+    delta_isogsm2          Calculate delta values from downloaded IsoGSM2 data.
     dewpoint               Calculates the dew point from ambient humidity.
     date2dec               Converts arrays with calendar date to decimal date.
     dec2date               Converts arrays with decimal date to calendar date.
@@ -71,6 +72,9 @@ from __future__ import division, absolute_import, print_function
     geoarray               Pythonic gdal wrapper
     get_angle              Returns the angle in radiant from each point in xy1 to each point in xy2.
     get_brewer             Registers and returns Brewer colormap.
+    get_era_interim        Download ERA-Interim data suitable to produce MuSICA input data.
+    get_era5               Download ERA5 data suitable to produce MuSICA input data.
+    get_isogsm2            Get IsoGSM2 output.
     get_nearest            Returns a value z for each point in xy near to the xyz field.
     grid_mid2edge          Longitude and latitude grid edges from grid midpoints.
     hdfread                Wrapper for readhdf.
@@ -280,6 +284,8 @@ from __future__ import division, absolute_import, print_function
     alpha_equ_h2o          Equilibrium fractionation between liquid water and vapour
     alpha_kin_h2o          Kinetic fractionation of molecular diffusion of water vapour
     cuntz_gleixner         Cuntz-Gleixner model of 13C discrimination.
+    delta_isogsm2          Calculate delta values from downloaded IsoGSM2 data.
+    get_isogsm2            Get IsoGSM2 output.
     tcherkez               Calculates the Tcherkez model of 13C-discrimiantion in the Calvin cycle.
 
 
@@ -318,6 +324,8 @@ from __future__ import division, absolute_import, print_function
     dewpoint               Calculates the dew point from ambient humidity.
     dielectric_water       Dielectric constant of liquid water.
     esat                   Calculates the saturation vapour pressure of water/ice.
+    get_era_interim        Download ERA-Interim data suitable to produce MuSICA input data.
+    get_era5               Download ERA5 data suitable to produce MuSICA input data.
     pritay                 Daily reference evapotranspiration after Priestley & Taylor
     
 
@@ -555,7 +563,7 @@ from __future__ import division, absolute_import, print_function
               MC, Mar 2018 - ascii2en, en2ascii, ascii2fr, fr2ascii, ascii2us, us2ascii
               MC, Jul 2018 - plot
               MC, Nov 2018 - intersection, jConfigParser
-              MC, Jan 2019 - dfgui
+              MC, Jan 2019 - dfgui, delta_isogsm2, get_era5, get_era_interim, get_isogsm2
 """
 
 # sub-packages without dependencies to rest of jams
@@ -593,6 +601,7 @@ except ImportError:
     pass # networkx not installed
 from .date2dec          import date2dec
 from .dec2date          import dec2date
+from .delta_isogsm2     import delta_isogsm2
 from .dewpoint          import dewpoint
 from .dielectric_water  import dielectric_water
 from .division          import division, div
@@ -617,6 +626,9 @@ try:
 except ImportError:
     pass
 from .get_angle         import get_angle
+from .get_era_interim   import get_era_interim
+from .get_era5          import get_era5
+from .get_isogsm2       import get_isogsm2
 from .get_nearest       import get_nearest
 from .grid_mid2edge     import grid_mid2edge
 from .head              import head
