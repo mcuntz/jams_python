@@ -3,7 +3,7 @@ from __future__ import division, absolute_import, print_function
 import numpy as np
 import xlrd
 
-__all__ = ['xread']
+__all__ = ['xread', 'xlsread', 'xlsxread']
 
 def xread(infile, sheet=None, nc=0, cname=None, snc=0, sname=None, skip=0, cskip=0, hskip=0, hstrip=True,
           squeeze=False, reform=False, transpose=False,
@@ -167,6 +167,7 @@ def xread(infile, sheet=None, nc=0, cname=None, snc=0, sname=None, skip=0, cskip
         -------
         Written,  MC, Feb 2017 - modified fsread
         Modified, MC, Nov 2017 - file->infile, hstrip
+                  MC, Feb 2019 - NA -> NaN, i.e. R to Python convention
     """
 
     # Input error
@@ -313,10 +314,11 @@ def xread(infile, sheet=None, nc=0, cname=None, snc=0, sname=None, skip=0, cskip
 
     # Values
     if nnc > 0:
-        var = np.empty((nrow,nnc), dtype=np.float)
+        var = np.full((nrow,nnc), np.nan, dtype=np.float)
         k = 0
         for ix in iinc:
             ilist = sh.col_values(ix, start_rowx=skip, end_rowx=sh.nrows)
+            ilist = [ 'NaN' if iv=='NA' else iv for iv in ilist ]
             if fill: ilist = [ fill_value if iv=='' else iv for iv in ilist ]
             var[:,k] = np.array(ilist, dtype=np.float)
             k += 1            
@@ -343,6 +345,20 @@ def xread(infile, sheet=None, nc=0, cname=None, snc=0, sname=None, skip=0, cskip
             return var
     else:
         return svar
+
+    
+def xlsread(*args, **kwargs):
+    """
+        Wrapper for xread
+    """
+    return xread(*args, **kwargs)
+
+    
+def xlsxread(*args, **kwargs):
+    """
+        Wrapper for xread
+    """
+    return xread(*args, **kwargs)
 
 
 if __name__ == '__main__':

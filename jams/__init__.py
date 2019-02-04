@@ -167,6 +167,8 @@ from __future__ import division, absolute_import, print_function
     volume_poly            Volume of function above a polygon
     writenetcdf            Write netCDF4 file.
     xkcd                   Make plot look handdrawn.
+    xlsread                Wrapper for xread.
+    xlsxread               Wrapper for xread.
     xread                  Simultaneous read of float and string array from Excel file.
     yrange                 Calculates plot range from input array.
     zacharias              Soil water content with van Genuchten and Zacharias et al. (2007).
@@ -400,6 +402,8 @@ from __future__ import division, absolute_import, print_function
     savez                  Save several numpy arrays into a single file in uncompressed ``.npz`` format.
     savez_compressed       Save several arrays into a single file in compressed ``.npz`` format.
     writenetcdf            Write netCDF4 file.
+    xlsread                Wrapper for xread.
+    xlsxread               Wrapper for xread.
     xread                  Simultaneous read of float and string array from Excel file.
 
 
@@ -564,6 +568,7 @@ from __future__ import division, absolute_import, print_function
               MC, Jul 2018 - plot
               MC, Nov 2018 - intersection, jConfigParser
               MC, Jan 2019 - dfgui, delta_isogsm2, get_era5, get_era_interim, get_isogsm2
+              MC, Feb 2019 - xlsread, xlsxread
 """
 
 # sub-packages without dependencies to rest of jams
@@ -713,7 +718,7 @@ except ImportError:
     pass # not installed
 from .xkcd              import xkcd
 try:
-    from .xread         import xread
+    from .xread         import xread, xlsread, xlsxread
 except ImportError:
     pass # not installed
 from .yrange            import yrange
