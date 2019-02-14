@@ -86,6 +86,7 @@ from __future__ import absolute_import, division, print_function
     Modified, Matthias Cuntz, Jan 2019 - exclude NaN in histograms
                                        - add index as 'Date' column automatically
                                        - plot controls
+              Matthias Cuntz, Feb 2019 - added 2nd line/scatter in scatter plots
 '''
 # --------------------------------------------------------------------
 # import
@@ -617,14 +618,15 @@ class ScatterPlot(wx.Panel):
         self.df_list_ctrl = df_list_ctrl
 
         self.figure = Figure(facecolor="white", figsize=(1, 1))
-        self.axes = self.figure.add_subplot(111)
+        self.axes  = self.figure.add_subplot(111)
+        self.axes2 = self.axes.twinx()
         self.canvas = FigureCanvas(self, -1, self.figure)
 
         chart_toolbar = NavigationToolbar2Wx(self.canvas)
 
+        # first line
         self.combo_box1 = wx.ComboBox(self, choices=columns_with_neutral_selection, style=wx.CB_READONLY)
         self.combo_box2 = wx.ComboBox(self, choices=columns_with_neutral_selection, style=wx.CB_READONLY)
-
         self.Bind(wx.EVT_COMBOBOX, self.on_combo_box_select)
 
         self.linestyle_label = wx.StaticText(self, wx.ID_ANY, label="linestyle", size=wx.Size(60, 20))
@@ -643,7 +645,6 @@ class ScatterPlot(wx.Panel):
         self.markeredgecolor = wx.TextCtrl(self, wx.ID_ANY, value="b", size=wx.Size(40, 20))
         self.markeredgewidth_label = wx.StaticText(self, wx.ID_ANY, label="markeredgewidth", size=wx.Size(110, 20))
         self.markeredgewidth = wx.TextCtrl(self, wx.ID_ANY, value="1", size=wx.Size(25, 20))
-
         self.Bind(wx.EVT_TEXT, self.on_text_change)
 
         row_sizer1 = wx.BoxSizer(wx.HORIZONTAL)
@@ -671,11 +672,59 @@ class ScatterPlot(wx.Panel):
         row_sizer3.Add(self.markeredgewidth_label, 0, wx.ALL | wx.ALIGN_CENTER, 1)
         row_sizer3.Add(self.markeredgewidth, 0, wx.ALL | wx.ALIGN_CENTER, 5)
 
+
+        # second line
+        self.combo_box3 = wx.ComboBox(self, choices=columns_with_neutral_selection, style=wx.CB_READONLY)
+        
+        self.linestyle_label2 = wx.StaticText(self, wx.ID_ANY, label="linestyle", size=wx.Size(60, 20))
+        self.linestyle2 = wx.TextCtrl(self, wx.ID_ANY, value="--", size=wx.Size(40, 20))
+        self.linewidth_label2 = wx.StaticText(self, wx.ID_ANY, label="linewidth", size=wx.Size(60, 20))
+        self.linewidth2 = wx.TextCtrl(self, wx.ID_ANY, value="1", size=wx.Size(25, 20))
+        self.linecolor_label2 = wx.StaticText(self, wx.ID_ANY, label="linecolor", size=wx.Size(60, 20))
+        self.linecolor2 = wx.TextCtrl(self, wx.ID_ANY, value="r", size=wx.Size(40, 20))
+        self.marker_label2 = wx.StaticText(self, wx.ID_ANY, label="marker", size=wx.Size(50, 20))
+        self.marker2 = wx.TextCtrl(self, wx.ID_ANY, value="None", size=wx.Size(40, 20))
+        self.markersize_label2 = wx.StaticText(self, wx.ID_ANY, label="markersize", size=wx.Size(70, 20))
+        self.markersize2 = wx.TextCtrl(self, wx.ID_ANY, value="1", size=wx.Size(25, 20))
+        self.markerfacecolor_label2 = wx.StaticText(self, wx.ID_ANY, label="markerfacecolor", size=wx.Size(100, 20))
+        self.markerfacecolor2 = wx.TextCtrl(self, wx.ID_ANY, value="r", size=wx.Size(40, 20))
+        self.markeredgecolor_label2 = wx.StaticText(self, wx.ID_ANY, label="markeredgecolor", size=wx.Size(110, 20))
+        self.markeredgecolor2 = wx.TextCtrl(self, wx.ID_ANY, value="r", size=wx.Size(40, 20))
+        self.markeredgewidth_label2 = wx.StaticText(self, wx.ID_ANY, label="markeredgewidth", size=wx.Size(110, 20))
+        self.markeredgewidth2 = wx.TextCtrl(self, wx.ID_ANY, value="1", size=wx.Size(25, 20))
+
+        row_sizer4 = wx.BoxSizer(wx.HORIZONTAL)
+        row_sizer4.Add(self.combo_box3, 0, wx.ALL | wx.ALIGN_CENTER, 5)
+
+        row_sizer5 = wx.BoxSizer(wx.HORIZONTAL)
+        row_sizer5.Add(self.linestyle_label2, 0, wx.ALL | wx.ALIGN_CENTER, 1)
+        row_sizer5.Add(self.linestyle2, 0, wx.ALL | wx.ALIGN_CENTER, 5)
+        row_sizer5.Add(self.linewidth_label2, 0, wx.ALL | wx.ALIGN_CENTER, 1)
+        row_sizer5.Add(self.linewidth2, 0, wx.ALL | wx.ALIGN_CENTER, 5)
+        row_sizer5.Add(self.linecolor_label2, 0, wx.ALL | wx.ALIGN_CENTER, 1)
+        row_sizer5.Add(self.linecolor2, 0, wx.ALL | wx.ALIGN_CENTER, 5)
+
+        row_sizer6 = wx.BoxSizer(wx.HORIZONTAL)
+        row_sizer6.Add(self.marker_label2, 0, wx.ALL | wx.ALIGN_CENTER, 1)
+        row_sizer6.Add(self.marker2, 0, wx.ALL | wx.ALIGN_CENTER, 5)
+        row_sizer6.Add(self.markersize_label2, 0, wx.ALL | wx.ALIGN_CENTER, 1)
+        row_sizer6.Add(self.markersize2, 0, wx.ALL | wx.ALIGN_CENTER, 5)
+        row_sizer6.Add(self.markerfacecolor_label2, 0, wx.ALL | wx.ALIGN_CENTER, 1)
+        row_sizer6.Add(self.markerfacecolor2, 0, wx.ALL | wx.ALIGN_CENTER, 5)
+        row_sizer6.Add(self.markeredgecolor_label2, 0, wx.ALL | wx.ALIGN_CENTER, 1)
+        row_sizer6.Add(self.markeredgecolor2, 0, wx.ALL | wx.ALIGN_CENTER, 5)
+        row_sizer6.Add(self.markeredgewidth_label2, 0, wx.ALL | wx.ALIGN_CENTER, 1)
+        row_sizer6.Add(self.markeredgewidth2, 0, wx.ALL | wx.ALIGN_CENTER, 5)
+
+        
         sizer = wx.BoxSizer(wx.VERTICAL)
         sizer.Add(self.canvas, 1, flag=wx.EXPAND, border=5)
         sizer.Add(row_sizer1)
         sizer.Add(row_sizer2)
         sizer.Add(row_sizer3)
+        sizer.Add(row_sizer4)
+        sizer.Add(row_sizer5)
+        sizer.Add(row_sizer6)
         self.SetSizer(sizer)
 
     def on_combo_box_select(self, event):
@@ -687,16 +736,28 @@ class ScatterPlot(wx.Panel):
     def redraw(self):
         column_index1 = self.combo_box1.GetSelection()
         column_index2 = self.combo_box2.GetSelection()
-        linestyle = self.linestyle.GetLineText(0)
-        linewidth = float(self.linewidth.GetLineText(0))
-        linecolor = self.linecolor.GetLineText(0)
+        linestyle       = self.linestyle.GetLineText(0)
+        linewidth       = float(self.linewidth.GetLineText(0))
+        linecolor       = self.linecolor.GetLineText(0)
         marker          = self.marker.GetLineText(0)
         markersize      = float(self.markersize.GetLineText(0))
         markerfacecolor = self.markerfacecolor.GetLineText(0)
         markeredgecolor = self.markeredgecolor.GetLineText(0)
         markeredgewidth = float(self.markeredgewidth.GetLineText(0))
-        if (column_index1 != wx.NOT_FOUND and column_index2 != wx.NOT_FOUND and
-            column_index1 != 0 and column_index2 != 0):
+        # line 2
+        column_index3 = self.combo_box3.GetSelection()
+        linestyle2       = self.linestyle2.GetLineText(0)
+        linewidth2       = float(self.linewidth2.GetLineText(0))
+        linecolor2       = self.linecolor2.GetLineText(0)
+        marker2          = self.marker2.GetLineText(0)
+        markersize2      = float(self.markersize2.GetLineText(0))
+        markerfacecolor2 = self.markerfacecolor2.GetLineText(0)
+        markeredgecolor2 = self.markeredgecolor2.GetLineText(0)
+        markeredgewidth2 = float(self.markeredgewidth2.GetLineText(0))
+        if ((column_index1 != wx.NOT_FOUND and column_index2 != wx.NOT_FOUND and
+             column_index1 != 0 and column_index2 != 0) or
+            (column_index1 != wx.NOT_FOUND and column_index3 != wx.NOT_FOUND and
+             column_index1 != 0 and column_index3 != 0)):
             df = self.df_list_ctrl.get_filtered_df()
             if len(df) > 0:
                 # subtract one to remove the neutral selection index
@@ -704,16 +765,35 @@ class ScatterPlot(wx.Panel):
                 x = df.iloc[:, column_index1].values
                 column_index2 -= 1
                 y = df.iloc[:, column_index2].values
+                column_index3 -= 1
+                y2 = df.iloc[:, column_index3].values
                 # It looks like using pandas dataframe.plot causes something weird to
                 # crash in wx internally. Therefore we use plain axes.plot functionality.
                 # column_name1 = self.columns[column_index1]
                 # column_name2 = self.columns[column_index2]
                 # df.plot(kind='scatter', x=column_name1, y=column_name2)
                 self.axes.clear()
-                self.axes.plot(x, y,
-                               linestyle=linestyle, linewidth=linewidth, color=linecolor,
-                               marker=marker, markersize=markersize, markerfacecolor=markerfacecolor,
-                               markeredgecolor=markeredgecolor, markeredgewidth=markeredgewidth)
+                if (column_index1 >= 0 and column_index2 >= 0):
+                    self.axes.plot(x, y,
+                                   linestyle=linestyle, linewidth=linewidth, color=linecolor,
+                                   marker=marker, markersize=markersize, markerfacecolor=markerfacecolor,
+                                   markeredgecolor=markeredgecolor, markeredgewidth=markeredgewidth)
+                    self.axes.spines['left'].set_color(linecolor)
+                    self.axes.tick_params(axis='y', colors=linecolor)
+                    self.axes.xaxis.set_label_text(self.columns[column_index1])
+                    self.axes.yaxis.label.set_color(linecolor)
+                    self.axes.yaxis.set_label_text(self.columns[column_index2])
+                self.axes2.clear()
+                if (column_index1 >= 0 and column_index3 >= 0):
+                    self.axes2.plot(x, y2,
+                                    linestyle=linestyle2, linewidth=linewidth2, color=linecolor2,
+                                    marker=marker2, markersize=markersize2, markerfacecolor=markerfacecolor2,
+                                    markeredgecolor=markeredgecolor2, markeredgewidth=markeredgewidth2)
+                    self.axes2.spines['right'].set_color(linecolor2)
+                    self.axes2.tick_params(axis='y', colors=linecolor2)
+                    self.axes2.xaxis.set_label_text(self.columns[column_index1])
+                    self.axes2.yaxis.label.set_color(linecolor2)
+                    self.axes2.yaxis.set_label_text(self.columns[column_index3])
                 self.canvas.draw()
 
 
