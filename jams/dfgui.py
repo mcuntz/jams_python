@@ -79,7 +79,6 @@ from __future__ import absolute_import, division, print_function
     SOFTWARE.
 
 
-
     History
     -------
     Written, Fabian Keller (fabian.keller@blue-yonder.com), 2014, http://github.com/bluenote10/PandasDataFrameGUI
@@ -87,6 +86,8 @@ from __future__ import absolute_import, division, print_function
                                        - add index as 'Date' column automatically
                                        - plot controls
               Matthias Cuntz, Feb 2019 - added 2nd line/scatter in scatter plots
+                                         -> Bug: time axis does not work with first line but with second line.
+                                       - label x-axis on histograms
 '''
 # --------------------------------------------------------------------
 # import
@@ -591,14 +592,14 @@ class HistogramPlot(wx.Panel):
             if len(df) > 0:
                 self.axes.clear()
 
-                column = df.iloc[:, column_index1]
+                column = df.iloc[:,column_index1]
                 is_string_col = column.dtype == np.object and isinstance(column.values[0], str)
                 if is_string_col:
                     value_counts = column.value_counts().sort_index()
                     value_counts.plot(kind='bar', ax=self.axes)
                 else:
                     self.axes.hist(np.ma.array(column.values, mask=~np.isfinite(column.values)), bins=100)
-                    # self.axes.hist(column.values[np.isfinite(column.values)], bins=100)
+                    self.axes.xaxis.set_label_text(self.columns[column_index1])
 
                 self.canvas.draw()
 
@@ -762,11 +763,11 @@ class ScatterPlot(wx.Panel):
             if len(df) > 0:
                 # subtract one to remove the neutral selection index
                 column_index1 -= 1
-                x = df.iloc[:, column_index1].values
+                x  = df.iloc[:,column_index1].values
                 column_index2 -= 1
-                y = df.iloc[:, column_index2].values
+                y  = df.iloc[:,column_index2].values
                 column_index3 -= 1
-                y2 = df.iloc[:, column_index3].values
+                y2 = df.iloc[:,column_index3].values
                 # It looks like using pandas dataframe.plot causes something weird to
                 # crash in wx internally. Therefore we use plain axes.plot functionality.
                 # column_name1 = self.columns[column_index1]
@@ -842,7 +843,7 @@ class MainFrame(wx.Frame):
         sizer.Add(nb, 1, wx.EXPAND)
         p.SetSizer(sizer)
 
-        self.SetSize((800, 600))
+        self.SetSize((1000, 800))
         self.Center()
 
     def on_tab_change(self, event):
