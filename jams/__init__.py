@@ -109,6 +109,7 @@ from __future__ import division, absolute_import, print_function
     mat2nc                 Converts Matlab file *.mat into NetCDF *.nc.
     means                  Calculate daily, monthly, yearly, etc. means of data depending on date stamp.
     morris_sampling        Sampling of optimised trajectories for Morris measures / elementary effects
+    nc2nc                  Copy netcdf file deleting, renaming, replacing variables and attribues.
     ncread                 Wrapper for readnetcdf.
     netcdfread             Wrapper for readnetcdf.
     netcdf4                Convenience layer around netCDF4
@@ -391,6 +392,7 @@ from __future__ import division, absolute_import, print_function
     hdf5read               Wrapper for readhdf5.
     jConfigParser          Extended Python ConfigParser.
     mat2nc                 Converts Matlab file *.mat into NetCDF *.nc.
+    nc2nc                  Copy netcdf file deleting, renaming, replacing variables and attribues.
     ncread                 Wrapper for readnetcdf.
     netcdfread             Wrapper for readnetcdf.
     netcdf4                Convenience layer around netCDF4
@@ -569,6 +571,7 @@ from __future__ import division, absolute_import, print_function
               MC, Nov 2018 - intersection, jConfigParser
               MC, Jan 2019 - dfgui, delta_isogsm2, get_era5, get_era_interim, get_isogsm2
               MC, Feb 2019 - xlsread, xlsxread
+              MC, Apr 2019 - nc2nc
 """
 
 # sub-packages without dependencies to rest of jams
@@ -657,6 +660,10 @@ from .maskgroup         import maskgroup
 from .mat2nc            import mat2nc
 from .means             import means
 from .morris            import morris_sampling, elementary_effects
+try:
+    from .nc2nc         import nc2nc
+except ImportError:
+    pass # not installed
 try:
     from .npyio         import savez, savez_compressed
 except ImportError:
