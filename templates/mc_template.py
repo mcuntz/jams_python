@@ -55,6 +55,7 @@ Modified, MC, Jul 2013 - optparse->argparse
           MC, Mar 2017 - bokeh, plotly
           MC, Aug 2018 - use jams.plot snippets
           MC, Nov 2018 - label=str(iplot) to each add_axes to suppress warning about future changes
+          MC, Apr 2019 - llcspace missing in calls to legend
 """
 
 # -------------------------------------------------------------------------
@@ -265,7 +266,8 @@ if __name__ == '__main__':
     else:
         tarr = [jams.str2tex(r'$\sin(x)$ sin Nothing 100', usetex=usetex)]
     ll = sub.legend(larr, tarr, frameon=frameon, ncol=1,
-                    labelspacing=llrspace, handletextpad=llhtextpad, handlelength=llhlength,
+                    labelspacing=llrspace, columnspacing=llcspace,
+                    handletextpad=llhtextpad, handlelength=llhlength,
                     loc='upper left', bbox_to_anchor=(llxbbox,llybbox), scatterpoints=1, numpoints=1)
     plt.setp(ll.get_texts(), fontsize='small')
 
@@ -317,7 +319,8 @@ if __name__ == '__main__':
     else:
         tarr = [jams.str2tex(r'$\sin$ Nothing', usetex=usetex)]
     ll = sub.legend(larr, tarr, frameon=frameon, ncol=1,
-                    labelspacing=llrspace, handletextpad=llhtextpad, handlelength=llhlength,
+                    labelspacing=llrspace, columnspacing=llcspace,
+                    handletextpad=llhtextpad, handlelength=llhlength,
                     loc='upper left', bbox_to_anchor=(llxbbox,llybbox), scatterpoints=1, numpoints=1)
     plt.setp(ll.get_texts(), fontsize='small')
 
