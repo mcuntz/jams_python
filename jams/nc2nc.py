@@ -5,8 +5,7 @@ __all__ = ['nc2nc']
 
 def nc2nc(ifile, ofile, dvar=[], rvar={}, rname={}, ratt={}, hist=None):
     '''
-        Copy netcdf file deleting or renaming variables, replacing values of other variables,
-        setting variable attributes.
+        Copies netcdf file deleting variables, replacing values of other variables.
 
 
         Definition
@@ -43,6 +42,11 @@ def nc2nc(ifile, ofile, dvar=[], rvar={}, rname={}, ratt={}, hist=None):
         netcdf file
 
 
+        Notes
+        -----
+        Make NETCDF4 files, using compression.
+
+
         Examples
         --------
         nc2nc('in.nc', 'out.nc',
@@ -77,6 +81,7 @@ def nc2nc(ifile, ofile, dvar=[], rvar={}, rname={}, ratt={}, hist=None):
         -------
         Written,  Matthias Cuntz, Mar 2019 - from a code found by Vanessa. Source unknown.
         Modified, Matthias Cuntz, Apr 2019 - allow variable removal, renaming and attribute editing
+                                           - use NETCDF4 and zlib variables.
     '''
     import numpy as np
     import netCDF4 as nc
@@ -86,7 +91,7 @@ def nc2nc(ifile, ofile, dvar=[], rvar={}, rname={}, ratt={}, hist=None):
     rnlist = list(rname.keys())
     ralist = list(ratt.keys())
     
-    with nc.Dataset(ifile) as src, nc.Dataset(ofile, "w") as dst:
+    with nc.Dataset(ifile) as src, nc.Dataset(ofile, 'w', format='NETCDF4') as dst:
         # copy file attributes
         for name in src.ncattrs():
             dst.setncattr(name, src.getncattr(name))
@@ -111,7 +116,7 @@ def nc2nc(ifile, ofile, dvar=[], rvar={}, rname={}, ratt={}, hist=None):
                     oname = rname[name]
                 else:
                     oname = name
-                x = dst.createVariable(oname, variable.datatype, variable.dimensions)
+                x = dst.createVariable(oname, variable.datatype, variable.dimensions, zlib=True)
                 x.setncatts({k: variable.getncattr(k) for k in variable.ncattrs()})
                 # Overwrite or set new attributes
                 if name in ralist:
