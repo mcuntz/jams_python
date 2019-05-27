@@ -74,184 +74,23 @@ def set_up_cipher():
         -------
         This file is part of the JAMS Python package.
 
-        The JAMS Python package is free software: you can redistribute it and/or modify
-        it under the terms of the GNU Lesser General Public License as published by
-        the Free Software Foundation, either version 3 of the License, or
-        (at your option) any later version.
+        Permission is hereby granted, free of charge, to any person obtaining a copy
+        of this software and associated documentation files (the "Software"), to deal
+        in the Software without restriction, including without limitation the rights
+        to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+        copies of the Software, and to permit persons to whom the Software is
+        furnished to do so, subject to the following conditions:
 
-        The JAMS Python package is distributed in the hope that it will be useful,
-        but WITHOUT ANY WARRANTY; without even the implied warranty of
-        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-        GNU Lesser General Public License for more details.
+        The above copyright notice and this permission notice shall be included in all
+        copies or substantial portions of the Software.
 
-        You should have received a copy of the GNU Lesser General Public License
-        along with the JAMS Python package (cf. gpl.txt and lgpl.txt).
-        If not, see <http://www.gnu.org/licenses/>.
-
-        Copyright 2014 Matthias Cuntz
-
-
-        History
-        -------
-        Written,  MC, Dec 2014 - modified from
-                  http://code.activestate.com/recipes/577954-encrypt-and-decrypt-text-and-text-files-beta/
-    """
-    # key
-    alpha = '1234567890qwertyuiop[]asdfghjkl;zxcvbnm,.!@#$%^&*()_+-=-{}:<>|QWERTYUIOPASDFGHJKLZXCVBNM ~`?'
-    # cipher
-    cipher = "".join([list(alpha)[randint(0,len(list(alpha))-1)] for i in range(5000)])
-
-    if os.path.exists(file_cipher):
-        os.remove(file_cipher)
-    f = open(file_cipher, 'w')
-    f.write(cipher)
-    f.close()
-
-# --------------------------------------------------------------------
-
-def wordEncrypt(word):
-    """
-        Encrypt a word into list of keys using the cipher in file_cipher.
-
-
-        Definition
-        ----------
-        def wordEncrypt(word):
-
-
-        Input
-        -----
-        word     string
-
-
-        Output
-        ------
-        list with numeric keys
-
-
-        Examples
-        --------
-        # Setup the encryption and decryption of password
-        if not os.path.exists(cipher_file):
-            set_up_cipher(cipher_file)
-
-        # Store encrypted password
-        pass_file = os.path.join(os.path.expanduser('~'),'.pass.cipher')
-        if not os.path.exists(pass_file):
-            print('')
-            prompt = 'Enter password: '
-            ipass = getpass.getpass(prompt)
-            cpass = wordEncrypt(ipass)
-            f = open(pass_file, 'w')
-            f.write(' '.join([ str(i) for i in cpass ])+'\n')
-            f.close()
-
-        # Read encrypted password
-        f = open(pass_file, 'r')
-        cpass = f.readline()[:-1]
-        f.close()
-        password = wordDecrypt([ int(c) for c in cpass.split()])
-
-
-        License
-        -------
-        This file is part of the JAMS Python package.
-
-        The JAMS Python package is free software: you can redistribute it and/or modify
-        it under the terms of the GNU Lesser General Public License as published by
-        the Free Software Foundation, either version 3 of the License, or
-        (at your option) any later version.
-
-        The JAMS Python package is distributed in the hope that it will be useful,
-        but WITHOUT ANY WARRANTY; without even the implied warranty of
-        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-        GNU Lesser General Public License for more details.
-
-        You should have received a copy of the GNU Lesser General Public License
-        along with the JAMS Python package (cf. gpl.txt and lgpl.txt).
-        If not, see <http://www.gnu.org/licenses/>.
-
-        Copyright 2014 Matthias Cuntz
-
-
-        History
-        -------
-        Written,  MC, Dec 2014 - modified from
-                  http://code.activestate.com/recipes/577954-encrypt-and-decrypt-text-and-text-files-beta/
-    """
-    cipher = open(file_cipher).read()+'\n'
-    cipherWord = find(cipher,list(word))
-    
-    keys = [randint(5001,7000), randint(2,5000)]
-
-    encryptedWord = baseExpansion(list(map(choice, cipherWord)),keys[0],keys[1])
-    encryptedWord.extend(keys)
-
-    return list(map(int,encryptedWord))
-
-# --------------------------------------------------------------------
-
-def wordDecrypt(encryptedList):
-    """
-        Decrypt list of keys back into original word using the cipher in file_cipher.
-
-
-        Definition
-        ----------
-        def wordDecrypt(encryptedList):
-
-
-        Input
-        -----
-        encryptedList   list with numeric keys
-
-
-        Output
-        ------
-        Original word (string)
-
-
-        Examples
-        --------
-        # Setup the encryption and decryption of password
-        if not os.path.exists(cipher_file):
-            set_up_cipher(cipher_file)
-
-        # Store encrypted password
-        pass_file = os.path.join(os.path.expanduser('~'),'.pass.cipher')
-        if not os.path.exists(pass_file):
-            print('')
-            prompt = 'Enter password: '
-            ipass = getpass.getpass(prompt)
-            cpass = wordEncrypt(ipass)
-            f = open(pass_file, 'w')
-            f.write(' '.join([ str(i) for i in cpass ])+'\n')
-            f.close()
-
-        # Read encrypted password
-        f = open(pass_file, 'r')
-        cpass = f.readline()[:-1]
-        f.close()
-        password = wordDecrypt([ int(c) for c in cpass.split()])
-
-
-        License
-        -------
-        This file is part of the JAMS Python package.
-
-        The JAMS Python package is free software: you can redistribute it and/or modify
-        it under the terms of the GNU Lesser General Public License as published by
-        the Free Software Foundation, either version 3 of the License, or
-        (at your option) any later version.
-
-        The JAMS Python package is distributed in the hope that it will be useful,
-        but WITHOUT ANY WARRANTY; without even the implied warranty of
-        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-        GNU Lesser General Public License for more details.
-
-        You should have received a copy of the GNU Lesser General Public License
-        along with the JAMS Python package (cf. gpl.txt and lgpl.txt).
-        If not, see <http://www.gnu.org/licenses/>.
+        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+        IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+        FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+        AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+        LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+        OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+        SOFTWARE.
 
         Copyright 2014 Matthias Cuntz
 
@@ -303,19 +142,23 @@ def sendfail(subject, message='', sender='jams.encrypt.sendfail'):
         -------
         This file is part of the JAMS Python package.
 
-        The JAMS Python package is free software: you can redistribute it and/or modify
-        it under the terms of the GNU Lesser General Public License as published by
-        the Free Software Foundation, either version 3 of the License, or
-        (at your option) any later version.
+        Permission is hereby granted, free of charge, to any person obtaining a copy
+        of this software and associated documentation files (the "Software"), to deal
+        in the Software without restriction, including without limitation the rights
+        to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+        copies of the Software, and to permit persons to whom the Software is
+        furnished to do so, subject to the following conditions:
 
-        The JAMS Python package is distributed in the hope that it will be useful,
-        but WITHOUT ANY WARRANTY; without even the implied warranty of
-        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-        GNU Lesser General Public License for more details.
+        The above copyright notice and this permission notice shall be included in all
+        copies or substantial portions of the Software.
 
-        You should have received a copy of the GNU Lesser General Public License
-        along with the JAMS Python package (cf. gpl.txt and lgpl.txt).
-        If not, see <http://www.gnu.org/licenses/>.
+        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+        IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+        FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+        AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+        LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+        OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+        SOFTWARE.
 
         Copyright 2014-2015 Matthias Cuntz
 

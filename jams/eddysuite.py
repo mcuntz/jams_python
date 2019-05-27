@@ -4,16 +4,30 @@ from jams import eddybox as eb
 from jams.timestepcheck import timestepcheck
 
 '''
-	Example file for processing Eddy Covariance data with eddybox and EddySoft.
+    Example file for processing Eddy Covariance data with eddybox and EddySoft.
 
 
     License
     -------
-    This file is part of the JAMS Python library.
+    This file is part of the JAMS Python package.
 
-    It is NOT released under the GNU Lesser General Public License, yet.
+    Permission is hereby granted, free of charge, to any person obtaining a copy
+    of this software and associated documentation files (the "Software"), to deal
+    in the Software without restriction, including without limitation the rights
+    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+    copies of the Software, and to permit persons to whom the Software is
+    furnished to do so, subject to the following conditions:
 
-    If you use this routine, please contact Arndt Piayda.
+    The above copyright notice and this permission notice shall be included in all
+    copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+    SOFTWARE.
 
     Copyright 2014 Arndt Piayda, Matthias Cuntz
 
@@ -25,22 +39,22 @@ from jams.timestepcheck import timestepcheck
 
 '''
 0. Folder structure for eddy data processing:
-e.g. |-2013				:containing everything
-       |-config			:containg log and config files
-       |-flux			:for final fluxes
-         |-itc			:for itc plots
-         |-spike			:for spike plots
-         |-ustar			:for ustar plots and thresholds
-       |-lags			:for lags from eddycorr and plots
-       |-meteo			:containing meteo files
-       |-online			:containing online calculated files (unused)
+e.g. |-2013                             :containing everything
+       |-config                 :containg log and config files
+       |-flux                   :for final fluxes
+         |-itc                  :for itc plots
+         |-spike                        :for spike plots
+         |-ustar                        :for ustar plots and thresholds
+       |-lags                   :for lags from eddycorr and plots
+       |-meteo                  :containing meteo files
+       |-online                 :containing online calculated files (unused)
        |-profile         :containing profile data
-       |-pfit			:for planar fit plots and files
-       |-raw				:for uncorrected raw fluxes
-       |-slt				:containing slt files
-         |-deleted		:for slts to small
-       |-spec			:for inductance files and plots
-       eddysuite.py		:this file
+       |-pfit                   :for planar fit plots and files
+       |-raw                            :for uncorrected raw fluxes
+       |-slt                            :containing slt files
+         |-deleted              :for slts to small
+       |-spec                   :for inductance files and plots
+       eddysuite.py             :this file
 '''
 
 '''

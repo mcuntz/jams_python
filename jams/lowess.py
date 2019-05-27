@@ -28,8 +28,6 @@ All rights reserved.
 
 License
 =======
-The MIT License (MIT)
-
 Copyright (c) 2015 Ariel Rokem
 
 Permission is hereby granted, free of charge, to any person obtaining a copy

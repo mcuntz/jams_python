@@ -79,328 +79,23 @@ def read_data(files, undef=-9999., strip=None, norecord=False, nofill=False):
         -------
         This file is part of the JAMS Python package.
 
-        The JAMS Python package is free software: you can redistribute it and/or modify
-        it under the terms of the GNU Lesser General Public License as published by
-        the Free Software Foundation, either version 3 of the License, or
-        (at your option) any later version.
+        Permission is hereby granted, free of charge, to any person obtaining a copy
+        of this software and associated documentation files (the "Software"), to deal
+        in the Software without restriction, including without limitation the rights
+        to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+        copies of the Software, and to permit persons to whom the Software is
+        furnished to do so, subject to the following conditions:
 
-        The JAMS Python package is distributed in the hope that it will be useful,
-        but WITHOUT ANY WARRANTY; without even the implied warranty of
-        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-        GNU Lesser General Public License for more details.
+        The above copyright notice and this permission notice shall be included in all
+        copies or substantial portions of the Software.
 
-        You should have received a copy of the GNU Lesser General Public License
-        along with the JAMS Python package (cf. gpl.txt and lgpl.txt).
-        If not, see <http://www.gnu.org/licenses/>.
-
-        Copyright 2015-2016 Matthias Cuntz
-
-
-        History
-        -------
-        Written,  MC, Mar 2015
-        Modified, MC, May 2015 - different variable in different input files
-                               - strip
-                               - norecord
-                               - nofill
-                  MC, Nov 2017 - assert files is iterable except string
-    """
-
-    debug = False
-    iundef = np.int(undef)
-    if not isinstance(files, (list, tuple, np.ndarray)): files = [files]
-
-    # Get unique header and time stamps of all input file
-    for cff, ff in enumerate(files):
-        ihead = jams.fread(ff, skip=1, strip=strip, header=True)        # head with TIMESTAMP and RECORD
-        if not norecord:
-            if (ihead[1].split()[0]).lower() != 'record':
-                raise ValueError('Assume the following structure: Date, Record, data, flag, data, flag, ...')
-        idate = jams.sread(ff, skip=1, nc=1, squeeze=True, strip=strip) # TIMESTAMP
-        idate = jams.ascii2eng(idate, full=True)
-        if cff == 0:
-            if norecord:
-                hdat   = ihead[1::2]
-                hflags = ihead[2::2]
-            else:
-                hdat   = ihead[2::2]
-                hflags = ihead[3::2]
-            adate  = idate
-        else:
-            if norecord:
-                hdat   += ihead[1::2]
-                hflags += ihead[2::2]
-            else:
-                hdat   += ihead[2::2]
-                hflags += ihead[3::2]
-            adate  += idate
-    hdat   = list(OrderedDict.fromkeys(hdat))   # unique data head
-    hflags = list(OrderedDict.fromkeys(hflags)) # unique flags head
-    adate  = list(OrderedDict.fromkeys(adate))  # unique dates
-    ii     = jams.argsort(hdat)
-    hdat   = [ hdat[i] for i in ii ]
-    hflags = [ hflags[i] for i in ii ]
-    adate.sort()
-
-    # Fill missing time steps in all time steps
-    if not nofill:
-        date  = jams.date2dec(eng=adate)
-        dd    = np.round(np.diff(date)*24.*60.).astype(np.int) # minutes between time steps
-        dmin  = np.amin(dd)                                    # time step in minutes
-        dt    = np.float(dmin)/(24.*60.)                       # time step in fractional day
-        igaps = np.where(dd != dmin)[0]                        # indexes of gaps
-        for i in igaps[::-1]:
-            nt      = np.round((date[i+1]-date[i])/dt).astype(np.int) # # of missing dates
-            newdate = (date[i]+np.arange(1,nt)*dt)[::-1]              # the missing dates in reverse order
-            for j in range(nt-1):
-                date.insert(i+1, newdate[j]) # fill in missing dates, last one first
-        adate = jams.dec2date(date, eng=True)
-
-    # Read files and fill in output array
-    nrow   = len(adate)
-    ncol   = len(hdat)
-    dat    = np.ones((nrow,ncol))*undef # output array without
-    flags  = np.ones((nrow,ncol), dtype=np.int)*iundef           # output array
-    if not norecord: record = np.ones(nrow, dtype=np.int)*iundef # output array
-    iidate = list()                     # list with indices of dates in dat/flag/record arrays
-    iihead = list()                     # list with indices of header in hdat/hflags lists
-    for cff, ff in enumerate(files):
-        if debug: print('File name: ', ff)
-        # date, data
-        isdat, ssdat = jams.fsread(ff, skip=1, snc=[0], nc=-1, strip=strip, strarr=True) # array
-        isdate = ssdat[:,0]
-        if norecord:
-            idat    = isdat[:,0::2]
-            iflags  = isdat[:,1::2].astype(np.int)
-        else:
-            irecord = isdat[:,0].astype(np.int)
-            idat    = isdat[:,1::2]
-            iflags  = isdat[:,2::2].astype(np.int)
-        isdate  = jams.ascii2eng(isdate, full=True)
-        # date header, data header
-        ihead, shead = jams.fsread(ff, skip=1, snc=[0], nc=-1, strip=strip, header=True) # list
-        ihdate   = shead[0]
-        if norecord:
-            ihdat    = ihead[0::2]
-            ihflags  = ihead[1::2]
-        else:
-            ihrecord = ihead[0]
-            ihdat    = ihead[1::2]
-            ihflags  = ihead[2::2]
-        # date and record header
-        if cff == 0:
-            hdate   = ihdate
-            if not norecord: hrecord = ihrecord
-        else:
-            if norecord:
-                if (ihdate != hdate):
-                    raise ValueError('Assume the same date headers.')
-            else:
-                if (ihdate != hdate) or (ihrecord != hrecord):
-                    raise ValueError('Assume the same date and record headers.')
-
-        # fill output arrays and index lists
-        iiidate = np.where(np.in1d(adate,isdate))[0]  # indexes in dat/flags of time steps in current file
-        if debug:
-            def findDuplicates(l):      # this function returns all duplicates in a list
-                return list([x for x in l if l.count(x) > 1])
-
-            print('Numbers should match: ', iiidate.size, idat.shape[0])
-            print('duplicate dates: ',findDuplicates(list(isdate)))
-            # print('Current time steps:  ', len(isdate), [ aa for aa in isdate ])
-            # print('Selected time steps: ', len(iiidate), [ adate[aa] for aa in iiidate ])                
-
-        iidate.append(iiidate)
-        if not norecord: record[iiidate] = irecord[:] # write at appropriate places in record
-        iiihead = list()
-        for i, h in enumerate(ihdat):
-            hh = hdat.index(h)
-            iiihead.extend([hh])
-            dat[iiidate, hh]   = idat[:,i]            # write at appropriate places in dat
-            flags[iiidate, hh] = iflags[:,i]          # write at appropriate places in flags
-        iihead.append(iiihead)
-
-    if norecord:
-        return adate, dat, flags, iidate, hdate, hdat, hflags, iihead
-    else:
-        return adate, record, dat, flags, iidate, hdate, hrecord, hdat, hflags, iihead
-
-# --------------------------------------------------------------------
-
-def write_data(*args):
-    """
-        Write concatenated data back to individual CHS level1 data files.
-
-        Wrapper to write_data_norecord and write_data_record.
-
-
-        Definition
-        ----------
-        def write_data(infiles, sdate, record, dat, flags, iidate, hdate, hrecord, hdat, hflags, iihead):
-        or
-        def write_data(infiles, sdate, dat, flags, iidate, hdate, hdat, hflags, iihead):
-
-
-        Input
-        -----
-        infiles   (nfile,)-list with CHS data level1 file names
-        sdate     (n,)-array of ascii dates in format YYYY-MM-DD hh:mm:ss
-        [record   (n,)-array of record number]
-        dat       (n,m)-array of data
-        flags     (n,m)-array of flags
-        iidate    (nfile,)-list with indices in the output arrays of the input files
-        hdate     date/time header
-        [hrecord  record header]
-        hdat      data headers
-        hflags    flags headers
-        iihead    (nfile,)-list with indices in the output array of headers in the input files
-
-
-        Output
-        ------
-        files will be overwritten
-
-
-        Examples
-        --------
-        --> see __init__.py for full example of workflow
-
-        # Read data
-        files = jams.files_from_gui(title='Choose Level 1 file(s)')
-        sdate, record, dat, flags, iidate, hdate, hrecord, hdat, hflags, iihead = jams.level1.read_data(files)
-
-        # Set flags if variables were not treated yet
-        flags[:,idx] = np.where(flags[:,idx]==np.int(undef), 9, flags[:,idx])
-
-        # Write back data
-        jams.level1.write_data(files, sdate, record, dat, flags, iidate, hdate, hrecord, hdat, hflags, iihead)
-
-
-        # Read data
-        files = jams.files_from_gui(title='Choose Level 1 file(s)')
-        sdate, dat, flags, iidate, hdate, hdat, hflags, iihead = jams.level1.read_data(files, norecord=True)
-
-        # Set flags if variables were not treated yet
-        flags[:,idx] = np.where(flags[:,idx]==np.int(undef), 9, flags[:,idx])
-
-        # Write back data
-        jams.level1.write_data(files, sdate, dat, flags, iidate, hdate, hdat, hflags, iihead)
-
-        License
-        -------
-        This file is part of the JAMS Python package.
-
-        The JAMS Python package is free software: you can redistribute it and/or modify
-        it under the terms of the GNU Lesser General Public License as published by
-        the Free Software Foundation, either version 3 of the License, or
-        (at your option) any later version.
-
-        The JAMS Python package is distributed in the hope that it will be useful,
-        but WITHOUT ANY WARRANTY; without even the implied warranty of
-        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-        GNU Lesser General Public License for more details.
-
-        You should have received a copy of the GNU Lesser General Public License
-        along with the JAMS Python package (cf. gpl.txt and lgpl.txt).
-        If not, see <http://www.gnu.org/licenses/>.
-
-        Copyright 2015 Matthias Cuntz
-
-
-        History
-        -------
-        Written,  MC, May 2015
-    """
-    if len(args) == 9:
-        write_data_norecord(*args)
-    elif len(args) == 11:
-        write_data_record(*args)
-    else:
-        raise ValueError('Must have 9 or 11 arguments.')
-
-# --------------------------------------------------------------------
-
-def write_data_dmp(*args):
-    """
-        Write data to individual Tereno Level2b files.
-
-        Wrapper to write_data_norecord_dmp.
-
-
-        Definition
-        ----------
-        def write_data_dmp(infiles, sdate, record, dat, flags, iidate, hdate, hrecord, hdat, hflags, iihead, hdmp):
-        or
-        def write_data_dmp(infiles, sdate, dat, flags, iidate, hdate, hdat, hflags, iihead, hdmp):
-
-
-        Input
-        -----
-        infiles   (nfile,)-list with CHS data level1 file names
-        sdate     (n,)-array of ascii dates in format YYYY-MM-DD hh:mm:ss
-        [record   (n,)-array of record number]
-        dat       (n,m)-array of data
-        flags     (n,m)-array of flags
-        iidate    (nfile,)-list with indices in the output arrays of the input files
-        hdate     date/time header
-        [hrecord  record header]
-        hdat      data headers
-        hflags    flags headers
-        iihead    (nfile,)-list with indices in the output array of headers in the input files
-        hdmp      data headers in Data Management Portal (DMP)
-
-
-        Output
-        ------
-        files will be overwritten
-
-
-        Examples
-        --------
-        --> see __init__.py for full example of workflow
-
-        # Read data
-        files = jams.files_from_gui(title='Choose Level 1 file(s)')
-        sdate, record, dat, flags, iidate, hdate, hrecord, hdat, hflags, iihead = jams.level1.read_data(files)
-
-        # Set flags if variables were not treated yet
-        flags[:,idx] = np.where(flags[:,idx]==np.int(undef), 9, flags[:,idx])
-
-        # Write back data
-        ofiles = [ f.replace('level2','level2b') for f in files ]
-        hdmp = jams.level1.get_value_excel(chsxlsfile, sheet, hdat, 'headerout (DB)')
-        jams.level1.write_data_dmp(ofiles, sdate, record, dat, flags, iidate, hdate, hrecord, hdat, hflags, iihead, hdmp)
-
-
-        # Read data
-        files = jams.files_from_gui(title='Choose Level 1 file(s)')
-        sdate, dat, flags, iidate, hdate, hdat, hflags, iihead = jams.level1.read_data(files, norecord=True)
-
-        # Set flags if variables were not treated yet
-        flags[:,idx] = np.where(flags[:,idx]==np.int(undef), 9, flags[:,idx])
-
-        # Write back data
-        ofiles = [ f.replace('level2','level2b') for f in files ]
-        hdmp = jams.level1.get_value_excel(chsxlsfile, sheet, hdat, 'headerout (DB)')
-        jams.level1.write_data_dmp(ofiles, sdate, dat, flags, iidate, hdate, hdat, hflags, iihead, hdmp)
-
-        License
-        -------
-        This file is part of the JAMS Python package.
-
-        The JAMS Python package is free software: you can redistribute it and/or modify
-        it under the terms of the GNU Lesser General Public License as published by
-        the Free Software Foundation, either version 3 of the License, or
-        (at your option) any later version.
-
-        The JAMS Python package is distributed in the hope that it will be useful,
-        but WITHOUT ANY WARRANTY; without even the implied warranty of
-        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-        GNU Lesser General Public License for more details.
-
-        You should have received a copy of the GNU Lesser General Public License
-        along with the JAMS Python package (cf. gpl.txt and lgpl.txt).
-        If not, see <http://www.gnu.org/licenses/>.
+        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+        IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+        FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+        AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+        LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+        OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+        SOFTWARE.
 
         Copyright 2015 Matthias Cuntz
 
@@ -487,19 +182,23 @@ def write_data_dmp_size(*args):
         -------
         This file is part of the JAMS Python package.
 
-        The JAMS Python package is free software: you can redistribute it and/or modify
-        it under the terms of the GNU Lesser General Public License as published by
-        the Free Software Foundation, either version 3 of the License, or
-        (at your option) any later version.
+        Permission is hereby granted, free of charge, to any person obtaining a copy
+        of this software and associated documentation files (the "Software"), to deal
+        in the Software without restriction, including without limitation the rights
+        to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+        copies of the Software, and to permit persons to whom the Software is
+        furnished to do so, subject to the following conditions:
 
-        The JAMS Python package is distributed in the hope that it will be useful,
-        but WITHOUT ANY WARRANTY; without even the implied warranty of
-        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-        GNU Lesser General Public License for more details.
+        The above copyright notice and this permission notice shall be included in all
+        copies or substantial portions of the Software.
 
-        You should have received a copy of the GNU Lesser General Public License
-        along with the JAMS Python package (cf. gpl.txt and lgpl.txt).
-        If not, see <http://www.gnu.org/licenses/>.
+        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+        IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+        FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+        AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+        LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+        OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+        SOFTWARE.
 
         Copyright 2015 Matthias Cuntz
 
@@ -582,19 +281,23 @@ def write_data_one_file(*args):
         -------
         This file is part of the JAMS Python package.
 
-        The JAMS Python package is free software: you can redistribute it and/or modify
-        it under the terms of the GNU Lesser General Public License as published by
-        the Free Software Foundation, either version 3 of the License, or
-        (at your option) any later version.
+        Permission is hereby granted, free of charge, to any person obtaining a copy
+        of this software and associated documentation files (the "Software"), to deal
+        in the Software without restriction, including without limitation the rights
+        to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+        copies of the Software, and to permit persons to whom the Software is
+        furnished to do so, subject to the following conditions:
 
-        The JAMS Python package is distributed in the hope that it will be useful,
-        but WITHOUT ANY WARRANTY; without even the implied warranty of
-        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-        GNU Lesser General Public License for more details.
+        The above copyright notice and this permission notice shall be included in all
+        copies or substantial portions of the Software.
 
-        You should have received a copy of the GNU Lesser General Public License
-        along with the JAMS Python package (cf. gpl.txt and lgpl.txt).
-        If not, see <http://www.gnu.org/licenses/>.
+        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+        IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+        FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+        AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+        LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+        OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+        SOFTWARE.
 
         Copyright 2016 Matthias Cuntz
 
@@ -659,19 +362,23 @@ def write_data_norecord(infiles, sdate, dat, flags, iidate, hdate, hdat, hflags,
         -------
         This file is part of the JAMS Python package.
 
-        The JAMS Python package is free software: you can redistribute it and/or modify
-        it under the terms of the GNU Lesser General Public License as published by
-        the Free Software Foundation, either version 3 of the License, or
-        (at your option) any later version.
+        Permission is hereby granted, free of charge, to any person obtaining a copy
+        of this software and associated documentation files (the "Software"), to deal
+        in the Software without restriction, including without limitation the rights
+        to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+        copies of the Software, and to permit persons to whom the Software is
+        furnished to do so, subject to the following conditions:
 
-        The JAMS Python package is distributed in the hope that it will be useful,
-        but WITHOUT ANY WARRANTY; without even the implied warranty of
-        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-        GNU Lesser General Public License for more details.
+        The above copyright notice and this permission notice shall be included in all
+        copies or substantial portions of the Software.
 
-        You should have received a copy of the GNU Lesser General Public License
-        along with the JAMS Python package (cf. gpl.txt and lgpl.txt).
-        If not, see <http://www.gnu.org/licenses/>.
+        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+        IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+        FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+        AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+        LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+        OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+        SOFTWARE.
 
         Copyright 2015 Matthias Cuntz
 
@@ -768,19 +475,23 @@ def write_data_norecord_dmp(infiles, sdate, dat, flags, iidate, hdate, hdat, hfl
         -------
         This file is part of the JAMS Python package.
 
-        The JAMS Python package is free software: you can redistribute it and/or modify
-        it under the terms of the GNU Lesser General Public License as published by
-        the Free Software Foundation, either version 3 of the License, or
-        (at your option) any later version.
+        Permission is hereby granted, free of charge, to any person obtaining a copy
+        of this software and associated documentation files (the "Software"), to deal
+        in the Software without restriction, including without limitation the rights
+        to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+        copies of the Software, and to permit persons to whom the Software is
+        furnished to do so, subject to the following conditions:
 
-        The JAMS Python package is distributed in the hope that it will be useful,
-        but WITHOUT ANY WARRANTY; without even the implied warranty of
-        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-        GNU Lesser General Public License for more details.
+        The above copyright notice and this permission notice shall be included in all
+        copies or substantial portions of the Software.
 
-        You should have received a copy of the GNU Lesser General Public License
-        along with the JAMS Python package (cf. gpl.txt and lgpl.txt).
-        If not, see <http://www.gnu.org/licenses/>.
+        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+        IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+        FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+        AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+        LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+        OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+        SOFTWARE.
 
         Copyright 2016 Matthias Cuntz
 
@@ -889,19 +600,23 @@ def write_data_norecord_dmp_size(infiles, sdate, dat, flags, iidate, hdate, hdat
         -------
         This file is part of the JAMS Python package.
 
-        The JAMS Python package is free software: you can redistribute it and/or modify
-        it under the terms of the GNU Lesser General Public License as published by
-        the Free Software Foundation, either version 3 of the License, or
-        (at your option) any later version.
+        Permission is hereby granted, free of charge, to any person obtaining a copy
+        of this software and associated documentation files (the "Software"), to deal
+        in the Software without restriction, including without limitation the rights
+        to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+        copies of the Software, and to permit persons to whom the Software is
+        furnished to do so, subject to the following conditions:
 
-        The JAMS Python package is distributed in the hope that it will be useful,
-        but WITHOUT ANY WARRANTY; without even the implied warranty of
-        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-        GNU Lesser General Public License for more details.
+        The above copyright notice and this permission notice shall be included in all
+        copies or substantial portions of the Software.
 
-        You should have received a copy of the GNU Lesser General Public License
-        along with the JAMS Python package (cf. gpl.txt and lgpl.txt).
-        If not, see <http://www.gnu.org/licenses/>.
+        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+        IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+        FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+        AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+        LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+        OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+        SOFTWARE.
 
         Copyright 2016 Matthias Cuntz
 
@@ -1037,19 +752,23 @@ def write_data_norecord_one_file(infile, sdate, dat, flags, hdate, hdat, hflags)
         -------
         This file is part of the JAMS Python package.
 
-        The JAMS Python package is free software: you can redistribute it and/or modify
-        it under the terms of the GNU Lesser General Public License as published by
-        the Free Software Foundation, either version 3 of the License, or
-        (at your option) any later version.
+        Permission is hereby granted, free of charge, to any person obtaining a copy
+        of this software and associated documentation files (the "Software"), to deal
+        in the Software without restriction, including without limitation the rights
+        to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+        copies of the Software, and to permit persons to whom the Software is
+        furnished to do so, subject to the following conditions:
 
-        The JAMS Python package is distributed in the hope that it will be useful,
-        but WITHOUT ANY WARRANTY; without even the implied warranty of
-        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-        GNU Lesser General Public License for more details.
+        The above copyright notice and this permission notice shall be included in all
+        copies or substantial portions of the Software.
 
-        You should have received a copy of the GNU Lesser General Public License
-        along with the JAMS Python package (cf. gpl.txt and lgpl.txt).
-        If not, see <http://www.gnu.org/licenses/>.
+        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+        IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+        FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+        AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+        LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+        OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+        SOFTWARE.
 
         Copyright 2016 Matthias Cuntz
 
@@ -1136,19 +855,23 @@ def write_data_record(infiles, sdate, record, dat, flags, iidate, hdate, hrecord
         -------
         This file is part of the JAMS Python package.
 
-        The JAMS Python package is free software: you can redistribute it and/or modify
-        it under the terms of the GNU Lesser General Public License as published by
-        the Free Software Foundation, either version 3 of the License, or
-        (at your option) any later version.
+        Permission is hereby granted, free of charge, to any person obtaining a copy
+        of this software and associated documentation files (the "Software"), to deal
+        in the Software without restriction, including without limitation the rights
+        to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+        copies of the Software, and to permit persons to whom the Software is
+        furnished to do so, subject to the following conditions:
 
-        The JAMS Python package is distributed in the hope that it will be useful,
-        but WITHOUT ANY WARRANTY; without even the implied warranty of
-        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-        GNU Lesser General Public License for more details.
+        The above copyright notice and this permission notice shall be included in all
+        copies or substantial portions of the Software.
 
-        You should have received a copy of the GNU Lesser General Public License
-        along with the JAMS Python package (cf. gpl.txt and lgpl.txt).
-        If not, see <http://www.gnu.org/licenses/>.
+        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+        IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+        FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+        AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+        LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+        OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+        SOFTWARE.
 
         Copyright 2015 Matthias Cuntz
 
@@ -1246,19 +969,23 @@ def write_data_record_one_file(infile, sdate, record, dat, flags, hdate, hrecord
         -------
         This file is part of the JAMS Python package.
 
-        The JAMS Python package is free software: you can redistribute it and/or modify
-        it under the terms of the GNU Lesser General Public License as published by
-        the Free Software Foundation, either version 3 of the License, or
-        (at your option) any later version.
+        Permission is hereby granted, free of charge, to any person obtaining a copy
+        of this software and associated documentation files (the "Software"), to deal
+        in the Software without restriction, including without limitation the rights
+        to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+        copies of the Software, and to permit persons to whom the Software is
+        furnished to do so, subject to the following conditions:
 
-        The JAMS Python package is distributed in the hope that it will be useful,
-        but WITHOUT ANY WARRANTY; without even the implied warranty of
-        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-        GNU Lesser General Public License for more details.
+        The above copyright notice and this permission notice shall be included in all
+        copies or substantial portions of the Software.
 
-        You should have received a copy of the GNU Lesser General Public License
-        along with the JAMS Python package (cf. gpl.txt and lgpl.txt).
-        If not, see <http://www.gnu.org/licenses/>.
+        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+        IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+        FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+        AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+        LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+        OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+        SOFTWARE.
 
         Copyright 2016 Matthias Cuntz
 

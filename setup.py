@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+from __future__ import division, absolute_import, print_function
 """
 jams: JAMS Python Utilities
 
@@ -7,7 +8,7 @@ such as reading different file formats, julian date routines, or meteorological 
 
 It has several subpackages offering constants, working with Eddy covariance data and EddySoft,
     offering special functions, or objective functions be used with scipy.optimize.fmin or scipy.optimize.curvefit,
-    and much more
+    and much more.
 """
 DOCLINES = __doc__.split("\n")
 
@@ -22,7 +23,7 @@ Development Status :: 5 - Production/Stable
 Intended Audience :: Developers
 Intended Audience :: End Users/Desktop
 Intended Audience :: Science/Research
-License :: OSI Approved :: GNU Lesser General Public License v3 or later (LGPLv3+)
+License :: OSI Approved :: MIT License
 Natural Language :: English
 Operating System :: MacOS
 Operating System :: MacOS :: MacOS X
@@ -38,11 +39,11 @@ Topic :: Software Development
 Topic :: Utilities
 """
 
-MAJOR               = 4
-MINOR               = 1
+MAJOR               = 5
+MINOR               = 0
 MICRO               = 0
 ISRELEASED          = True
-VERSION             = '%d.%d.%d' % (MAJOR, MINOR, MICRO)
+VERSION             = '{:d}.{:d}.{:d}'.format(MAJOR, MINOR, MICRO)
 
 from setuptools import setup, find_packages
 
@@ -57,7 +58,7 @@ metadata = dict(
     url = "https://bitbucket.org/mcuntz/jams_python",
     author = "JAMS = Juliane Mai, Matthias Cuntz, Stephan Thober",
     author_email = "mc (at) macu (dot) de",
-    license = 'LGPL -  see LICENSE',
+    license = 'MIT -  see LICENSE',
     classifiers=[_f for _f in CLASSIFIERS.split('\n') if _f],
     platforms = ["Windows", "Linux", "Solaris", "Mac OS-X", "Unix"],
     include_package_data=True,

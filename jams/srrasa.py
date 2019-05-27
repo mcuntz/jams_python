@@ -51,143 +51,23 @@ def srrasa(xy, strata=5, n=3, plot=False):
         -------
         This file is part of the JAMS Python package.
 
-        It is NOT released under the GNU Lesser General Public License, yet.
+        Permission is hereby granted, free of charge, to any person obtaining a copy
+        of this software and associated documentation files (the "Software"), to deal
+        in the Software without restriction, including without limitation the rights
+        to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+        copies of the Software, and to permit persons to whom the Software is
+        furnished to do so, subject to the following conditions:
 
-        If you use this routine, please contact Arndt Piayda.
+        The above copyright notice and this permission notice shall be included in all
+        copies or substantial portions of the Software.
 
-        Copyright 2012-2013 Arndt Piayda, Matthias Cuntz
-
-
-        History
-        -------
-        Written,  AP, Nov 2012
-        Modified, MC, Nov 2012 - default plot=False
-                  AP, Dec 2012 - documentation change
-                  MC, Feb 2013 - docstring
-                  MC, Feb 2013 - ported to Python 3
-    """
-
-    # calculate strata steps
-    sw = (xy[1]-xy[0])/strata
-    sh = (xy[3]-xy[2])/strata
-    xsteps = np.arange(xy[0],xy[1]+sw,sw)
-    ysteps = np.arange(xy[2],xy[3]+sh,sh)
-
-    # make output array
-    rand_xy = np.empty((strata**2*n,2))
-
-    # throw random points in each strata
-    for j in range(strata):
-        for i in range(strata):
-            rand_xy[i*n+strata*n*j:(i+1)*n+strata*n*j,0] = (xsteps[i+1] - xsteps[i])*np.random.random(n) + xsteps[i]
-            rand_xy[i*n+strata*n*j:(i+1)*n+strata*n*j,1] = (ysteps[j+1] - ysteps[j])*np.random.random(n) + ysteps[j]
-
-    # plot stratas and random points within
-    if plot:
-        import matplotlib as mpl
-        import matplotlib.pyplot as plt
-        mpl.rc('font', size=20)
-        mpl.rc('lines', linewidth=2)
-        mpl.rc('axes', linewidth=1.5)
-        mpl.rc('xtick.major', width=1.5)
-        mpl.rc('ytick.major', width=1.5)
-        mpl.rcParams['lines.markersize']=6
-
-        fig = plt.figure('stratified random sampling')
-        sub = fig.add_subplot(111, aspect='equal')
-        sub.set_xlim(xy[0],xy[1])
-        sub.set_ylim(xy[2],xy[3])
-        for i in range(strata):
-            sub.axhline(y=ysteps[i], color=(166/256., 206/256., 227/256.))
-            sub.axvline(x=xsteps[i], color=(166/256., 206/256., 227/256.))
-        sub.scatter(rand_xy[:,0],rand_xy[:,1],marker='+', s=60,
-                    color=( 51/256., 160/256.,  44/256.))
-        sub.set_xlabel('X')
-        sub.set_ylabel('Y')
-        sub.set_title('strata = %i, n = %i' %(strata,n))
-        sub.xaxis.set_major_formatter(mpl.ticker.
-                                      ScalarFormatter(useOffset=False))
-        sub.yaxis.set_major_formatter(mpl.ticker.
-                                      ScalarFormatter(useOffset=False))
-        fig.autofmt_xdate(rotation=45)
-        plt.tight_layout(pad=1, h_pad=0, w_pad=0)
-        plt.show()
-
-    return rand_xy
-
-
-
-def srrasa_trans(xy,strata=5,n=3,num=3,rl=0.5,silent=True,plot=False):
-
-    """
-        Generates stratified random 2D transects within a given rectangular
-        area.
-
-
-        Definition
-        ----------
-        def srrasa(xy,strata=5,n=3,num=3,rl=0.5,silent=True,plot=False):
-
-
-        Input
-        -----
-        xy          list of floats (4), list with the x and y coordinates
-                    enclosing the designated rectangle in the form [x1,x2,y1,y2]
-
-
-        Optional Input
-        --------------
-        strata      int, number of strata per axis
-        n           int, number of random transects in each strata
-        num         int, number of points in each transect
-        rl          float [0. to 1.], relative length of transect with respect
-                    to width of stratum
-        silent      bool, if False, runtime diagnostics are printed to the
-                    console, otherwise not
-        plot        bool, if True, stratas and points are plotted,
-                    otherwise not
-
-
-        Output
-        ------
-        rand_xy     ndarray (n,2), x and y coordinates of the stratified random
-                    transect points in the given rectangular.
-
-
-        Examples
-        --------
-        >>> # seed for reproducible results in doctest
-        >>> np.random.seed(1)
-        >>> # gives within the rectangle of the given coordinates
-        >>> # 16 (4**2) stratas with 3 random transects in each one.
-        >>> # Each transect is 0.5*width_of_strata long and contains 5 points logarithmical distributed.
-        >>> rand_xy = srrasa_trans([652219.,652290.,5772970.,5773040.], strata=4,
-        ...                        n=3, num=5, rl=0.5, silent=True, plot=False)
-        >>> from autostring import astr
-        >>> print(astr(rand_xy[0:4,0:2],6,pp=True))
-        [['6.522264e+05' '5.772983e+06']
-         ['6.522276e+05' '5.772983e+06']
-         ['6.522292e+05' '5.772983e+06']
-         ['6.522315e+05' '5.772983e+06']]
-
-
-        License
-        -------
-        This file is part of the JAMS Python package.
-
-        The JAMS Python package is free software: you can redistribute it and/or
-        modify it under the terms of the GNU Lesser General Public License as
-        published by the Free Software Foundation, either version 3 of the License,
-        or (at your option) any later version.
-
-        The JAMS Python package is distributed in the hope that it will be useful,
-        but WITHOUT ANY WARRANTY; without even the implied warranty of
-        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-        GNU Lesser General Public License for more details.
-
-        You should have received a copy of the GNU Lesser General Public License
-        along with the JAMS Python package (cf. gpl.txt and lgpl.txt).
-        If not, see <http://www.gnu.org/licenses/>.
+        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+        IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+        FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+        AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+        LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+        OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+        SOFTWARE.
 
         Copyright 2012-2013 Arndt Piayda, Matthias Cuntz
 

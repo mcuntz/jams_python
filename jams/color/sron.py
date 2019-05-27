@@ -163,182 +163,23 @@ def sron_colors(cmap='palette1', ncol=9, cname=None, rgb=False, rgb256=False, re
         -------
         This file is part of the JAMS Python package.
 
-        The JAMS Python package is free software: you can redistribute it and/or modify
-        it under the terms of the GNU Lesser General Public License as published by
-        the Free Software Foundation, either version 3 of the License, or
-        (at your option) any later version.
+        Permission is hereby granted, free of charge, to any person obtaining a copy
+        of this software and associated documentation files (the "Software"), to deal
+        in the Software without restriction, including without limitation the rights
+        to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+        copies of the Software, and to permit persons to whom the Software is
+        furnished to do so, subject to the following conditions:
 
-        The JAMS Python package is distributed in the hope that it will be useful,
-        but WITHOUT ANY WARRANTY; without even the implied warranty of
-        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-        GNU Lesser General Public License for more details.
+        The above copyright notice and this permission notice shall be included in all
+        copies or substantial portions of the Software.
 
-        You should have received a copy of the GNU Lesser General Public License
-        along with the JAMS Python package (cf. gpl.txt and lgpl.txt).
-        If not, see <http://www.gnu.org/licenses/>.
-
-        Copyright 2016 Matthias Cuntz
-
-
-        History
-        -------
-        Written,  MC, May 2016
-    """
-    from jams.color import hex2rgb01
-    
-    if cmap.lower() == 'palette1':
-        assert (ncol>0) and (ncol<13), 'palette1 has 1-12 colours.'
-        cols = []
-        for i in palette1[ncol-1]:
-            cols.append(tuple(hex2rgb01(i)))
-    elif cmap.lower() == 'palette2':
-        cols = []
-        for i in range(7):
-            cols.append(tuple(hex2rgb01(palette2_light[i])))
-            cols.append(tuple(hex2rgb01(palette2_medium[i])))
-            cols.append(tuple(hex2rgb01(palette2_dark[i])))
-    elif cmap.lower() == 'palette2-light':
-        cols = []
-        for i in palette2_light:
-            cols.append(tuple(hex2rgb01(i)))
-    elif cmap.lower() == 'palette2-medium':
-        cols = []
-        for i in palette2_medium:
-            cols.append(tuple(hex2rgb01(i)))
-    elif cmap.lower() == 'palette2-dark':
-        cols = []
-        for i in palette2_dark:
-            cols.append(tuple(hex2rgb01(i)))
-    elif cmap.lower() == 'grey' or cmap.lower() == 'gray':
-        cols = []
-        for i in greysafe:
-            cols.append(tuple(hex2rgb01(i)))
-    elif cmap.lower() == 'ylorbr':
-        assert (ncol>2) and (ncol<10), 'ylorbr has 3-9 colours.'
-        cols = []
-        for i in palette_ylorbr[ncol-3]:
-            cols.append(tuple(hex2rgb01(i)))
-    elif cmap.lower() == 'buylrd':
-        assert (ncol>2) and (ncol<12), 'buylrd has 3-11 colours.'
-        cols = []
-        for i in palette_buylrd[ncol-3]:
-            cols.append(tuple(hex2rgb01(i)))
-    elif cmap.lower() == 'rainbow':
-        assert (ncol>3) and (ncol<13), 'rainbow has 4-12 colours.'
-        cols = []
-        for i in palette_rainbow[ncol-4]:
-            cols.append(tuple(hex2rgb01(i)))
-    elif cmap.lower() == 'banded-rainbow':
-        if ncol==14:
-            psel = palette_rainbow_band[0]
-        elif ncol==15:
-            psel = palette_rainbow_band[1]
-        elif ncol==18:
-            psel = palette_rainbow_band[2]
-        elif ncol==21:
-            psel = palette_rainbow_band[3]
-        else:
-            raise ValueError('banded-rainbow palette has 14, 15, 18, or 21 colours.')
-        cols = []
-        for i in psel:
-            cols.append(tuple(hex2rgb01(i)))
-    else:
-        raise ValueError('Colour palette not known: '+cmap)
-            
-    if reverse: cols = cols[::-1]
-        
-    if (not rgb) and (not rgb256):
-        from matplotlib.colors import ListedColormap
-        ccmap = ListedColormap(cols)
-        if cname:
-            from matplotlib.cm import register_cmap, get_cmap
-            register_cmap(cname, ccmap)
-            return get_cmap(cname)
-        else:
-            return ccmap
-    else:
-        if rgb256:
-            from jams.color import rgb012rgb
-            return [ rgb012rgb(*i) for i in cols ]
-        else:
-            return cols
-
-
-def sron_colours(*args, **kwargs):
-    """
-        Wrapper for sron_colors
-        def sron_colors(cmap='palette1', ncol=9, cname=None, rgb=False, rgb256=False, reverse=False):
-    """
-    return sron_colors(*args, **kwargs)
-
-
-def sron_maps(cmap, ncol=256, offset=0, upper=1,
-              cname=None, rgb=False, rgb256=False, reverse=False, grey=False, gray=False):
-    """
-        Colour maps of Paul Tol at SRON - Netherlands Institute for Space Research
-
-
-        Definition
-        ----------
-        def sron_maps(cmap, ncol=256, offset=0, upper=1,
-                      cname=None, rgb=False, rgb256=False, reverse=False, grey=False, gray=False):
-
-
-        Input
-        -----
-        cmap       Colour map name
-                   buylrd:  blue-yellow-red diverging
-                   rainbow: rainbow
-                   ylorbr:  yellow-orange-red sequential
-        
-
-        Optional Input
-        --------------
-        ncol       number of desired colors
-        offset     bottom fraction to exclude (0-1)
-        upper      upper most fraction included (0-1)
-        cname      if given, name of registered colormap
-        rgb        if True, return RGB value tuple between 0 and 1
-        rgb256     if True, return RGB value tuple between 0 and 255
-        reverse    if True, reverse colormap
-        grey       if True, return grey equivalent
-        gray       same as grey
-
-
-        Output
-        ------
-        matplotlip listed colormap of ncol colours
-
-
-        Restrictions
-        ------------
-        None
-        
-
-        Examples
-        --------
-        cmap = sron_maps('rainbow', 256)
-        
-        cc = sron_maps('buylrd', 11, rgb=True)
-
-
-        License
-        -------
-        This file is part of the JAMS Python package.
-
-        The JAMS Python package is free software: you can redistribute it and/or modify
-        it under the terms of the GNU Lesser General Public License as published by
-        the Free Software Foundation, either version 3 of the License, or
-        (at your option) any later version.
-
-        The JAMS Python package is distributed in the hope that it will be useful,
-        but WITHOUT ANY WARRANTY; without even the implied warranty of
-        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-        GNU Lesser General Public License for more details.
-
-        You should have received a copy of the GNU Lesser General Public License
-        along with the JAMS Python package (cf. gpl.txt and lgpl.txt).
-        If not, see <http://www.gnu.org/licenses/>.
+        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+        IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+        FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+        AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+        LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+        OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+        SOFTWARE.
 
         Copyright 2016 Matthias Cuntz
 

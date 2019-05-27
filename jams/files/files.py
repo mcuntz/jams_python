@@ -60,197 +60,23 @@ def fullnames(fname=None, dirs=None):
         -------
         This file is part of the JAMS Python package.
 
-        The JAMS Python package is free software: you can redistribute it and/or modify
-        it under the terms of the GNU Lesser General Public License as published by
-        the Free Software Foundation, either version 3 of the License, or
-        (at your option) any later version.
+        Permission is hereby granted, free of charge, to any person obtaining a copy
+        of this software and associated documentation files (the "Software"), to deal
+        in the Software without restriction, including without limitation the rights
+        to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+        copies of the Software, and to permit persons to whom the Software is
+        furnished to do so, subject to the following conditions:
 
-        The JAMS Python package is distributed in the hope that it will be useful,
-        but WITHOUT ANY WARRANTY; without even the implied warranty of
-        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-        GNU Lesser General Public License for more details.
+        The above copyright notice and this permission notice shall be included in all
+        copies or substantial portions of the Software.
 
-        You should have received a copy of the GNU Lesser General Public License
-        along with the JAMS Python package (cf. gpl.txt and lgpl.txt).
-        If not, see <http://www.gnu.org/licenses/>.
-
-        Copyright 2014 Matthias Cuntz
-
-
-        History
-        -------
-        Written,  MC, Dec 2014
-        Modified, MC, Jun 2015 - dirs can be single directory
-                               - dirs can be empty
-    """
-    if dirs is None:
-        idirs = ['.']
-    else:
-        if isinstance(dirs, (list, tuple, np.ndarray, set)):
-            idirs = dirs
-        else:
-            idirs = [dirs]
-    lls  = []
-    curdir = os.path.realpath(os.path.curdir)
-    for i in idirs:
-        if i != '.':
-            os.chdir(str(i))
-        if fname is None:
-            fnames = os.listdir('.')
-        else:
-            fnames = glob.glob(fname)
-        fnames = [ os.path.abspath(f) for f in fnames ]
-        lls  += fnames
-        if i != '.':
-            os.chdir(curdir)
-    lls.sort()
-    return lls
-
-# --------------------------------------------------------------------
-
-def fullnames_dates(fname=None, dirs=None):
-    """
-        Filenames with absolute paths and modification times in local directories.
-
-
-        Definition
-        ----------
-        def fullnames_dates(fname=None, dirs=None):
-
-
-        Optional Input
-        --------------
-        fname        filename, filename globbing is possible such as '*.dat' (all files)
-        dirs         list of or single directory names (default: '.')
-
-        
-        Output
-        ------
-        List of filenames incl. absolute paths, List of modification times
-
-
-        Examples
-        --------
-        import os
-        # get .dat filenames with absolute paths and modification times in directories 2013, 2014, ...
-        fls, flsdate = fullnames_dates('*.dat', dirs=glob.glob('[0-9][0-9][0-9][0-9]'))
-
-        # get .dat filenames and modification times in current directory
-        os.chdir('change/directory')
-        fls, flsdate = fullnames_dates('*.dat')
-
-        # get all filenames and modification times in current directory
-        fls, flsdate = fullnames_dates()
-
-
-        License
-        -------
-        This file is part of the JAMS Python package.
-
-        The JAMS Python package is free software: you can redistribute it and/or modify
-        it under the terms of the GNU Lesser General Public License as published by
-        the Free Software Foundation, either version 3 of the License, or
-        (at your option) any later version.
-
-        The JAMS Python package is distributed in the hope that it will be useful,
-        but WITHOUT ANY WARRANTY; without even the implied warranty of
-        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-        GNU Lesser General Public License for more details.
-
-        You should have received a copy of the GNU Lesser General Public License
-        along with the JAMS Python package (cf. gpl.txt and lgpl.txt).
-        If not, see <http://www.gnu.org/licenses/>.
-
-        Copyright 2014 Matthias Cuntz
-
-
-        History
-        -------
-        Written,  MC, Dec 2014
-        Modified, MC, Jun 2015 - dirs can be single directory
-                               - dirs can be empty
-    """
-    if dirs is None:
-        idirs = ['.']
-    else:
-        if isinstance(dirs, (list, tuple, np.ndarray, set)):
-            idirs = dirs
-        else:
-            idirs = [dirs]
-    lls  = []
-    llsd = []
-    curdir = os.path.realpath(os.path.curdir)
-    for i in idirs:
-        if i != '.':
-            os.chdir(str(i))
-        if fname is None:
-            fnames = os.listdir('.')
-        else:
-            fnames = glob.glob(fname)
-        fnames = [ os.path.abspath(f) for f in fnames ]
-        lls  += fnames
-        llsd += [ datetime.datetime.fromtimestamp(os.stat(n).st_mtime) for n in fnames ]
-        if i != '.':
-            os.chdir(curdir)
-    ii = argsort(lls)
-    lls  = [ lls[i] for i in ii ]
-    llsd = [ llsd[i] for i in ii ]
-    return lls, llsd
-
-# --------------------------------------------------------------------
-
-def fullnames_dates_sizes(fname=None, dirs=None):
-    """
-        Filenames with absolute paths, modification times, and file sizes in local directories.
-
-
-        Definition
-        ----------
-        def fullnames_dates_sizes(fname=None, dirs=None):
-
-
-        Optional Input
-        --------------
-        fname        filename, filename globbing is possible such as '*.dat' (all files)
-        dirs         list of or single directory names (default: '.')
-
-        
-        Output
-        ------
-        List of filenames incl. absolute paths, List of modification times, List of file sizes
-
-
-        Examples
-        --------
-        import os
-        # get .dat filenames with absolute paths, modification times, and file sizes in directories 2013, 2014, ...
-        fls, flsdate, flssize = fullnames_dates_sizes('*.dat', dirs=glob.glob('[0-9][0-9][0-9][0-9]'))
-
-        # get .dat filenames, modification times, and file sizes in current directory
-        os.chdir('change/directory')
-        fls, flsdate, flssize = fullnames_dates_sizes('*.dat')
-
-        # get all filenames, modification times, and file sizes in current directory
-        fls, flsdate, flssize = fullnames_dates_sizes()
-
-
-        License
-        -------
-        This file is part of the JAMS Python package.
-
-        The JAMS Python package is free software: you can redistribute it and/or modify
-        it under the terms of the GNU Lesser General Public License as published by
-        the Free Software Foundation, either version 3 of the License, or
-        (at your option) any later version.
-
-        The JAMS Python package is distributed in the hope that it will be useful,
-        but WITHOUT ANY WARRANTY; without even the implied warranty of
-        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-        GNU Lesser General Public License for more details.
-
-        You should have received a copy of the GNU Lesser General Public License
-        along with the JAMS Python package (cf. gpl.txt and lgpl.txt).
-        If not, see <http://www.gnu.org/licenses/>.
+        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+        IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+        FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+        AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+        LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+        OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+        SOFTWARE.
 
         Copyright 2014 Matthias Cuntz
 
@@ -333,19 +159,23 @@ def fullnames_sizes(fname=None, dirs=None):
         -------
         This file is part of the JAMS Python package.
 
-        The JAMS Python package is free software: you can redistribute it and/or modify
-        it under the terms of the GNU Lesser General Public License as published by
-        the Free Software Foundation, either version 3 of the License, or
-        (at your option) any later version.
+        Permission is hereby granted, free of charge, to any person obtaining a copy
+        of this software and associated documentation files (the "Software"), to deal
+        in the Software without restriction, including without limitation the rights
+        to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+        copies of the Software, and to permit persons to whom the Software is
+        furnished to do so, subject to the following conditions:
 
-        The JAMS Python package is distributed in the hope that it will be useful,
-        but WITHOUT ANY WARRANTY; without even the implied warranty of
-        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-        GNU Lesser General Public License for more details.
+        The above copyright notice and this permission notice shall be included in all
+        copies or substantial portions of the Software.
 
-        You should have received a copy of the GNU Lesser General Public License
-        along with the JAMS Python package (cf. gpl.txt and lgpl.txt).
-        If not, see <http://www.gnu.org/licenses/>.
+        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+        IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+        FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+        AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+        LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+        OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+        SOFTWARE.
 
         Copyright 2014 Matthias Cuntz
 
@@ -409,19 +239,23 @@ def fullnames_times(*args, **kwargs):
         -------
         This file is part of the JAMS Python package.
 
-        The JAMS Python package is free software: you can redistribute it and/or modify
-        it under the terms of the GNU Lesser General Public License as published by
-        the Free Software Foundation, either version 3 of the License, or
-        (at your option) any later version.
+        Permission is hereby granted, free of charge, to any person obtaining a copy
+        of this software and associated documentation files (the "Software"), to deal
+        in the Software without restriction, including without limitation the rights
+        to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+        copies of the Software, and to permit persons to whom the Software is
+        furnished to do so, subject to the following conditions:
 
-        The JAMS Python package is distributed in the hope that it will be useful,
-        but WITHOUT ANY WARRANTY; without even the implied warranty of
-        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-        GNU Lesser General Public License for more details.
+        The above copyright notice and this permission notice shall be included in all
+        copies or substantial portions of the Software.
 
-        You should have received a copy of the GNU Lesser General Public License
-        along with the JAMS Python package (cf. gpl.txt and lgpl.txt).
-        If not, see <http://www.gnu.org/licenses/>.
+        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+        IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+        FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+        AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+        LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+        OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+        SOFTWARE.
 
         Copyright 2014 Matthias Cuntz
 
@@ -458,19 +292,23 @@ def fullnames_times_sizes(*args, **kwargs):
         -------
         This file is part of the JAMS Python package.
 
-        The JAMS Python package is free software: you can redistribute it and/or modify
-        it under the terms of the GNU Lesser General Public License as published by
-        the Free Software Foundation, either version 3 of the License, or
-        (at your option) any later version.
+        Permission is hereby granted, free of charge, to any person obtaining a copy
+        of this software and associated documentation files (the "Software"), to deal
+        in the Software without restriction, including without limitation the rights
+        to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+        copies of the Software, and to permit persons to whom the Software is
+        furnished to do so, subject to the following conditions:
 
-        The JAMS Python package is distributed in the hope that it will be useful,
-        but WITHOUT ANY WARRANTY; without even the implied warranty of
-        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-        GNU Lesser General Public License for more details.
+        The above copyright notice and this permission notice shall be included in all
+        copies or substantial portions of the Software.
 
-        You should have received a copy of the GNU Lesser General Public License
-        along with the JAMS Python package (cf. gpl.txt and lgpl.txt).
-        If not, see <http://www.gnu.org/licenses/>.
+        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+        IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+        FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+        AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+        LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+        OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+        SOFTWARE.
 
         Copyright 2014 Matthias Cuntz
 
@@ -522,19 +360,23 @@ def last_fullname(fname=None, dirs=None):
         -------
         This file is part of the JAMS Python package.
 
-        The JAMS Python package is free software: you can redistribute it and/or modify
-        it under the terms of the GNU Lesser General Public License as published by
-        the Free Software Foundation, either version 3 of the License, or
-        (at your option) any later version.
+        Permission is hereby granted, free of charge, to any person obtaining a copy
+        of this software and associated documentation files (the "Software"), to deal
+        in the Software without restriction, including without limitation the rights
+        to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+        copies of the Software, and to permit persons to whom the Software is
+        furnished to do so, subject to the following conditions:
 
-        The JAMS Python package is distributed in the hope that it will be useful,
-        but WITHOUT ANY WARRANTY; without even the implied warranty of
-        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-        GNU Lesser General Public License for more details.
+        The above copyright notice and this permission notice shall be included in all
+        copies or substantial portions of the Software.
 
-        You should have received a copy of the GNU Lesser General Public License
-        along with the JAMS Python package (cf. gpl.txt and lgpl.txt).
-        If not, see <http://www.gnu.org/licenses/>.
+        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+        IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+        FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+        AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+        LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+        OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+        SOFTWARE.
 
         Copyright 2014 Matthias Cuntz
 
@@ -597,19 +439,23 @@ def last_fullname_date(fname=None, dirs=None):
         -------
         This file is part of the JAMS Python package.
 
-        The JAMS Python package is free software: you can redistribute it and/or modify
-        it under the terms of the GNU Lesser General Public License as published by
-        the Free Software Foundation, either version 3 of the License, or
-        (at your option) any later version.
+        Permission is hereby granted, free of charge, to any person obtaining a copy
+        of this software and associated documentation files (the "Software"), to deal
+        in the Software without restriction, including without limitation the rights
+        to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+        copies of the Software, and to permit persons to whom the Software is
+        furnished to do so, subject to the following conditions:
 
-        The JAMS Python package is distributed in the hope that it will be useful,
-        but WITHOUT ANY WARRANTY; without even the implied warranty of
-        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-        GNU Lesser General Public License for more details.
+        The above copyright notice and this permission notice shall be included in all
+        copies or substantial portions of the Software.
 
-        You should have received a copy of the GNU Lesser General Public License
-        along with the JAMS Python package (cf. gpl.txt and lgpl.txt).
-        If not, see <http://www.gnu.org/licenses/>.
+        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+        IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+        FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+        AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+        LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+        OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+        SOFTWARE.
 
         Copyright 2014 Matthias Cuntz
 
@@ -672,19 +518,23 @@ def last_fullname_date_size(fname=None, dirs=None):
         -------
         This file is part of the JAMS Python package.
 
-        The JAMS Python package is free software: you can redistribute it and/or modify
-        it under the terms of the GNU Lesser General Public License as published by
-        the Free Software Foundation, either version 3 of the License, or
-        (at your option) any later version.
+        Permission is hereby granted, free of charge, to any person obtaining a copy
+        of this software and associated documentation files (the "Software"), to deal
+        in the Software without restriction, including without limitation the rights
+        to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+        copies of the Software, and to permit persons to whom the Software is
+        furnished to do so, subject to the following conditions:
 
-        The JAMS Python package is distributed in the hope that it will be useful,
-        but WITHOUT ANY WARRANTY; without even the implied warranty of
-        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-        GNU Lesser General Public License for more details.
+        The above copyright notice and this permission notice shall be included in all
+        copies or substantial portions of the Software.
 
-        You should have received a copy of the GNU Lesser General Public License
-        along with the JAMS Python package (cf. gpl.txt and lgpl.txt).
-        If not, see <http://www.gnu.org/licenses/>.
+        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+        IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+        FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+        AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+        LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+        OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+        SOFTWARE.
 
         Copyright 2014 Matthias Cuntz
 
@@ -747,19 +597,23 @@ def last_fullname_size(fname=None, dirs=None):
         -------
         This file is part of the JAMS Python package.
 
-        The JAMS Python package is free software: you can redistribute it and/or modify
-        it under the terms of the GNU Lesser General Public License as published by
-        the Free Software Foundation, either version 3 of the License, or
-        (at your option) any later version.
+        Permission is hereby granted, free of charge, to any person obtaining a copy
+        of this software and associated documentation files (the "Software"), to deal
+        in the Software without restriction, including without limitation the rights
+        to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+        copies of the Software, and to permit persons to whom the Software is
+        furnished to do so, subject to the following conditions:
 
-        The JAMS Python package is distributed in the hope that it will be useful,
-        but WITHOUT ANY WARRANTY; without even the implied warranty of
-        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-        GNU Lesser General Public License for more details.
+        The above copyright notice and this permission notice shall be included in all
+        copies or substantial portions of the Software.
 
-        You should have received a copy of the GNU Lesser General Public License
-        along with the JAMS Python package (cf. gpl.txt and lgpl.txt).
-        If not, see <http://www.gnu.org/licenses/>.
+        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+        IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+        FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+        AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+        LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+        OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+        SOFTWARE.
 
         Copyright 2014 Matthias Cuntz
 
@@ -807,19 +661,23 @@ def last_fullname_time(*args, **kwargs):
         -------
         This file is part of the JAMS Python package.
 
-        The JAMS Python package is free software: you can redistribute it and/or modify
-        it under the terms of the GNU Lesser General Public License as published by
-        the Free Software Foundation, either version 3 of the License, or
-        (at your option) any later version.
+        Permission is hereby granted, free of charge, to any person obtaining a copy
+        of this software and associated documentation files (the "Software"), to deal
+        in the Software without restriction, including without limitation the rights
+        to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+        copies of the Software, and to permit persons to whom the Software is
+        furnished to do so, subject to the following conditions:
 
-        The JAMS Python package is distributed in the hope that it will be useful,
-        but WITHOUT ANY WARRANTY; without even the implied warranty of
-        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-        GNU Lesser General Public License for more details.
+        The above copyright notice and this permission notice shall be included in all
+        copies or substantial portions of the Software.
 
-        You should have received a copy of the GNU Lesser General Public License
-        along with the JAMS Python package (cf. gpl.txt and lgpl.txt).
-        If not, see <http://www.gnu.org/licenses/>.
+        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+        IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+        FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+        AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+        LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+        OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+        SOFTWARE.
 
         Copyright 2014 Matthias Cuntz
 
@@ -856,19 +714,23 @@ def last_fullname_time_size(*args, **kwargs):
         -------
         This file is part of the JAMS Python package.
 
-        The JAMS Python package is free software: you can redistribute it and/or modify
-        it under the terms of the GNU Lesser General Public License as published by
-        the Free Software Foundation, either version 3 of the License, or
-        (at your option) any later version.
+        Permission is hereby granted, free of charge, to any person obtaining a copy
+        of this software and associated documentation files (the "Software"), to deal
+        in the Software without restriction, including without limitation the rights
+        to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+        copies of the Software, and to permit persons to whom the Software is
+        furnished to do so, subject to the following conditions:
 
-        The JAMS Python package is distributed in the hope that it will be useful,
-        but WITHOUT ANY WARRANTY; without even the implied warranty of
-        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-        GNU Lesser General Public License for more details.
+        The above copyright notice and this permission notice shall be included in all
+        copies or substantial portions of the Software.
 
-        You should have received a copy of the GNU Lesser General Public License
-        along with the JAMS Python package (cf. gpl.txt and lgpl.txt).
-        If not, see <http://www.gnu.org/licenses/>.
+        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+        IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+        FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+        AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+        LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+        OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+        SOFTWARE.
 
         Copyright 2014 Matthias Cuntz
 
@@ -920,19 +782,23 @@ def last_name(fname=None, dirs=None):
         -------
         This file is part of the JAMS Python package.
 
-        The JAMS Python package is free software: you can redistribute it and/or modify
-        it under the terms of the GNU Lesser General Public License as published by
-        the Free Software Foundation, either version 3 of the License, or
-        (at your option) any later version.
+        Permission is hereby granted, free of charge, to any person obtaining a copy
+        of this software and associated documentation files (the "Software"), to deal
+        in the Software without restriction, including without limitation the rights
+        to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+        copies of the Software, and to permit persons to whom the Software is
+        furnished to do so, subject to the following conditions:
 
-        The JAMS Python package is distributed in the hope that it will be useful,
-        but WITHOUT ANY WARRANTY; without even the implied warranty of
-        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-        GNU Lesser General Public License for more details.
+        The above copyright notice and this permission notice shall be included in all
+        copies or substantial portions of the Software.
 
-        You should have received a copy of the GNU Lesser General Public License
-        along with the JAMS Python package (cf. gpl.txt and lgpl.txt).
-        If not, see <http://www.gnu.org/licenses/>.
+        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+        IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+        FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+        AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+        LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+        OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+        SOFTWARE.
 
         Copyright 2014 Matthias Cuntz
 
@@ -995,19 +861,23 @@ def last_name_date(fname=None, dirs=None):
         -------
         This file is part of the JAMS Python package.
 
-        The JAMS Python package is free software: you can redistribute it and/or modify
-        it under the terms of the GNU Lesser General Public License as published by
-        the Free Software Foundation, either version 3 of the License, or
-        (at your option) any later version.
+        Permission is hereby granted, free of charge, to any person obtaining a copy
+        of this software and associated documentation files (the "Software"), to deal
+        in the Software without restriction, including without limitation the rights
+        to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+        copies of the Software, and to permit persons to whom the Software is
+        furnished to do so, subject to the following conditions:
 
-        The JAMS Python package is distributed in the hope that it will be useful,
-        but WITHOUT ANY WARRANTY; without even the implied warranty of
-        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-        GNU Lesser General Public License for more details.
+        The above copyright notice and this permission notice shall be included in all
+        copies or substantial portions of the Software.
 
-        You should have received a copy of the GNU Lesser General Public License
-        along with the JAMS Python package (cf. gpl.txt and lgpl.txt).
-        If not, see <http://www.gnu.org/licenses/>.
+        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+        IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+        FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+        AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+        LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+        OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+        SOFTWARE.
 
         Copyright 2014 Matthias Cuntz
 
@@ -1070,19 +940,23 @@ def last_name_date_size(fname=None, dirs=None):
         -------
         This file is part of the JAMS Python package.
 
-        The JAMS Python package is free software: you can redistribute it and/or modify
-        it under the terms of the GNU Lesser General Public License as published by
-        the Free Software Foundation, either version 3 of the License, or
-        (at your option) any later version.
+        Permission is hereby granted, free of charge, to any person obtaining a copy
+        of this software and associated documentation files (the "Software"), to deal
+        in the Software without restriction, including without limitation the rights
+        to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+        copies of the Software, and to permit persons to whom the Software is
+        furnished to do so, subject to the following conditions:
 
-        The JAMS Python package is distributed in the hope that it will be useful,
-        but WITHOUT ANY WARRANTY; without even the implied warranty of
-        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-        GNU Lesser General Public License for more details.
+        The above copyright notice and this permission notice shall be included in all
+        copies or substantial portions of the Software.
 
-        You should have received a copy of the GNU Lesser General Public License
-        along with the JAMS Python package (cf. gpl.txt and lgpl.txt).
-        If not, see <http://www.gnu.org/licenses/>.
+        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+        IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+        FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+        AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+        LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+        OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+        SOFTWARE.
 
         Copyright 2014 Matthias Cuntz
 
@@ -1145,19 +1019,23 @@ def last_name_size(fname=None, dirs=None):
         -------
         This file is part of the JAMS Python package.
 
-        The JAMS Python package is free software: you can redistribute it and/or modify
-        it under the terms of the GNU Lesser General Public License as published by
-        the Free Software Foundation, either version 3 of the License, or
-        (at your option) any later version.
+        Permission is hereby granted, free of charge, to any person obtaining a copy
+        of this software and associated documentation files (the "Software"), to deal
+        in the Software without restriction, including without limitation the rights
+        to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+        copies of the Software, and to permit persons to whom the Software is
+        furnished to do so, subject to the following conditions:
 
-        The JAMS Python package is distributed in the hope that it will be useful,
-        but WITHOUT ANY WARRANTY; without even the implied warranty of
-        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-        GNU Lesser General Public License for more details.
+        The above copyright notice and this permission notice shall be included in all
+        copies or substantial portions of the Software.
 
-        You should have received a copy of the GNU Lesser General Public License
-        along with the JAMS Python package (cf. gpl.txt and lgpl.txt).
-        If not, see <http://www.gnu.org/licenses/>.
+        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+        IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+        FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+        AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+        LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+        OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+        SOFTWARE.
 
         Copyright 2014 Matthias Cuntz
 
@@ -1205,19 +1083,23 @@ def last_name_time(*args, **kwargs):
         -------
         This file is part of the JAMS Python package.
 
-        The JAMS Python package is free software: you can redistribute it and/or modify
-        it under the terms of the GNU Lesser General Public License as published by
-        the Free Software Foundation, either version 3 of the License, or
-        (at your option) any later version.
+        Permission is hereby granted, free of charge, to any person obtaining a copy
+        of this software and associated documentation files (the "Software"), to deal
+        in the Software without restriction, including without limitation the rights
+        to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+        copies of the Software, and to permit persons to whom the Software is
+        furnished to do so, subject to the following conditions:
 
-        The JAMS Python package is distributed in the hope that it will be useful,
-        but WITHOUT ANY WARRANTY; without even the implied warranty of
-        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-        GNU Lesser General Public License for more details.
+        The above copyright notice and this permission notice shall be included in all
+        copies or substantial portions of the Software.
 
-        You should have received a copy of the GNU Lesser General Public License
-        along with the JAMS Python package (cf. gpl.txt and lgpl.txt).
-        If not, see <http://www.gnu.org/licenses/>.
+        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+        IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+        FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+        AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+        LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+        OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+        SOFTWARE.
 
         Copyright 2014 Matthias Cuntz
 
@@ -1254,19 +1136,23 @@ def last_name_time_size(*args, **kwargs):
         -------
         This file is part of the JAMS Python package.
 
-        The JAMS Python package is free software: you can redistribute it and/or modify
-        it under the terms of the GNU Lesser General Public License as published by
-        the Free Software Foundation, either version 3 of the License, or
-        (at your option) any later version.
+        Permission is hereby granted, free of charge, to any person obtaining a copy
+        of this software and associated documentation files (the "Software"), to deal
+        in the Software without restriction, including without limitation the rights
+        to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+        copies of the Software, and to permit persons to whom the Software is
+        furnished to do so, subject to the following conditions:
 
-        The JAMS Python package is distributed in the hope that it will be useful,
-        but WITHOUT ANY WARRANTY; without even the implied warranty of
-        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-        GNU Lesser General Public License for more details.
+        The above copyright notice and this permission notice shall be included in all
+        copies or substantial portions of the Software.
 
-        You should have received a copy of the GNU Lesser General Public License
-        along with the JAMS Python package (cf. gpl.txt and lgpl.txt).
-        If not, see <http://www.gnu.org/licenses/>.
+        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+        IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+        FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+        AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+        LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+        OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+        SOFTWARE.
 
         Copyright 2014 Matthias Cuntz
 
@@ -1318,19 +1204,23 @@ def names(fname=None, dirs=None):
         -------
         This file is part of the JAMS Python package.
 
-        The JAMS Python package is free software: you can redistribute it and/or modify
-        it under the terms of the GNU Lesser General Public License as published by
-        the Free Software Foundation, either version 3 of the License, or
-        (at your option) any later version.
+        Permission is hereby granted, free of charge, to any person obtaining a copy
+        of this software and associated documentation files (the "Software"), to deal
+        in the Software without restriction, including without limitation the rights
+        to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+        copies of the Software, and to permit persons to whom the Software is
+        furnished to do so, subject to the following conditions:
 
-        The JAMS Python package is distributed in the hope that it will be useful,
-        but WITHOUT ANY WARRANTY; without even the implied warranty of
-        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-        GNU Lesser General Public License for more details.
+        The above copyright notice and this permission notice shall be included in all
+        copies or substantial portions of the Software.
 
-        You should have received a copy of the GNU Lesser General Public License
-        along with the JAMS Python package (cf. gpl.txt and lgpl.txt).
-        If not, see <http://www.gnu.org/licenses/>.
+        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+        IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+        FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+        AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+        LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+        OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+        SOFTWARE.
 
         Copyright 2014 Matthias Cuntz
 
@@ -1404,19 +1294,23 @@ def names_dates(fname=None, dirs=None):
         -------
         This file is part of the JAMS Python package.
 
-        The JAMS Python package is free software: you can redistribute it and/or modify
-        it under the terms of the GNU Lesser General Public License as published by
-        the Free Software Foundation, either version 3 of the License, or
-        (at your option) any later version.
+        Permission is hereby granted, free of charge, to any person obtaining a copy
+        of this software and associated documentation files (the "Software"), to deal
+        in the Software without restriction, including without limitation the rights
+        to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+        copies of the Software, and to permit persons to whom the Software is
+        furnished to do so, subject to the following conditions:
 
-        The JAMS Python package is distributed in the hope that it will be useful,
-        but WITHOUT ANY WARRANTY; without even the implied warranty of
-        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-        GNU Lesser General Public License for more details.
+        The above copyright notice and this permission notice shall be included in all
+        copies or substantial portions of the Software.
 
-        You should have received a copy of the GNU Lesser General Public License
-        along with the JAMS Python package (cf. gpl.txt and lgpl.txt).
-        If not, see <http://www.gnu.org/licenses/>.
+        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+        IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+        FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+        AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+        LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+        OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+        SOFTWARE.
 
         Copyright 2014 Matthias Cuntz
 
@@ -1494,19 +1388,23 @@ def names_dates_sizes(fname=None, dirs=None):
         -------
         This file is part of the JAMS Python package.
 
-        The JAMS Python package is free software: you can redistribute it and/or modify
-        it under the terms of the GNU Lesser General Public License as published by
-        the Free Software Foundation, either version 3 of the License, or
-        (at your option) any later version.
+        Permission is hereby granted, free of charge, to any person obtaining a copy
+        of this software and associated documentation files (the "Software"), to deal
+        in the Software without restriction, including without limitation the rights
+        to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+        copies of the Software, and to permit persons to whom the Software is
+        furnished to do so, subject to the following conditions:
 
-        The JAMS Python package is distributed in the hope that it will be useful,
-        but WITHOUT ANY WARRANTY; without even the implied warranty of
-        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-        GNU Lesser General Public License for more details.
+        The above copyright notice and this permission notice shall be included in all
+        copies or substantial portions of the Software.
 
-        You should have received a copy of the GNU Lesser General Public License
-        along with the JAMS Python package (cf. gpl.txt and lgpl.txt).
-        If not, see <http://www.gnu.org/licenses/>.
+        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+        IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+        FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+        AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+        LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+        OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+        SOFTWARE.
 
         Copyright 2014 Matthias Cuntz
 
@@ -1588,19 +1486,23 @@ def names_sizes(fname=None, dirs=None):
         -------
         This file is part of the JAMS Python package.
 
-        The JAMS Python package is free software: you can redistribute it and/or modify
-        it under the terms of the GNU Lesser General Public License as published by
-        the Free Software Foundation, either version 3 of the License, or
-        (at your option) any later version.
+        Permission is hereby granted, free of charge, to any person obtaining a copy
+        of this software and associated documentation files (the "Software"), to deal
+        in the Software without restriction, including without limitation the rights
+        to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+        copies of the Software, and to permit persons to whom the Software is
+        furnished to do so, subject to the following conditions:
 
-        The JAMS Python package is distributed in the hope that it will be useful,
-        but WITHOUT ANY WARRANTY; without even the implied warranty of
-        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-        GNU Lesser General Public License for more details.
+        The above copyright notice and this permission notice shall be included in all
+        copies or substantial portions of the Software.
 
-        You should have received a copy of the GNU Lesser General Public License
-        along with the JAMS Python package (cf. gpl.txt and lgpl.txt).
-        If not, see <http://www.gnu.org/licenses/>.
+        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+        IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+        FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+        AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+        LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+        OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+        SOFTWARE.
 
         Copyright 2014 Matthias Cuntz
 
@@ -1663,19 +1565,23 @@ def names_times(*args, **kwargs):
         -------
         This file is part of the JAMS Python package.
 
-        The JAMS Python package is free software: you can redistribute it and/or modify
-        it under the terms of the GNU Lesser General Public License as published by
-        the Free Software Foundation, either version 3 of the License, or
-        (at your option) any later version.
+        Permission is hereby granted, free of charge, to any person obtaining a copy
+        of this software and associated documentation files (the "Software"), to deal
+        in the Software without restriction, including without limitation the rights
+        to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+        copies of the Software, and to permit persons to whom the Software is
+        furnished to do so, subject to the following conditions:
 
-        The JAMS Python package is distributed in the hope that it will be useful,
-        but WITHOUT ANY WARRANTY; without even the implied warranty of
-        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-        GNU Lesser General Public License for more details.
+        The above copyright notice and this permission notice shall be included in all
+        copies or substantial portions of the Software.
 
-        You should have received a copy of the GNU Lesser General Public License
-        along with the JAMS Python package (cf. gpl.txt and lgpl.txt).
-        If not, see <http://www.gnu.org/licenses/>.
+        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+        IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+        FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+        AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+        LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+        OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+        SOFTWARE.
 
         Copyright 2014 Matthias Cuntz
 
@@ -1712,19 +1618,23 @@ def names_times_sizes(*args, **kwargs):
         -------
         This file is part of the JAMS Python package.
 
-        The JAMS Python package is free software: you can redistribute it and/or modify
-        it under the terms of the GNU Lesser General Public License as published by
-        the Free Software Foundation, either version 3 of the License, or
-        (at your option) any later version.
+        Permission is hereby granted, free of charge, to any person obtaining a copy
+        of this software and associated documentation files (the "Software"), to deal
+        in the Software without restriction, including without limitation the rights
+        to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+        copies of the Software, and to permit persons to whom the Software is
+        furnished to do so, subject to the following conditions:
 
-        The JAMS Python package is distributed in the hope that it will be useful,
-        but WITHOUT ANY WARRANTY; without even the implied warranty of
-        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-        GNU Lesser General Public License for more details.
+        The above copyright notice and this permission notice shall be included in all
+        copies or substantial portions of the Software.
 
-        You should have received a copy of the GNU Lesser General Public License
-        along with the JAMS Python package (cf. gpl.txt and lgpl.txt).
-        If not, see <http://www.gnu.org/licenses/>.
+        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+        IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+        FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+        AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+        LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+        OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+        SOFTWARE.
 
         Copyright 2014 Matthias Cuntz
 
@@ -1761,19 +1671,23 @@ def newest_fullname(*args, **kwargs):
         -------
         This file is part of the JAMS Python package.
 
-        The JAMS Python package is free software: you can redistribute it and/or modify
-        it under the terms of the GNU Lesser General Public License as published by
-        the Free Software Foundation, either version 3 of the License, or
-        (at your option) any later version.
+        Permission is hereby granted, free of charge, to any person obtaining a copy
+        of this software and associated documentation files (the "Software"), to deal
+        in the Software without restriction, including without limitation the rights
+        to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+        copies of the Software, and to permit persons to whom the Software is
+        furnished to do so, subject to the following conditions:
 
-        The JAMS Python package is distributed in the hope that it will be useful,
-        but WITHOUT ANY WARRANTY; without even the implied warranty of
-        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-        GNU Lesser General Public License for more details.
+        The above copyright notice and this permission notice shall be included in all
+        copies or substantial portions of the Software.
 
-        You should have received a copy of the GNU Lesser General Public License
-        along with the JAMS Python package (cf. gpl.txt and lgpl.txt).
-        If not, see <http://www.gnu.org/licenses/>.
+        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+        IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+        FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+        AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+        LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+        OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+        SOFTWARE.
 
         Copyright 2014 Matthias Cuntz
 
@@ -1810,19 +1724,23 @@ def newest_fullname_date(*args, **kwargs):
         -------
         This file is part of the JAMS Python package.
 
-        The JAMS Python package is free software: you can redistribute it and/or modify
-        it under the terms of the GNU Lesser General Public License as published by
-        the Free Software Foundation, either version 3 of the License, or
-        (at your option) any later version.
+        Permission is hereby granted, free of charge, to any person obtaining a copy
+        of this software and associated documentation files (the "Software"), to deal
+        in the Software without restriction, including without limitation the rights
+        to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+        copies of the Software, and to permit persons to whom the Software is
+        furnished to do so, subject to the following conditions:
 
-        The JAMS Python package is distributed in the hope that it will be useful,
-        but WITHOUT ANY WARRANTY; without even the implied warranty of
-        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-        GNU Lesser General Public License for more details.
+        The above copyright notice and this permission notice shall be included in all
+        copies or substantial portions of the Software.
 
-        You should have received a copy of the GNU Lesser General Public License
-        along with the JAMS Python package (cf. gpl.txt and lgpl.txt).
-        If not, see <http://www.gnu.org/licenses/>.
+        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+        IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+        FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+        AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+        LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+        OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+        SOFTWARE.
 
         Copyright 2014 Matthias Cuntz
 
@@ -1859,19 +1777,23 @@ def newest_fullname_date_size(*args, **kwargs):
         -------
         This file is part of the JAMS Python package.
 
-        The JAMS Python package is free software: you can redistribute it and/or modify
-        it under the terms of the GNU Lesser General Public License as published by
-        the Free Software Foundation, either version 3 of the License, or
-        (at your option) any later version.
+        Permission is hereby granted, free of charge, to any person obtaining a copy
+        of this software and associated documentation files (the "Software"), to deal
+        in the Software without restriction, including without limitation the rights
+        to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+        copies of the Software, and to permit persons to whom the Software is
+        furnished to do so, subject to the following conditions:
 
-        The JAMS Python package is distributed in the hope that it will be useful,
-        but WITHOUT ANY WARRANTY; without even the implied warranty of
-        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-        GNU Lesser General Public License for more details.
+        The above copyright notice and this permission notice shall be included in all
+        copies or substantial portions of the Software.
 
-        You should have received a copy of the GNU Lesser General Public License
-        along with the JAMS Python package (cf. gpl.txt and lgpl.txt).
-        If not, see <http://www.gnu.org/licenses/>.
+        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+        IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+        FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+        AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+        LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+        OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+        SOFTWARE.
 
         Copyright 2014 Matthias Cuntz
 
@@ -1924,19 +1846,23 @@ def newest_fullname_size(*args, **kwargs):
         -------
         This file is part of the JAMS Python package.
 
-        The JAMS Python package is free software: you can redistribute it and/or modify
-        it under the terms of the GNU Lesser General Public License as published by
-        the Free Software Foundation, either version 3 of the License, or
-        (at your option) any later version.
+        Permission is hereby granted, free of charge, to any person obtaining a copy
+        of this software and associated documentation files (the "Software"), to deal
+        in the Software without restriction, including without limitation the rights
+        to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+        copies of the Software, and to permit persons to whom the Software is
+        furnished to do so, subject to the following conditions:
 
-        The JAMS Python package is distributed in the hope that it will be useful,
-        but WITHOUT ANY WARRANTY; without even the implied warranty of
-        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-        GNU Lesser General Public License for more details.
+        The above copyright notice and this permission notice shall be included in all
+        copies or substantial portions of the Software.
 
-        You should have received a copy of the GNU Lesser General Public License
-        along with the JAMS Python package (cf. gpl.txt and lgpl.txt).
-        If not, see <http://www.gnu.org/licenses/>.
+        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+        IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+        FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+        AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+        LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+        OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+        SOFTWARE.
 
         Copyright 2014 Matthias Cuntz
 
@@ -1973,19 +1899,23 @@ def newest_fullname_time(*args, **kwargs):
         -------
         This file is part of the JAMS Python package.
 
-        The JAMS Python package is free software: you can redistribute it and/or modify
-        it under the terms of the GNU Lesser General Public License as published by
-        the Free Software Foundation, either version 3 of the License, or
-        (at your option) any later version.
+        Permission is hereby granted, free of charge, to any person obtaining a copy
+        of this software and associated documentation files (the "Software"), to deal
+        in the Software without restriction, including without limitation the rights
+        to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+        copies of the Software, and to permit persons to whom the Software is
+        furnished to do so, subject to the following conditions:
 
-        The JAMS Python package is distributed in the hope that it will be useful,
-        but WITHOUT ANY WARRANTY; without even the implied warranty of
-        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-        GNU Lesser General Public License for more details.
+        The above copyright notice and this permission notice shall be included in all
+        copies or substantial portions of the Software.
 
-        You should have received a copy of the GNU Lesser General Public License
-        along with the JAMS Python package (cf. gpl.txt and lgpl.txt).
-        If not, see <http://www.gnu.org/licenses/>.
+        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+        IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+        FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+        AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+        LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+        OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+        SOFTWARE.
 
         Copyright 2014 Matthias Cuntz
 
@@ -2022,19 +1952,23 @@ def newest_fullname_time_size(*args, **kwargs):
         -------
         This file is part of the JAMS Python package.
 
-        The JAMS Python package is free software: you can redistribute it and/or modify
-        it under the terms of the GNU Lesser General Public License as published by
-        the Free Software Foundation, either version 3 of the License, or
-        (at your option) any later version.
+        Permission is hereby granted, free of charge, to any person obtaining a copy
+        of this software and associated documentation files (the "Software"), to deal
+        in the Software without restriction, including without limitation the rights
+        to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+        copies of the Software, and to permit persons to whom the Software is
+        furnished to do so, subject to the following conditions:
 
-        The JAMS Python package is distributed in the hope that it will be useful,
-        but WITHOUT ANY WARRANTY; without even the implied warranty of
-        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-        GNU Lesser General Public License for more details.
+        The above copyright notice and this permission notice shall be included in all
+        copies or substantial portions of the Software.
 
-        You should have received a copy of the GNU Lesser General Public License
-        along with the JAMS Python package (cf. gpl.txt and lgpl.txt).
-        If not, see <http://www.gnu.org/licenses/>.
+        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+        IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+        FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+        AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+        LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+        OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+        SOFTWARE.
 
         Copyright 2014 Matthias Cuntz
 
@@ -2071,19 +2005,23 @@ def newest_name(*args, **kwargs):
         -------
         This file is part of the JAMS Python package.
 
-        The JAMS Python package is free software: you can redistribute it and/or modify
-        it under the terms of the GNU Lesser General Public License as published by
-        the Free Software Foundation, either version 3 of the License, or
-        (at your option) any later version.
+        Permission is hereby granted, free of charge, to any person obtaining a copy
+        of this software and associated documentation files (the "Software"), to deal
+        in the Software without restriction, including without limitation the rights
+        to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+        copies of the Software, and to permit persons to whom the Software is
+        furnished to do so, subject to the following conditions:
 
-        The JAMS Python package is distributed in the hope that it will be useful,
-        but WITHOUT ANY WARRANTY; without even the implied warranty of
-        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-        GNU Lesser General Public License for more details.
+        The above copyright notice and this permission notice shall be included in all
+        copies or substantial portions of the Software.
 
-        You should have received a copy of the GNU Lesser General Public License
-        along with the JAMS Python package (cf. gpl.txt and lgpl.txt).
-        If not, see <http://www.gnu.org/licenses/>.
+        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+        IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+        FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+        AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+        LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+        OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+        SOFTWARE.
 
         Copyright 2014 Matthias Cuntz
 
@@ -2120,19 +2058,23 @@ def newest_name_date(*args, **kwargs):
         -------
         This file is part of the JAMS Python package.
 
-        The JAMS Python package is free software: you can redistribute it and/or modify
-        it under the terms of the GNU Lesser General Public License as published by
-        the Free Software Foundation, either version 3 of the License, or
-        (at your option) any later version.
+        Permission is hereby granted, free of charge, to any person obtaining a copy
+        of this software and associated documentation files (the "Software"), to deal
+        in the Software without restriction, including without limitation the rights
+        to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+        copies of the Software, and to permit persons to whom the Software is
+        furnished to do so, subject to the following conditions:
 
-        The JAMS Python package is distributed in the hope that it will be useful,
-        but WITHOUT ANY WARRANTY; without even the implied warranty of
-        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-        GNU Lesser General Public License for more details.
+        The above copyright notice and this permission notice shall be included in all
+        copies or substantial portions of the Software.
 
-        You should have received a copy of the GNU Lesser General Public License
-        along with the JAMS Python package (cf. gpl.txt and lgpl.txt).
-        If not, see <http://www.gnu.org/licenses/>.
+        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+        IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+        FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+        AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+        LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+        OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+        SOFTWARE.
 
         Copyright 2014 Matthias Cuntz
 
@@ -2180,19 +2122,23 @@ def newest_name_date_size(*args, **kwargs):
         -------
         This file is part of the JAMS Python package.
 
-        The JAMS Python package is free software: you can redistribute it and/or modify
-        it under the terms of the GNU Lesser General Public License as published by
-        the Free Software Foundation, either version 3 of the License, or
-        (at your option) any later version.
+        Permission is hereby granted, free of charge, to any person obtaining a copy
+        of this software and associated documentation files (the "Software"), to deal
+        in the Software without restriction, including without limitation the rights
+        to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+        copies of the Software, and to permit persons to whom the Software is
+        furnished to do so, subject to the following conditions:
 
-        The JAMS Python package is distributed in the hope that it will be useful,
-        but WITHOUT ANY WARRANTY; without even the implied warranty of
-        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-        GNU Lesser General Public License for more details.
+        The above copyright notice and this permission notice shall be included in all
+        copies or substantial portions of the Software.
 
-        You should have received a copy of the GNU Lesser General Public License
-        along with the JAMS Python package (cf. gpl.txt and lgpl.txt).
-        If not, see <http://www.gnu.org/licenses/>.
+        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+        IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+        FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+        AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+        LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+        OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+        SOFTWARE.
 
         Copyright 2014 Matthias Cuntz
 
@@ -2229,19 +2175,23 @@ def newest_name_size(*args, **kwargs):
         -------
         This file is part of the JAMS Python package.
 
-        The JAMS Python package is free software: you can redistribute it and/or modify
-        it under the terms of the GNU Lesser General Public License as published by
-        the Free Software Foundation, either version 3 of the License, or
-        (at your option) any later version.
+        Permission is hereby granted, free of charge, to any person obtaining a copy
+        of this software and associated documentation files (the "Software"), to deal
+        in the Software without restriction, including without limitation the rights
+        to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+        copies of the Software, and to permit persons to whom the Software is
+        furnished to do so, subject to the following conditions:
 
-        The JAMS Python package is distributed in the hope that it will be useful,
-        but WITHOUT ANY WARRANTY; without even the implied warranty of
-        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-        GNU Lesser General Public License for more details.
+        The above copyright notice and this permission notice shall be included in all
+        copies or substantial portions of the Software.
 
-        You should have received a copy of the GNU Lesser General Public License
-        along with the JAMS Python package (cf. gpl.txt and lgpl.txt).
-        If not, see <http://www.gnu.org/licenses/>.
+        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+        IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+        FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+        AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+        LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+        OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+        SOFTWARE.
 
         Copyright 2014 Matthias Cuntz
 
@@ -2278,19 +2228,23 @@ def newest_name_time(*args, **kwargs):
         -------
         This file is part of the JAMS Python package.
 
-        The JAMS Python package is free software: you can redistribute it and/or modify
-        it under the terms of the GNU Lesser General Public License as published by
-        the Free Software Foundation, either version 3 of the License, or
-        (at your option) any later version.
+        Permission is hereby granted, free of charge, to any person obtaining a copy
+        of this software and associated documentation files (the "Software"), to deal
+        in the Software without restriction, including without limitation the rights
+        to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+        copies of the Software, and to permit persons to whom the Software is
+        furnished to do so, subject to the following conditions:
 
-        The JAMS Python package is distributed in the hope that it will be useful,
-        but WITHOUT ANY WARRANTY; without even the implied warranty of
-        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-        GNU Lesser General Public License for more details.
+        The above copyright notice and this permission notice shall be included in all
+        copies or substantial portions of the Software.
 
-        You should have received a copy of the GNU Lesser General Public License
-        along with the JAMS Python package (cf. gpl.txt and lgpl.txt).
-        If not, see <http://www.gnu.org/licenses/>.
+        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+        IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+        FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+        AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+        LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+        OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+        SOFTWARE.
 
         Copyright 2014 Matthias Cuntz
 
@@ -2327,19 +2281,23 @@ def newest_name_date_size(*args, **kwargs):
         -------
         This file is part of the JAMS Python package.
 
-        The JAMS Python package is free software: you can redistribute it and/or modify
-        it under the terms of the GNU Lesser General Public License as published by
-        the Free Software Foundation, either version 3 of the License, or
-        (at your option) any later version.
+        Permission is hereby granted, free of charge, to any person obtaining a copy
+        of this software and associated documentation files (the "Software"), to deal
+        in the Software without restriction, including without limitation the rights
+        to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+        copies of the Software, and to permit persons to whom the Software is
+        furnished to do so, subject to the following conditions:
 
-        The JAMS Python package is distributed in the hope that it will be useful,
-        but WITHOUT ANY WARRANTY; without even the implied warranty of
-        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-        GNU Lesser General Public License for more details.
+        The above copyright notice and this permission notice shall be included in all
+        copies or substantial portions of the Software.
 
-        You should have received a copy of the GNU Lesser General Public License
-        along with the JAMS Python package (cf. gpl.txt and lgpl.txt).
-        If not, see <http://www.gnu.org/licenses/>.
+        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+        IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+        FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+        AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+        LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+        OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+        SOFTWARE.
 
         Copyright 2014 Matthias Cuntz
 

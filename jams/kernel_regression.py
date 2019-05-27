@@ -86,134 +86,23 @@ def kernel_regression(x, y, h=None, silverman=False, xout=None):
         -------
         This file is part of the JAMS Python package.
 
-        It is NOT released under the GNU Lesser General Public License, yet.
+        Permission is hereby granted, free of charge, to any person obtaining a copy
+        of this software and associated documentation files (the "Software"), to deal
+        in the Software without restriction, including without limitation the rights
+        to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+        copies of the Software, and to permit persons to whom the Software is
+        furnished to do so, subject to the following conditions:
 
-        If you use this routine, please contact Matthias Cuntz.
+        The above copyright notice and this permission notice shall be included in all
+        copies or substantial portions of the Software.
 
-        Copyright 2012-2013 Matthias Cuntz
-
-
-        History
-        -------
-        Written,  MC, Jun 2012 - inspired by Matlab routines
-                                 of Yingying Dong, Boston College and Yi Cao, Cranfield University
-        Modified, MC, Feb 2013 - ported to Python 3
-                  MC, Apr 2014 - assert
-    """
-    #
-    # Check input
-    ss = np.shape(x)
-    n  = ss[0]
-    assert n == np.size(y), 'size(x,0) != size(y): '+str(n)+' != '+str(np.size(y))
-    if np.size(ss) == 1: # to deal with 1d-arrays
-        xx = x[:,np.newaxis]
-    else:
-        xx = x
-    ss = np.shape(xx)
-    d  = ss[1]
-    #
-    # determine h
-    if h is None:
-        hh = kernel_regression_h(xx,y,silverman=silverman)
-    else:
-        if np.size(np.shape(h))==0:
-            hh = np.repeat(h,d)
-        else:
-            hh = np.array(h)
-        assert np.size(hh) == d, 'size(h) must be 1 or size(x,1): '
-    #
-    # Calc regression
-    if xout is None:
-        xxout = xx
-    else:
-        if np.size(np.shape(xout)) == 1:
-            xxout = xout[:,np.newaxis]
-        else:
-            xxout = xout
-    ssout = np.shape(xxout)
-    nout  = ssout[0]
-    dout  = ssout[1]
-    assert d == dout, 'size(x,1) != size(xout,1): '+str(d)+' != '+str(dout)
-    # allocate output
-    out = np.empty(nout)
-    # Loop through each regression point
-    for i in range(nout):
-        # scaled deference from regression point
-        z = (xx - xxout[i,:]) / hh
-        # nadaraya-watson estimator of gaussian multivariate kernel
-        out[i] = nadaraya_watson(z, y)
-    #
-    return out
-
-
-def kernel_regression_h(x, y, silverman=False):
-    """
-        Optimal bandwidth for multi-dimensional non-parametric kernel regression
-        using cross-validation or Silverman''s rule-of-thumb.
-
-        Definition
-        ----------
-        def kernel_regression_h(x, y):
-
-
-        Input
-        -----
-        x          ndarray(n,k) of independent values
-        y          array(n) of dependent values
-
-
-        Optional Input
-        --------------
-        silverman  False: determine h via cross-validation
-                   True:  use Silverman''s rule-of-thumb
-
-
-        Output
-        ------
-        Optimal bandwidth. If multidimensional regression then h is vector,
-        assuming diagonal bandwith matrix.
-
-
-        References
-        ----------
-        Haerdle, W., & Mueller, M. (2000). Multivariate and semiparametric kernel regression.
-            In M. G. Schimek (Ed.), Smoothing and regression: Approaches, computation, and
-            application (pp. 357-392). Hoboken, NJ, USA: John Wiley & Sons, Inc. doi:10.1002/9781118150658.ch12
-
-
-        Examples
-        --------
-        >>> import numpy as np
-        >>> x = np.zeros((10,2))
-        >>> x[:,0] = np.arange(10,dtype=np.float)/9.
-        >>> x[:,1] = 1./(np.arange(10,dtype=np.float)/9.+0.1)
-        >>> y      = 1. + x[:,0]**2 - np.sin(x[:,1])**2
-        >>> h = kernel_regression_h(x,y)
-        >>> print(np.allclose(h, [0.172680, 9.516907], atol=0.0001))
-        True
-
-        >>> h = kernel_regression_h(x,y,silverman=True)
-        >>> print(np.allclose(h, [0.229190, 1.903381], atol=0.0001))
-        True
-
-
-        License
-        -------
-        This file is part of the JAMS Python package.
-
-        The JAMS Python package is free software: you can redistribute it and/or modify
-        it under the terms of the GNU Lesser General Public License as published by
-        the Free Software Foundation, either version 3 of the License, or
-        (at your option) any later version.
-
-        The JAMS Python package is distributed in the hope that it will be useful,
-        but WITHOUT ANY WARRANTY; without even the implied warranty of
-        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-        GNU Lesser General Public License for more details.
-
-        You should have received a copy of the GNU Lesser General Public License
-        along with the JAMS Python package (cf. gpl.txt and lgpl.txt).
-        If not, see <http://www.gnu.org/licenses/>.
+        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+        IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+        FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+        AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+        LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+        OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+        SOFTWARE.
 
         Copyright 2012-2013 Matthias Cuntz
 

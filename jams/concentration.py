@@ -1,5 +1,4 @@
 #!/usr/bin/env python2
-# -*- coding: utf-8 -*-
 from __future__ import division, absolute_import, print_function
 
 import numpy as np
@@ -10,21 +9,25 @@ from scipy.integrate import quad
 License:
 This file is part of the JAMS Python package.
 
-The JAMS Python package is free software: you can redistribute it
-and/or modify it under the terms of the GNU Lesser General Public
-License as published by the Free Software Foundation, either version 3
-of the License, or (at your option) any later version.
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
 
-The JAMS Python package is distributed in the hope that it will be
-useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-Lesser General Public License for more details.
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
 
-You should have received a copy of the GNU Lesser General Public
-License along with the JAMS Python package (cf. gpl.txt and lgpl.txt)
-If not, see <http://www.gnu.org/licenses/>.
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
 
-Copyright 2016 Lennart Schüler
+Copyright 2016 Lennart Schueler
 """
 
 
@@ -85,7 +88,7 @@ class Concentration(object):
     """Calculate analytical solutions for mean concentration and
        mean concentration variance.
 
-       See Schüler et al. 2016, AWR for details, derivations, and assumptions
+       See Schueler et al. 2016, AWR for details, derivations, and assumptions
     """
     def __init__(self, dimension, u_mean, D_local, lambda_Y, sigma_2_Y, t0):
         """Initialiser
@@ -205,7 +208,7 @@ class Concentration(object):
     def Chi_TDIEM(self, t):
         """The time dependent mixing model.
 
-        For details see Schüler et al. 2016, AWR.
+        For details see Schueler et al. 2016, AWR.
         """
         d = self.dimension
         return np.sum(self.D_eff(t, d) / (self.lambda_Y)**2 *
