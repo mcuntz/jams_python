@@ -55,6 +55,107 @@ def get_header_excel(excelfile, sheet):
         OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
         SOFTWARE.
 
+        Copyright 2016 Matthias Cuntz
+
+
+        History
+        -------
+        Written,  MC, Mar 2016
+    """
+    # open Excel file
+    wb = xlrd.open_workbook(excelfile)
+    # check sheet exists
+    if sheet not in wb.sheet_names(): raise ValueError('No sheet '+sheet+' in file '+excelfile)
+    sh = wb.sheet_by_name(sheet)
+    # Return variable and column names
+    columns   = sh.row_values(0,0)
+
+    # relase Excel file
+    del wb
+
+    return columns
+
+
+# --------------------------------------------------------------------
+
+def get_value_excel(excelfile, sheet, variable, column, all_rows=False):
+
+    """
+        Get a cell in a sheet of an Excel file
+        where the column is identified by the name in the first row
+        and the row is identified by the value in the column "headerout (final)".
+
+        Both, variable and column can be iterables.
+
+        If variable and/or column is None then the list of variables and columns is returned.
+
+
+        Input
+        -----
+        excelfile   Filename of Excel file
+        sheet       Name of Sheet in Excel file
+        variable    Variable name in column "headerout (final)"
+        column      Name in header line
+
+
+        Optional Input
+        --------------
+        all_rows    option to return whole column, i.e. all rows (default: False).
+                    Should be chosen if there are/may be duplicates in vars/the "headerout (final)" column;
+                    the result of get_value_excel(file,sheet,vars,col)
+                    if vars = get_value_excel(file,sheet,None,'') is NOT equal to
+                    get_value_excel(file,sheet,None,col,all_rows=True)
+                    as the former cannot deal properly with duplicates in vars.
+
+
+        Output
+        ------
+        content of the desired cell
+        if column or variable is iterable, output is list
+        if column and variable is iterable, output is list (variable) of list (columns)
+        if column and/or variable is not given, then a list of all variable and/or columns is returned
+        if column is iterable and all_rows==True, output is list of list (all rows of all columns)
+
+
+        Examples
+        --------
+        --> see __init__.py for full example of workflow
+
+        mini = get_value_excel('CHS-measurements.xlsx', 'Logger Hohes Holz', 'BC1_Ptemp [degC]', 'Min')
+        -> -20.0
+        mini, maxi = get_value_excel('CHS-measurements.xlsx', 'Logger Hohes Holz', 'BC1_Ptemp [degC]', ['Min', 'Max'])
+        -> -20.0, 50.0
+        min1, min2 = get_value_excel('CHS-measurements.xlsx', 'Logger Hohes Holz', ['BC1_Ptemp [degC]', 'Tair50HMP [degC]'], 'Min')
+        -> -20.0, -20.0
+        minmax1, minmax2 = get_value_excel('CHS-measurements.xlsx', 'Logger Hohes Holz', ['BC1_Ptemp [degC]', 'Tair50HMP [degC]'], ['Min', 'Max'])
+        -> [-20.0, 50.0], [-20.0, 50.0]
+        vars = get_value_excel('CHS-measurements.xlsx', 'Logger Hohes Holz', None, '')
+        columns = get_value_excel('CHS-measurements.xlsx', 'Logger Hohes Holz', '', None)
+        vars, columns = get_value_excel('CHS-measurements.xlsx', 'Logger Hohes Holz', None, None)
+
+
+        License
+        -------
+        This file is part of the JAMS Python package.
+
+        Permission is hereby granted, free of charge, to any person obtaining a copy
+        of this software and associated documentation files (the "Software"), to deal
+        in the Software without restriction, including without limitation the rights
+        to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+        copies of the Software, and to permit persons to whom the Software is
+        furnished to do so, subject to the following conditions:
+
+        The above copyright notice and this permission notice shall be included in all
+        copies or substantial portions of the Software.
+
+        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+        IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+        FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+        AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+        LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+        OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+        SOFTWARE.
+
         Copyright 2015 Matthias Cuntz
 
 

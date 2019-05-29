@@ -79,6 +79,160 @@ def get_binary(ftp, fname):
         History
         -------
         Written,  MC, Dec 2014 - modified from
+                                 http://www.java2s.com/Tutorial/Python/0420__Network/Binaryfiledownload.htm
+    """
+    ftp.voidcmd("TYPE I")
+    datasock, estsize = ftp.ntransfercmd("RETR "+fname)
+    transbytes = 0
+    fd = open(fname, 'wb')
+    while True:
+        buf = datasock.recv(2048)
+        if not len(buf):
+            break
+        fd.write(buf)
+        transbytes += len(buf)
+    fd.close()
+    datasock.close()
+    ftp.voidresp()
+    set_mtime(ftp, fname)
+
+# ------------------------------------------------------------------------------------------
+
+def get_check_binary(ftp, fname):
+    """
+        Get a binary file from an open FTP connection and
+        check that local filesize is the same as the remote file size.
+
+
+        Definition
+        ----------
+        def get_check_binary(ftp, fname):
+
+
+        Input
+        -----
+        ftp          instance of the ftplib.FTP class
+        fname        filename
+
+
+        Output
+        ------
+        File fname in current local directory
+
+
+        Examples
+        --------
+        import ftplib
+        import os
+        ftp = ftplib.FTP("ftp.server.de")
+        ftp.login("user", "password")
+        ftp.cwd('ftp/directory')
+        os.chdir('local/directory')
+        if not get_check_binary(ftp, 'test.dat'):
+            print('Error in transfer')
+        ftp.close()
+
+
+        License
+        -------
+        This file is part of the JAMS Python package.
+
+        Permission is hereby granted, free of charge, to any person obtaining a copy
+        of this software and associated documentation files (the "Software"), to deal
+        in the Software without restriction, including without limitation the rights
+        to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+        copies of the Software, and to permit persons to whom the Software is
+        furnished to do so, subject to the following conditions:
+
+        The above copyright notice and this permission notice shall be included in all
+        copies or substantial portions of the Software.
+
+        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+        IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+        FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+        AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+        LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+        OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+        SOFTWARE.
+
+        Copyright 2014 Matthias Cuntz
+
+
+        History
+        -------
+        Written,  MC, Dec 2014
+    """
+    rsize = get_size(ftp, fname)
+    get_binary(ftp, fname)
+    lsize = os.stat(fname).st_size
+    if rsize == lsize:
+        return True
+    else:
+        return False
+
+# ------------------------------------------------------------------------------------------
+
+def get_mac_ascii(ftp, fname):
+    """
+        Get a Mac ascii file from an open FTP connection.
+
+
+        Definition
+        ----------
+        def get_mac_ascii(ftp, fname):
+
+
+        Input
+        -----
+        ftp          instance of the ftplib.FTP class
+        fname        filename
+
+
+        Output
+        ------
+        File fname in current local directory
+
+
+        Examples
+        --------
+        import ftplib
+        import os
+        ftp = ftplib.FTP("ftp.server.de")
+        ftp.login("user", "password")
+        ftp.cwd('ftp/directory')
+        os.chdir('local/directory')
+        get_mac_ascii(ftp, 'test.dat')
+        ftp.close()
+
+
+        License
+        -------
+        This file is part of the JAMS Python package.
+
+        Permission is hereby granted, free of charge, to any person obtaining a copy
+        of this software and associated documentation files (the "Software"), to deal
+        in the Software without restriction, including without limitation the rights
+        to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+        copies of the Software, and to permit persons to whom the Software is
+        furnished to do so, subject to the following conditions:
+
+        The above copyright notice and this permission notice shall be included in all
+        copies or substantial portions of the Software.
+
+        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+        IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+        FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+        AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+        LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+        OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+        SOFTWARE.
+
+        Copyright 2014 Matthias Cuntz
+
+
+        History
+        -------
+        Written,  MC, Dec 2014 - modified from
                                  http://www.java2s.com/Tutorial/Python/0420__Network/ASCIIfiledownload.htm
     """
     def writeline(data):
