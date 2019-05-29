@@ -152,6 +152,8 @@ def upscale_fdir(sn, factor, print_info=False, return_maxlocs=False, do_co=False
         -------
         This file is part of the JAMS Python package.
 
+        Copyright (c) 2016 Stephan Thober
+
         Permission is hereby granted, free of charge, to any person obtaining a copy
         of this software and associated documentation files (the "Software"), to deal
         in the Software without restriction, including without limitation the rights
@@ -328,6 +330,8 @@ class river_network(object):
         License
         -------
         This file is part of the JAMS Python package.
+
+        Copyright (c) 2016 Stephan Thober
 
         Permission is hereby granted, free of charge, to any person obtaining a copy
         of this software and associated documentation files (the "Software"), to deal

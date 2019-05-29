@@ -137,6 +137,8 @@ def nee2gpp(dates, nee, t, isday, rg=False, vpd=False, undef=np.nan,
         -------
         This file is part of the JAMS Python package.
 
+        Copyright (c) 2012-2014 Matthias Cuntz, Arndt Piayda - mc (at) macu (dot) de
+
         Permission is hereby granted, free of charge, to any person obtaining a copy
         of this software and associated documentation files (the "Software"), to deal
         in the Software without restriction, including without limitation the rights
@@ -255,6 +257,8 @@ def nee2gpp_falge(dates, nee, t, isday, undef=np.nan,
         License
         -------
         This file is part of the JAMS Python package.
+
+        Copyright (c) 2012-2013 Matthias Cuntz, Arndt Piayda - mc (at) macu (dot) de
 
         Permission is hereby granted, free of charge, to any person obtaining a copy
         of this software and associated documentation files (the "Software"), to deal
@@ -447,6 +451,8 @@ def nee2gpp_reichstein(dates, nee, t, isday, rg=False, vpd=False, undef=np.nan,
         License
         -------
         This file is part of the JAMS Python package.
+
+        Copyright (c) 2012-2013 Matthias Cuntz, Arndt Piayda - mc (at) macu (dot) de
 
         Permission is hereby granted, free of charge, to any person obtaining a copy
         of this software and associated documentation files (the "Software"), to deal
@@ -764,6 +770,8 @@ def nee2gpp_lasslop(dates, nee, t, isday, rg, vpd, undef=np.nan,
         License
         -------
         This file is part of the JAMS Python package.
+
+        Copyright (c) 2012-2013 Matthias Cuntz, Arndt Piayda - mc (at) macu (dot) de
 
         Permission is hereby granted, free of charge, to any person obtaining a copy
         of this software and associated documentation files (the "Software"), to deal

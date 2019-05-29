@@ -60,6 +60,8 @@ def fullnames(fname=None, dirs=None):
         -------
         This file is part of the JAMS Python package.
 
+        Copyright (c) 2014-2015 Matthias Cuntz - mc (at) macu (dot) de
+
         Permission is hereby granted, free of charge, to any person obtaining a copy
         of this software and associated documentation files (the "Software"), to deal
         in the Software without restriction, including without limitation the rights
@@ -150,6 +152,8 @@ def fullnames_dates(fname=None, dirs=None):
         License
         -------
         This file is part of the JAMS Python package.
+
+        Copyright (c) 2014-2015 Matthias Cuntz - mc (at) macu (dot) de
 
         Permission is hereby granted, free of charge, to any person obtaining a copy
         of this software and associated documentation files (the "Software"), to deal
@@ -245,6 +249,8 @@ def fullnames_dates_sizes(fname=None, dirs=None):
         License
         -------
         This file is part of the JAMS Python package.
+
+        Copyright (c) 2014-2015 Matthias Cuntz - mc (at) macu (dot) de
 
         Permission is hereby granted, free of charge, to any person obtaining a copy
         of this software and associated documentation files (the "Software"), to deal
@@ -345,6 +351,8 @@ def fullnames_sizes(fname=None, dirs=None):
         -------
         This file is part of the JAMS Python package.
 
+        Copyright (c) 2014-2015 Matthias Cuntz - mc (at) macu (dot) de
+
         Permission is hereby granted, free of charge, to any person obtaining a copy
         of this software and associated documentation files (the "Software"), to deal
         in the Software without restriction, including without limitation the rights
@@ -425,6 +433,8 @@ def fullnames_times(*args, **kwargs):
         -------
         This file is part of the JAMS Python package.
 
+        Copyright (c) 2014-2015 Matthias Cuntz - mc (at) macu (dot) de
+
         Permission is hereby granted, free of charge, to any person obtaining a copy
         of this software and associated documentation files (the "Software"), to deal
         in the Software without restriction, including without limitation the rights
@@ -477,6 +487,8 @@ def fullnames_times_sizes(*args, **kwargs):
         License
         -------
         This file is part of the JAMS Python package.
+
+        Copyright (c) 2014-2015 Matthias Cuntz - mc (at) macu (dot) de
 
         Permission is hereby granted, free of charge, to any person obtaining a copy
         of this software and associated documentation files (the "Software"), to deal
@@ -545,6 +557,8 @@ def last_fullname(fname=None, dirs=None):
         License
         -------
         This file is part of the JAMS Python package.
+
+        Copyright (c) 2014-2015 Matthias Cuntz - mc (at) macu (dot) de
 
         Permission is hereby granted, free of charge, to any person obtaining a copy
         of this software and associated documentation files (the "Software"), to deal
@@ -625,6 +639,8 @@ def last_fullname_date(fname=None, dirs=None):
         -------
         This file is part of the JAMS Python package.
 
+        Copyright (c) 2014-2015 Matthias Cuntz - mc (at) macu (dot) de
+
         Permission is hereby granted, free of charge, to any person obtaining a copy
         of this software and associated documentation files (the "Software"), to deal
         in the Software without restriction, including without limitation the rights
@@ -703,6 +719,8 @@ def last_fullname_date_size(fname=None, dirs=None):
         License
         -------
         This file is part of the JAMS Python package.
+
+        Copyright (c) 2014-2015 Matthias Cuntz - mc (at) macu (dot) de
 
         Permission is hereby granted, free of charge, to any person obtaining a copy
         of this software and associated documentation files (the "Software"), to deal
@@ -783,6 +801,8 @@ def last_fullname_size(fname=None, dirs=None):
         -------
         This file is part of the JAMS Python package.
 
+        Copyright (c) 2014-2015 Matthias Cuntz - mc (at) macu (dot) de
+
         Permission is hereby granted, free of charge, to any person obtaining a copy
         of this software and associated documentation files (the "Software"), to deal
         in the Software without restriction, including without limitation the rights
@@ -847,6 +867,8 @@ def last_fullname_time(*args, **kwargs):
         -------
         This file is part of the JAMS Python package.
 
+        Copyright (c) 2014-2015 Matthias Cuntz - mc (at) macu (dot) de
+
         Permission is hereby granted, free of charge, to any person obtaining a copy
         of this software and associated documentation files (the "Software"), to deal
         in the Software without restriction, including without limitation the rights
@@ -899,6 +921,8 @@ def last_fullname_time_size(*args, **kwargs):
         License
         -------
         This file is part of the JAMS Python package.
+
+        Copyright (c) 2014-2015 Matthias Cuntz - mc (at) macu (dot) de
 
         Permission is hereby granted, free of charge, to any person obtaining a copy
         of this software and associated documentation files (the "Software"), to deal
@@ -967,6 +991,8 @@ def last_name(fname=None, dirs=None):
         License
         -------
         This file is part of the JAMS Python package.
+
+        Copyright (c) 2014-2015 Matthias Cuntz - mc (at) macu (dot) de
 
         Permission is hereby granted, free of charge, to any person obtaining a copy
         of this software and associated documentation files (the "Software"), to deal
@@ -1047,6 +1073,8 @@ def last_name_date(fname=None, dirs=None):
         -------
         This file is part of the JAMS Python package.
 
+        Copyright (c) 2014-2015 Matthias Cuntz - mc (at) macu (dot) de
+
         Permission is hereby granted, free of charge, to any person obtaining a copy
         of this software and associated documentation files (the "Software"), to deal
         in the Software without restriction, including without limitation the rights
@@ -1125,6 +1153,8 @@ def last_name_date_size(fname=None, dirs=None):
         License
         -------
         This file is part of the JAMS Python package.
+
+        Copyright (c) 2014-2015 Matthias Cuntz - mc (at) macu (dot) de
 
         Permission is hereby granted, free of charge, to any person obtaining a copy
         of this software and associated documentation files (the "Software"), to deal
@@ -1205,6 +1235,8 @@ def last_name_size(fname=None, dirs=None):
         -------
         This file is part of the JAMS Python package.
 
+        Copyright (c) 2014-2015 Matthias Cuntz - mc (at) macu (dot) de
+
         Permission is hereby granted, free of charge, to any person obtaining a copy
         of this software and associated documentation files (the "Software"), to deal
         in the Software without restriction, including without limitation the rights
@@ -1269,6 +1301,8 @@ def last_name_time(*args, **kwargs):
         -------
         This file is part of the JAMS Python package.
 
+        Copyright (c) 2014-2015 Matthias Cuntz - mc (at) macu (dot) de
+
         Permission is hereby granted, free of charge, to any person obtaining a copy
         of this software and associated documentation files (the "Software"), to deal
         in the Software without restriction, including without limitation the rights
@@ -1321,6 +1355,8 @@ def last_name_time_size(*args, **kwargs):
         License
         -------
         This file is part of the JAMS Python package.
+
+        Copyright (c) 2014-2015 Matthias Cuntz - mc (at) macu (dot) de
 
         Permission is hereby granted, free of charge, to any person obtaining a copy
         of this software and associated documentation files (the "Software"), to deal
@@ -1389,6 +1425,8 @@ def names(fname=None, dirs=None):
         License
         -------
         This file is part of the JAMS Python package.
+
+        Copyright (c) 2014-2015 Matthias Cuntz - mc (at) macu (dot) de
 
         Permission is hereby granted, free of charge, to any person obtaining a copy
         of this software and associated documentation files (the "Software"), to deal
@@ -1479,6 +1517,8 @@ def names_dates(fname=None, dirs=None):
         License
         -------
         This file is part of the JAMS Python package.
+
+        Copyright (c) 2014-2015 Matthias Cuntz - mc (at) macu (dot) de
 
         Permission is hereby granted, free of charge, to any person obtaining a copy
         of this software and associated documentation files (the "Software"), to deal
@@ -1573,6 +1613,8 @@ def names_dates_sizes(fname=None, dirs=None):
         License
         -------
         This file is part of the JAMS Python package.
+
+        Copyright (c) 2014-2015 Matthias Cuntz - mc (at) macu (dot) de
 
         Permission is hereby granted, free of charge, to any person obtaining a copy
         of this software and associated documentation files (the "Software"), to deal
@@ -1672,6 +1714,8 @@ def names_sizes(fname=None, dirs=None):
         -------
         This file is part of the JAMS Python package.
 
+        Copyright (c) 2014-2015 Matthias Cuntz - mc (at) macu (dot) de
+
         Permission is hereby granted, free of charge, to any person obtaining a copy
         of this software and associated documentation files (the "Software"), to deal
         in the Software without restriction, including without limitation the rights
@@ -1751,6 +1795,8 @@ def names_times(*args, **kwargs):
         -------
         This file is part of the JAMS Python package.
 
+        Copyright (c) 2014-2015 Matthias Cuntz - mc (at) macu (dot) de
+
         Permission is hereby granted, free of charge, to any person obtaining a copy
         of this software and associated documentation files (the "Software"), to deal
         in the Software without restriction, including without limitation the rights
@@ -1803,6 +1849,8 @@ def names_times_sizes(*args, **kwargs):
         License
         -------
         This file is part of the JAMS Python package.
+
+        Copyright (c) 2014-2015 Matthias Cuntz - mc (at) macu (dot) de
 
         Permission is hereby granted, free of charge, to any person obtaining a copy
         of this software and associated documentation files (the "Software"), to deal
@@ -1857,6 +1905,8 @@ def newest_fullname(*args, **kwargs):
         -------
         This file is part of the JAMS Python package.
 
+        Copyright (c) 2014-2015 Matthias Cuntz - mc (at) macu (dot) de
+
         Permission is hereby granted, free of charge, to any person obtaining a copy
         of this software and associated documentation files (the "Software"), to deal
         in the Software without restriction, including without limitation the rights
@@ -1910,6 +1960,8 @@ def newest_fullname_date(*args, **kwargs):
         -------
         This file is part of the JAMS Python package.
 
+        Copyright (c) 2014-2015 Matthias Cuntz - mc (at) macu (dot) de
+
         Permission is hereby granted, free of charge, to any person obtaining a copy
         of this software and associated documentation files (the "Software"), to deal
         in the Software without restriction, including without limitation the rights
@@ -1962,6 +2014,8 @@ def newest_fullname_date_size(*args, **kwargs):
         License
         -------
         This file is part of the JAMS Python package.
+
+        Copyright (c) 2014-2015 Matthias Cuntz - mc (at) macu (dot) de
 
         Permission is hereby granted, free of charge, to any person obtaining a copy
         of this software and associated documentation files (the "Software"), to deal
@@ -2032,6 +2086,8 @@ def newest_fullname_size(*args, **kwargs):
         -------
         This file is part of the JAMS Python package.
 
+        Copyright (c) 2014-2015 Matthias Cuntz - mc (at) macu (dot) de
+
         Permission is hereby granted, free of charge, to any person obtaining a copy
         of this software and associated documentation files (the "Software"), to deal
         in the Software without restriction, including without limitation the rights
@@ -2084,6 +2140,8 @@ def newest_fullname_time(*args, **kwargs):
         License
         -------
         This file is part of the JAMS Python package.
+
+        Copyright (c) 2014-2015 Matthias Cuntz - mc (at) macu (dot) de
 
         Permission is hereby granted, free of charge, to any person obtaining a copy
         of this software and associated documentation files (the "Software"), to deal
@@ -2138,6 +2196,8 @@ def newest_fullname_time_size(*args, **kwargs):
         -------
         This file is part of the JAMS Python package.
 
+        Copyright (c) 2014-2015 Matthias Cuntz - mc (at) macu (dot) de
+
         Permission is hereby granted, free of charge, to any person obtaining a copy
         of this software and associated documentation files (the "Software"), to deal
         in the Software without restriction, including without limitation the rights
@@ -2191,6 +2251,8 @@ def newest_name(*args, **kwargs):
         -------
         This file is part of the JAMS Python package.
 
+        Copyright (c) 2014-2015 Matthias Cuntz - mc (at) macu (dot) de
+
         Permission is hereby granted, free of charge, to any person obtaining a copy
         of this software and associated documentation files (the "Software"), to deal
         in the Software without restriction, including without limitation the rights
@@ -2243,6 +2305,8 @@ def newest_name_date(*args, **kwargs):
         License
         -------
         This file is part of the JAMS Python package.
+
+        Copyright (c) 2014-2015 Matthias Cuntz - mc (at) macu (dot) de
 
         Permission is hereby granted, free of charge, to any person obtaining a copy
         of this software and associated documentation files (the "Software"), to deal
@@ -2308,6 +2372,8 @@ def newest_name_date_size(*args, **kwargs):
         -------
         This file is part of the JAMS Python package.
 
+        Copyright (c) 2014-2015 Matthias Cuntz - mc (at) macu (dot) de
+
         Permission is hereby granted, free of charge, to any person obtaining a copy
         of this software and associated documentation files (the "Software"), to deal
         in the Software without restriction, including without limitation the rights
@@ -2360,6 +2426,8 @@ def newest_name_size(*args, **kwargs):
         License
         -------
         This file is part of the JAMS Python package.
+
+        Copyright (c) 2014-2015 Matthias Cuntz - mc (at) macu (dot) de
 
         Permission is hereby granted, free of charge, to any person obtaining a copy
         of this software and associated documentation files (the "Software"), to deal
@@ -2414,6 +2482,8 @@ def newest_name_time(*args, **kwargs):
         -------
         This file is part of the JAMS Python package.
 
+        Copyright (c) 2014-2015 Matthias Cuntz - mc (at) macu (dot) de
+
         Permission is hereby granted, free of charge, to any person obtaining a copy
         of this software and associated documentation files (the "Software"), to deal
         in the Software without restriction, including without limitation the rights
@@ -2466,6 +2536,8 @@ def newest_name_date_size(*args, **kwargs):
         License
         -------
         This file is part of the JAMS Python package.
+
+        Copyright (c) 2014-2015 Matthias Cuntz - mc (at) macu (dot) de
 
         Permission is hereby granted, free of charge, to any person obtaining a copy
         of this software and associated documentation files (the "Software"), to deal

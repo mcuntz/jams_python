@@ -148,6 +148,8 @@ def gapfill(date, data, rg, tair, vpd,
         -------
         This file is part of the JAMS Python package.
 
+        Copyright (c) 2012-2014 Matthias Cuntz - mc (at) macu (dot) de
+
         Permission is hereby granted, free of charge, to any person obtaining a copy
         of this software and associated documentation files (the "Software"), to deal
         in the Software without restriction, including without limitation the rights

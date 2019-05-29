@@ -140,6 +140,8 @@ def writenetcdf(fhandle, vhandle=None, var=None, time=None, isdim=False, name=No
         -------
         This file is part of the JAMS Python package.
 
+        Copyright (c) 2012-2015 Matthias Zink, Matthias Cuntz, Stephan Thober - mc (at) macu (dot) de
+
         Permission is hereby granted, free of charge, to any person obtaining a copy
         of this software and associated documentation files (the "Software"), to deal
         in the Software without restriction, including without limitation the rights
@@ -330,6 +332,8 @@ def dumpnetcdf( fname, dims=None, fileattributes=None, vnames=None, create=True,
         -------
         This file is part of the JAMS Python package.
 
+        Copyright (c) 2014-2016 Stephan Thober
+
         Permission is hereby granted, free of charge, to any person obtaining a copy
         of this software and associated documentation files (the "Software"), to deal
         in the Software without restriction, including without limitation the rights
@@ -480,6 +484,8 @@ def get_dims( fname ):
         License
         -------
         This file is part of the JAMS Python package.
+
+        Copyright (c) 2015-2016 Stephan Thober
 
         Permission is hereby granted, free of charge, to any person obtaining a copy
         of this software and associated documentation files (the "Software"), to deal

@@ -244,6 +244,8 @@ def sn(front, reference_front):
         -------
         This file is part of the JAMS Python package.
 
+        Copyright (c) 2016 Juliane Mai
+
         Permission is hereby granted, free of charge, to any person obtaining a copy
         of this software and associated documentation files (the "Software"), to deal
         in the Software without restriction, including without limitation the rights
@@ -347,6 +349,8 @@ def cz(front, all_fronts, all_cz=False):
         License
         -------
         This file is part of the JAMS Python package.
+
+        Copyright (c) 2016 Juliane Mai
 
         Permission is hereby granted, free of charge, to any person obtaining a copy
         of this software and associated documentation files (the "Software"), to deal
@@ -521,6 +525,8 @@ def hi(front, reference_point, nsamples=None, reference_front=None, hi_range=Fal
         License
         -------
         This file is part of the JAMS Python package.
+
+        Copyright (c) 2016 Juliane Mai
 
         Permission is hereby granted, free of charge, to any person obtaining a copy
         of this software and associated documentation files (the "Software"), to deal
@@ -703,6 +709,8 @@ def ef(front, reference_front):
         -------
         This file is part of the JAMS Python package.
 
+        Copyright (c) 2016 Juliane Mai
+
         Permission is hereby granted, free of charge, to any person obtaining a copy
         of this software and associated documentation files (the "Software"), to deal
         in the Software without restriction, including without limitation the rights
@@ -826,6 +834,8 @@ def aed(front, reference_front):
         License
         -------
         This file is part of the JAMS Python package.
+
+        Copyright (c) 2016 Juliane Mai
 
         Permission is hereby granted, free of charge, to any person obtaining a copy
         of this software and associated documentation files (the "Software"), to deal

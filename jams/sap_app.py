@@ -75,6 +75,8 @@ def t2sap(date, data, swd=None, undef=-9999.):
         -------
         This file is part of the JAMS Python package.
 
+        Copyright (c) 2014-2016 Andreas Wiedemann, Matthias Cuntz - mc (at) macu (dot) de
+
         Permission is hereby granted, free of charge, to any person obtaining a copy
         of this software and associated documentation files (the "Software"), to deal
         in the Software without restriction, including without limitation the rights

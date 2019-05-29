@@ -37,6 +37,8 @@ def get_header_excel(excelfile, sheet):
         -------
         This file is part of the JAMS Python package.
 
+        Copyright (c) 2016 Matthias Cuntz - mc (at) macu (dot) de
+
         Permission is hereby granted, free of charge, to any person obtaining a copy
         of this software and associated documentation files (the "Software"), to deal
         in the Software without restriction, including without limitation the rights
@@ -137,6 +139,8 @@ def get_value_excel(excelfile, sheet, variable, column, all_rows=False):
         License
         -------
         This file is part of the JAMS Python package.
+
+        Copyright (c) 2015-2016 Matthias Cuntz, Benjamin Dechant - mc (at) macu (dot) de
 
         Permission is hereby granted, free of charge, to any person obtaining a copy
         of this software and associated documentation files (the "Software"), to deal

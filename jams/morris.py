@@ -77,6 +77,8 @@ from __future__ import division, absolute_import, print_function
     -------
     This file is part of the JAMS Python package.
 
+    Copyright (c) 2012-2017 S Van Hoey, Matthias Cuntz - mc (at) macu (dot) de
+
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"), to deal
     in the Software without restriction, including without limitation the rights
@@ -198,6 +200,10 @@ def  Sampling_Function_2(p, k, r, LB, UB, GroupMat=np.array([])):
 
         License
         -------
+        This file is part of the JAMS Python package.
+
+        Copyright (c) 2012-2013 S Van Hoey, Matthias Cuntz - mc (at) macu (dot) de
+
         Permission is hereby granted, free of charge, to any person obtaining a copy
         of this software and associated documentation files (the "Software"), to deal
         in the Software without restriction, including without limitation the rights
@@ -359,6 +365,10 @@ def Optimized_Groups(NumFact, LB, UB, N=500, p=4, r=10, GroupMat=np.array([]), D
 
         License
         -------
+        This file is part of the JAMS Python package.
+
+        Copyright (c) 2012-2013 S Van Hoey, Matthias Cuntz - mc (at) macu (dot) de
+
         Permission is hereby granted, free of charge, to any person obtaining a copy
         of this software and associated documentation files (the "Software"), to deal
         in the Software without restriction, including without limitation the rights
@@ -613,6 +623,10 @@ def Morris_Measure_Groups(NumFact, Sample, OutFact, Output, p=4, Group=[], Diagn
 
         License
         -------
+        This file is part of the JAMS Python package.
+
+        Copyright (c) 2012-2017 S Van Hoey, Matthias Cuntz - mc (at) macu (dot) de
+
         Permission is hereby granted, free of charge, to any person obtaining a copy
         of this software and associated documentation files (the "Software"), to deal
         in the Software without restriction, including without limitation the rights

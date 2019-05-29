@@ -38,6 +38,7 @@ def in_poly(P, coord_x, coord_y):
         ----------
         This routine is re-coded from the JAMS Fortran package.
         Copyright: Juliane Mai, 2012.
+        
         The original version of the source code (pnpoly) was implemented by
         W. Randolph Franklin. It had been, however, assigning insufficiently
         vertex/edge points.
@@ -67,6 +68,8 @@ def in_poly(P, coord_x, coord_y):
         License
         -------
         This file is part of the JAMS Python package.
+
+        Copyright (c) 2012-2014 Arndt Piayda, Matthias Cuntz - mc (at) macu (dot) de
 
         Permission is hereby granted, free of charge, to any person obtaining a copy
         of this software and associated documentation files (the "Software"), to deal

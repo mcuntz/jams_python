@@ -79,6 +79,8 @@ def pca(mat, corr=False, ndim=None, rvar=None):
         -------
         This file is part of the JAMS Python package.
 
+        Copyright (c) 2014 Matthias Cuntz - mc (at) macu (dot) de
+
         Permission is hereby granted, free of charge, to any person obtaining a copy
         of this software and associated documentation files (the "Software"), to deal
         in the Software without restriction, including without limitation the rights
@@ -201,6 +203,8 @@ def check_pca(data, comps, eigenvectors, corr=False, rtol=1e-05, atol=1e-08):
         License
         -------
         This file is part of the JAMS Python package.
+
+        Copyright (c) 2014 Matthias Cuntz - mc (at) macu (dot) de
 
         Permission is hereby granted, free of charge, to any person obtaining a copy
         of this software and associated documentation files (the "Software"), to deal

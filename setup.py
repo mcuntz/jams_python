@@ -3,12 +3,14 @@ from __future__ import division, absolute_import, print_function
 """
 jams: JAMS Python Utilities
 
-jams is a general package offering miscellaneous functions in different categories,
+JAMS is a general package offering miscellaneous functions in different categories,
 such as reading different file formats, julian date routines, or meteorological functions.
 
 It has several subpackages offering constants, working with Eddy covariance data and EddySoft,
-    offering special functions, or objective functions be used with scipy.optimize.fmin or scipy.optimize.curvefit,
-    and much more.
+offering special functions, or objective functions be used with scipy.optimize.fmin or scipy.optimize.curvefit,
+and much more.
+
+Copyright (c) 2012-2019 Matthias Cuntz, Juliane Mai, Stephan Thober
 """
 DOCLINES = __doc__.split("\n")
 
@@ -55,8 +57,8 @@ metadata = dict(
     description = DOCLINES[0],
     # long_description = "\n".join(DOCLINES[2:]),
     long_description = readme,
-    url = "https://bitbucket.org/mcuntz/jams_python",
-    author = "JAMS = Juliane Mai, Matthias Cuntz, Stephan Thober",
+    url = "https://github.com/mcuntz/jams_python.git",
+    author = "JAMS = Matthias Cuntz, Juliane Mai, Stephan Thober",
     author_email = "mc (at) macu (dot) de",
     license = 'MIT -  see LICENSE',
     classifiers=[_f for _f in CLASSIFIERS.split('\n') if _f],

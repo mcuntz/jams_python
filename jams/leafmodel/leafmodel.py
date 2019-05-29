@@ -28,6 +28,8 @@ from jams.sce import sce
     -------
     This file is part of the JAMS Python package.
 
+    Copyright (c) 2014 Arndt Piayda, Matthias Cuntz - mc (at) macu (dot) de
+
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"), to deal
     in the Software without restriction, including without limitation the rights
@@ -189,6 +191,8 @@ def opt_leafmodel(params, Eobs, GPPobs, ci_ini, Tl, PAR, ea, ca, ga, gb, P,
     License
     -------
     This file is part of the JAMS Python package.
+
+    Copyright (c) 2014 Arndt Piayda, Matthias Cuntz - mc (at) macu (dot) de
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"), to deal
@@ -517,6 +521,8 @@ def leafmodel(ci_ini, Tl, PAR, ea, ca, ga, gb, P, par1, par2,
     -------
     This file is part of the JAMS Python package.
 
+    Copyright (c) 2014 Arndt Piayda, Matthias Cuntz - mc (at) macu (dot) de
+
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"), to deal
     in the Software without restriction, including without limitation the rights
@@ -676,6 +682,8 @@ def twoleafmodel(ci_ini, Tl, PAR, ea, ca, ga, gb, P, PARdiff, fsun, par1, par2,
     License
     -------
     This file is part of the JAMS Python package.
+
+    Copyright (c) 2014 Arndt Piayda, Matthias Cuntz - mc (at) macu (dot) de
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"), to deal

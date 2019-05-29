@@ -40,6 +40,8 @@ def directories_from_gui(initialdir='.', title='Choose one of several directorie
         -------
         This file is part of the JAMS Python package.
 
+        Copyright (c) 2015 Matthias Cuntz - mc (at) macu (dot) de
+
         Permission is hereby granted, free of charge, to any person obtaining a copy
         of this software and associated documentation files (the "Software"), to deal
         in the Software without restriction, including without limitation the rights
@@ -134,6 +136,8 @@ def directory_from_gui(initialdir='.', title='Choose directory'):
         License
         -------
         This file is part of the JAMS Python package.
+
+        Copyright (c) 2014 Matthias Cuntz - mc (at) macu (dot) de
 
         Permission is hereby granted, free of charge, to any person obtaining a copy
         of this software and associated documentation files (the "Software"), to deal
@@ -233,6 +237,8 @@ def file_from_gui(initialdir='.', title='Choose file', multiple=False):
         -------
         This file is part of the JAMS Python package.
 
+        Copyright (c) 2014 Matthias Cuntz - mc (at) macu (dot) de
+
         Permission is hereby granted, free of charge, to any person obtaining a copy
         of this software and associated documentation files (the "Software"), to deal
         in the Software without restriction, including without limitation the rights
@@ -304,6 +310,8 @@ def files_from_gui(initialdir='.', title='Choose file(s)', multiple=True):
         License
         -------
         This file is part of the JAMS Python package.
+
+        Copyright (c) 2014 Matthias Cuntz - mc (at) macu (dot) de
 
         Permission is hereby granted, free of charge, to any person obtaining a copy
         of this software and associated documentation files (the "Software"), to deal

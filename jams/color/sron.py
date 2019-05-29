@@ -163,6 +163,8 @@ def sron_colors(cmap='palette1', ncol=9, cname=None, rgb=False, rgb256=False, re
         -------
         This file is part of the JAMS Python package.
 
+        Copyright (c) 2016 Matthias Cuntz - mc (at) macu (dot) de
+
         Permission is hereby granted, free of charge, to any person obtaining a copy
         of this software and associated documentation files (the "Software"), to deal
         in the Software without restriction, including without limitation the rights
@@ -329,6 +331,8 @@ def sron_maps(cmap, ncol=256, offset=0, upper=1,
         License
         -------
         This file is part of the JAMS Python package.
+
+        Copyright (c) 2016 Matthias Cuntz - mc (at) macu (dot) de
 
         Permission is hereby granted, free of charge, to any person obtaining a copy
         of this software and associated documentation files (the "Software"), to deal

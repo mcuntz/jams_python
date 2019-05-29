@@ -27,9 +27,9 @@ import numpy as np
 
     Licence
     -------
-    Copyright (c) 2017 Sukhbinder Singh
-
     This file is part of the JAMS Python package.
+
+    Copyright (c) 2017 Sukhbinder Singh
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"), to deal

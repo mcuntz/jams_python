@@ -146,6 +146,8 @@ def xread(infile, sheet=None, nc=0, cname=None, snc=0, sname=None, skip=0, cskip
         -------
         This file is part of the JAMS Python package.
 
+        Copyright (c) 2017-2019 Matthias Cuntz - mc (at) macu (dot) de
+
         Permission is hereby granted, free of charge, to any person obtaining a copy
         of this software and associated documentation files (the "Software"), to deal
         in the Software without restriction, including without limitation the rights

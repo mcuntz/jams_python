@@ -79,6 +79,8 @@ def read_data(files, undef=-9999., strip=None, norecord=False, nofill=False):
         -------
         This file is part of the JAMS Python package.
 
+        Copyright (c) 2015-2017 Matthias Cuntz - mc (at) macu (dot) de
+
         Permission is hereby granted, free of charge, to any person obtaining a copy
         of this software and associated documentation files (the "Software"), to deal
         in the Software without restriction, including without limitation the rights
@@ -294,6 +296,8 @@ def write_data(*args):
         -------
         This file is part of the JAMS Python package.
 
+        Copyright (c) 2014-2015 Matthias Cuntz - mc (at) macu (dot) de
+
         Permission is hereby granted, free of charge, to any person obtaining a copy
         of this software and associated documentation files (the "Software"), to deal
         in the Software without restriction, including without limitation the rights
@@ -395,6 +399,8 @@ def write_data_dmp(*args):
         License
         -------
         This file is part of the JAMS Python package.
+
+        Copyright (c) 2015 Matthias Cuntz - mc (at) macu (dot) de
 
         Permission is hereby granted, free of charge, to any person obtaining a copy
         of this software and associated documentation files (the "Software"), to deal
@@ -499,6 +505,8 @@ def write_data_dmp_size(*args):
         -------
         This file is part of the JAMS Python package.
 
+        Copyright (c) 2015-2016 Matthias Cuntz, Benjamin Dechant - mc (at) macu (dot) de
+
         Permission is hereby granted, free of charge, to any person obtaining a copy
         of this software and associated documentation files (the "Software"), to deal
         in the Software without restriction, including without limitation the rights
@@ -598,6 +606,8 @@ def write_data_one_file(*args):
         -------
         This file is part of the JAMS Python package.
 
+        Copyright (c) 2016 Matthias Cuntz - mc (at) macu (dot) de
+
         Permission is hereby granted, free of charge, to any person obtaining a copy
         of this software and associated documentation files (the "Software"), to deal
         in the Software without restriction, including without limitation the rights
@@ -678,6 +688,8 @@ def write_data_norecord(infiles, sdate, dat, flags, iidate, hdate, hdat, hflags,
         License
         -------
         This file is part of the JAMS Python package.
+
+        Copyright (c) 2015 Matthias Cuntz - mc (at) macu (dot) de
 
         Permission is hereby granted, free of charge, to any person obtaining a copy
         of this software and associated documentation files (the "Software"), to deal
@@ -791,6 +803,8 @@ def write_data_norecord_dmp(infiles, sdate, dat, flags, iidate, hdate, hdat, hfl
         License
         -------
         This file is part of the JAMS Python package.
+
+        Copyright (c) 2016 Matthias Cuntz - mc (at) macu (dot) de
 
         Permission is hereby granted, free of charge, to any person obtaining a copy
         of this software and associated documentation files (the "Software"), to deal
@@ -916,6 +930,8 @@ def write_data_norecord_dmp_size(infiles, sdate, dat, flags, iidate, hdate, hdat
         License
         -------
         This file is part of the JAMS Python package.
+
+        Copyright (c) 2016 Matthias Cuntz - mc (at) macu (dot) de
 
         Permission is hereby granted, free of charge, to any person obtaining a copy
         of this software and associated documentation files (the "Software"), to deal
@@ -1069,6 +1085,8 @@ def write_data_norecord_one_file(infile, sdate, dat, flags, hdate, hdat, hflags)
         -------
         This file is part of the JAMS Python package.
 
+        Copyright (c) 2016 Matthias Cuntz - mc (at) macu (dot) de
+
         Permission is hereby granted, free of charge, to any person obtaining a copy
         of this software and associated documentation files (the "Software"), to deal
         in the Software without restriction, including without limitation the rights
@@ -1171,6 +1189,8 @@ def write_data_record(infiles, sdate, record, dat, flags, iidate, hdate, hrecord
         License
         -------
         This file is part of the JAMS Python package.
+
+        Copyright (c) 2015 Matthias Cuntz - mc (at) macu (dot) de
 
         Permission is hereby granted, free of charge, to any person obtaining a copy
         of this software and associated documentation files (the "Software"), to deal
@@ -1285,6 +1305,8 @@ def write_data_record_one_file(infile, sdate, record, dat, flags, hdate, hrecord
         License
         -------
         This file is part of the JAMS Python package.
+
+        Copyright (c) 2016 Matthias Cuntz - mc (at) macu (dot) de
 
         Permission is hereby granted, free of charge, to any person obtaining a copy
         of this software and associated documentation files (the "Software"), to deal
