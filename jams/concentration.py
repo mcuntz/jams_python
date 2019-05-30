@@ -489,6 +489,5 @@ class Concentration(object):
 
 
 if __name__ == '__main__':
-    import matplotlib.pylab as pt
     import doctest
     doctest.testmod()

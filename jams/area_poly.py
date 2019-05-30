@@ -47,7 +47,7 @@ def area_poly(x, y):
         -------
         This file is part of the JAMS Python package.
 
-        Copyright (c) 2012-2013 Matthias Cuntz - mc (at) macu (dot) de
+        Copyright (c) 2012-2019 Matthias Cuntz - mc (at) macu (dot) de
 
         Permission is hereby granted, free of charge, to any person obtaining a copy
         of this software and associated documentation files (the "Software"), to deal
@@ -72,11 +72,12 @@ def area_poly(x, y):
         -------
         Written,  MC, Nov 2012 - stackoverflow.com
         Modified, MC, Feb 2013 - ported to Python 3
+                  MC, May 2019 - np.sum needs iterable instead of generator in Python 3
     """
 
     # Could include some checks here
     p = list(zip(x,y))
-    return 0.5 * np.abs(np.sum(x0*y1 - x1*y0 for ((x0, y0), (x1, y1)) in segments(p)))
+    return 0.5 * np.abs(np.sum([ x0*y1 - x1*y0 for ((x0, y0), (x1, y1)) in segments(p) ]))
 
 
 def segments(p):

@@ -65,7 +65,7 @@ metadata = dict(
     platforms = ["Windows", "Linux", "Solaris", "Mac OS-X", "Unix"],
     include_package_data=True,
     scripts=['jams/bin/makehtml'],
-    install_requires=['numpy, scipy'],
+    install_requires=['numpy, scipy','netcdf4','matplotlib'],
     packages=find_packages(exclude=['templates', 'tests*']),
     )
 

@@ -121,7 +121,10 @@ from __future__ import division, absolute_import, print_function
               BD, Sep 2016 - spike
 """
 from .constant_values import constant_values
-from .excel           import get_header_excel, get_value_excel
+try:
+    from .excel       import get_header_excel, get_value_excel
+except:
+    pass # No xlrd installed
 from .getset_flag     import get_flag, set_flag, get_maxflag
 from .manual_flags    import get_manual_flags
 from .spike    import spike

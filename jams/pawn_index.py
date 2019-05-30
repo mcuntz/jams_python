@@ -1,7 +1,15 @@
 #!/usr/bin/env python
 from __future__ import division, absolute_import, print_function
 import numpy as np
-from   statsmodels.distributions.empirical_distribution import ECDF
+from statsmodels.distributions.empirical_distribution import ECDF
+# error in statsmodel 0.9.0 using old scipy.misc
+# One could use in the meantime ecdf from
+#     https://stackoverflow.com/questions/15792552/numpy-scipy-equivalent-of-r-ecdfxx-function
+# def ecdf(x):
+#     xs = np.sort(x)
+#     ys = np.arange(1, len(xs)+1)/float(len(xs))
+#     return xs, ys
+
 
 def pawn_index( uncond, cond,
                 alpha=0.05,

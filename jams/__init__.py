@@ -590,6 +590,7 @@ from .date2dec          import date2dec
 from .dec2date          import dec2date
 from .delta_isogsm2     import delta_isogsm2
 from .dewpoint          import dewpoint
+# import dfgui
 from .dielectric_water  import dielectric_water
 from .division          import division, div
 from .ellipse_area      import ellipse_area
@@ -613,9 +614,15 @@ try:
 except ImportError:
     pass
 from .get_angle         import get_angle
-from .get_era_interim   import get_era_interim
+try:
+    from .get_era_interim   import get_era_interim
+except ImportError:
+    pass
 from .get_era5          import get_era5
-from .get_isogsm2       import get_isogsm2
+try:
+    from .get_isogsm2   import get_isogsm2
+except ImportError:
+    pass
 from .get_nearest       import get_nearest
 from .grid_mid2edge     import grid_mid2edge
 from .head              import head
@@ -639,10 +646,7 @@ from .maskgroup         import maskgroup
 from .mat2nc            import mat2nc
 from .means             import means
 from .morris            import morris_sampling, elementary_effects
-try:
-    from .nc2nc         import nc2nc
-except ImportError:
-    pass # not installed
+from .nc2nc             import nc2nc
 try:
     from .npyio         import savez, savez_compressed
 except ImportError:
@@ -654,7 +658,10 @@ except:
     pass # No extra statistics in scipy and hence in JAMS. Disabled functions: outlier, rossner.
 from .pack              import pack
 from .pareto_metrics    import sn, cz, hi, ef, aed, is_dominated, point_to_front
-from .pawn_index        import pawn_index
+try:
+    from .pawn_index        import pawn_index
+except:
+    pass # No statsmodels installed.
 from .pca               import pca, check_pca
 from .pi                import pi
 from .position          import position
@@ -669,10 +676,7 @@ try:
 except ImportError:
     pass # not installed
 from .readhdf5          import readhdf5, hdf5read
-try:
-    from .readnetcdf    import readnetcdf, netcdfread, ncread, readnc
-except ImportError:
-    pass # not installed
+from .readnetcdf        import readnetcdf, netcdfread, ncread, readnc
 from .river_network     import river_network, upscale_fdir
 from .rolling           import rolling
 from .romanliterals     import int2roman, roman2int
@@ -698,10 +702,7 @@ from .timestepcheck     import timestepcheck
 from .tsym              import tsym
 from .unpack            import unpack
 from .volume_poly       import volume_poly
-try:
-    from .writenetcdf   import writenetcdf, dumpnetcdf
-except ImportError:
-    pass # not installed
+from .writenetcdf       import writenetcdf, dumpnetcdf
 from .xkcd              import xkcd
 try:
     from .xread         import xread, xlsread, xlsxread
@@ -720,7 +721,6 @@ from . import ftp
 from . import leafmodel
 from . import level1
 from . import logtools
-# import dfgui
 
 
 # Information
