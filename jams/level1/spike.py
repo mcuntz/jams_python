@@ -83,8 +83,6 @@ def spike(datin, thresh=7, toler=0, length=15):
         OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
         SOFTWARE.
 
-        Copyright 2016 Benjamin Dechant
-
 
         History
         -------

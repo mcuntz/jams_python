@@ -104,8 +104,6 @@ def create_network(nnodes, nedges, maxdegree=None, maxoutdegree=None, maxindegre
         OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
         SOFTWARE.
 
-        Copyright 2016-2016 Juliane Mai
-
 
         History
         -------
@@ -266,8 +264,6 @@ def source_nodes(G):
         OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
         SOFTWARE.
 
-        Copyright 2016-2016 Juliane Mai
-
 
         History
         -------
@@ -332,8 +328,6 @@ def sink_nodes(G):
         LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
         OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
         SOFTWARE.
-
-        Copyright 2016-2016 Juliane Mai
 
 
         History
@@ -405,8 +399,6 @@ def plot_network(G, fname_plot):
         LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
         OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
         SOFTWARE.
-
-        Copyright 2016-2016 Juliane Mai
 
 
         History

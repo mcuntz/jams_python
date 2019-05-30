@@ -54,8 +54,6 @@ class RNG(object):
          LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
          OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
          SOFTWARE.
-
-         Copyright 2015 Lennart Schueler
     """
     def __init__(self, seed=None):
         self.seed = seed
@@ -570,8 +568,6 @@ class Field(object):
         LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
         OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
         SOFTWARE.
-
-        Copyright 2015 Lennart Schueler
     """
     def __init__(self, K_G, variance, corr_len, random_modes_no,
                  seed=None):
@@ -699,8 +695,6 @@ class IncomprField(Field):
         LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
         OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
         SOFTWARE.
-
-        Copyright 2015 Lennart Schueler
     """
     def __init__(self, mean_velocity, variance, corr_len, random_modes_no,
                  seed=None):

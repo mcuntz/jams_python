@@ -161,8 +161,6 @@ def mad(datin, z=7, deriv=0, nozero=False):
         OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
         SOFTWARE.
 
-        Copyright 2011-2013 Matthias Cuntz
-
 
         History
         -------

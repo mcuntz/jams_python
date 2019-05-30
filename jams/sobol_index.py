@@ -399,8 +399,6 @@ def sobol_index(s=None, ns=None, ya=None, yb=None, yc=None,
         OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
         SOFTWARE.
 
-        Copyright 2012-2013 Matthias Cuntz, Juliane Mai
-
 
         History
         -------

@@ -113,8 +113,6 @@ def tcherkez(Rstar, Phi=0.3, T=0.056,
         OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
         SOFTWARE.
 
-        Copyright 2012-2013 Matthias Cuntz
-
 
         History
         -------

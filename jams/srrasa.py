@@ -71,8 +71,6 @@ def srrasa(xy, strata=5, n=3, plot=False):
         OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
         SOFTWARE.
 
-        Copyright 2012-2013 Arndt Piayda, Matthias Cuntz
-
 
         History
         -------
@@ -210,8 +208,6 @@ def srrasa_trans(xy,strata=5,n=3,num=3,rl=0.5,silent=True,plot=False):
         LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
         OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
         SOFTWARE.
-
-        Copyright 2012-2013 Arndt Piayda, Matthias Cuntz
 
 
         History

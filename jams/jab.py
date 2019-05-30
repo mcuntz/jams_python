@@ -134,8 +134,6 @@ def jab(arr, ind=None, nind=None, mask=None, weight=False, nsteps=1):
         OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
         SOFTWARE.
 
-        Copyright 2012-2014 Maren Goehler, Matthias Cuntz
-
 
         History
         -------

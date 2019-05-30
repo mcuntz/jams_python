@@ -88,8 +88,6 @@ def fftngo(t, y, nbins=False, plot=False):
         OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
         SOFTWARE.
 
-        Copyright 2014 Matthias Cuntz
-
 
         History
         -------

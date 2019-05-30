@@ -75,8 +75,6 @@ def line_dev_mask(x, y, z, p_guess=[1.,0.], plot=False):
         OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
         SOFTWARE.
 
-        Copyright 2014 Arndt Piayda, Matthias Cuntz
-
 
         History
         -------

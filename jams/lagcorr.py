@@ -75,8 +75,6 @@ def lagcorr(y1, y2, max=True, plot=False):
         OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
         SOFTWARE.
 
-        Copyright 2014 Arndt Piayda, Matthias Cuntz
-
 
         History
         -------

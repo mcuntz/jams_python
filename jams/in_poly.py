@@ -89,8 +89,6 @@ def in_poly(P, coord_x, coord_y):
         OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
         SOFTWARE.
 
-        Copyright 2012-2013 Juliane Mai, Arndt Piayda, Matthias Cuntz
-
 
         History
         -------

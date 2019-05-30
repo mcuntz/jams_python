@@ -183,8 +183,6 @@ def sron_colors(cmap='palette1', ncol=9, cname=None, rgb=False, rgb256=False, re
         OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
         SOFTWARE.
 
-        Copyright 2016 Matthias Cuntz
-
 
         History
         -------
@@ -351,8 +349,6 @@ def sron_maps(cmap, ncol=256, offset=0, upper=1,
         LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
         OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
         SOFTWARE.
-
-        Copyright 2016 Matthias Cuntz
 
 
         History

@@ -95,8 +95,6 @@ def t2sap(date, data, swd=None, undef=-9999.):
         OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
         SOFTWARE.
 
-        Copyright 2014 Andreas Wiedemann
-
 
         History
         -------

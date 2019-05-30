@@ -48,8 +48,6 @@ from jams.sce import sce
     OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
     SOFTWARE.
 
-    Copyright 2014 Arndt Piayda, Matthias Cuntz
-
 
     History
     -------
@@ -211,8 +209,6 @@ def opt_leafmodel(params, Eobs, GPPobs, ci_ini, Tl, PAR, ea, ca, ga, gb, P,
     LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
     OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
     SOFTWARE.
-
-    Copyright 2014 Arndt Piayda, Matthias Cuntz
 
 
     History
@@ -541,8 +537,6 @@ def leafmodel(ci_ini, Tl, PAR, ea, ca, ga, gb, P, par1, par2,
     OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
     SOFTWARE.
 
-    Copyright 2014 Arndt Piayda, Matthias Cuntz
-
 
     History
     -------
@@ -702,8 +696,6 @@ def twoleafmodel(ci_ini, Tl, PAR, ea, ca, ga, gb, P, PARdiff, fsun, par1, par2,
     LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
     OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
     SOFTWARE.
-
-    Copyright 2014 Arndt Piayda, Matthias Cuntz
 
 
     History

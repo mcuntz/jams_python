@@ -114,8 +114,6 @@ def outlier(y, alpha=0.01, k=-1, quiet=True):
         OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
         SOFTWARE.
 
-        Copyright 2010-2013 Maren Goehler, Matthias Cuntz
-
 
         History
         -------

@@ -66,8 +66,6 @@ def find_in_path(filename):
         OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
         SOFTWARE.
 
-        Copyright 2013 Matthias Cuntz
-
 
         History
         -------

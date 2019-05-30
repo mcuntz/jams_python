@@ -298,8 +298,6 @@ def semivariogram(x, y, v, nL, di, td, stype='omnidirectional', negscat=0.,
         OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
         SOFTWARE.
 
-        Copyright 2011-2013 Arndt Piayda, Matthias Cuntz
-
 
         History
         -------

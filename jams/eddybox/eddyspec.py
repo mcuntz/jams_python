@@ -86,8 +86,6 @@ def eddyspec(indir, cfile, hfile, rawfile, sltdir, tspfile='34_specmean.csv',
     OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
     SOFTWARE.
 
-    Copyright 2014 Arndt Piayda
-
 
     History
     -------

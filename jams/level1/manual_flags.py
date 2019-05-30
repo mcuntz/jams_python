@@ -72,8 +72,6 @@ def get_manual_flags(flagfile, variable, dendro=None, julian=True):
         OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
         SOFTWARE.
 
-        Copyright 2015 Matthias Cuntz
-
 
         History
         -------

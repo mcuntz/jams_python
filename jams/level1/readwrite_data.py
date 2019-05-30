@@ -99,8 +99,6 @@ def read_data(files, undef=-9999., strip=None, norecord=False, nofill=False):
         OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
         SOFTWARE.
 
-        Copyright 2015-2016 Matthias Cuntz
-
 
         History
         -------
@@ -316,8 +314,6 @@ def write_data(*args):
         OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
         SOFTWARE.
 
-        Copyright 2015 Matthias Cuntz
-
 
         History
         -------
@@ -419,8 +415,6 @@ def write_data_dmp(*args):
         LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
         OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
         SOFTWARE.
-
-        Copyright 2015 Matthias Cuntz
 
 
         History
@@ -525,8 +519,6 @@ def write_data_dmp_size(*args):
         OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
         SOFTWARE.
 
-        Copyright 2015 Matthias Cuntz
-
 
         History
         -------
@@ -626,8 +618,6 @@ def write_data_one_file(*args):
         OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
         SOFTWARE.
 
-        Copyright 2016 Matthias Cuntz
-
 
         History
         -------
@@ -708,8 +698,6 @@ def write_data_norecord(infiles, sdate, dat, flags, iidate, hdate, hdat, hflags,
         LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
         OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
         SOFTWARE.
-
-        Copyright 2015 Matthias Cuntz
 
 
         History
@@ -823,8 +811,6 @@ def write_data_norecord_dmp(infiles, sdate, dat, flags, iidate, hdate, hdat, hfl
         LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
         OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
         SOFTWARE.
-
-        Copyright 2016 Matthias Cuntz
 
 
         History
@@ -950,8 +936,6 @@ def write_data_norecord_dmp_size(infiles, sdate, dat, flags, iidate, hdate, hdat
         LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
         OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
         SOFTWARE.
-
-        Copyright 2016 Matthias Cuntz
 
 
         History
@@ -1105,8 +1089,6 @@ def write_data_norecord_one_file(infile, sdate, dat, flags, hdate, hdat, hflags)
         OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
         SOFTWARE.
 
-        Copyright 2016 Matthias Cuntz
-
 
         History
         -------
@@ -1209,8 +1191,6 @@ def write_data_record(infiles, sdate, record, dat, flags, iidate, hdate, hrecord
         LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
         OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
         SOFTWARE.
-
-        Copyright 2015 Matthias Cuntz
 
 
         History
@@ -1325,8 +1305,6 @@ def write_data_record_one_file(infile, sdate, record, dat, flags, hdate, hrecord
         LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
         OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
         SOFTWARE.
-
-        Copyright 2016 Matthias Cuntz
 
 
         History

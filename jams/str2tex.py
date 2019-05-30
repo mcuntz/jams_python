@@ -80,8 +80,6 @@ def str2tex(strin, space2linebreak=False, bold=False, italic=False, usetex=True)
         OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
         SOFTWARE.
 
-        Copyright 2015 Matthias Cuntz
-
 
         History
         -------

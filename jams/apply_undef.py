@@ -95,8 +95,6 @@ def apply_undef(func, undef, *args, **kwargs):
         OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
         SOFTWARE.
 
-        Copyright 2018 Matthias Cuntz
-
 
         History
         -------

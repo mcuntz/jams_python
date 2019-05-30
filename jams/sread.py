@@ -264,8 +264,6 @@ def sread(infile, nc=0, cname=None, skip=0, cskip=0, hskip=0, hstrip=True, separ
         OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
         SOFTWARE.
 
-        Copyright 2009-2015 Matthias Cuntz
-
 
         History
         -------

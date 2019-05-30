@@ -60,8 +60,6 @@ def directories_from_gui(initialdir='.', title='Choose one of several directorie
         OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
         SOFTWARE.
 
-        Copyright 2015 Matthias Cuntz
-
 
         History
         -------
@@ -156,8 +154,6 @@ def directory_from_gui(initialdir='.', title='Choose directory'):
         LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
         OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
         SOFTWARE.
-
-        Copyright 2015 Matthias Cuntz
 
 
         History
@@ -257,8 +253,6 @@ def file_from_gui(initialdir='.', title='Choose file', multiple=False):
         OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
         SOFTWARE.
 
-        Copyright 2015 Matthias Cuntz
-
 
         History
         -------
@@ -330,8 +324,6 @@ def files_from_gui(initialdir='.', title='Choose file(s)', multiple=True):
         LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
         OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
         SOFTWARE.
-
-        Copyright 2015 Matthias Cuntz
 
 
         History

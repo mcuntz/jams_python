@@ -160,8 +160,6 @@ def writenetcdf(fhandle, vhandle=None, var=None, time=None, isdim=False, name=No
         OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
         SOFTWARE.
 
-        Copyright 2012-2013 Matthias Cuntz, Matthias Zink, Stephan Thober
-
 
         History
         -------
@@ -352,8 +350,6 @@ def dumpnetcdf( fname, dims=None, fileattributes=None, vnames=None, create=True,
         OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
         SOFTWARE.
 
-        Copyright 2012-2013 Stephan Thober
-
 
         History
         -------
@@ -504,8 +500,6 @@ def get_dims( fname ):
         LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
         OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
         SOFTWARE.
-
-        Copyright 2015-2015 Stephan Thober
 
 
         History

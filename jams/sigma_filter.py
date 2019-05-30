@@ -112,8 +112,6 @@ def sigma_filter(x, y, z=3, func=functions.line_p, p=[0.,1.], plot=False, popt=F
         OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
         SOFTWARE.
 
-        Copyright 2014-2018 Matthias Cuntz
-
 
         History
         -------

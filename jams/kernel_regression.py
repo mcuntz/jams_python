@@ -104,8 +104,6 @@ def kernel_regression(x, y, h=None, silverman=False, xout=None):
         OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
         SOFTWARE.
 
-        Copyright 2012-2013 Matthias Cuntz
-
 
         History
         -------
@@ -234,8 +232,6 @@ def kernel_regression_h(x, y, silverman=False):
         LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
         OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
         SOFTWARE.
-
-        Copyright 2012-2013 Matthias Cuntz
 
 
         History

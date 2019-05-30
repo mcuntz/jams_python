@@ -80,8 +80,6 @@ def nc2nc(ifile, ofile, dvar=[], rvar={}, rname={}, ratt={}, hist=None):
         OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
         SOFTWARE.
 
-        Copyright 2019 Matthias Cuntz
-
 
         History
         -------

@@ -149,8 +149,6 @@ def head(ifile, n=10, noblank=False, comment='', skip=0, keepnewline=False):
         OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
         SOFTWARE.
 
-        Copyright 2014 Matthias Cuntz
-
 
         History
         -------

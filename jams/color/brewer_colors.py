@@ -62,8 +62,6 @@ from __future__ import division, absolute_import, print_function
     OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
     SOFTWARE.
 
-    Copyright 2015 Matthias Cuntz
-
 
     History
     -------

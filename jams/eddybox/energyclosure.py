@@ -117,8 +117,6 @@ def energyclosure(fluxfile, metfile, outdir, Rn, G, swdr, Ts=None, theta=None,
     OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
     SOFTWARE.
 
-    Copyright 2014 Arndt Piayda
-
 
     History
     -------
@@ -296,8 +294,6 @@ def soilheatflux(Ts, theta, depths, por, undef=-9999):
     OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
     SOFTWARE.
 
-    Copyright 2014 Arndt Piayda
-
 
     History
     -------
@@ -391,8 +387,6 @@ def energyclosure_year(H, Hflag, Le, Leflag, Rn, G, isday, outdir, force0=True,
     LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
     OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
     SOFTWARE.
-
-    Copyright 2014 Arndt Piayda
 
 
     History

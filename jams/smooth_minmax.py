@@ -63,8 +63,6 @@ def smax(x, y, eta=1. - 1.e-5):
         OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
         SOFTWARE.
 
-        Copyright 2016-2016 Stephan Thober
-
 
         History
         -------
@@ -140,8 +138,6 @@ def smin(x, y, eta=1. - 1.e-5):
         LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
         OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
         SOFTWARE.
-
-        Copyright 2016-2016 Stephan Thober
 
 
         History

@@ -169,8 +169,6 @@ def colours(name=False, rgb=True, rgb256=False, names=False):
         OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
         SOFTWARE.
 
-        Copyright 2013 Matthias Cuntz
-
 
         History
         -------

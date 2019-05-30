@@ -102,8 +102,6 @@ def homo_sampling(p1, p2, n, func=None, plot=False, maxit=1000):
         OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
         SOFTWARE.
 
-        Copyright 2014 Arndt Piayda
-
 
         History
         -------

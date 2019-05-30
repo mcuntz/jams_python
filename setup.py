@@ -10,7 +10,7 @@ It has several subpackages offering constants, working with Eddy covariance data
 offering special functions, or objective functions be used with scipy.optimize.fmin or scipy.optimize.curvefit,
 and much more.
 
-Copyright (c) 2012-2019 Matthias Cuntz, Juliane Mai, Stephan Thober
+Copyright (c) 2012-2019 Matthias Cuntz, Juliane Mai, Stephan Thober, Arndt Piayda
 """
 DOCLINES = __doc__.split("\n")
 
@@ -58,7 +58,7 @@ metadata = dict(
     # long_description = "\n".join(DOCLINES[2:]),
     long_description = readme,
     url = "https://github.com/mcuntz/jams_python.git",
-    author = "JAMS = Matthias Cuntz, Juliane Mai, Stephan Thober",
+    author = "JAMS = Matthias Cuntz, Juliane Mai, Stephan Thober, Arndt Piayda",
     author_email = "mc (at) macu (dot) de",
     license = 'MIT -  see LICENSE',
     classifiers=[_f for _f in CLASSIFIERS.split('\n') if _f],

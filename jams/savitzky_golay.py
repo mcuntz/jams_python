@@ -102,8 +102,6 @@ def savitzky_golay(y, window, order, deriv=0, rate=1):
         OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
         SOFTWARE.
 
-        Copyright 2012-2013 Matthias Cuntz
-
 
         History
         -------
@@ -287,8 +285,6 @@ def savitzky_golay2d(z, window, order, deriv=None):
         LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
         OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
         SOFTWARE.
-
-        Copyright 2012-2013 Matthias Cuntz
 
 
         History

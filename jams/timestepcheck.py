@@ -82,8 +82,6 @@ def timestepcheck(indir, pat, outfile, begin, end, numhead=1, timeint=30,
     OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
     SOFTWARE.
 
-    Copyright 2014 Arndt Piayda
-
 
     History
     -------

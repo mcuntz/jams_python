@@ -24,8 +24,6 @@ from __future__ import division, absolute_import, print_function
     LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
     OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
     SOFTWARE.
-
-    Copyright 2016 Juliane Mai, Dmitri Kavetski, Matthias Cuntz
 """
 import numpy as np
 

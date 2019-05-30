@@ -140,8 +140,6 @@
     OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
     SOFTWARE.
 
-    Copyright 2012-2013 Matthias Cuntz
-
 
     History
     -------

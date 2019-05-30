@@ -79,8 +79,6 @@ def division(a, b, otherwise=np.nan, prec=0.):
         OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
         SOFTWARE.
 
-        Copyright 2012-2014 Matthias Cuntz
-
 
         History
         -------

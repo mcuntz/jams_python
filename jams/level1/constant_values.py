@@ -87,8 +87,6 @@ def constant_values(juldate,series, length, eps):
         OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
         SOFTWARE.
 
-        Copyright 2015 Matthias Cuntz
-
 
         History
         -------

@@ -91,8 +91,6 @@ def signature2plot(handle, dx=None, dy=None, name=None,
         OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
         SOFTWARE.
 
-        Copyright 2014 Matthias Cuntz
-
 
         History
         -------

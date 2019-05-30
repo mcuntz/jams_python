@@ -796,8 +796,6 @@ def pso(func, x0, lb, ub,
         OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
         SOFTWARE.
 
-        Copyright 2016 Matthias Cuntz
-
 
         History
         -------

@@ -212,8 +212,6 @@ def get_era_interim(area=None, years=None, path='.', override=False):
         OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
         SOFTWARE.
 
-        Copyright 2018 Matthias Cuntz
-
 
         History
         -------

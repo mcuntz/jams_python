@@ -71,8 +71,6 @@ def fwrite(fname, arr, header=None, precision='10.0', delimiter=' '):
         OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
         SOFTWARE.
 
-        Copyright 2009-2015 Stephan Thober
-
 
         History
         -------

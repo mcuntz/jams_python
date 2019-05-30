@@ -122,8 +122,6 @@ def ascii2ascii(edate, full=False, en=False, fr=False, us=False, eng=False, YY=F
         OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
         SOFTWARE.
 
-        Copyright 2014-2018 Matthias Cuntz
-
 
         History
         -------
@@ -460,8 +458,6 @@ def fr2ascii(edate, full=False, YY=False):
         LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
         OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
         SOFTWARE.
-
-        Copyright 2018 Matthias Cuntz
 
 
         History

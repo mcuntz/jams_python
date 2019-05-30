@@ -94,8 +94,6 @@ def pack(array, mask):
         OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
         SOFTWARE.
 
-        Copyright 2009-2013 Matthias Cuntz
-
 
         History
         -------

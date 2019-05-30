@@ -88,8 +88,6 @@ def alpha_kin_h2o(isotope=None, eps=False, greater1=True, boundary=False, cappa=
         OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
         SOFTWARE.
 
-        Copyright 2014 Matthias Cuntz
-
 
         History
         -------

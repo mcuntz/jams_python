@@ -92,8 +92,6 @@ def zacharias(h, clay, sand, db, params=None, thetar=False, thetas=False, lnalph
         OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
         SOFTWARE.
 
-        Copyright 2012-2013 Matthias Cuntz
-
 
         History
         -------
@@ -298,8 +296,6 @@ def zacharias_check(params, sand=None, clay=None):
         LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
         OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
         SOFTWARE.
-
-        Copyright 2012-2013 Matthias Cuntz
 
 
         History

@@ -153,8 +153,6 @@ def readnetcdf(file, var='', code=-1, reform=False, squeeze=False,
         OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
         SOFTWARE.
 
-        Copyright 2009-2014 Matthias Cuntz, Stephan Thober
-
 
         History
         -------

@@ -166,8 +166,6 @@ def xread(infile, sheet=None, nc=0, cname=None, snc=0, sname=None, skip=0, cskip
         OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
         SOFTWARE.
 
-        Copyright 2009-2017 Matthias Cuntz
-
 
         History
         -------

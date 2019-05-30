@@ -264,8 +264,6 @@ def sn(front, reference_front):
         OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
         SOFTWARE.
 
-        Copyright 2016 Juliane Mai
-
 
         History
         -------
@@ -369,8 +367,6 @@ def cz(front, all_fronts, all_cz=False):
         LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
         OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
         SOFTWARE.
-
-        Copyright 2016 Juliane Mai
 
 
         History
@@ -545,8 +541,6 @@ def hi(front, reference_point, nsamples=None, reference_front=None, hi_range=Fal
         LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
         OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
         SOFTWARE.
-
-        Copyright 2016 Juliane Mai
 
 
         History
@@ -729,8 +723,6 @@ def ef(front, reference_front):
         OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
         SOFTWARE.
 
-        Copyright 2016 Juliane Mai
-
 
         History
         -------
@@ -854,8 +846,6 @@ def aed(front, reference_front):
         LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
         OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
         SOFTWARE.
-
-        Copyright 2016 Juliane Mai
 
 
         History

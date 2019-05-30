@@ -99,8 +99,6 @@ def pca(mat, corr=False, ndim=None, rvar=None):
         OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
         SOFTWARE.
 
-        Copyright 2014 Matthias Cuntz
-
 
         History
         -------
@@ -223,8 +221,6 @@ def check_pca(data, comps, eigenvectors, corr=False, rtol=1e-05, atol=1e-08):
         LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
         OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
         SOFTWARE.
-
-        Copyright 2014 Matthias Cuntz
 
 
         History

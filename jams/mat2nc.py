@@ -156,8 +156,6 @@ def mat2nc(fname, overwrite=False, fname_out=None, verbose=True, squeeze=True,
         OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
         SOFTWARE.
 
-        Copyright 2016-2016 Juliane Mai
-
 
         History
         -------

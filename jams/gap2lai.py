@@ -135,8 +135,6 @@ def gap2lai(tgap, lgap, G, alpha, boot=False):
         LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
         OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
         SOFTWARE.
-        
-        Copyright 2014 Arndt Piayda
 
 
         History
@@ -319,8 +317,6 @@ def leafprojection(alpha, theta, t360=False, kernel=False, min=0., max=90.,
         LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
         OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
         SOFTWARE.
-    
-        Copyright 2014 Arndt Piayda
 
 
         History

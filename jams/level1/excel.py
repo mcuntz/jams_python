@@ -57,8 +57,6 @@ def get_header_excel(excelfile, sheet):
         OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
         SOFTWARE.
 
-        Copyright 2016 Matthias Cuntz
-
 
         History
         -------
@@ -159,8 +157,6 @@ def get_value_excel(excelfile, sheet, variable, column, all_rows=False):
         LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
         OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
         SOFTWARE.
-
-        Copyright 2015 Matthias Cuntz
 
 
         History

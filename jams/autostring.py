@@ -140,8 +140,6 @@ def autostring(num, prec=0, zero=False, set_printoptions=False, pp=False, join=F
         OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
         SOFTWARE.
 
-        Copyright 2011-2013 Matthias Cuntz
-
 
         History
         -------

@@ -209,8 +209,6 @@ def means(date, dat, year=False, month=False, day=False, hour=False, minute=Fals
         OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
         SOFTWARE.
 
-        Copyright 2013-2014 Matthias Cuntz
-
 
         History
         -------

@@ -214,8 +214,6 @@ def kriging(x, y, z, semi_mod, semi_popt, xnew=None, ynew=None, plot=False,
         OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
         SOFTWARE.
 
-        Copyright 2009-2013 Matthias Cuntz, Arndt Piayda, Juliane Mai
-
 
         History
         -------

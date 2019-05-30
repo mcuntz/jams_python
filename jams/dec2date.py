@@ -312,8 +312,6 @@ def dec2date(indata, calendar='standard', refdate=None, units=None,
         OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
         SOFTWARE.
 
-        Copyright 2010-2013 Arndt Piayda, Matthias Cuntz
-
 
         History
         -------

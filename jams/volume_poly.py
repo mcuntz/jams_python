@@ -142,8 +142,6 @@ def volume_poly(func, x=None, y=None, tri=None, convexhull=False, area=False, al
         OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
         SOFTWARE.
 
-        Copyright 2013 Matthias Cuntz, Juliane Mai
-
 
         History
         -------

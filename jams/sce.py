@@ -68,8 +68,6 @@ def SampleInputMatrix(nrows, npars, bl, bu, distname='randomUniform'):
         OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
         SOFTWARE.
 
-        Copyright 2013 Matthias Cuntz
-
 
         History
         -------
@@ -158,8 +156,6 @@ def cce(functn, s, sf, bl, bu, mask, icall, maxn, alpha, beta, maxit, printit,
         LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
         OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
         SOFTWARE.
-
-        Copyright 2013 Matthias Cuntz
 
 
         History
@@ -435,8 +431,6 @@ def sce(functn, x0, bl, bu,
         LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
         OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
         SOFTWARE.
-
-        Copyright 2013 Matthias Cuntz
 
 
         History

@@ -202,8 +202,6 @@ def screening(func, x0, lb, ub, mask=None,
         OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
         SOFTWARE.
 
-        Copyright 2017-2018 Matthias Cuntz
-
 
         History
         -------

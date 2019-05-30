@@ -84,8 +84,6 @@ def convex_hull(points, graphic=False, smidgen=0.0075):
         OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
         SOFTWARE.
 
-        Copyright 2009-2013 Arndt Piayda, Matthias Cuntz
-
 
         History
         -------

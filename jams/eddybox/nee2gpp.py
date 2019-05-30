@@ -157,8 +157,6 @@ def nee2gpp(dates, nee, t, isday, rg=False, vpd=False, undef=np.nan,
         OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
         SOFTWARE.
 
-        Copyright 2012-2013 Matthias Cuntz, Arndt Piayda
-
 
         History
         -------
@@ -277,8 +275,6 @@ def nee2gpp_falge(dates, nee, t, isday, undef=np.nan,
         LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
         OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
         SOFTWARE.
-
-        Copyright 2012-2013 Matthias Cuntz, Arndt Piayda
 
 
         History
@@ -471,8 +467,6 @@ def nee2gpp_reichstein(dates, nee, t, isday, rg=False, vpd=False, undef=np.nan,
         LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
         OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
         SOFTWARE.
-
-        Copyright 2012-2013 Matthias Cuntz, Arndt Piayda
 
 
         History
@@ -790,8 +784,6 @@ def nee2gpp_lasslop(dates, nee, t, isday, rg, vpd, undef=np.nan,
         LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
         OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
         SOFTWARE.
-
-        Copyright 2012-2013 Matthias Cuntz, Arndt Piayda
 
 
         History

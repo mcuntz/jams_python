@@ -104,8 +104,6 @@ def unpack(array, mask, value=0.):
         OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
         SOFTWARE.
 
-        Copyright 2009-2013 Matthias Cuntz
-
 
         History
         -------

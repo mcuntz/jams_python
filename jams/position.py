@@ -138,8 +138,6 @@ def position(row=1, col=1, num=1,
         OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
         SOFTWARE.
 
-        Copyright 2009-2013 Matthias Cuntz
-
 
         History
         -------

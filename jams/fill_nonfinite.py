@@ -159,8 +159,6 @@ def fill_nonfinite(xin, yin=None, nan=None, inf=None, undef=None, method='interp
         OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
         SOFTWARE.
 
-        Copyright 2013-2018 Matthias Cuntz
-
 
         History
         -------

@@ -190,8 +190,6 @@ def get_era5(area=None, years=None, path='.', override=False):
         OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
         SOFTWARE.
 
-        Copyright 2019 Matthias Cuntz
-
 
         History
         -------

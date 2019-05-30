@@ -26,8 +26,6 @@ import numpy as np
     OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
     SOFTWARE.
 
-    Copyright 2016-2017 Matthias Cuntz
-
     Modified, MC, Dec 2017 - multinormal
 """
 
