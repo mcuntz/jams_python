@@ -3,9 +3,9 @@ include MANIFEST.in
 include README
 include *.txt
 include setupegg.py
+include bin/*
 include jams/Humor-Sans.ttf
 include jams/test_*
-include jams/bin/*
 include jams/color/brewer.tiff
 include jams/color/sron_colourschemes.pdf
 include jams/eddybox/test_*
