@@ -3,7 +3,8 @@ include MANIFEST.in
 include README
 include *.txt
 include setupegg.py
-include bin/*
+include bin/*.py
+include bin/makehtml
 include jams/Humor-Sans.ttf
 include jams/test_*
 include jams/color/brewer.tiff
