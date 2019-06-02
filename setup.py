@@ -14,7 +14,7 @@ Copyright (c) 2012-2019 Matthias Cuntz, Juliane Mai, Stephan Thober, Arndt Piayd
 """
 DOCLINES = __doc__.split("\n")
 
-readme = open('README').read()
+readme = open('README.md').read()
 
 import sys
 if sys.version_info[:2] < (2, 6) or (3, 0) <= sys.version_info[0:2] < (3, 2):
@@ -22,9 +22,9 @@ if sys.version_info[:2] < (2, 6) or (3, 0) <= sys.version_info[0:2] < (3, 2):
 
 CLASSIFIERS = """\
 Development Status :: 5 - Production/Stable
+Intended Audience :: Science/Research
 Intended Audience :: Developers
 Intended Audience :: End Users/Desktop
-Intended Audience :: Science/Research
 License :: OSI Approved :: MIT License
 Natural Language :: English
 Operating System :: MacOS
@@ -32,6 +32,7 @@ Operating System :: MacOS :: MacOS X
 Operating System :: Microsoft
 Operating System :: Microsoft :: Windows
 Operating System :: POSIX
+Operating System :: POSIX :: Linux
 Operating System :: Unix
 Programming Language :: Python
 Programming Language :: Python :: 2
@@ -54,19 +55,23 @@ metadata = dict(
     version=VERSION,
     maintainer = "Matthias Cuntz",
     maintainer_email = "mc (at) macu (dot) de",
-    description = DOCLINES[0],
+    # description = DOCLINES[0],
+    description = "JAMS Python Utilities",
     # long_description = "\n".join(DOCLINES[2:]),
     long_description = readme,
-    url = "https://github.com/mcuntz/jams_python.git",
+    keywords = ['utilities','array manipulation', 'ascii files', 'date and time', 'hydrology', 'isotopes', 'meteorology', ],
+    url = "https://github.com/mcuntz/jams_python/",
     author = "JAMS = Matthias Cuntz, Juliane Mai, Stephan Thober, Arndt Piayda",
     author_email = "mc (at) macu (dot) de",
     license = 'MIT -  see LICENSE',
     classifiers=[_f for _f in CLASSIFIERS.split('\n') if _f],
     platforms = ["Windows", "Linux", "Solaris", "Mac OS-X", "Unix"],
-    include_package_data=True,
-    scripts=['jams/bin/makehtml'],
-    install_requires=['numpy, scipy','netcdf4','matplotlib'],
-    packages=find_packages(exclude=['templates', 'tests*']),
+    packages = find_packages(exclude=['templates', 'tests*']),
+    include_package_data = True,
+    # scripts = ['bin/makehtml'],
+    scripts = ['bin/*'],
+    # install_requires=['numpy>=1.11.0', 'scipy>=0.9.0', 'netCDF4>=1.1.4', 'matplotlib>=1.4.3']
+    install_requires = ['numpy, scipy','netcdf4','matplotlib'],
     )
 
 setup(**metadata)
