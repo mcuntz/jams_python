@@ -27,7 +27,7 @@ import numpy as np
 
     Licence
     -------
-    This file is part of the JAMS Python package.
+    This file is part of the JAMS Python package, distributed under the MIT License.
 
     Copyright (c) 2017 Sukhbinder Singh
 

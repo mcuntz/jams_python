@@ -58,7 +58,7 @@ def str2tex(strin, space2linebreak=False, bold=False, italic=False, usetex=True)
 
         License
         -------
-        This file is part of the JAMS Python package.
+        This file is part of the JAMS Python package, distributed under the MIT License.
 
         Copyright (c) 2015 Matthias Cuntz - mc (at) macu (dot) de
 

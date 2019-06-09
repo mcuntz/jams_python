@@ -57,7 +57,7 @@ def get_flag(flags, n):
 
         License
         -------
-        This file is part of the JAMS Python package.
+        This file is part of the JAMS Python package, distributed under the MIT License.
 
         Copyright (c) 2015 Matthias Cuntz - mc (at) macu (dot) de
 
@@ -155,7 +155,7 @@ AL        def set_flag(flags, n, iflag, ii=None):
 
         License
         -------
-        This file is part of the JAMS Python package.
+        This file is part of the JAMS Python package, distributed under the MIT License.
 
         Copyright (c) 2015-2016 Matthias Cuntz - mc (at) macu (dot) de
 
@@ -264,7 +264,7 @@ def get_maxflag(flags, no=0):
 
         License
         -------
-        This file is part of the JAMS Python package.
+        This file is part of the JAMS Python package, distributed under the MIT License.
 
         Copyright (c) 2015-2016 Matthias Cuntz - mc (at) macu (dot) de
 

@@ -222,7 +222,7 @@ def fsread(infile, nc=0, cname=None, snc=0, sname=None, skip=0, cskip=0, hskip=0
 
         License
         -------
-        This file is part of the JAMS Python package.
+        This file is part of the JAMS Python package, distributed under the MIT License.
 
         Copyright (c) 2015-2017 Matthias Cuntz - mc (at) macu (dot) de
 

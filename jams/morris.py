@@ -75,7 +75,7 @@ from __future__ import division, absolute_import, print_function
 
     License
     -------
-    This file is part of the JAMS Python package.
+    This file is part of the JAMS Python package, distributed under the MIT License.
 
     Copyright (c) 2012-2017 S Van Hoey, Matthias Cuntz - mc (at) macu (dot) de
 
@@ -198,7 +198,7 @@ def  Sampling_Function_2(p, k, r, LB, UB, GroupMat=np.array([])):
 
         License
         -------
-        This file is part of the JAMS Python package.
+        This file is part of the JAMS Python package, distributed under the MIT License.
 
         Copyright (c) 2012-2013 S Van Hoey, Matthias Cuntz - mc (at) macu (dot) de
 
@@ -361,7 +361,7 @@ def Optimized_Groups(NumFact, LB, UB, N=500, p=4, r=10, GroupMat=np.array([]), D
 
         License
         -------
-        This file is part of the JAMS Python package.
+        This file is part of the JAMS Python package, distributed under the MIT License.
 
         Copyright (c) 2012-2013 S Van Hoey, Matthias Cuntz - mc (at) macu (dot) de
 
@@ -617,7 +617,7 @@ def Morris_Measure_Groups(NumFact, Sample, OutFact, Output, p=4, Group=[], Diagn
 
         License
         -------
-        This file is part of the JAMS Python package.
+        This file is part of the JAMS Python package, distributed under the MIT License.
 
         Copyright (c) 2012-2017 S Van Hoey, Matthias Cuntz - mc (at) macu (dot) de
 

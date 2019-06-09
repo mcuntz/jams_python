@@ -46,7 +46,7 @@ def SampleInputMatrix(nrows, npars, bl, bu, distname='randomUniform'):
 
         License
         -------
-        This file is part of the JAMS Python package.
+        This file is part of the JAMS Python package, distributed under the MIT License.
 
         Copyright (c) 2004-2013 Q Duan, S Van Hoey, Matthias Cuntz - mc (at) macu (dot) de
 
@@ -135,7 +135,7 @@ def cce(functn, s, sf, bl, bu, mask, icall, maxn, alpha, beta, maxit, printit,
 
         License
         -------
-        This file is part of the JAMS Python package.
+        This file is part of the JAMS Python package, distributed under the MIT License.
 
         Copyright (c) 2004-2013 Q Duan, S Van Hoey, Matthias Cuntz - mc (at) macu (dot) de
 
@@ -410,7 +410,7 @@ def sce(functn, x0, bl, bu,
 
         License
         -------
-        This file is part of the JAMS Python package.
+        This file is part of the JAMS Python package, distributed under the MIT License.
 
         Copyright (c) 2004-2016 Q Duan, S Van Hoey, Matthias Cuntz - mc (at) macu (dot) de
 

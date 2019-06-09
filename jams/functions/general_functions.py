@@ -35,7 +35,7 @@ from __future__ import division, absolute_import, print_function
 
     License
     -------
-    This file is part of the JAMS Python package.
+    This file is part of the JAMS Python package, distributed under the MIT License.
 
     Copyright (c) 2015-2017 Matthias Cuntz - mc (at) macu (dot) de
 

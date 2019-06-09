@@ -112,7 +112,7 @@ def esat(T, liquid=False, formula='GoffGratch'):
 
         License
         -------
-        This file is part of the JAMS Python package.
+        This file is part of the JAMS Python package, distributed under the MIT License.
 
         Copyright (c) 2012-2014 Matthias Cuntz - mc (at) macu (dot) de
 

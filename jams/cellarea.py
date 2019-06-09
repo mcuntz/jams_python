@@ -50,7 +50,7 @@ def cellarea(lat, lon, globe=False):
 
         License
         -------
-        This file is part of the JAMS Python package.
+        This file is part of the JAMS Python package, distributed under the MIT License.
 
         Copyright (c) 2009-2018 Matthias Cuntz - mc (at) macu (dot) de
 

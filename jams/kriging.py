@@ -192,7 +192,7 @@ def kriging(x, y, z, semi_mod, semi_popt, xnew=None, ynew=None, plot=False,
 
         License
         -------
-        This file is part of the JAMS Python package.
+        This file is part of the JAMS Python package, distributed under the MIT License.
 
         Copyright (c) 2012-2014 Arndt Piayda, Juliane Mai, Matthias Cuntz - mc (at) macu (dot) de
 

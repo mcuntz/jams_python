@@ -80,7 +80,7 @@ def savitzky_golay(y, window, order, deriv=0, rate=1):
 
         License
         -------
-        This file is part of the JAMS Python package.
+        This file is part of the JAMS Python package, distributed under the MIT License.
 
         Copyright (c) 2012-2014 Matthias Cuntz - mc (at) macu (dot) de
 
@@ -264,7 +264,7 @@ def savitzky_golay2d(z, window, order, deriv=None):
 
         License
         -------
-        This file is part of the JAMS Python package.
+        This file is part of the JAMS Python package, distributed under the MIT License.
 
         Copyright (c) 2012-2014 Matthias Cuntz - mc (at) macu (dot) de
 

@@ -4,7 +4,7 @@ import numpy as np
 """
     License
     -------
-    This file is part of the JAMS Python package.
+    This file is part of the JAMS Python package, distributed under the MIT License.
 
     Copyright (c) 2016-2017 Matthias Cuntz - mc (at) macu (dot) de
 

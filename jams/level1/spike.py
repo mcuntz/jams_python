@@ -61,7 +61,7 @@ def spike(datin, thresh=7, toler=0, length=15):
 
         License
         -------
-        This file is part of the JAMS Python package.
+        This file is part of the JAMS Python package, distributed under the MIT License.
 
         Copyright (c) 2016 Benjamin Dechant
 

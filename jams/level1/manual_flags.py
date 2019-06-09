@@ -50,7 +50,7 @@ def get_manual_flags(flagfile, variable, dendro=None, julian=True):
 
         License
         -------
-        This file is part of the JAMS Python package.
+        This file is part of the JAMS Python package, distributed under the MIT License.
 
         Copyright (c) 2015-2016 Matthias Cuntz, Benjamin Dechant - mc (at) macu (dot) de
 

@@ -131,7 +131,7 @@ def readnetcdf(file, var='', code=-1, reform=False, squeeze=False,
 
         License
         -------
-        This file is part of the JAMS Python package.
+        This file is part of the JAMS Python package, distributed under the MIT License.
 
         Copyright (c) 2009-2016 Matthias Cuntz, Stephan Thober - mc (at) macu (dot) de
 

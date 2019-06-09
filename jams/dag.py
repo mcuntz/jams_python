@@ -82,7 +82,7 @@ def create_network(nnodes, nedges, maxdegree=None, maxoutdegree=None, maxindegre
         
         License
         -------
-        This file is part of the JAMS Python package.
+        This file is part of the JAMS Python package, distributed under the MIT License.
 
         Copyright (c) 2016 Juliane Mai
 
@@ -242,7 +242,7 @@ def source_nodes(G):
 
         License
         -------
-        This file is part of the JAMS Python package.
+        This file is part of the JAMS Python package, distributed under the MIT License.
 
         Copyright (c) 2016 Juliane Mai
 
@@ -307,7 +307,7 @@ def sink_nodes(G):
 
         License
         -------
-        This file is part of the JAMS Python package.
+        This file is part of the JAMS Python package, distributed under the MIT License.
 
         Copyright (c) 2016 Juliane Mai
 
@@ -378,7 +378,7 @@ def plot_network(G, fname_plot):
 
         License
         -------
-        This file is part of the JAMS Python package.
+        This file is part of the JAMS Python package, distributed under the MIT License.
 
         Copyright (c) 2016 Juliane Mai
 

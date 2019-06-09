@@ -72,7 +72,7 @@ def hollickLyneFilter(data,beta=0.925,invert=True):
 
     License
     -------
-    This file is part of the JAMS Python package.
+    This file is part of the JAMS Python package, distributed under the MIT License.
 
     Copyright (c) 2015 David Schaefer
 

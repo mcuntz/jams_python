@@ -95,7 +95,7 @@ def energyclosure(fluxfile, metfile, outdir, Rn, G, swdr, Ts=None, theta=None,
 
     License
     -------
-    This file is part of the JAMS Python package.
+    This file is part of the JAMS Python package, distributed under the MIT License.
 
     Copyright (c) 2014 Arndt Piayda
 
@@ -272,7 +272,7 @@ def soilheatflux(Ts, theta, depths, por, undef=-9999):
     
     License
     -------
-    This file is part of the JAMS Python package.
+    This file is part of the JAMS Python package, distributed under the MIT License.
 
     Copyright (c) 2014 Arndt Piayda
 
@@ -366,7 +366,7 @@ def energyclosure_year(H, Hflag, Le, Leflag, Rn, G, isday, outdir, force0=True,
     
     License
     -------
-    This file is part of the JAMS Python package.
+    This file is part of the JAMS Python package, distributed under the MIT License.
 
     Copyright (c) 2014 Arndt Piayda
 

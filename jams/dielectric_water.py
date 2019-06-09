@@ -46,7 +46,7 @@ def dielectric_water(T):
 
         License
         -------
-        This file is part of the JAMS Python package.
+        This file is part of the JAMS Python package, distributed under the MIT License.
 
         Copyright (c) 2014-2015 Matthias Cuntz - mc (at) macu (dot) de
 

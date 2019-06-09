@@ -139,7 +139,7 @@ def mad(datin, z=7, deriv=0, nozero=False):
 
         License
         -------
-        This file is part of the JAMS Python package.
+        This file is part of the JAMS Python package, distributed under the MIT License.
 
         Copyright (c) 2011-2013 Matthias Cuntz - mc (at) macu (dot) de
 

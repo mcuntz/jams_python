@@ -51,7 +51,7 @@ def itc(H, zeta, ustar, varu, varw, vart, rho, lat, limit, outdir, plot=False):
     
     License
     -------
-    This file is part of the JAMS Python package.
+    This file is part of the JAMS Python package, distributed under the MIT License.
 
     Copyright (c) 2014 Arndt Piayda
 

@@ -39,7 +39,7 @@ def sltclean(indir, pat = '[a-zA-Z0-9]*.slt|[a-zA-Z0-9]*.SLT'):
         
         License
         -------
-        This file is part of the JAMS Python package.
+        This file is part of the JAMS Python package, distributed under the MIT License.
 
         Copyright (c) 2014 Arndt Piayda
 

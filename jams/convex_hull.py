@@ -62,7 +62,7 @@ def convex_hull(points, graphic=False, smidgen=0.0075):
 
         License
         -------
-        This file is part of the JAMS Python package.
+        This file is part of the JAMS Python package, distributed under the MIT License.
 
         Copyright (c) 2009-2013 Arndt Piayda
 

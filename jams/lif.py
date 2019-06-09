@@ -88,7 +88,7 @@ def lif(ifile, noblank=False, comment='', skip=0, maxcol=False):
 
         License
         -------
-        This file is part of the JAMS Python package.
+        This file is part of the JAMS Python package, distributed under the MIT License.
 
         Copyright (c) 2009-2016 Matthias Cuntz - mc (at) macu (dot) de
 

@@ -92,7 +92,7 @@ def outlier(y, alpha=0.01, k=-1, quiet=True):
 
         License
         -------
-        This file is part of the JAMS Python package.
+        This file is part of the JAMS Python package, distributed under the MIT License.
 
         Copyright (c) 2010-2014 Maren Goehler, Matthias Cuntz - mc (at) macu (dot) de
 

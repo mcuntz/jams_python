@@ -70,7 +70,7 @@ def zacharias(h, clay, sand, db, params=None, thetar=False, thetas=False, lnalph
 
         License
         -------
-        This file is part of the JAMS Python package.
+        This file is part of the JAMS Python package, distributed under the MIT License.
 
         Copyright (c) 2012-2016 Matthias Cuntz - mc (at) macu (dot) de
 
@@ -275,7 +275,7 @@ def zacharias_check(params, sand=None, clay=None):
 
         License
         -------
-        This file is part of the JAMS Python package.
+        This file is part of the JAMS Python package, distributed under the MIT License.
 
         Copyright (c) 2012-2016 Matthias Cuntz - mc (at) macu (dot) de
 

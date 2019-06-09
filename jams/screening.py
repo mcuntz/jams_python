@@ -180,7 +180,7 @@ def screening(func, x0, lb, ub, mask=None,
 
         License
         -------
-        This file is part of the JAMS Python package.
+        This file is part of the JAMS Python package, distributed under the MIT License.
 
         Copyright (c) 2017 Matthias Cuntz - mc (at) macu (dot) de
 

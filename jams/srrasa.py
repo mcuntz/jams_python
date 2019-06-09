@@ -49,7 +49,7 @@ def srrasa(xy, strata=5, n=3, plot=False):
 
         License
         -------
-        This file is part of the JAMS Python package.
+        This file is part of the JAMS Python package, distributed under the MIT License.
 
         Copyright (c) 2012-2013 Arndt Piayda, Matthias Cuntz - mc (at) macu (dot) de
 
@@ -187,7 +187,7 @@ def srrasa_trans(xy,strata=5,n=3,num=3,rl=0.5,silent=True,plot=False):
 
         License
         -------
-        This file is part of the JAMS Python package.
+        This file is part of the JAMS Python package, distributed under the MIT License.
 
         Copyright (c) 2012-2013 Arndt Piayda, Matthias Cuntz - mc (at) macu (dot) de
 

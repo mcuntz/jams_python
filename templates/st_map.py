@@ -3,7 +3,7 @@ from __future__ import print_function
 """ 
 License
 -------
-This file is part of the JAMS Python package.
+This file is part of the JAMS Python package, distributed under the MIT License.
 
 Copyright (c) 2016 Stephan Thober
 

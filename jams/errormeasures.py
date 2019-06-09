@@ -44,7 +44,7 @@ from scipy.stats import t
 
     License
     -------
-    This file is part of the JAMS Python package.
+    This file is part of the JAMS Python package, distributed under the MIT License.
 
     Copyright (c) 2014-2017 Arndt Piayda, Stephan Thober, Matthias Cuntz - mc (at) macu (dot) de
 

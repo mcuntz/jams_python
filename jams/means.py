@@ -187,7 +187,7 @@ def means(date, dat, year=False, month=False, day=False, hour=False, minute=Fals
 
         License
         -------
-        This file is part of the JAMS Python package.
+        This file is part of the JAMS Python package, distributed under the MIT License.
 
         Copyright (c) 2013-2018 Matthias Cuntz - mc (at) macu (dot) de
 

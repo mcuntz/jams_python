@@ -134,7 +134,7 @@ def mat2nc(fname, overwrite=False, fname_out=None, verbose=True, squeeze=True,
 
         License
         -------
-        This file is part of the JAMS Python package.
+        This file is part of the JAMS Python package, distributed under the MIT License.
 
         Copyright (c) 2016 Juliane Mai
 

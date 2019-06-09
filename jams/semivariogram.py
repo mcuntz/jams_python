@@ -276,7 +276,7 @@ def semivariogram(x, y, v, nL, di, td, stype='omnidirectional', negscat=0.,
 
         License
         -------
-        This file is part of the JAMS Python package.
+        This file is part of the JAMS Python package, distributed under the MIT License.
 
         Copyright (c) 2011-2014 Arndt Piayda, Matthias Cuntz - mc (at) macu (dot) de
 

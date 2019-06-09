@@ -67,7 +67,7 @@ def in_poly(P, coord_x, coord_y):
 
         License
         -------
-        This file is part of the JAMS Python package.
+        This file is part of the JAMS Python package, distributed under the MIT License.
 
         Copyright (c) 2012-2014 Arndt Piayda, Matthias Cuntz - mc (at) macu (dot) de
 

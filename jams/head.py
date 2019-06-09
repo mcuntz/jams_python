@@ -127,7 +127,7 @@ def head(ifile, n=10, noblank=False, comment='', skip=0, keepnewline=False):
 
         License
         -------
-        This file is part of the JAMS Python package.
+        This file is part of the JAMS Python package, distributed under the MIT License.
 
         Copyright (c) 2014-2016 Matthias Cuntz, David Schaefer - mc (at) macu (dot) de
 

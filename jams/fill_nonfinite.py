@@ -137,7 +137,7 @@ def fill_nonfinite(xin, yin=None, nan=None, inf=None, undef=None, method='interp
 
         License
         -------
-        This file is part of the JAMS Python package.
+        This file is part of the JAMS Python package, distributed under the MIT License.
 
         Copyright (c) 2013-2018 Matthias Cuntz - mc (at) macu (dot) de
 

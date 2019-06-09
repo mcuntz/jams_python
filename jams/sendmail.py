@@ -67,7 +67,7 @@ def sendmail(fromm, to, subject, message, login, password, cc=None, smtpserver='
 
         License
         -------
-        This file is part of the JAMS Python package.
+        This file is part of the JAMS Python package, distributed under the MIT License.
 
         Copyright (c) 2014 Matthias Cuntz - mc (at) macu (dot) de
 

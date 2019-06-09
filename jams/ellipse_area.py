@@ -48,7 +48,7 @@ def ellipse_area(a, b=None):
 
         License
         -------
-        This file is part of the JAMS Python package.
+        This file is part of the JAMS Python package, distributed under the MIT License.
 
         Copyright (c) 2014 Matthias Cuntz - mc (at) macu (dot) de
 

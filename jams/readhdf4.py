@@ -70,7 +70,7 @@ def readhdf4(fName, var='', reform=False, squeeze=False, variables=False,
 
         License
         -------
-        This file is part of the JAMS Python package.
+        This file is part of the JAMS Python package, distributed under the MIT License.
 
         Copyright (c) 2012-2013 Matthias Cuntz - mc (at) macu (dot) de
 

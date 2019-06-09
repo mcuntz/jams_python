@@ -290,7 +290,7 @@ def dec2date(indata, calendar='standard', refdate=None, units=None,
 
         License
         -------
-        This file is part of the JAMS Python package.
+        This file is part of the JAMS Python package, distributed under the MIT License.
 
         Copyright (c) 2010-2016 Arndt Piayda, Matthias Cuntz - mc (at) macu (dot) de
 

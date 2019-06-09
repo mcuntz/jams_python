@@ -100,7 +100,7 @@ def ascii2ascii(edate, full=False, en=False, fr=False, us=False, eng=False, YY=F
         
         License
         -------
-        This file is part of the JAMS Python package.
+        This file is part of the JAMS Python package, distributed under the MIT License.
 
         Copyright (c) 2015-2018 Matthias Cuntz - mc (at) macu (dot) de
 
@@ -437,7 +437,7 @@ def fr2ascii(edate, full=False, YY=False):
 
         License
         -------
-        This file is part of the JAMS Python package.
+        This file is part of the JAMS Python package, distributed under the MIT License.
 
         Copyright (c) 2018 Matthias Cuntz - mc (at) macu (dot) de
 

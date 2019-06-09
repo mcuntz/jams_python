@@ -60,7 +60,7 @@ def timestepcheck(indir, pat, outfile, begin, end, numhead=1, timeint=30,
     
     License
     -------
-    This file is part of the JAMS Python package.
+    This file is part of the JAMS Python package, distributed under the MIT License.
 
     Copyright (c) 2014 Arndt Piayda
 

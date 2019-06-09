@@ -114,7 +114,7 @@ def gap2lai(tgap, lgap, G, alpha, boot=False):
         
         License
         -------
-        This file is part of the JAMS Python package.
+        This file is part of the JAMS Python package, distributed under the MIT License.
 
         Copyright (c) 2014 Arndt Piayda
 
@@ -296,7 +296,7 @@ def leafprojection(alpha, theta, t360=False, kernel=False, min=0., max=90.,
         
         License
         -------
-        This file is part of the JAMS Python package.
+        This file is part of the JAMS Python package, distributed under the MIT License.
 
         Copyright (c) 2014 Arndt Piayda
 

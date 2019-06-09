@@ -3,7 +3,7 @@
 # Makes html-pages of all Python scripts in current directory using pydoc
 #
 # License
-# This file is part of the JAMS Python package.
+# This file is part of the JAMS Python package, distributed under the MIT License.
 #
 # Copyright (c) 2012-2014 Matthias Cuntz - mc (at) macu (dot) de
 #

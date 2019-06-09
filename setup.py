@@ -9,9 +9,10 @@ such as reading different file formats, julian date routines, or meteorological 
 It has several subpackages offering constants, working with Eddy covariance data and EddySoft,
 offering special functions, or objective functions be used with scipy.optimize.fmin or scipy.optimize.curvefit,
 and much more.
+
 Copyright (c) 2012-2019 Matthias Cuntz, Juliane Mai, Stephan Thober, Arndt Piayda
 """
-# DOCLINES = __doc__.split("\n")
+# DOCLINES = __doc__.split("\n") # __doc__ does not work
 
 readme = open('README.md').read()
 
@@ -41,11 +42,11 @@ Topic :: Software Development
 Topic :: Utilities
 """
 
-MAJOR               = 5
-MINOR               = 0
-MICRO               = 0
-ISRELEASED          = True
-VERSION             = '{:d}.{:d}.{:d}'.format(MAJOR, MINOR, MICRO)
+MAJOR      = 5
+MINOR      = 0
+MICRO      = 0
+ISRELEASED = True
+VERSION    = '{:d}.{:d}.{:d}'.format(MAJOR, MINOR, MICRO)
 
 from setuptools import setup, find_packages
 
@@ -61,7 +62,6 @@ metadata = dict(
     keywords = ['utilities','array manipulation', 'ascii files', 'date and time', 'hydrology', 'isotopes', 'meteorology', ],
     url = "https://github.com/mcuntz/jams_python/",
     author = "JAMS = Matthias Cuntz, Juliane Mai, Stephan Thober, Arndt Piayda",
-    author_email = "mc (at) macu (dot) de",
     license = 'MIT -  see LICENSE',
     classifiers=[_f for _f in CLASSIFIERS.split('\n') if _f],
     platforms = ["Windows", "Linux", "Solaris", "Mac OS-X", "Unix"],

@@ -55,7 +55,7 @@ def ustarflag(date, data, flags, isday, outdir, min_thresh=0.1, nboot=100,
     
     License
     -------
-    This file is part of the JAMS Python package.
+    This file is part of the JAMS Python package, distributed under the MIT License.
 
     Copyright (c) 2014 Arndt Piayda
 

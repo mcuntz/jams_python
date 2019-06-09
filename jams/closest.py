@@ -56,7 +56,7 @@ def closest(vec, num, value=False):
 
         License
         -------
-        This file is part of the JAMS Python package.
+        This file is part of the JAMS Python package, distributed under the MIT License.
 
         Copyright (c) 2012-2015 Matthias Cuntz - mc (at) macu (dot) de
 

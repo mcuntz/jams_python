@@ -284,7 +284,7 @@ def fread(infile, nc=0, cname=None, skip=0, cskip=0, hskip=0, hstrip=True, separ
 
         License
         -------
-        This file is part of the JAMS Python package.
+        This file is part of the JAMS Python package, distributed under the MIT License.
 
         Copyright (c) 2009-2017 Matthias Cuntz - mc (at) macu (dot) de
 

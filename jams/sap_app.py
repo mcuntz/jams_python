@@ -73,7 +73,7 @@ def t2sap(date, data, swd=None, undef=-9999.):
 
         License
         -------
-        This file is part of the JAMS Python package.
+        This file is part of the JAMS Python package, distributed under the MIT License.
 
         Copyright (c) 2014-2016 Andreas Wiedemann, Matthias Cuntz - mc (at) macu (dot) de
 

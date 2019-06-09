@@ -91,7 +91,7 @@ def tcherkez(Rstar, Phi=0.3, T=0.056,
 
         License
         -------
-        This file is part of the JAMS Python package.
+        This file is part of the JAMS Python package, distributed under the MIT License.
 
         Copyright (c) 2012-2013 Matthias Cuntz - mc (at) macu (dot) de
 

@@ -7,7 +7,7 @@ from scipy.integrate import quad
 
 """
 License:
-This file is part of the JAMS Python package.
+This file is part of the JAMS Python package, distributed under the MIT License.
 
 Copyright (c) 2016 Lennart Schueler
 

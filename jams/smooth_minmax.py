@@ -41,7 +41,7 @@ def smax(x, y, eta=1. - 1.e-5):
 
         License
         -------
-        This file is part of the JAMS Python package.
+        This file is part of the JAMS Python package, distributed under the MIT License.
 
         Copyright (c) 2016 Stephan Thober
 
@@ -117,7 +117,7 @@ def smin(x, y, eta=1. - 1.e-5):
 
         License
         -------
-        This file is part of the JAMS Python package.
+        This file is part of the JAMS Python package, distributed under the MIT License.
 
         Copyright (c) 2016 Stephan Thober
 

@@ -53,7 +53,7 @@ def get_binary(ftp, fname):
 
         License
         -------
-        This file is part of the JAMS Python package.
+        This file is part of the JAMS Python package, distributed under the MIT License.
 
         Copyright (c) 2014 Matthias Cuntz - mc (at) macu (dot) de
 
@@ -135,7 +135,7 @@ def get_check_binary(ftp, fname):
 
         License
         -------
-        This file is part of the JAMS Python package.
+        This file is part of the JAMS Python package, distributed under the MIT License.
 
         Copyright (c) 2014 Matthias Cuntz - mc (at) macu (dot) de
 
@@ -207,7 +207,7 @@ def get_mac_ascii(ftp, fname):
 
         License
         -------
-        This file is part of the JAMS Python package.
+        This file is part of the JAMS Python package, distributed under the MIT License.
 
         Copyright (c) 2014 Matthias Cuntz - mc (at) macu (dot) de
 
@@ -281,7 +281,7 @@ def get_check_mac_ascii(ftp, fname):
 
         License
         -------
-        This file is part of the JAMS Python package.
+        This file is part of the JAMS Python package, distributed under the MIT License.
 
         Copyright (c) 2014 Matthias Cuntz - mc (at) macu (dot) de
 
@@ -353,7 +353,7 @@ def get_unix_ascii(ftp, fname):
 
         License
         -------
-        This file is part of the JAMS Python package.
+        This file is part of the JAMS Python package, distributed under the MIT License.
 
         Copyright (c) 2014 Matthias Cuntz - mc (at) macu (dot) de
 
@@ -427,7 +427,7 @@ def get_check_unix_ascii(ftp, fname):
 
         License
         -------
-        This file is part of the JAMS Python package.
+        This file is part of the JAMS Python package, distributed under the MIT License.
 
         Copyright (c) 2014 Matthias Cuntz - mc (at) macu (dot) de
 
@@ -499,7 +499,7 @@ def get_windows_ascii(ftp, fname):
 
         License
         -------
-        This file is part of the JAMS Python package.
+        This file is part of the JAMS Python package, distributed under the MIT License.
 
         Copyright (c) 2014 Matthias Cuntz - mc (at) macu (dot) de
 
@@ -573,7 +573,7 @@ def get_check_windows_ascii(ftp, fname):
 
         License
         -------
-        This file is part of the JAMS Python package.
+        This file is part of the JAMS Python package, distributed under the MIT License.
 
         Copyright (c) 2014 Matthias Cuntz - mc (at) macu (dot) de
 
@@ -648,7 +648,7 @@ def get_names(ftp, fname=None):
 
         License
         -------
-        This file is part of the JAMS Python package.
+        This file is part of the JAMS Python package, distributed under the MIT License.
 
         Copyright (c) 2014 Matthias Cuntz - mc (at) macu (dot) de
 
@@ -728,7 +728,7 @@ def get_names_dates(ftp, fname=None):
 
         License
         -------
-        This file is part of the JAMS Python package.
+        This file is part of the JAMS Python package, distributed under the MIT License.
 
         Copyright (c) 2014-2016 Matthias Cuntz - mc (at) macu (dot) de
 
@@ -831,7 +831,7 @@ def get_names_dates_sizes(ftp, fname=None):
 
         License
         -------
-        This file is part of the JAMS Python package.
+        This file is part of the JAMS Python package, distributed under the MIT License.
 
         Copyright (c) 2014-2016 Matthias Cuntz - mc (at) macu (dot) de
 
@@ -937,7 +937,7 @@ def get_names_sizes(ftp, fname=None):
 
         License
         -------
-        This file is part of the JAMS Python package.
+        This file is part of the JAMS Python package, distributed under the MIT License.
 
         Copyright (c) 2014 Matthias Cuntz - mc (at) macu (dot) de
 
@@ -1002,7 +1002,7 @@ def get_names_times(*args, **kwargs):
 
         License
         -------
-        This file is part of the JAMS Python package.
+        This file is part of the JAMS Python package, distributed under the MIT License.
 
         Copyright (c) 2014 Matthias Cuntz - mc (at) macu (dot) de
 
@@ -1052,7 +1052,7 @@ def get_names_times_sizes(*args, **kwargs):
 
         License
         -------
-        This file is part of the JAMS Python package.
+        This file is part of the JAMS Python package, distributed under the MIT License.
 
         Copyright (c) 2014 Matthias Cuntz - mc (at) macu (dot) de
 
@@ -1117,7 +1117,7 @@ def get_size(ftp, fname):
 
         License
         -------
-        This file is part of the JAMS Python package.
+        This file is part of the JAMS Python package, distributed under the MIT License.
 
         Copyright (c) 2014 Matthias Cuntz - mc (at) macu (dot) de
 
@@ -1188,7 +1188,7 @@ def get_sizes(ftp, fname=None):
 
         License
         -------
-        This file is part of the JAMS Python package.
+        This file is part of the JAMS Python package, distributed under the MIT License.
 
         Copyright (c) 2014 Matthias Cuntz - mc (at) macu (dot) de
 
@@ -1266,7 +1266,7 @@ def set_mtime(ftp, fname):
 
         License
         -------
-        This file is part of the JAMS Python package.
+        This file is part of the JAMS Python package, distributed under the MIT License.
 
         Copyright (c) 2014 Matthias Cuntz - mc (at) macu (dot) de
 
@@ -1350,7 +1350,7 @@ def put_binary(ftp, fname):
 
         License
         -------
-        This file is part of the JAMS Python package.
+        This file is part of the JAMS Python package, distributed under the MIT License.
 
         Copyright (c) 2016 Matthias Cuntz - mc (at) macu (dot) de
 
@@ -1421,7 +1421,7 @@ def put_check_binary(ftp, fname):
 
         License
         -------
-        This file is part of the JAMS Python package.
+        This file is part of the JAMS Python package, distributed under the MIT License.
 
         Copyright (c) 2016 Matthias Cuntz - mc (at) macu (dot) de
 

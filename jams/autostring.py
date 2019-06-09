@@ -118,7 +118,7 @@ def autostring(num, prec=0, zero=False, set_printoptions=False, pp=False, join=F
 
         License
         -------
-        This file is part of the JAMS Python package.
+        This file is part of the JAMS Python package, distributed under the MIT License.
 
         Copyright (c) 2011-2014 Matthias Cuntz - mc (at) macu (dot) de
 

@@ -59,7 +59,7 @@ def eddycorr(indir, sltdir, cfile, hfile, meteofile, outfile, novalue=-9999,
 
     License
     -------
-    This file is part of the JAMS Python package.
+    This file is part of the JAMS Python package, distributed under the MIT License.
 
     Copyright (c) 2014 Arndt Piayda
 

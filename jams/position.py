@@ -116,7 +116,7 @@ def position(row=1, col=1, num=1,
 
         License
         -------
-        This file is part of the JAMS Python package.
+        This file is part of the JAMS Python package, distributed under the MIT License.
 
         Copyright (c) 2009-2016 Matthias Cuntz - mc (at) macu (dot) de
 

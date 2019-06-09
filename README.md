@@ -29,7 +29,7 @@ The library is maintained with a git repository at:
 
     https://github.com/mcuntz/jams_python/
 
-To use it, either checkout the git repository
+To use it, checkout the git repository
 
     git clone https://github.com/mcuntz/jams_python.git
 
@@ -58,17 +58,17 @@ Append --user on pip commands if you have no root access.
 
 The documentation of the package is in the docstring of __init__.py so
 that one can get help on the Python prompt:  
->>> import jams  
->>> help(jams)
+\>\>\> import jams  
+\>\>\> help(jams)
 
 The individual functions also provide their help as doctrings.  
 Getting help, for example, on fread for reading numbers from an ascii file:  
->>> import jams  
->>> help(jams.fread)
+\>\>\> import jams  
+\>\>\> help(jams.fread)
 
 or  
->>> from jams import fread  
->>> help(fread)
+\>\>\> from jams import fread  
+\>\>\> help(fread)
 
 One can produce html versions of the documentation in a directory
 called html by calling the script:
@@ -112,7 +112,7 @@ bottleneck, bs4, cartopy, cdsapi, ecmwfapi, h5py, matplotlib, mpi4py, netCDF4, n
 
 ##  License
 
-This file is part of the JAMS Python package.
+This file is part of the JAMS Python package, distributed under the MIT License.
 
 Copyright (c) 2012-2019 Matthias Cuntz, Juliane Mai, Stephan Thober, Arndt Piayda
 

@@ -28,7 +28,7 @@ optional arguments:
 
 License
 -------
-This file is part of the JAMS Python package.
+This file is part of the JAMS Python package, distributed under the MIT License.
 
 Copyright (c) 2012-2019 Matthias Cuntz - mc (at) macu (dot) de
 

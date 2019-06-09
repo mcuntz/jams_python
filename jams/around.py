@@ -67,7 +67,7 @@ def around(num, powten, ceil=False, floor=False):
 
         License
         -------
-        This file is part of the JAMS Python package.
+        This file is part of the JAMS Python package, distributed under the MIT License.
 
         Copyright (c) 2011-2016 Matthias Cuntz - mc (at) macu (dot) de
 

@@ -60,7 +60,7 @@ def spikeflag(date, data, inflag, isday, outdir, window=13, iter=1,
     
     License
     -------
-    This file is part of the JAMS Python package.
+    This file is part of the JAMS Python package, distributed under the MIT License.
 
     Copyright (c) 2014 Arndt Piayda
 

@@ -119,7 +119,7 @@ def pawn_index( uncond, cond,
 
         License
         -------
-        This file is part of the JAMS Python package.
+        This file is part of the JAMS Python package, distributed under the MIT License.
 
         Copyright (c) 2017 Juliane Mai
 

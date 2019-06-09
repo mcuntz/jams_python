@@ -80,7 +80,7 @@ def homo_sampling(p1, p2, n, func=None, plot=False, maxit=1000):
 
         License
         -------
-        This file is part of the JAMS Python package.
+        This file is part of the JAMS Python package, distributed under the MIT License.
 
         Copyright (c) 2014 Arndt Piayda
 
