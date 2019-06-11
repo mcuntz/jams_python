@@ -28,7 +28,7 @@ class Test(unittest.TestCase):
         rpcvalue = -2222
         for base in self.grids:
             base.fill_value = rpcvalue
-            self.assertEqual(base.fill_value, rpcvalue)
+            self.assertEqual(base.fill_value, base.dtype.type(rpcvalue))
 
     def test_setDataType(self):
         rpctype = np.int32
@@ -65,9 +65,10 @@ class Test(unittest.TestCase):
 
         self.assertTupleEqual(grid[3:4].cellsize, (-10, 10))
         self.assertTupleEqual(grid[0::2, 0::4].cellsize, (-20, 40))
+
         self.assertTupleEqual(grid[0::3, 0::5].cellsize, (-30, 50))
         self.assertTupleEqual(grid[0::1, 0::7].cellsize, (-10, 70))
-        # needs to be extended...
+        # # # needs to be extended...
         self.assertTupleEqual(grid[[1,2,5]].cellsize, (-20, 10))
         self.assertTupleEqual(grid[[1,2,4,10]].cellsize, (-30, 10))
 
@@ -85,28 +86,33 @@ class Test(unittest.TestCase):
         grid = ga.ones((100,100), yorigin=1000, xorigin=1200, cellsize=10, origin="ur")
         self.assertTupleEqual(grid[3:4].cellsize, (-10, -10))
 
+        # yvals = np.array(range(1000, 1100, 2) + range(1100, 1250, 3))[::-1]
+        # xvals = np.array(range(0, 100, 2) + range(100, 250, 3))
+        # xvalues, yvalues = np.meshgrid(yvals, xvals)
+        # grid = ga.ones((100, 100), origin="ul", yvalues=yvalues, xvalues=xvalues)
+
+
     def test_getitemOrigin(self):
         grids = (
-            ga.ones((100,100),yorigin=1000,xorigin=1200,origin="ul"),
-            ga.ones((100,100),yorigin=1000,xorigin=1200,origin="ll"),
-            ga.ones((100,100),yorigin=1000,xorigin=1200,origin="ur"),
-            ga.ones((100,100),yorigin=1000,xorigin=1200,origin="lr"),
-        )
+            ga.ones((100, 100), yorigin=1000, xorigin=1200, origin="ul"),
+            ga.ones((100, 100), yorigin=1000, xorigin=1200, origin="ll"),
+            ga.ones((100, 100), yorigin=1000, xorigin=1200, origin="ur"),
+            ga.ones((100, 100), yorigin=1000, xorigin=1200, origin="lr"))
         slices = (
-            ( slice(3,4) ),
-            ( slice(3,4),slice(55,77,None) ),
-            ( slice(None,None,7),slice(55,77,None) ),
-            ( -1, ),
-        )
+            (slice(3, 4)),
+            (slice(3, 4), slice(55, 77, None)),
+            (slice(None, None, 7), slice(55, 77, None)),
+            (-1, ),)
+
         expected = (
-            ( (997,  1200), (997,  1255), (1000, 1255), (901,  1200) ),
-            ( (1096, 1200), (1096, 1255), (1001, 1255), (1000, 1200) ),
-            ( (997,  1200), (997,  1177), (1000, 1177), (901,  1200) ),
-            ( (1096, 1200), (1096, 1177), (1001, 1177), (1000, 1200) )
-        )
-        for i,grid in enumerate(grids):
-            for slc,exp in zip(slices,expected[i]):
-                self.assertTupleEqual( exp, grid[slc].getOrigin() )
+            ((997,   1200),  (997,   1255),  (1000,  1255),  (901,   1200)),
+            ((1096,  1200),  (1096,  1255),  (1001,  1255),  (1000,  1200)),
+            ((997,   1200),  (997,   1177),  (1000,  1177),  (901,   1200)),
+            ((1096,  1200),  (1096,  1177),  (1001,  1177),  (1000,  1200)))
+
+        for i, grid in enumerate(grids):
+            for slc, exp in zip(slices, expected[i]):
+                self.assertTupleEqual( exp,  grid[slc].getCorner() )
                 break
             break
 
@@ -132,15 +138,15 @@ class Test(unittest.TestCase):
 
     def test_bbox(self):
         grids = (
-            ga.ones((100,100),yorigin=1000,xorigin=1200,origin="ul"),
-            ga.ones((100,100),yorigin=1000,xorigin=1200,origin="ll"),
-            ga.ones((100,100),yorigin=1000,xorigin=1200,origin="ur"),
-            ga.ones((100,100),yorigin=1000,xorigin=1200,origin="lr"),
+            ga.ones((100,100), yorigin=1000, xorigin=1200, origin="ul"),
+            ga.ones((100,100), yorigin=1000, xorigin=1200, origin="ll"),
+            ga.ones((100,100), yorigin=1000, xorigin=1200, origin="ur"),
+            ga.ones((100,100), yorigin=1000, xorigin=1200, origin="lr"),
         )
         expected = (
-            {'xmin': 1200, 'ymin': 900, 'ymax': 1000, 'xmax': 1300},
+            {'xmin': 1200, 'ymin': 900,  'ymax': 1000, 'xmax': 1300},
             {'xmin': 1200, 'ymin': 1000, 'ymax': 1100, 'xmax': 1300},
-            {'xmin': 1100, 'ymin': 900, 'ymax': 1000, 'xmax': 1200},
+            {'xmin': 1100, 'ymin': 900,  'ymax': 1000, 'xmax': 1200},
             {'xmin': 1100, 'ymin': 1000, 'ymax': 1100, 'xmax': 1200},
         )
 
@@ -187,7 +193,6 @@ class Test(unittest.TestCase):
             self.assertNotEqual(id(base),id(shallow_copy))
             self.assertTrue(np.all(base == shallow_copy))
 
-
     def test_numpyFunctions(self):
         # Ignore over/underflow warnings in function calls
         warnings.filterwarnings("ignore")
@@ -197,10 +202,10 @@ class Test(unittest.TestCase):
                  np.around, np.rint, np.fix,
                  np.prod, np.sum,
                  np.trapz,
-                 np.i0, np.sinc,
+                 np.i0,
+                 np.sinc,
                  np.arctanh,
-                 np.gradient,
-        )
+                 np.gradient)
 
         for base in self.grids:
             grid = base.copy()

@@ -1,7 +1,14 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
 
+
 import numpy as np
+
+
+try:
+    basestring
+except NameError:
+    basestring = str
 
 
 def _broadcastTo(array, shape, dims):
@@ -17,7 +24,7 @@ def _broadcastTo(array, shape, dims):
     # bring array to the desired dimensionality
     slc = [slice(None, None, None) if i in dims else None
            for i in range(len(shape))]
-    return np.broadcast_to(array[slc], shape)
+    return np.broadcast_to(array[tuple(slc)], shape)
 
 
 def _broadcastedMeshgrid(*arrays):
@@ -31,7 +38,7 @@ def _broadcastedMeshgrid(*arrays):
         shape = np.ones(n, dtype=int)
         shape[pos] = len(array)
         return arr.reshape(shape)
-                   
+
     shape = tuple(len(arr) for arr in arrays)
 
     out = []
@@ -43,5 +50,15 @@ def _broadcastedMeshgrid(*arrays):
         # there should be a solution without transposing...
         out.append(tmp.T)
     return out
-        
- 
+
+
+def _tupelize(arg):
+    out = arg
+    if isinstance(out, basestring):
+        out = (out, )
+    if not isinstance(out, tuple):
+        try:
+            out = tuple(out)
+        except TypeError:
+            out = (out, )
+    return out

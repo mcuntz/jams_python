@@ -110,7 +110,7 @@ bottleneck, bs4, cartopy, cdsapi, ecmwfapi, h5py, matplotlib, mpi4py, netCDF4, n
 
 ---------------------------------------------------------------
 
-##  License
+###  License
 
 This file is part of the JAMS Python package, distributed under the MIT License.
 

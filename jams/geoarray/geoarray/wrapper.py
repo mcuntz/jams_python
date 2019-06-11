@@ -14,18 +14,29 @@ This module provides initializer function for core.GeoArray
 import numpy as np
 from .core import GeoArray
 from .gdalio import _fromFile, _fromDataset
+from .gdalspatial import _Projection
+from .geotrans import _Geotrans, _Geolocation
+from .utils import _tupelize
 # from typing import Optional, Union, Tuple, Any, Mapping, AnyStr
 
 
-def array(data,               # type: Union[np.ndarray, GeoArray]       
+def array(data,               # type: Union[np.ndarray, GeoArray]
           dtype      = None,  # type: Optional[Union[AnyStr, np.dtype]]
-          yorigin    = None,  # type: Optional[float]
-          xorigin    = None,  # type: Optional[float]
-          origin     = None,  # type: Optional[AnyStr]
+          yorigin    = 0,     # type: Optional[float]
+          xorigin    = 0,     # type: Optional[float]
+          origin     = "ul",  # type: Optional[floatAnyStr]
           fill_value = None,  # type: Optional[float]
-          cellsize   = None,  # type: Optional[Union[float, Tuple[float, float]]]
+          cellsize   = 1,     # type: Optional[float]]
+          ycellsize  = None,  # type: Optional[float]
+          xcellsize  = None,  # type: Optional[float]
+          yparam     = 0,     # type: Optional[float]
+          xparam     = 0,     # type: Optional[float]
+          # geotrans   = None,  # type: Optional[_Geotrans]
+          yvalues    = None,  # type: Optional[np.ndarray]
+          xvalues    = None,  # type: Optional[np.ndarray]
           proj       = None,  # type: Mapping[AnyStr, Union[AnyStr, float]]
-          mode       = None,  # type: AnyStr
+          mode       = "r",   # type: AnyStr
+          color_mode = "L",   # type: AnyStr
           copy       = False, # type: bool
           fobj       = None,  # type: Optional[osgeo.gdal.Dataset]
 ):                            # type: (...) -> GeoArray
@@ -48,7 +59,7 @@ def array(data,               # type: Union[np.ndarray, GeoArray]
     cellsize     : int/float or 2-tuple of those # cellsize, cellsizes in y and x direction
     proj         : dict/None                     # proj4 projection parameters
     copy         : bool                          # create a copy of the given data
-    
+
     Returns
     -------
     GeoArray
@@ -58,63 +69,67 @@ def array(data,               # type: Union[np.ndarray, GeoArray]
     Create a GeoArray from data.
     """
 
+
+    def _checkGeolocArray(array, diffaxis):
+        array = np.asarray(array)
+        diff = np.diff(array, axis=diffaxis)
+
+        assert array.ndim == 2
+        assert array.shape == data.shape[-2:]
+        assert len(np.unique(np.sign(diff))) == 1
+
+        return array
+
+    if yvalues is not None and xvalues is not None:
+        yvalues = _checkGeolocArray(yvalues, 0)
+        xvalues = _checkGeolocArray(xvalues, 1)
+        geotrans = _Geolocation(yvalues, xvalues, shape=data.shape, origin=origin)
+    else:
+
+        cellsize = _tupelize(cellsize)
+
+        if ycellsize is None:
+            ycellsize = cellsize[0]
+            if (origin[0] == "u" and ycellsize > 0) or (origin[0] == "l" and ycellsize < 0):
+                ycellsize *= -1
+
+        if xcellsize is None:
+            xcellsize = cellsize[-1]
+            if (origin[1] == "r" and xcellsize > 0) or (origin[0] == "l" and xcellsize < 0):
+                xcellsize *= -1
+
+        # if geotrans is None:
+        # NOTE: not to robust...
+        geotrans = _Geotrans(
+            yorigin=yorigin, xorigin=xorigin,
+            ycellsize=ycellsize, xcellsize=xcellsize,
+            yparam=yparam, xparam=xparam,
+            origin=origin, shape=data.shape)
+
+    proj = _Projection(proj)
+
     if isinstance(data, GeoArray):
-        dtype      = dtype or data.dtype
-        yorigin    = yorigin or data.yorigin
-        xorigin    = xorigin or data.xorigin
-        origin     = origin or data.origin
-        fill_value = fill_value or data.fill_value
-        cellsize   = cellsize or data.cellsize
-        proj       = proj or data.proj
-        mode       = mode or data.mode
-        fobj       = data.fobj
-        data       = data.data
-        
+        return GeoArray(
+            dtype      = dtype or data.dtype,
+            geotrans   = data.geotrans,
+            fill_value = fill_value or data.fill_value,
+            proj       = proj or data.proj,
+            mode       = mode or data.mode,
+            color_mode = color_mode or data.color_mode,
+            fobj       = data.fobj,
+            data       = data.data)
+
     return GeoArray(
-        data       = np.array(data, dtype=dtype, copy=copy), 
-        yorigin    = yorigin or 0,
-        xorigin    = xorigin or 0,
-        origin     = origin or "ul",
+        data       = np.array(data, dtype=dtype, copy=copy),
+        geotrans   = geotrans,
         fill_value = fill_value,
-        cellsize   = cellsize or (1,1),
         proj       = proj,
         mode       = mode,
-        fobj       = fobj,
-    )
+        color_mode = color_mode,
+        fobj       = fobj,)
 
 
-def _likeArgs(arr):
-
-    out = {}
-    if isinstance(arr, GeoArray):
-        out["yorigin"]    = arr.yorigin
-        out["xorigin"]     = arr.xorigin
-        out["origin"]     = arr.origin
-        out["fill_value"] = arr.fill_value
-        out["cellsize"]   = arr.cellsize
-        out["proj"]       = arr.proj
-        out["mode"]       = arr.mode
-
-    return out
-    
-
-def zeros_like(arr, dtype=None):
-    args = _likeArgs(arr)
-    return zeros(shape=arr.shape, dtype=dtype or arr.dtype, **args)
-    
-
-def ones_like(arr, dtype=None):
-    args = _likeArgs(arr)
-    return ones(shape=arr.shape, dtype=dtype or arr.dtype, **args)
- 
-
-def full_like(arr, value, dtype=None):
-    args = _likeArgs(arr)
-    return full(shape=arr.shape, value=value, dtype=dtype or arr.dtype, **args)
-
-
-def zeros(shape, dtype=np.float64, yorigin=0, xorigin=0, origin="ul",
-          fill_value=None, cellsize=1, proj=None, mode=None):
+def zeros(shape, dtype=np.float64, *args, **kwargs):
     """
     Arguments
     ---------
@@ -122,17 +137,7 @@ def zeros(shape, dtype=np.float64, yorigin=0, xorigin=0, origin="ul",
 
     Optional Arguments
     ------------------
-    dtype        : str/np.dtype                  # type of the returned grid
-    yorigin      : int/float                     # y-value of the grid's origin
-    xorigin      : int/float                     # x-value of the grid's origin
-    origin       : {"ul","ur","ll","lr"}         # position of the origin. One of:
-                                                 #     "ul" : upper left corner
-                                                 #     "ur" : upper right corner
-                                                 #     "ll" : lower left corner
-                                                 #     "lr" : lower right corner
-    fill_value   : inf/float                     # fill or fill value
-    cellsize     : int/float or 2-tuple of those # cellsize, cellsizes in y and x direction
-    proj         : dict/None                     # proj4 projection parameters
+    see array
 
     Returns
     -------
@@ -143,20 +148,10 @@ def zeros(shape, dtype=np.float64, yorigin=0, xorigin=0, origin="ul",
     Return a new GeoArray of given shape and type, filled with zeros.
     """
 
-    return GeoArray(
-        data       = np.zeros(shape, dtype),
-        yorigin    = yorigin,
-        xorigin    = xorigin,
-        origin     = origin,
-        fill_value = fill_value,
-        cellsize   = cellsize,
-        proj       = proj,
-        mode       = mode,
-    )
+    return array(data=np.zeros(shape, dtype), *args, **kwargs)
 
 
-def ones(shape, dtype=np.float64, yorigin=0, xorigin=0, origin="ul",
-         fill_value=None, cellsize=1, proj=None, mode=None):
+def ones(shape, dtype=np.float64, *args, **kwargs):
     """
     Arguments
     ---------
@@ -164,13 +159,7 @@ def ones(shape, dtype=np.float64, yorigin=0, xorigin=0, origin="ul",
 
     Optional Arguments
     ------------------
-    dtype        : str/np.dtype                  # type of the returned grid
-    yorigin      : int/float                     # y-value of the grid's origin
-    xorigin      : int/float                     # x-value of the grid's origin
-    origin       : {"ul","ur","ll","lr"}         # position of the origin. One of:
-    fill_value   : inf/float                     # fill or fill value
-    cellsize     : int/float or 2-tuple of those # cellsize, cellsizes in y and x direction
-    proj         : dict/None                     # proj4 projection parameters
+    see array
 
     Returns
     -------
@@ -181,20 +170,10 @@ def ones(shape, dtype=np.float64, yorigin=0, xorigin=0, origin="ul",
     Return a new GeoArray of given shape and type, filled with ones.
     """
 
-    return GeoArray(
-        data       = np.ones(shape, dtype),
-        yorigin    = yorigin,
-        xorigin    = xorigin,
-        origin     = origin,
-        fill_value = fill_value,
-        cellsize   = cellsize,
-        proj       = proj,
-        mode       = mode,
-    )
+    return array(data=np.ones(shape, dtype), *args, **kwargs)
 
 
-def full(shape, value, dtype=np.float64, yorigin=0, xorigin=0, origin="ul",
-         fill_value=None, cellsize=1, proj=None, mode=None):
+def full(shape, value, dtype=np.float64, *args, **kwargs):
     """
     Arguments
     ---------
@@ -203,13 +182,7 @@ def full(shape, value, dtype=np.float64, yorigin=0, xorigin=0, origin="ul",
 
     Optional Arguments
     ------------------
-    dtype        : str/np.dtype                  # type of the returned grid
-    yorigin      : int/float                     # y-value of the grid's origin
-    xorigin      : int/float                     # x-value of the grid's origin
-    origin       : {"ul","ur","ll","lr"}         # position of the origin. One of:
-    fill_value   : inf/float                     # fill or fill value
-    cellsize     : int/float or 2-tuple of those # cellsize, cellsizes in y and x direction
-    proj         : dict/None                     # proj4 projection parameters
+    see array
 
     Returns
     -------
@@ -220,19 +193,10 @@ def full(shape, value, dtype=np.float64, yorigin=0, xorigin=0, origin="ul",
     Return a new GeoArray of given shape and type, filled with fill_value.
     """
 
-    return GeoArray(
-        data       = np.full(shape, value, dtype),
-        yorigin    = yorigin,
-        xorigin    = xorigin,
-        origin     = origin,
-        fill_value = fill_value,
-        cellsize   = cellsize,
-        proj       = proj,
-        mode       = mode)
+    return array(data=np.full(shape, value, dtype), *args, **kwargs)
 
 
-def empty(shape, dtype=np.float64, yorigin=0, xorigin=0, origin="ul",
-          fill_value=None, cellsize=1, proj=None, mode=None):
+def empty(shape, dtype=np.float64, *args, **kwargs):
     """
     Arguments
     ----------
@@ -240,13 +204,7 @@ def empty(shape, dtype=np.float64, yorigin=0, xorigin=0, origin="ul",
 
     Optional Arguments
     ------------------
-    dtype        : str/np.dtype                  # type of the returned grid
-    yorigin      : int/float                     # y-value of the grid's origin
-    xorigin      : int/float                     # x-value of the grid's origin
-    origin       : {"ul","ur","ll","lr"}         # position of the origin. One of:
-    fill_value   : inf/float                     # fill or fill value
-    cellsize     : int/float or 2-tuple of those # cellsize, cellsizes in y and x direction
-    proj         : dict/None                     # proj4 projection parameters
+    see array
 
     Returns
     -------
@@ -257,28 +215,40 @@ def empty(shape, dtype=np.float64, yorigin=0, xorigin=0, origin="ul",
     Return a new empty GeoArray of given shape and type
     """
 
-    return GeoArray(
-        data       = np.empty(shape, dtype),
-        yorigin    = yorigin,
-        xorigin    = xorigin,
-        origin     = origin,
-        fill_value = fill_value,
-        cellsize   = cellsize,
-        proj       = proj,
-        mode       = mode,
-    )
+    return array(data=np.empty(shape, dtype), *args, **kwargs)
+
+
+def _likeArgs(arr):
+    if isinstance(arr, GeoArray):
+        return arr.header
+    return {}
+
+
+def zeros_like(arr, dtype=None):
+    args = _likeArgs(arr)
+    return zeros(shape=arr.shape, dtype=dtype or arr.dtype, **args)
+
+
+def ones_like(arr, dtype=None):
+    args = _likeArgs(arr)
+    return ones(shape=arr.shape, dtype=dtype or arr.dtype, **args)
+
+
+def full_like(arr, value, dtype=None):
+    args = _likeArgs(arr)
+    return full(shape=arr.shape, value=value, dtype=dtype or arr.dtype, **args)
 
 
 def fromdataset(ds):
     return array(**_fromDataset(ds))
 
 
-def fromfile(fname):
+def fromfile(fname, mode="r"):
     """
     Arguments
     ---------
     fname : str  # file name
-    
+
     Returns
     -------
     GeoArray
@@ -288,6 +258,4 @@ def fromfile(fname):
     Create GeoArray from file
 
     """
-    
-    return array(**_fromFile(fname))
-
+    return _fromFile(fname, mode)

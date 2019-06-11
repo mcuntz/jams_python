@@ -55,7 +55,7 @@ class Test(unittest.TestCase):
             self.assertTrue(np.all(padgrid == base))
 
     def test_enlarge(self):
-        for base in self.grids[1:]:
+        for i, base in enumerate(self.grids[6:]):
             bbox = base.bbox
             if base.fill_value is None:
                 base.fill_value = -9999
@@ -67,16 +67,18 @@ class Test(unittest.TestCase):
                 "xmax" : bbox["xmax"] +  .1 * cellsize[1]
             }
             enlrgrid = base.enlarge(**newbbox)
+
             self.assertEqual(enlrgrid.nrows, base.nrows + 1 + 7)
             self.assertEqual(enlrgrid.ncols, base.ncols + 3 + 1)
 
         x = np.arange(20).reshape((4,5))
-        grid = ga.array(x, yorigin=100, xorigin=200, origin="ll", cellsize=20, fill_value=-9)
+        grid = ga.array(
+            x, yorigin=100, xorigin=200,
+            origin="ll", cellsize=20, fill_value=-9)
         enlarged = grid.enlarge(xmin=130, xmax=200, ymin=66)
         self.assertDictEqual(
             enlarged.bbox,
-            {'xmin': 120, 'ymin': 60, 'ymax': 180, 'xmax': 300}
-        )
+            {'xmin': 120, 'ymin': 60, 'ymax': 180, 'xmax': 300})
 
     def test_shrink(self):
         for base in self.grids:
@@ -119,7 +121,7 @@ class Test(unittest.TestCase):
     #             grid = copy.deepcopy(base)
     #             grid.yorigin -= yoff
     #             grid.xorigin -= xoff
-    #             yorg, xorg = grid.getOrigin()
+    #             yorg, xorg = grid.getCorner()
     #             grid.snap(base)
 
     #             xdelta = abs(grid.xorigin - xorg)
@@ -178,42 +180,42 @@ class Test(unittest.TestCase):
 
     def test_project(self):
 
-        """
-        This test fails for gdal versions below 2.0. The warping is correct, but
-        the void space around the original image is filled with fill_value in versions
-        >= 2.0, else with 0. The tested function behaves like the more recent versions
-        of GDAL
-        """
-        codes = (2062, 3857)
+        def assertGeoArrayEqual(ga1, ga2):
+            self.assertTrue(np.all(ga1.data == ga1.data))
+            self.assertTrue(np.all(ga2.mask == ga2.mask))
+            self.assertDictEqual(ga1.bbox, ga2.bbox)
+            self.assertEqual(ga1.proj, ga2.proj)
 
-        if gdal.VersionInfo().startswith("1"):
-            warnings.warn("Skipping incompatible warp test on GDAL versions < 2", RuntimeWarning)
-            return
+        epsgcodes = (32632, 32634)
+        error = 0
+        cellsize = 1000
+        warpcmd = "gdalwarp -r 'near' -tr {cellsize} {cellsize} -et {error} -s_srs '{sproj}' -t_srs 'EPSG:{tproj}' {sfname} {tfname}"
 
         for fname, base in zip(self.fnames, self.grids):
-            # break
-            if base.proj:
-                for epsg in codes:
-                    # gdalwarp flips the warped image
-                    proj = ga.project(
-                        grid      = base[::-1],
-                        proj      = {"init":"epsg:{:}".format(epsg)},
-                        max_error = 0
-                    )
-                    # proj = base[::-1].warp({"init":"epsg:{:}".format(epsg)}, 0)
-                    with tempfile.NamedTemporaryFile(suffix=".tif") as tf:
-                        subprocess.check_output(
-                            "gdalwarp -r 'near' -et 0 -t_srs 'EPSG:{:}' {:} {:}".format(
-                                epsg, fname, tf.name
-                            ),
-                            shell=True
-                        )
-                        compare = ga.fromfile(tf.name)
-                        self.assertTrue(np.all(proj.data == compare.data))
-                        self.assertTrue(np.all(proj.mask == compare.mask))
-                        self.assertDictEqual(proj.bbox, compare.bbox)
-            else:
-                self.assertRaises(AttributeError)
+            for epsgcode in epsgcodes:
+                proj = ga.project(
+                    grid      = base,
+                    proj      = {"init":"epsg:{:}".format(epsgcode)},
+                    func      = "nearest",
+                    cellsize  = cellsize,
+                    max_error = 0)
+
+                with tempfile.NamedTemporaryFile(suffix=".tif") as tf:
+                    subprocess.check_output(
+                        warpcmd.format(error=error, cellsize=cellsize,
+                                       sproj=base.proj, tproj=epsgcode,
+                                       sfname=fname, tfname=tf.name),
+                    shell=True)
+                    compare = ga.fromfile(tf.name).trim()
+                    try:
+                        assertGeoArrayEqual(proj, compare)
+                    except AssertionError:
+                        if fname.endswith("png"):
+                            # the fill_vaue is not set correctly with the png-driver
+                            compare.fill_value = 0
+                            assertGeoArrayEqual(proj, compare.trim())
+                        else:
+                            raise
 
 
 if __name__== "__main__":
