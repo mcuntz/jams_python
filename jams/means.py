@@ -4,7 +4,7 @@ import numpy as np
 from jams.date2dec import date2dec
 from jams.dec2date import dec2date
 
-def means(date, dat, year=False, month=False, day=False, hour=False, minute=False,
+def means(date, dat, year=False, month=False, day=False, hour=False, half_hour=False, minute=False,
           meanday=False, meanmonth=False, seasonal=False,
           sum=False, max=False, min=False, onlydat=False):
     """
@@ -18,6 +18,7 @@ def means(date, dat, year=False, month=False, day=False, hour=False, minute=Fals
             Monthly  dates are centred at 15th, 12:00h.
             Daily    dates are centred at 12:00h.
             Hourly   dates are centred at 30 min.
+            Half hourly dates are centred at 15 and 45 min.
             Minutely dates are centred at 30 sec.
             Mean daily dates centred on 30 min of 01. January of first year.
             Mean monthly dates centred on 15th of month, 12:00h of first year.
@@ -26,7 +27,7 @@ def means(date, dat, year=False, month=False, day=False, hour=False, minute=Fals
 
         Definition
         ----------
-        def means(date, dat, year=False, month=False, day=False, hour=False, minute=False,
+        def means(date, dat, year=False, month=False, day=False, hour=False, half_hour=False, minute=False,
                   meanday=False, meanmonth=False, seasonal=False,
                   sum=False, max=False, min=False, onlydat=False):
 
@@ -43,6 +44,7 @@ def means(date, dat, year=False, month=False, day=False, hour=False, minute=Fals
         month     if True, monthly  means.
         day       if True, daily    means.
         hour      if True, hourly   means.
+        half_hour if True, half-hourly means.
         minute    if True, minutely means.
         meanday   if True, mean daily cycle.
         meanmonth if True, mean monthly cycle.
@@ -51,6 +53,7 @@ def means(date, dat, year=False, month=False, day=False, hour=False, minute=Fals
         max       if True, calculate maxima instead of means.
         min       if True, calculate minima instead of means.
         onlydat   if True, return only meandat, else return [outdate, meandat]
+
 
         Output
         ------
@@ -61,6 +64,15 @@ def means(date, dat, year=False, month=False, day=False, hour=False, minute=Fals
         If meanmonth==True, then all months will be written; as a masked-array if months are missing.
         If seasonal==True: input data has to be spaced <= days, otherwise consider meanmonth.
         If seasonal==True, then all days will be written; as a masked-array if days are missing.
+
+
+        Note
+        ----
+        If input date signifies the end of the time step, the user should remove half a time step
+        before using the routine. Otherwise the routine would have to guess the time step, which
+        is error prone.
+        For example, remove 15 minutes in decimal days from time steps of half an hour:
+        date = jams.date2dec(ascii=adate) - 15./(24.*60.)
 
 
         Examples
@@ -86,6 +98,14 @@ def means(date, dat, year=False, month=False, day=False, hour=False, minute=Fals
         >>> odates, xout = means(jdates, x, day=True)
         >>> print(astr(xout, 3, pp=True))
         ['4.000' '2.000' '3.000']
+
+        >>> odates, xout = means(jdates, x, hour=True)
+        >>> print(astr(xout, 3, pp=True))
+        ['2.500' '5.000' '6.000' '2.000' '3.000']
+
+        >>> odates, xout = means(jdates, x, half_hour=True)
+        >>> print(astr(xout, 3, pp=True))
+        ['2.500' '5.000' '6.000' '2.000' '3.000']
 
         >>> odates, xout = means(jdates, x, meanday=True)
         >>> print(astr(xout[10:16], 3, pp=True))
@@ -217,6 +237,9 @@ def means(date, dat, year=False, month=False, day=False, hour=False, minute=Fals
                   MC, Apr 2014 - max, min
                   MC, Jun 2015 - onlydat, meanmonth
                   MC, Oct 2018 - seasonal
+                  MC, Jun 2019 - bug in minute averaging: compred unique minutes to hours instead of minutes
+                               - half_hour inspired by Robin Leucht for level1 data
+                               - did not take keyword 'retrospective' from Robin Leucht but added a Note above for this case
     """
     # Constants
     myundef  = 9e33
@@ -232,7 +255,7 @@ def means(date, dat, year=False, month=False, day=False, hour=False, minute=Fals
         dat = dat[:,np.newaxis]
 
     # Check options
-    allopts = day+month+year+hour+minute+meanday+meanmonth+seasonal
+    allopts = day+month+year+hour+half_hour+minute+meanday+meanmonth+seasonal
     assert allopts <= 1, "only one averaging option day, month, year, etc. possible"
 
     # Check aggregation
@@ -370,6 +393,36 @@ def means(date, dat, year=False, month=False, day=False, hour=False, minute=Fals
                                 else:
                                     out[zahl,:] = np.ma.mean(dat[ii,:],0)
                                 zahl += 1
+        # half_hour
+        if half_hour:
+            yrs  = np.unique(yr)
+            mos  = np.unique(mo)
+            dys  = np.unique(dy)
+            hrs  = np.unique(hr)
+            nout = yrs.size*mos.size*dys.size*hrs.size*2
+            dout = np.ones(nout)*myundef
+            if ismasked:
+                out  = np.ma.ones([nout]+list(dat.shape[1:]))*myundef
+            else:
+                out  = np.ones([nout]+list(dat.shape[1:]))*myundef
+            zahl = 0
+            for i in yrs:
+                for j in mos:
+                    for k in dys:
+                        for l in hrs:
+                            for m in range(2):
+                                ii = np.where((yr==i) & (mo==j) & (dy==k) & (hr==l) & ((mn//30)==m))[0]
+                                if np.size(ii) > 0:
+                                    dout[zahl]  = date2dec(yr=i, mo=j, dy=k, hr=l, mi=15+m*30)
+                                    if sum:
+                                        out[zahl,:] = np.ma.sum(dat[ii,:],0)
+                                    elif max:
+                                        out[zahl,:] = np.ma.amax(dat[ii,:],0)
+                                    elif min:
+                                        out[zahl,:] = np.ma.amin(dat[ii,:],0)
+                                    else:
+                                        out[zahl,:] = np.ma.mean(dat[ii,:],0)
+                                    zahl += 1
 
         # minute
         if minute:
@@ -390,7 +443,7 @@ def means(date, dat, year=False, month=False, day=False, hour=False, minute=Fals
                     for k in dys:
                         for l in hrs:
                             for m in mns:
-                                ii = np.where((yr==i) & (mo==j) & (dy==k) & (hr==l) & (hr==m))[0]
+                                ii = np.where((yr==i) & (mo==j) & (dy==k) & (hr==l) & (mn==m))[0]
                                 if np.size(ii) > 0:
                                     dout[zahl]  = date2dec(yr=i, mo=j, dy=k, hr=l, mi=m, sc=30)
                                     if sum:
