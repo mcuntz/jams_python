@@ -130,7 +130,9 @@ def ascii2ascii(edate, full=False, en=False, fr=False, us=False, eng=False, YY=F
                   MC, Nov 2016 - adapted docstring to Python 2 and 3
                   MC, Mar 2018 - us, eng->en, fr
                   MC, Nov 2018 - YY
+                  MC, Jun 2019 - eng->en working again
     """
+    if eng: en = True
     assert (en+fr+us <= 1), 'en, fr and us keywords mutually exclusive.'
 
     # Input type and shape
