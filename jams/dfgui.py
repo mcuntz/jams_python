@@ -88,6 +88,8 @@ from __future__ import absolute_import, division, print_function
               Matthias Cuntz, Feb 2019 - added 2nd line/scatter in scatter plots
                                          -> Bug: time axis does not work with first line but with second line.
                                        - label x-axis on histograms
+              Matthias Cuntz, Jun 2019 - make application
+                                       - Removed bug that x-axis in scatter plots is only correct if line2 is chosen.
 '''
 # --------------------------------------------------------------------
 # import
@@ -773,7 +775,8 @@ class ScatterPlot(wx.Panel):
                 # column_name1 = self.columns[column_index1]
                 # column_name2 = self.columns[column_index2]
                 # df.plot(kind='scatter', x=column_name1, y=column_name2)
-                self.axes.clear()
+                self.axes.clear()  # Clear both axes first, otherwise x-axis only shows if line2 is chosen
+                self.axes2.clear()
                 if (column_index1 >= 0 and column_index2 >= 0):
                     self.axes.plot(x, y,
                                    linestyle=linestyle, linewidth=linewidth, color=linecolor,
@@ -784,7 +787,6 @@ class ScatterPlot(wx.Panel):
                     self.axes.xaxis.set_label_text(self.columns[column_index1])
                     self.axes.yaxis.label.set_color(linecolor)
                     self.axes.yaxis.set_label_text(self.columns[column_index2])
-                self.axes2.clear()
                 if (column_index1 >= 0 and column_index3 >= 0):
                     self.axes2.plot(x, y2,
                                     linestyle=linestyle2, linewidth=linewidth2, color=linecolor2,
@@ -879,3 +881,66 @@ def show(df):
     frame = MainFrame(df)
     frame.Show()
     app.MainLoop()
+
+            
+# --------------------------------------------------------------------
+# Script
+#
+
+if __name__ == "__main__":
+
+    import argparse
+
+    form   = '%Y-%m-%d %H:%M:%S'
+    sep    = None
+    parser = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter,
+                                     description='''A minimalistic GUI for analyzing text files.
+Date/Time must be in the first data column. Its format can be given on the command line,
+otherwise assumed %Y-%m-%d %H:%M:%S.''')
+    parser.add_argument('-f', '--format', action='store', default=form, dest='form', metavar='C-format',
+                            help="Format codes of the platform's C library strftime(), used by Python.")
+    parser.add_argument('-s', '--sep', action='store', default=sep, dest='sep', metavar='field_delimiter',
+                            help="Field delimiter (Default: try , ; None)")
+    parser.add_argument('files', nargs='*', default=None, metavar='file(s)',
+                        help='Comma (,) or semi-colon (;) delimited text file(s).')
+
+    args    = parser.parse_args()
+    form    = args.form
+    sep     = args.sep
+    infiles = args.files
+
+    del parser, args
+
+    import numpy as np
+    import pandas as pd
+
+    parser = lambda date: pd.datetime.strptime(date, form)
+
+    infile = infiles[0]
+    if sep is not None:
+        df = pd.read_csv(infile, sep, parse_dates=[0], date_parser=parser, index_col=0, header=0)
+    else:
+        try:
+            sep = ','
+            df = pd.read_csv(infile, sep, parse_dates=[0], date_parser=parser, index_col=0, header=0)
+        except:
+            try:
+                sep = ';'
+                df = pd.read_csv(infile, sep, parse_dates=[0], date_parser=parser, index_col=0, header=0)
+            except:
+                try:
+                    sep = None # Pandas try to detect delimiter by using csv.Sniffer.
+                    df = pd.read_csv(infile, sep, parse_dates=[0], date_parser=parser, index_col=0, header=0)
+                except:
+                    raise IOError('Pandas could not read input file: '+infile)
+    
+    if len(infiles) > 1:
+        for infile in infiles[1:]:
+            df1 = pd.read_csv(infile, sep, parse_dates=[0], date_parser=parser, index_col=0, header=0)
+            df = df.append(df1, sort=False)
+
+    # This must be before any other call to matplotlib because it use the wxAgg backend.
+    # This means, do not use --pylab with ipython.
+    df.replace(-9999., np.nan, inplace=True)
+
+    show(df)
