@@ -276,11 +276,12 @@ def sread(infile, nc=0, cname=None, skip=0, cskip=0, hskip=0, hstrip=True, separ
                                - large re-write
                   MC, Nov 2017 - use range instead of np.arange for producing indexes
                   MC, Nov 2017 - cname, sname, file->infile, hstrip
+                  MC, Jun 2019 - open(errors='ignore') to ignore unicode characters, for example, on read
     """
     #
     # Open file
     try:
-        f = open(infile, 'r')
+        f = open(infile, 'r', errors='ignore')
     except IOError:
         raise IOError('Cannot open file '+infile)
     #
