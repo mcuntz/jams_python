@@ -90,6 +90,7 @@ from __future__ import absolute_import, division, print_function
                                        - label x-axis on histograms
               Matthias Cuntz, Jun 2019 - make application
                                        - Removed bug that x-axis in scatter plots is only correct if line2 is chosen.
+              Matthias Cuntz, Jul 2019 - Added example to filter panel
 '''
 # --------------------------------------------------------------------
 # import
@@ -505,6 +506,11 @@ class FilterPanel(wx.Panel):
 
         self.main_sizer = wx.BoxSizer(wx.VERTICAL)
 
+        self.example = wx.StaticText(self, wx.ID_ANY, label="Select column. Use filter like:   _ > 0.   or   _ > datetime.datetime(1998,1,1)", size=wx.Size(560, 20))
+        row_sizer = wx.BoxSizer(wx.HORIZONTAL)
+        row_sizer.Add(self.example, 0, wx.ALL | wx.ALIGN_CENTER, 1)
+        self.main_sizer.Add(row_sizer, 0, wx.EXPAND)
+
         self.combo_boxes = []
         self.text_controls = []
 
@@ -678,7 +684,7 @@ class ScatterPlot(wx.Panel):
 
         # second line
         self.combo_box3 = wx.ComboBox(self, choices=columns_with_neutral_selection, style=wx.CB_READONLY)
-        
+
         self.linestyle_label2 = wx.StaticText(self, wx.ID_ANY, label="linestyle", size=wx.Size(60, 20))
         self.linestyle2 = wx.TextCtrl(self, wx.ID_ANY, value="--", size=wx.Size(40, 20))
         self.linewidth_label2 = wx.StaticText(self, wx.ID_ANY, label="linewidth", size=wx.Size(60, 20))
@@ -719,7 +725,7 @@ class ScatterPlot(wx.Panel):
         row_sizer6.Add(self.markeredgewidth_label2, 0, wx.ALL | wx.ALIGN_CENTER, 1)
         row_sizer6.Add(self.markeredgewidth2, 0, wx.ALL | wx.ALIGN_CENTER, 5)
 
-        
+
         sizer = wx.BoxSizer(wx.VERTICAL)
         sizer.Add(self.canvas, 1, flag=wx.EXPAND, border=5)
         sizer.Add(row_sizer1)
@@ -882,7 +888,7 @@ def show(df):
     frame.Show()
     app.MainLoop()
 
-            
+
 # --------------------------------------------------------------------
 # Script
 #
@@ -933,7 +939,7 @@ otherwise assumed %Y-%m-%d %H:%M:%S.''')
                     df = pd.read_csv(infile, sep, parse_dates=[0], date_parser=parser, index_col=0, header=0)
                 except:
                     raise IOError('Pandas could not read input file: '+infile)
-    
+
     if len(infiles) > 1:
         for infile in infiles[1:]:
             df1 = pd.read_csv(infile, sep, parse_dates=[0], date_parser=parser, index_col=0, header=0)
