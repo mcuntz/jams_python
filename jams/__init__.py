@@ -16,6 +16,8 @@ from __future__ import division, absolute_import, print_function
     alpha_kin_h2o          Kinetic fractionation of molecular diffusion of water vapour.
     apply_undef            Use a function on masked arguments.
     area_poly              Area of a polygon.
+    argmax                 Wrapper for numpy.argmax, numpy.ma.argmax, and using max for Python iterables.
+    argmin                 Wrapper for numpy.argmin, numpy.ma.argmin, and using min for Python iterables.
     argsort                Wrapper for numpy.argsort, numpy.ma.argsort, and using sorted for Python iterables.
     around                 Round to the passed power of ten.
     ascii2ascii            Convert date notations between to ascii date format DD.MM.YYYY hh:mm:ss.
@@ -195,6 +197,8 @@ from __future__ import division, absolute_import, print_function
 
     Array manipulation
     ------------------
+    argmax                 Wrapper for numpy.argmax, numpy.ma.argmax, and using max for Python iterables.
+    argmin                 Wrapper for numpy.argmin, numpy.ma.argmin, and using min for Python iterables.
     argsort                Wrapper for numpy.argsort, numpy.ma.argsort, and using sorted for Python iterables.
     closest                Index in array which entry is closest to a given number.
     pack                   Similar to Fortran pack function with mask.
@@ -551,6 +555,7 @@ from __future__ import division, absolute_import, print_function
               MC, Jan 2019 - dfgui, delta_isogsm2, get_era5, get_era_interim, get_isogsm2
               MC, Feb 2019 - xlsread, xlsxread
               MC, Apr 2019 - nc2nc
+              MC, Jul 2019 - argmax, argmin
 """
 
 # sub-packages without dependencies to rest of jams
@@ -566,7 +571,7 @@ from .alpha_equ_h2o     import alpha_equ_h2o
 from .alpha_kin_h2o     import alpha_kin_h2o
 from .apply_undef       import apply_undef
 from .area_poly         import area_poly
-from .argsort           import argsort
+from .argsort           import argmax, argmin, argsort
 from .around            import around
 from .ascii2ascii       import ascii2ascii, ascii2en, ascii2fr, ascii2us, ascii2eng, en2ascii, fr2ascii, us2ascii, eng2ascii
 from .autostring        import autostring, astr
