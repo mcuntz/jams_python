@@ -112,7 +112,26 @@ bottleneck, bs4, cartopy, cdsapi, ecmwfapi, h5py, matplotlib, mpi4py, netCDF4, n
 
 ###  Content
 
-#### Provided functions and modules (alphabetic w/o obsolete functions)
+Modules and functions are provided in the following categories:  
+ * [Array manipulation](#array)  
+ * [Ascii files](#ascii)  
+ * [Data processing](#data)  
+ * [Date & Time](#date)  
+ * [Grids / Polygons](#grids)  
+ * [Hydrology](#hydro)  
+ * [Isotopes](#iso)  
+ * [Math](#math)  
+ * [Meteorology](#meteo)  
+ * [Miscellaneous](#misc)  
+ * [Models](#model)  
+ * [Plotting](#plot)  
+ * [Special files](#special)  
+
+
+---------------------------------------------------------------
+
+### Functions and modules (alphabetic w/o obsolete functions)
+
 | | | |
 | --- | --- | ------------------------------------------------------------------------------------------------------------- |
 | | abc2plot | Write a, b, c, ... on plots. |
@@ -279,22 +298,12 @@ bottleneck, bs4, cartopy, cdsapi, ecmwfapi, h5py, matplotlib, mpi4py, netCDF4, n
 | | zacharias | Soil water content with van Genuchten and Zacharias et al. (2007). |
 | | zacharias\_check | Checks validity of parameter set for Zacharias et al. (2007). |
 
-#### Provided functions and modules per category
- * Array manipulation
- * Ascii files
- * Data processing
- * Date & Time
- * Grids / Polygons
- * Hydrology
- * Isotopes
- * Math
- * Meteorology
- * Miscellaneous
- * Models
- * Plotting
- * Special files
 
-**Array manipulation**
+---------------------------------------------------------------
+
+### Functions and modules per category
+
+<a name="array"></a>**Array manipulation**
 
 | | | |
 | --- | --- | ------------------------------------------------------------------------------------------------------------- |
@@ -308,7 +317,8 @@ bottleneck, bs4, cartopy, cdsapi, ecmwfapi, h5py, matplotlib, mpi4py, netCDF4, n
 | | smin | Calculating smooth minimum of two numbers |
 | | unpack | Similar to Fortran unpack function with mask. |
 
-**Ascii files**
+
+<a name="ascii"></a>**Ascii files**
 
 | | | |
 | --- | --- | ------------------------------------------------------------------------------------------------------------- |
@@ -320,7 +330,8 @@ bottleneck, bs4, cartopy, cdsapi, ecmwfapi, h5py, matplotlib, mpi4py, netCDF4, n
 | | sread | Reads in string array from ascii file. |
 | | tail | Return list with last n lines of file. |
 
-**Data processing**
+
+<a name="data"></a>**Data processing**
 
 | | | |
 | --- | --- | ------------------------------------------------------------------------------------------------------------- |
@@ -354,7 +365,8 @@ bottleneck, bs4, cartopy, cdsapi, ecmwfapi, h5py, matplotlib, mpi4py, netCDF4, n
 | | srrasa\_trans | Generates stratified random 2D transects within a given rectangular area. |
 | | timestepcheck | Fills missing time steps in ascii data files |
 
-**Date & Time**
+
+<a name="date"></a>**Date & Time**
 
 | | | |
 | --- | --- | ------------------------------------------------------------------------------------------------------------- |
@@ -368,7 +380,8 @@ bottleneck, bs4, cartopy, cdsapi, ecmwfapi, h5py, matplotlib, mpi4py, netCDF4, n
 | | fr2ascii | Convert date notations from French DD/MM/YYYY to ascii date format DD.MM.YYYY hh:mm:ss. |
 | | us2ascii | Convert date notations from American MM/DD/YYYY to ascii format DD.MM.YYYY hh:mm:ss. |
 
-**Grids / Polygons**
+
+<a name="grids"></a>**Grids / Polygons**
 
 | | | |
 | --- | --- | ------------------------------------------------------------------------------------------------------------- |
@@ -382,14 +395,16 @@ bottleneck, bs4, cartopy, cdsapi, ecmwfapi, h5py, matplotlib, mpi4py, netCDF4, n
 | | get\_angle | Returns the angle in radiant from each point in xy1 to each point in xy2. |
 | | get\_nearest | Returns a value z for each point in xy near to the xyz field. |
 
-**Hydrology**
+
+<a name="hydro"></a>**Hydrology**
 
 | | | |
 | --- | --- | ------------------------------------------------------------------------------------------------------------- |
 | | baseflow | Calculate baseflow from discharge timeseries |
 | | river\_network | a class for creating a river network from a DEM including flow direction, flow accumulation and channel order |
-    
-**Isotopes**
+
+
+<a name="iso"></a>**Isotopes**
 
 | | | |
 | --- | --- | ------------------------------------------------------------------------------------------------------------- |
@@ -400,7 +415,8 @@ bottleneck, bs4, cartopy, cdsapi, ecmwfapi, h5py, matplotlib, mpi4py, netCDF4, n
 | | get\_isogsm2 | Get IsoGSM2 output. |
 | | tcherkez | Calculates the Tcherkez model of 13C-discrimiantion in the Calvin cycle. |
 
-**Math**
+
+<a name="math"></a>**Math**
 
 | | | |
 | --- | --- | ------------------------------------------------------------------------------------------------------------- |
@@ -431,7 +447,8 @@ bottleneck, bs4, cartopy, cdsapi, ecmwfapi, h5py, matplotlib, mpi4py, netCDF4, n
 | | sobol | Generates Sobol sequences |
 | | sobol\_index | Calculates the first-order and total variance-based sensitivity indices. |
 
-**Meteorology**
+
+<a name="meteo"></a>**Meteorology**
 
 | | | |
 | --- | --- | ------------------------------------------------------------------------------------------------------------- |
@@ -442,7 +459,8 @@ bottleneck, bs4, cartopy, cdsapi, ecmwfapi, h5py, matplotlib, mpi4py, netCDF4, n
 | | get\_era5 | Download ERA5 data suitable to produce MuSICA input data. |
 | | pritay | Daily reference evapotranspiration after Priestley & Taylor |    
 
-**Miscellaneous**
+
+<a name="misc"></a>**Miscellaneous**
 
 | | | |
 | --- | --- | ------------------------------------------------------------------------------------------------------------- |
@@ -465,7 +483,8 @@ bottleneck, bs4, cartopy, cdsapi, ecmwfapi, h5py, matplotlib, mpi4py, netCDF4, n
 | | zacharias | Soil water content with van Genuchten and Zacharias et al. (2007). |
 | | zacharias\_check | Checks validity of parameter set for Zacharias et al. (2007). |
 
-**Models**
+
+<a name="model"></a>**Models**
 
 | | | |
 | --- | --- | ------------------------------------------------------------------------------------------------------------- |
@@ -474,7 +493,8 @@ bottleneck, bs4, cartopy, cdsapi, ecmwfapi, h5py, matplotlib, mpi4py, netCDF4, n
 | | Incompr\_Field | Generates random velocity fields. |
 | | leafmodel | Model to compute photosynthesis and stomatal conductance of canopies |
 
-**Plotting**
+
+<a name="plot"></a>**Plotting**
 
 | | | |
 | --- | --- | ------------------------------------------------------------------------------------------------------------- |
@@ -496,7 +516,8 @@ bottleneck, bs4, cartopy, cdsapi, ecmwfapi, h5py, matplotlib, mpi4py, netCDF4, n
 | | xkcd | Make plot look handdrawn. |
 | | yrange | Calculates plot range from input array. |
 
-**Special files**
+
+<a name="special"></a>**Special files**
 
 | | | |
 | --- | --- | ------------------------------------------------------------------------------------------------------------- |
