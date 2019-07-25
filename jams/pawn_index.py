@@ -115,7 +115,7 @@ def pawn_index( uncond, cond,
         >>> print('PAWN_index :: T_stat       =',astr(T_stat,3,pp=True))
         PAWN_index :: T_stat       = ['0.460' '0.110' '0.270']
         >>> print('certainty  :: influential  =',astr(influential,3,pp=True))
-        certainty  :: influential  = ['1.000' '1.000' '1.000']
+        certainty  :: influential  = ['1.000' '0.000' '0.860']
 
         License
         -------
@@ -196,7 +196,7 @@ def pawn_index( uncond, cond,
             #       https://en.m.wikipedia.org/wiki/Kolmogorov-Smirnov_test
             # and:
             #       Massey (1951) and Marsaglia et al. (2003)
-            ks_crit = np.sqrt(-0.5*np.log(alpha/2.0)) * np.sqrt((nu + nc) / (nu * nc))
+            ks_crit = np.sqrt(-0.5*np.log(alpha/2.0)) * np.sqrt((nu + nc) / (nu * nc * 1.0))
             if stat > ks_crit:
                 count_influential    += 1.0
             else:
