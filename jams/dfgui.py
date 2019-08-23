@@ -91,6 +91,7 @@ from __future__ import absolute_import, division, print_function
               Matthias Cuntz, Jun 2019 - make application
                                        - Removed bug that x-axis in scatter plots is only correct if line2 is chosen.
               Matthias Cuntz, Jul 2019 - Added example to filter panel
+              Matthias Cuntz, Aug 2019 - Added checkbox for linking the two y-axes in scatter plots
 '''
 # --------------------------------------------------------------------
 # import
@@ -636,7 +637,6 @@ class ScatterPlot(wx.Panel):
         # first line
         self.combo_box1 = wx.ComboBox(self, choices=columns_with_neutral_selection, style=wx.CB_READONLY)
         self.combo_box2 = wx.ComboBox(self, choices=columns_with_neutral_selection, style=wx.CB_READONLY)
-        self.Bind(wx.EVT_COMBOBOX, self.on_combo_box_select)
 
         self.linestyle_label = wx.StaticText(self, wx.ID_ANY, label="linestyle", size=wx.Size(60, 20))
         self.linestyle = wx.TextCtrl(self, wx.ID_ANY, value="-", size=wx.Size(40, 20))
@@ -654,7 +654,6 @@ class ScatterPlot(wx.Panel):
         self.markeredgecolor = wx.TextCtrl(self, wx.ID_ANY, value="b", size=wx.Size(40, 20))
         self.markeredgewidth_label = wx.StaticText(self, wx.ID_ANY, label="markeredgewidth", size=wx.Size(110, 20))
         self.markeredgewidth = wx.TextCtrl(self, wx.ID_ANY, value="1", size=wx.Size(25, 20))
-        self.Bind(wx.EVT_TEXT, self.on_text_change)
 
         row_sizer1 = wx.BoxSizer(wx.HORIZONTAL)
         row_sizer1.Add(self.combo_box1, 0, wx.ALL | wx.ALIGN_CENTER, 5)
@@ -684,6 +683,7 @@ class ScatterPlot(wx.Panel):
 
         # second line
         self.combo_box3 = wx.ComboBox(self, choices=columns_with_neutral_selection, style=wx.CB_READONLY)
+        self.checkbox1 = wx.CheckBox(self, label="Same y-axis")
 
         self.linestyle_label2 = wx.StaticText(self, wx.ID_ANY, label="linestyle", size=wx.Size(60, 20))
         self.linestyle2 = wx.TextCtrl(self, wx.ID_ANY, value="--", size=wx.Size(40, 20))
@@ -704,6 +704,7 @@ class ScatterPlot(wx.Panel):
 
         row_sizer4 = wx.BoxSizer(wx.HORIZONTAL)
         row_sizer4.Add(self.combo_box3, 0, wx.ALL | wx.ALIGN_CENTER, 5)
+        row_sizer4.Add(self.checkbox1, 0, wx.ALL | wx.ALIGN_CENTER, 5)
 
         row_sizer5 = wx.BoxSizer(wx.HORIZONTAL)
         row_sizer5.Add(self.linestyle_label2, 0, wx.ALL | wx.ALIGN_CENTER, 1)
@@ -736,13 +737,20 @@ class ScatterPlot(wx.Panel):
         sizer.Add(row_sizer6)
         self.SetSizer(sizer)
 
+        self.Bind(wx.EVT_COMBOBOX, self.on_combo_box_select)
+        self.Bind(wx.EVT_TEXT, self.on_text_change)
+        self.Bind(wx.EVT_CHECKBOX, self.on_checkbox)
+
     def on_combo_box_select(self, event):
         self.redraw()
 
     def on_text_change(self, event):
         self.redraw()
 
-    def redraw(self):
+    def on_checkbox(self, event):
+        self.redraw()
+
+    def redraw(self, event=None):
         column_index1 = self.combo_box1.GetSelection()
         column_index2 = self.combo_box2.GetSelection()
         linestyle       = self.linestyle.GetLineText(0)
@@ -763,6 +771,7 @@ class ScatterPlot(wx.Panel):
         markerfacecolor2 = self.markerfacecolor2.GetLineText(0)
         markeredgecolor2 = self.markeredgecolor2.GetLineText(0)
         markeredgewidth2 = float(self.markeredgewidth2.GetLineText(0))
+        sameyaxes = self.checkbox1.GetValue()
         if ((column_index1 != wx.NOT_FOUND and column_index2 != wx.NOT_FOUND and
              column_index1 != 0 and column_index2 != 0) or
             (column_index1 != wx.NOT_FOUND and column_index3 != wx.NOT_FOUND and
@@ -783,6 +792,8 @@ class ScatterPlot(wx.Panel):
                 # df.plot(kind='scatter', x=column_name1, y=column_name2)
                 self.axes.clear()  # Clear both axes first, otherwise x-axis only shows if line2 is chosen
                 self.axes2.clear()
+                ylim1 = [None,None]
+                ylim2 = [None,None]
                 if (column_index1 >= 0 and column_index2 >= 0):
                     self.axes.plot(x, y,
                                    linestyle=linestyle, linewidth=linewidth, color=linecolor,
@@ -793,6 +804,7 @@ class ScatterPlot(wx.Panel):
                     self.axes.xaxis.set_label_text(self.columns[column_index1])
                     self.axes.yaxis.label.set_color(linecolor)
                     self.axes.yaxis.set_label_text(self.columns[column_index2])
+                    ylim1 = self.axes.get_ylim()
                 if (column_index1 >= 0 and column_index3 >= 0):
                     self.axes2.plot(x, y2,
                                     linestyle=linestyle2, linewidth=linewidth2, color=linecolor2,
@@ -803,6 +815,25 @@ class ScatterPlot(wx.Panel):
                     self.axes2.xaxis.set_label_text(self.columns[column_index1])
                     self.axes2.yaxis.label.set_color(linecolor2)
                     self.axes2.yaxis.set_label_text(self.columns[column_index3])
+                    ylim2 = self.axes2.get_ylim()
+                if sameyaxes:
+                    if (ylim1[0] is not None) and (ylim2[0] is not None):
+                        ymin = min(ylim1[0],ylim2[0])
+                    else:
+                        if (ylim1[0] is not None):
+                            ymin = ylim1[0]
+                        else:
+                            ymin = ylim2[0]
+                    if (ylim1[1] is not None) and (ylim2[1] is not None):
+                        ymax = max(ylim1[1],ylim2[1])
+                    else:
+                        if (ylim1[1] is not None):
+                            ymax = ylim1[1]
+                        else:
+                            ymax = ylim2[1]
+                    if (ymin is not None) and (ymax is not None):
+                        self.axes.set_ylim([ymin,ymax])
+                        self.axes2.set_ylim([ymin,ymax])                        
                 self.canvas.draw()
 
 
