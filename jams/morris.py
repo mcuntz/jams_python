@@ -75,7 +75,10 @@ from __future__ import division, absolute_import, print_function
 
     License
     -------
-    This file is part of the JAMS Python package, distributed under the MIT License.
+    This file is part of the JAMS Python package, distributed under the MIT
+    License. The JAMS Python package originates from the former UFZ Python library,
+    Department of Computational Hydrosystems, Helmholtz Centre for Environmental
+    Research - UFZ, Leipzig, Germany.
 
     Copyright (c) 2012-2017 S Van Hoey, Matthias Cuntz - mc (at) macu (dot) de
 
@@ -198,7 +201,10 @@ def  Sampling_Function_2(p, k, r, LB, UB, GroupMat=np.array([])):
 
         License
         -------
-        This file is part of the JAMS Python package, distributed under the MIT License.
+        This file is part of the JAMS Python package, distributed under the MIT
+        License. The JAMS Python package originates from the former UFZ Python library,
+        Department of Computational Hydrosystems, Helmholtz Centre for Environmental
+        Research - UFZ, Leipzig, Germany.
 
         Copyright (c) 2012-2013 S Van Hoey, Matthias Cuntz - mc (at) macu (dot) de
 

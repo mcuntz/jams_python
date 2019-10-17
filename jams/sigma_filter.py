@@ -90,7 +90,10 @@ def sigma_filter(x, y, z=3, func=functions.line_p, p=[0.,1.], plot=False, popt=F
         
         License
         -------
-        This file is part of the JAMS Python package, distributed under the MIT License.
+        This file is part of the JAMS Python package, distributed under the MIT
+        License. The JAMS Python package originates from the former UFZ Python library,
+        Department of Computational Hydrosystems, Helmholtz Centre for Environmental
+        Research - UFZ, Leipzig, Germany.
 
         Copyright (c) 2014-2018 Matthias Cuntz - mc (at) macu (dot) de
 
