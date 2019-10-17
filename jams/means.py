@@ -207,7 +207,10 @@ def means(date, dat, year=False, month=False, day=False, hour=False, half_hour=F
 
         License
         -------
-        This file is part of the JAMS Python package, distributed under the MIT License.
+        This file is part of the JAMS Python package, distributed under the MIT
+        License. The JAMS Python package originates from the former UFZ Python library,
+        Department of Computational Hydrosystems, Helmholtz Centre for Environmental
+        Research - UFZ, Leipzig, Germany.
 
         Copyright (c) 2013-2018 Matthias Cuntz - mc (at) macu (dot) de
 

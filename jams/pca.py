@@ -77,7 +77,10 @@ def pca(mat, corr=False, ndim=None, rvar=None):
 
         License
         -------
-        This file is part of the JAMS Python package, distributed under the MIT License.
+        This file is part of the JAMS Python package, distributed under the MIT
+        License. The JAMS Python package originates from the former UFZ Python library,
+        Department of Computational Hydrosystems, Helmholtz Centre for Environmental
+        Research - UFZ, Leipzig, Germany.
 
         Copyright (c) 2014 Matthias Cuntz - mc (at) macu (dot) de
 
@@ -200,7 +203,10 @@ def check_pca(data, comps, eigenvectors, corr=False, rtol=1e-05, atol=1e-08):
 
         License
         -------
-        This file is part of the JAMS Python package, distributed under the MIT License.
+        This file is part of the JAMS Python package, distributed under the MIT
+        License. The JAMS Python package originates from the former UFZ Python library,
+        Department of Computational Hydrosystems, Helmholtz Centre for Environmental
+        Research - UFZ, Leipzig, Germany.
 
         Copyright (c) 2014 Matthias Cuntz - mc (at) macu (dot) de
 

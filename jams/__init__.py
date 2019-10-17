@@ -415,9 +415,10 @@ from __future__ import division, absolute_import, print_function
 
     License
     -------
-    This file is part of the JAMS Python package, distributed under the MIT License. 
-
-    This file was part of the UFZ Python library until 2016 hosted at Department Computational Hydrosystems, Helmholtz Centre for Environmental Research - UFZ, Permoserstr. 15, 04318 Leipzig, Germany
+    This file is part of the JAMS Python package, distributed under the MIT
+    License. The JAMS Python package originates from the former UFZ Python library,
+    Department of Computational Hydrosystems, Helmholtz Centre for Environmental
+    Research - UFZ, Leipzig, Germany.
 
     Copyright (c) 2012-2019 Matthias Cuntz, Juliane Mai, Stephan Thober, Arndt Piayda
 
