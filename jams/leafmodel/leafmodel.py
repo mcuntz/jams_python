@@ -26,7 +26,10 @@ from jams.sce import sce
 
     License
     -------
-    This file is part of the JAMS Python package, distributed under the MIT License.
+    This file is part of the JAMS Python package, distributed under the MIT
+    License. The JAMS Python package originates from the former UFZ Python library,
+    Department of Computational Hydrosystems, Helmholtz Centre for Environmental
+    Research - UFZ, Leipzig, Germany.
 
     Copyright (c) 2014 Arndt Piayda, Matthias Cuntz - mc (at) macu (dot) de
 
@@ -188,7 +191,10 @@ def opt_leafmodel(params, Eobs, GPPobs, ci_ini, Tl, PAR, ea, ca, ga, gb, P,
     
     License
     -------
-    This file is part of the JAMS Python package, distributed under the MIT License.
+    This file is part of the JAMS Python package, distributed under the MIT
+    License. The JAMS Python package originates from the former UFZ Python library,
+    Department of Computational Hydrosystems, Helmholtz Centre for Environmental
+    Research - UFZ, Leipzig, Germany.
 
     Copyright (c) 2014 Arndt Piayda, Matthias Cuntz - mc (at) macu (dot) de
 
@@ -515,7 +521,10 @@ def leafmodel(ci_ini, Tl, PAR, ea, ca, ga, gb, P, par1, par2,
     
     License
     -------
-    This file is part of the JAMS Python package, distributed under the MIT License.
+    This file is part of the JAMS Python package, distributed under the MIT
+    License. The JAMS Python package originates from the former UFZ Python library,
+    Department of Computational Hydrosystems, Helmholtz Centre for Environmental
+    Research - UFZ, Leipzig, Germany.
 
     Copyright (c) 2014 Arndt Piayda, Matthias Cuntz - mc (at) macu (dot) de
 
@@ -675,7 +684,10 @@ def twoleafmodel(ci_ini, Tl, PAR, ea, ca, ga, gb, P, PARdiff, fsun, par1, par2,
     
     License
     -------
-    This file is part of the JAMS Python package, distributed under the MIT License.
+    This file is part of the JAMS Python package, distributed under the MIT
+    License. The JAMS Python package originates from the former UFZ Python library,
+    Department of Computational Hydrosystems, Helmholtz Centre for Environmental
+    Research - UFZ, Leipzig, Germany.
 
     Copyright (c) 2014 Arndt Piayda, Matthias Cuntz - mc (at) macu (dot) de
 

@@ -76,7 +76,10 @@ import numpy as np
 
     License
     -------
-    This file is part of the JAMS Python package, distributed under the MIT License.
+    This file is part of the JAMS Python package, distributed under the MIT
+    License. The JAMS Python package originates from the former UFZ Python library,
+    Department of Computational Hydrosystems, Helmholtz Centre for Environmental
+    Research - UFZ, Leipzig, Germany.
 
     Copyright (c) 2014-2016 Arndt Piayda, Matthias Cuntz, Stephan Thober - mc (at) macu (dot) de
 
