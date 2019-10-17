@@ -95,7 +95,10 @@ def abc2plot(handle, dx, dy, iplot,
 
         License
         -------
-        This file is part of the JAMS Python package, distributed under the MIT License.
+        This file is part of the JAMS Python package, distributed under the MIT
+        License. The JAMS Python package originates from the former UFZ Python library,
+        Department of Computational Hydrosystems, Helmholtz Centre for Environmental
+        Research - UFZ, Leipzig, Germany.
 
         Copyright (c) 2012-2015 Matthias Cuntz - mc (at) macu (dot) de
 

@@ -150,7 +150,10 @@ def upscale_fdir(sn, factor, print_info=False, return_maxlocs=False, do_co=False
 
         License
         -------
-        This file is part of the JAMS Python package, distributed under the MIT License.
+        This file is part of the JAMS Python package, distributed under the MIT
+        License. The JAMS Python package originates from the former UFZ Python library,
+        Department of Computational Hydrosystems, Helmholtz Centre for Environmental
+        Research - UFZ, Leipzig, Germany.
 
         Copyright (c) 2016 Stephan Thober
 
@@ -327,7 +330,10 @@ class river_network(object):
 
         License
         -------
-        This file is part of the JAMS Python package, distributed under the MIT License.
+        This file is part of the JAMS Python package, distributed under the MIT
+        License. The JAMS Python package originates from the former UFZ Python library,
+        Department of Computational Hydrosystems, Helmholtz Centre for Environmental
+        Research - UFZ, Leipzig, Germany.
 
         Copyright (c) 2016 Stephan Thober
 
@@ -476,7 +482,10 @@ class river_network(object):
 
             License
             -------
-            This file is part of the JAMS Python package, distributed under the MIT License.
+            This file is part of the JAMS Python package, distributed under the MIT
+            License. The JAMS Python package originates from the former UFZ Python library,
+            Department of Computational Hydrosystems, Helmholtz Centre for Environmental
+            Research - UFZ, Leipzig, Germany.
 
             Copyright (c) 2015 Stephan Thober, David Schaefer
 
@@ -591,7 +600,10 @@ class river_network(object):
 
             License
             -------
-            This file is part of the JAMS Python package, distributed under the MIT License.
+            This file is part of the JAMS Python package, distributed under the MIT
+            License. The JAMS Python package originates from the former UFZ Python library,
+            Department of Computational Hydrosystems, Helmholtz Centre for Environmental
+            Research - UFZ, Leipzig, Germany.
 
             Copyright (c) 2015-2018 Stephan Thober, David Schaefer, Matthias Cuntz
 
