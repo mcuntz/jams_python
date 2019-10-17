@@ -110,8 +110,13 @@ from __future__ import division, absolute_import, print_function
                            - by using in Optimised_Groups one call to cdist from scipy.spatial.distance
                              and removed one loop in a loop over total number of trajectories
                            - several little improvements on speed
+              MC & FG, Aug 2018 - Distance matrix not done for all trajectories at once because of very
+                                  large memory requirement.
 """
 import numpy as np
+
+
+__all__ = ['morris_sampling', 'elementary_effects']
 
 
 def  Sampling_Function_2(p, k, r, LB, UB, GroupMat=np.array([])):
@@ -392,6 +397,12 @@ def Optimized_Groups(NumFact, LB, UB, N=500, p=4, r=10, GroupMat=np.array([]), D
             now at: https://ec.europa.eu/jrc/en/samo/simlab
         Modified, S. Van Hoey, May 2012 - ported to Python
                   MC, Oct 2013 - adapted to JAMS Python package and ported to Python 3
+                  MC, Dec 2017 - from exponential time increase with number of trajectories to linear increase
+                               - by using in Optimised_Groups one call to cdist from scipy.spatial.distance
+                                 and removed one loop in a loop over total number of trajectories
+                               - several little improvements on speed
+                  MC & FG, Aug 2018 - Distance matrix not done for all trajectories at once because of very
+                                 large memory requirement.
     """
     from scipy.spatial import distance
 
@@ -417,10 +428,9 @@ def Optimized_Groups(NumFact, LB, UB, N=500, p=4, r=10, GroupMat=np.array([]), D
     #   if the two trajectories differ, 0 otherwise
     Dist = np.zeros((N,N))
     Diff_Traj = np.arange(0.0,N,1.0)
-    MyDistall = distance.cdist(OutMatrix,OutMatrix)
     for j in range(N):   # combine all trajectories: eg N=3: 0&1; 0&2; 1&2 (is not dependent from sequence)
         for z in range(j+1,N):
-            MyDist = MyDistall[sizeb*j:sizeb*(j+1),sizeb*z:sizeb*(z+1)]
+            MyDist = distance.cdist(OutMatrix[sizeb*(j):sizeb*(j+1),:],OutMatrix[sizeb*(z):sizeb*(z+1),:])
             if np.where(MyDist==0.)[0].size == sizeb:
                 # Same trajectory. If the number of zeros in Dist matrix is equal to
                 # (NumFact+1) then the trajectory is a replica. In fact (NumFact+1) is the maximum number of
@@ -515,9 +525,9 @@ def Optimized_Groups(NumFact, LB, UB, N=500, p=4, r=10, GroupMat=np.array([]), D
         # Plot the histogram for the original samplng strategy
         # Select the matrix
         OrigSample = OutMatrix[:r*(sizeb),:]
-        print(OrigSample)
+        print('OrigSample', OrigSample)
         Orihplot = np.zeros((2*r,NumFact))
-        print(Orihplot)
+        print('Orihplot', Orihplot)
 
         for i in range(NumFact):
             for j in range(r):
@@ -648,8 +658,9 @@ def Morris_Measure_Groups(NumFact, Sample, OutFact, Output, p=4, Group=[], Diagn
             now at: https://ec.europa.eu/jrc/en/samo/simlab
         Modified, S. Van Hoey, May 2012 - ported to Python
                   MC, Oct 2013 - adapted to JAMS Python package and ported to Python 3
-                  MC, Dec 2017 - deal with single trajectories
-                  MC, Dec 2017 - set Delta=A and not A[np.where(A)]; deal with Delta==0.
+                  MC, Dec 2017 - allow single trajectories
+                  MC, Feb 2018 - catch degenerated case where lower bound==upper bound -> return 0.
+                  FG, Jul 2018 - use // instead of / for trajectory length r
     """
 
     try:
@@ -665,12 +676,13 @@ def Morris_Measure_Groups(NumFact, Sample, OutFact, Output, p=4, Group=[], Diagn
         sizea = NumGroups
         GroupMat = Group
         GroupMat = GroupMat.transpose()
-        if Diagnostic: print(NumGroups)
+        if Diagnostic: print('NumGroups', NumGroups)
     else:
         sizea = NumFact
     sizeb = sizea+1
 
-    r = Sample.shape[0]/sizeb
+    # r = Sample.shape[0]/sizeb
+    r = Sample.shape[0]//sizeb
 
     try:
         NumOutp = Output.shape[1]
@@ -703,6 +715,11 @@ def Morris_Measure_Groups(NumFact, Sample, OutFact, Output, p=4, Group=[], Diagn
 
             A = (Single_Sample[1:sizeb,:]-Single_Sample[:sizea,:]).transpose()
             Delta=A[np.where(A)] # AAN TE PASSEN?
+            # If upper bound==lower bound then A==0 in all trajectories.
+            # Delta will have not the right dimensions then because these are filtered out with where.
+            # Fill in Delta==0 for these cases.
+            ii = np.where(np.sum(A, axis=0)==0.)[0]
+            if ii.size > 0: Delta = np.insert(Delta, ii, 0.)
 
             if Diagnostic:
                 print('A: ', A)
@@ -736,7 +753,7 @@ def Morris_Measure_Groups(NumFact, Sample, OutFact, Output, p=4, Group=[], Diagn
                 if NumGroups == 0:
                     Mu[j] = SAm.mean()
                     if SAm.size > 1:
-                        Stdev[j] = np.std(SAm, dtype=np.float64, ddof=1) #ddof: /N-1 instead of /N
+                        Stdev[j] = np.std(SAm, ddof=1)
                     else:
                         Stdev[j] = 0.
         else:
@@ -744,7 +761,7 @@ def Morris_Measure_Groups(NumFact, Sample, OutFact, Output, p=4, Group=[], Diagn
             if NumGroups == 0:
                 Mu = SAmeas.mean(axis=1)
                 if SAmeas.shape[1] > 1:
-                    Stdev = np.std(SAmeas, dtype=np.float64, ddof=1, axis=1) #ddof: /N-1 instead of /N
+                    Stdev = np.std(SAmeas, ddof=1, axis=1)
                 else:
                     Stdev = np.zeros(SAmeas.shape[0])
             else:
