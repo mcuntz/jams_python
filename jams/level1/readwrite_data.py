@@ -77,7 +77,10 @@ def read_data(files, undef=-9999., strip=None, norecord=False, nofill=False):
 
         License
         -------
-        This file is part of the JAMS Python package, distributed under the MIT License.
+        This file is part of the JAMS Python package, distributed under the MIT
+        License. The JAMS Python package originates from the former UFZ Python library,
+        Department of Computational Hydrosystems, Helmholtz Centre for Environmental
+        Research - UFZ, Leipzig, Germany.
 
         Copyright (c) 2015-2017 Matthias Cuntz - mc (at) macu (dot) de
 
@@ -292,7 +295,10 @@ def write_data(*args):
 
         License
         -------
-        This file is part of the JAMS Python package, distributed under the MIT License.
+        This file is part of the JAMS Python package, distributed under the MIT
+        License. The JAMS Python package originates from the former UFZ Python library,
+        Department of Computational Hydrosystems, Helmholtz Centre for Environmental
+        Research - UFZ, Leipzig, Germany.
 
         Copyright (c) 2014-2015 Matthias Cuntz - mc (at) macu (dot) de
 
@@ -394,7 +400,10 @@ def write_data_dmp(*args):
 
         License
         -------
-        This file is part of the JAMS Python package, distributed under the MIT License.
+        This file is part of the JAMS Python package, distributed under the MIT
+        License. The JAMS Python package originates from the former UFZ Python library,
+        Department of Computational Hydrosystems, Helmholtz Centre for Environmental
+        Research - UFZ, Leipzig, Germany.
 
         Copyright (c) 2015 Matthias Cuntz - mc (at) macu (dot) de
 
@@ -497,7 +506,10 @@ def write_data_dmp_size(*args):
 
         License
         -------
-        This file is part of the JAMS Python package, distributed under the MIT License.
+        This file is part of the JAMS Python package, distributed under the MIT
+        License. The JAMS Python package originates from the former UFZ Python library,
+        Department of Computational Hydrosystems, Helmholtz Centre for Environmental
+        Research - UFZ, Leipzig, Germany.
 
         Copyright (c) 2015-2016 Matthias Cuntz, Benjamin Dechant - mc (at) macu (dot) de
 
@@ -596,7 +608,10 @@ def write_data_one_file(*args):
 
         License
         -------
-        This file is part of the JAMS Python package, distributed under the MIT License.
+        This file is part of the JAMS Python package, distributed under the MIT
+        License. The JAMS Python package originates from the former UFZ Python library,
+        Department of Computational Hydrosystems, Helmholtz Centre for Environmental
+        Research - UFZ, Leipzig, Germany.
 
         Copyright (c) 2016 Matthias Cuntz - mc (at) macu (dot) de
 
@@ -677,7 +692,10 @@ def write_data_norecord(infiles, sdate, dat, flags, iidate, hdate, hdat, hflags,
 
         License
         -------
-        This file is part of the JAMS Python package, distributed under the MIT License.
+        This file is part of the JAMS Python package, distributed under the MIT
+        License. The JAMS Python package originates from the former UFZ Python library,
+        Department of Computational Hydrosystems, Helmholtz Centre for Environmental
+        Research - UFZ, Leipzig, Germany.
 
         Copyright (c) 2015 Matthias Cuntz - mc (at) macu (dot) de
 
@@ -790,7 +808,10 @@ def write_data_norecord_dmp(infiles, sdate, dat, flags, iidate, hdate, hdat, hfl
 
         License
         -------
-        This file is part of the JAMS Python package, distributed under the MIT License.
+        This file is part of the JAMS Python package, distributed under the MIT
+        License. The JAMS Python package originates from the former UFZ Python library,
+        Department of Computational Hydrosystems, Helmholtz Centre for Environmental
+        Research - UFZ, Leipzig, Germany.
 
         Copyright (c) 2016 Matthias Cuntz - mc (at) macu (dot) de
 
@@ -915,7 +936,10 @@ def write_data_norecord_dmp_size(infiles, sdate, dat, flags, iidate, hdate, hdat
 
         License
         -------
-        This file is part of the JAMS Python package, distributed under the MIT License.
+        This file is part of the JAMS Python package, distributed under the MIT
+        License. The JAMS Python package originates from the former UFZ Python library,
+        Department of Computational Hydrosystems, Helmholtz Centre for Environmental
+        Research - UFZ, Leipzig, Germany.
 
         Copyright (c) 2016 Matthias Cuntz - mc (at) macu (dot) de
 
@@ -1067,7 +1091,10 @@ def write_data_norecord_one_file(infile, sdate, dat, flags, hdate, hdat, hflags)
 
         License
         -------
-        This file is part of the JAMS Python package, distributed under the MIT License.
+        This file is part of the JAMS Python package, distributed under the MIT
+        License. The JAMS Python package originates from the former UFZ Python library,
+        Department of Computational Hydrosystems, Helmholtz Centre for Environmental
+        Research - UFZ, Leipzig, Germany.
 
         Copyright (c) 2016 Matthias Cuntz - mc (at) macu (dot) de
 
@@ -1170,7 +1197,10 @@ def write_data_record(infiles, sdate, record, dat, flags, iidate, hdate, hrecord
 
         License
         -------
-        This file is part of the JAMS Python package, distributed under the MIT License.
+        This file is part of the JAMS Python package, distributed under the MIT
+        License. The JAMS Python package originates from the former UFZ Python library,
+        Department of Computational Hydrosystems, Helmholtz Centre for Environmental
+        Research - UFZ, Leipzig, Germany.
 
         Copyright (c) 2015 Matthias Cuntz - mc (at) macu (dot) de
 
@@ -1284,7 +1314,10 @@ def write_data_record_one_file(infile, sdate, record, dat, flags, hdate, hrecord
 
         License
         -------
-        This file is part of the JAMS Python package, distributed under the MIT License.
+        This file is part of the JAMS Python package, distributed under the MIT
+        License. The JAMS Python package originates from the former UFZ Python library,
+        Department of Computational Hydrosystems, Helmholtz Centre for Environmental
+        Research - UFZ, Leipzig, Germany.
 
         Copyright (c) 2016 Matthias Cuntz - mc (at) macu (dot) de
 

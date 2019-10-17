@@ -135,7 +135,10 @@ def nee2gpp(dates, nee, t, isday, rg=False, vpd=False, undef=np.nan,
 
         License
         -------
-        This file is part of the JAMS Python package, distributed under the MIT License.
+        This file is part of the JAMS Python package, distributed under the MIT
+        License. The JAMS Python package originates from the former UFZ Python library,
+        Department of Computational Hydrosystems, Helmholtz Centre for Environmental
+        Research - UFZ, Leipzig, Germany.
 
         Copyright (c) 2012-2014 Matthias Cuntz, Arndt Piayda - mc (at) macu (dot) de
 
@@ -254,7 +257,10 @@ def nee2gpp_falge(dates, nee, t, isday, undef=np.nan,
 
         License
         -------
-        This file is part of the JAMS Python package, distributed under the MIT License.
+        This file is part of the JAMS Python package, distributed under the MIT
+        License. The JAMS Python package originates from the former UFZ Python library,
+        Department of Computational Hydrosystems, Helmholtz Centre for Environmental
+        Research - UFZ, Leipzig, Germany.
 
         Copyright (c) 2012-2013 Matthias Cuntz, Arndt Piayda - mc (at) macu (dot) de
 
@@ -446,7 +452,10 @@ def nee2gpp_reichstein(dates, nee, t, isday, rg=False, vpd=False, undef=np.nan,
 
         License
         -------
-        This file is part of the JAMS Python package, distributed under the MIT License.
+        This file is part of the JAMS Python package, distributed under the MIT
+        License. The JAMS Python package originates from the former UFZ Python library,
+        Department of Computational Hydrosystems, Helmholtz Centre for Environmental
+        Research - UFZ, Leipzig, Germany.
 
         Copyright (c) 2012-2013 Matthias Cuntz, Arndt Piayda - mc (at) macu (dot) de
 
@@ -763,7 +772,10 @@ def nee2gpp_lasslop(dates, nee, t, isday, rg, vpd, undef=np.nan,
 
         License
         -------
-        This file is part of the JAMS Python package, distributed under the MIT License.
+        This file is part of the JAMS Python package, distributed under the MIT
+        License. The JAMS Python package originates from the former UFZ Python library,
+        Department of Computational Hydrosystems, Helmholtz Centre for Environmental
+        Research - UFZ, Leipzig, Germany.
 
         Copyright (c) 2012-2013 Matthias Cuntz, Arndt Piayda - mc (at) macu (dot) de
 

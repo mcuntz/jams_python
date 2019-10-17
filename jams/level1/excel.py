@@ -35,7 +35,10 @@ def get_header_excel(excelfile, sheet):
 
         License
         -------
-        This file is part of the JAMS Python package, distributed under the MIT License.
+        This file is part of the JAMS Python package, distributed under the MIT
+        License. The JAMS Python package originates from the former UFZ Python library,
+        Department of Computational Hydrosystems, Helmholtz Centre for Environmental
+        Research - UFZ, Leipzig, Germany.
 
         Copyright (c) 2016 Matthias Cuntz - mc (at) macu (dot) de
 
@@ -136,7 +139,10 @@ def get_value_excel(excelfile, sheet, variable, column, all_rows=False):
 
         License
         -------
-        This file is part of the JAMS Python package, distributed under the MIT License.
+        This file is part of the JAMS Python package, distributed under the MIT
+        License. The JAMS Python package originates from the former UFZ Python library,
+        Department of Computational Hydrosystems, Helmholtz Centre for Environmental
+        Research - UFZ, Leipzig, Germany.
 
         Copyright (c) 2015-2016 Matthias Cuntz, Benjamin Dechant - mc (at) macu (dot) de
 

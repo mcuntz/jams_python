@@ -161,7 +161,10 @@ def sron_colors(cmap='palette1', ncol=9, cname=None, rgb=False, rgb256=False, re
 
         License
         -------
-        This file is part of the JAMS Python package, distributed under the MIT License.
+        This file is part of the JAMS Python package, distributed under the MIT
+        License. The JAMS Python package originates from the former UFZ Python library,
+        Department of Computational Hydrosystems, Helmholtz Centre for Environmental
+        Research - UFZ, Leipzig, Germany.
 
         Copyright (c) 2016 Matthias Cuntz - mc (at) macu (dot) de
 
@@ -328,7 +331,10 @@ def sron_maps(cmap, ncol=256, offset=0, upper=1,
 
         License
         -------
-        This file is part of the JAMS Python package, distributed under the MIT License.
+        This file is part of the JAMS Python package, distributed under the MIT
+        License. The JAMS Python package originates from the former UFZ Python library,
+        Department of Computational Hydrosystems, Helmholtz Centre for Environmental
+        Research - UFZ, Leipzig, Germany.
 
         Copyright (c) 2016 Matthias Cuntz - mc (at) macu (dot) de
 
