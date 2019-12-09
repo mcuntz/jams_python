@@ -8,7 +8,7 @@ def fread(infile, nc=0, cname=None, skip=0, cskip=0, hskip=0, hstrip=True, separ
           squeeze=False, reform=False, skip_blank=False, comment=None,
           fill=False, fill_value=0, strip=None, encoding='ascii', errors='ignore',
           header=False, full_header=False,
-          transpose=False, strarr=False):
+          transpose=False, strarr=False, returnArr=True):
     """
         Read numbers into 2D-array from a file.
 
@@ -22,7 +22,7 @@ def fread(infile, nc=0, cname=None, skip=0, cskip=0, hskip=0, hstrip=True, separ
                   squeeze=False, reform=False, skip_blank=False, comment=None,
                   fill=False, fill_value=0, strip=None, encoding='ascii', errors='ignore',
                   header=False, full_header=False,
-                  transpose=False, strarr=False):
+                  transpose=False, strarr=False, returnArr=True):
 
 
         Input
@@ -80,7 +80,8 @@ def fread(infile, nc=0, cname=None, skip=0, cskip=0, hskip=0, hstrip=True, separ
                      False: row-major format output(0:nlines,0:ncolumns) (default)
         strarr       True:  return header as numpy array of strings
                      False: return header as list
-
+        returnArr    True:  return file content as numpy array
+                     False: return file content as list
 
         Output
         ------
@@ -329,6 +330,7 @@ def fread(infile, nc=0, cname=None, skip=0, cskip=0, hskip=0, hstrip=True, separ
                   MC, Jul 2019 - errors='ignore' compatible with Python2 and Python3
                                  -> returns header in unicode in Python2
                   MC, Aug 2019 - use codecs module and allow user encoding and error handling
+                  ST, Dec 2019 - added returnArr flag
     """
     #
     # Open file
@@ -475,7 +477,7 @@ def fread(infile, nc=0, cname=None, skip=0, cskip=0, hskip=0, hstrip=True, separ
     # list -> array
     if fill:
         var = [ [ fill_value if i=='' else i for i in row ] for row in var ]
-    var = np.array(var, dtype=np.float)
+    if returnArr: var = np.array(var, dtype=np.float)
     if squeeze or reform: var = var.squeeze()
     if transpose: var = var.T
 
