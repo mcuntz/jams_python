@@ -194,10 +194,11 @@ def get_era5(area=None, years=None, path='.', override=False):
         History
         -------
         Written  Matthias Cuntz, Jan 2019 - from get_era_interim.py
+        Modified Matthias Cuntz, Dec 2019 - default area (global) was not working: used == instead of =
     '''
     # check parameters
     if area is None:
-        area == '90/-180/-90/180'
+        area = '90/-180/-90/180'
     else:
         if '/' in area:
             sarea = area.split('/')
