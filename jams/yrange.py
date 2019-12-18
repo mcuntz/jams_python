@@ -64,6 +64,12 @@ def yrange(*args, **kwargs):
         >>> print(yrange(a))
         [0.0, 100.0]
 
+        >>> a = np.ma.arange(102,dtype=np.float)
+        >>> a[-1] = np.ma.masked
+        >>> a[-2] = np.nan
+        >>> print(yrange(a))
+        [0.0, 99.0]
+
 
         License
         -------
@@ -101,12 +107,16 @@ def yrange(*args, **kwargs):
                   MC, Nov 2013 - masked arrays
                   MC, Apr 2014 - assert
                   MC, Nov 2016 - const.tiny -> const.eps
+                  MC, Nov 2019 - mask NaN values, e.g. from Pandas
     """
     # Check input
     assert len(args) > 0, 'no input argument given.'
     counter = 0
     for i in args:
-        arr    = np.ma.array(i)
+        if np.any(np.isnan(i)):
+            arr = np.ma.array(i, mask=np.isnan(i))
+        else:
+            arr    = np.ma.array(i)
         minarr = np.ma.amin(arr)
         maxarr = np.ma.amax(arr)
         # Round to max difference between adjacent values
