@@ -61,10 +61,12 @@ if (outtype == 'pdf'):
                 r'\\renewcommand{\\familydefault}{\\sfdefault}',       # normal text font is sans serif
                 r'\\figureversion{lining,tabular}',
                 r'\\usepackage{wasysym}',                            # for permil symbol (load after MyriadPro)
+                r'\\usepackage{gensymb}',                           # for degree symbol (load after MyriadPro)
                 ]
         else:
             mpl.rcParams['text.latex.preamble'] = [
-                r'\\usepackage{wasysym}'                     # for permil symbol
+                r'\\usepackage{wasysym}'                             # for permil symbol
+                r'\\usepackage{gensymb}',                           # for degree symbol
                 ]
     else:
         if serif:
@@ -86,10 +88,12 @@ elif (outtype == 'png') or (outtype == 'html') or (outtype == 'd3') or (outtype 
                 r'\\renewcommand{\\familydefault}{\\sfdefault}',       # normal text font is sans serif
                 r'\\figureversion{lining,tabular}',
                 r'\\usepackage{wasysym}',                            # for permil symbol (load after MyriadPro)
+                r'\\usepackage{gensymb}',                           # for degree symbol (load after MyriadPro)
                 ]
         else:
             mpl.rcParams['text.latex.preamble'] = [
-                r'\\usepackage{wasysym}'                     # for permil symbol
+                r'\\usepackage{wasysym}'                             # for permil symbol
+                r'\\usepackage{gensymb}',                           # for degree symbol
                 ]
     else:
         if serif:
@@ -102,7 +106,6 @@ elif (outtype == 'png') or (outtype == 'html') or (outtype == 'd3') or (outtype 
 else:
     import matplotlib.pyplot as plt
     mpl.rc('figure', figsize=(4./5.*8.27,4./5.*11.69)) # a4 portrait
-mpl.rc('text.latex', unicode=True)
 mpl.rc('font', size=textsize)
 mpl.rc('path', simplify=False) # do not remove
 # print(mpl.rcParams)
