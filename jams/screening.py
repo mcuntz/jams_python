@@ -205,8 +205,9 @@ def screening(func, x0, lb, ub, mask=None,
 
         History
         -------
-        Written,  MC, Dec 2017
-        Modified, MC, Dec 2017 - output for nt=1 also (npara,3)
+        Written,  Matthias Cuntz, Dec 2017
+        Modified, Matthias Cuntz, Dec 2017 - output for nt=1 also (npara,3)
+                  Matthias Cuntz, Dec 2019 - bug: default ntotal was not set if ntotal<0 (but nt instead)
     """
     # Get MPI communicator
     try:
@@ -256,7 +257,7 @@ def screening(func, x0, lb, ub, mask=None,
     if nt <= 0:
         nt = npara
     if ntotal <= 0:
-        nt = max(nt**2, 10*nt)
+        ntotal = max(nt**2, 10*nt)
 
     # Partialise objective function
     if isinstance(func, (str,list)):
