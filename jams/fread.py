@@ -8,7 +8,7 @@ def fread(infile, nc=0, cname=None, skip=0, cskip=0, hskip=0, hstrip=True, separ
           squeeze=False, reform=False, skip_blank=False, comment=None,
           fill=False, fill_value=0, strip=None, encoding='ascii', errors='ignore',
           header=False, full_header=False,
-          transpose=False, strarr=False, return_list=True):
+          transpose=False, strarr=False, return_list=False):
     """
         Read numbers into 2D-array from a file.
 
@@ -22,7 +22,7 @@ def fread(infile, nc=0, cname=None, skip=0, cskip=0, hskip=0, hstrip=True, separ
                   squeeze=False, reform=False, skip_blank=False, comment=None,
                   fill=False, fill_value=0, strip=None, encoding='ascii', errors='ignore',
                   header=False, full_header=False,
-                  transpose=False, strarr=False, return_list=True):
+                  transpose=False, strarr=False, return_list=False):
 
 
         Input
@@ -81,7 +81,7 @@ def fread(infile, nc=0, cname=None, skip=0, cskip=0, hskip=0, hstrip=True, separ
         strarr       True:  return header as numpy array of strings
                      False: return header as list
         return_list  True:  return file content as numpy array
-                     False: return file content as list
+                     False: return file content as list (default)
 
         Output
         ------
@@ -331,6 +331,7 @@ def fread(infile, nc=0, cname=None, skip=0, cskip=0, hskip=0, hstrip=True, separ
                                  -> returns header in unicode in Python2
                   MC, Aug 2019 - use codecs module and allow user encoding and error handling
                   ST, Dec 2019 - added return_list flag
+                  MC, Jan 2020 - default return_list=False
     """
     #
     # Open file
