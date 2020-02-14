@@ -119,6 +119,7 @@ from __future__ import division, absolute_import, print_function
     pack                   Similar to Fortran pack function with mask.
     pareto_metrics         Performance metrics to compare Pareto fronts.
     pca                    Principal component analysis (PCA) upon the first dimension of an 2D-array.
+    pet_oudin              Daily potential evapotranspiration following the Oudin formula.
     pi                     Parameter importance index PI or alternatively B index calculation.
     plot                   Module with code snippets for plotting.
     plot_brewer            Plots available Brewer color maps in pdf file.
@@ -333,6 +334,7 @@ from __future__ import division, absolute_import, print_function
     esat                   Calculates the saturation vapour pressure of water/ice.
     get_era_interim        Download ERA-Interim data suitable to produce MuSICA input data.
     get_era5               Download ERA5 data suitable to produce MuSICA input data.
+    pet_oudin              Daily potential evapotranspiration following the Oudin formula.
     pritay                 Daily reference evapotranspiration after Priestley & Taylor
     
 
@@ -559,6 +561,7 @@ from __future__ import division, absolute_import, print_function
               MC, Feb 2019 - xlsread, xlsxread
               MC, Apr 2019 - nc2nc
               MC, Jul 2019 - argmax, argmin
+              JM, Feb 2020 - pet_oudin
 """
 
 # sub-packages without dependencies to rest of jams
@@ -671,6 +674,7 @@ try:
 except:
     pass # No statsmodels installed.
 from .pca               import pca, check_pca
+from .pet_oudin         import pet_oudin
 from .pi                import pi
 from .position          import position
 from .pritay            import pritay
