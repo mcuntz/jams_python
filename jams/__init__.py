@@ -28,6 +28,7 @@ from __future__ import division, absolute_import, print_function
     autostring             Format number (array) with given decimal precision.
     baseflow               Calculate baseflow from discharge timeseries
     cellarea               Calc areas of grid cells in m^2.
+    climate_index_knoben   Determines continuous climate indexes based on Knoben et al. (2018).
     clockplot              The clockplot of mHM.
     closest                Index in array which entry is closest to a given number.
     color                  Module with color functions for plotting.
@@ -329,6 +330,7 @@ from __future__ import division, absolute_import, print_function
 
     Meteorology
     -----------
+    climate_index_knoben   Determines continuous climate indexes based on Knoben et al. (2018).
     dewpoint               Calculates the dew point from ambient humidity.
     dielectric_water       Dielectric constant of liquid water.
     esat                   Calculates the saturation vapour pressure of water/ice.
@@ -562,6 +564,7 @@ from __future__ import division, absolute_import, print_function
               MC, Apr 2019 - nc2nc
               MC, Jul 2019 - argmax, argmin
               JM, Feb 2020 - pet_oudin
+              JM, Feb 2020 - climate_index_knoben
 """
 
 # sub-packages without dependencies to rest of jams
@@ -572,156 +575,157 @@ from . import plot
 from . import qa
 
 # Routines
-from .abc2plot          import abc2plot
-from .alpha_equ_h2o     import alpha_equ_h2o
-from .alpha_kin_h2o     import alpha_kin_h2o
-from .apply_undef       import apply_undef
-from .area_poly         import area_poly
-from .argsort           import argmax, argmin, argsort
-from .around            import around
-from .ascii2ascii       import ascii2ascii, ascii2en, ascii2fr, ascii2us, ascii2eng, en2ascii, fr2ascii, us2ascii, eng2ascii
-from .autostring        import autostring, astr
-from .baseflow          import hollickLyneFilter
-from .brewer            import register_brewer, get_brewer, plot_brewer, print_brewer
+from .abc2plot             import abc2plot
+from .alpha_equ_h2o        import alpha_equ_h2o
+from .alpha_kin_h2o        import alpha_kin_h2o
+from .apply_undef          import apply_undef
+from .area_poly            import area_poly
+from .argsort              import argmax, argmin, argsort
+from .around               import around
+from .ascii2ascii          import ascii2ascii, ascii2en, ascii2fr, ascii2us, ascii2eng, en2ascii, fr2ascii, us2ascii, eng2ascii
+from .autostring           import autostring, astr
+from .baseflow             import hollickLyneFilter
+from .brewer               import register_brewer, get_brewer, plot_brewer, print_brewer
 try:
-    from .calcvpd       import calcvpd
+    from .calcvpd          import calcvpd
 except ImportError:
     pass # obsolete
-from .cellarea          import cellarea
-from .clockplot         import clockplot
-from .closest           import closest
-from .convex_hull       import convex_hull
-from .correlate         import correlate
-from .cuntz_gleixner    import cuntz_gleixner
+from .cellarea             import cellarea
+from .climate_index_knoben import climate_index_knoben
+from .clockplot            import clockplot
+from .closest              import closest
+from .convex_hull          import convex_hull
+from .correlate            import correlate
+from .cuntz_gleixner       import cuntz_gleixner
 try:
-    from .dag           import create_network, source_nodes, sink_nodes, plot_network
+    from .dag              import create_network, source_nodes, sink_nodes, plot_network
 except ImportError:
     pass # networkx not installed
-from .date2dec          import date2dec
-from .dec2date          import dec2date
-from .delta_isogsm2     import delta_isogsm2
-from .dewpoint          import dewpoint
-# import dfgui
-from .dielectric_water  import dielectric_water
-from .division          import division, div
-from .ellipse_area      import ellipse_area
-from .errormeasures     import bias, mae, mse, rmse, nse, kge, pear2
-from .esat              import esat
-from .fftngo            import fftngo
-from .fgui              import directories_from_gui, directory_from_gui, file_from_gui, files_from_gui
-# from .field_gen         import Field, Incompr_Field, Filtered_Incompr_Field
-from .fill_nonfinite    import fill_nonfinite
-from .find_in_path      import find_in_path
-from .fread             import fread
-from .fsread            import fsread
-from .fwrite            import fwrite
+from .date2dec             import date2dec
+from .dec2date             import dec2date
+from .delta_isogsm2        import delta_isogsm2
+from .dewpoint             import dewpoint
+#                          import dfgui
+from .dielectric_water     import dielectric_water
+from .division             import division, div
+from .ellipse_area         import ellipse_area
+from .errormeasures        import bias, mae, mse, rmse, nse, kge, pear2
+from .esat                 import esat
+from .fftngo               import fftngo
+from .fgui                 import directories_from_gui, directory_from_gui, file_from_gui, files_from_gui
+# from .field_gen          import Field, Incompr_Field, Filtered_Incompr_Field
+from .fill_nonfinite       import fill_nonfinite
+from .find_in_path         import find_in_path
+from .fread                import fread
+from .fsread               import fsread
+from .fwrite               import fwrite
 try:
-    from .gap_filling   import gap_filling
-except ImportError:
+    from .gap_filling      import gap_filling
+except                     ImportError:
     pass # obsolete
-from .gap2lai           import gap2lai, leafprojection
+from .gap2lai              import gap2lai, leafprojection
 try:
-    from .geoarray      import geoarray
-except ImportError:
+    from .geoarray         import geoarray
+except                     ImportError:
     pass
-from .get_angle         import get_angle
+from .get_angle            import get_angle
 try:
-    from .get_era_interim   import get_era_interim
-except ImportError:
+    from .get_era_interim  import get_era_interim
+except                     ImportError:
     pass
-from .get_era5          import get_era5
+from .get_era5             import get_era5
 try:
-    from .get_isogsm2   import get_isogsm2
-except ImportError:
+    from .get_isogsm2      import get_isogsm2
+except                     ImportError:
     pass
-from .get_nearest       import get_nearest
-from .grid_mid2edge     import grid_mid2edge
-from .head              import head
-from .heaviside         import heaviside
-from .homo_sampling     import homo_sampling
-from .in_poly           import in_poly, inpoly
-from .interpol          import interpol
-from .intersection      import intersection
-from .jab               import jab
-from .jconfigparser     import jConfigParser
-from .kernel_regression import kernel_regression, kernel_regression_h
-from .kriging           import kriging
-from .lagcorr           import lagcorr
-from .latlon_fmt        import lat_fmt, lon_fmt
-from .lhs               import lhs
-from .lif               import lif
-from .line_dev_mask     import line_dev_mask
-from .lowess            import lowess
-from .mad               import mad
-from .maskgroup         import maskgroup
-from .mat2nc            import mat2nc
-from .means             import means
-from .morris            import morris_sampling, elementary_effects
-from .nc2nc             import nc2nc
+from .get_nearest          import get_nearest
+from .grid_mid2edge        import grid_mid2edge
+from .head                 import head
+from .heaviside            import heaviside
+from .homo_sampling        import homo_sampling
+from .in_poly              import in_poly, inpoly
+from .interpol             import interpol
+from .intersection         import intersection
+from .jab                  import jab
+from .jconfigparser        import jConfigParser
+from .kernel_regression    import kernel_regression, kernel_regression_h
+from .kriging              import kriging
+from .lagcorr              import lagcorr
+from .latlon_fmt           import lat_fmt, lon_fmt
+from .lhs                  import lhs
+from .lif                  import lif
+from .line_dev_mask        import line_dev_mask
+from .lowess               import lowess
+from .mad                  import mad
+from .maskgroup            import maskgroup
+from .mat2nc               import mat2nc
+from .means                import means
+from .morris               import morris_sampling, elementary_effects
+from .nc2nc                import nc2nc
 try:
-    from .npyio         import savez, savez_compressed
+    from .npyio            import savez, savez_compressed
 except ImportError:
     pass # old numpy version
-from .netcdf4 import netcdf4
+from .netcdf4              import netcdf4
 try:
-    from .outlier       import outlier, rossner
+    from .outlier          import outlier, rossner
 except:
     pass # No extra statistics in scipy and hence in JAMS. Disabled functions: outlier, rossner.
-from .pack              import pack
-from .pareto_metrics    import sn, cz, hi, ef, aed, is_dominated, point_to_front
+from .pack                 import pack
+from .pareto_metrics       import sn, cz, hi, ef, aed, is_dominated, point_to_front
 try:
-    from .pawn_index        import pawn_index
+    from .pawn_index       import pawn_index
 except:
     pass # No statsmodels installed.
-from .pca               import pca, check_pca
-from .pet_oudin         import pet_oudin
-from .pi                import pi
-from .position          import position
-from .pritay            import pritay
-from .pso               import pso
+from .pca                  import pca, check_pca
+from .pet_oudin            import pet_oudin
+from .pi                   import pi
+from .position             import position
+from .pritay               import pritay
+from .pso                  import pso
 try:
-    from .readhdf       import readhdf,  hdfread
+    from .readhdf          import readhdf,  hdfread
 except ImportError:
     pass # not installed
 try:
-    from .readhdf4      import readhdf4, hdf4read
+    from .readhdf4         import readhdf4, hdf4read
 except ImportError:
     pass # not installed
-from .readhdf5          import readhdf5, hdf5read
-from .readnetcdf        import readnetcdf, netcdfread, ncread, readnc
-from .river_network     import river_network, upscale_fdir
-from .rolling           import rolling
-from .romanliterals     import int2roman, roman2int
-from .saltelli          import saltelli
-from .samevalue         import samevalue
-from .sap_app           import t2sap
-from .savitzky_golay    import savitzky_golay, sg, savitzky_golay2d, sg2d
-from .sce               import sce
-from .screening         import screening
-from .semivariogram     import semivariogram
-from .sendmail          import sendmail
-from .sigma_filter      import sigma_filter
-from .signature2plot    import signature2plot
-from .smooth_minmax     import smin, smax
-from .sobol_index       import sobol_index
-from .sread             import sread
-from .srrasa            import srrasa, srrasa_trans
-from .str2tex           import str2tex
-from .tail              import tail
-from .tcherkez          import tcherkez
-from .tee               import tee
-from .timestepcheck     import timestepcheck
-from .tsym              import tsym
-from .unpack            import unpack
-from .volume_poly       import volume_poly
-from .writenetcdf       import writenetcdf, dumpnetcdf
-from .xkcd              import xkcd
+from .readhdf5             import readhdf5, hdf5read
+from .readnetcdf           import readnetcdf, netcdfread, ncread, readnc
+from .river_network        import river_network, upscale_fdir
+from .rolling              import rolling
+from .romanliterals        import int2roman, roman2int
+from .saltelli             import saltelli
+from .samevalue            import samevalue
+from .sap_app              import t2sap
+from .savitzky_golay       import savitzky_golay, sg, savitzky_golay2d, sg2d
+from .sce                  import sce
+from .screening            import screening
+from .semivariogram        import semivariogram
+from .sendmail             import sendmail
+from .sigma_filter         import sigma_filter
+from .signature2plot       import signature2plot
+from .smooth_minmax        import smin, smax
+from .sobol_index          import sobol_index
+from .sread                import sread
+from .srrasa               import srrasa, srrasa_trans
+from .str2tex              import str2tex
+from .tail                 import tail
+from .tcherkez             import tcherkez
+from .tee                  import tee
+from .timestepcheck        import timestepcheck
+from .tsym                 import tsym
+from .unpack               import unpack
+from .volume_poly          import volume_poly
+from .writenetcdf          import writenetcdf, dumpnetcdf
+from .xkcd                 import xkcd
 try:
-    from .xread         import xread, xlsread, xlsxread
+    from .xread            import xread, xlsread, xlsxread
 except ImportError:
     pass # not installed
-from .yrange            import yrange
-from .zacharias         import zacharias, zacharias_check
+from .yrange               import yrange
+from .zacharias            import zacharias, zacharias_check
 
 # sub-packages with dependencies to rest jams have to be loaded separately as in scipy
 from . import color
