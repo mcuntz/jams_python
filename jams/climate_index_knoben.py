@@ -11,6 +11,11 @@ def climate_index_knoben(time, precip, tave, pet, color=True, indicators=False):
     as snow f_S. These three are used to derive a color which is used to identify the 
     continuous climatic zones.
 
+    Knoben, W. J. M., Woods, R. A., & Freer, J. E. (2018). 
+    A Quantitative Hydrological Climate Classification Evaluated With Independent Streamflow Data. 
+    Water Resources Research, 54(7), 5088-5109. 
+    http://doi.org/10.1029/2018WR022913
+
 
     Definition
     ----------
@@ -125,7 +130,7 @@ def climate_index_knoben(time, precip, tave, pet, color=True, indicators=False):
 
     # >>>>>>>>>>>>>> TODO: write these three to file
 
-    # Equation 1 in Knoben et al. (2015): moisture index MI
+    # Equation 1 in Knoben et al. (2018): moisture index MI
     nmonths = 12
     MI = np.zeros(nmonths)
     for itime in range(nmonths):
@@ -136,19 +141,19 @@ def climate_index_knoben(time, precip, tave, pet, color=True, indicators=False):
         else:
             MI[itime] = 0.0
 
-    # Equation 2 in Knoben et al. (2015)
+    # Equation 2 in Knoben et al. (2018)
     #  ---> Red   = Aridity I_m
     #       -1 = arid
     #        1 = wet
     I_m = np.mean(MI)
 
-    # Equation 3 in Knoben et al. (2015)
+    # Equation 3 in Knoben et al. (2018)
     #  ---> Green = Seasonality I_m,r
     #       0 = constant
     #       2 = seasonal
     I_mr = np.max(MI) - np.min(MI)
 
-    # Equation 3 in Knoben et al. (2015)
+    # Equation 3 in Knoben et al. (2018)
     #  ---> Blue  = Fraction of precipitation as snow f_S
     #       0 = no snow
     #       1 = all snow
