@@ -64,7 +64,7 @@ def pet_oudin(temperature, lat, doy):
         Department of Computational Hydrosystems, Helmholtz Centre for Environmental
         Research - UFZ, Leipzig, Germany.
 
-        Copyright (c) 20020 Juliane Mai - juliane.mai@uwaterloo.ca 
+        Copyright (c) 2020 Juliane Mai - juliane.mai@uwaterloo.ca 
 
         Permission is hereby granted, free of charge, to any person obtaining a copy
         of this software and associated documentation files (the "Software"), to deal
