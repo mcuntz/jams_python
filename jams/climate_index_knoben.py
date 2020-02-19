@@ -136,7 +136,7 @@ def climate_index_knoben(time, precip, tave, pet, color=True, indicators=False):
     for itime in range(nmonths):
         if precip_total_monthly_ave.values[itime] > pet_total_monthly_ave.values[itime]:
             MI[itime] = 1.0 - pet_total_monthly_ave.values[itime] / precip_total_monthly_ave.values[itime]
-        elif precip[itime] < pet[itime]:
+        elif precip_total_monthly_ave.values[itime] < pet_total_monthly_ave.values[itime]:
             MI[itime] = precip_total_monthly_ave.values[itime] / pet_total_monthly_ave.values[itime] - 1.0
         else:
             MI[itime] = 0.0
