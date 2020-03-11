@@ -177,7 +177,7 @@ def climate_index_knoben(time, precip, tave, pet, snow=None, color=True, indicat
 
     # color mapping
     # R = 1 - (aridity_Im + 1)./2       --> transforms [-1,1] to [1,0] --> [most arid, least arid]
-    # G = (aridity_seasonality_Imr)./2  --> transforms [ 0,2] to [0,1] --> [least seasonal, most seaonal]
+    # G = (aridity_seasonality_Imr)./2  --> transforms [ 0,2] to [0,1] --> [least seasonal, most seasonal]
     # B = precipitation_as_snow_fs      --> transforms [ 0,1] to [0,1] --> [least snow, most snow]
     red   = 1.0 - (I_m + 1.0)/ 2.0
     green = I_mr/ 2.0
