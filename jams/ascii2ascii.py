@@ -1,139 +1,145 @@
 #!/usr/bin/env python
 from __future__ import division, absolute_import, print_function
+"""
+ascii2ascii : Convert date notations between different regional variants
+              such as English YYYY-MM-DD hh:mm:ss and US-English
+              MM/DD/YYYY hh:mm:ss formats.
+
+This module was written by Matthias Cuntz while at Department of
+Computational Hydrosystems, Helmholtz Centre for Environmental
+Research - UFZ, Leipzig, Germany, and continued while at Institut
+National de Recherche pour l'Agriculture, l'Alimentation et
+l'Environnement (INRAE), Nancy, France.
+
+Copyright (c) 2015-2020 Matthias Cuntz - mc (at) macu (dot) de
+Released under the MIT License; see LICENSE file for details.
+
+* Written Feb 2015 by Matthias Cuntz (mc (at) macu (dot) de)
+* Removed usage of date2dec and dec2date, Nov 2016, Matthias Cuntz
+* Adapted docstrings to Python 2 and 3, Nov 2016, Matthias Cuntz
+* Added us and fr keywords, renamed eng to en, Mar 2018, Matthias Cuntz
+* Added two-digit year, Nov 2018, Matthias Cuntz
+* Removed bug from usage of en and old name eng, Jun 2019, Matthias Cuntz
+* Using numpy docstring format, May 2020, Matthias Cuntz
+
+.. moduleauthor:: Matthias Cuntz
+
+The following functions are provided
+
+.. autosummary::
+   ascii2ascii
+   ascii2en
+   ascii2fr
+   ascii2us
+   ascii2eng
+   en2ascii
+   fr2ascii
+   us2ascii
+   eng2ascii
+"""
 import numpy as np
+
 
 __all__ = ['ascii2ascii',
            'ascii2en', 'ascii2fr', 'ascii2us', 'ascii2eng',
            'en2ascii', 'fr2ascii', 'us2ascii', 'eng2ascii']
 
+    
 def ascii2ascii(edate, full=False, en=False, fr=False, us=False, eng=False, YY=False):
     """
-        Convert date notationas between ascii DD.MM.YYYY hh:mm:ss, English YYYY-MM-DD hh:mm:ss,
-        and American MM/DD/YYYY hh:mm:ss.
-        Input can only be ascii, English and American. Output can also be French DD/MM/YYYY hh:mm:ss.
-        Use fr2ascii first for French input formats.
+    Convert date notations between ascii DD.MM.YYYY hh:mm:ss, English YYYY-MM-DD hh:mm:ss,
+    American MM/DD/YYYY hh:mm:ss, and French DD/MM/YYYY hh:mm:ss.
+    Input can only be ascii, English and American. Output can also be French DD/MM/YYYY hh:mm:ss.
+    Use fr2ascii first for French input formats.
 
+    Parameters
+    ----------
+    edate : array_like
+        date strings in ascii, English or American format.
+    full : bool, optional
+        True:  output dates arr all in full format DD.MM.YYYY hh:mm:ss; missing time inputs are 00 on output
+        False: output dates are as long as input dates (default),
+               e.g. [YYYY-MM-DD, YYYY-MM-DD hh:mm] gives [DD.MM.YYYY, DD.MM.YYYY hh:mm]
+    en : bool, optional
+        True:  output format is English YYYY-MM-DD hh:mm:ss (default: False)
+    fr : bool, optional
+        True:  output format is French DD/MM/YYYY hh:mm:ss (default: False)
+    us : bool, optional
+        True:  output format is American MM/DD/YYYY hh:mm:ss (default: False)
+    YY : bool, optional
+        Year in input file is 2-digit year. Every year that is above the current year will
+        be taken as being in 1900 (default: False).
+    eng : bool, optional
+        Same as en: obsolete.
 
-        Definition
-        ----------
-        def ascii2ascii(edate, full=False, en=False, fr=False, us=False):
+    Returns
+    -------
+    date : array_like
+        date strings in chosen date format.
+        If no optional keyword True then output is in ascii format: DD.MM.YYYY hh:mm:ss.
+        The output type will be the same as the type of the input.
 
+    Examples
+    --------
+    >>> edate = ['2014-11-12 12:00', '01.03.2015 17:56:00', '1990-12-01', '04.05.1786']
+    >>> print(", ".join(ascii2ascii(edate)))
+    12.11.2014 12:00, 01.03.2015 17:56:00, 01.12.1990, 04.05.1786
 
-        Input
-        -----
-        list/ND-array of date strings in ascii, English or American format.
+    >>> print(", ".join(ascii2ascii(edate, full=True)))
+    12.11.2014 12:00:00, 01.03.2015 17:56:00, 01.12.1990 00:00:00, 04.05.1786 00:00:00
 
+    >>> print(", ".join(ascii2ascii(edate, en=True)))
+    2014-11-12 12:00, 2015-03-01 17:56:00, 1990-12-01, 1786-05-04
 
-        Optional Input
-        --------------
-        full    True:  output dates arr all in full format DD.MM.YYYY hh:mm:ss; missing time inputs are 00 on output
-                False: output dates are as long as input dates,
-                e.g. [YYYY-MM-DD, YYYY-MM-DD hh:mm] gives [DD.MM.YYYY, DD.MM.YYYY hh:mm]
-        en      True:  output format is English YYYY-MM-DD hh:mm:ss
-                False: output format is ascii DD.MM.YYYY hh:mm:ss (default)
-        fr      True:  output format is French DD/MM/YYYY hh:mm:ss
-                False: output format is ascii DD.MM.YYYY hh:mm:ss (default)
-        us      True:  output format is American MM/DD/YYYY hh:mm:ss
-                False: output format is ascii DD.MM.YYYY hh:mm:ss (default)
-        eng     Same as en: obsolete.
-        YY      boolean (default: False)
-                Year in input file is 2-digit year. Every year above current year will be taken in 1900.
+    >>> print(", ".join(ascii2ascii(edate, en=True, full=True)))
+    2014-11-12 12:00:00, 2015-03-01 17:56:00, 1990-12-01 00:00:00, 1786-05-04 00:00:00
 
+    >>> print(ascii2ascii(list(edate)))
+    ['12.11.2014 12:00', '01.03.2015 17:56:00', '01.12.1990', '04.05.1786']
 
-        Output
-        ------
-        list/ND-array of date strings in chosen date format (default: ascii)
+    >>> print(ascii2ascii(tuple(edate)))
+    ('12.11.2014 12:00', '01.03.2015 17:56:00', '01.12.1990', '04.05.1786')
 
+    >>> print(ascii2ascii(np.array(edate)))
+    ['12.11.2014 12:00' '01.03.2015 17:56:00' '01.12.1990' '04.05.1786']
 
-        Examples
-        --------
-        >>> edate = ['2014-11-12 12:00', '01.03.2015 17:56:00', '1990-12-01', '04.05.1786']
-        >>> print(" ".join(ascii2ascii(edate)))
-        12.11.2014 12:00 01.03.2015 17:56:00 01.12.1990 04.05.1786
+    >>> print(ascii2ascii(edate[0]))
+    12.11.2014 12:00
 
-        >>> print(" ".join(ascii2ascii(edate, full=True)))
-        12.11.2014 12:00:00 01.03.2015 17:56:00 01.12.1990 00:00:00 04.05.1786 00:00:00
+    >>> print(", ".join(ascii2ascii(edate, us=True)))
+    11/12/2014 12:00, 03/01/2015 17:56:00, 12/01/1990, 05/04/1786
 
-        >>> print(" ".join(ascii2ascii(edate, en=True)))
-        2014-11-12 12:00 2015-03-01 17:56:00 1990-12-01 1786-05-04
+    >>> print(", ".join(ascii2ascii(ascii2ascii(edate, en=True), us=True, full=True)))
+    11/12/2014 12:00:00, 03/01/2015 17:56:00, 12/01/1990 00:00:00, 05/04/1786 00:00:00
 
-        >>> print(" ".join(ascii2ascii(edate, en=True, full=True)))
-        2014-11-12 12:00:00 2015-03-01 17:56:00 1990-12-01 00:00:00 1786-05-04 00:00:00
+    >>> print(", ".join(ascii2ascii(edate, fr=True)))
+    12/11/2014 12:00, 01/03/2015 17:56:00, 01/12/1990, 04/05/1786
 
-        >>> print(" ".join(ascii2ascii(list(edate))))
-        12.11.2014 12:00 01.03.2015 17:56:00 01.12.1990 04.05.1786
+    >>> print(", ".join(ascii2ascii(edate, fr=True, full=True)))
+    12/11/2014 12:00:00, 01/03/2015 17:56:00, 01/12/1990 00:00:00, 04/05/1786 00:00:00
 
-        >>> print(" ".join(ascii2ascii(tuple(edate))))
-        12.11.2014 12:00 01.03.2015 17:56:00 01.12.1990 04.05.1786
+    # YY=True
+    >>> edate = ['14-11-12 12:00', '01.03.15 17:56:00', '90-12-01']
+    >>> print(", ".join(ascii2ascii(edate, YY=True)))
+    12.11.2014 12:00, 01.03.2015 17:56:00, 01.12.1990
+    >>> print(", ".join(ascii2ascii(edate, en=True, YY=True)))
+    2014-11-12 12:00, 2015-03-01 17:56:00, 1990-12-01
+    >>> print(", ".join(ascii2ascii(edate, us=True, YY=True)))
+    11/12/2014 12:00, 03/01/2015 17:56:00, 12/01/1990
+    >>> print(", ".join(ascii2ascii(ascii2ascii(edate, en=True, YY=True), us=True, full=True)))
+    11/12/2014 12:00:00, 03/01/2015 17:56:00, 12/01/1990 00:00:00
+    >>> print(", ".join(ascii2ascii(edate, fr=True, full=True, YY=True)))
+    12/11/2014 12:00:00, 01/03/2015 17:56:00, 01/12/1990 00:00:00
 
-        >>> print(" ".join(ascii2ascii(np.array(edate))))
-        12.11.2014 12:00 01.03.2015 17:56:00 01.12.1990 04.05.1786
-
-        >>> print(ascii2ascii(edate[0]))
-        12.11.2014 12:00
-
-        >>> print(" ".join(ascii2ascii(edate, us=True)))
-        11/12/2014 12:00 03/01/2015 17:56:00 12/01/1990 05/04/1786
-
-        >>> print(" ".join(ascii2ascii(ascii2ascii(edate, en=True), us=True, full=True)))
-        11/12/2014 12:00:00 03/01/2015 17:56:00 12/01/1990 00:00:00 05/04/1786 00:00:00
-
-        >>> print(" ".join(ascii2ascii(edate, fr=True)))
-        12/11/2014 12:00 01/03/2015 17:56:00 01/12/1990 04/05/1786
-
-        >>> print(" ".join(ascii2ascii(edate, fr=True, full=True)))
-        12/11/2014 12:00:00 01/03/2015 17:56:00 01/12/1990 00:00:00 04/05/1786 00:00:00
-
-        # YY=True
-        >>> edate = ['14-11-12 12:00', '01.03.15 17:56:00', '90-12-01']
-        >>> print(" ".join(ascii2ascii(edate, YY=True)))
-        12.11.2014 12:00 01.03.2015 17:56:00 01.12.1990
-        >>> print(" ".join(ascii2ascii(edate, en=True, YY=True)))
-        2014-11-12 12:00 2015-03-01 17:56:00 1990-12-01
-        >>> print(" ".join(ascii2ascii(edate, us=True, YY=True)))
-        11/12/2014 12:00 03/01/2015 17:56:00 12/01/1990
-        >>> print(" ".join(ascii2ascii(ascii2ascii(edate, en=True, YY=True), us=True, full=True)))
-        11/12/2014 12:00:00 03/01/2015 17:56:00 12/01/1990 00:00:00
-        >>> print(" ".join(ascii2ascii(edate, fr=True, full=True, YY=True)))
-        12/11/2014 12:00:00 01/03/2015 17:56:00 01/12/1990 00:00:00
-
-        
-        License
-        -------
-        This file is part of the JAMS Python package, distributed under the MIT
-        License. The JAMS Python package originates from the former UFZ Python library,
-        Department of Computational Hydrosystems, Helmholtz Centre for Environmental
-        Research - UFZ, Leipzig, Germany.
-
-        Copyright (c) 2015-2018 Matthias Cuntz - mc (at) macu (dot) de
-
-        Permission is hereby granted, free of charge, to any person obtaining a copy
-        of this software and associated documentation files (the "Software"), to deal
-        in the Software without restriction, including without limitation the rights
-        to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-        copies of the Software, and to permit persons to whom the Software is
-        furnished to do so, subject to the following conditions:
-
-        The above copyright notice and this permission notice shall be included in all
-        copies or substantial portions of the Software.
-
-        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-        IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-        FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-        AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-        LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-        OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-        SOFTWARE.
-
-
-        History
-        -------
-        Written,  MC, Feb 2015
-        Modified, MC, Sep 2015 - removed date2dec and dec2date
-                  MC, Nov 2016 - adapted docstring to Python 2 and 3
-                  MC, Mar 2018 - us, eng->en, fr
-                  MC, Nov 2018 - YY
-                  MC, Jun 2019 - eng->en working again
+    History
+    -------
+    Written,  Matthias Cuntz, Feb 2015
+    Modified, Matthias Cuntz, Sep 2015 - removed date2dec and dec2date
+              Matthias Cuntz, Nov 2016 - adapted docstring to Python 2 and 3
+              Matthias Cuntz, Mar 2018 - us, eng->en, fr
+              Matthias Cuntz, Nov 2018 - YY
+              Matthias Cuntz, Jun 2019 - eng->en working again
+              Matthias Cuntz, May 2020 - numpy docstring format
     """
     if eng: en = True
     assert (en+fr+us <= 1), 'en, fr and us keywords mutually exclusive.'
@@ -255,7 +261,6 @@ def ascii2ascii(edate, full=False, en=False, fr=False, us=False, eng=False, YY=F
     if full:
         odate = [ (d+' 00:00:00')[:19] if len(d) < 11 else (d+':00:00')[:19] for d in odate ]
 
-
     # Return right type
     if isinstance(edate, list):
         return odate
@@ -269,206 +274,169 @@ def ascii2ascii(edate, full=False, en=False, fr=False, us=False, eng=False, YY=F
 
 def ascii2en(edate, **kwarg):
     """
-        Wrapper function for ascii2ascii with English date format output, i.e. en=True.
-        def ascii2ascii(edate, full=False, en=False, us=False):
+    Wrapper function for :func:`ascii2ascii` with English date format output, i.e. `en=True`:
+        `ascii2ascii(edate, en=True, **kwarg)`
 
+    Examples
+    --------
+    >>> edate = ['2014-11-12 12:00', '01.03.2015 17:56:00', '1990-12-01', '04.05.1786']
+    >>> print(", ".join(ascii2en(edate)))
+    2014-11-12 12:00, 2015-03-01 17:56:00, 1990-12-01, 1786-05-04
 
-        Examples
-        --------
-        >>> edate = ['2014-11-12 12:00', '01.03.2015 17:56:00', '1990-12-01', '04.05.1786']
-        >>> print(" ".join(ascii2en(edate)))
-        2014-11-12 12:00 2015-03-01 17:56:00 1990-12-01 1786-05-04
+    >>> print(", ".join(ascii2en(edate, full=True)))
+    2014-11-12 12:00:00, 2015-03-01 17:56:00, 1990-12-01 00:00:00, 1786-05-04 00:00:00
 
-        >>> print(" ".join(ascii2en(edate, full=True)))
-        2014-11-12 12:00:00 2015-03-01 17:56:00 1990-12-01 00:00:00 1786-05-04 00:00:00
-
-        >>> edate = ['14-11-12 12:00', '01.03.15 17:56:00', '90-12-01']
-        >>> print(" ".join(ascii2en(edate, full=True, YY=True)))
-        2014-11-12 12:00:00 2015-03-01 17:56:00 1990-12-01 00:00:00
+    >>> edate = ['14-11-12 12:00', '01.03.15 17:56:00', '90-12-01']
+    >>> print(", ".join(ascii2en(edate, full=True, YY=True)))
+    2014-11-12 12:00:00, 2015-03-01 17:56:00, 1990-12-01 00:00:00
     """
     return ascii2ascii(edate, en=True, **kwarg)
 
 
 def ascii2fr(edate, **kwarg):
     """
-        Wrapper function for ascii2ascii with French date format output, i.e. fr=True.
-        def ascii2ascii(edate, full=False, en=False, us=False):
+    Wrapper function for :func:`ascii2ascii` with French date format output, i.e. `fr=True`:
+        `ascii2ascii(edate, fr=True, **kwarg)`
 
+    Examples
+    --------
+    >>> edate = ['2014-11-12 12:00', '01.03.2015 17:56:00', '1990-12-01', '04.05.1786']
+    >>> print(", ".join(ascii2fr(edate)))
+    12/11/2014 12:00, 01/03/2015 17:56:00, 01/12/1990, 04/05/1786
 
-        Examples
-        --------
-        >>> edate = ['2014-11-12 12:00', '01.03.2015 17:56:00', '1990-12-01', '04.05.1786']
-        >>> print(" ".join(ascii2fr(edate)))
-        12/11/2014 12:00 01/03/2015 17:56:00 01/12/1990 04/05/1786
+    >>> print(", ".join(ascii2fr(edate, full=True)))
+    12/11/2014 12:00:00, 01/03/2015 17:56:00, 01/12/1990 00:00:00, 04/05/1786 00:00:00
 
-        >>> print(" ".join(ascii2fr(edate, full=True)))
-        12/11/2014 12:00:00 01/03/2015 17:56:00 01/12/1990 00:00:00 04/05/1786 00:00:00
-
-        >>> edate = ['14-11-12 12:00', '01.03.15 17:56:00', '90-12-01']
-        >>> print(" ".join(ascii2fr(edate, full=True, YY=True)))
-        12/11/2014 12:00:00 01/03/2015 17:56:00 01/12/1990 00:00:00
+    >>> edate = ['14-11-12 12:00', '01.03.15 17:56:00', '90-12-01']
+    >>> print(", ".join(ascii2fr(edate, full=True, YY=True)))
+    12/11/2014 12:00:00, 01/03/2015 17:56:00, 01/12/1990 00:00:00
     """
     return ascii2ascii(edate, fr=True, **kwarg)
 
 
 def ascii2us(edate, **kwarg):
     """
-        Wrapper function for ascii2ascii with American date format output, i.e. us=True.
-        def ascii2ascii(edate, full=False, en=False, us=False):
+    Wrapper function for :func:`ascii2ascii` with US-English date format output, i.e. `us=True`:
+        `ascii2ascii(edate, us=True, **kwarg)`
 
+    Examples
+    --------
+    >>> edate = ['2014-11-12 12:00', '01.03.2015 17:56:00', '1990-12-01', '04.05.1786']
+    >>> print(", ".join(ascii2ascii(edate, us=True)))
+    11/12/2014 12:00, 03/01/2015 17:56:00, 12/01/1990, 05/04/1786
 
-        Examples
-        --------
-        >>> edate = ['2014-11-12 12:00', '01.03.2015 17:56:00', '1990-12-01', '04.05.1786']
-        >>> print(" ".join(ascii2ascii(edate, us=True)))
-        11/12/2014 12:00 03/01/2015 17:56:00 12/01/1990 05/04/1786
+    >>> print(", ".join(ascii2ascii(ascii2ascii(edate, en=True), us=True, full=True)))
+    11/12/2014 12:00:00, 03/01/2015 17:56:00, 12/01/1990 00:00:00, 05/04/1786 00:00:00
 
-        >>> print(" ".join(ascii2ascii(ascii2ascii(edate, en=True), us=True, full=True)))
-        11/12/2014 12:00:00 03/01/2015 17:56:00 12/01/1990 00:00:00 05/04/1786 00:00:00
-
-        >>> edate = ['14-11-12 12:00', '01.03.15 17:56:00', '90-12-01']
-        >>> print(" ".join(ascii2ascii(ascii2ascii(edate, en=True, YY=True), us=True, full=True)))
-        11/12/2014 12:00:00 03/01/2015 17:56:00 12/01/1990 00:00:00
-
+    >>> edate = ['14-11-12 12:00', '01.03.15 17:56:00', '90-12-01']
+    >>> print(", ".join(ascii2ascii(ascii2ascii(edate, en=True, YY=True), us=True, full=True)))
+    11/12/2014 12:00:00, 03/01/2015 17:56:00, 12/01/1990 00:00:00
     """
     return ascii2ascii(edate, us=True, **kwarg)
 
 
 def ascii2eng(edate, **kwarg):
     """
-        Wrapper function for ascii2ascii with English date format output, i.e. en=True.
-        def ascii2ascii(edate, full=False, en=False, us=False):
+    Wrapper function for :func:`ascii2ascii` with English date format output, i.e. `en=True`:
+        `ascii2ascii(edate, en=True, **kwarg)`
 
+    Examples
+    --------
+    >>> edate = ['2014-11-12 12:00', '01.03.2015 17:56:00', '1990-12-01', '04.05.1786']
+    >>> print(", ".join(ascii2eng(edate)))
+    2014-11-12 12:00, 2015-03-01 17:56:00, 1990-12-01, 1786-05-04
 
-        Examples
-        --------
-        >>> edate = ['2014-11-12 12:00', '01.03.2015 17:56:00', '1990-12-01', '04.05.1786']
-        >>> print(" ".join(ascii2eng(edate)))
-        2014-11-12 12:00 2015-03-01 17:56:00 1990-12-01 1786-05-04
+    >>> print(", ".join(ascii2eng(edate, full=True)))
+    2014-11-12 12:00:00, 2015-03-01 17:56:00, 1990-12-01 00:00:00, 1786-05-04 00:00:00
 
-        >>> print(" ".join(ascii2eng(edate, full=True)))
-        2014-11-12 12:00:00 2015-03-01 17:56:00 1990-12-01 00:00:00 1786-05-04 00:00:00
-
-        >>> edate = ['14-11-12 12:00', '01.03.15 17:56:00', '90-12-01']
-        >>> print(" ".join(ascii2eng(edate, full=True, YY=True)))
-        2014-11-12 12:00:00 2015-03-01 17:56:00 1990-12-01 00:00:00
+    >>> edate = ['14-11-12 12:00', '01.03.15 17:56:00', '90-12-01']
+    >>> print(", ".join(ascii2eng(edate, full=True, YY=True)))
+    2014-11-12 12:00:00, 2015-03-01 17:56:00, 1990-12-01 00:00:00
     """
     return ascii2ascii(edate, en=True, **kwarg)
 
 
 def en2ascii(edate, **kwarg):
     """
-        Wrapper function for ascii2ascii with ascii date format output.
-        def ascii2ascii(edate, full=False, en=False, us=False):
+    Wrapper function for ascii2ascii with ascii date format output (default):
+        ascii2ascii(edate, **kwarg)
 
+    Examples
+    --------
+    >>> edate = ['2014-11-12 12:00', '01.03.2015 17:56:00', '1990-12-01', '04.05.1786']
+    >>> edate = ascii2ascii(edate, en=True)
+    >>> print(", ".join(en2ascii(edate)))
+    12.11.2014 12:00, 01.03.2015 17:56:00, 01.12.1990, 04.05.1786
 
-        Examples
-        --------
-        >>> edate = ['2014-11-12 12:00', '01.03.2015 17:56:00', '1990-12-01', '04.05.1786']
-        >>> edate = ascii2ascii(edate, en=True)
-        >>> print(" ".join(en2ascii(edate)))
-        12.11.2014 12:00 01.03.2015 17:56:00 01.12.1990 04.05.1786
+    >>> print(", ".join(en2ascii(edate, full=True)))
+    12.11.2014 12:00:00, 01.03.2015 17:56:00, 01.12.1990 00:00:00, 04.05.1786 00:00:00
 
-        >>> print(" ".join(en2ascii(edate, full=True)))
-        12.11.2014 12:00:00 01.03.2015 17:56:00 01.12.1990 00:00:00 04.05.1786 00:00:00
-
-        >>> edate = ['14-11-12 12:00', '01.03.15 17:56:00', '90-12-01']
-        >>> edate = ascii2ascii(edate, en=True, YY=True)
-        >>> print(" ".join(en2ascii(edate, full=True)))
-        12.11.2014 12:00:00 01.03.2015 17:56:00 01.12.1990 00:00:00
+    >>> edate = ['14-11-12 12:00', '01.03.15 17:56:00', '90-12-01']
+    >>> edate = ascii2ascii(edate, en=True, YY=True)
+    >>> print(", ".join(en2ascii(edate, full=True)))
+    12.11.2014 12:00:00, 01.03.2015 17:56:00, 01.12.1990 00:00:00
     """
     return ascii2ascii(edate, **kwarg)
 
 
 def fr2ascii(edate, full=False, YY=False):
     """
-        Convert French date notation DD/MM/YYYY hh:mm:ss to ascii notation DD.MM.YYYY hh:mm:ss.
-        Simply replaces / with ., assuring iterable type
+    Convert French date notation DD/MM/YYYY hh:mm:ss to ascii notation DD.MM.YYYY hh:mm:ss.
+    Simply replaces '/' with '.', assuring iterable type.
 
 
-        Definition
-        ----------
-        def fr2ascii(edate, full=False):
+    Parameters
+    ----------
+    edate : array_like
+        date strings in French date format DD/MM/YYYY [hh:mm:ss]
+    full : bool, optional
+        True:  output dates arr all in full format DD.MM.YYYY hh:mm:ss; missing time inputs are 00 on output
+        False: output dates are as long as input dates (default),
+               e.g. [DD/MM/YYYY, DD/MM/YYYY hh:mm] gives [DD.MM.YYYY, DD.MM.YYYY hh:mm]
+    YY : bool, optional
+        Year in input file is 2-digit year. Every year that is above the current year will
+        be taken as being in 1900 (default: False).
 
+    Returns
+    -------
+    date : array_like
+        date strings in ascii date format: DD.MM.YYYY hh:mm:ss.
+        The output type will be the same as the type of the input.
 
-        Input
-        -----
-        list/ND-array of date strings in French format DD/MM/YYYY hh:mm:ss
+    Examples
+    --------
+    >>> edate = ['12/11/2014 12:00', '01/03/2015 17:56:00', '01/12/1990', '04/05/1786']
+    >>> print(", ".join(fr2ascii(edate)))
+    12.11.2014 12:00, 01.03.2015 17:56:00, 01.12.1990, 04.05.1786
 
+    >>> print(", ".join(fr2ascii(edate, full=True)))
+    12.11.2014 12:00:00, 01.03.2015 17:56:00, 01.12.1990 00:00:00, 04.05.1786 00:00:00
 
-        Optional Input
-        --------------
-        full    True:  output dates arr all in full format DD.MM.YYYY hh:mm:ss; missing time inputs are 00 on output
-                False: output dates are as long as input dates,
-                e.g. [DD/MM/YYYY, DD/MM/YYYY hh:mm] gives [DD.MM.YYYY, DD.MM.YYYY hh:mm]
-        YY      boolean (default: False)
-                Year in input file is 2-digit year. Every year above current year will be taken in 1900.
+    >>> print(fr2ascii(list(edate)))
+    ['12.11.2014 12:00', '01.03.2015 17:56:00', '01.12.1990', '04.05.1786']
 
+    >>> print(fr2ascii(tuple(edate)))
+    ('12.11.2014 12:00', '01.03.2015 17:56:00', '01.12.1990', '04.05.1786')
 
-        Output
-        ------
-        list/ND-array of date strings in ascii format DD.MM.YYYY hh:mm:ss
+    >>> print(fr2ascii(np.array(edate)))
+    ['12.11.2014 12:00' '01.03.2015 17:56:00' '01.12.1990' '04.05.1786']
 
+    >>> print(fr2ascii(edate[0]))
+    12.11.2014 12:00
 
-        Examples
-        --------
-        >>> edate = ['12/11/2014 12:00', '01/03/2015 17:56:00', '01/12/1990', '04/05/1786']
-        >>> print(" ".join(fr2ascii(edate)))
-        12.11.2014 12:00 01.03.2015 17:56:00 01.12.1990 04.05.1786
+    # YY=True
+    >>> edate = ['12/11/14 12:00', '01/03/15 17:56:00', '01/12/90']
+    >>> print(", ".join(fr2ascii(edate, YY=True)))
+    12.11.2014 12:00, 01.03.2015 17:56:00, 01.12.1990
 
-        >>> print(" ".join(fr2ascii(edate, full=True)))
-        12.11.2014 12:00:00 01.03.2015 17:56:00 01.12.1990 00:00:00 04.05.1786 00:00:00
+    >>> print(", ".join(fr2ascii(edate, full=True, YY=True)))
+    12.11.2014 12:00:00, 01.03.2015 17:56:00, 01.12.1990 00:00:00
 
-        >>> print(" ".join(fr2ascii(list(edate))))
-        12.11.2014 12:00 01.03.2015 17:56:00 01.12.1990 04.05.1786
-
-        >>> print(" ".join(fr2ascii(tuple(edate))))
-        12.11.2014 12:00 01.03.2015 17:56:00 01.12.1990 04.05.1786
-
-        >>> print(" ".join(fr2ascii(np.array(edate))))
-        12.11.2014 12:00 01.03.2015 17:56:00 01.12.1990 04.05.1786
-
-        >>> print(fr2ascii(edate[0]))
-        12.11.2014 12:00
-
-        # YY=True
-        >>> edate = ['12/11/14 12:00', '01/03/15 17:56:00', '01/12/90']
-        >>> print(" ".join(fr2ascii(edate, YY=True)))
-        12.11.2014 12:00 01.03.2015 17:56:00 01.12.1990
-
-        >>> print(" ".join(fr2ascii(edate, full=True, YY=True)))
-        12.11.2014 12:00:00 01.03.2015 17:56:00 01.12.1990 00:00:00
-
-
-        License
-        -------
-        This file is part of the JAMS Python package, distributed under the MIT License.
-
-        Copyright (c) 2018 Matthias Cuntz - mc (at) macu (dot) de
-
-        Permission is hereby granted, free of charge, to any person obtaining a copy
-        of this software and associated documentation files (the "Software"), to deal
-        in the Software without restriction, including without limitation the rights
-        to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-        copies of the Software, and to permit persons to whom the Software is
-        furnished to do so, subject to the following conditions:
-
-        The above copyright notice and this permission notice shall be included in all
-        copies or substantial portions of the Software.
-
-        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-        IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-        FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-        AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-        LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-        OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-        SOFTWARE.
-
-
-        History
-        -------
-        Written,  MC, Mar 2018
-        Modified, MC, Nov 2018 - YY
+    History
+    -------
+    Written,  Matthias Cuntz, Mar 2018
+    Modified, Matthias Cuntz, Nov 2018 - YY
+              Matthias Cuntz, May 2020 - numpy docstring format
     """
 
     # Input type and shape
@@ -503,48 +471,46 @@ def fr2ascii(edate, full=False, YY=False):
 
 def us2ascii(edate, **kwarg):
     """
-        Wrapper function for ascii2ascii with ascii date format output.
-        def ascii2ascii(edate, full=False, en=False, us=False):
+    Wrapper function for :func:`ascii2ascii` with ascii date format output (default):
+        `ascii2ascii(edate, **kwarg)`
 
+    Examples
+    --------
+    >>> edate = ['2014-11-12 12:00', '01.03.2015 17:56:00', '1990-12-01', '04.05.1786']
+    >>> edate = ascii2ascii(edate, us=True)
+    >>> print(", ".join(us2ascii(edate)))
+    12.11.2014 12:00, 01.03.2015 17:56:00, 01.12.1990, 04.05.1786
 
-        Examples
-        --------
-        >>> edate = ['2014-11-12 12:00', '01.03.2015 17:56:00', '1990-12-01', '04.05.1786']
-        >>> edate = ascii2ascii(edate, us=True)
-        >>> print(" ".join(us2ascii(edate)))
-        12.11.2014 12:00 01.03.2015 17:56:00 01.12.1990 04.05.1786
+    >>> print(", ".join(us2ascii(edate, full=True)))
+    12.11.2014 12:00:00, 01.03.2015 17:56:00, 01.12.1990 00:00:00, 04.05.1786 00:00:00
 
-        >>> print(" ".join(us2ascii(edate, full=True)))
-        12.11.2014 12:00:00 01.03.2015 17:56:00 01.12.1990 00:00:00 04.05.1786 00:00:00
-
-        >>> edate = ['14-11-12 12:00', '01.03.15 17:56:00', '90-12-01']
-        >>> edate = ascii2ascii(edate, us=True, YY=True)
-        >>> print(" ".join(us2ascii(edate, full=True)))
-        12.11.2014 12:00:00 01.03.2015 17:56:00 01.12.1990 00:00:00
+    >>> edate = ['14-11-12 12:00', '01.03.15 17:56:00', '90-12-01']
+    >>> edate = ascii2ascii(edate, us=True, YY=True)
+    >>> print(", ".join(us2ascii(edate, full=True)))
+    12.11.2014 12:00:00, 01.03.2015 17:56:00, 01.12.1990 00:00:00
     """
     return ascii2ascii(edate, **kwarg)
 
 
 def eng2ascii(edate, **kwarg):
     """
-        Wrapper function for ascii2ascii with ascii date format output.
-        def ascii2ascii(edate, full=False, en=False, us=False):
+    Wrapper function for :func:`ascii2ascii` with ascii date format output (default):
+        `ascii2ascii(edate, **kwarg)`
 
+    Examples
+    --------
+    >>> edate = ['2014-11-12 12:00', '01.03.2015 17:56:00', '1990-12-01', '04.05.1786']
+    >>> edate = ascii2ascii(edate, en=True)
+    >>> print(", ".join(eng2ascii(edate)))
+    12.11.2014 12:00, 01.03.2015 17:56:00, 01.12.1990, 04.05.1786
 
-        Examples
-        --------
-        >>> edate = ['2014-11-12 12:00', '01.03.2015 17:56:00', '1990-12-01', '04.05.1786']
-        >>> edate = ascii2ascii(edate, en=True)
-        >>> print(" ".join(eng2ascii(edate)))
-        12.11.2014 12:00 01.03.2015 17:56:00 01.12.1990 04.05.1786
+    >>> print(", ".join(eng2ascii(edate, full=True)))
+    12.11.2014 12:00:00, 01.03.2015 17:56:00, 01.12.1990 00:00:00, 04.05.1786 00:00:00
 
-        >>> print(" ".join(eng2ascii(edate, full=True)))
-        12.11.2014 12:00:00 01.03.2015 17:56:00 01.12.1990 00:00:00 04.05.1786 00:00:00
-
-        >>> edate = ['14-11-12 12:00', '01.03.15 17:56:00', '90-12-01']
-        >>> edate = ascii2ascii(edate, en=True, YY=True)
-        >>> print(" ".join(eng2ascii(edate, full=True)))
-        12.11.2014 12:00:00 01.03.2015 17:56:00 01.12.1990 00:00:00
+    >>> edate = ['14-11-12 12:00', '01.03.15 17:56:00', '90-12-01']
+    >>> edate = ascii2ascii(edate, en=True, YY=True)
+    >>> print(", ".join(eng2ascii(edate, full=True)))
+    12.11.2014 12:00:00, 01.03.2015 17:56:00, 01.12.1990 00:00:00
     """
     return ascii2ascii(edate, **kwarg)
 
@@ -552,40 +518,3 @@ def eng2ascii(edate, **kwarg):
 if __name__ == '__main__':
     import doctest
     doctest.testmod(optionflags=doctest.NORMALIZE_WHITESPACE)
-
-    # edate = ['2014-11-12 12:00', '01.03.2015 17:56:00', '1990-12-01', '04.05.1786']
-    # print(" ".join(ascii2ascii(edate)))
-    # # 12.11.2014 12:00 01.03.2015 17:56:00 01.12.1990 04.05.1786
-
-    # print(" ".join(ascii2ascii(edate, full=True)))
-    # # 12.11.2014 12:00:00 01.03.2015 17:56:00 01.12.1990 00:00:00 04.05.1786 00:00:00
-
-    # print(" ".join(ascii2ascii(edate, en=True)))
-    # # 2014-11-12 12:00 2015-03-01 17:56:00 1990-12-01 1786-05-04
-
-    # print(" ".join(ascii2ascii(edate, en=True, full=True)))
-    # # 2014-11-12 12:00:00 2015-03-01 17:56:00 1990-12-01 00:00:00 1786-05-04 00:00:00
-
-    # print(" ".join(ascii2ascii(list(edate))))
-    # # 12.11.2014 12:00 01.03.2015 17:56:00 01.12.1990 04.05.1786
-
-    # print(" ".join(ascii2ascii(tuple(edate))))
-    # # 12.11.2014 12:00 01.03.2015 17:56:00 01.12.1990 04.05.1786
-
-    # print(" ".join(ascii2ascii(np.array(edate))))
-    # # 12.11.2014 12:00 01.03.2015 17:56:00 01.12.1990 04.05.1786
-
-    # print(ascii2ascii(edate[0]))
-    # # 12.11.2014 12:00
-
-    # print(" ".join(ascii2ascii(edate, us=True)))
-    # # 11/12/2014 12:00 03/01/2015 17:56:00 12/01/1990 05/04/1786
-
-    # print(" ".join(ascii2ascii(ascii2ascii(edate, en=True), us=True, full=True)))
-    # # 11/12/2014 12:00:00 03/01/2015 17:56:00 12/01/1990 00:00:00 05/04/1786 00:00:00
-
-    # print(" ".join(ascii2ascii(edate, fr=True)))
-    # # 12/11/2014 12:00 01/03/2015 17:56:00 01/12/1990 04/05/1786
-
-    # print(" ".join(ascii2ascii(edate, fr=True, full=True)))
-    # # 12/11/2014 12:00:00 01/03/2015 17:56:00 01/12/1990 00:00:00 04/05/1786 00:00:00

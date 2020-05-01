@@ -1,10 +1,39 @@
 #!/usr/bin/env python
 from __future__ import division, absolute_import, print_function
+"""
+fsread : Read from a file numbers into 2D float array as well as characters into 2D string array.
+
+This module was written by Matthias Cuntz while at Department of
+Computational Hydrosystems, Helmholtz Centre for Environmental
+Research - UFZ, Leipzig, Germany, and continued while at Institut
+National de Recherche pour l'Agriculture, l'Alimentation et
+l'Environnement (INRAE), Nancy, France.
+
+Copyright (c) 2015-2020 Matthias Cuntz - mc (at) macu (dot) de
+Released under the MIT License; see LICENSE file for details.
+
+* Written Feb 2015 by Matthias Cuntz (mc (at) macu (dot) de)
+* nc<=-1 rmoved in case of nc is list, Nov 2016, Matthias Cuntz
+* range instead of np.arange, Nov 2017, Matthias Cuntz
+* Keywords cname, sname, hstrip, rename file to infile, Nov 2017, Matthias Cuntz
+* full_header=True returns vector of strings, Nov 2017, Matthias Cuntz
+* Ignore unicode characters on read, Jun 2019, Matthias Cuntz
+* Keywords encoding, errors with codecs module, Aug 2019, Matthias Cuntz
+* return_list=False default, Jan 2020, Matthias Cuntz
+* Using numpy docstring format, May 2020, Matthias Cuntz
+
+.. moduleauthor:: Matthias Cuntz
+
+The following functions are provided
+
+.. autosummary::
+   fread
+"""
 import numpy as np
-from jams.fread import fread
-from jams.sread import sread
+
 
 __all__ = ['fsread']
+
 
 def fsread(infile, nc=0, cname=None, snc=0, sname=None, skip=0, cskip=0, hskip=0, hstrip=True, separator=None,
            squeeze=False, reform=False, skip_blank=False, comment=None,
@@ -12,257 +41,240 @@ def fsread(infile, nc=0, cname=None, snc=0, sname=None, skip=0, cskip=0, hskip=0
            header=False, full_header=False,
            transpose=False, strarr=False):
     """
-        Read from a file numbers into 2D float array as well as characters into 2D string array.
+    Read from a file numbers into 2D float array
+    as well as characters into 2D string array.
 
+    Parameters
+    ----------
+    infile : str
+        source file name
+    nc : int or iterable, optional
+        number of columns to be read as floats [default: all (`nc<=0`)].
 
-        Definition
-        ----------
-        def fsread(infile, nc=0, cname=None, snc=0, sname=None, skip=0, cskip=0, hskip=0, hstrip=True, separator=None,
-                   squeeze=False, reform=False, skip_blank=False, comment=None,
-                   fill=False, fill_value=0, sfill_value='', strip=None, encoding='ascii', errors='ignore',
-                   header=False, full_header=False,
-                   transpose=False, strarr=False):
+        `nc` can be an int or a vector of column indexes, starting with 0;
+        `cskip` will be ignored in the latter case.
 
+        If `snc!=0`: `nc` must be iterable or -1 to read all other columns as floats.
+    cname : iterable of str, optional
+        float columns can be chosen by the values in the first header line;
+        must be iterable with strings.
+    snc : int or iterable, optional
+        number of columns to be read as strings [default: none (`snc=0`)].
 
-        Input
-        -----
-        infile         source file name
+        `snc` can be an int or a vector of column indexes, starting with 0;
+        `cskip` will be ignored in the latter case.
 
+        If `nc!=0`: `snc` must be iterable or -1 to read all other columns as strings.
+    sname : iterable of str, optional
+        string columns can be chosen by the values in the first header line;
+        must be iterable with strings.
+    skip : int, optional
+        number of lines to skip at the beginning of file (default: 0)
+    cskip : int, optional
+        number of columns to skip at the beginning of each line (default: 0)
+    hskip : int, optional
+        number of lines in skip that do not belong to header (default: 0)
+    hstrip : bool, optional
+        True: strip header cells to match with cname (default: True)
+    separator : str, optional
+        column separator. If not given, columns separator are (in order):
+        comma (','), semicolon (';'), whitespace.
+    comment : iterable, optional
+         line gets excluded if first character of line is in comment sequence.
+         Sequence must be iterable such as string, list and tuple.
+    fill_value : float, optional
+         value to fill in float array in empty cells or if not enough columns in line
+         and `fill==True` (default: 0).
+    sfill_value : str, optional
+         value to fill in string array in empty cells or if not enough columns in line
+         and `fill==True` (default: '').
+    strip : str, optional
+        Strip strings with str.strip(strip).
 
-        Optional Input Parameters
-        -------------------------
-        nc           number of columns to be read into float array (default: all (nc<=0))
-                     nc can be a vector of column indeces,
-                     starting with 0; cskip will be ignored then.
-                     if snc!=0: nc must be iterable or -1 for all other columns.
-        cname        float columns can alternatively be chosen by the values in the first header line;
-                     must be iterable with strings.
-        snc          number of columns to be read into string array (default: none (snc=0))
-                     snc can be a vector of column indeces,
-                     starting with 0; cskip will be ignored then.
-                     if nc!=0: snc must be iterable or -1 for all other columns.
-        sname        string columns can alternatively be chosen by the values in the first header line;
-                     must be iterable with strings.
-        skip         number of lines to skip at the beginning of file (default: 0)
-        cskip        number of columns to skip at the beginning of each line (default: 0)
-        hskip        number of lines in skip that do not belong to header (default: 0)
-        hstrip       If true strip header cells to match with cname and sname (default: True)
-        separator    column separator
-                     If not given, columns separator are (in order):
-                     comma, semi-colon, whitespace
-        comment      line gets excluded if first character of line is in comment sequence
-                     sequence can be e.g. string, list or tuple
-        fill_value   value to fill float arry in empty cells or if not enough columns per line
-                     and fill=True (default 0)
-        sfill_value  value to fill in header and in string array in empty cells
-                     or if not enough columns per line and fill=True (default '')
-        strip        Strip strings with str.strip(strip).
-                     If None then strip quotes " and ' (default).
-                     If False then no strip (30% faster).
-                     Otherwise strip character given by strip.
-        encoding     Specifies the encoding which is to be used for the file.
-                     Any encoding that encodes to and decodes from bytes is allowed.
-                     (default: ascii)
-        errors       Errors may be given to define the error handling during encoding of the file.
-                     Possible values: strict, replace, ignore (default: ignore).
+        None: strip quotes " and ' (default).
 
+        False: no strip (~30% faster).
 
-        Options
-        -------
-        squeeze      True:  2-dim array will be cleaned of degenerated
-                            dimension, i.e. results in vector
-                     False: array will be two-dimensional as read (default)
-        reform       Same as squeeze.
-        skip_blank   True:  continues reading after blank line
-                     False: stops reading at first blank line (default)
-        fill         True:  fills in fill_value if not enough columns in line
-                     False: stops execution and returns None if not enough
-                            columns in line (default)
-        header       True:  header strings will be returned
-                     False  numbers in file will be returned (default)
-        full_header  True:  header is a string vector of the skipped rows
-                     False: header will be split in columns,
-                            exactly as the data, and will hold only the
-                            selected columns (default)
-        transpose    True:  column-major format output(0:ncolumns,0:nlines)
-                     False: row-major format output(0:nlines,0:ncolumns) (default)
-        strarr       True:  return header as numpy array of strings
-                            if nc==0 and snc!=0: return strarr
-                     False: return header as list
-                            if nc==0 and snc!=0: return list
+        str: strip character given by `strip`.
+    encoding : str, optional
+        Specifies the encoding which is to be used for the file (default: 'ascii').
+        Any encoding that encodes to and decodes from bytes is allowed.
+    errors : str, optional
+        Errors may be given to define the error handling during encoding of the file (default: 'ignore').
 
+        Possible values: 'strict', 'replace', 'ignore'.
+    squeeze : bool, optional
+        True:  2-dim array will be cleaned of degenerated dimension, i.e. results in a vector.
+        False: array will be two-dimensional as read (default).
+    reform : bool, optional
+        Same as squeeze.
+    skip_blank : bool, optional
+        True:  continues reading after blank line.
+        False: stops reading at first blank line (default).
+    fill : bool, optional
+        True:  fills in `fill_value` if not enough columns in line.
+        False: stops execution and returns None if not enough columns in line (default).
+    header : bool, optional
+        True:  header strings will be returned.
+        False: numbers in file will be returned (default).
+    full_header : bool, optional
+        True:  header is a string vector of the skipped rows.
+        False: header will be split in columns, exactly as the data,
+               and will hold only the selected columns (default).
+    transpose : bool, optional
+        True:  column-major format `output(0:ncolumns,0:nlines)`.
+        False: row-major format `output(0:nlines,0:ncolumns)` (default).
+    strarr : bool, optional
+        True:  return header as numpy array of strings.
+        False: return header as list.
 
-        Output
-        ------
-        Depending on options:
-            1 output:  2D-array of floats (snc=0)
-            1 output:  list/2D-array of strings (nc=0 and snc!=0)
-            2 outputs: 2D-array of floats, 2D-array of strings (nc!=0 and snc!=0)
-            1 output:  list/string array of header ((nc=0 or snc=0) and header=True)
-            2 outputs: list/string array of header for float array, list/string array of header for strarr ((nc!=0 and snc!=0) and header=True)
-            1 output:  String vector of full file header (header=True and full_header=True)
+    Returns
+    -------
+    array(s)
+        1 output:  array of floats (`nc!=0` and `snc=0`)
+        1 output:  array of strings (`nc=0` and `snc!=0`)
+        2 outputs: array of floats, array of strings (`nc!=0` and `snc!=0`)
+        1 output:  list/string array of header ((`nc=0` or `snc=0`) and `header=True`)
+        2 outputs: list/string array of header for float array, list/string array of header for strarr ((`nc!=0` and `snc!=0`) and `header=True`)
+        1 output:  String vector of full file header (`header=True` and `full_header=True`)
 
+    Notes
+    -----
+    If `header==True` then skip is counterintuitive because it is
+    actually the number of header rows to be read. This is to
+    be able to have the exact same call of the function, once
+    with `header=False` and once with `header=True`.
+    
+    If `fill==True`, blank lines are not filled but are taken as end of file.
 
-        Restrictions
-        ------------
-        If header=True then skip is counterintuitive because it is
-          actally the number of header rows to be read. This is to
-          be able to have the exact same call of the function, once
-          with header=False and once with header=True.
-        If fill=True, blank lines are not filled but are taken as end of file.
+    `transpose=True` has no effect on 1D output such as 1 header line.
 
+    Passes file to :func:`fread` if `snc==0`.
 
-        Examples
-        --------
-        >>> # Create some data
-        >>> filename = 'test.dat'
-        >>> ff = open(filename,'w')
-        >>> ff.writelines('head1 head2 head3 head4\\n')
-        >>> ff.writelines('1.1 1.2 1.3 1.4\\n')
-        >>> ff.writelines('2.1 2.2 2.3 2.4\\n')
-        >>> ff.close()
+    Passes file to :func:`sread` if `nc==0`.
 
-        >>> # Read sample with fread - see fread for more examples
-        >>> from autostring import astr
-        >>> print(astr(fsread(filename, nc=[1,3], skip=1), 1, pp=True))
-        [['1.2' '1.4']
-         ['2.2' '2.4']]
-        >>> print(fsread(filename, nc=2, skip=1, header=True))
-        ['head1', 'head2']
+    Examples
+    --------
+    >>> # Create some data
+    >>> filename = 'test.dat'
+    >>> ff = open(filename,'w')
+    >>> ff.writelines('head1 head2 head3 head4\\n')
+    >>> ff.writelines('1.1 1.2 1.3 1.4\\n')
+    >>> ff.writelines('2.1 2.2 2.3 2.4\\n')
+    >>> ff.close()
 
-        >>> # Read sample with sread - see sread for more examples
-        >>> print(fsread(filename, snc=[1,3], skip=1))
-        [['1.2', '1.4'], ['2.2', '2.4']]
+    >>> # Read sample with fread - see fread for more examples
+    >>> print(fsread(filename, nc=[1,3], skip=1))
+    [[1.2 1.4]
+     [2.2 2.4]]
+    >>> print(fsread(filename, nc=2, skip=1, header=True))
+    ['head1', 'head2']
 
-        >>> # Some mixed data
-        >>> ff = open(filename,'w')
-        >>> ff.writelines('head1 head2 head3 head4\\n')
-        >>> ff.writelines('01.12.2012 1.2 name1 1.4\\n')
-        >>> ff.writelines('01.01.2013 2.2 name2 2.4\\n')
-        >>> ff.close()
+    >>> # Read sample with sread - see sread for more examples
+    >>> print(fsread(filename, snc=[1,3], skip=1))
+    [['1.2', '1.4'], ['2.2', '2.4']]
 
-        >>> # Read columns
-        >>> print(astr(fsread(filename, nc=[1,3], skip=1), 1, pp=True))
-        [['1.2' '1.4']
-         ['2.2' '2.4']]
-        >>> a, sa = fsread(filename, nc=[1,3], snc=[0,2], skip=1)
-        >>> print(astr(a, 1, pp=True))
-        [['1.2' '1.4']
-         ['2.2' '2.4']]
-        >>> print(sa[0][0])
-        01.12.2012
-        >>> print(sa[0][1])
-        name1
-        >>> print(sa[1][0])
-        01.01.2013
-        >>> print(sa[1][1])
-        name2
-        >>> a, sa = fsread(filename, nc=[1,3], snc=-1, skip=1)
-        >>> print(astr(a, 1, pp=True))
-        [['1.2' '1.4']
-         ['2.2' '2.4']]
-        >>> print(sa[0][0])
-        01.12.2012
-        >>> print(sa[0][1])
-        name1
-        >>> print(sa[1][0])
-        01.01.2013
-        >>> print(sa[1][1])
-        name2
-        >>> a, sa = fsread(filename, nc=-1, snc=[0,2], skip=1)
-        >>> print(astr(a, 1, pp=True))
-        [['1.2' '1.4']
-         ['2.2' '2.4']]
+    >>> # Some mixed data
+    >>> ff = open(filename,'w')
+    >>> ff.writelines('head1 head2 head3 head4\\n')
+    >>> ff.writelines('01.12.2012 1.2 name1 1.4\\n')
+    >>> ff.writelines('01.01.2013 2.2 name2 2.4\\n')
+    >>> ff.close()
 
-        >>> # Read header
-        >>> a, sa = fsread(filename, nc=[1,3], snc=[0,2], skip=1, header=True)
-        >>> print(a)
-        ['head2', 'head4']
-        >>> print(sa)
-        ['head1', 'head3']
+    >>> # Read columns
+    >>> print(fsread(filename, nc=[1,3], skip=1))
+    [[1.2 1.4]
+     [2.2 2.4]]
+    >>> a, sa = fsread(filename, nc=[1,3], snc=[0,2], skip=1)
+    >>> print(a)
+    [[1.2 1.4]
+     [2.2 2.4]]
+    >>> print(sa[0][0])
+    01.12.2012
+    >>> print(sa[0][1])
+    name1
+    >>> print(sa[1][0])
+    01.01.2013
+    >>> print(sa[1][1])
+    name2
+    >>> a, sa = fsread(filename, nc=[1,3], snc=-1, skip=1)
+    >>> print(a)
+    [[1.2 1.4]
+     [2.2 2.4]]
+    >>> print(sa[0][0])
+    01.12.2012
+    >>> print(sa[0][1])
+    name1
+    >>> print(sa[1][0])
+    01.01.2013
+    >>> print(sa[1][1])
+    name2
+    >>> a, sa = fsread(filename, nc=-1, snc=[0,2], skip=1)
+    >>> print(a)
+    [[1.2 1.4]
+     [2.2 2.4]]
 
-        >>> # Some mixed data with missing values
-        >>> ff = open(filename,'w')
-        >>> ff.writelines('head1,head2,head3,head4\\n')
-        >>> ff.writelines('01.12.2012,1.2,name1,1.4\\n')
-        >>> ff.writelines('01.01.2013,,name2,2.4\\n')
-        >>> ff.close()
+    >>> # Read header
+    >>> a, sa = fsread(filename, nc=[1,3], snc=[0,2], skip=1, header=True)
+    >>> print(a)
+    ['head2', 'head4']
+    >>> print(sa)
+    ['head1', 'head3']
 
-        >>> print(astr(fsread(filename, nc=[1,3], skip=1, fill=True, fill_value=-1), 1, pp=True))
-        [[' 1.2' ' 1.4']
-         ['-1.0' ' 2.4']]
+    >>> # Some mixed data with missing values
+    >>> ff = open(filename,'w')
+    >>> ff.writelines('head1,head2,head3,head4\\n')
+    >>> ff.writelines('01.12.2012,1.2,name1,1.4\\n')
+    >>> ff.writelines('01.01.2013,,name2,2.4\\n')
+    >>> ff.close()
 
-        >>> # cname, sname
-        >>> a, sa = fsread(filename, cname='head2', snc=[0,2], skip=1, fill=True, fill_value=-1, squeeze=True)
-        >>> print(astr(a, 1, pp=True))
-        [' 1.2' '-1.0']
-        >>> print(sa)
-        [['01.12.2012', 'name1'],
-         ['01.01.2013', 'name2']]
-        >>> a, sa = fsread(filename, cname=['head2','head4'], snc=-1, skip=1, fill=True, fill_value=-1)
-        >>> print(astr(a, 1, pp=True))
-        [[' 1.2' ' 1.4']
-         ['-1.0' ' 2.4']]
-        >>> print(sa)
-        [['01.12.2012', 'name1'],
-         ['01.01.2013', 'name2']]
-        >>> a, sa = fsread(filename, nc=[1,3], sname=['head1','head3'], skip=1, fill=True, fill_value=-1, strarr=True, header=True)
-        >>> print(a)
-        ['head2' 'head4']
-        >>> print(sa)
-        ['head1' 'head3']
-        >>> print(fsread(filename, cname=['head2','head4'], snc=-1, skip=1, header=True, full_header=True))
-        ['head1,head2,head3,head4']
-        >>> print(fsread(filename, cname=['head2','head4'], snc=-1, skip=1, fill=True, fill_value=-1, header=True, full_header=True))
-        ['head1,head2,head3,head4']
-        >>> a, sa = fsread(filename, cname=['  head2','head4'], snc=-1, skip=1, fill=True, fill_value=-1, hstrip=False)
-        >>> print(astr(a, 1, pp=True))
-        [['1.4']
-         ['2.4']]
+    >>> print(fsread(filename, nc=[1,3], skip=1, fill=True, fill_value=-1))
+    [[ 1.2  1.4]
+     [-1.   2.4]]
 
-        >>> # Clean up doctest
-        >>> import os
-        >>> os.remove(filename)
+    >>> # cname, sname
+    >>> a, sa = fsread(filename, cname='head2', snc=[0,2], skip=1, fill=True, fill_value=-1, squeeze=True)
+    >>> print(a)
+    [ 1.2 -1. ]
+    >>> print(sa)
+    [['01.12.2012', 'name1'],
+     ['01.01.2013', 'name2']]
+    >>> a, sa = fsread(filename, cname=['head2','head4'], snc=-1, skip=1, fill=True, fill_value=-1)
+    >>> print(a)
+    [[ 1.2  1.4]
+     [-1.   2.4]]
+    >>> print(sa)
+    [['01.12.2012', 'name1'],
+     ['01.01.2013', 'name2']]
+    >>> a, sa = fsread(filename, nc=[1,3], sname=['head1','head3'], skip=1, fill=True, fill_value=-1, strarr=True, header=True)
+    >>> print(a)
+    ['head2' 'head4']
+    >>> print(sa)
+    ['head1' 'head3']
+    >>> print(fsread(filename, cname=['head2','head4'], snc=-1, skip=1, header=True, full_header=True))
+    ['head1,head2,head3,head4']
+    >>> print(fsread(filename, cname=['head2','head4'], snc=-1, skip=1, fill=True, fill_value=-1, header=True, full_header=True))
+    ['head1,head2,head3,head4']
+    >>> a, sa = fsread(filename, cname=['  head2','head4'], snc=-1, skip=1, fill=True, fill_value=-1, hstrip=False)
+    >>> print(a)
+    [[1.4]
+     [2.4]]
 
+    >>> # Clean up doctest
+    >>> import os
+    >>> os.remove(filename)
 
-        License
-        -------
-        This file is part of the JAMS Python package, distributed under the MIT
-        License. The JAMS Python package originates from the former UFZ Python library,
-        Department of Computational Hydrosystems, Helmholtz Centre for Environmental
-        Research - UFZ, Leipzig, Germany.
-
-        Copyright (c) 2015-2017 Matthias Cuntz - mc (at) macu (dot) de
-
-        Permission is hereby granted, free of charge, to any person obtaining a copy
-        of this software and associated documentation files (the "Software"), to deal
-        in the Software without restriction, including without limitation the rights
-        to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-        copies of the Software, and to permit persons to whom the Software is
-        furnished to do so, subject to the following conditions:
-
-        The above copyright notice and this permission notice shall be included in all
-        copies or substantial portions of the Software.
-
-        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-        IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-        FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-        AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-        LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-        OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-        SOFTWARE.
-
-
-        History
-        -------
-        Written,  MC, Feb 2015 - modified fread
-        Modified, MC, Nov 2016 - nc<=-1 does not work in Python 3 if nc is list
-                  MC, Nov 2017 - use range instead of np.arange for producing indexes
-                  MC, Nov 2017 - full_header=True returns on vector of strings
-                               - cname, sname, file->infile, hstrip
-                  MC, Jun 2019 - open(errors='ignore') to ignore unicode characters, for example, on read
-                                 -> returns header in unicode in Python2
-                  MC, Aug 2019 - use codecs module and allow user encoding and error handling
+    History
+    -------
+    Written,  Matthias Cuntz, Feb 2015 - modified fread
+    Modified, Matthias Cuntz, Nov 2016 - nc<=-1 does not work in Python 3 if nc is list
+              Matthias Cuntz, Nov 2017 - use range instead of np.arange for producing indexes
+              Matthias Cuntz, Nov 2017 - full_header=True returns vector of strings
+                                       - cname, sname, file->infile, hstrip
+              Matthias Cuntz, Jun 2019 - open(errors='ignore') to ignore unicode characters, for example, on read
+                                         -> returns header in unicode in Python2
+              Matthias Cuntz, Aug 2019 - use codecs module and allow user encoding and error handling
+              Matthias Cuntz, May 2020 - numpy docstring format
     """
 
     # Input error
@@ -272,6 +284,10 @@ def fsread(infile, nc=0, cname=None, snc=0, sname=None, skip=0, cskip=0, hskip=0
     # wrap to fread/sread
     if (not isinstance(snc, (list, tuple, np.ndarray))) and (sname is None):
         if snc==0:
+            try:
+                from jams import fread
+            except:
+                from fread import fread
             return fread(infile, nc=nc, cname=cname, skip=skip, cskip=cskip, hskip=hskip, hstrip=hstrip,
                          separator=separator,
                          squeeze=squeeze, reform=reform, skip_blank=skip_blank, comment=comment,
@@ -281,6 +297,10 @@ def fsread(infile, nc=0, cname=None, snc=0, sname=None, skip=0, cskip=0, hskip=0
     # snc!=0
     if (not isinstance(nc, (list, tuple, np.ndarray))) and (cname is None):
         if nc==0:
+            try:
+                from jams import sread
+            except:
+                from sread import sread
             return sread(infile, nc=snc, cname=sname, skip=skip, cskip=cskip, hskip=hskip, hstrip=hstrip,
                          separator=separator,
                          squeeze=squeeze, reform=reform, skip_blank=skip_blank, comment=comment,
@@ -546,43 +566,3 @@ def line2var(res, var, iinc, strip):
 if __name__ == '__main__':
     import doctest
     doctest.testmod(optionflags=doctest.NORMALIZE_WHITESPACE)
-
-    # from autostring import astr
-    # filename = 'test.dat'
-    # ff = open(filename,'w')
-    # ff.writelines('head1 head2 head3 head4\n')
-    # ff.writelines('1.1 1.2 1.3 1.4\n')
-    # ff.writelines('2.1 2.2 2.3 2.4\n')
-    # ff.writelines('\n')
-    # ff.writelines('3.1 3.2 3.3 3.4\n')
-    # ff.writelines('# First comment\n')
-    # ff.writelines('! Second 2 comment\n')
-    # ff.writelines('4.1 4.2 4.3 4.4\n')
-    # ff.close()
-    # # print(astr(fread(filename, skip=1), 1, pp=True))
-    # # print(astr(fread(filename, skip=1, nc=[2], skip_blank=True, comment='#'), 1, pp=True))
-    # print('#1: ', astr(fread(filename, skip=1, skip_blank=True, comment='#!'), 1, pp=True))
-    # a, sa = fsread(filename, nc=[1], snc=[0,2], skip=1, comment='#!', skip_blank=True, squeeze=True)
-    # print('#2: ', astr(a, 1, pp=True))
-    # print(sa)
-    # a, sa = fsread(filename, cname='head2', snc=[0,2], skip=1, comment='#!', skip_blank=True, squeeze=True)
-    # print('#3: ', astr(a, 1, pp=True))
-    # print(sa)
-    # a, sa = fsread(filename, cname=['head2','head4'], snc=[0,2], skip=1, comment='#!', skip_blank=True, squeeze=True)
-    # print('#4: ', astr(a, 1, pp=True))
-    # print(sa)
-
-    # # Some mixed data with missing values
-    # ff = open(filename,'w')
-    # ff.writelines('head1,head2,head3,head4\n')
-    # ff.writelines('01.12.2012,1.2,name1,1.4\n')
-    # ff.writelines('01.01.2013,,name2,2.4\n')
-    # ff.close()
-
-    # print('#5: ', astr(fsread(filename, nc=[1,3], skip=1, fill=True, fill_value=-1), 1, pp=True))
-
-    # # cname, sname
-    # a, sa = fsread(filename, cname='head2', snc=[0,2], skip=1, fill=True, fill_value=-1, squeeze=True)
-    # a, sa = fsread(filename, cname=['head2','head4'], snc=-1, skip=1, fill=True, fill_value=-1, strarr=True)
-    # a, sa = fsread(filename, nc=[1,3], sname=['head1','head3'], skip=1, fill=True, fill_value=-1, strarr=True, header=True)
-    # a = fsread(filename, cname=['head2','head4'], snc=-1, skip=1, fill=True, fill_value=-1, strarr=True, header=True, full_header=True)

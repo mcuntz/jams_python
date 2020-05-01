@@ -1,110 +1,92 @@
 #!/usr/bin/env python
 from __future__ import division, absolute_import, print_function
 """
-    Test functions for parameter sensitivity analysis from
-        Ishigami and Homma (1990) An importance qualification technique in uncertainty analysis for computer models,
-                                  Proceedings of the isuma '90, First International Symposium on Uncertainty
-                                  Modelling and Analysis, University of Maryland, Dec. 03 - Dec 05 1990, 398-403
-        Oakley and O'Hagan (2004) Probabilistic sensitivity analysis of complex models: a Bayesian approach
-                                  J. R. Statist. Soc. B 66, Part 3, 751-769.
-        Morris (1991)             Factorial sampling plans for preliminary computational experiments,
-                                  Technometrics 33, 161-174.
-        Saltelli et al. (2008)    Global Sensitivity Analysis. The Primer, John Wiley & Sons, pp. 292
-        Saltelli et al. (2010)    Variance based sensitivity analysis of model output, Design and estimator
-                                  for the total sensitivity index, Comp. Phys. Comm. 181, 259-270.
-        Sobol' (1990),            Sensitivity estimates for nonlinear mathematical models,
-                                  Matematicheskoe Modelirovanie 2, 112-118 (in Russian),
-                                  translated in English in Sobol' (1993).
-        Sobol' (1993)             Sensitivity analysis for non-linear mathematical models,
-                                  Mathematical Modelling and Computational Experiment 1, 407-414,
-                                  English translation of Russian original paper Sobol' (1990).
+Module provides test functions for parameter sensitivity analysis from
+    Ishigami and Homma (1990) An importance qualification technique in uncertainty analysis for computer models,
+                              Proceedings of the isuma '90, First International Symposium on Uncertainty
+                              Modelling and Analysis, University of Maryland, Dec. 03 - Dec 05 1990, 398-403
+    Oakley and O'Hagan (2004) Probabilistic sensitivity analysis of complex models: a Bayesian approach
+                              J. R. Statist. Soc. B 66, Part 3, 751-769.
+    Morris (1991)             Factorial sampling plans for preliminary computational experiments,
+                              Technometrics 33, 161-174.
+    Saltelli et al. (2008)    Global Sensitivity Analysis. The Primer, John Wiley & Sons, pp. 292
+    Saltelli et al. (2010)    Variance based sensitivity analysis of model output, Design and estimator
+                              for the total sensitivity index, Comp. Phys. Comm. 181, 259-270.
+    Sobol' (1990),            Sensitivity estimates for nonlinear mathematical models,
+                              Matematicheskoe Modelirovanie 2, 112-118 (in Russian),
+                              translated in English in Sobol' (1993).
+    Sobol' (1993)             Sensitivity analysis for non-linear mathematical models,
+                              Mathematical Modelling and Computational Experiment 1, 407-414,
+                              English translation of Russian original paper Sobol' (1990).
 
-
-    Current functions are:
+Current functions are:
     B                     B of Saltelli et al. (2010)
     G / g                 G-function attributed to Sobol' (1990, 1993), given by Saltelli et al. (2008, 2010)
     Gstar                 G* of Saltelli et al. (2010)
     ishigami_homma        Ishigami and Homma (1990), given by Saltelli et al. (2008, page 179)
-    K                     K  of Saltelli et al. (2010)
-    morris                After Morris (1991)
+    K / bratley           K  of Saltelli et al. (2010)
+    fmorris / morris      After Morris (1991)
     oakley_ohagan         Oakley and O'Hagan (2004), parameters given in Saltelli et al. (2008)
                           or on http://www.jeremy-oakley.staff.shef.ac.uk/psa_example.txt
 
+This module was written by Matthias Cuntz & Juliane Mai while at
+Department of Computational Hydrosystems, Helmholtz Centre for
+Environmental Research - UFZ, Leipzig, Germany, and continued by
+Matthias Cuntz while at Institut National de Recherche pour l'Agriculture,
+l'Alimentation et l'Environnement (INRAE), Nancy, France.
 
-    Input / Output
-    --------------
-    See the help of the individual functions for explanations of in/out, etc.
+Copyright (c) 2015-2020 Matthias Cuntz - mc (at) macu (dot) de
+Released under the MIT License; see LICENSE file for details.
 
+* Written Mar 2015 by Matthias Cuntz (mc (at) macu (dot) de) & Juliane Mai
+* Added functions to properly test PAWN method: linear, product, ratio, and ishigami_homma_easy, Dec 2017, Juliane Mai
+* Provide morris function under the name fmorris and the K function under the name bratley, Nov 2019, Matthias Cuntz
+* Changed to Sphinx docstring and numpydoc, Dec 2019, Matthias Cuntz
+* Distinguish iterable and array_like parameter types, Jan 2020, Matthias Cuntz
 
-    Examples
-    --------
-    >>> from jams.autostring import astr
+.. moduleauthor:: Matthias Cuntz
 
-    !!! ToDo !!!
-    print(astr(griewank([0,0]),3,pp=True))
-    0.000
-    print(astr(goldstein_price([0,-1]),3,pp=True))
-    3.000
+The following functions are provided:
 
-
-    License
-    -------
-    This file is part of the JAMS Python package, distributed under the MIT
-    License. The JAMS Python package originates from the former UFZ Python library,
-    Department of Computational Hydrosystems, Helmholtz Centre for Environmental
-    Research - UFZ, Leipzig, Germany.
-
-    Copyright (c) 2015 Matthias Cuntz - mc (at) macu (dot) de
-
-    Permission is hereby granted, free of charge, to any person obtaining a copy
-    of this software and associated documentation files (the "Software"), to deal
-    in the Software without restriction, including without limitation the rights
-    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-    copies of the Software, and to permit persons to whom the Software is
-    furnished to do so, subject to the following conditions:
-
-    The above copyright notice and this permission notice shall be included in all
-    copies or substantial portions of the Software.
-
-    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-    SOFTWARE.
-
-
-    History
-    -------
-    Written,  MC, Mar 2015
+.. autosummary::
+    B
+    g
+    G
+    Gstar
+    K
+    bratley
+    fmorris
+    morris
+    oakley_ohagan
+    ishigami_homma
+    linear
+    product
+    ratio
+    ishigami_homma_easy
 """
-
-__all__ = ['B', 'g', 'G', 'Gstar', 'K', 'morris', 'oakley_ohagan', 'ishigami_homma']
-
 import numpy as np
+
+
+__all__ = ['B', 'g', 'G', 'Gstar', 'K', 'bratley', 'fmorris', 'morris', 'oakley_ohagan', 'ishigami_homma',
+           'linear', 'product', 'ratio', 'ishigami_homma_easy']
+
 
 # -----------------------------------------------------------
 
 def B(X):
-    '''
-        B function, Saltelli et al. (2010) Comp. Phys. Comm., 181, p. 259-270
+    """
+    B function, Saltelli et al. (2010) Comp. Phys. Comm. 181, p. 259-270
 
-        
-        Input
-        -----
-        X        (nX,) or (nX,npoints) array of floats
+    Parameters
+    ----------
+    X : array_like
+        (nX,) or (nX,npoints) array of floats
 
-
-        Output
-        ------
-        float or (npoints,) array of floats
-
-        
-        History
-        -------
-        Written,  MC & JM, Mar 2015
-    '''
+    Returns
+    -------
+    B : float or ndarray
+        float or (npoints,) floats of B function values at `X`
+    """
     # Parameter sets are assumed to be in following ordering: (x_1, x_2, ..., X_m, w_1, w_2, ..., w_m)
     X = np.array(X)
     if X.ndim == 1:
@@ -124,79 +106,81 @@ def B(X):
     else:
         return y
 
+
 # -----------------------------------------------------------
+
 
 def g(X, a):
     """
-        G-function: Sobol' (1990) Matematicheskoe Modelirovanie 2, 112-118 (in Russian)
-                    Sobol' (1993) Mathematical Modelling and Computational Experiment 1, 407-414 (English translation)
+    G-function
 
-        
-        Input
-        -----
-        X        (nX,) or (nX,npoints) array of floats
-        a        (nX,) array of floats
+    Sobol' (1990) Matematicheskoe Modelirovanie 2, 112-118 (in Russian)
 
+    Sobol' (1993) Mathematical Modelling and Computational Experiment 1, 407-414 (English translation)
 
-        Output
-        ------
-        float or (npoints,) array of floats
+    Parameters
+    ----------
+    X : array_like
+        (nX,) or (nX,npoints) array of floats
+    a : array_like
+        (nX,) array of floats
 
-        
-        History
-        -------
-        Written,  MC & JM, Mar 2015
+    Returns
+    -------
+    G : float or ndarray
+        float or (npoints,) floats of G function values at `X` with parameters `a`
     """
     return Gstar(X, np.ones(len(a)), np.zeros(len(a)), a)
 
+
 # -----------------------------------------------------------
+
 
 def G(X, a):
     """
-        G-function: Sobol' (1990) Matematicheskoe Modelirovanie 2, 112-118 (in Russian)
-                    Sobol' (1993) Mathematical Modelling and Computational Experiment 1, 407-414 (English translation)
+    G-function
 
-        
-        Input
-        -----
-        X        (nX,) or (nX,npoints) array of floats
-        a        (nX,) array of floats
+    Sobol' (1990) Matematicheskoe Modelirovanie 2, 112-118 (in Russian)
 
+    Sobol' (1993) Mathematical Modelling and Computational Experiment 1, 407-414 (English translation)
 
-        Output
-        ------
-        float or (npoints,) array of floats
+    Parameters
+    ----------
+    X : array_like
+        (nX,) or (nX,npoints) array of floats
+    a : array_like
+        (nX,) array of floats
 
-        
-        History
-        -------
-        Written,  MC & JM, Mar 2015
+    Returns
+    -------
+    g : float or ndarray
+        float or (npoints,) floats of G function values at `X` with parameters `a`
     """
     return Gstar(X, np.ones(len(a)), np.zeros(len(a)), a)
 
+
 # -----------------------------------------------------------
+
 
 def Gstar(X, alpha, delta, a):
     """
-        G* example, Saltelli et al. (2010) Comp. Phys. Comm., 181, p. 259-270
+    G* example, Saltelli et al. (2010) Comp. Phys. Comm., 181, p. 259-270
 
-        
-        Input
-        -----
-        X        (nX,) or (nX,npoints) array of floats
-        alpha    (nX,) array of floats
-        delta    (nX,) array of floats
-        a        (nX,) array of floats
+    Parameters
+    ----------
+    X : array_like
+        (nX,) or (nX,npoints) array of floats
+    alpha : array_like
+        (nX,) array of floats
+    delta : array_like
+        (nX,) array of floats
+    a : array_like
+        (nX,) array of floats
 
-
-        Output
-        ------
-        float or (npoints,) array of floats
-
-        
-        History
-        -------
-        Written,  MC & JM, Mar 2015
+    Returns
+    -------
+    G* : float or ndarray
+        float or (npoints,) floats of G* function values at `X` with parameters `alpha`, `delta` and `a`
     """
     # Model output for given parameter set(s) is returned
     # X: dim1 = # of parameters = 10
@@ -227,30 +211,29 @@ def Gstar(X, alpha, delta, a):
     else:
         return y
 
+
 # -----------------------------------------------------------
+
 
 def linear(X, a, b):
     """
-        Julie's own creation to test properly PAWN method
+    Linear test function to test PAWN method:
 
-        Y = a X + b
+        `Y = a*X + b`
 
-        
-        Input
-        -----
-        X    (nX,) or (nX,npoints) array of floats
-        a    (nX,) array of floats
-        b    (nX,) array of floats
-
-
-        Output
-        ------
+    Parameters
+    ----------
+    X : array_like
+        (1,) or (1,npoints) array of floats
+    a : array_like
+        float or (npoints,) array of floats
+    b : array_like
         float or (npoints,) array of floats
 
-        
-        History
-        -------
-        Written,  JM, Dec 2017
+    Returns
+    -------
+    linear : float or ndarray
+        float or (npoints,) floats of linear function values at `X` with parameters `a` and `b`
     """
     # Model output for given parameter set(s) is returned
     # X:    dim1 = # of parameters = 1
@@ -266,34 +249,31 @@ def linear(X, a, b):
     assert iX.shape[0] == 1, 'X.shape[0] must 1.'
 
     y = a * iX[0,:] + b
-    
+
     if isone:
         return y[0]
     else:
         return y
-    
+
+
 # -----------------------------------------------------------
+
 
 def product(X):
     """
-        Julie's own creation to test properly PAWN method
+    Product test function to test PAWN method:
 
-        Y = X1 * X2
+        `Y = X[0] * X[1]`
 
-        
-        Input
-        -----
-        X    (nX,) or (nX,npoints) array of floats
+    Parameters
+    ----------
+    X : array_like
+        (2,) or (2,npoints) array of floats
 
-
-        Output
-        ------
-        float or (npoints,) array of floats
-
-        
-        History
-        -------
-        Written,  JM, Dec 2017
+    Returns
+    -------
+    product : float or ndarray
+        float or (npoints,) floats of product function values at `X`
     """
     # Model output for given parameter set(s) is returned
     # X:    dim1 = # of parameters = 2
@@ -309,39 +289,43 @@ def product(X):
     assert iX.shape[0] == 2, 'X.shape[0] must 2.'
 
     y = iX[0,:] * iX[1,:]
-    
+
     if isone:
         return y[0]
     else:
         return y
 
+
 # -----------------------------------------------------------
+
 
 def ratio(X):
     """
-        Simple nonlinear model proposed by Liu et al. (2006)
-              Liu, H., Sudjianto, A., Chen, W., 2006. 
-              Relative entropy based method for probabilistic sensitivity analysis in engineering design. 
-              J. Mech. Des. 128, 326-336.
-        Used by Pianosi & Wagener, Environmental Modelling & Software (2015)
-              Pianosi, F. & Wagener T., 2015
-              A simple and efficient method for global sensitivity analysis based on cumulative distribution functions.
-              Environmental Modelling & Software 67, 1-11.
+    Ratio test function:
 
-        
-        Input
-        -----
-        X    (nX,) or (nX,npoints) array of floats
+        `Y = X[0] / X[1]`
 
+    Simple nonlinear model proposed by Liu et al. (2006):
 
-        Output
-        ------
-        float or (npoints,) array of floats
+        Liu, H., Sudjianto, A., Chen, W., 2006.
+        Relative entropy based method for probabilistic sensitivity analysis in engineering design.
+        J. Mech. Des. 128, 326-336.
 
-        
-        History
-        -------
-        Written,  JM, Dec 2017
+    Used by Pianosi & Wagener, Environmental Modelling & Software (2015)
+
+        Pianosi, F. & Wagener T., 2015
+        A simple and efficient method for global sensitivity analysis based on cumulative distribution functions.
+        Environmental Modelling & Software 67, 1-11.
+
+    Parameters
+    ----------
+    X : array_like
+        (2,) or (2,npoints) array of floats
+
+    Returns
+    -------
+    ratio : float or ndarray
+        float or (npoints,) floats of ratio function values at `X`
     """
     # Model output for given parameter set(s) is returned
     # X:    dim1 = # of parameters = 2
@@ -357,34 +341,33 @@ def ratio(X):
     assert iX.shape[0] == 2, 'X.shape[0] must 2.'
 
     y = iX[0,:] / iX[1,:]
-    
+
     if isone:
         return y[0]
     else:
         return y
 
+
 # -----------------------------------------------------------
+
 
 def ishigami_homma_easy(X):
     """
-        Simplified Ishigami and Homma function: y = sin(x1) + x2, x1,x2 ~ Uni[-Pi,Pi]
-        Created by Juliane Mai to properly test PAWN method
-        Ishigami and Homma (1990), given by Saltelli et al. (2008, page 179)
+    Simplified Ishigami and Homma function to test PAWN method:
 
-        
-        Input
-        -----
-        X    (nX,) or (nX,npoints) array of floats
+        `Y = sin(X[0]) + X[1]`
 
+    with `X[0],X[1]` ~ `Uniform[-Pi,Pi]`
 
-        Output
-        ------
-        float or (npoints,) array of floats
+    Parameters
+    ----------
+    X : array_like
+        (2,) or (2,npoints) array of floats
 
-        
-        History
-        -------
-        Written,  MC & JM, Mar 2015
+    Returns
+    -------
+    ishigami_homma_easy : float or ndarray
+        float or (npoints,) floats of simplified Ishigami and Homma function values at `X`
     """
     # Model output for given parameter set(s) is returned
     # X:    dim1 = # of parameters = 2
@@ -400,7 +383,7 @@ def ishigami_homma_easy(X):
     assert iX.shape[0] == 2, 'X.shape[0] must 2.'
 
     y = np.sin(iX[0,:])  + iX[1,:]
-    
+
     if isone:
         return y[0]
     else:
@@ -409,26 +392,24 @@ def ishigami_homma_easy(X):
 
 # -----------------------------------------------------------
 
+
 def ishigami_homma(X, a, b):
     """
-        Ishigami and Homma (1990), given by Saltelli et al. (2008, page 179)
+    Ishigami and Homma (1990), given by Saltelli et al. (2008, page 179)
 
-        
-        Input
-        -----
-        X    (nX,) or (nX,npoints) array of floats
-        a    (nX,) array of floats
-        b    (nX,) array of floats
-
-
-        Output
-        ------
+    Parameters
+    ----------
+    X : array_like
+        (3,) or (3,npoints) array of floats
+    a : array_like
+        float or (npoints,) array of floats
+    b : array_like
         float or (npoints,) array of floats
 
-        
-        History
-        -------
-        Written,  MC & JM, Mar 2015
+    Returns
+    -------
+    ishigami_homma : float or ndarray
+        float or (npoints,) floats of Ishigami and Homma function values at `X` with parameters `a` and `b`
     """
     # Model output for given parameter set(s) is returned
     # X: dim1 = # of parameters = 3
@@ -444,36 +425,33 @@ def ishigami_homma(X, a, b):
     assert iX.shape[0] == 3, 'X.shape[0] must be 3.'
 
     y = np.sin(iX[0,:])  + a*(np.sin(iX[1,:]))**2  + b*iX[2,:]**4  * np.sin(iX[0,:])
-    
+
     if isone:
         return y[0]
     else:
         return y
 
+
 # -----------------------------------------------------------
+
 
 def K(X):
     """
-        K example, Saltelli et al. (2010) Comp. Phys. Comm., 181, p. 259-270
+    K example, Saltelli et al. (2010) Comp. Phys. Comm., 181, p. 259-270
 
-        
-        Input
-        -----
-        X        (nX,) or (nX,npoints) array of floats
+    Parameters
+    ----------
+    X : array_like
+        (nX,) or (nX,npoints) array of floats
 
-
-        Output
-        ------
-        float or (npoints,) array of floats
-
-        
-        History
-        -------
-        Written,  MC & JM, Mar 2015
+    Returns
+    -------
+    K : float or ndarray
+        float or (npoints,) floats of K function values at `X`
     """
     # Model output for given parameter set(s) is returned
     # X: dim1 = # of parameters = 10
-    #       dim2 = # of parameter sets
+    #    dim2 = # of parameter sets
     X = np.array(X)
     if X.ndim == 1:
         isone = True
@@ -490,37 +468,56 @@ def K(X):
     for ii in range(nX):
         iX[ii,:] = (-1)**(ii+1) * iX[ii,:]
     y = iX.sum(axis=0)
-    
+
     if isone:
         return y[0]
     else:
         return y
 
+
+def bratley(*args):
+    """
+    K example, Saltelli et al. (2010) Comp. Phys. Comm., 181, p. 259-270
+
+    Parameters
+    ----------
+    X : array_like
+        (nX,) or (nX,npoints) array of floats
+
+    Returns
+    -------
+    bratley : float or ndarray
+        float or (npoints,) floats of K function values at `X`
+    """
+    return K(*args)
+
+
 # -----------------------------------------------------------
 
-def morris(X, beta0, beta1, beta2, beta3, beta4):
+
+def fmorris(X, beta0, beta1, beta2, beta3, beta4):
     """
-        Morris-function: Morris (1991) Technometrics 33, 161-174
+    Morris-function, Morris (1991) Technometrics 33, 161-174
 
-        
-        Input
-        -----
-        X        (20,) or (20,npoints) array of floats
-        beta0    float
-        beta1    (20,) array of floats
-        beta2    (20,20) array of floats
-        beta3    (20,20,20) array of floats
-        beta4    (20,20,20,20) array of floats
+    Parameters
+    ----------
+    X : array_like
+        (20,) or (20,npoints) array of floats
+    beta0 : float
+        float
+    beta1 : array_like
+        (20,) array of floats
+    beta2 : array_like
+        (20,20) array of floats
+    beta3 : array_like
+        (20,20,20) array of floats
+    beta4 : array_like
+        (20,20,20,20) array of floats
 
-
-        Output
-        ------
-        float or (npoints,) array of floats
-
-        
-        History
-        -------
-        Written,  MC & JM, Mar 2015
+    Returns
+    -------
+    fmorris : float or ndarray
+        float or (npoints,) floats of Morris function values at `X` with parameters `beta0-beta4`
     """
     X = np.array(X)
     if X.ndim == 1:
@@ -558,26 +555,50 @@ def morris(X, beta0, beta1, beta2, beta3, beta4):
     else:
         return y
 
+
+def morris(*args):
+    """
+    Morris-function, Morris (1991) Technometrics 33, 161-174
+
+    Parameters
+    ----------
+    X : array_like
+        (20,) or (20,npoints) array of floats
+    beta0 : float
+        float
+    beta1 : array_like
+        (20,) array of floats
+    beta2 : array_like
+        (20,20) array of floats
+    beta3 : array_like
+        (20,20,20) array of floats
+    beta4 : array_like
+        (20,20,20,20) array of floats
+
+    Returns
+    -------
+    morris : float or ndarray
+        float or (npoints,) floats of Morris function values at `X` with parameters `beta0-beta4`
+    """
+    return fmorris(*args)
+
+
 # -----------------------------------------------------------
-    
+
+
 def oakley_ohagan(X):
     """
-        Oakley and O'Hagan (2004) J. R. Statist. Soc. B 66, Part 3, 751-769
+    Oakley and O'Hagan (2004) J. R. Statist. Soc. B 66, Part 3, 751-769
 
-        
-        Input
-        -----
-        X        (15,) or (15,npoints) array of floats
+    Parameters
+    ----------
+    X : array_like
+        (15,) or (15,npoints) array of floats
 
-
-        Output
-        ------
-        float or (npoints,) array of floats
-
-        
-        History
-        -------
-        Written,  MC & JM, Mar 2015
+    Returns
+    -------
+    oakley_ohagan : float or ndarray
+        float or (npoints,) floats of Oakley and O'Hagan function values at `X`
     """
     X = np.array(X)
     if X.ndim == 1:
@@ -614,19 +635,67 @@ def oakley_ohagan(X):
     y = np.dot(a1,iX) + np.dot(a2,np.sin(iX)) + np.dot(a3,np.cos(iX))
     for i in range(iX.shape[1]):
         y[i] += np.dot(iX[:,i].T,np.dot(M,iX[:,i]))
-    
+
     if isone:
-        return y[0,0]
+        return y[0]
     else:
         return y.squeeze()
 
+
 # -----------------------------------------------------------
+
 
 if __name__ == '__main__':
     import doctest
     doctest.testmod(optionflags=doctest.NORMALIZE_WHITESPACE)
 
-    # print(griewank([0,0]))
-    # #0.0
-    # print(goldstein_price([0,-1]))
-    # #3.0
+    # ishigami_homma([np.pi/2.,np.pi/2.,1.], 1., 1.)
+    # # 3.0
+    # B(np.arange(10))
+    # # 80
+    # B(np.arange(12).reshape(6,2))
+    # # array([56, 89])
+    # linear(np.ones(1), 1., 1.)
+    # # 2.0
+    # product(np.arange(2)+1.)
+    # # 2.0
+    # ratio(np.arange(2)+1.)
+    # # 0.5
+    # ishigami_homma_easy([np.pi/2.,1.])
+    # # 2.0
+    # bratley(np.arange(5)+1.)
+    # K(np.arange(5)+1.)
+    # # -101.0
+    # K(np.arange(8).reshape((4,2))+1.)
+    # # [ 92., 342.]
+    # oakley_ohagan(np.zeros(15))
+    # # 15.75
+    # Gstar(np.ones(5), np.zeros(5), np.ones(5), np.zeros(5))
+    # # 1.0
+    # g(np.ones(5), np.zeros(5))
+    # G(np.ones(5), np.zeros(5))
+    # # 32.0
+
+    # # Morris function
+    # seed = 1234
+    # np.random.seed(seed=seed)
+    # npars = 20
+    # x0 = np.ones(npars)*0.5
+    # lb = np.zeros(npars)
+    # ub = np.ones(npars)
+    # beta0              = 0.
+    # beta1              = np.random.standard_normal(npars)
+    # beta1[:10]         = 20.
+    # beta2              = np.random.standard_normal((npars,npars))
+    # beta2[:6,:6]       = -15.
+    # beta3              = np.zeros((npars,npars,npars))
+    # beta3[:5,:5,:5]    = -10.
+    # beta4              = np.zeros((npars,npars,npars,npars))
+    # beta4[:4,:4,:4,:4] = 5.
+    # mm = fmorris(np.linspace(0,2*(npars-1),npars)/float(2*npars-1), beta0, beta1, beta2, beta3, beta4)
+    # print(np.around(mm,3))
+    # # -82.711
+    # mm = fmorris(np.arange(2*npars,dtype=np.float).reshape((npars,2))/float(2*npars-1),
+    #              beta0, beta1, beta2, beta3, beta4)
+    # print(np.around(mm,3))
+    # # [-82.711 -60.589]

@@ -2,6 +2,8 @@
 from __future__ import division, absolute_import, print_function
 import numpy as np
 
+__all__ = ['autostring', 'astr']
+
 def autostring(num, prec=0, zero=False, set_printoptions=False, pp=False, join=False, joinall=False, sep=' '):
     """
         Format number (array) with given decimal precision.

@@ -1,95 +1,107 @@
 #!/usr/bin/env python
 from __future__ import division, absolute_import, print_function
+"""
+division : Divide two arrays, return `otherwise` if division by 0.
+
+This module was written by Matthias Cuntz while at Department of
+Computational Hydrosystems, Helmholtz Centre for Environmental
+Research - UFZ, Leipzig, Germany, and continued while at Institut
+National de Recherche pour l'Agriculture, l'Alimentation et
+l'Environnement (INRAE), Nancy, France.
+
+Copyright (c) 2012-2020 Matthias Cuntz - mc (at) macu (dot) de
+Released under the MIT License; see LICENSE file for details.
+
+* Written Jan 2012 by Matthias Cuntz (mc (at) macu (dot) de)
+* Added wrapper div, May 2012, Matthias Cuntz
+* Ported to Python 3, Feb 2013, Matthias Cuntz
+* Do not return masked array if no masked array given, Oct 2014, Matthias Cuntz
+* Added two-digit year, Nov 2018, Matthias Cuntz
+* Removed bug that non-masked array was returned if masked array given, Sep 2015, Matthias Cuntz
+* Using numpy docstring format, May 2020, Matthias Cuntz
+
+.. moduleauthor:: Matthias Cuntz
+
+The following functions are provided
+
+.. autosummary::
+   division
+   div
+"""
 import numpy as np
+
+
+__all__ = ['division', 'div']
+
 
 def division(a, b, otherwise=np.nan, prec=0.):
     """
-        Divide two arrays, return "otherwise" if division by 0.
+    Divide two arrays, return `otherwise` if division by 0.
+
+    Parameters
+    ----------
+    a : array_like
+        enumerator
+    b : array_like
+        denominator
+    otherwise : float
+        value to return if `b=0` (default: `np.nan`)
+    prec : float
+        if |b|<|prec| then `otherwise`
+
+    Returns
+    -------
+    ratio : numpy array or masked array
+        a/b        if |b| >  |prec|
+
+        otherwise  if |b| <= |prec|
+
+        Output is numpy array. It is a masked array if at least one
+        of `a` or `b` is a masked array.
+
+    Examples
+    --------
+    >>> a = [1., 2., 3.]
+    >>> b = 2.
+    >>> print('{:.1f} {:.1f} {:.1f}'.format(*division(a, b)))
+    0.5 1.0 1.5
+
+    >>> a = [1., 1., 1.]
+    >>> b = [2., 1., 0.]
+    >>> print('{:.1f} {:.1f} {:.1f}'.format(*division(a, b)))
+    0.5 1.0 nan
+    >>> print('{:.1f} {:.1f} {:.1f}'.format(*division(a, b, 0.)))
+    0.5 1.0 0.0
+    >>> print('{:.1f} {:.1f} {:.1f}'.format(*division(a, b, otherwise=0.)))
+    0.5 1.0 0.0
+    >>> print('{:.1f} {:.1f} {:.1f}'.format(*division(a, b, prec=1.)))
+    0.5 nan nan
+
+    >>> import numpy as np
+    >>> a = np.array([1., 1., 1.])
+    >>> b = [2., 1., 0.]
+    >>> print('{:.1f} {:.1f} {:.1f}'.format(*division(a, b)))
+    0.5 1.0 nan
+
+    >>> b = np.array([2., 1., 0.])
+    >>> print('{:.1f} {:.1f} {:.1f}'.format(*division(a, b)))
+    0.5 1.0 nan
+
+    >>> mask = [0, 0, 1]
+    >>> b = np.ma.array([2., 1., 0.], mask=mask)
+    >>> ratio = division(a, b)
+    >>> print(ratio)
+    [0.5 1.0 --]
 
 
-        Definition
-        ----------
-        def division(a, b, otherwise=np.nan, prec=0.):
-          There is a wrapper function for convenience with the short name 'div'.
-
-
-        Input
-        -----
-        a            enumerator
-        b            denominator
-
-
-        Optional Input
-        --------------
-        otherwise    value to return if b=0 (default: np.nan)
-        prec         if |b|<|prec| then otherwise
-
-
-        Output
-        ------
-        a/b          if |b|>|prec|
-        otherwise    if |b|<=|prec|
-
-
-        Restrictions
-        ------------
-        None.
-
-
-        Examples
-        --------
-        >>> from autostring import astr
-        >>> print(astr(division([1., 2., 3.], 2.),1,pp=True))
-        ['0.5' '1.0' '1.5']
-
-        >>> print(astr(division([1., 1., 1.], [2., 1., 0.]),1,pp=True))
-        ['0.5' '1.0' 'nan']
-
-        >>> print(astr(division([1., 1., 1.], [2., 1., 0.], 0.),1,pp=True))
-        ['0.5' '1.0' '0.0']
-
-        >>> print(astr(division([1., 1., 1.], [2., 1., 0.], otherwise=0.),1,pp=True))
-        ['0.5' '1.0' '0.0']
-
-        >>> print(astr(division([1., 1., 1.], [2., 1., 0.], prec=1.),1,pp=True))
-        ['0.5' 'nan' 'nan']
-
-
-        License
-        -------
-        This file is part of the JAMS Python package, distributed under the MIT
-        License. The JAMS Python package originates from the former UFZ Python library,
-        Department of Computational Hydrosystems, Helmholtz Centre for Environmental
-        Research - UFZ, Leipzig, Germany.
-
-        Copyright (c) 2012-2015 Matthias Cuntz - mc (at) macu (dot) de
-
-        Permission is hereby granted, free of charge, to any person obtaining a copy
-        of this software and associated documentation files (the "Software"), to deal
-        in the Software without restriction, including without limitation the rights
-        to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-        copies of the Software, and to permit persons to whom the Software is
-        furnished to do so, subject to the following conditions:
-
-        The above copyright notice and this permission notice shall be included in all
-        copies or substantial portions of the Software.
-
-        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-        IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-        FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-        AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-        LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-        OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-        SOFTWARE.
-
-
-        History
-        -------
-        Written,  MC, Jan 2012
-        Modified, MC, May 2012 - div
-                  MC, Feb 2013 - ported to Python 3
-                  MC, Oct 2014 - do not return masked array if no masked array given
-                  MC, Sep 2015 - bug: returned non-masked array in case of masked array input
+    History
+    -------
+    Written,  Matthias Cuntz, Jan 2012
+    Modified, Matthias Cuntz, May 2012 - div
+              Matthias Cuntz, Feb 2013 - ported to Python 3
+              Matthias Cuntz, Oct 2014 - do not return masked array if no masked array given
+              Matthias Cuntz, Sep 2015 - bug: returned non-masked array in case of masked array input
+              Matthias Cuntz, May 2020 - numpy docstring format
     """
     oldsettings = np.geterr()
     np.seterr(divide='ignore')
@@ -104,30 +116,27 @@ def division(a, b, otherwise=np.nan, prec=0.):
     return out
 
 
-
 def div(*args, **kwargs):
     """
-        Wrapper function for division
-        def division(a, b, otherwise=np.nan, prec=0.):
+    Wrapper function for :func:`division`.
 
+    Examples
+    --------
+    >>> a = [1., 2., 3.]
+    >>> b = 2.
+    >>> print('{:.1f} {:.1f} {:.1f}'.format(*div(a, b)))
+    0.5 1.0 1.5
 
-        Examples
-        --------
-        >>> from autostring import astr
-        >>> print(astr(div([1., 2., 3.], 2.),1,pp=True))
-        ['0.5' '1.0' '1.5']
-
-        >>> print(astr(div([1., 1., 1.], [2., 1., 0.]),1,pp=True))
-        ['0.5' '1.0' 'nan']
-
-        >>> print(astr(div([1., 1., 1.], [2., 1., 0.], 0.),1,pp=True))
-        ['0.5' '1.0' '0.0']
-
-        >>> print(astr(div([1., 1., 1.], [2., 1., 0.], otherwise=0.),1,pp=True))
-        ['0.5' '1.0' '0.0']
-
-        >>> print(astr(div([1., 1., 1.], [2., 1., 0.], prec=1.),1,pp=True))
-        ['0.5' 'nan' 'nan']
+    >>> a = [1., 1., 1.]
+    >>> b = [2., 1., 0.]
+    >>> print('{:.1f} {:.1f} {:.1f}'.format(*div(a, b)))
+    0.5 1.0 nan
+    >>> print('{:.1f} {:.1f} {:.1f}'.format(*div(a, b, 0.)))
+    0.5 1.0 0.0
+    >>> print('{:.1f} {:.1f} {:.1f}'.format(*div(a, b, otherwise=0.)))
+    0.5 1.0 0.0
+    >>> print('{:.1f} {:.1f} {:.1f}'.format(*div(a, b, prec=1.)))
+    0.5 nan nan
     """
     return division(*args, **kwargs)
 

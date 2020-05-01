@@ -976,8 +976,8 @@ otherwise assumed %Y-%m-%d %H:%M:%S.''')
             df1 = pd.read_csv(infile, sep, parse_dates=[0], date_parser=parser, index_col=0, header=0)
             df = df.append(df1, sort=False)
 
-    # This must be before any other call to matplotlib because it use the wxAgg backend.
-    # This means, do not use --pylab with ipython.
     df.replace(-9999., np.nan, inplace=True)
 
+    # This must be before any other call to matplotlib because it use the wxAgg backend.
+    # This means, do not use --pylab with ipython.
     show(df)
