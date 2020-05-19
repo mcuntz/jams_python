@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-from __future__ import division, absolute_import, print_function
 """
 date2dec : Converts calendar dates into decimal dates.
 
@@ -36,6 +35,7 @@ The following functions are provided
 .. autosummary::
    date2dec
 """
+from __future__ import division, absolute_import, print_function
 import numpy as np
 
 
@@ -155,7 +155,7 @@ def date2dec(calendar = 'standard', units=None,
     List input is only supported up to 2 dimensions.
 
     Requires `netcdftime.py` from module `netcdftime` available at:
-        http://netcdf4-python.googlecode.com
+    http://netcdf4-python.googlecode.com
 
     Examples
     --------
@@ -190,7 +190,7 @@ def date2dec(calendar = 'standard', units=None,
 
     # ascii input
     >>> if datetime.MINYEAR > 0:
-    ...     a = np.array(['05.01.2000 12:30:15', '24.04.1810 16:15:10', '15.07.1630 10:20:40',  '20.09.1510 14:35:50',
+    ...     a = np.array(['05.01.2000 12:30:15', '24.04.1810 16:15:10', '15.07.1630 10:20:40', '20.09.1510 14:35:50',
     ...                   '18.03.1271 19:41:34', '27.08. 619 11:08:37', '23.08.0002 20:03:41', '01.01.0001 12:00:00'])
     ... else:
     ...     a = np.array(['05.01.2000 12:30:15', '24.04.1810 16:15:10', '15.07.1630 10:20:40',  '20.09.1510 14:35:50',

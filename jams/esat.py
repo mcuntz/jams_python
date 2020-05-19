@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-from __future__ import division, absolute_import, print_function
 """
 esat : Saturation vapour pressure of water and ice.
 
@@ -25,6 +24,7 @@ The following functions are provided
 .. autosummary::
    esat
 """
+from __future__ import division, absolute_import, print_function
 import numpy as np
 
 
@@ -238,7 +238,7 @@ def esat(T, liquid=False, formula='GoffGratch'):
             ews   = 1013.246  # saturation pressure at steam point temperature, normal atmosphere
             esat_liq = (10.**(-7.90298*(Ts/T_liq-1.) + 5.02808 * np.ma.log10(Ts/T_liq)
                           - 1.3816e-7 * (10.**(11.344*(1.-T_liq/Ts))-1.)
-                          + 8.1328e-3 * (10.**(-3.49149*(Ts/T_liq-1))-1.) + np.ma.log10(ews)))
+                          + 8.1328e-3 * (10.**(-3.49149*(Ts/T_liq-1.))-1.) + np.ma.log10(ews)))
         elif form == 'hylandwexler':
             '''Hyland, R. W. and A. Wexler, Formulations for the Thermodynamic Properties of the
                saturated Phases of H2O from 173.15K to 473.15K, ASHRAE Trans, 89(2A), 500-519, 1983.'''

@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-from __future__ import division, absolute_import, print_function
 """
 fread : Read numbers into array from a file.
 
@@ -34,6 +33,7 @@ The following functions are provided
 .. autosummary::
    fread
 """
+from __future__ import division, absolute_import, print_function
 import numpy as np
 
 
@@ -47,6 +47,13 @@ def fread(infile, nc=0, cname=None, skip=0, cskip=0, hskip=0, hstrip=True, separ
           transpose=False, strarr=False, return_list=False):
     """
     Read numbers into array with floats from a file.
+
+    Lines or columns can be skipped.
+    Columns can be picked specifically.
+
+    Blank (only whitespace) and comment lines can be excluded.
+
+    The header of the file can be read separately.
 
     This routines is exactly the same as sread but transforms
     everything to floats, handling NaN and Inf.
@@ -72,7 +79,7 @@ def fread(infile, nc=0, cname=None, skip=0, cskip=0, hskip=0, hstrip=True, separ
     hstrip : bool, optional
         True: strip header cells to match with cname (default: True)
     separator : str, optional
-        column separator. If not given, columns separator are (in order):
+        column separator. If not given, columns separators are (in order):
         comma (','), semicolon (';'), whitespace.
     comment : iterable, optional
          line gets excluded if first character of line is in comment sequence.
@@ -97,30 +104,38 @@ def fread(infile, nc=0, cname=None, skip=0, cskip=0, hskip=0, hstrip=True, separ
         Possible values: 'strict', 'replace', 'ignore'.
     squeeze : bool, optional
         True:  2-dim array will be cleaned of degenerated dimension, i.e. results in a vector.
+
         False: array will be two-dimensional as read (default)
     reform : bool, optional
         Same as squeeze.
     skip_blank : bool, optional
         True:  continues reading after blank line.
+
         False: stops reading at first blank line (default).
     fill : bool, optional
         True:  fills in `fill_value` if not enough columns in line.
+
         False: stops execution and returns None if not enough columns in line (default).
     header : bool, optional
         True:  header strings will be returned.
+
         False: numbers in file will be returned (default).
     full_header : bool, optional
         True:  header is a string vector of the skipped rows.
+
         False: header will be split in columns, exactly as the data,
                and will hold only the selected columns (default).
     transpose : bool, optional
         True:  column-major format `output(0:ncolumns,0:nlines)`.
+
         False: row-major format `output(0:nlines,0:ncolumns)` (default).
     strarr : bool, optional
         True:  return header as numpy array of strings.
-        False: return header as list.
+
+        False: return header as list (default).
     return_list : bool, optional
         True:  return file content as list.
+
         False: return file content as numpy array (default).
 
     Returns

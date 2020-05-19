@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-from __future__ import division, absolute_import, print_function
 """
 fgui : GUI dialogs to choose files and directories using Tkinter.
 
@@ -26,6 +25,7 @@ The following functions are provided
    file_from_gui
    files_from_gui
 """
+from __future__ import division, absolute_import, print_function
 
 
 __all__ = ['directory_from_gui', 'directories_from_gui', 'file_from_gui', 'files_from_gui']
@@ -53,10 +53,12 @@ def directories_from_gui(initialdir='.', title='Choose one or several directorie
 
     Examples
     --------
-    if not dirs:
-        dirs = directories_from_gui()
-        if not dirs:
-            raise ValueError('Error: no directories given.')
+    .. code-block:: python
+
+       if not dirs:
+           dirs = directories_from_gui()
+           if not dirs:
+               raise ValueError('Error: no directories given.')
 
     History
     -------
@@ -119,10 +121,12 @@ def directory_from_gui(initialdir='.', title='Choose directory.'):
 
     Examples
     --------
-    if not idir:
-        idir = directory_from_gui()
-        if not idir:
-            raise ValueError('Error: no directory given.')
+    .. code-block:: python
+
+       if not idir:
+           idir = directory_from_gui()
+           if not idir:
+               raise ValueError('Error: no directory given.')
 
     History
     -------
@@ -169,10 +173,12 @@ def file_from_gui(initialdir='.', title='Choose file', multiple=False):
 
     Examples
     --------
-    if not file:
-        file = file_from_gui()
-        if not file:
-            raise ValueError('Error: no input file given.')
+    .. code-block:: python
+
+       if not file:
+           file = file_from_gui()
+           if not file:
+               raise ValueError('Error: no input file given.')
 
     History
     -------
@@ -211,10 +217,12 @@ def files_from_gui(initialdir='.', title='Choose file(s).', multiple=True):
 
     Examples
     --------
-    if not files:
-        files = files_from_gui()
-        if not files:
-            raise ValueError('Error: no input file(s) given.')
+    .. code-block:: python
+
+       if not files:
+           files = files_from_gui()
+           if not files:
+               raise ValueError('Error: no input file(s) given.')
 
     History
     -------

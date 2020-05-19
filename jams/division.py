@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-from __future__ import division, absolute_import, print_function
 """
 division : Divide two arrays, return `otherwise` if division by 0.
 
@@ -28,6 +27,7 @@ The following functions are provided
    division
    div
 """
+from __future__ import division, absolute_import, print_function
 import numpy as np
 
 
@@ -47,14 +47,14 @@ def division(a, b, otherwise=np.nan, prec=0.):
     otherwise : float
         value to return if `b=0` (default: `np.nan`)
     prec : float
-        if |b|<|prec| then `otherwise`
+        if `|b|<|prec|` then `otherwise`
 
     Returns
     -------
     ratio : numpy array or masked array
-        a/b        if |b| >  |prec|
+        a/b        if `|b| >  |prec|`
 
-        otherwise  if |b| <= |prec|
+        otherwise  if `|b| <= |prec|`
 
         Output is numpy array. It is a masked array if at least one
         of `a` or `b` is a masked array.

@@ -1,131 +1,150 @@
 #!/usr/bin/env python
+"""
+const : Provides physical, mathematical, computational, isotope, and material constants.
+
+Defines the following constants:
+    Mathematical
+        Pi, Pi2, Pi3, TwoPi, Sqrt2, pi, pi2, pi3, Twopi
+
+    Physical
+        Gravity, T0, P0, T25, sigma, R, R_air, R_H2O, Na, REarth
+
+    Isotope
+        R13VPDB, R18VSMOW, R2VSMOW
+
+    Computational
+        tiny, huge, eps
+
+    Material
+        mmol_co2, mmol_h2o, mmol_air,
+        density_quartz, cheat_quartz, cheat_water, cheat_air, latentheat_vaporization
+
+This module was written by Matthias Cuntz while at Department of
+Computational Hydrosystems, Helmholtz Centre for Environmental
+Research - UFZ, Leipzig, Germany, and continued while at Institut
+National de Recherche pour l'Agriculture, l'Alimentation et
+l'Environnement (INRAE), Nancy, France.
+
+Examples
+--------
+>>> print({:.3f}.format(Pi))
+3.142
+
+>>> print({:.3f}.format(Sqrt2))
+1.414
+
+>>> print({:.3f}.format(Gravity))
+9.810
+
+>>> print({:.3f}.format(T0))
+273.150
+
+>>> print({:.3f}.format(sigma))
+5.670e-08
+
+>>> print({:.3f}.format(R13VPDB))
+0.011
+
+>>> print({:.3f}.format(tiny))
+1.000e-06
+
+>>> print({:.3f}.format(REarth))
+6371000.000
+
+>>> print({:.3f}.format(mmol_h2o))
+18.015
+
+>>> print({:.3f}.format(mmol_air))
+28.964
+
+>>> print({:.3f}.format(density_quartz))
+2.650
+
+>>> print({:.3f}.format(cheat_quartz))
+800.000
+
+>>> print({:.3f}.format(cheat_water))
+4180.000
+
+>>> print({:.3f}.format(cheat_air))
+1010.000
+
+>>> print({:.3f}.format(latentheat_vaporization))
+2.450e+06
+
+Copyright (c) 2012-2020 Matthias Cuntz - mc (at) macu (dot) de
+Released under the MIT License; see LICENSE file for details.
+
+* Written Jan 2012 by Matthias Cuntz (mc (at) macu (dot) de)
+* Ported to Python 3, Feb 2013, Matthias Cuntz
+* Added dielectric constant for water, Mar 2014, Arndt Piayda
+* Added heat capacities for air, water and quartz as well as density of quartz, Sep 2014, Arndt Piayda
+* Added Pi3=pi/3, R13VPDB, R18VSMOW, R2VSMOW, Mar 2015, Matthias Cuntz
+* Renamed heat capacities, molar masses, density of quartz, Mar 2015, Matthias Cuntz
+* Moved calculation of dielectric constant of water to own routine, Mar 2015, Matthias Cuntz
+* Added computational constants such as tiny=np.finfo(np.float).tiny, Nov 2016, Matthias Cuntz
+* Added gas constants for dry air and water, May 2017, RL
+* Using numpy docstring format, May 2020, Matthias Cuntz
+* Added lowercase version of pi constants, May 2020, Matthias Cuntz
+
+.. moduleauthor:: Matthias Cuntz
+
+.. autosummary::
+   Pi
+   Pi2
+   Pi3
+   TwoPi
+   pi
+   pi2
+   pi3
+   Twopi
+   Sqrt2
+   Gravity
+   T0
+   P0
+   T25
+   sigma
+   R
+   R_air
+   R_H2O
+   Na
+   REarth
+   mmol_co2
+   mmol_h2o
+   mmol_air
+   density_quartz
+   cheat_quartz
+   cheat_water
+   cheat_air
+   latentheat_vaporization
+   R13VPDB
+   R18VSMOW
+   R2VSMOW
+   tiny
+   huge
+   eps
+"""
 from __future__ import division, absolute_import, print_function
 import numpy as np
-"""
-    Provides physical, mathematical, computational, and isotope constants.
 
 
-    Definition
-    ----------
-    Pi = 3.141592653589793238462643383279502884197
-    ...
-    Define the following constants:
-        Mathematical
-            Pi, Pi2, Pi3, TwoPi, Sqrt2
-        Physical
-            Gravity, T0, P0, T25, sigma, R, R_air, R_H2O, Na, REarth
-        Isotope
-            R13VPDB, R18VSMOW, R2VSMOW
-        Computational
-            tiny, huge, eps
-        Material
-            mmol_co2, mmol_h2o, mmol_air
-            density_quartz, cheat_quartz, cheat_water, cheat_air, latentheat_vaporization
-
-
-    Examples
-    --------
-    >>> from autostring import astr
-    >>> print(astr(Pi,3,pp=True))
-    3.142
-
-    >>> print(astr(Sqrt2,3,pp=True))
-    1.414
-
-    >>> print(astr(Gravity,3,pp=True))
-    9.810
-
-    >>> print(astr(T0,3,pp=True))
-    273.150
-
-    >>> print(astr(sigma,3,pp=True))
-    5.670e-08
-
-    >>> print(astr(R13VPDB,3,pp=True))
-    0.011
-
-    >>> print(astr(tiny,3,pp=True))
-    1.000e-06
-
-    >>> print(astr(REarth,3,pp=True))
-    6371000.000
-
-    >>> print(astr(mmol_h2o,3,pp=True))
-    18.015
-
-    >>> print(astr(mmol_air,3,pp=True))
-    28.964
-
-    >>> print(astr(density_quartz,3,pp=True))
-    2.650
-
-    >>> print(astr(cheat_quartz,3,pp=True))
-    800.000
-
-    >>> print(astr(cheat_water,3,pp=True))
-    4180.000
-
-    >>> print(astr(cheat_air,3,pp=True))
-    1010.000
-
-    >>> print(astr(latentheat_vaporization,3,pp=True))
-    2.450e+06
-
-
-    License
-    -------
-    This file is part of the JAMS Python package, distributed under the MIT
-    License. The JAMS Python package originates from the former UFZ Python library,
-    Department of Computational Hydrosystems, Helmholtz Centre for Environmental
-    Research - UFZ, Leipzig, Germany.
-
-    Copyright (c) 2012-2017 Matthias Cuntz - mc (at) macu (dot) de
-
-    Permission is hereby granted, free of charge, to any person obtaining a copy
-    of this software and associated documentation files (the "Software"), to deal
-    in the Software without restriction, including without limitation the rights
-    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-    copies of the Software, and to permit persons to whom the Software is
-    furnished to do so, subject to the following conditions:
-
-    The above copyright notice and this permission notice shall be included in all
-    copies or substantial portions of the Software.
-
-    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-    SOFTWARE.
-
-
-    History
-    -------
-    Written,  MC, Jan 2012
-    Modified, MC, Feb 2013 - ported to Python 3
-              AP, Mar 2014 - dielectric constant H2O
-              AP, Sep 2014 - heat capacity of quartz, air and water, density of quartz
-              MC, Mar 2015 - Pi3=Pi/3
-                           - rename heat capacities, molar masses, density of quartz
-                           - moved dielH2O to own routine/file
-                           - R13VPDB, R18VSMOW, R2VSMOW
-              MC, Nov 2016 - tiny->np.finfo(np.float).tiny, huge
-              RL, May 2017 - gas constants for dry air and water vapour
-"""
-
-__all__ = ['Pi', 'Pi2', 'Pi3', 'TwoPi', 'Sqrt2',
-           'Gravity', 'T0', 'P0', 'T25', 'sigma', 'R','R_air', 'R_H2O', 'Na', 'REarth',
+__all__ = ['Pi', 'Pi2', 'Pi3', 'TwoPi', 'pi', 'pi2', 'pi3', 'Twopi', 'Sqrt2',
+           'Gravity', 'T0', 'P0', 'T25', 'sigma', 'R', 'R_air', 'R_H2O', 'Na', 'REarth',
            'mmol_co2', 'mmol_h2o', 'mmol_air',
            'density_quartz', 'cheat_quartz', 'cheat_water', 'cheat_air', 'latentheat_vaporization',
            'R13VPDB', 'R18VSMOW', 'R2VSMOW',
            'tiny', 'huge', 'eps']
 
+
 # Mathematical
 Pi    = 3.141592653589793238462643383279502884197    # Pi
+pi    = 3.141592653589793238462643383279502884197
 Pi2   = 1.57079632679489661923132169163975144209858  # Pi/2
+pi2   = 1.57079632679489661923132169163975144209858
 Pi3   = 1.0471975511965977461542144610931676280656   # Pi/3
+pi3   = 1.0471975511965977461542144610931676280656
 TwoPi = 6.283185307179586476925286766559005768394    # 2*Pi
+Twopi = 6.283185307179586476925286766559005768394
 Sqrt2 = 1.41421356237309504880168872420969807856967  # Sqrt(2)
 
 # Physical

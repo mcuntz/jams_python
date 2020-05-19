@@ -1,12 +1,14 @@
 #!/usr/bin/env python
-from __future__ import division, absolute_import, print_function
 """
 argsort : argmax, argmin and argsort for array_like and Python iterables.
 
-This module was written by Matthias Cuntz while at Institut National de Recherche
-pour l'Agriculture, l'Alimentation et l'Environnement (INRAE), Nancy, France.
+This module was written by Matthias Cuntz while at Department of
+Computational Hydrosystems, Helmholtz Centre for Environmental
+Research - UFZ, Leipzig, Germany, and continued while at Institut
+National de Recherche pour l'Agriculture, l'Alimentation et
+l'Environnement (INRAE), Nancy, France.
 
-Copyright (c) 2019-2020 Matthias Cuntz - mc (at) macu (dot) de
+Copyright (c) 2014-2020 Matthias Cuntz - mc (at) macu (dot) de
 Released under the MIT License; see LICENSE file for details.
 
 * Written Dec 2014 by Matthias Cuntz (mc (at) macu (dot) de)
@@ -22,6 +24,7 @@ The following functions are provided
    argmin
    argsort
 """
+from __future__ import division, absolute_import, print_function
 import numpy as np
 
 
@@ -33,14 +36,17 @@ def argmax(a, *args, **kwargs):
     Wrapper for numpy.argmax, numpy.ma.argmax, and using max for Python iterables.
 
     Passes all keywords directly to the individual routines, i.e.
+
         numpy.argmax(a, axis=None, out=None)
+
         numpy.ma.argmax(self, axis=None, fill_value=None, out=None)
+
     No keyword will be passed to max routine for Python iterables.
 
     Parameters
     ----------
     a : array_like
-        numpy.ndarray, numpy.ma.MaskedArray or Python iterable
+        input array, masked array, or Python iterable
     *args : optional
         all arguments of numpy.argmax or numpy.ma.argmax
     **kwargs : optional
@@ -84,7 +90,7 @@ def argmax(a, *args, **kwargs):
     >>> print(a[ii])
     6
 
-    # from numpy.argmax docstring
+    >>> # from numpy.argmax docstring
     >>> a = np.arange(6).reshape(2,3) + 10
     >>> a
     array([[10, 11, 12],
@@ -134,13 +140,15 @@ def argmin(a, *args, **kwargs):
 
     Passes all keywords directly to the individual routines, i.e.
         numpy.argmin(a, axis=None, out=None)
+
         numpy.ma.argmin(self, axis=None, fill_value=None, out=None)
-    No keyword will be passed to min routine for Python iterables.
+
+        No keyword will be passed to min routine for Python iterables.
 
     Parameters
     ----------
     a : array_like
-        numpy.ndarray, numpy.ma.MaskedArray or Python iterable
+        input array, masked array, or Python iterable
     *args : optional
         all arguments of numpy.argmin or numpy.ma.argmin
     **kwargs : optional
@@ -184,7 +192,7 @@ def argmin(a, *args, **kwargs):
     >>> print(a[ii])
     0
 
-    # from numpy.argmin docstring
+    >>> # from numpy.argmin docstring
     >>> a = np.arange(6).reshape(2,3) + 10
     >>> a
     array([[10, 11, 12],
@@ -243,7 +251,7 @@ def argsort(a, *args, **kwargs):
     Parameters
     ----------
     a : array_like
-        numpy.ndarray, numpy.ma.MaskedArray or Python iterable
+        input array, masked array, or Python iterable
     *args : optional
         all arguments of numpy.argsort, numpy.ma.argsort, and sorted (except key argument)
     **kwargs : optional
@@ -299,7 +307,7 @@ def argsort(a, *args, **kwargs):
     >>> np.argsort(x)
     array([1, 2, 0])
 
-    # Two-dimensional array:
+    >>> # Two-dimensional array:
     >>> x = np.array([[0, 3], [2, 2]])
     >>> x
     array([[0, 3],
@@ -326,7 +334,7 @@ def argsort(a, *args, **kwargs):
     >>> x[ind]  # same as np.sort(x, axis=None)
     array([0, 2, 2, 3])
 
-    # Sorting with keys:
+    >>> # Sorting with keys:
     >>> x = np.array([(1, 0), (0, 1)], dtype=[('x', '<i4'), ('y', '<i4')])
     >>> x
     array([(1, 0), (0, 1)],

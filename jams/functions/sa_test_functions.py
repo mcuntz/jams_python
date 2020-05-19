@@ -1,31 +1,42 @@
 #!/usr/bin/env python
-from __future__ import division, absolute_import, print_function
 """
 Module provides test functions for parameter sensitivity analysis from
     Ishigami and Homma (1990) An importance qualification technique in uncertainty analysis for computer models,
                               Proceedings of the isuma '90, First International Symposium on Uncertainty
                               Modelling and Analysis, University of Maryland, Dec. 03 - Dec 05 1990, 398-403
+
     Oakley and O'Hagan (2004) Probabilistic sensitivity analysis of complex models: a Bayesian approach
                               J. R. Statist. Soc. B 66, Part 3, 751-769.
+
     Morris (1991)             Factorial sampling plans for preliminary computational experiments,
                               Technometrics 33, 161-174.
+
     Saltelli et al. (2008)    Global Sensitivity Analysis. The Primer, John Wiley & Sons, pp. 292
+
     Saltelli et al. (2010)    Variance based sensitivity analysis of model output, Design and estimator
                               for the total sensitivity index, Comp. Phys. Comm. 181, 259-270.
+
     Sobol' (1990),            Sensitivity estimates for nonlinear mathematical models,
                               Matematicheskoe Modelirovanie 2, 112-118 (in Russian),
                               translated in English in Sobol' (1993).
+
     Sobol' (1993)             Sensitivity analysis for non-linear mathematical models,
                               Mathematical Modelling and Computational Experiment 1, 407-414,
                               English translation of Russian original paper Sobol' (1990).
 
 Current functions are:
     B                     B of Saltelli et al. (2010)
+
     G / g                 G-function attributed to Sobol' (1990, 1993), given by Saltelli et al. (2008, 2010)
+
     Gstar                 G* of Saltelli et al. (2010)
+
     ishigami_homma        Ishigami and Homma (1990), given by Saltelli et al. (2008, page 179)
+
     K / bratley           K  of Saltelli et al. (2010)
+
     fmorris / morris      After Morris (1991)
+
     oakley_ohagan         Oakley and O'Hagan (2004), parameters given in Saltelli et al. (2008)
                           or on http://www.jeremy-oakley.staff.shef.ac.uk/psa_example.txt
 
@@ -64,6 +75,7 @@ The following functions are provided:
     ratio
     ishigami_homma_easy
 """
+from __future__ import division, absolute_import, print_function
 import numpy as np
 
 

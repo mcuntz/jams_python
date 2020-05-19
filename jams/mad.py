@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-from __future__ import division, absolute_import, print_function
 """
 mad : Median absolute deviation test, either on raw values or on 1st or 2nd derivatives.
 
@@ -15,7 +14,7 @@ Released under the MIT License; see LICENSE file for details.
 * Written Nov 2011 by Matthias Cuntz - mc (at) macu (dot) de
 * ND-array, act on axis=0, May 2012, Matthias Cuntz
 * Removed bug in broadcasting, Jun 2012, Matthias Cuntz
-* Better usage of numpy possbilities, e.g. use=ing np.diff, Jun 2012, Matthias Cuntz
+* Better usage of numpy possibilities, e.g. using np.diff, Jun 2012, Matthias Cuntz
 * Ported to Python 3, Feb 2013, Matthias Cuntz
 * Use bottleneck for medians, otherwise loop over axis=1, Jul 2013, Matthias Cuntz and Juliane Mai
 * Re-allow masked arrays and arrays with NaNs, Jul 2013, Matthias Cuntz
@@ -30,6 +29,7 @@ The following functions are provided
 .. autosummary::
    mad
 """
+from __future__ import division, absolute_import, print_function
 import numpy as np
 
 
@@ -40,8 +40,9 @@ def mad(datin, z=7, deriv=0, nozero=False):
     """
     Median absolute deviation test, either on raw values,
     or on 1st or 2nd derivatives.
-    Returns mask with False everywhere except where <(median-MAD*z/0.6745)
-    or >(md+MAD*z/0.6745).
+
+    Returns mask with False everywhere except where `<(median-MAD\*z/0.6745)`
+    or `>(md+MAD\*z/0.6745)`.
 
     Parameters
     ----------
@@ -51,7 +52,7 @@ def mad(datin, z=7, deriv=0, nozero=False):
         Input is allowed to deviate maximum `z` standard deviations from the median (default: 7)
     deriv : int, optional
         0: Act on raw input (default).
-        
+
         1: Use first derivatives.
 
         2: Use 2nd derivatives.
@@ -79,7 +80,7 @@ def mad(datin, z=7, deriv=0, nozero=False):
     ...               2.64,2.90,2.92,2.92,2.93,3.21,3.26,3.30,3.59,3.68,4.30,
     ...               4.64,5.34,5.42,8.01],dtype=np.float)
 
-    # Normal MAD
+    >>> # Normal MAD
     >>> print(mad(y))
     [False False False False False False False False False False False False
      False False False False False False False False False False False False
@@ -95,18 +96,18 @@ def mad(datin, z=7, deriv=0, nozero=False):
      False False False False False False False False False False False False
       True  True]
 
-    # MAD on 2nd derivatives
+    >>> # MAD on 2nd derivatives
     >>> print(mad(y,z=4,deriv=2))
     [False False False False False False False False False False False False
      False False False False False False False False False False False  True]
 
-    # direct usage
+    >>> # direct usage
     >>> my = np.ma.array(y, mask=mad(y,z=4))
     >>> print(my)
     [-0.25 0.68 0.94 1.15 2.26 2.35 2.37 2.4 2.47 2.54 2.62 2.64 2.9 2.92 2.92
      2.93 3.21 3.26 3.3 3.59 3.68 4.3 4.64 5.34 5.42 --]
 
-    # MAD on several dimensions
+    >>> # MAD on several dimensions
     >>> yy = np.transpose(np.array([y,y]))
     >>> print(np.transpose(mad(yy,z=4)))
     [[False False False False False False False False False False False False
@@ -128,7 +129,7 @@ def mad(datin, z=7, deriv=0, nozero=False):
       False False False False False False False False False False False False
        True  True]]
 
-    # Masked arrays
+    >>> # Masked arrays
     >>> my = np.ma.array(y, mask=np.zeros(y.shape))
     >>> my.mask[-1] = True
     >>> print(mad(my,z=4))
@@ -141,7 +142,7 @@ def mad(datin, z=7, deriv=0, nozero=False):
      False False False False False False False False False False False True
      True --]
 
-    # Arrays with NaNs
+    >>> # Arrays with NaNs
     >>> ny = y.copy()
     >>> ny[-1] = np.nan
     >>> print(mad(ny,z=4))
@@ -154,7 +155,7 @@ def mad(datin, z=7, deriv=0, nozero=False):
      False False False False False False False False False False False  True
       True False]
 
-    # Exclude zeros
+    >>> # Exclude zeros
     >>> zy = y.copy()
     >>> zy[1] = 0.
     >>> print(mad(zy,z=3))

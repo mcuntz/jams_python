@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-from __future__ import division, absolute_import, print_function
 """
 fsread : Read from a file numbers into 2D float array as well as characters into 2D string array.
 
@@ -27,8 +26,9 @@ Released under the MIT License; see LICENSE file for details.
 The following functions are provided
 
 .. autosummary::
-   fread
+   fsread
 """
+from __future__ import division, absolute_import, print_function
 import numpy as np
 
 
@@ -105,37 +105,49 @@ def fsread(infile, nc=0, cname=None, snc=0, sname=None, skip=0, cskip=0, hskip=0
         Possible values: 'strict', 'replace', 'ignore'.
     squeeze : bool, optional
         True:  2-dim array will be cleaned of degenerated dimension, i.e. results in a vector.
+
         False: array will be two-dimensional as read (default).
     reform : bool, optional
         Same as squeeze.
     skip_blank : bool, optional
         True:  continues reading after blank line.
+
         False: stops reading at first blank line (default).
     fill : bool, optional
         True:  fills in `fill_value` if not enough columns in line.
+
         False: stops execution and returns None if not enough columns in line (default).
     header : bool, optional
         True:  header strings will be returned.
+
         False: numbers in file will be returned (default).
     full_header : bool, optional
         True:  header is a string vector of the skipped rows.
+
         False: header will be split in columns, exactly as the data,
                and will hold only the selected columns (default).
     transpose : bool, optional
         True:  column-major format `output(0:ncolumns,0:nlines)`.
+
         False: row-major format `output(0:nlines,0:ncolumns)` (default).
     strarr : bool, optional
         True:  return header as numpy array of strings.
+
         False: return header as list.
 
     Returns
     -------
     array(s)
         1 output:  array of floats (`nc!=0` and `snc=0`)
+
         1 output:  array of strings (`nc=0` and `snc!=0`)
+
         2 outputs: array of floats, array of strings (`nc!=0` and `snc!=0`)
+
         1 output:  list/string array of header ((`nc=0` or `snc=0`) and `header=True`)
+
         2 outputs: list/string array of header for float array, list/string array of header for strarr ((`nc!=0` and `snc!=0`) and `header=True`)
+
         1 output:  String vector of full file header (`header=True` and `full_header=True`)
 
     Notes
@@ -284,9 +296,9 @@ def fsread(infile, nc=0, cname=None, snc=0, sname=None, skip=0, cskip=0, hskip=0
     # wrap to fread/sread
     if (not isinstance(snc, (list, tuple, np.ndarray))) and (sname is None):
         if snc==0:
-            try:
-                from jams import fread
-            except:
+            try:    # import package
+                from .fread import fread
+            except: # python fsread.py
                 from fread import fread
             return fread(infile, nc=nc, cname=cname, skip=skip, cskip=cskip, hskip=hskip, hstrip=hstrip,
                          separator=separator,
@@ -297,9 +309,9 @@ def fsread(infile, nc=0, cname=None, snc=0, sname=None, skip=0, cskip=0, hskip=0
     # snc!=0
     if (not isinstance(nc, (list, tuple, np.ndarray))) and (cname is None):
         if nc==0:
-            try:
-                from jams import sread
-            except:
+            try:    # import package
+                from .sread import sread
+            except: # python fsread.py
                 from sread import sread
             return sread(infile, nc=snc, cname=sname, skip=skip, cskip=cskip, hskip=hskip, hstrip=hstrip,
                          separator=separator,

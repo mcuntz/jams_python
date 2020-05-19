@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-from __future__ import division, absolute_import, print_function
 """
 dec2date : Converts decimal dates to calendar dates.
 
@@ -37,6 +36,7 @@ The following functions are provided
 .. autosummary::
    dec2date
 """
+from __future__ import division, absolute_import, print_function
 import numpy as np
 
 

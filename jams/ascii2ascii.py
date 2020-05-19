@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-from __future__ import division, absolute_import, print_function
 """
 ascii2ascii : Convert date notations between different regional variants
               such as English YYYY-MM-DD hh:mm:ss and US-English
@@ -37,6 +36,7 @@ The following functions are provided
    us2ascii
    eng2ascii
 """
+from __future__ import division, absolute_import, print_function
 import numpy as np
 
 
@@ -58,6 +58,7 @@ def ascii2ascii(edate, full=False, en=False, fr=False, us=False, eng=False, YY=F
         date strings in ascii, English or American format.
     full : bool, optional
         True:  output dates arr all in full format DD.MM.YYYY hh:mm:ss; missing time inputs are 00 on output
+
         False: output dates are as long as input dates (default),
                e.g. [YYYY-MM-DD, YYYY-MM-DD hh:mm] gives [DD.MM.YYYY, DD.MM.YYYY hh:mm]
     en : bool, optional
@@ -359,7 +360,7 @@ def ascii2eng(edate, **kwarg):
 def en2ascii(edate, **kwarg):
     """
     Wrapper function for ascii2ascii with ascii date format output (default):
-        ascii2ascii(edate, **kwarg)
+        `ascii2ascii(edate, **kwarg)`
 
     Examples
     --------
@@ -391,6 +392,7 @@ def fr2ascii(edate, full=False, YY=False):
         date strings in French date format DD/MM/YYYY [hh:mm:ss]
     full : bool, optional
         True:  output dates arr all in full format DD.MM.YYYY hh:mm:ss; missing time inputs are 00 on output
+
         False: output dates are as long as input dates (default),
                e.g. [DD/MM/YYYY, DD/MM/YYYY hh:mm] gives [DD.MM.YYYY, DD.MM.YYYY hh:mm]
     YY : bool, optional
