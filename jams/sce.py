@@ -1,83 +1,98 @@
 #!/usr/bin/env python
+"""
+Shuffled-Complex-Evolution (SCE) algorithm for function minimization
+
+References
+----------
+Duan, Sorooshian and Gupta (1992)
+    Effective and efficient global optimization for conceptual rainfall-runoff models,
+    Water Resour Res 28, 1015-1031, https://doi.org/10.1029/91WR02985
+
+This code is based on a Fortran program of Qingyun Duan (2004), ported to Python by
+Stijn Van Hoey (2011). It was taken up, debugged, enhanced and is maintained by
+Matthias Cuntz while at Department of Computational Hydrosystems (CHS), Helmholtz
+Centre for Environmental Research - UFZ, Leipzig, Germany, and continued while
+at Institut National de Recherche pour l'Agriculture, l'Alimentation et
+l'Environnement (INRAE), Nancy, France.
+
+Copyright (c) 2004-2020 Qingyun Duan, Stijn Van Hoey, Matthias Cuntz - mc (at) macu (dot) de
+Released under the MIT License.
+
+* Written in Fortran by Q Duan, Sep 2004
+* Ported to Python by Stijn Van Hoey, 2011
+  https://github.com/stijnvanhoey/Optimization_SCE
+* Synchronised with enhanced Fortran version of CHS, Oct 2013, Matthias Cuntz
+* Added functionality to call external executable, Nov 2016, Matthias Cuntz
+* Treat NaN and Inf in function output, Nov 2016, Matthias Cuntz
+* Possibility to exclude (mask) parameters from optimisation, Nov 2016, Matthias Cuntz
+* Added restart possibility, Nov 2016, Matthias Cuntz
+* Return also function value of best parameter set if maxit==True, Nov 2016, Matthias Cuntz
+* Removed functionality to call external executable, Dec 2017, Matthias Cuntz
+* Print out number of function evaluations with printit=1, Mar 2018, Matthias Cuntz
+* Mask parameters with degenerated ranges, e.g. upper<lower bound, Mar 2018, Matthias Cuntz
+* Use only masked parameters in calculation of geometric range, Mar 2018, Matthias Cuntz
+* Removed bug that calculated the size of the complexes using all parameters
+  and not only the masked parameters, Mar 2018, Matthias Cuntz
+* Fixed bug where masked parameters were always out of bounds, Mar 2018, Matthias Cuntz
+* Allow scalar bounds, which will be taken for all parameters, Mar 2018, Matthias Cuntz
+* Define number of parameters by inquiring x0 in case of restart, May 2018, Matthias Cuntz
+* Removed multiplication with hundred in criter_change,
+  regarded a bug compared to Fortran code, May 2018, Matthias Cuntz
+* Removed exec command to make restart work with Python 3, May 2020, Matthias Cuntz
+
+.. moduleauthor:: Matthias Cuntz
+
+.. autosummary::
+    sce
+"""
 from __future__ import division, absolute_import, print_function
-import subprocess
 from distutils.util import strtobool
+from numpy import savez_compressed
 import numpy as np
-from jams.const import huge
-from jams.npyio import savez_compressed
-# ToDo: write tmp/population files (of Fortran)
-# ToDo: write out also in logfile if not None (use jams.tee as in joptimise)
 
-def SampleInputMatrix(nrows, npars, bl, bu, distname='randomUniform'):
-    '''
-        Create input parameter matrix (nrows,npars) for
-        nrows simulations and npars parameters with bounds bl and bu
+# ToDo: write tmp/population files (of Fortran code)
 
+__all__ = ['sce']
 
-        Definition
-        ----------
-        def SampleInputMatrix(nrows, npars, bl, bu, distname='randomUniform'):
+def _SampleInputMatrix(nrows, bl, bu, distname='randomUniform'):
+    """
+    Create input parameter matrix (nrows,npars) for
+    nrows simulations and npars parameters with bounds bl and bu
 
 
-        Input
-        -----
-        nrows             # of simulations
-        npars             # of parameters
-        bl                (npars) lower bounds of parameters
-        bu                (npars) upper bounds of parameters
+    Input
+    -----
+    nrows             # of simulations
+    bl                (npars) lower bounds of parameters
+    bu                (npars) upper bounds of parameters
 
 
-        Optional Input
-        --------------
-        distname          initial sampling ditribution (not implemented yet, takes uniform distribution)
+    Optional Input
+    --------------
+    distname          initial sampling ditribution (not implemented yet, takes uniform distribution)
 
 
-        Output
-        ------
-        parameter matrix (nrows, npars) with new parameter samples
+    Output
+    ------
+    parameter matrix (nrows, npars) with new parameter samples
 
 
-        References
-        ----------
-        Duan, Q., S. Sorooshian, and V. Gupta,
-            Effective and efficient global optimization for conceptual rainfall-runoff models,
-            Water Resour. Res., 28, 1015-1031, 1992.
+    References
+    ----------
+    Duan, Q., S. Sorooshian, and V. Gupta,
+        Effective and efficient global optimization for conceptual rainfall-runoff models,
+        Water Resour. Res., 28, 1015-1031, 1992.
 
 
-        License
-        -------
-        This file is part of the JAMS Python package, distributed under the MIT
-        License. The JAMS Python package originates from the former UFZ Python library,
-        Department of Computational Hydrosystems, Helmholtz Centre for Environmental
-        Research - UFZ, Leipzig, Germany.
-
-        Copyright (c) 2004-2013 Q Duan, S Van Hoey, Matthias Cuntz - mc (at) macu (dot) de
-
-        Permission is hereby granted, free of charge, to any person obtaining a copy
-        of this software and associated documentation files (the "Software"), to deal
-        in the Software without restriction, including without limitation the rights
-        to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-        copies of the Software, and to permit persons to whom the Software is
-        furnished to do so, subject to the following conditions:
-
-        The above copyright notice and this permission notice shall be included in all
-        copies or substantial portions of the Software.
-
-        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-        IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-        FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-        AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-        LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-        OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-        SOFTWARE.
-
-
-        History
-        -------
-        Written,  Q. Duan, Sep 2004
-        Modified, S. Van Hoey 2011 - ported to Python
-                  MC, Oct 2013     - adapted to JAMS package and sync with JAMS Fortran version
-    '''
+    History
+    -------
+    Written,  Q. Duan, Sep 2004
+    Modified, S. Van Hoey 2011         - ported to Python
+              Matthias Cuntz, Oct 2013 - adapted to JAMS package and sync with JAMS Fortran version
+              Matthias Cuntz, Mar 2018 - removed npars from call, get it from lower boundary
+              Matthias Cuntz, May 2020 - underscore before function name
+    """
+    npars = len(bl)
     x = np.zeros((nrows,npars))
     bound = bu-bl
     for i in range(nrows):
@@ -86,89 +101,55 @@ def SampleInputMatrix(nrows, npars, bl, bu, distname='randomUniform'):
     return x
 
 
-def cce(functn, s, sf, bl, bu, mask, icall, maxn, alpha, beta, maxit, printit,
-        parameterfile, parameterwriter, objectivefile, objectivereader, shell, debug):
-    '''
-        Generate a new point in a simplex
+def _cce(func, s, sf, bl, bu, mask, icall, maxn, alpha, beta, maxit, printit):
+    """
+    Generate a new point in a simplex
 
 
-        Definition
-        ----------
-        def cce(functn, s, sf, bl, bu, mask, icall, maxn, alpha, beta, maxit, printit):
+    Input
+    -----
+    func              function to minimize
+    s                 2D-array, the sorted simplex in order of increasing function values
+    sf                1D-array, function values in increasing order
+    bl                (npars) lower bounds of parameters
+    bu                (npars) upper bounds of parameters
+    mask              (npars) mask to include (1) or exclude (0) parameter from optimisation
+    icall             counter of function calls
+    maxn              maximum number of function evaluations allowed during optimization
+    alpha             parameter for reflection  of points in complex
+    beta              parameter for contraction of points in complex
+    maxit             if True: maximise instead of minimize func
+    printit           if 1: print each function evaluation
 
 
-        Input
-        -----
-        functn            function to minimise (python function or string for external executable)
-        s                 2D-array, the sorted simplex in order of increasing function values
-        sf                1D-array, function values in increasing order
-        bl                (npars) lower bounds of parameters
-        bu                (npars) upper bounds of parameters
-        mask              (npars) mask to include (1) or exclude (0) parameter from optimisation
-        icall             counter of function calls
-        maxn              maximum number of function evaluations allowed during optimization
-        alpha             parameter for reflection  of points in complex
-        beta              parameter for contraction of points in complex
-        maxit             if True: maximise instead of minimise functn
-        printit           if ==1: print each function evaluation
-        parameterfile     Parameter file for executable; must be given if functn is name of executable
-        parameterwriter   Python function for writing parameter file if functn is name of executable
-        objectivefile     File with objective value from executable; must be given if functn is name of executable
-        objectivereader   Python function for reading objective value if functn is name of executable
-        shell             If True, the specified command will be executed through the shell.
-        debug             If True, model output is displayed for executable.
+    Optional Input
+    --------------
+    None
 
 
-        Optional Input
-        --------------
-        None
+    Output
+    ------
+    new parameter set, function value of new set, number of function calls
 
 
-        Output
-        ------
-        new parameter set, function value of new set, number of function calls
+    References
+    ----------
+    Duan, Q., S. Sorooshian, and V. Gupta,
+        Effective and efficient global optimization for conceptual rainfall-runoff models,
+        Water Resour. Res., 28, 1015-1031, 1992.
 
 
-        References
-        ----------
-        Duan, Q., S. Sorooshian, and V. Gupta,
-            Effective and efficient global optimization for conceptual rainfall-runoff models,
-            Water Resour. Res., 28, 1015-1031, 1992.
+    History
+    -------
+    Written,  Q. Duan, Sep 2004
+    Modified, S. Van Hoey 2011         - ported to Python
+              Matthias Cuntz, Oct 2013 - adapted to JAMS package and sync with JAMS Fortran version
+              Matthias Cuntz, Mar 2018 - changed indentation of random point last resort
+                                       - fixed masked values that were always out of bounds
+              Matthias Cuntz, May 2020 - underscore before function name
+    """
 
-
-        License
-        -------
-        This file is part of the JAMS Python package, distributed under the MIT License.
-
-        Copyright (c) 2004-2013 Q Duan, S Van Hoey, Matthias Cuntz - mc (at) macu (dot) de
-
-        Permission is hereby granted, free of charge, to any person obtaining a copy
-        of this software and associated documentation files (the "Software"), to deal
-        in the Software without restriction, including without limitation the rights
-        to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-        copies of the Software, and to permit persons to whom the Software is
-        furnished to do so, subject to the following conditions:
-
-        The above copyright notice and this permission notice shall be included in all
-        copies or substantial portions of the Software.
-
-        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-        IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-        FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-        AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-        LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-        OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-        SOFTWARE.
-
-
-        History
-        -------
-        Written,  Q. Duan, Sep 2004
-        Modified, S. Van Hoey 2011 - ported to Python
-                  MC, Oct 2013 - adapted to JAMS package and sync with JAMS Fortran version
-    '''
-
-    '''
+    """
     List of local variables
       sb(.) = the best point of the simplex
       sw(.) = the worst point of the simplex
@@ -179,11 +160,7 @@ def cce(functn, s, sf, bl, bu, mask, icall, maxn, alpha, beta, maxit, printit,
       iviol = flag indicating if constraints are violated
             = 1 , yes
             = 0 , no
-    '''
-    nps, nopt = s.shape
-    n = nps
-    m = nopt
-
+    """
     # Assign the best and worst points:
     sb = s[0,:]
     fb = sf[0]
@@ -199,257 +176,206 @@ def cce(functn, s, sf, bl, bu, mask, icall, maxn, alpha, beta, maxit, printit,
 
     # Check if is outside the bounds:
     ibound = 0
-    s1 = snew-bl
-    idx = (s1<0).nonzero()
-    if idx[0].size != 0:
-        ibound = 1
+    # s1 = snew-bl
+    # idx = (s1<0).nonzero()
+    # if idx[0].size != 0: ibound = 1
+    if np.ma.any(np.ma.array(snew-bl, mask=~mask) < 0.): ibound = 1
 
-    s1 = bu-snew
-    idx = (s1<0).nonzero()
-    if idx[0].size != 0: ibound = 2
+    # s1 = bu-snew
+    # idx = (s1<0).nonzero()
+    # if idx[0].size != 0: ibound = 2
+    if np.ma.any(np.ma.array(bu-snew, mask=~mask) < 0.): ibound = 2
 
     if ibound >= 1:
-        snew = SampleInputMatrix(1,nopt,bl,bu,distname='randomUniform')[0]  #checken!!
+        snew = _SampleInputMatrix(1,bl,bu,distname='randomUniform')[0]
         snew = np.where(mask, snew, sb)
 
-    fuc = call_function(functn, snew, bl, bu, mask,
-                        parameterfile, parameterwriter, objectivefile, objectivereader, shell, debug)
+    fuc = func(snew)
     fnew = -fuc if maxit else fuc
-    if printit==1: print('  f, X: ', fnew, snew)
     icall += 1
+    if printit==1: print('  i, f, X: ', icall, fnew, snew)
 
     # Reflection failed; now attempt a contraction point:
     if fnew > fw:
         snew = sw + beta*(ce-sw)
         snew = np.where(mask, snew, sb)
-        fuc = call_function(functn, snew, bl, bu, mask,
-                            parameterfile, parameterwriter, objectivefile, objectivereader, shell, debug)
+        fuc = func(snew)
         fnew = -fuc if maxit else fuc
-        if printit==1: print('  f, X: ', fnew, snew)
         icall += 1
+        if printit==1: print('  i, f, X: ', icall, fnew, snew)
 
     # Both reflection and contraction have failed, attempt a random point;
-        if fnew > fw:
-            snew = SampleInputMatrix(1,nopt,bl,bu,distname='randomUniform')[0]  #checken!!
-            snew = np.where(mask, snew, sb)
-            fuc = call_function(functn, snew, bl, bu, mask,
-                                parameterfile, parameterwriter, objectivefile, objectivereader, shell, debug)
-            fnew = -fuc if maxit else fuc
-            if printit==1: print('  f, X: ', fnew, snew)
-            icall += 1
+    if fnew > fw:
+        snew = _SampleInputMatrix(1,bl,bu,distname='randomUniform')[0]
+        snew = np.where(mask, snew, sb)
+        fuc = func(snew)
+        fnew = -fuc if maxit else fuc
+        icall += 1
+        if printit==1: print('  i, f, X: ', icall, fnew, snew)
 
-    # END OF CCE
+    # end of _cce
     return snew, fnew, icall
 
 
-def call_function(functn, params, bl, bu, mask,
-                  parameterfile, parameterwriter, objectivefile, objectivereader, shell, debug):
-    '''
-        Call python function or external executable
-
-
-        Definition
-        ----------
-        def call_function(functn, params, bl, bu, mask,
-                          parameterfile, parameterwriter, objectivefile, objectivereader, shell, debug):
-
-
-        Input
-        -----
-        functn            function to minimise (python function or string for external executable)
-        params            (npars) parameter set
-        bl                (npars) lower bounds of parameters
-        bu                (npars) upper bounds of parameters
-        mask              (npars) mask to include (1) or exclude (0) parameter from optimisation
-        parameterfile     Parameter file for executable; must be given if functn is name of executable
-        parameterwriter   Python function for writing parameter file if functn is name of executable
-        objectivefile     File with objective value from executable; must be given if functn is name of executable
-        objectivereader   Python function for reading objective value if functn is name of executable
-        shell             If True, the specified command will be executed through the shell.
-        debug             If True, model output is displayed for executable.
-
-        Output
-        ------
-        Function value
-
-
-        History
-        -------
-        Written,  MC, Nov 2016
-    '''
-    if isinstance(functn, (str,list)):
-        parameterwriter(parameterfile, params, bl, bu, mask)
-        if debug:
-            err = subprocess.call(functn, shell=shell)
-        else:
-            err = subprocess.check_output(functn, shell=shell)
-        obj = objectivereader(objectivefile)
-        return obj
-    else:
-        return functn(params)
-
-
-def sce(functn, x0, bl, bu,
+def sce(func, x0, bl, bu,
         mask=None,
         maxn=1000, kstop=10, pcento=0.0001,
         ngs=2, npg=None, nps=None, nspl=None, mings=None,
         peps=0.001, seed=None, iniflg=True,
         alpha=0.8, beta=0.45, maxit=False, printit=2,
         outf=False, outhist=False, outcall=False,
-        restart=False, restartfile1='sce.restart.npz', restartfile2='sce.restart.txt',
-        parameterfile=None, parameterwriter=None,
-        objectivefile=None, objectivereader=None,
-        shell=False, debug=False):
-    '''
-        Shuffled-Complex-Evolution algorithm for function minimalisation
+        restart=False, restartfile1='sce.restart.npz', restartfile2='sce.restart.txt'):
+    """
+    Shuffled-Complex-Evolution algorithm for function minimization
+
+    Parameters
+    ----------
+    func : callable
+        Python function to minimize, callable as `func(x)` with `x` the function parameters.
+    x0 : array_like
+        Parameter values used in initial complex and with `mask==0`.
+    bl : array_like
+        Lower bounds of parameters.
+    bu : array_like
+        Upper bounds of parameters.
+    mask : array_like, optional
+        Include (1,True) or exclude (0,False) parameters in minimization (default: include all parameters).
+
+        'nopt = sum(mask)`
+    maxn : int, optional
+        Maximum number of function evaluations allowed during minimization (default: 1000).
+    kstop : int, optional
+        Maximum number of evolution loops before convergency (default: 10).
+    pcento : float, optional
+        Percentage change allowed in kstop loops before convergency (default: 0.0001).
+    peps : float, optional
+        Value of normalised geometric range needed for convergence (default: 0.001).
+    ngs : int, optional
+        Number of complexes (default: 2).
+    npg : int, optional
+        Number of points in each complex (default: `2*nopt+1`).
+    nps : int, optional
+        Number of points in each sub-complex (default: `nopt+1`).
+    mings : int, optional
+        Minimum number of complexes required if the number of complexes is allowed to reduce as the
+        optimization proceeds (default: `ngs`).
+    nspl : int, optional
+        Number of evolution steps allowed for each complex before complex shuffling (default: `2*nopt+1`).
+    seed : int, optional
+        Random number generator seed (default: None).
+    iniflg : bool, optional
+        If True: include initial parameter in initial population (default: True).
+    alpha : float, optional
+        Parameter for reflection of points in complex (default: 0.8).
+    beta : float, optional
+        Parameter for contraction of points in complex (default: 0.45).
+    maxit : bool, optional
+        If True: maximize instead of minimize func (default: False).
+    printit : int, optional
+        Controlling print-out (default: 2)
+
+        0: print information on the best point of the population
+
+        1: print information on each function evaluation
+
+        2: no printing.
+    outf : bool, optional
+        If True: return best function value (default: False).
+    outhist : bool, optional
+        If True: return parameters and function values of each evolution loop (default: False).
+    outcall : bool, optional
+        If True: return number of function evaluations (default: False).
+    restart : bool, optional
+        If True, continue from saved state in `restartfile1` and `restartfile2` (default: False).
+    restartfile1 : str, optional
+        Filename for saving state of SCE, array variables (default: `sce.restart.npz`)
+
+        Note: state will be always written, except if `restartfile1=None`.
+    restartfile2 : int, optional
+        Filename for saving state of SCE, non-array variables (default: `sce.restart.txt`)
+
+    Returns
+    -------
+    list
+       list[0] is array with best parameter set
+
+       list[1:] depends on `outf`, `outhist` and `outcall`.
+
+       If `outf=True`, `outhist=True` and `outcall=True`
+
+        list[1] : function value at best parameter set
+
+        list[2] : vector of best parameters sets per evolution, function values of the best parameter vector
+
+        list[3] : number of function evaluations
+
+    References
+    ----------
+    Duan, Sorooshian and Gupta (1992)
+        Effective and efficient global optimization for conceptual rainfall-runoff models,
+        Water Resources Research 28, 1015-1031, https://doi.org/10.1029/91WR02985
+    Duan, Sorooshian, and Gupta (1994)
+        Optimal use of the SCE-UA global optimization method for calibrating watershed models,
+        Journal of Hydrology 58, 265–284, https://doi.org/10.1016/0022-1694(94)90057-4
+    Behrangi, Khakbaz, Vrugt, Duan, and Sorooshian (2008)
+        Comment on “Dynamically dimensioned search algorithm for computationally efficient
+        watershed model calibration” by Bryan A. Tolson and Christine A. Shoemaker,
+        Water Resources Research 44, W12603, http://doi.org/10.1029/2007WR006429
+
+    Example
+    -------
+    >>> import numpy as np
+    >>> from scipy.optimize import rosen
+
+    >>> bl = np.array([-5.,-2.])
+    >>> bu = np.array([5.,8.])
+    >>> x0 = np.array([-2.,7.])
+    >>> bestx, bestf, icall = sce(rosen, x0, bl, bu, seed=1, maxn=1000, outf=True, outcall=True, printit=2, restartfile1=None)
+    >>> print(icall)
+    298
+    >>> print('{:.3f}'.format(bestf))
+    0.001
+
+    >>> nopt = 10
+    >>> bl = np.ones((10))*(-5.)
+    >>> bu = np.ones((10))*(5.)
+    >>> x0 = np.ones((10))*(0.5)
+    >>> bestx, bestf, icall = sce(rosen, x0, bl, bu,
+    ...                           maxn=30000, kstop=10, pcento=0.0001, seed=12358,
+    ...                           ngs=5, npg=5*nopt+1, nps=nopt+1, nspl=5*nopt+1, mings=2,
+    ...                           iniflg=True, printit=2, alpha=0.8, beta=0.45,
+    ...                           outf=True, outcall=True, restartfile1=None)
+    >>> print(icall)
+    30228
+    >>> print('{:.3g}'.format(bestf))
+    3.38e-12
 
 
-        Definition
-        ----------
-        def sce(functn, x0, bl, bu,
-                mask=None,
-                maxn=1000, kstop=10, pcento=0.0001,
-                ngs=2, npg=None, nps=None, nspl=None, mings=None,
-                peps=0.001, seed=None, iniflg=True,
-                alpha=0.8, beta=0.45, maxit=False, printit=0,
-                outf=False, outhist=False, outcall=False,
-                restart=False, restartfile1='sce.restart.npz', restartfile2='sce.restart.txt',
-                parameterfile=None, parameterwriter=None,
-                objectivefile=None, objectivereader=None,
-                shell=False, debug=False):
+    History
+    -------
+    Written,  Qingyun Duan,   Sep 2004
+    Modified, Stijn Van Hoey,     2011 - ported to Python
+              Matthias Cuntz, Oct 2013 - adapted to JAMS package and sync with JAMS Fortran version
+              Matthias Cuntz, Nov 2016 - call external programs
+              Matthias Cuntz, Nov 2016 - NaN and Inf
+              Matthias Cuntz, Nov 2016 - mask
+              Matthias Cuntz, Nov 2016 - restart - only Python 2
+              Matthias Cuntz, Nov 2016 - restartfile1=None
+              Matthias Cuntz, Nov 2016 - return -bestf if maxit
+              Matthias Cuntz, Dec 2017 - rm call of external programs
+              Matthias Cuntz, Mar 2018 - print out also number of function evaluations with printit==1
+                                       - mask parameters with degenerated ranges, e.g. upper<lower
+                                       - use only masked in normalized geometric range of parameters
+                                       - bug: calc of size of complexes used all parameters not only masked
+                                       - bug: masked points were always out of bounds
+                                       - allow scalar bounds, which will be taken for all parameters
+              Matthias Cuntz, May 2018 - define nn=len(x0) in case of restart
+                                       - removed *100 from criter_change, which was a bug compared to Fortran code
+              Matthias Cuntz, May 2020 - removed exec commands for read/write of restart files
+                                       - use numpy.savez_compressed to be independent of JAMS
+    """
 
-
-        Input
-        -----
-        functn            function to minimise (python function or string for external executable)
-        x0                1D-array of size nopt, initial parameter set
-        bl                (npars) lower bounds of parameters
-        bu                (npars) upper bounds of parameters
-
-
-        Optional Input
-        --------------
-        mask              (npars) include (1,True) or exclude (0,False) parameters in optimisation
-        maxn              maximum number of function evaluations allowed during optimization (default: 1000)
-        kstop             maximum number of evolution loops before convergency (default: 10)
-        pcento            the percentage change allowed in kstop loops before convergency (default: 0.0001)
-        peps              value of normalised geometric range needed for convergence (default: 0.001)
-        ngs               number of complexes (default: 2)
-        npg               number of points in each complex (default: 2*nopt+1)
-        nps               number of points in each sub-complex (default: nopt+1)
-        mings             minimum number of complexes required if the number of complexes is allowed to reduce as the
-                          optimization proceeds (default: ngs)
-        nspl              number of evolution steps allowed for each complex before complex shuffling (default: 2*nopt+1)
-        seed              Random number generator seed (default: None)
-        iniflg            if True: include initial parameter in initial population (default: True)
-        alpha             parameter for reflection  of points in complex (default: 0.8)
-        beta              parameter for contraction of points in complex (default: 0.45)
-        maxit             if True: maximise instead of minimise functn (default: false)
-        printit           controlling print-out (default: 2)
-                          0: print information on the best point of the population
-                          1: print information on each function evaluation
-                          2: no printing
-        outf              if True: return best function value (default: False)
-        outhist           if True: return parameters and function values of each evolution loop (default: False)
-        outcall           if True: return number of function evaluations (default: False)
-        restart           if True, continue from saved state in restartfile1/2
-        restartfile1/2    File names for saving state of SCE (default: sce.restart.npz and sce.restart.txt)
-                          State will be always written, except if restartfile1=None.
-        parameterfile     Parameter file for executable; must be given if functn is name of executable
-        parameterwriter   Python function for writing parameter file if functn is name of executable
-        objectivefile     File with objective value from executable; must be given if functn is name of executable
-        objectivereader   Python function for reading objective value if functn is name of executable
-        shell             If True, the specified executable will be executed through the shell (default: False).
-        debug             If True, model output is displayed for executable (default: False).
-
-
-        Output
-        ------
-        best parameter set
-        depending on outf, outhist and outcall also
-            function value at best parameter set
-            vector of best parameters sets per evolution, function values of the best parameter vector
-            number of function evaluations
-        If functn is name of executable, parameterwriter will be called at the end,
-        i.e. parameter file contains best parameter set.
-
-
-        References
-        ----------
-        Duan, Q., S. Sorooshian, and V. Gupta,
-            Effective and efficient global optimization for conceptual rainfall-runoff models,
-            Water Resour. Res., 28, 1015-1031, 1992.
-
-
-        Example
-        -------
-        >>> import numpy as np
-        >>> from functions import ackley, rosenbrock
-        >>> from autostring import astr
-
-        >>> bl = np.array([-5.,-2.])
-        >>> bu = np.array([5.,8.])
-        >>> x0 = np.array([-2.,7.])
-        >>> bestx, bestf, icall = sce(rosenbrock, x0, bl, bu, seed=1, maxn=1000, outf=True, outcall=True, printit=2, restartfile1=None)
-        >>> print(astr(icall))
-        298
-        >>> print(astr(bestf,3))
-        0.001
-
-        >>> nopt = 30
-        >>> bl = np.ones((30))*(-10.)
-        >>> bu = np.ones((30))*(10.)
-        >>> x0 = np.ones((30))*(0.5)
-        >>> bestx, bestf, icall = sce(ackley, x0, bl, bu,
-        ...                           maxn=30000, kstop=10, pcento=0.0001, seed=10987,
-        ...                           ngs=2, npg=2*nopt+1, nps=nopt+1, nspl=2*nopt+1, mings=2,
-        ...                           iniflg=True, printit=2, alpha=0.8, beta=0.45,
-        ...                           outf=True, outcall=True, restartfile1=None)
-        >>> print(astr(icall))
-        4608
-        >>> print(astr(bestf,3))
-        0.014
-
-
-        License
-        -------
-        This file is part of the JAMS Python package, distributed under the MIT License.
-
-        Copyright (c) 2004-2016 Q Duan, S Van Hoey, Matthias Cuntz - mc (at) macu (dot) de
-
-        Permission is hereby granted, free of charge, to any person obtaining a copy
-        of this software and associated documentation files (the "Software"), to deal
-        in the Software without restriction, including without limitation the rights
-        to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-        copies of the Software, and to permit persons to whom the Software is
-        furnished to do so, subject to the following conditions:
-
-        The above copyright notice and this permission notice shall be included in all
-        copies or substantial portions of the Software.
-
-        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-        IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-        FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-        AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-        LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-        OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-        SOFTWARE.
-
-
-        History
-        -------
-        Written,  Q. Duan, Sep 2004
-        Modified, S. Van Hoey 2011 - ported to Python
-                  MC, Oct 2013 - adapted to JAMS package and sync with JAMS Fortran version
-                  MC, Nov 2016 - call external programs
-                  MC, Nov 2016 - NaN and Inf
-                  MC, Nov 2016 - mask
-                  MC, Nov 2016 - restart - only Python 2
-                  MC, Nov 2016 - restartfile1=None
-                  MC, Nov 2016 - return -bestf if maxit
-    '''
-
-    '''
+    """
        List of local variables
        x(.,.)    = coordinates of points in the population
        xf(.)     = function values of x(.,.)
@@ -471,75 +397,48 @@ def sce(functn, x0, bl, bu,
        iseed1    = current random seed
        criter(.) = vector containing the best criterion values of the last
                    10 shuffling loops
-    '''
-    # Different variabels types (array, float, int, ...) for restart
-    if restartfile1 is not None:
-        # Only arrays with savez_compressed - restartfile1
-        restartarray  = ['bl', 'bu', 'bound', 'mask',
-                         'criter',
-                         'x', 'xf',
-                         'bestx', 'worstx', 'allbestf', 'allbestx',
-                         'rs2']
-        # Save scalars in simple text file - restartfile2
-        restartint    = ['nopt', 'npg', 'nps', 'nspl', 'mings', 'npt',
-                         'nloop', 'icall', 'rs3', 'rs4']
-        restartfloat  = ['gnrng', 'criter_change', 'bestf', 'worstf', 'rs5']
-        restartbool   = ['maxit']
-        restartstring = ['rs1']
-        saveargarray = '"'+restartfile1+'"'
-        for j in restartarray: saveargarray = saveargarray + ', '+j+'='+j
-        saveargint    = ','.join(restartint)
-        saveargfloat  = ','.join(restartfloat)
-        saveargbool   = ','.join(restartbool)
-        saveargstring = ','.join(restartstring)
-
-    # Check parameterfile etc. if functn is name of executable
-    if isinstance(functn, (str,list)):
-        if parameterfile is None:
-            raise IOError('parameterfile must be given if functn is name of executable.')
-        if parameterwriter is None:
-            raise IOError('parameterwrite must be given if functn is name of executable.')
-        if objectivefile is None:
-            raise IOError('objectivefile must be given if functn is name of executable.')
-        if objectivereader is None:
-            raise IOError('objectivereader must be given if functn is name of executable.')
-
+    """
     if not restart:
         # Initialize SCE parameters:
-        nopt = len(x0)
+        nn = len(x0)
+        if mask is None: mask = np.ones(nn, dtype=np.bool)
+        nopt = np.sum(mask)
         if npg   is None: npg   = 2*nopt+1
         if nps   is None: nps   = nopt+1
         if nspl  is None: nspl  = 2*nopt+1
         if mings is None: mings = ngs
         npt = npg*ngs
 
-        # assure numpy array
+        # assure numpy array with size(x0)=nn
         bl = np.array(bl)
         bu = np.array(bu)
+        # same bounds for all parameters
+        if len(bl) == 1: bl = np.full(nn, bl[0])
+        if len(bu) == 1: bu = np.full(nn, bu[0])
 
         bound = bu-bl
 
         # Seed random number generator
         np.random.seed(seed=seed)
 
-        if mask is None: mask = np.ones(nopt, dtype=np.bool)
+        # degenerated bounds
+        if np.any(bound <= 0.): mask[np.where(bound <= 0.)] = False
 
-        large = 0.5*huge
+        large = 0.5*np.finfo(np.float).max
 
-        # Create an initial population to fill array x(npt,nopt):
-        x = SampleInputMatrix(npt, nopt, bl, bu, distname='randomUniform')
+        # Create an initial population to fill array x(npt,nn):
+        x = _SampleInputMatrix(npt, bl, bu, distname='randomUniform')
         for i in range(npt):
             x[i,:] = np.where(mask, x[i,:], x0)
         if iniflg==1: x[0,:] = x0
 
         icall = 0
         xf = np.zeros(npt)
-        for i in range (npt):
-            fuc = call_function(functn, x[i,:], bl, bu, mask,
-                                parameterfile, parameterwriter, objectivefile, objectivereader, shell, debug)
+        for i in range(npt):
+            fuc = func(x[i,:])
             xf[i] = -fuc if maxit else fuc
-            if printit==1: print('  f, X: ', xf[i], x[i,:])
             icall += 1
+            if printit==1: print('  i, f, X: ', icall, xf[i], x[i,:])
 
         # remember largest for treating of NaNs
         large = xf[np.isfinite(xf)].max()
@@ -564,11 +463,15 @@ def sce(functn, x0, bl, bu,
         xnstd = np.std(x,axis=0)
 
         # Computes the normalized geometric range of the parameters
-        gnrng = np.exp(np.mean(np.log((np.max(x,axis=0)-np.min(x,axis=0))/bound)))
+        # gnrng = np.exp(np.mean(np.log((np.max(x,axis=0)-np.min(x,axis=0))/bound)))
+        rrange = np.ma.array(x.max(axis=0)-x.min(axis=0), mask=~mask) / np.ma.array(bound, mask=~mask)
+        gnrng  = np.ma.exp(np.ma.mean(np.ma.log(rrange)))
 
         if printit<2:
-            print('The Initial Loop: 0. Best f: {:f}, worst f {:f}'.format(bestf, worstf))
-            print('  best X: ', bestx)
+            print('')
+            print('Initial complex: Best f: {:f}, worst f {:f}'.format(bestf, worstf))
+            print('  best X:')
+            print(bestx)
             print('')
 
         # Check for convergence
@@ -589,26 +492,50 @@ def sce(functn, x0, bl, bu,
         # save restart
         if restartfile1 is not None:
             rs1, rs2, rs3, rs4, rs5 = np.random.get_state()
-            exec("savez_compressed("+saveargarray+")")
+            # Only arrays with savez_compressed - restartfile1
+            savez_compressed(restartfile1,
+                             bl=bl, bu=bu, bound=bound, mask=mask,
+                             criter=criter,
+                             x=x, xf=xf,
+                             bestx=bestx, worstx=worstx, allbestf=allbestf, allbestx=allbestx,
+                             rs2=rs2)
             p = open(restartfile2, 'w')
-            exec("print("+saveargint+", file=p)")
-            exec("print("+saveargfloat+", file=p)")
-            exec("print("+saveargbool+", file=p)")
-            exec("print("+saveargstring+", file=p)")
+            iout  = [nopt, npg, nps, nspl, mings, npt, nloop, icall, rs3, rs4]
+            fform = '{:d},'*(len(iout)-1) + '{:d}'
+            print(fform.format(*iout), file=p)
+            fout = [gnrng, criter_change, bestf, worstf, rs5]
+            fform = '{:.15g},'*(len(fout)-1) + '{:.15g}'
+            print(fform.format(*fout), file=p)
+            print(maxit, file=p)
+            print(rs1, file=p)
             p.close()
 
-    else: # if no restart
+    else: # if not restart
+        nn = len(x0)
 
         # load restart
         p1 = open(restartfile1, 'rb')
         pp = np.load(p1)
-        for i in pp.files: exec(i+" = pp['"+i+"']")
+        bl       = pp['bl']
+        bu       = pp['bu']
+        bound    = pp['bound']
+        mask     = pp['mask']
+        criter   = pp['criter']
+        x        = pp['x']
+        xf       = pp['xf']
+        bestx    = pp['bestx']
+        worstx   = pp['worstx']
+        allbestf = pp['allbestf']
+        allbestx = pp['allbestx']
+        rs2      = pp['rs2']
         p1.close()
         p2 = open(restartfile2, 'r')
-        for i, pp in enumerate(p2.readline().rstrip().split()): exec(restartint[i]+" = int(pp)")
-        for i, pp in enumerate(p2.readline().rstrip().split()): exec(restartfloat[i]+" = float(pp)")
-        for i, pp in enumerate(p2.readline().rstrip().split()): exec(restartbool[i]+" = bool(strtobool(pp))")
-        for i, pp in enumerate(p2.readline().rstrip().split()): exec(restartstring[i]+" = pp")
+        nopt, npg, nps, nspl, mings, npt, nloop, icall, rs3, rs4 = [
+            int(inn) for inn in p2.readline().rstrip().split(',') ]
+        gnrng, criter_change, bestf, worstf, rs5 = [
+            float(inn) for inn in p2.readline().rstrip().split(',') ]
+        maxit = bool(strtobool(p2.readline().rstrip()))
+        rs1 = p2.readline().rstrip()
         p2.close()
         np.random.set_state((rs1, rs2, rs3, rs4, rs5))
 
@@ -619,7 +546,7 @@ def sce(functn, x0, bl, bu,
         # Loop on complexes (sub-populations);
         for igs in range(ngs):
             # Partition the population into complexes (sub-populations);
-            cx = np.zeros((npg,nopt))
+            cx = np.zeros((npg,nn))
             cf = np.zeros((npg))
 
             k1 = np.array(range(npg))
@@ -645,7 +572,7 @@ def sce(functn, x0, bl, bu,
                 lcs.sort()
 
                 # Construct the simplex:
-                s  = np.zeros((nps,nopt))
+                s  = np.zeros((nps,nn))
                 s  = cx[lcs,:]
                 sf = cf[lcs]
 
@@ -653,8 +580,7 @@ def sce(functn, x0, bl, bu,
                 large = cf[np.isfinite(cf)].max()
                 large = 1.1*large if large>0. else 0.9*large
 
-                snew, fnew, icall = cce(functn, s, sf, bl, bu, mask, icall, maxn, alpha, beta, maxit, printit,
-                                        parameterfile, parameterwriter, objectivefile, objectivereader, shell, debug)
+                snew, fnew, icall = _cce(func, s, sf, bl, bu, mask, icall, maxn, alpha, beta, maxit, printit)
                 # Replace the worst point in Simplex with the new point:
                 s[-1,:] = snew
                 sf[-1]  = fnew
@@ -694,11 +620,15 @@ def sce(functn, x0, bl, bu,
         xnstd=np.std(x,axis=0)
 
         # Computes the normalized geometric range of the parameters
-        gnrng=np.exp(np.mean(np.log((np.max(x,axis=0)-np.min(x,axis=0))/bound)))
+        # gnrng=np.exp(np.mean(np.log((np.max(x,axis=0)-np.min(x,axis=0))/bound)))
+        rrange = np.ma.array(x.max(axis=0)-x.min(axis=0), mask=~mask) / np.ma.array(bound, mask=~mask)
+        gnrng  = np.ma.exp(np.ma.mean(np.ma.log(rrange)))
 
         if printit<2:
+            print('')
             print('Evolution loop {0:d}, trials {1:d}. Best f: {2:f}, worst f {3:f}'.format(nloop, icall, bestf, worstf))
-            print('  best X: ', bestx)
+            print('  best X:')
+            print(bestx)
             print('')
 
         # Check for convergency;
@@ -714,8 +644,8 @@ def sce(functn, x0, bl, bu,
         criter = np.append(criter,bestf)
 
         if nloop >= kstop: # nodig zodat minimum zoveel doorlopen worden
-            criter_change = np.abs(criter[nloop-1]-criter[nloop-kstop])*100
-            criter_change = criter_change/np.mean(np.abs(criter[nloop-kstop:nloop]))
+            criter_change = np.abs(criter[nloop-1]-criter[nloop-kstop])
+            criter_change = criter_change/np.maximum(np.mean(np.abs(criter[nloop-kstop:nloop])), 1e-15)
             if criter_change < pcento:
                 if printit<2:
                     print('The best point has improved by less then {:f} in the last {:d} loops.'.format(pcento, kstop))
@@ -723,12 +653,21 @@ def sce(functn, x0, bl, bu,
         # save restart
         if restartfile1 is not None:
             rs1, rs2, rs3, rs4, rs5 = np.random.get_state()
-            exec("savez_compressed("+saveargarray+")")
+            savez_compressed(restartfile1,
+                             bl=bl, bu=bu, bound=bound, mask=mask,
+                             criter=criter,
+                             x=x, xf=xf,
+                             bestx=bestx, worstx=worstx, allbestf=allbestf, allbestx=allbestx,
+                             rs2=rs2)
             p = open(restartfile2, 'w')
-            exec("print("+saveargint+", file=p)")
-            exec("print("+saveargfloat+", file=p)")
-            exec("print("+saveargbool+", file=p)")
-            exec("print("+saveargstring+", file=p)")
+            iout  = [nopt, npg, nps, nspl, mings, npt, nloop, icall, rs3, rs4]
+            fform = '{:d},'*(len(iout)-1) + '{:d}'
+            print(fform.format(*iout), file=p)
+            fout = [gnrng, criter_change, bestf, worstf, rs5]
+            fform = '{:.15g},'*(len(fout)-1) + '{:.15g}'
+            print(fform.format(*fout), file=p)
+            print(maxit, file=p)
+            print(rs1, file=p)
             p.close()
     # End of the Outer Loop: while icall<maxn and gnrng>peps and criter_change>pcento
 
@@ -737,7 +676,7 @@ def sce(functn, x0, bl, bu,
         print('The best point has improved by {:f} in the last {:d} loops.'.format(criter_change, kstop))
 
     # reshape allbestx
-    allbestx = allbestx.reshape(allbestx.size//nopt,nopt)
+    allbestx = allbestx.reshape(allbestx.size//nn,nn)
 
     # end of subroutine sce
     if maxit:
@@ -748,78 +687,75 @@ def sce(functn, x0, bl, bu,
     if outhist: out += [allbestx, allbestf]
     if outcall: out += [icall]
 
-    # write parameter file with best parameters
-    if isinstance(functn, (str,list)):
-        parameterwriter(parameterfile, bestx, bl, bu, mask)
-
     return out
 
 
 if __name__ == '__main__':
     import doctest
     doctest.testmod(optionflags=doctest.NORMALIZE_WHITESPACE)
-    
+
     # maxn = 10000
     # from jams.functions import ackley, griewank, goldstein_price, rastrigin, rosenbrock, six_hump_camelback
-    # '''
+    # np.random.seed(1023)
+    # """
     # This is the Ackley Function
     # Global Optimum (n>=2): 0.0 at origin
-    # '''
+    # """
     # npara = 10
     # bl = -10*np.ones(npara)
     # bu = 10*np.ones(npara)
     # x0 = np.random.rand(npara)*10.
     # bestx, bestf = sce(ackley, x0, bl, bu, maxn=maxn, outf=True, restartfile1=None)
     # print('Ackley ', bestx, bestf)
-    # '''
-    #     This is the Griewank Function (2-D or 10-D)
-    #     Bound: X(i)=[-600,600], for i=1,2,...,10  !for visualization only 2!
-    #        Global Optimum: 0, at origin
-    # '''
+    # """
+    # This is the Griewank Function (2-D or 10-D)
+    # Bound: X(i)=[-600,600], for i=1,2,...,10  !for visualization only 2!
+    #    Global Optimum: 0, at origin
+    # """
     # npara = 10
     # bl = -600*np.ones(npara)
     # bu = 600*np.ones(npara)
     # x0 = np.random.rand(npara)*600.
     # bestx, bestf = sce(griewank, x0, bl, bu, maxn=maxn, outf=True, restartfile1=None)
     # print('Griewank ', bestx, bestf)
-    # '''
+    # """
     # This is the Goldstein-Price Function
     # Bound X1=[-2,2], X2=[-2,2]
     # Global Optimum: 3.0,(0.0,-1.0)
-    # '''
+    # """
     # npara = 2
     # bl = -2*np.ones(npara)
     # bu = 2*np.ones(npara)
     # x0 = np.random.rand(npara)*2.
     # bestx, bestf = sce(goldstein_price, x0, bl, bu, maxn=maxn, outf=True, restartfile1=None)
     # print('Goldstein ', bestx, bestf)
-    # '''
+    # """
     # This is the Rastrigin Function
     # Bound: X1=[-1,1], X2=[-1,1]
     # Global Optimum: -2, (0,0)
-    # '''
+    # """
     # npara = 2
     # bl = -1*np.ones(npara)
     # bu = 1*np.ones(npara)
     # x0 = np.random.rand(npara)*1.
     # bestx, bestf = sce(rastrigin, x0, bl, bu, maxn=maxn, outf=True, restartfile1=None)
     # print('Rastrigin ', bestx, bestf)
-    # '''
+    # """
     # This is the Rosenbrock Function
     # Bound: X1=[-5,5], X2=[-2,8]; Global Optimum: 0,(1,1)
     #        bl=[-5 -5]; bu=[5 5]; x0=[1 1];
-    # '''
+    # """
     # npara = 2
     # bl = -2*np.ones(npara)
     # bu = 5*np.ones(npara)
     # x0 = np.random.rand(npara)*2.
     # bestx, bestf = sce(rosenbrock, x0, bl, bu, maxn=maxn, outf=True, restartfile1=None)
     # print('Rosenbrock ', bestx, bestf)
-    # '''
+    # """
     # This is the Six-hump Camelback Function.
     # Bound: X1=[-5,5], X2=[-5,5]
     # True Optima: -1.031628453489877, (-0.08983,0.7126), (0.08983,-0.7126)
-    # '''
+    # """
     # npara = 2
     # bl = -5*np.ones(npara)
     # bu = 5*np.ones(npara)
@@ -844,3 +780,10 @@ if __name__ == '__main__':
     # bestx, bestf = sce(rosenbrock, x0, lb, ub, maxn=maxn, outf=True,
     #                    seed=seed, restart=True)
     # print('Rosenbrock Restart 2 - ', bestx, bestf)
+
+    # # Clean restart
+    # import os
+    # restartfile1='sce.restart.npz'
+    # restartfile2='sce.restart.txt'
+    # os.remove(restartfile1)
+    # os.remove(restartfile2)
