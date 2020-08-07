@@ -1,113 +1,100 @@
 #!/usr/bin/env python
 from __future__ import division, absolute_import, print_function
+"""
+tee : Prints arguments on screen and in file, like *nix tee utility.
+
+This module was by Matthias Cuntz while at Department of Computational
+Hydrosystems, Helmholtz Centre for Environmental Research - UFZ,
+Leipzig, Germany, and continued while at Institut National de Recherche
+pour l'Agriculture, l'Alimentation et l'Environnement (INRAE), Nancy, France.
+
+Copyright (c) 2014-2020 Matthias Cuntz - mc (at) macu (dot) de
+Released under the MIT License; see LICENSE file for details.
+
+* Written Dec 2014 by Matthias Cuntz (mc (at) macu (dot) de)
+* Allow that file keyword not given, Nov 2016, Matthias Cuntz
+* Make numpy doctsring format, Dec 2019, Matthias Cuntz
+
+.. moduleauthor:: Matthias Cuntz
+
+The following functions are provided:
+
+.. autosummary::
+   tee
+"""
+
 
 __all__ = ['tee']
 
+
 def tee(*args, **kwargs):
     """
-        Prints arguments on screen and in file.
+    Prints arguments on screen and in file, like Unix/Linux tee utility.
         
-        Calls print function twice, once with the keyword file and once without, i.e. prints on sys.stdout.
+    Calls print function twice, once with the keyword file and once without, i.e. prints on sys.stdout.
+
+    Parameters
+    ----------
+    *args : iterable
+        All arguments of the print function; will be passed to the `print` function.
+    **kwargs : dict
+        All keyword arguments of the `print` function; will be passed to the `print` function.
+    file : object
+        The file argument must be an object with a `write(string)` method.
+        If it is not present or `None`, `*args` will be printed on `sys.stdout` only.
+        Since printed arguments are converted to text strings, `print()` cannot be used with
+        binary mode file objects.arguments.
+
+    Returns
+    -------
+    None
+        If `file` is given and not `None`, then print will be called with `*args` and `**kwargs`
+        and a second time with the `file` keyword argument removed, so that `*args` will be
+        written to `sys.stdout`.
+
+        If `file` is not given or `None`, `*args` will only be written to `sys.stdout`,
+        i.e. ``tee`` is a simple wrapper of the `print` function.
+
+    Examples
+    --------
+    >>> st = 'Output on screen and in log file'
+    >>> ff = 'tee_log.txt'
+
+    >>> f = open(ff, 'w')
+    >>> tee(st, file=f)
+    Output on screen and in log file
+    >>> f.close()
+
+    >>> f = open(ff, 'r')
+    >>> test = f.readline()
+    >>> f.close()
+    >>> test = test[:-1] # rm trailing newline character
+    >>> if test == st:
+    ...     print('Yes')
+    ... else:
+    ...     print('No')
+    Yes
+
+    >>> import os
+    >>> os.remove(ff)
+
+    >>> f=None
+    >>> st = 'Output only on screen'
+    >>> tee(st, file=f)
+    Output only on screen
 
 
-        Definition
-        ----------
-        def tee(*args, **kwargs):
-
-
-        Input
-        -----
-        All arguments of the print function.
-
-
-        Optional Input
-        --------------
-        All keyword arguments of the print function.
-
-        The file argument must be an object with a write(string) method.
-        If the file argument is None, then there will be no second print.
-
-
-        Output
-        ------
-        Print on sys.stdout (screen) and in file if given.
-
-
-        Restrictions
-        ------------
-        If the keyword file is not given, arguments and keyword arguments are passed
-        to the print function only once, i.e. tee is then just a wrapper for print.
-
-
-        Examples
-        --------
-        >>> st = 'Output on screen and in log file'
-        >>> ff = 'tee_log.txt'
-
-        # write
-        >>> f = open(ff, 'w')
-        >>> tee(st, file=f)
-        Output on screen and in log file
-        >>> f.close()
-
-        # test
-        >>> f = open(ff, 'r')
-        >>> test = f.readline()
-        >>> f.close()
-        >>> test = test[:-1] # rm trailing newline character
-        >>> if test == st:
-        ...     print('Yes')
-        ... else:
-        ...     print('No')
-        Yes
-
-        >>> import os
-        >>> os.remove(ff)
-
-        >>> f=None
-        >>> st = 'Output only on screen'
-        >>> tee(st, file=f)
-        Output only on screen
-
-
-        License
-        -------
-        This file is part of the JAMS Python package, distributed under the MIT
-        License. The JAMS Python package originates from the former UFZ Python library,
-        Department of Computational Hydrosystems, Helmholtz Centre for Environmental
-        Research - UFZ, Leipzig, Germany.
-
-        Copyright (c) 2014-2016 Matthias Cuntz - mc (at) macu (dot) de
-
-        Permission is hereby granted, free of charge, to any person obtaining a copy
-        of this software and associated documentation files (the "Software"), to deal
-        in the Software without restriction, including without limitation the rights
-        to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-        copies of the Software, and to permit persons to whom the Software is
-        furnished to do so, subject to the following conditions:
-
-        The above copyright notice and this permission notice shall be included in all
-        copies or substantial portions of the Software.
-
-        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-        IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-        FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-        AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-        LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-        OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-        SOFTWARE.
-
-
-        History
-        -------
-        Written,  MC, Oct 2014
-        Modified, Mc, Nov 2016 - file=None
+    History
+    -------
+    Written,  Matthias Cuntz, Oct 2014
+    Modified, Matthias Cuntz, Nov 2016 - file=None
+              Matthias Cuntz, Dec 2019 - numpy docstring format
     """
     if 'file' in kwargs:
         if kwargs['file'] is not None:
-            print(*args, **kwargs) # file
+            print(*args, **kwargs)  # file
         del kwargs['file']
-    print(*args, **kwargs)         # screen
+    print(*args, **kwargs)          # screen
 
 
 if __name__ == '__main__':

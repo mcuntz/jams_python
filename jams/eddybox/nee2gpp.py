@@ -99,38 +99,50 @@ def nee2gpp(dates, nee, t, isday, rg=False, vpd=False, undef=np.nan,
         >>> undef = -9999.
         >>> isday = np.where(rg > 10., True, False)
         >>> tt    = np.where(tair == undef, undef, tair+273.15)
+        >>> # partition
         >>> GPP, Reco = nee2gpp(dates, NEE, tt, isday, undef=undef, method='local')
-        >>> from jams.autostring import astr
-        >>> print(astr(GPP[1120:1128],3,pp=True))
-        ['-9999.000' '-9999.000' '-9999.000' '    4.491' '    8.396' '   10.688' '    8.542' '   11.271']
-        >>> print(astr(Reco[1120:1128],3,pp=True))
-        ['1.782' '1.906' '2.079' '2.256' '2.464' '2.708' '2.951' '3.218']
+        >>> print(GPP[1120:1128])
+        [-9.99900000e+03 -9.99900000e+03 -9.99900000e+03  4.40606871e+00
+          8.31942152e+00  1.06242542e+01  8.49245664e+00  1.12381973e+01]
+        >>> print(Reco[1120:1128])
+        [1.68311981 1.81012431 1.9874173  2.17108871 2.38759152 2.64372415
+         2.90076664 3.18592735]
+
         >>> GPP, Reco = nee2gpp(dates, NEE, tt, isday, undef=undef, method='local')
-        >>> print(astr(GPP[1120:1128],3,pp=True))
-        ['-9999.000' '-9999.000' '-9999.000' '    4.491' '    8.396' '   10.688' '    8.542' '   11.271']
-        >>> GPP, Reco = nee2gpp(dates, NEE, tt, isday, undef=undef, method='reichstein')
-        >>> print(astr(GPP[1120:1128],3,pp=True))
-        ['-9999.000' '-9999.000' '-9999.000' '    4.491' '    8.396' '   10.688' '    8.542' '   11.271']
-        >>> GPP, Reco = nee2gpp(dates, NEE, tt, isday, undef=undef, method='local', masked=True)
-        >>> print(astr(GPP[1120:1128],3,pp=True))
-        ['--    ' '--    ' '--    ' ' 4.491' ' 8.396' '10.688' ' 8.542' '11.271']
-        >>> GPP, Reco = nee2gpp(dates, NEE, tt, isday, undef=undef, method='local', shape=(np.size(NEE),1))
-        >>> print(astr(GPP[1120:1128],3,pp=True))
-        [['-9999.000']
-         ['-9999.000']
-         ['-9999.000']
-         ['    4.491']
-         ['    8.396']
-         ['   10.688']
-         ['    8.542']
-         ['   11.271']]
+        >>> print(GPP[1120:1128])
+        [-9.99900000e+03 -9.99900000e+03 -9.99900000e+03  4.40606871e+00
+          8.31942152e+00  1.06242542e+01  8.49245664e+00  1.12381973e+01]
+
+        >>> GPP, Reco = nee2gpp(dates, NEE, tt, isday, undef=undef, method='global')
+        >>> print(GPP[1120:1128])
+        [-9.99900000e+03 -9.99900000e+03 -9.99900000e+03  4.33166157e+00
+          8.18228013e+00  1.04092252e+01  8.19395317e+00  1.08427448e+01]
+
+        >>> GPP, Reco = nee2gpp(dates, NEE, tt, isday, undef=undef, method='Reichstein', masked=True)
+        >>> print(GPP[1120:1128])
+        [-- -- -- 4.406068706013192 8.319421516040766 10.624254150217764
+         8.492456637225963 11.238197347837367]
+
+        >>> GPP, Reco = nee2gpp(dates, NEE, tt, isday, undef=undef, method='reichstein', shape=(np.size(NEE),1))
+        >>> print(GPP[1120:1128])
+        [[-9.99900000e+03]
+         [-9.99900000e+03]
+         [-9.99900000e+03]
+         [ 4.40606871e+00]
+         [ 8.31942152e+00]
+         [ 1.06242542e+01]
+         [ 8.49245664e+00]
+         [ 1.12381973e+01]]
+
         >>> VPD = np.squeeze(dat[8,:])
         >>> vpd = np.where(VPD == undef, undef, VPD*100.)
         >>> GPP, Reco = nee2gpp(dates, NEE, tt, isday, rg, vpd, undef=undef, method='day')
-        >>> print(astr(GPP[1120:1128],3,pp=True))
-        ['-9999.000' '-9999.000' '-9999.000' '    2.897' '    6.771' '    9.064' '    6.957' '    9.778']
-        >>> print(astr(Reco[1120:1128],3,pp=True))
-        ['0.352' '0.421' '0.531' '0.662' '0.839' '1.083' '1.365' '1.726']
+        >>> print(GPP[1120:1128])
+        [-9.99900000e+03 -9.99900000e+03 -9.99900000e+03  2.78457540e+00
+          6.63212545e+00  8.88902165e+00  6.74243873e+00  9.51364527e+00]
+        >>> print(Reco[1120:1128])
+        [0.28786696 0.34594516 0.43893276 0.5495954  0.70029545 0.90849165
+         1.15074873 1.46137527]
 
 
         License
@@ -249,10 +261,11 @@ def nee2gpp_falge(dates, nee, t, isday, undef=np.nan,
         >>> undef = -9999.
         >>> isday = np.where(rg > 10., True, False)
         >>> tt    = np.where(tair == undef, undef, tair+273.15)
+        >>> # partition
         >>> GPP, Reco = nee2gpp(dates, NEE, tt, isday, undef=undef, method='global')
-        >>> from jams.autostring import astr
-        >>> print(astr(GPP[1120:1128],3,pp=True))
-        ['-9999.000' '-9999.000' '-9999.000' '    4.332' '    8.182' '   10.409' '    8.194' '   10.843']
+        >>> print(GPP[1120:1128])
+        [-9.99900000e+03 -9.99900000e+03 -9.99900000e+03  4.33166157e+00
+          8.18228013e+00  1.04092252e+01  8.19395317e+00  1.08427448e+01]
 
 
         License
@@ -332,6 +345,7 @@ def nee2gpp_falge(dates, nee, t, isday, undef=np.nan,
     # p, c     = opt.curve_fit(functions.lloyd_fix, tt, net, p0=[2.,200.]) # global parameter, global cov matrix
     #p        = opt.fmin(functions.cost_lloyd_fix, [2.,200.], args=(tt, net), disp=False)
     p        = opt.fmin(functions.cost_abs, [2.,200.], args=(functions.lloyd_fix_p, tt, net), disp=False)
+
     Reco     = np.ones(ndata)*undef
     ii       = np.where(~t.mask)[0]
     Reco[ii] = functions.lloyd_fix(t[ii], p[0], p[1])
@@ -426,28 +440,35 @@ def nee2gpp_reichstein(dates, nee, t, isday, rg=False, vpd=False, undef=np.nan,
         >>> undef = -9999.
         >>> isday = np.where(rg > 10., True, False)
         >>> tt    = np.where(tair == undef, undef, tair+273.15)
+        >>> # partition
         >>> GPP, Reco = nee2gpp(dates, NEE, tt, isday, undef=undef, method='local')
-        >>> from jams.autostring import astr
-        >>> print(astr(GPP[1120:1128],3,pp=True))
-        ['-9999.000' '-9999.000' '-9999.000' '    4.491' '    8.396' '   10.688' '    8.542' '   11.271']
-        >>> print(astr(Reco[1120:1128],3,pp=True))
-        ['1.782' '1.906' '2.079' '2.256' '2.464' '2.708' '2.951' '3.218']
-        >>> GPP, Reco = nee2gpp(dates, NEE, tt, isday, undef=undef, method='Reichstein')
-        >>> print(astr(GPP[1120:1128],3,pp=True))
-        ['-9999.000' '-9999.000' '-9999.000' '    4.491' '    8.396' '   10.688' '    8.542' '   11.271']
-        >>> GPP, Reco = nee2gpp(dates, NEE, tt, isday, undef=undef, method='local', masked=True)
-        >>> print(astr(GPP[1120:1128],3,pp=True))
-        ['--    ' '--    ' '--    ' ' 4.491' ' 8.396' '10.688' ' 8.542' '11.271']
-        >>> GPP, Reco = nee2gpp(dates, NEE, tt, isday, undef=undef, method='local', shape=(np.size(NEE),1))
-        >>> print(astr(GPP[1120:1128],3,pp=True))
-        [['-9999.000']
-         ['-9999.000']
-         ['-9999.000']
-         ['    4.491']
-         ['    8.396']
-         ['   10.688']
-         ['    8.542']
-         ['   11.271']]
+        >>> print(GPP[1120:1128])
+        [-9.99900000e+03 -9.99900000e+03 -9.99900000e+03  4.40606871e+00
+          8.31942152e+00  1.06242542e+01  8.49245664e+00  1.12381973e+01]
+        >>> print(Reco[1120:1128])
+        [1.68311981 1.81012431 1.9874173  2.17108871 2.38759152 2.64372415
+         2.90076664 3.18592735]
+
+        >>> GPP, Reco = nee2gpp(dates, NEE, tt, isday, undef=undef, method='local')
+        >>> print(GPP[1120:1128])
+        [-9.99900000e+03 -9.99900000e+03 -9.99900000e+03  4.40606871e+00
+          8.31942152e+00  1.06242542e+01  8.49245664e+00  1.12381973e+01]
+
+        >>> GPP, Reco = nee2gpp(dates, NEE, tt, isday, undef=undef, method='Reichstein', masked=True)
+        >>> print(GPP[1120:1128])
+        [-- -- -- 4.406068706013192 8.319421516040766 10.624254150217764
+         8.492456637225963 11.238197347837367]
+
+        >>> GPP, Reco = nee2gpp(dates, NEE, tt, isday, undef=undef, method='reichstein', shape=(np.size(NEE),1))
+        >>> print(GPP[1120:1128])
+        [[-9.99900000e+03]
+         [-9.99900000e+03]
+         [-9.99900000e+03]
+         [ 4.40606871e+00]
+         [ 8.31942152e+00]
+         [ 1.06242542e+01]
+         [ 8.49245664e+00]
+         [ 1.12381973e+01]]
 
 
         License
@@ -541,8 +562,8 @@ def nee2gpp_reichstein(dates, nee, t, isday, rg=False, vpd=False, undef=np.nan,
     # 1. each 5 days, in 15 day period, fit if range of T > 5
     locp = [] # local param
     locs = [] # local err
-    dmin = np.int(np.floor(np.amin(jul))) # be aware that julian days starts at noon, i.e. 1.0 is 12h
-    dmax = np.int(np.ceil(np.amax(jul)))  # so the search will be from noon to noon and thus includes all nights
+    dmin = np.floor(np.amin(jul)).astype(np.int) # be aware that julian days starts at noon, i.e. 1.0 is 12h
+    dmax = np.ceil(np.amax(jul)).astype(np.int)  # so the search will be from noon to noon and thus includes all nights
     for i in range(dmin,dmax,5):
         iii  = np.where((jul>=i) & (jul<(i+14)))[0]
         niii = iii.size
@@ -762,12 +783,14 @@ def nee2gpp_lasslop(dates, nee, t, isday, rg, vpd, undef=np.nan,
         >>> tt    = np.where(tair == undef, undef, tair+273.15)
         >>> VPD = np.squeeze(dat[8,:])
         >>> vpd = np.where(VPD == undef, undef, VPD*100.)
+        >>> # partition
         >>> GPP, Reco = nee2gpp(dates, NEE, tt, isday, rg, vpd, undef=undef, method='day')
-        >>> from jams.autostring import astr
-        >>> print(astr(GPP[1120:1128],3,pp=True))
-        ['-9999.000' '-9999.000' '-9999.000' '    2.897' '    6.771' '    9.064' '    6.957' '    9.778']
-        >>> print(astr(Reco[1120:1128],3,pp=True))
-        ['0.352' '0.421' '0.531' '0.662' '0.839' '1.083' '1.365' '1.726']
+        >>> print(GPP[1120:1128])
+        [-9.99900000e+03 -9.99900000e+03 -9.99900000e+03  2.78457540e+00
+          6.63212545e+00  8.88902165e+00  6.74243873e+00  9.51364527e+00]
+        >>> print(Reco[1120:1128])
+        [0.28786696 0.34594516 0.43893276 0.5495954  0.70029545 0.90849165
+         1.15074873 1.46137527]
 
 
         License
@@ -869,7 +892,7 @@ def nee2gpp_lasslop(dates, nee, t, isday, rg, vpd, undef=np.nan,
     aalpha = 0.01
     qnet   = np.sort(dnet)
     nqnet  = qnet.size
-    abeta0 = np.abs(qnet[np.floor(0.97*nqnet)]-qnet[np.ceil(0.03*nqnet)])
+    abeta0 = np.abs(qnet[np.floor(0.97*nqnet).astype(np.int)]-qnet[np.ceil(0.03*nqnet).astype(np.int)])
     ak     = 0.
     # out
     lE0    = []
@@ -879,8 +902,8 @@ def nee2gpp_lasslop(dates, nee, t, isday, rg, vpd, undef=np.nan,
         lk     = []
     lRref  = []
     lii    = []
-    dmin = np.int(np.floor(np.amin(dates)))
-    dmax = np.int(np.ceil(np.amax(dates)))
+    dmin = np.floor(np.amin(dates)).astype(np.int)
+    dmax = np.ceil(np.amax(dates)).astype(np.int)
     zaehl = -1
     for i in range(dmin,dmax,2):
         good = True
@@ -1026,8 +1049,8 @@ if __name__ == '__main__':
     import doctest
     doctest.testmod(optionflags=doctest.NORMALIZE_WHITESPACE)
 
-    # from fread import fread # from jams
-    # from date2dec import date2dec # from jams
+    # from jams.fread import fread # from jams
+    # from jams.date2dec import date2dec # from jams
     # dat   = fread('test_nee2gpp.csv', skip=2, transpose=True)
     # dates = date2dec(dy=dat[0,:], mo=dat[1,:], yr=dat[2,:], hr=dat[3,:], mi=dat[4,:])
     # NEE   = np.squeeze(dat[5,:])
@@ -1038,39 +1061,39 @@ if __name__ == '__main__':
     # tt    = np.where(tair == undef, undef, tair+273.15)
     # GPP, Reco = nee2gpp(dates, NEE, tt, isday, undef=undef, method='local')
     # print(GPP[1120:1128])
-    # #[ -9.99900000e+03  -9.99900000e+03  -9.99900000e+03   4.49101620e+00
-    # #  8.39556274e+00   1.06881053e+01   8.54233665e+00   1.12707122e+01]
+    # # [-9.99900000e+03 -9.99900000e+03 -9.99900000e+03  4.40606871e+00
+    # #   8.31942152e+00  1.06242542e+01  8.49245664e+00  1.12381973e+01]
     # print(Reco[1120:1128])
-    # #[ 1.78172209  1.90616886  2.07856924  2.2560362   2.46373274  2.70757535
-    # #  2.95064665  3.2184422 ]
+    # # [1.68311981 1.81012431 1.9874173  2.17108871 2.38759152 2.64372415
+    # #  2.90076664 3.18592735]
     # GPP, Reco = nee2gpp(dates, NEE, tt, isday, undef=undef, method='local')
     # print(GPP[1120:1128])
-    # #[ -9.99900000e+03  -9.99900000e+03  -9.99900000e+03   4.49101620e+00
-    # #   8.39556274e+00   1.06881053e+01   8.54233665e+00   1.12707122e+01]
+    # # [-9.99900000e+03 -9.99900000e+03 -9.99900000e+03  4.40606871e+00
+    # #   8.31942152e+00  1.06242542e+01  8.49245664e+00  1.12381973e+01]
     # GPP, Reco = nee2gpp(dates, NEE, tt, isday, undef=undef, method='global')
     # print(GPP[1120:1128])
-    # #[ -9.99900000e+03  -9.99900000e+03  -9.99900000e+03   4.33166157e+00
-    # #   8.18228013e+00   1.04092252e+01   8.19395317e+00   1.08427448e+01]
-    # GPP, Reco = nee2gpp(dates, NEE, tt, isday, undef=undef, method='local', masked=True)
+    # # [-9.99900000e+03 -9.99900000e+03 -9.99900000e+03  4.33166157e+00
+    # #   8.18228013e+00  1.04092252e+01  8.19395317e+00  1.08427448e+01]
+    # GPP, Reco = nee2gpp(dates, NEE, tt, isday, undef=undef, method='Reichstein', masked=True)
     # print(GPP[1120:1128])
-    # #[-- -- -- 4.49101619818 8.39556273706 10.6881053462 8.54233664766
-    # # 11.2707121977]
-    # GPP, Reco = nee2gpp(dates, NEE, tt, isday, undef=undef, method='local', shape=(np.size(NEE),1))
+    # # [-- -- -- 4.406068706013192 8.319421516040766 10.624254150217764
+    # #  8.492456637225963 11.238197347837367]
+    # GPP, Reco = nee2gpp(dates, NEE, tt, isday, undef=undef, method='reichstein', shape=(np.size(NEE),1))
     # print(GPP[1120:1128])
-    # #[[ -9.99900000e+03]
-    # # [ -9.99900000e+03]
-    # # [ -9.99900000e+03]
-    # # [  4.49101620e+00]
-    # # [  8.39556274e+00]
-    # # [  1.06881053e+01]
-    # # [  8.54233665e+00]
-    # # [  1.12707122e+01]]
+    # # [[-9.99900000e+03]
+    # #  [-9.99900000e+03]
+    # #  [-9.99900000e+03]
+    # #  [ 4.40606871e+00]
+    # #  [ 8.31942152e+00]
+    # #  [ 1.06242542e+01]
+    # #  [ 8.49245664e+00]
+    # #  [ 1.12381973e+01]]
     # VPD = np.squeeze(dat[8,:])
     # vpd = np.where(VPD == undef, undef, VPD*100.)
     # GPP, Reco = nee2gpp(dates, NEE, tt, isday, rg, vpd, undef=undef, method='day')
     # print(GPP[1120:1128])
-    # #[ -9.99900000e+03  -9.99900000e+03  -9.99900000e+03   2.89693618e+00
-    # #   6.77103400e+00   9.06351370e+00   6.95696901e+00   9.77798943e+00]
+    # # [-9.99900000e+03 -9.99900000e+03 -9.99900000e+03  2.78457540e+00
+    # #   6.63212545e+00  8.88902165e+00  6.74243873e+00  9.51364527e+00]
     # print(Reco[1120:1128])
-    # #[ 0.35174817  0.42088838  0.53124809  0.66195618  0.839204    1.0829837
-    # #  1.36527901  1.72571943]
+    # # [0.28786696 0.34594516 0.43893276 0.5495954  0.70029545 0.90849165
+    # #  1.15074873 1.46137527]

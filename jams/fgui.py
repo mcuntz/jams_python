@@ -1,72 +1,69 @@
 #!/usr/bin/env python
+"""
+fgui : GUI dialogs to choose files and directories using Tkinter.
+
+This module was written by Matthias Cuntz while at Department of
+Computational Hydrosystems, Helmholtz Centre for Environmental
+Research - UFZ, Leipzig, Germany, and continued while at Institut
+National de Recherche pour l'Agriculture, l'Alimentation et
+l'Environnement (INRAE), Nancy, France.
+
+Copyright (c) 2015-2020 Matthias Cuntz - mc (at) macu (dot) de
+Released under the MIT License; see LICENSE file for details.
+
+* Written Jun 2014 by Matthias Cuntz (mc (at) macu (dot) de)
+* Added directories_from_gui, Oct 2015, Matthias Cuntz
+* Using numpy docstring format, May 2020, Matthias Cuntz
+
+.. moduleauthor:: Matthias Cuntz
+
+The following functions are provided
+
+.. autosummary::
+   directory_from_gui
+   directories_from_gui
+   file_from_gui
+   files_from_gui
+"""
 from __future__ import division, absolute_import, print_function
 
+
 __all__ = ['directory_from_gui', 'directories_from_gui', 'file_from_gui', 'files_from_gui']
+
 
 # -------------------------------------------------------------------------
 # Choose directories in GUI
 #
 
-def directories_from_gui(initialdir='.', title='Choose one of several directories. Press Cancel when finished.'):
+def directories_from_gui(initialdir='.', title='Choose one or several directories.'):
     """
-        Opens consecutive directory selection dialogs, returns consecutiveley selected directories
+    Open dialog to select several directories.
 
+    Parameters
+    ----------
+    initialdir : str, optional
+        Initial directory, in which opens GUI (default: '.')
+    title : str, optional
+        Title of GUI (default: 'Choose one or several directories.'
 
-        Definition
-        ----------
-        def directories_from_gui(initialdir='.', title='Choose one of several directories'):
+    Returns
+    ------
+    list
+        Selected directories.
 
+    Examples
+    --------
+    .. code-block:: python
 
-        Optional Input
-        --------------
-        initialdir   Initial directory GUI opens in (default: '.')
-        title        Title of GUI (default: 'Choose one of several directories. Press Cancel when finished.'
+       if not dirs:
+           dirs = directories_from_gui()
+           if not dirs:
+               raise ValueError('Error: no directories given.')
 
-
-        Output
-        ------
-        Consecutiveley selected directories
-
-
-        Examples
-        --------
-        if not dirs:
-            dirs = directories_from_gui()
-            if not dirs:
-                raise ValueError('Error: no directories given.')
-
-
-        License
-        -------
-        This file is part of the JAMS Python package, distributed under the MIT
-        License. The JAMS Python package originates from the former UFZ Python library,
-        Department of Computational Hydrosystems, Helmholtz Centre for Environmental
-        Research - UFZ, Leipzig, Germany.
-
-        Copyright (c) 2015 Matthias Cuntz - mc (at) macu (dot) de
-
-        Permission is hereby granted, free of charge, to any person obtaining a copy
-        of this software and associated documentation files (the "Software"), to deal
-        in the Software without restriction, including without limitation the rights
-        to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-        copies of the Software, and to permit persons to whom the Software is
-        furnished to do so, subject to the following conditions:
-
-        The above copyright notice and this permission notice shall be included in all
-        copies or substantial portions of the Software.
-
-        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-        IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-        FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-        AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-        LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-        OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-        SOFTWARE.
-
-
-        History
-        -------
-        Written,  MC, Oct 2015
+    History
+    -------
+    Written,  Matthias Cuntz, Oct 2015
+    Modified, Matthias Cuntz, May 2020 - numpy docstring format
     """
     try:                # Python 3
         import tkinter as Tkinter
@@ -101,70 +98,40 @@ def directories_from_gui(initialdir='.', title='Choose one of several directorie
 
     return alldirs
 
+
 # -------------------------------------------------------------------------
 # Choose one directory in GUI
 #
 
-def directory_from_gui(initialdir='.', title='Choose directory'):
+def directory_from_gui(initialdir='.', title='Choose directory.'):
     """
-        Opens directory selection dialog, returns selected directory
+    Opens dialog to select directory.
 
+    Parameters
+    ----------
+    initialdir : str, optional
+        Initial directory, in which opens GUI (default: '.')
+    title : str, optional
+        Title of GUI (default: 'Choose directory.')
 
-        Definition
-        ----------
-        def directory_from_gui(initialdir='.', title='Choose one directory'):
+    Returns
+    ------
+    str
+        Selected directory.
 
+    Examples
+    --------
+    .. code-block:: python
 
-        Optional Input
-        --------------
-        initialdir   Initial directory GUI opens in (default: '.')
-        title        Title of GUI (default: 'Choose directory'
+       if not idir:
+           idir = directory_from_gui()
+           if not idir:
+               raise ValueError('Error: no directory given.')
 
-
-        Output
-        ------
-        Selected directory
-
-
-        Examples
-        --------
-        if not dirs:
-            dirs = directory_from_gui()
-            if not dirs:
-                raise ValueError('Error: no directory given.')
-
-
-        License
-        -------
-        This file is part of the JAMS Python package, distributed under the MIT
-        License. The JAMS Python package originates from the former UFZ Python library,
-        Department of Computational Hydrosystems, Helmholtz Centre for Environmental
-        Research - UFZ, Leipzig, Germany.
-
-        Copyright (c) 2014 Matthias Cuntz - mc (at) macu (dot) de
-
-        Permission is hereby granted, free of charge, to any person obtaining a copy
-        of this software and associated documentation files (the "Software"), to deal
-        in the Software without restriction, including without limitation the rights
-        to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-        copies of the Software, and to permit persons to whom the Software is
-        furnished to do so, subject to the following conditions:
-
-        The above copyright notice and this permission notice shall be included in all
-        copies or substantial portions of the Software.
-
-        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-        IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-        FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-        AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-        LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-        OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-        SOFTWARE.
-
-
-        History
-        -------
-        Written,  MC, Jun 2014
+    History
+    -------
+    Written,  Matthias Cuntz, Jun 2014
+    Modified, Matthias Cuntz, May 2020 - numpy docstring format
     """
     try:                # Python 3
         import tkinter as Tkinter
@@ -201,72 +168,22 @@ def directory_from_gui(initialdir='.', title='Choose directory'):
 
 def file_from_gui(initialdir='.', title='Choose file', multiple=False):
     """
-        Wrapper for files_from_gui with multiple=False as default
+    Wrapper for :func:`files_from_gui` with multiple=False, i.e.
+    open dialog to select one file.
 
+    Examples
+    --------
+    .. code-block:: python
 
-        Definition
-        ----------
-        def file_from_gui(initialdir='.', title='Choose file', multiple=False):
+       if not file:
+           file = file_from_gui()
+           if not file:
+               raise ValueError('Error: no input file given.')
 
-
-        Optional Input
-        --------------
-        initialdir   Initial directory GUI opens in (default: '.')
-        title        Title of GUI (default: 'Choose file'
-        multiple     True:  allow selection of multiple files
-                     False: only one single file to select (default)
-
-
-        Output
-        ------
-        List of selected files
-
-
-        Restrictions
-        ------------
-        Always returns a list even with multiple=False.
-
-
-        Examples
-        --------
-        if not file:
-            file = file_from_gui()
-            if not file:
-                raise ValueError('Error: no input file given.')
-
-
-        License
-        -------
-        This file is part of the JAMS Python package, distributed under the MIT
-        License. The JAMS Python package originates from the former UFZ Python library,
-        Department of Computational Hydrosystems, Helmholtz Centre for Environmental
-        Research - UFZ, Leipzig, Germany.
-
-
-        Copyright (c) 2014 Matthias Cuntz - mc (at) macu (dot) de
-
-        Permission is hereby granted, free of charge, to any person obtaining a copy
-        of this software and associated documentation files (the "Software"), to deal
-        in the Software without restriction, including without limitation the rights
-        to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-        copies of the Software, and to permit persons to whom the Software is
-        furnished to do so, subject to the following conditions:
-
-        The above copyright notice and this permission notice shall be included in all
-        copies or substantial portions of the Software.
-
-        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-        IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-        FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-        AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-        LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-        OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-        SOFTWARE.
-
-
-        History
-        -------
-        Written,  MC, Jun 2014
+    History
+    -------
+    Written,  Matthias Cuntz, Jun 2014
+    Modified, Matthias Cuntz, May 2020 - numpy docstring format
     """
     return files_from_gui(initialdir=initialdir, title=title, multiple=multiple)
 
@@ -275,73 +192,42 @@ def file_from_gui(initialdir='.', title='Choose file', multiple=False):
 # Choose files in GUI
 #
 
-def files_from_gui(initialdir='.', title='Choose file(s)', multiple=True):
+def files_from_gui(initialdir='.', title='Choose file(s).', multiple=True):
     """
-        Opens file selection dialog, returns selected files
+    Open dialog to select one or several files.
 
+    Parameters
+    ----------
+    initialdir : str, optional
+        Initial directory, in which opens GUI (default: '.')
+    title : str, optional
+        Title of GUI (default: 'Choose file(s).')
+    multiple : bool, optional
+        True:  allow selection of multiple files (default).
+        False: only one single file possible to select.
 
-        Definition
-        ----------
-        def files_from_gui(initialdir='.', title='Choose file(s)', multiple=True):
+    Returns
+    ------
+    list
+        Selected files.
 
+    Note
+    ----
+    It always returns a list even with `multiple=False`.
 
-        Optional Input
-        --------------
-        initialdir   Initial directory GUI opens in (default: '.')
-        title        Title of GUI (default: 'Choose file(s)'
-        multiple     True:  allow selection of multiple files (default)
-                     False: only one single file to select
+    Examples
+    --------
+    .. code-block:: python
 
+       if not files:
+           files = files_from_gui()
+           if not files:
+               raise ValueError('Error: no input file(s) given.')
 
-        Output
-        ------
-        List of selected files
-
-
-        Restrictions
-        ------------
-        Always returns a list even with multiple=False.
-
-
-        Examples
-        --------
-        if not files:
-            files = files_from_gui()
-            if not files:
-                raise ValueError('Error: no input file(s) given.')
-
-
-        License
-        -------
-        This file is part of the JAMS Python package, distributed under the MIT
-        License. The JAMS Python package originates from the former UFZ Python library,
-        Department of Computational Hydrosystems, Helmholtz Centre for Environmental
-        Research - UFZ, Leipzig, Germany.
-
-        Copyright (c) 2014 Matthias Cuntz - mc (at) macu (dot) de
-
-        Permission is hereby granted, free of charge, to any person obtaining a copy
-        of this software and associated documentation files (the "Software"), to deal
-        in the Software without restriction, including without limitation the rights
-        to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-        copies of the Software, and to permit persons to whom the Software is
-        furnished to do so, subject to the following conditions:
-
-        The above copyright notice and this permission notice shall be included in all
-        copies or substantial portions of the Software.
-
-        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-        IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-        FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-        AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-        LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-        OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-        SOFTWARE.
-
-
-        History
-        -------
-        Written,  MC, Jun 2014
+    History
+    -------
+    Written,  Matthias Cuntz, Jun 2014
+    Modified, Matthias Cuntz, May 2020 - numpy docstring format
     """
     try:                # Python 3
         import tkinter as Tkinter

@@ -1,8 +1,44 @@
 #!/usr/bin/env python
+"""
+fread : Read numbers into array from a file.
+
+This module was written by Matthias Cuntz while at Department of
+Computational Hydrosystems, Helmholtz Centre for Environmental
+Research - UFZ, Leipzig, Germany, and continued while at Institut
+National de Recherche pour l'Agriculture, l'Alimentation et
+l'Environnement (INRAE), Nancy, France.
+
+Copyright (c) 2009-2020 Matthias Cuntz - mc (at) macu (dot) de
+Released under the MIT License; see LICENSE file for details.
+
+* Written Jul 2009 by Matthias Cuntz (mc (at) macu (dot) de)
+* Keyword transpose, Feb 2012, Matthias Cuntz
+* Ported to Python 3, Feb 2013, Matthias Cuntz
+* Removed bug when nc is list and contains 0, Nov 2014, Matthias Cuntz
+* Keyword hskip, Nov 2014, Matthias Cuntz
+* Speed improvements: everything list until the very end, Feb 2015, Matthias Cuntz
+* range instead of np.arange, Nov 2017, Matthias Cuntz
+* Keywords cname, sname, hstrip, rename file to infile, Nov 2017, Matthias Cuntz
+* Ignore unicode characters on read, Jun 2019, Matthias Cuntz
+* Make ignoring unicode characters campatible with Python 2 and Python 3, Jul 2019, Matthias Cuntz
+* Keywords encoding, errors with codecs module, Aug 2019, Matthias Cuntz
+* Keyword return_list, Dec 2019, Stephan Thober
+* return_list=False default, Jan 2020, Matthias Cuntz
+* Using numpy docstring format, May 2020, Matthias Cuntz
+
+.. moduleauthor:: Matthias Cuntz
+
+The following functions are provided
+
+.. autosummary::
+   fread
+"""
 from __future__ import division, absolute_import, print_function
 import numpy as np
 
+
 __all__ = ['fread']
+
 
 def fread(infile, nc=0, cname=None, skip=0, cskip=0, hskip=0, hstrip=True, separator=None,
           squeeze=False, reform=False, skip_blank=False, comment=None,
@@ -10,328 +46,326 @@ def fread(infile, nc=0, cname=None, skip=0, cskip=0, hskip=0, hstrip=True, separ
           header=False, full_header=False,
           transpose=False, strarr=False, return_list=False):
     """
-        Read numbers into 2D-array from a file.
+    Read numbers into array with floats from a file.
 
-        This routines is exactly the same as sread but transforms
-        everything to floats, handling NaN and Inf.
+    Lines or columns can be skipped.
+    Columns can be picked specifically.
 
+    Blank (only whitespace) and comment lines can be excluded.
 
-        Definition
-        ----------
-        def fread(infile, nc=0, cname=None, skip=0, cskip=0, hskip=0, hstrip=True, separator=None,
-                  squeeze=False, reform=False, skip_blank=False, comment=None,
-                  fill=False, fill_value=0, strip=None, encoding='ascii', errors='ignore',
-                  header=False, full_header=False,
-                  transpose=False, strarr=False, return_list=False):
+    The header of the file can be read separately.
 
+    This routines is exactly the same as sread but transforms
+    everything to floats, handling NaN and Inf.
 
-        Input
-        -----
-        infile         source file name
+    Parameters
+    ----------
+    infile : str
+        source file name
+    nc : int or iterable, optional
+        number of columns to be read [default: all (`nc<=0`)].
 
+        `nc` can be an int or a vector of column indexes, starting with 0;
+        `cskip` will be ignored in the latter case.
+    cname : iterable of str, optional
+        columns can be chosen by the values in the first header line;
+        must be iterable with strings.
+    skip : int, optional
+        number of lines to skip at the beginning of file (default: 0)
+    cskip : int, optional
+        number of columns to skip at the beginning of each line (default: 0)
+    hskip : int, optional
+        number of lines in skip that do not belong to header (default: 0)
+    hstrip : bool, optional
+        True: strip header cells to match with cname (default: True)
+    separator : str, optional
+        column separator. If not given, columns separators are (in order):
+        comma (','), semicolon (';'), whitespace.
+    comment : iterable, optional
+         line gets excluded if first character of line is in comment sequence.
+         Sequence must be iterable such as string, list and tuple.
+    fill_value : float, optional
+         value to fill in array in empty cells or if not enough columns in line
+         and `fill==True` (default: 0, and '' for header).
+    strip : str, optional
+        Strip strings with str.strip(strip).
 
-        Optional Input Parameters
-        -------------------------
-        nc           number of columns to be read (default: all (nc<=0))
-                     nc can be a vector of column indexes,
-                     starting with 0; cskip will be ignored then.
-        cname        columns can alternatively be chosen by the values in the first header line;
-                     must be iterable with strings.
-        skip         number of lines to skip at the beginning of file (default: 0)
-        cskip        number of columns to skip at the beginning of each line (default: 0)
-        hskip        number of lines in skip that do not belong to header (default: 0)
-        hstrip       If true strip header cells to match with cname (default: True)
-        separator    column separator
-                     If not given, columns separator are (in order):
-                     comma, semi-colon, whitespace
-        comment      line gets excluded if first character of line is in comment sequence
-                     sequence can be e.g. string, list or tuple
-        fill_value   value to fill in if not enough columns in line
-                     and fill=True (default: 0, and '' for header)
-        strip        Strip strings with str.strip(strip).
-                     If None then strip quotes " and ' (default).
-                     If False then no strip (30% faster).
-                     Otherwise strip character given by strip.
-        encoding     Specifies the encoding which is to be used for the file.
-                     Any encoding that encodes to and decodes from bytes is allowed.
-                     (default: ascii)
-        errors       Errors may be given to define the error handling during encoding of the file.
-                     Possible values: strict, replace, ignore (default: ignore).
+        None: strip quotes " and ' (default).
 
+        False: no strip (~30% faster).
 
-        Options
-        -------
-        squeeze      True:  2-dim array will be cleaned of degenerated
-                            dimension, i.e. results in vector
-                     False: array will be two-dimensional as read (default)
-        reform       Same as squeeze.
-        skip_blank   True:  continues reading after blank line
-                     False: stops reading at first blank line (default)
-        fill         True:  fills in fill_value if not enough columns in line
-                     False: stops execution and returns None if not enough
-                            columns in line (default)
-        header       True:  header strings will be returned
-                     False  numbers in file will be returned (default)
-        full_header  True:  header is a string vector of the skipped rows
-                     False: header will be split in columns,
-                            exactly as the data, and will hold only the
-                            selected columns (default)
-        transpose    True:  column-major format output(0:ncolumns,0:nlines)
-                     False: row-major format output(0:nlines,0:ncolumns) (default)
-        strarr       True:  return header as numpy array of strings
-                     False: return header as list
-        return_list  True:  return file content as numpy array
-                     False: return file content as list (default)
+        str: strip character given by `strip`.
+    encoding : str, optional
+        Specifies the encoding which is to be used for the file (default: 'ascii').
+        Any encoding that encodes to and decodes from bytes is allowed.
+    errors : str, optional
+        Errors may be given to define the error handling during encoding of the file (default: 'ignore').
 
-        Output
-        ------
+        Possible values: 'strict', 'replace', 'ignore'.
+    squeeze : bool, optional
+        True:  2-dim array will be cleaned of degenerated dimension, i.e. results in a vector.
+
+        False: array will be two-dimensional as read (default)
+    reform : bool, optional
+        Same as squeeze.
+    skip_blank : bool, optional
+        True:  continues reading after blank line.
+
+        False: stops reading at first blank line (default).
+    fill : bool, optional
+        True:  fills in `fill_value` if not enough columns in line.
+
+        False: stops execution and returns None if not enough columns in line (default).
+    header : bool, optional
+        True:  header strings will be returned.
+
+        False: numbers in file will be returned (default).
+    full_header : bool, optional
+        True:  header is a string vector of the skipped rows.
+
+        False: header will be split in columns, exactly as the data,
+               and will hold only the selected columns (default).
+    transpose : bool, optional
+        True:  column-major format `output(0:ncolumns,0:nlines)`.
+
+        False: row-major format `output(0:nlines,0:ncolumns)` (default).
+    strarr : bool, optional
+        True:  return header as numpy array of strings.
+
+        False: return header as list (default).
+    return_list : bool, optional
+        True:  return file content as list.
+
+        False: return file content as numpy array (default).
+
+    Returns
+    -------
+    array of floats
         Depending on options:
-            2D-array of floats if header=False
-            String array of file header if header=True
-            String vector of file header if header=True and full_header=True
 
+        Array of floats if `header==False`.
 
-        Restrictions
-        ------------
-        If header=True then skip is counterintuitive because it is
-          actally the number of header rows to be read. This is to
-          be able to have the exact same call of the function, once
-          with header=False and once with header=True.
-        If fill=True, blank lines are not filled but are expected end of file.
-        transpose=True has no effect on 1D output such as 1 header line
+        List of floats if `return_list==True`.
 
+        List with file header strings if `header==True`.
 
-        Examples
-        --------
-        >>> # Create some data
-        >>> filename = 'test.dat'
-        >>> ff = open(filename,'w')
-        >>> ff.writelines('head1 head2 head3 head4\\n')
-        >>> ff.writelines('1.1 1.2 1.3 1.4\\n')
-        >>> ff.writelines('2.1 2.2 2.3 2.4\\n')
-        >>> ff.close()
+        String array of file header if `header==True` and `strarr==True`.
 
-        >>> # Read sample file in different ways
-        >>> # header
-        >>> print(fread(filename, nc=2, skip=1, header=True))
-        ['head1', 'head2']
-        >>> print(fread(filename, nc=2, skip=1, header=True, full_header=True))
-        ['head1 head2 head3 head4']
-        >>> print(fread(filename, nc=1, skip=2, header=True))
-        [['head1'], ['1.1']]
-        >>> print(fread(filename, nc=1, skip=2, header=True, squeeze=True))
-        ['head1', '1.1']
-        >>> print(fread(filename, nc=1, skip=2, header=True, strarr=True))
-        [['head1']
-         ['1.1']]
+        List of lines of strings if `header=True` and `full_header=True`.
 
-        >>> # data
-        >>> from autostring import astr
-        >>> print(astr(fread(filename, skip=1), 1, pp=True))
-        [['1.1' '1.2' '1.3' '1.4']
-         ['2.1' '2.2' '2.3' '2.4']]
-        >>> print(astr(fread(filename, skip=2), 1, pp=True))
-        [['2.1' '2.2' '2.3' '2.4']]
-        >>> print(astr(fread(filename, skip=1, cskip=1), 1, pp=True))
-        [['1.2' '1.3' '1.4']
-         ['2.2' '2.3' '2.4']]
-        >>> print(astr(fread(filename, nc=2, skip=1, cskip=1), 1, pp=True))
-        [['1.2' '1.3']
-         ['2.2' '2.3']]
-        >>> print(astr(fread(filename, nc=[1,3], skip=1), 1, pp=True))
-        [['1.2' '1.4']
-         ['2.2' '2.4']]
-        >>> print(astr(fread(filename, nc=1, skip=1), 1, pp=True))
-        [['1.1']
-         ['2.1']]
-        >>> print(astr(fread(filename, nc=1, skip=1, reform=True), 1, pp=True))
-        ['1.1' '2.1']
+    Notes
+    -----
+    If `header==True` then skip is counterintuitive because it is
+    actually the number of header rows to be read. This is to
+    be able to have the exact same call of the function, once
+    with `header=False` and once with `header=True`.
 
-        >>> # skip blank lines
-        >>> ff = open(filename, 'a')
-        >>> ff.writelines('\\n')
-        >>> ff.writelines('3.1 3.2 3.3 3.4\\n')
-        >>> ff.close()
-        >>> print(astr(fread(filename, skip=1), 1, pp=True))
-        [['1.1' '1.2' '1.3' '1.4']
-         ['2.1' '2.2' '2.3' '2.4']]
-        >>> print(astr(fread(filename, skip=1, skip_blank=True, comment='#!'), 1, pp=True))
-        [['1.1' '1.2' '1.3' '1.4']
-         ['2.1' '2.2' '2.3' '2.4']
-         ['3.1' '3.2' '3.3' '3.4']]
+    If `fill==True`, blank lines are not filled but are taken as end of file.
 
-        >>> # skip comment lines
-        >>> ff = open(filename, 'a')
-        >>> ff.writelines('# First comment\\n')
-        >>> ff.writelines('! Second 2 comment\\n')
-        >>> ff.writelines('4.1 4.2 4.3 4.4\\n')
-        >>> ff.close()
-        >>> print(astr(fread(filename, skip=1), 1, pp=True))
-        [['1.1' '1.2' '1.3' '1.4']
-         ['2.1' '2.2' '2.3' '2.4']]
-        >>> print(astr(fread(filename, skip=1, nc=[2], skip_blank=True, comment='#'), 1, pp=True))
-        [['1.3']
-         ['2.3']
-         ['3.3']
-         ['2.0']
-         ['4.3']]
-        >>> print(astr(fread(filename, skip=1, skip_blank=True, comment='#!'), 1, pp=True))
-        [['1.1' '1.2' '1.3' '1.4']
-         ['2.1' '2.2' '2.3' '2.4']
-         ['3.1' '3.2' '3.3' '3.4']
-         ['4.1' '4.2' '4.3' '4.4']]
-        >>> print(astr(fread(filename, skip=1, skip_blank=True, comment=('#','!')), 1, pp=True))
-        [['1.1' '1.2' '1.3' '1.4']
-         ['2.1' '2.2' '2.3' '2.4']
-         ['3.1' '3.2' '3.3' '3.4']
-         ['4.1' '4.2' '4.3' '4.4']]
-        >>> print(astr(fread(filename, skip=1, skip_blank=True, comment=['#','!']), 1, pp=True))
-        [['1.1' '1.2' '1.3' '1.4']
-         ['2.1' '2.2' '2.3' '2.4']
-         ['3.1' '3.2' '3.3' '3.4']
-         ['4.1' '4.2' '4.3' '4.4']]
+    `transpose=True` has no effect on 1D output such as 1 header line.
 
-        >>> # fill missing columns
-        >>> ff = open(filename, 'a')
-        >>> ff.writelines('5.1 5.2\\n')
-        >>> ff.close()
-        >>> print(astr(fread(filename, skip=1), 1, pp=True))
-        [['1.1' '1.2' '1.3' '1.4']
-         ['2.1' '2.2' '2.3' '2.4']]
-        >>> print(astr(fread(filename, skip=1, skip_blank=True, comment='#!', fill=True, fill_value=-1), 1, pp=True))
-        [[' 1.1' ' 1.2' ' 1.3' ' 1.4']
-         [' 2.1' ' 2.2' ' 2.3' ' 2.4']
-         [' 3.1' ' 3.2' ' 3.3' ' 3.4']
-         [' 4.1' ' 4.2' ' 4.3' ' 4.4']
-         [' 5.1' ' 5.2' '-1.0' '-1.0']]
+    Examples
+    --------
+    >>> # Create some data
+    >>> filename = 'test.dat'
+    >>> ff = open(filename,'w')
+    >>> ff.writelines('head1 head2 head3 head4\\n')
+    >>> ff.writelines('1.1 1.2 1.3 1.4\\n')
+    >>> ff.writelines('2.1 2.2 2.3 2.4\\n')
+    >>> ff.close()
 
-        >>> # transpose
-        >>> print(astr(fread(filename, skip=1), 1, pp=True))
-        [['1.1' '1.2' '1.3' '1.4']
-         ['2.1' '2.2' '2.3' '2.4']]
-        >>> print(astr(fread(filename, skip=1, transpose=True), 1, pp=True))
-        [['1.1' '2.1']
-         ['1.2' '2.2']
-         ['1.3' '2.3']
-         ['1.4' '2.4']]
+    >>> # Read sample file in different ways
+    >>> # header
+    >>> print(fread(filename, nc=2, skip=1, header=True))
+    ['head1', 'head2']
+    >>> print(fread(filename, nc=2, skip=1, header=True, full_header=True))
+    ['head1 head2 head3 head4']
+    >>> print(fread(filename, nc=1, skip=2, header=True))
+    [['head1'], ['1.1']]
+    >>> print(fread(filename, nc=1, skip=2, header=True, squeeze=True))
+    ['head1', '1.1']
+    >>> print(fread(filename, nc=1, skip=2, header=True, strarr=True))
+    [['head1']
+     ['1.1']]
 
-        >>> # Create some more data with Nan and Inf
-        >>> filename1 = 'test1.dat'
-        >>> ff = open(filename1, 'w')
-        >>> ff.writelines('head1 head2 head3 head4\\n')
-        >>> ff.writelines('1.1 1.2 1.3 1.4\\n')
-        >>> ff.writelines('2.1 nan Inf "NaN"\\n')
-        >>> ff.close()
+    >>> # data
+    >>> print(fread(filename, skip=1))
+    [[1.1 1.2 1.3 1.4]
+     [2.1 2.2 2.3 2.4]]
+    >>> print(fread(filename, skip=2))
+    [[2.1 2.2 2.3 2.4]]
+    >>> print(fread(filename, skip=1, cskip=1))
+    [[1.2 1.3 1.4]
+     [2.2 2.3 2.4]]
+    >>> print(fread(filename, nc=2, skip=1, cskip=1))
+    [[1.2 1.3]
+     [2.2 2.3]]
+    >>> print(fread(filename, nc=[1,3], skip=1))
+    [[1.2 1.4]
+     [2.2 2.4]]
+    >>> print(fread(filename, nc=1, skip=1))
+    [[1.1]
+     [2.1]]
+    >>> print(fread(filename, nc=1, skip=1, reform=True))
+    [1.1 2.1]
 
-        >>> # Treat Nan and Inf with automatic strip of " and '
-        >>> print(astr(fread(filename1, skip=1, transpose=True), 1, pp=True))
-        [['1.1' '2.1']
-         ['1.2' 'nan']
-         ['1.3' 'inf']
-         ['1.4' 'nan']]
+    >>> # skip blank lines
+    >>> ff = open(filename, 'a')
+    >>> ff.writelines('\\n')
+    >>> ff.writelines('3.1 3.2 3.3 3.4\\n')
+    >>> ff.close()
+    >>> print(fread(filename, skip=1))
+    [[1.1 1.2 1.3 1.4]
+     [2.1 2.2 2.3 2.4]]
+    >>> print(fread(filename, skip=1, skip_blank=True, comment='#!'))
+    [[1.1 1.2 1.3 1.4]
+     [2.1 2.2 2.3 2.4]
+     [3.1 3.2 3.3 3.4]]
 
-        >>> # Create some more data with escaped numbers
-        >>> filename2 = 'test2.dat'
-        >>> ff = open(filename2, 'w')
-        >>> ff.writelines('head1 head2 head3 head4\\n')
-        >>> ff.writelines('"1.1" "1.2" "1.3" "1.4"\\n')
-        >>> ff.writelines('2.1 nan Inf "NaN"\\n')
-        >>> ff.close()
+    >>> # skip comment lines
+    >>> ff = open(filename, 'a')
+    >>> ff.writelines('# First comment\\n')
+    >>> ff.writelines('! Second 2 comment\\n')
+    >>> ff.writelines('4.1 4.2 4.3 4.4\\n')
+    >>> ff.close()
+    >>> print(fread(filename, skip=1))
+    [[1.1 1.2 1.3 1.4]
+     [2.1 2.2 2.3 2.4]]
+    >>> print(fread(filename, skip=1, nc=[2], skip_blank=True, comment='#'))
+    [[1.3]
+     [2.3]
+     [3.3]
+     [2. ]
+     [4.3]]
+    >>> print(fread(filename, skip=1, skip_blank=True, comment='#!'))
+    [[1.1 1.2 1.3 1.4]
+     [2.1 2.2 2.3 2.4]
+     [3.1 3.2 3.3 3.4]
+     [4.1 4.2 4.3 4.4]]
+    >>> print(fread(filename, skip=1, skip_blank=True, comment=('#','!')))
+    [[1.1 1.2 1.3 1.4]
+     [2.1 2.2 2.3 2.4]
+     [3.1 3.2 3.3 3.4]
+     [4.1 4.2 4.3 4.4]]
+    >>> print(fread(filename, skip=1, skip_blank=True, comment=['#','!']))
+    [[1.1 1.2 1.3 1.4]
+     [2.1 2.2 2.3 2.4]
+     [3.1 3.2 3.3 3.4]
+     [4.1 4.2 4.3 4.4]]
 
-        >>> # Strip
-        >>> print(astr(fread(filename2,  skip=1,  transpose=True,  strip='"'), 1, pp=True))
-        [['1.1' '2.1']
-         ['1.2' 'nan']
-         ['1.3' 'inf']
-         ['1.4' 'nan']]
+    >>> # fill missing columns
+    >>> ff = open(filename, 'a')
+    >>> ff.writelines('5.1 5.2\\n')
+    >>> ff.close()
+    >>> print(fread(filename, skip=1))
+    [[1.1 1.2 1.3 1.4]
+     [2.1 2.2 2.3 2.4]]
+    >>> print(fread(filename, skip=1, skip_blank=True, comment='#!', fill=True, fill_value=-1))
+    [[ 1.1  1.2  1.3  1.4]
+     [ 2.1  2.2  2.3  2.4]
+     [ 3.1  3.2  3.3  3.4]
+     [ 4.1  4.2  4.3  4.4]
+     [ 5.1  5.2 -1.  -1. ]]
 
-        >>> # Create some more data with an extra (shorter) header line
-        >>> filename3 = 'test3.dat'
-        >>> ff = open(filename3, 'w')
-        >>> ff.writelines('Extra header\\n')
-        >>> ff.writelines('head1 head2 head3 head4\\n')
-        >>> ff.writelines('1.1 1.2 1.3 1.4\\n')
-        >>> ff.writelines('2.1 2.2 2.3 2.4\\n')
-        >>> ff.close()
+    >>> # transpose
+    >>> print(fread(filename, skip=1))
+    [[1.1 1.2 1.3 1.4]
+     [2.1 2.2 2.3 2.4]]
+    >>> print(fread(filename, skip=1, transpose=True))
+    [[1.1 2.1]
+     [1.2 2.2]
+     [1.3 2.3]
+     [1.4 2.4]]
 
-        >>> print(astr(fread(filename3, skip=2, hskip=1), 1, pp=True))
-        [['1.1' '1.2' '1.3' '1.4']
-         ['2.1' '2.2' '2.3' '2.4']]
-        >>> print(fread(filename3, nc=2, skip=2, hskip=1, header=True))
-        ['head1', 'head2']
+    >>> # Create some more data with Nan and Inf
+    >>> filename1 = 'test1.dat'
+    >>> ff = open(filename1, 'w')
+    >>> ff.writelines('head1 head2 head3 head4\\n')
+    >>> ff.writelines('1.1 1.2 1.3 1.4\\n')
+    >>> ff.writelines('2.1 nan Inf "NaN"\\n')
+    >>> ff.close()
 
-        >>> # cname
-        >>> print(astr(fread(filename, cname='head2', skip=1, skip_blank=True, comment='#!', squeeze=True), 1, pp=True))
-        ['1.2' '2.2' '3.2' '4.2' '5.2']
-        >>> print(astr(fread(filename, cname=['head1','head2'], skip=1, skip_blank=True, comment='#!'), 1, pp=True))
-        [['1.1' '1.2']
-         ['2.1' '2.2']
-         ['3.1' '3.2']
-         ['4.1' '4.2']
-         ['5.1' '5.2']]
-        >>> print(fread(filename, cname=['head1','head2'], skip=1, skip_blank=True, comment='#!', header=True))
-        ['head1', 'head2']
-        >>> print(fread(filename, cname=['head1','head2'], skip=1, skip_blank=True, comment='#!', header=True, full_header=True))
-        ['head1 head2 head3 head4']
-        >>> print(astr(fread(filename, cname=['  head1','head2'], skip=1, skip_blank=True, comment='#!', hstrip=False), 1, pp=True))
-        [['1.2']
-         ['2.2']
-         ['3.2']
-         ['4.2']
-         ['5.2']]
+    >>> # Treat Nan and Inf with automatic strip of " and '
+    >>> print(fread(filename1, skip=1, transpose=True))
+    [[1.1 2.1]
+     [1.2 nan]
+     [1.3 inf]
+     [1.4 nan]]
 
-        >>> # Clean up doctest
-        >>> import os
-        >>> os.remove(filename)
-        >>> os.remove(filename1)
-        >>> os.remove(filename2)
-        >>> os.remove(filename3)
+    >>> # Create some more data with escaped numbers
+    >>> filename2 = 'test2.dat'
+    >>> ff = open(filename2, 'w')
+    >>> ff.writelines('head1 head2 head3 head4\\n')
+    >>> ff.writelines('"1.1" "1.2" "1.3" "1.4"\\n')
+    >>> ff.writelines('2.1 nan Inf "NaN"\\n')
+    >>> ff.close()
 
+    >>> # Strip
+    >>> print(fread(filename2,  skip=1,  transpose=True,  strip='"'))
+    [[1.1 2.1]
+     [1.2 nan]
+     [1.3 inf]
+     [1.4 nan]]
 
-        License
-        -------
-        This file is part of the JAMS Python package, distributed under the MIT
-        License. The JAMS Python package originates from the former UFZ Python library,
-        Department of Computational Hydrosystems, Helmholtz Centre for Environmental
-        Research - UFZ, Leipzig, Germany.
+    >>> # Create some more data with an extra (shorter) header line
+    >>> filename3 = 'test3.dat'
+    >>> ff = open(filename3, 'w')
+    >>> ff.writelines('Extra header\\n')
+    >>> ff.writelines('head1 head2 head3 head4\\n')
+    >>> ff.writelines('1.1 1.2 1.3 1.4\\n')
+    >>> ff.writelines('2.1 2.2 2.3 2.4\\n')
+    >>> ff.close()
 
-        Copyright (c) 2009-2017 Matthias Cuntz - mc (at) macu (dot) de
+    >>> print(fread(filename3, skip=2, hskip=1))
+    [[1.1 1.2 1.3 1.4]
+     [2.1 2.2 2.3 2.4]]
+    >>> print(fread(filename3, nc=2, skip=2, hskip=1, header=True))
+    ['head1', 'head2']
 
-        Permission is hereby granted, free of charge, to any person obtaining a copy
-        of this software and associated documentation files (the "Software"), to deal
-        in the Software without restriction, including without limitation the rights
-        to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-        copies of the Software, and to permit persons to whom the Software is
-        furnished to do so, subject to the following conditions:
+    >>> # cname
+    >>> print(fread(filename, cname='head2', skip=1, skip_blank=True, comment='#!', squeeze=True))
+    [1.2 2.2 3.2 4.2 5.2]
+    >>> print(fread(filename, cname=['head1','head2'], skip=1, skip_blank=True, comment='#!'))
+    [[1.1 1.2]
+     [2.1 2.2]
+     [3.1 3.2]
+     [4.1 4.2]
+     [5.1 5.2]]
+    >>> print(fread(filename, cname=['head1','head2'], skip=1, skip_blank=True, comment='#!', header=True))
+    ['head1', 'head2']
+    >>> print(fread(filename, cname=['head1','head2'], skip=1, skip_blank=True, comment='#!', header=True, full_header=True))
+    ['head1 head2 head3 head4']
+    >>> print(fread(filename, cname=['  head1','head2'], skip=1, skip_blank=True, comment='#!', hstrip=False))
+    [[1.2]
+     [2.2]
+     [3.2]
+     [4.2]
+     [5.2]]
 
-        The above copyright notice and this permission notice shall be included in all
-        copies or substantial portions of the Software.
+    >>> # Clean up doctest
+    >>> import os
+    >>> os.remove(filename)
+    >>> os.remove(filename1)
+    >>> os.remove(filename2)
+    >>> os.remove(filename3)
 
-        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-        IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-        FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-        AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-        LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-        OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-        SOFTWARE.
-
-
-        History
-        -------
-        Written,  MC, Jul 2009
-        Modified, MC, Feb 2012 - transpose
-                  MC, Feb 2013 - ported to Python 3
-                  MC, Nov 2014 - bug when nc is list and contains 0
-                  MC, Nov 2014 - hskip
-                  MC, Feb 2015 - speed: everything list until very end
-                  MC, Nov 2017 - use range instead of np.arange for producing indexes
-                  MC, Nov 2017 - cname, sname, file->infile, hstrip
-                  MC, Jun 2019 - open(errors='ignore') to ignore unicode characters, for example, on read
-                  MC, Jul 2019 - errors='ignore' compatible with Python2 and Python3
-                                 -> returns header in unicode in Python2
-                  MC, Aug 2019 - use codecs module and allow user encoding and error handling
-                  ST, Dec 2019 - added return_list flag
-                  MC, Jan 2020 - default return_list=False
+    History
+    -------
+    Written,  Matthias Cuntz, Jul 2009
+    Modified, Matthias Cuntz, Feb 2012 - transpose
+              Matthias Cuntz, Feb 2013 - ported to Python 3
+              Matthias Cuntz, Nov 2014 - bug when nc is list and contains 0
+              Matthias Cuntz, Nov 2014 - hskip
+              Matthias Cuntz, Feb 2015 - speed: everything list until very end
+              Matthias Cuntz, Nov 2017 - use range instead of np.arange for producing indexes
+              Matthias Cuntz, Nov 2017 - cname, sname, file->infile, hstrip
+              Matthias Cuntz, Jun 2019 - open(errors='ignore') to ignore unicode characters, for example, on read
+              Matthias Cuntz, Jul 2019 - errors='ignore' compatible with Python2 and Python3
+                                         -> returns header in unicode in Python2
+              Matthias Cuntz, Aug 2019 - use codecs module and allow user encoding and error handling
+              Stephan Thober, Dec 2019 - added return_list flag
+              Matthias Cuntz, Jan 2020 - default return_list=False
+              Matthias Cuntz, May 2020 - numpy docstring format
     """
     #
     # Open file
@@ -509,23 +543,3 @@ def line2var(res, var, iinc, strip):
 if __name__ == '__main__':
     import doctest
     doctest.testmod(optionflags=doctest.NORMALIZE_WHITESPACE)
-
-    # from autostring import astr
-    # filename = 'test.dat'
-    # ff = open(filename,'w')
-    # ff.writelines('head1 head2 head3 head4\n')
-    # ff.writelines('1.1 1.2 1.3 1.4\n')
-    # ff.writelines('2.1 2.2 2.3 2.4\n')
-    # ff.writelines('\n')
-    # ff.writelines('3.1 3.2 3.3 3.4\n')
-    # ff.writelines('# First comment\n')
-    # ff.writelines('! Second 2 comment\n')
-    # ff.writelines('4.1 4.2 4.3 4.4\n')
-    # ff.close()
-    # print(astr(fread(filename, skip=1), 1, pp=True))
-    # print(astr(fread(filename, skip=1, nc=[2], skip_blank=True, comment='#'), 1, pp=True))
-    # print(astr(fread(filename, skip=1, skip_blank=True, comment='#!'), 1, pp=True))
-    # print(astr(fread(filename, cname='head2', skip=1, skip_blank=True, comment='#!'), 1, pp=True))
-    # print(astr(fread(filename, cname=['head1','head2'], skip=1, skip_blank=True, comment='#!'), 1, pp=True))
-    # print(fread(filename, cname=['head1','head2'], skip=1, skip_blank=True, comment='#!', header=True))
-    # print(fread(filename, cname=['head1','head2'], skip=1, skip_blank=True, comment='#!', header=True, full_header=True))

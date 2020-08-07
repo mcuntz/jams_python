@@ -1,152 +1,160 @@
 #!/usr/bin/env python
+"""
+esat : Saturation vapour pressure of water and ice.
+
+This module was written by Matthias Cuntz while at Department of
+Computational Hydrosystems, Helmholtz Centre for Environmental
+Research - UFZ, Leipzig, Germany, and continued while at Institut
+National de Recherche pour l'Agriculture, l'Alimentation et
+l'Environnement (INRAE), Nancy, France.
+
+Copyright (c) 2012-2020 Matthias Cuntz - mc (at) macu (dot) de
+Released under the MIT License; see LICENSE file for details.
+
+* Written Jan 2012 by Matthias Cuntz (mc (at) macu (dot) de)
+* Ported to Python 3, Feb 2013, Matthias Cuntz
+* Changed handling of masked arrays, Oct 2013, Matthias Cuntz
+* Assert T>0, Apr 2014, Matthias Cuntz
+* Using numpy docstring format, May 2020, Matthias Cuntz
+
+.. moduleauthor:: Matthias Cuntz
+
+The following functions are provided
+
+.. autosummary::
+   esat
+"""
 from __future__ import division, absolute_import, print_function
 import numpy as np
-import jams.const as const
+
+
+__all__ = ['esat']
+
 
 def esat(T, liquid=False, formula='GoffGratch'):
     """
-        Calculates the saturation vapour pressure of water/ice.
-        For temperatures above (and equal) 0 deg C (273.15 K), the vapour pressure over liquid water is calculated.
-        For temperatures below 0 deg C, the vapour pressure over ice is calculated.
+    Calculates the saturation vapour pressure of water and/or ice.
 
-        The optional parameter liquid=True changes the calculation to vapour pressure
-        over liquid water over the entire temperature range.
+    For temperatures above (and equal) 0 degree C (273.15 K),
+    the vapour pressure over liquid water is calculated.
+    For temperatures below 0 degree C, the vapour pressure over ice is calculated.
 
-
-        Definition
-        ----------
-        def esat(T, liquid=False, undef=False, formula='GoffGratch'):
+    The optional parameter liquid=True changes the calculation to vapour pressure
+    over liquid water over the entire temperature range.
 
 
-        Input
-        -----
-        T          Temperature (masked) array [K]
+    Parameters
+    ----------
+    T : float or array_like
+        Temperature [K]
+    liquid : bool, optional
+        If True, use liquid formula for all temperatures.
+    formula : str, optional
+        Name of reference to use for calculations, case-insensitive (default: GoffGratch).
 
+        Note that several formulations do not provide a vapour pressure formulation over ice
+        and Marti and Mauersberger do not provide a formula over liquid: GoffGratch is used in theses cases.
 
-        Optional Input
-        --------------
-        liquid     If true, use liquid formula for all temperatures.
-        formula    Name of reference to use for calculations (ignore case).
-                   Note that not several formulations do not provide a vapour pressure formulation over ice
-                   and Marti and Mauersberger do not provide a formula over liquid: GoffGratch is used in this cases.
-                       GoffGratch:        Smithsonian Tables, 1984; after Goff and Gratch, 1946 (default)
-                       MartiMauersberger: Marti and Mauersberger, 1993
-                       MagnusTeten:       Murray, 1967
-                       Buck_original:     Buck, 1981
-                       Buck       :       Buck Research Manual, 1996
-                       WMO:               Goff, 1957; WMO 1988, 2000
-                       Wexler:            Wexler, 1977
-                       Sonntag:           Sonntag, 1994
-                       Bolton:            Bolton, 1980
-                       Fukuta:            Fukuta, N. and C. M. Gramada, 2003
-                       HylandWexler:      Hyland and Wexler, 1983
-                       IAPWS:             Wagner and Pruss, 2002
-                       MurphyKoop:        Murphy and Koop, 2005
+        GoffGratch:        Smithsonian Tables, 1984; after Goff and Gratch, 1946 (default)
 
+        MartiMauersberger: Marti and Mauersberger, 1993
 
-        Output
-        ------
+        MagnusTeten:       Murray, 1967
+
+        Buck_original:     Buck, 1981
+
+        Buck:              Buck Research Manual, 1996
+
+        WMO:               Goff, 1957; WMO 1988, 2000
+
+        Wexler:            Wexler, 1977
+
+        Sonntag:           Sonntag, 1994
+
+        Bolton:            Bolton, 1980
+
+        Fukuta:            Fukuta, N. and C. M. Gramada, 2003
+
+        HylandWexler:      Hyland and Wexler, 1983
+
+        IAPWS:             Wagner and Pruss, 2002
+
+        MurphyKoop:        Murphy and Koop, 2005
+
+    Returns
+    -------
+    float or array_like
         Saturation water pressure at temperature T in Pascal [Pa].
 
+    Notes
+    -----
+    From Holger Voemel: http://cires.colorado.edu/~voemel/vp.html
 
-        Restrictions
-        ------------
-        None.
+    Referred literature cited in code.
 
+    Examples
+    --------
+    >>> print('{:.3f}'.format(esat(293.15)))
+    2335.847
+    >>> print('{:.3f}'.format(esat(253.15)))
+    103.074
 
-        References
-        ----------
-        From Holger Voemel: http://cires.colorado.edu/~voemel/vp.html
-        Referred literature in code below.
+    >>> print('{:.3f} {:.3f}'.format(*esat([293.15,253.15])))
+    2335.847 103.074
+    >>> print('{:.3f} {:.3f}'.format(*esat([293.15,253.15],formula='GoffGratch')))
+    2335.847 103.074
+    >>> print('{:.3f} {:.3f}'.format(*esat([293.15,253.15],formula='MartiMauersberger')))
+    2335.847 103.650
+    >>> print('{:.3f} {:.3f}'.format(*esat([293.15,253.15],formula='MagnusTeten')))
+    2335.201 102.771
+    >>> print('{:.3f} {:.3f}'.format(*esat([293.15,253.15],formula='buck')))
+    2338.340 103.286
+    >>> print('{:.3f} {:.3f}'.format(*esat([293.15,253.15],formula='Buck_original')))
+    2337.282 103.267
+    >>> print('{:.3f} {:.3f}'.format(*esat([293.15,253.15],formula='wmo')))
+    2337.080 103.153
+    >>> print('{:.3f} {:.3f}'.format(*esat([293.15,253.15],formula='WEXLER')))
+    2323.254 103.074
+    >>> print('{:.3f} {:.3f}'.format(*esat([293.15,253.15],formula='Sonntag')))
+    2339.249 103.249
+    >>> print('{:.3f} {:.3f}'.format(*esat([293.15,253.15],formula='Bolton')))
+    2336.947 103.074
+    >>> print('{:.3f} {:.3f}'.format(*esat([293.15,253.15],formula='Fukuta')))
+    2335.847 103.074
+    >>> print('{:.3f} {:.3f}'.format(*esat([293.15,253.15],formula='HylandWexler')))
+    2338.804 103.260
+    >>> print('{:.3f} {:.3f}'.format(*esat([293.15,253.15],formula='IAPWS')))
+    2339.194 103.074
+    >>> print('{:.3f} {:.3f}'.format(*esat([293.15,253.15],formula='MurphyKoop')))
+    2339.399 103.252
 
+    >>> print('{:.3f} {:.3f}'.format(*esat(np.array([293.15,253.15]), liquid=True)))
+    2335.847 125.292
+    >>> print('{:.3f} {:.3f}'.format(*esat([293.15,253.15],formula='Fukuta', liquid=True)))
+    2335.847 125.079
 
-        Examples
-        --------
-        >>> from autostring import astr
-        >>> print(astr(esat(293.15),3,pp=True))
-        2335.847
-        >>> print(astr(esat(253.15),3,pp=True))
-        103.074
-        >>> print(astr(esat([293.15,253.15]),3,pp=True))
-        ['2335.847' ' 103.074']
-        >>> print(astr(esat([293.15,253.15],formula='GoffGratch'),3,pp=True))
-        ['2335.847' ' 103.074']
-        >>> print(astr(esat([293.15,253.15],formula='MartiMauersberger'),3,pp=True))
-        ['2335.847' ' 103.650']
-        >>> print(astr(esat([293.15,253.15],formula='MagnusTeten'),3,pp=True))
-        ['2335.201' ' 102.771']
-        >>> print(astr(esat([293.15,253.15],formula='buck'),3,pp=True))
-        ['2338.340' ' 103.286']
-        >>> print(astr(esat([293.15,253.15],formula='Buck_original'),3,pp=True))
-        ['2337.282' ' 103.267']
-        >>> print(astr(esat([293.15,253.15],formula='wmo'),3,pp=True))
-        ['2337.080' ' 103.153']
-        >>> print(astr(esat([293.15,253.15],formula='WEXLER'),3,pp=True))
-        ['2323.254' ' 103.074']
-        >>> print(astr(esat([293.15,253.15],formula='Sonntag'),3,pp=True))
-        ['2339.249' ' 103.249']
-        >>> print(astr(esat([293.15,253.15],formula='Bolton'),3,pp=True))
-        ['2336.947' ' 103.074']
-        >>> print(astr(esat([293.15,253.15],formula='Fukuta'),3,pp=True))
-        ['2335.847' ' 103.074']
-        >>> print(astr(esat([293.15,253.15],formula='HylandWexler'),3,pp=True))
-        ['2338.804' ' 103.260']
-        >>> print(astr(esat([293.15,253.15],formula='IAPWS'),3,pp=True))
-        ['2339.194' ' 103.074']
-        >>> print(astr(esat([293.15,253.15],formula='MurphyKoop'),3,pp=True))
-        ['2339.399' ' 103.252']
-        >>> print(astr(esat(np.array([293.15,253.15]), liquid=True),3,pp=True))
-        ['2335.847' ' 125.292']
-        >>> print(astr(esat([293.15,253.15],formula='Fukuta', liquid=True),3,pp=True))
-        ['2335.847' ' 125.079']
-        >>> print(astr(esat(np.array([293.15,393.15])),3,pp=True))
-        esat.py: UserWarning: T>373.15 K - something might be wrong with T.
-        ['  2335.847' '198473.378']
-        >>> print(astr(esat(np.array([293.15,93.15])),3,pp=True))
-        esat.py: UserWarning: T<100 - T probably given in Celsius instead of Kelvin.
-        ['2335.847' '   0.000']
-        >>> print(astr(esat(np.ma.array([253.15,-9999.], mask=[False,True])),3,pp=True))
-        ['103.074' '--     ']
+    >>> print('{:.3f} {:.3f}'.format(*esat(np.array([293.15,393.15]))))
+    esat.py: UserWarning: T>373.15 K - something might be wrong with T.
+    2335.847 198473.378
+    >>> print('{:.3f} {:.3f}'.format(*esat(np.array([293.15,93.15]))))
+    esat.py: UserWarning: T<100 - T probably given in Celsius instead of Kelvin.
+    2335.847 0.000
 
+    >>> out = esat(np.ma.array([253.15,-9999.], mask=[False,True]))
+    >>> print('{:.3f} {:.3f}'.format(*out.filled(-9999.)))
+    103.074 -9999.000
 
-
-        License
-        -------
-        This file is part of the JAMS Python package, distributed under the MIT
-        License. The JAMS Python package originates from the former UFZ Python library,
-        Department of Computational Hydrosystems, Helmholtz Centre for Environmental
-        Research - UFZ, Leipzig, Germany.
-
-        Copyright (c) 2012-2014 Matthias Cuntz - mc (at) macu (dot) de
-
-        Permission is hereby granted, free of charge, to any person obtaining a copy
-        of this software and associated documentation files (the "Software"), to deal
-        in the Software without restriction, including without limitation the rights
-        to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-        copies of the Software, and to permit persons to whom the Software is
-        furnished to do so, subject to the following conditions:
-
-        The above copyright notice and this permission notice shall be included in all
-        copies or substantial portions of the Software.
-
-        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-        IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-        FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-        AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-        LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-        OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-        SOFTWARE.
-
-
-        History
-        -------
-        Written,  MC, Jan 2012
-        Modified, MC, Feb 2013 - ported to Python 3
-                  MC, Oct 2013 - changed masked array handling
-                  MC, Apr 2014 - assert
+    History
+    -------
+    Written,  Matthias Cuntz, Jan 2012
+    Modified, Matthias Cuntz, Feb 2013 - ported to Python 3
+              Matthias Cuntz, Oct 2013 - changed masked array handling
+              Matthias Cuntz, Apr 2014 - assert
+              Matthias Cuntz, May 2020 - numpy docstring format
     """
     #
     # Constants
+    T0 = 273.15 # Celcius <-> Kelvin [K]
     knownforms = (['Buck', 'Buck_original', 'Bolton', 'Fukuta', 'GoffGratch', 'HylandWexler',
                   'IAPWS', 'MagnusTeten', 'MartiMauersberger', 'MurphyKoop',
                   'Sonntag', 'Vaisala', 'Wexler', 'WMO'])
@@ -157,7 +165,7 @@ def esat(T, liquid=False, formula='GoffGratch'):
     assert not np.ma.any(T <= 0.), 'T<0 - T probably given in Celsius instead of Kelvin.'
     if np.ma.any(T < 100.):
         print("esat.py: UserWarning: T<100 - T probably given in Celsius instead of Kelvin.")
-    if np.ma.any(T > (const.T0+100.)):
+    if np.ma.any(T > (T0+100.)):
         print("esat.py: UserWarning: T>373.15 K - something might be wrong with T.")
     form = formula.lower()
     if form not in lknown:
@@ -167,7 +175,7 @@ def esat(T, liquid=False, formula='GoffGratch'):
     if liquid == True:
         Tlim = 1e-3
     else:
-        Tlim = const.T0
+        Tlim = T0
 
     if T.size > 1:
         isone = False
@@ -193,7 +201,7 @@ def esat(T, liquid=False, formula='GoffGratch'):
     #
     # Liquid
     if np.size(ii) > 0:
-        TC_liq = T_liq - const.T0
+        TC_liq = T_liq - T0
         if form == 'buck':
             '''Bucks vapour pressure formulation based on Tetens formula
                Buck Research, Model CR-1A Hygrometer Operating Manual, Sep 2001'''
@@ -230,7 +238,7 @@ def esat(T, liquid=False, formula='GoffGratch'):
             ews   = 1013.246  # saturation pressure at steam point temperature, normal atmosphere
             esat_liq = (10.**(-7.90298*(Ts/T_liq-1.) + 5.02808 * np.ma.log10(Ts/T_liq)
                           - 1.3816e-7 * (10.**(11.344*(1.-T_liq/Ts))-1.)
-                          + 8.1328e-3 * (10.**(-3.49149*(Ts/T_liq-1))-1.) + np.ma.log10(ews)))
+                          + 8.1328e-3 * (10.**(-3.49149*(Ts/T_liq-1.))-1.) + np.ma.log10(ews)))
         elif form == 'hylandwexler':
             '''Hyland, R. W. and A. Wexler, Formulations for the Thermodynamic Properties of the
                saturated Phases of H2O from 173.15K to 473.15K, ASHRAE Trans, 89(2A), 500-519, 1983.'''
@@ -292,7 +300,7 @@ def esat(T, liquid=False, formula='GoffGratch'):
     #
     # Ice
     if np.size(jj) > 0:
-        TC_ice = T_ice - const.T0
+        TC_ice = T_ice - T0
         if form == 'buck':
             '''Bucks vapour pressure formulation based on Tetens formula
                Buck Research, Model CR-1A Hygrometer Operating Manual, Sep 2001'''
@@ -351,69 +359,3 @@ def esat(T, liquid=False, formula='GoffGratch'):
 if __name__ == '__main__':
     import doctest
     doctest.testmod(optionflags=doctest.NORMALIZE_WHITESPACE)
-
-    # from autostring import astr
-    # print(astr(esat(293.15),3,pp=True))
-    # # 2335.847
-
-    # print(astr(esat(253.15),3,pp=True))
-    # # 103.074
-
-    # print(astr(esat([293.15,253.15]),3,pp=True))
-    # # ['2335.847' ' 103.074']
-
-    # print(astr(esat([293.15,253.15],formula='GoffGratch'),3,pp=True))
-    # # ['2335.847' ' 103.074']
-
-    # print(astr(esat([293.15,253.15],formula='MartiMauersberger'),3,pp=True))
-    # # ['2335.847' ' 103.650']
-
-    # print(astr(esat([293.15,253.15],formula='MagnusTeten'),3,pp=True))
-    # # ['2335.201' ' 102.771']
-
-    # print(astr(esat([293.15,253.15],formula='buck'),3,pp=True))
-    # # ['2338.340' ' 103.286']
-
-    # print(astr(esat([293.15,253.15],formula='Buck_original'),3,pp=True))
-    # # ['2337.282' ' 103.267']
-
-    # print(astr(esat([293.15,253.15],formula='wmo'),3,pp=True))
-    # # ['2337.080' ' 103.153']
-
-    # print(astr(esat([293.15,253.15],formula='WEXLER'),3,pp=True))
-    # # ['2323.254' ' 103.074']
-
-    # print(astr(esat([293.15,253.15],formula='Sonntag'),3,pp=True))
-    # # ['2339.249' ' 103.249']
-
-    # print(astr(esat([293.15,253.15],formula='Bolton'),3,pp=True))
-    # # ['2336.947' ' 103.074']
-
-    # print(astr(esat([293.15,253.15],formula='Fukuta'),3,pp=True))
-    # # ['2335.847' ' 103.074']
-
-    # print(astr(esat([293.15,253.15],formula='HylandWexler'),3,pp=True))
-    # # ['2338.804' ' 103.260']
-
-    # print(astr(esat([293.15,253.15],formula='IAPWS'),3,pp=True))
-    # # ['2339.194' ' 103.074']
-
-    # print(astr(esat([293.15,253.15],formula='MurphyKoop'),3,pp=True))
-    # # ['2339.399' ' 103.252']
-
-    # print(astr(esat(np.array([293.15,253.15]), liquid=True),3,pp=True))
-    # # ['2335.847' ' 125.292']
-
-    # print(astr(esat([293.15,253.15],formula='Fukuta', liquid=True),3,pp=True))
-    # # ['2335.847' ' 125.079']
-
-    # print(astr(esat(np.array([293.15,393.15])),3,pp=True))
-    # # esat.py: UserWarning: T>373.15 K - something might be wrong with T.
-    # # ['  2335.847' '198473.378']
-
-    # print(astr(esat(np.array([293.15,93.15])),3,pp=True))
-    # # esat.py: UserWarning: T<100 - T probably given in Celsius instead of Kelvin.
-    # # ['2335.847' '   0.000']
-
-    # print(astr(esat(np.ma.array([253.15,-9999.], mask=[False,True])),3,pp=True))
-    # # ['103.074' '--     ']

@@ -236,7 +236,7 @@ from __future__ import division, absolute_import, print_function
     kernel_regression_h    Optimal bandwidth for kernel regression.
     leafprojection         Calculation of leaf projection from leaf angle observations.
     level1                 Module with functions dealing with CHS level1 data files, data and flags.
-    line_dev_mask          Maskes elements of an array deviating from a line fit.
+    line_dev_mask          Mask elements of an array deviating from a line fit.
     logtools               Module with control file functions of Logtools, the Logger Tools Software of Olaf Kolle.
     lowess                 Locally linear regression in n dimensions.
     mad                    Median absolute deviation test.
