@@ -58,8 +58,7 @@ def tcherkez(Rstar, Phi=0.3, T=0.056,
             distribution in glucose of C3 plants, Functional Plant Biology 31, 857-877, 2004
         Gessler A, Tcherkez G, Peuke AD, Ghashghaie J & Farquhar GD, Experimental evidence for diel variations
             of the carbon isotope composition in leaf, stem and phloem sap organic matter in Ricinus communis,
-            Plant, Cell and Environment 31, 941-953, 2004
-
+            Plant, Cell and Environment 31, 941-953, 2008
 
         Examples
         --------

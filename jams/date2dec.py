@@ -318,7 +318,7 @@ def date2dec(calendar = 'standard', units=None,
     calendars = ['standard', 'gregorian', 'julian', 'proleptic_gregorian',
                  'excel1900', 'excel1904', '365_day', 'noleap', '366_day',
                  'all_leap', '360_day', 'decimal', 'decimal360']
-    muleps = np.finfo(np.float).eps # add little epsilon to julian dates for better reconversion
+    muleps = np.finfo(np.float).eps  # add little epsilon to julian dates for better reconversion
     try:
         import cftime as nt
         if (nt.__version__ <= '1.0.4'):

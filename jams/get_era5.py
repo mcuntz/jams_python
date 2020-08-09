@@ -1,61 +1,82 @@
 #!/usr/bin/env python
+'''
+Download ERA5 or ERA5-Land data from Copernicus Climate Data Store.
+
+If override=False (default), the script checks if the data is already available
+in the local download directory (path).
+It expects files with the same naming convention than its own, i.e.
+     path + '/' + 'era5_'+area.replace('/','_')+'_{:04d}.nc'.format(year)
+or
+     path + '/' + 'era5_'+area.replace('/','_')+'_{:04d}-{:04d}.nc'.format(yearstart, yearend)
+Filenames can also end on .nc?.
+It checks if the area and years are included in a file in the download
+directory by checking ONLY filenames.
+
+Be aware that the request is processed once it is queued even if you abort
+this script. Queued request can be deleted after login at:
+   https://cds.climate.copernicus.eu/cdsapp#!/yourrequests
+You can (re-)download the data from this site later as well.
+
+Written  Matthias Cuntz, Jan 2019 - from get_era_interim.py
+Modified Stephan Thober, Mar 2020 - added era5-land capability
+         Matthias Cuntz, Jun 2020 - return correct file list and not the list
+                                    of projected filenames for chosen area
+                                  - input variable list with MuSICA variables
+                                    as default
+                                  - finalised era5-land capability
+
+
+--------------------------------------------------------
+usage: get_era5.py [-h] [-a area] [-o] [-p path] [-r reanalysis_model] [-v variables] [-y years]
+
+        Download ERA5 or ERA5-Land data from Copernicus Climate Data Store
+        https://climate.copernicus.eu/climate-data-store.
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -a area, --area area  area format as either lat,lon or
+                        NorthLat/WestLon/SouthLat/EastLon
+                        (default: global 90/-180/-90/180).
+  -o, --override        Do not check that output file already exists
+                        that includes request. Override existing output file
+                        (default: False).
+  -p path, --path path  Output directory (default: current directory ".").
+  -r reanalysis_model, --reanalyis-model reanalysis_model
+                        Reanalyis model to download, either: era5, era5-land
+                        or era5land (default: era5)
+  -v variables, --variables variables
+                        Comma-separated variable list var1,var2,...
+                        (default: forcing variables of ecosystem model MuSICA:
+                        10m_u_component_of_wind,10m_v_component_of_wind,
+                        2m_temperature,2m_dewpoint_temperature,
+                        total_precipitation,snowfall,surface_pressure,
+                        surface_solar_radiation_downwards,
+                        surface_thermal_radiation_downwards).
+  -y years, --years years
+                        years format is startyear,endyear
+                        (default: 1979,current-1 for ERA5
+                        and 1981,current-1 for ERA5-Land.)
+
+
+Examples
+--------
+    # Hesse
+    python get_era5.py -r ERA5-Land -v 2m_temperature,2m_dewpoint_temperature -a 48.6742166667,7.06461666667 -y 1995,2017 -p era
+    # Tumbarumba
+    python get_era5.py -r ERA5-Land -v 10m_u_component_of_wind,10m_v_component_of_wind,2m_temperature,2m_dewpoint_temperature,total_precipitation,snowfall,surface_pressure,surface_solar_radiation_downwards,surface_thermal_radiation_downwards --area=-35.7833302,148.0166666 -y 2016,2018 -p era
+
+
+--------------------------------------------------------
+
+Script was originally adapted from CDS Web API
+    https://cds.climate.copernicus.eu/cdsapp#!/dataset/reanalysis-era5-single-levels?tab=form
+Further help comes from
+    https://confluence.ecmwf.int/display/CKB/C3S+ERA5%3A+Web+API+to+CDS+API
+'''
 from __future__ import division, absolute_import, print_function
-'''
-    Download ERA5 or ERA5Land data.
-
-    If override=False (default), the script checks if the data is already available
-    in the local download directory (path).
-    It expects files with the same naming convention than its own, i.e.
-         path + '/' + 'era5_'+area.replace('/','_')+'_{:04d}.nc'.format(year)
-    or
-         path + '/' + 'era5_'+area.replace('/','_')+'_{:04d}-{:04d}.nc'.format(yearstart, yearend)
-    Filenames can also end on .nc?.
-    It checks if the area and years are included in a file in the download directory by checking ONLY filenames.
-
-    Be aware that the request is processed once it is queued even if you abort this script.
-    Queued request can be deleted after login at:
-       https://cds.climate.copernicus.eu/cdsapp#!/yourrequests
-    You can (re-)download the data from this site later as well.
-
-    Written  Matthias Cuntz, Jan 2019 - from get_era_interim.py
-
-    Modified Stephan Thober, Mar 2020 - added era5-land capability
-
-
-    --------------------------------------------------------
-    usage: get_era5.py [-h] [-a area] [-y years] [-p path] [-o]
-
-    Download ERA5 data suitable to produce MuSICA input data.
-
-    optional arguments:
-      -h, --help            show this help message and exit
-      -a area, --area area  area format as either lat,lon or
-                            NorthLat/WestLon/SouthLat/EastLon (default: global 90/-180/-90/180).
-                            Min and Max of Lat and Lon must be different by at least 0.25 degree.
-      -y years, --years years
-                            years format is either single year or startyear,endyear
-                            (default: 1979,current-1).
-      -p path, --path path  Output directory (default: current directory ".").
-      -o, --override        Do not check that output file already exists that
-                            includes request. Override existing output file
-                            (default: False).
-      -r, --reanalysis-model Reanalyis model to download, either: era5 or era5land (default: era5)
-
-
-    Example
-        # Hesse
-        python get_era5.py -a 48.6742166667,7.06461666667 -y 1995,2017 -p era
-
-
-    --------------------------------------------------------
-
-    Script was originally adapted from CDS Web API
-        https://cds.climate.copernicus.eu/cdsapp#!/dataset/reanalysis-era5-single-levels?tab=form
-    Further help comes from
-        https://confluence.ecmwf.int/display/CKB/C3S+ERA5%3A+Web+API+to+CDS+API
-'''
 import os
 import glob
+
 
 __all__ = ['get_era5']
 
@@ -64,18 +85,25 @@ __all__ = ['get_era5']
 # Retrieval function
 #
 
-def get_era5_single_level5(variables, date, time, area, target, grid=None, reanalysis_model='era5'):
-
+def _get_era5_single_level5(variables, date, time, area, target,
+                            grid=None, reanalysis_model='era5'):
+    """
+    ToDo
+    """
     import cdsapi
-    #
+
     # check reanalysis mode
-    retrieve_name = {'era5': 'reanalysis-era5-single-levels',
-                     'era5land': 'reanalysis-era5-land'}
+    retrieve_name = {'era5':      'reanalysis-era5-single-levels',
+                     'era5land':  'reanalysis-era5-land',
+                     'era5-land': 'reanalysis-era5-land'}
     if reanalysis_model not in retrieve_name.keys():
-        raise ValueError('***ERROR: value of variable reanalysis_model {} is not in retrieve_name.keys()'.format(reanalysis_model))
-    
-    # Disable: InsecureRequestWarning: Unverified HTTPS request is being made. Adding certificate
-    #     verification is strongly advised.
+        estr = 'Value of variable reanalysis_model'
+        estr = estr + ' {:s} is not in retrieve_name.keys()'.format(
+            reanalysis_model)
+        raise ValueError(estr)
+
+    # Disable: InsecureRequestWarning: Unverified HTTPS request is being made.
+    #          Adding certificate verification is strongly advised.
     try:
         import urllib3
         urllib3.disable_warnings()
@@ -86,172 +114,242 @@ def get_era5_single_level5(variables, date, time, area, target, grid=None, reana
 
     server = cdsapi.Client()
 
+    form = 'netcdf'
     request = {
-        'format':       'netcdf',     # grib or netcdf
-        'variable':     variables,    # ['10m_v_component_of_wind', '2m_dewpoint_temperature', ...]
-        'date':         date,         # "2010-01-01", "2010-01-01/2015-12-31"
-        'time':         time,         # "[00:00, 01:00, 02:00, ..., 23:00]
-        'area':         area,         # # North, West, South, East within "90/-180/-90/180" or [90, -180, -90, 180]
-        }
+        'format':   form,       # grib or netcdf
+        'variable': variables,  # ['10m_v_component_of_wind', ...]
+        'date':     date,       # "2010-01-01", "2010-01-01/2015-12-31"
+        'time':     time,       # "[00:00, 01:00, 02:00, ..., 23:00]
+        'area':     area,       # North, West, South, East within
+                                # "90/-180/-90/180" or [90, -180, -90, 180]
+    }
+
     if reanalysis_model == 'era5':
         request['product_type'] = 'reanalysis'
 
-    if grid is not None:
+    if grid:
         # 'grid': [1.0,1.0]
-        request['grid'] = grid        # Latitude/longitude grid: east-west (longitude) and north-south resolution (latitude). Default: 0.25 x 0.25
+        # Latitude/longitude grid: east-west (longitude)
+        # and north-south resolution (latitude). Default: 0.25 x 0.25
+        request['grid'] = grid
 
     # print('Request: ', request)
     server.retrieve(retrieve_name[reanalysis_model], request, target)
 
     return target
 
-def get_era5_single_level5_datestarget(variables, time, area, datestarget, grid=None, reanalysis_model='era5'):
+
+def _get_era5_single_level5_datestarget(variables, time, area, datestarget,
+                                        grid=None, reanalysis_model='era5'):
+    """
+    Wrapper function for `_get_era5_single_level5` to parallelise with
+    Python's `multiprocessing.Pool`.
+    """
     date, target = datestarget
-    return get_era5_single_level5(variables, date, time, area, target, grid, reanalysis_model=reanalysis_model)
+    return _get_era5_single_level5(variables, date, time, area, target,
+                                   grid, reanalysis_model=reanalysis_model)
+
 
 # --------------------------------------------------------------------
 # Main routine
 #
 
-def get_era5(area=None, years=None, path='.', override=False, reanalysis_model='era5'):
-    '''
-        Download ERA5 or ERA5land data.
-    
-        If override=False, checks if the data is already available in the download directory.
-        It expects files with the same naming convention than its own, i.e.
+def get_era5(vars=['10m_u_component_of_wind', '10m_v_component_of_wind',
+                   '2m_temperature', '2m_dewpoint_temperature',
+                   'total_precipitation', 'snowfall', 'surface_pressure',
+                   'surface_solar_radiation_downwards',
+                   'surface_thermal_radiation_downwards'],
+             area='90/-180/-90/180', years=None, path='.',
+             override=False, reanalysis_model='era5'):
+    """
+    Download ERA5 or ERA5-Land data from Copernicus Climate Data Store.
+
+    If override=False, checks if the data is already available in
+    the download directory.
+    It expects files with the same naming convention than its own, i.e.
+        path + '/' + 'era5<land>_'+area.replace('/','_')+'_{:04d}.nc'.format(year)
+    or
+        path + '/' + 'era5<land>_'+area.replace('/','_')+'_{:04d}-{:04d}.nc'.format(yearstart, yearend)
+    Filenames can also end on .nc?.
+    It checks if the area and years are included in a file by checking
+    ONLY filenames.
+
+    Be aware that the request is processed once it is queued even if you
+    abort this function.
+    Queued request can be deleted after login at:
+       https://cds.climate.copernicus.eu/cdsapp#!/yourrequests
+    You can (re-)download the data from this site later as well.
+
+    Parameters
+    ----------
+    vars : list of str, optional
+        List of names of variables to retrieve.
+        Default are the input variables for the ecosystem model MuSICA:
+
+        `vars=['10m_u_component_of_wind', '10m_v_component_of_wind',
+               'total_precipitation',
+               'snowfall', '2m_temperature', '2m_dewpoint_temperature',
+               'surface_pressure',
+               'surface_solar_radiation_downwards',
+               'surface_thermal_radiation_downwards']`
+
+        Look up variable names for ERA5 by selecting variables and examining
+        the API (Show API request):
+        https://cds.climate.copernicus.eu/cdsapp#!/dataset/reanalysis-era5-single-levels?tab=form
+
+        and for ERA5-Land:
+        https://cds.climate.copernicus.eu/cdsapp#!/dataset/reanalysis-era5-land?tab=form
+    area : string, optional
+        Area. Can be one point given as lat,lon
+        or box as NorthLat/WestLon/SouthLat/EastLon.
+        Default is the globe: '90/-180/-90/180'.
+
+        Min and Max of Lat and Lon of box must be different by
+        at least 0.25 degree for ERA5 and 0.1 degree for ERA5-Land.
+    years : scalar or iterable of len(2), optional
+        Year or year range (default: [1979,current_year-1] for ERA5
+        and [1981,current_year-1] for ERA5-Land)
+    path : string, optional
+        Output path (default: '.')
+    override : bool, optional
+        If True, check if data is already available in path (default: False).
+
+        Expects file with the naming convention
+
             path + '/' + 'era5<land>_'+area.replace('/','_')+'_{:04d}.nc'.format(year)
+
         or
+
             path + '/' + 'era5<land>_'+area.replace('/','_')+'_{:04d}-{:04d}.nc'.format(yearstart, yearend)
-        Filenames can also end on .nc?.
-        It checks if the area and years are included in a file by checking ONLY filenames.
 
-        Be aware that the request is processed once it is queued even if you abort this function.
-        Queued request can be deleted after login at:
-           https://cds.climate.copernicus.eu/cdsapp#!/yourrequests
-        You can (re-)download the data from this site later as well.
+        Checks if `area` and `years` are included in a file in path by
+        checking ONLY filenames.
+    reanalysis_model : string, optional
+        Reanalyis model to download. Can be era5, era5-land or era5land
+        (default: 'ear5').
+        Output filenames will be adapted accordingly.
 
+    Returns
+    -------
+    list
+        Returns filenames of the output files in path, either the newly written
+        files or the files that contain the output requested:
 
-        Definition
-        ----------
-        def get_era5(area=None, years=None, path='.', override=False, reanalysis_model='era5'):
+            [ path + '/' + 'era5<land>_' + area.replace('/','_')
+            + '_{:04d}.nc'.format(yy) for yy in years ]
 
+    Warnings
+    --------
+    Existing files will only be checked by filename not by content.
 
-        Parameters
-        ----------
-        area             string (default: '90/-180/-90/180')
-                         Area. Can be one point given as lat,lon
-                         or box as NorthLat/WestLon/SouthLat/EastLon. Default is the globe.
-                         Min and Max of Lat and Lon of box must be different by at least 0.25 degree.
-        years            Scalar or iterable of len(2) [default: (1979,current_year-1)]
-                         Year or year range.
-        path             string (default: '.')
-                         Output path
-        override         boolean (default: False)
-                         If True, check if data is already available in path.
-                         Expect file with the naming convention
-                             path + '/' + 'era5<land>_'+area.replace('/','_')+'_{:04d}.nc'.format(year)
-                         or
-                             path + '/' + 'era5<land>_'+area.replace('/','_')+'_{:04d}-{:04d}.nc'.format(yearstart, yearend)
-                         Check if area and years are included in a file in path by checking ONLY filenames.
-        reanalysis_model Reanalyis model to download, either: era5 or era5land. File names will be adapted accordingly.
+    Examples
+    --------
+    >>> area  = '48/7/47/8'
+    >>> years = (1995,2017)
+    >>> ofile = get_era5(area=area, years=years, path='.')
+    >>> file1 = 'era5_'+area.replace('/','_')+'_{:04d}.nc'.format(years[0])
+    >>> if file1 != ofile[0]: print(
+    ...     'Returned filename not recognised: ', ofile, ' Expected: ', file1)
+    >>> import os
+    >>> if not os.path.exists(ofile): print('No ofile: ', ofile)
+    >>> if not os.path.exists(file1): print('No file1: ', file1)
 
-        Ouput
-        -----
-        Returns file names of the output files in path, either the newly written files
-        or the files that contains the output requested:
-            for yy in years: path+'/'+'era5<land>_'+area.replace('/','_')+'_{:04d}.nc'.format(yy)
+    License
+    -------
+    This file is part of the JAMS Python package,
+    distributed under the MIT License.
 
-
-        Restrictions
-        ------------
-        Existing files will only be checked by filename not by content.
+    Copyright (c) 2019 Matthias Cuntz - mc (at) macu (dot) de
 
 
-        Examples
-        --------
-        >>> area  = '48/7/47/8'
-        >>> years = (1995,2017)
-        >>> get_era5(area=area, years=years, path='.')
-        >>> import os
-        >>> file1 = 'era5_'+area.replace('/','_')+'_{:04d}.nc'.format(years[0])
-        >>> if not os.path.exists(file1): print('No file: ', file1)
-
-
-        License
-        -------
-        This file is part of the JAMS Python package, distributed under the MIT License.
-
-        Copyright (c) 2019 Matthias Cuntz - mc (at) macu (dot) de
-
-        Permission is hereby granted, free of charge, to any person obtaining a copy
-        of this software and associated documentation files (the "Software"), to deal
-        in the Software without restriction, including without limitation the rights
-        to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-        copies of the Software, and to permit persons to whom the Software is
-        furnished to do so, subject to the following conditions:
-
-        The above copyright notice and this permission notice shall be included in all
-        copies or substantial portions of the Software.
-
-        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-        IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-        FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-        AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-        LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-        OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-        SOFTWARE.
-
-
-        History
-        -------
-        Written  Matthias Cuntz, Jan 2019 - from get_era_interim.py
-        Modified Matthias Cuntz, Dec 2019 - default area (global) was not working: used == instead of =
-                 Stephan Thober, Mar 2020 - added optional reanalysis_model argument to download era5land
-    '''
-    # check parameters
-    if area is None:
-        area = '90/-180/-90/180'
+    History
+    -------
+    Written  Matthias Cuntz, Jan 2019 - from get_era_interim.py
+    Modified Matthias Cuntz, Dec 2019 - default area (global) was not working:
+                                        used == instead of =
+             Stephan Thober, Mar 2020 - added optional reanalysis_model
+                                        argument to download era5land
+             Matthias Cuntz, Jun 2020 - allow name era5-land
+                                      - return correct file list and not the
+                                        list of projected filenames for chosen
+                                        area
+                                      - input variable list with MuSICA
+                                        variables as default
+                                      - finalised era5-land capability
+                                      - use numpydoc format
+    """
+    # Check parameters
+    # reanalysis model
+    rmodel = reanalysis_model.lower()
+    estr = 'Reanalysis model must be era5, era5-land or era5land.'
+    assert rmodel in ['era5', 'era5-land', 'era5land'], estr
+    if rmodel == 'era5':
+        resolution = 0.25
+        minyear    = 1979
     else:
-        if '/' in area:
-            sarea = area.split('/')
-            assert len(sarea) == 4, 'area format is lat,lon or NorthLat/WestLon/SouthLat/EastLon.'
-            assert float(sarea[0]) <= 90.,   'area must be in 90/-180/-90/180'
-            assert float(sarea[1]) >= -180., 'area must be in 90/-180/-90/180'
-            assert float(sarea[2]) >= -90.,  'area must be in 90/-180/-90/180'
-            assert float(sarea[3]) <= 180.,  'area must be in 90/-180/-90/180'
-            assert float(sarea[0]) >= float(sarea[2])+0.25, 'area format is lat,lon or NorthLat/WestLon/SouthLat/EastLon.'
-            assert float(sarea[1])+0.25 <= float(sarea[3]), 'area format is lat,lon or NorthLat/WestLon/SouthLat/EastLon.'
-        else:
-            assert ',' in area, 'area format is lat,lon or NorthLat/WestLon/SouthLat/EastLon.'
-            sarea = area.split(',')
-            assert len(sarea) == 2, 'area format is lat,lon or NorthLat/WestLon/SouthLat/EastLon.'
-            lat, lon = sarea
-            # single point does not work. Needs to encompass an actual grid point.
-            area = str(float(lat)-0.125)+'/'+str(float(lon)-0.125)+'/'+str(float(lat)+0.125)+'/'+str(float(lon)+0.125)
+        rmodel     = 'era5land'
+        resolution = 0.1
+        minyear    = 1981
 
-    if years is None:
-        import time as ptime
-        yearstart = 1979
-        curryear  = int(ptime.asctime().split()[-1])
-        yearend   = curryear - 1
+    # area
+    if '/' in area:
+        sarea = area.split('/')
+        estr = 'area format is lat,lon or NorthLat/WestLon/SouthLat/EastLon.'
+        assert len(sarea) == 4, estr
+        estr = 'area must be in 90/-180/-90/180'
+        assert float(sarea[0]) <= 90.,   estr
+        assert float(sarea[1]) >= -180., estr
+        assert float(sarea[2]) >= -90.,  estr
+        assert float(sarea[3]) <= 180.,  estr
+        estr = 'area format is lat,lon or NorthLat/WestLon/SouthLat/EastLon.'
+        assert float(sarea[0]) >= float(sarea[2])+resolution, estr
+        estr = 'area format is lat,lon or NorthLat/WestLon/SouthLat/EastLon.'
+        assert float(sarea[1])+resolution <= float(sarea[3]), estr
     else:
-        assert len(years) <= 2, 'years must be scaler or iterable with two elements.'
+        estr = 'area format is lat,lon or NorthLat/WestLon/SouthLat/EastLon.'
+        assert ',' in area, estr
+        sarea = area.split(',')
+        estr = 'area format is lat,lon or NorthLat/WestLon/SouthLat/EastLon.'
+        assert len(sarea) == 2, estr
+        lat, lon = sarea
+        # single point does not work. Needs to encompass an actual grid point.
+        area = (str(float(lat)-resolution/2.) + '/'
+                + str(float(lon)-resolution/2.) + '/'
+                + str(float(lat)+resolution/2.) + '/'
+                + str(float(lon)+resolution/2.))
+
+    # years
+    if years:
+        estr = 'years must be scaler or iterable with two elements.'
+        assert len(years) <= 2, estr
         if len(years) == 1:
             yearstart, yearend = years, years
-        else: 
+        else:
             yearstart, yearend = [ int(i) for i in years ]
-    
-    # make output directory
-    if not os.path.exists(path): os.makedirs(path)
+        estr = 'Start year must be greater'
+        estr = estr + ' {:d} for reanalysis model {:s}.'.format(
+            minyear, reanalysis_model)
+        assert yearstart >= minyear, estr
+    else:
+        import time as ptime
+        yearstart = minyear
+        curryear  = int(ptime.asctime().split()[-1])
+        yearend   = curryear - 1
 
-    # output files, single year files
-    targetera5 = [ path + '/' + reanalysis_model + '_'+area.replace('/','_')+'_{:04d}.nc'.format(yy) for yy in range(yearstart,yearend+1) ]
-    targetyrs = targetera5[:]
+    # Make output directory
+    if not os.path.exists(path):
+        os.makedirs(path)
+
+    # Single year output files
+    hasyrs     = list(range(yearstart, yearend+1))
+    targetera5 = [ path + '/' + rmodel + '_' + area.replace('/', '_')
+                   + '_{:04d}.nc'.format(yy) for yy in hasyrs ]
+    targetyrs  = targetera5[:]
 
     # Check existing files
     files = glob.glob(path+'/*.nc*')
-    files = [ ff for ff in files if os.path.basename(ff).startswith('era5_') ]
-    hasyrs = list(range(yearstart,yearend+1))
+    files = [ ff for ff in files
+              if os.path.basename(ff).startswith(rmodel+'_') ]
     if (len(files) > 0) and (not override):
         ilat1, ilon1, ilat2, ilon2 = [ float(i) for i in area.split('/') ]
         for ff in files:
@@ -260,8 +358,9 @@ def get_era5(area=None, years=None, path='.', override=False, reanalysis_model='
             lon1 = float(fs[-4])
             lat2 = float(fs[-3])
             lon2 = float(fs[-2])
-            if ((ilat1 <= lat1) and (ilat2 >= lat2) and (ilon1 >= lon1) and (ilon2 <= lon2)):
-                fs = fs[-1]
+            if ((ilat1 <= lat1) and (ilat2 >= lat2) and
+                (ilon1 >= lon1) and (ilon2 <= lon2)):
+                fs  = fs[-1]
                 yrs = fs[:fs.rfind('.')]
                 if '-' in yrs:
                     # check merged file
@@ -269,60 +368,15 @@ def get_era5(area=None, years=None, path='.', override=False, reanalysis_model='
                 else:
                     # check single year file
                     yr2 = yr1 = int(yrs)
-                for yr in range(yr1,yr2+1):
+                for yr in range(yr1, yr2+1):
                     if (yr >= yearstart) and (yr <= yearend):
                         if yr in hasyrs:
                             ii = hasyrs.index(yr)
                             hasyrs.remove(yr)
-                            _ = targetyrs.pop(ii)
+                            fyr = targetyrs.pop(ii)
+                            targetera5[targetera5.index(fyr)] = ff
 
-    # List of meteorological parameter(s) to analyse.
-    #    Examples:
-    #        variables = ['10m_u_component_of_wind', '10m_v_component_of_wind', '2m_dewpoint_temperature', ...]
-    #        param = "165/166/167/228"
-    #    The first example uses the variable names, the second uses parameter IDs.
-    #    Both are valid and yield the same result.
-    #    The parameters in the example are:
-    #        10 metre U wind component, 10u, ID 165
-    #        10 metre V wind component, 10v, ID 166
-    #        2 metre temperature, 2t, ID 167
-    #        Total precipitation, tp, ID 228
-    #
-    # Look up variable names by selecting variables and examining the API:
-    #     https://cds.climate.copernicus.eu/cdsapp#!/dataset/reanalysis-era5-single-levels?tab=form
-    #
-    # MuSICA needs the following forcing data:
-    #     Name      | Description                | unit
-    #     windspeed | Wind speed                 | m/s
-    #        precip | Precipitation              | mm/dt
-    #          tair | Air temperature            | C
-    #         rhair | Air relative humidity      | %
-    #         psurf | Atmospheric pressure       | hPa
-    #        swdown | Incoming solar radiation   | W/m2
-    #        lwdown | Incoming thermal radiation | W/m2
-    #        co2air | CO2 mixing ratio           | ppmv
-    # Optional
-    #       winddir | Wind direction             | deg
-    # Standard
-    variables  = ['10m_u_component_of_wind', '10m_v_component_of_wind',
-                  'total_precipitation', 'snowfall',
-                  '2m_temperature',
-                  '2m_dewpoint_temperature',
-                  'surface_pressure',
-                  'surface_solar_radiation_downwards',
-                  'surface_thermal_radiation_downwards']
-    # # Test alternative variables
-    # variables  = ['mean_total_precipitation_rate', 'mean_snowfall_rate',
-    #               'mean_surface_downward_short_wave_radiation_flux',
-    #               'mean_surface_downward_long_wave_radiation_flux',
-    #               'mean_top_downward_short_wave_radiation_flux', 'total_cloud_cover']
-    # # Extra information
-    # variables += ['land_sea_mask', 'orography', 'slope_of_sub_gridscale_orography',
-    #               'soil_type',
-    #               'type_of_high_vegetation', 'type_of_low_vegetation'
-    #               'high_vegetation_cover', 'low_vegetation_cover', 
-    #               'leaf_area_index_high_vegetation', 'leaf_area_index_low_vegetation']
-
+    # Select all times
     times = ['00:00', '01:00', '02:00',
              '03:00', '04:00', '05:00',
              '06:00', '07:00', '08:00',
@@ -344,9 +398,12 @@ def get_era5(area=None, years=None, path='.', override=False, reanalysis_model='
             lastdate  = '{:04d}-{:02d}-{:02d}'.format(hasyrs[yy], 12, 31)
             dates = (startdate+"/"+lastdate)
             print('Retrieve ', dates, target)
-            data_file_era5 = get_era5_single_level5(variables, dates, times, area, target, reanalysis_model=reanalysis_model)
+            data_file_era5 = _get_era5_single_level5(vars, dates, times, area,
+                                                     target,
+                                                     reanalysis_model=rmodel)
         else:
-            # Do one by year because CDS allows only download of 100000 items at a time.
+            # Do one by year because CDS allows only download of 100000 items
+            # at a time.
             # Items are time steps and variables but a map is one item.
             # So 10 variables, 24 hours a day per year are: 10*24*365 = 87600.
             datestarget = []
@@ -361,7 +418,8 @@ def get_era5(area=None, years=None, path='.', override=False, reanalysis_model='
                 datestarget += [(dates, target)]
                 print('Pool ', dates, target)
             from functools import partial
-            getit = partial(get_era5_single_level5_datestarget, variables, times, area, reanalysis_model=reanalysis_model)
+            getit = partial(_get_era5_single_level5_datestarget, vars, times,
+                            area, reanalysis_model=rmodel)
             from multiprocessing import Pool
             pool = Pool(processes=len(hasyrs))
             pool.map(getit, datestarget, None)
@@ -377,171 +435,87 @@ if __name__ == "__main__":
 
     import argparse
 
-    area             = None
-    years            = None
-    path             = '.'
+    area             = '90/-180/-90/180'
     override         = False
+    path             = '.'
     reanalysis_model = 'era5'
-    parser           = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter,
-                                       description ='''Download ERA5 or ERA5-Land data from Copernicus Climate Data Store (https://climate.copernicus.eu/climate-data-store).''')
-    parser.add_argument('-a', '--area', action='store', default=area, dest='area', metavar='area',
-                        help='area format as either lat,lon or NorthLat/WestLon/SouthLat/EastLon '
-                        '(default: global 90/-180/-90/180.')
-    parser.add_argument('-y', '--years', action='store', default=years, dest='years', metavar='years',
-                        help='years format is startyear,endyear (default: 1979,current-1).')
-    parser.add_argument('-p', '--path', action='store', default=path, dest='path', metavar='path',
-                        help='Output directory (default: current directory ".").')
-    parser.add_argument('-o', '--override', action='store_true', default=override, dest='override',
-                        help='Do not check that output file already exists that includes request. '
-                        'Override existing output file (default: False).')
-    parser.add_argument('-r', '--reanalyis-model', action='store', default=reanalysis_model, dest='reanalyis_model', metavar='reanalysis_model',
-                        help='Reanalyis model to download, either: era5 or era5land (default: era5)')
+    varis            = '10m_u_component_of_wind'
+    varis            = varis + ',' + '10m_v_component_of_wind'
+    varis            = varis + ',' + '2m_temperature,2m_dewpoint_temperature'
+    varis            = varis + ',' + 'total_precipitation,snowfall'
+    varis            = varis + ',' + 'surface_pressure'
+    varis            = varis + ',' + 'surface_solar_radiation_downwards'
+    varis            = varis + ',' + 'surface_thermal_radiation_downwards'
+    years            = None
+
+    parser           = argparse.ArgumentParser(
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        description='''
+        Download ERA5 or ERA5-Land data from Copernicus Climate Data Store
+        https://climate.copernicus.eu/climate-data-store.
+        ''')
+    hstr = 'area format as either lat,lon or NorthLat/WestLon/SouthLat/EastLon'
+    hstr = hstr + ' (default: global '+area+').'
+    parser.add_argument('-a', '--area', action='store', default=area,
+                        dest='area', metavar='area', help=hstr)
+    hstr = 'Do not check that output file already exists that includes'
+    hstr = hstr + ' request. Override existing output file (default: False).'
+    parser.add_argument('-o', '--override', action='store_true',
+                        default=override, dest='override',
+                        help=hstr)
+    hstr = 'Output directory (default: current directory ".").'
+    parser.add_argument('-p', '--path', action='store', default=path,
+                        dest='path', metavar='path', help=hstr)
+    hstr = 'Reanalyis model to download, either: era5, era5-land or era5land'
+    hstr = hstr + ' (default: era5)'
+    parser.add_argument('-r', '--reanalyis-model', action='store',
+                        default=reanalysis_model, dest='reanalyis_model',
+                        metavar='reanalysis_model', help=hstr)
+    hstr = 'Comma-separated variable list var1,var2,... (default: forcing'
+    hstr = hstr + ' variables of ecosystem model MuSICA: '+varis+').'
+    parser.add_argument('-v', '--variables', action='store', default=varis,
+                        dest='varis', metavar='variables', help=hstr)
+    hstr = 'years format is startyear,endyear (default: 1979,current-1 for'
+    hstr = hstr + ' ERA5 and 1981,current-1 for ERA5-Land.)'
+    parser.add_argument('-y', '--years', action='store', default=years,
+                        dest='years', metavar='years', help=hstr)
 
     args             = parser.parse_args()
     area             = args.area
-    years            = args.years
-    path             = args.path
     override         = args.override
+    path             = args.path
     reanalysis_model = args.reanalyis_model
+    varis            = args.varis
+    years            = args.years
 
     del parser, args
 
-    if years is not None:
+    # years
+    if years:
         if ',' in years:
             syears = years.split(',')
             assert len(syears) == 2, 'years format is startyear,endyear.'
             lyears = [ int(i) for i in syears ]
         else:
-            year = int(years)
+            year   = int(years)
             lyears = (year, year)
     else:
-        lyears = years
+        lyears = None
+
+    # variables
+    if ',' in varis:
+        svars = varis.split(',')
+    else:
+        svars = [varis]
 
     import time as ptime
     t1 = ptime.time()
 
-    era5file = get_era5(area=area, years=lyears, path=path, override=override, reanalysis_model=reanalysis_model)
-    print('File: ', era5file)
+    era5files = get_era5(vars=svars, area=area, years=lyears, path=path,
+                         override=override, reanalysis_model=reanalysis_model)
+    print('Files: ', era5files)
 
     t2    = ptime.time()
-    strin = '[m]: {:.1f}'.format((t2-t1)/60.) if (t2-t1)>60. else '[s]: {:d}'.format(int(t2-t1))
+    strin = ('[m]: {:.1f}'.format((t2-t1)/60.) if (t2-t1) > 60. else
+             '[s]: {:d}'.format(int(t2-t1)))
     print('Time elapsed', strin)
-
-'''
-Examples from different sources for ERA5:
-
-
-c = cdsapi.Client()
-
-c.retrieve(
-    'reanalysis-era5-single-levels',
-    {
-        'product_type':'reanalysis',
-        'format':'netcdf',
-        'variable':[
-            '10m_u_component_of_wind','10m_v_component_of_wind','2m_dewpoint_temperature',
-            '2m_temperature','high_vegetation_cover','land_sea_mask',
-            'leaf_area_index_high_vegetation','leaf_area_index_low_vegetation','low_vegetation_cover',
-            'mean_snowfall_rate','mean_surface_downward_long_wave_radiation_flux',
-            'mean_surface_downward_short_wave_radiation_flux',
-            'mean_top_downward_short_wave_radiation_flux','mean_total_precipitation_rate','orography',
-            'slope_of_sub_gridscale_orography','snowfall','soil_type',
-            'surface_pressure','surface_solar_radiation_downwards','surface_thermal_radiation_downwards',
-            'total_cloud_cover','total_precipitation','type_of_high_vegetation',
-            'type_of_low_vegetation'
-        ],
-        'year':[
-            '1979','1980','1981',
-            '1982','1983','1984',
-            '1985','1986','1987',
-            '1988','1989','1990',
-            '1991','1992','1993',
-            '1994','1995','1996',
-            '1997','1998','1999',
-            '2000','2001','2002',
-            '2003','2004','2005',
-            '2006','2007','2008',
-            '2009','2010','2011',
-            '2012','2013','2014',
-            '2015','2016','2017',
-            '2018'
-        ],
-        'month':[
-            '01','02','03',
-            '04','05','06',
-            '07','08','09',
-            '10','11','12'
-        ],
-        'day':[
-            '01','02','03',
-            '04','05','06',
-            '07','08','09',
-            '10','11','12',
-            '13','14','15',
-            '16','17','18',
-            '19','20','21',
-            '22','23','24',
-            '25','26','27',
-            '28','29','30',
-            '31'
-        ],
-        'time':[
-            '00:00','01:00','02:00',
-            '03:00','04:00','05:00',
-            '06:00','07:00','08:00',
-            '09:00','10:00','11:00',
-            '12:00','13:00','14:00',
-            '15:00','16:00','17:00',
-            '18:00','19:00','20:00',
-            '21:00','22:00','23:00'
-        ]
-    },
-    'download.nc')
-
-
-    c.retrieve('reanalysis-era5-pressure-levels', {
-           "variable": "temperature",
-           "pressure_level": "1000",
-           "product_type": "reanalysis",
-           "date": "2017-12-01/2017-12-31",
-           "time": "12:00",
-           "area": "75/-15/28/45",
-           "format": "grib",
-       }, 'download.grib')
-
-
-    c.retrieve('reanalysis-era5-pressure-levels', {
-        'variable'      : 'temperature',
-        'pressure_level': '1000',
-        'product_type'  : 'reanalysis',
-        'date'          : '2008-01-01',
-        'area'          : [60, -10, 50, 2], # North, West, South, East. Default: global
-        'grid'          : [1.0, 1.0], # Latitude/longitude grid: east-west (longitude) and north-south resolution (latitude). Default: 0.25 x 0.25
-        'time'          : '12:00',
-        'format'        : 'netcdf' # Supported format: grib and netcdf. Default: grib
-        }, 'test.nc')
-
-
-Examples from different sources for ERA5Land:
-
-
-import cdsapi
-import os
-
-out_path = './'
-
-c = cdsapi.Client()
-
-c.retrieve(
-    'reanalysis-era5-land',
-    {
-        'format': 'netcdf',
-        'variable': '2m_temperature',
-        'year': '2019',
-        'month': '12',
-        'day': '01',
-        'time': '00:00',
-    },
-    os.path.join(out_path, 'download.nc'))
-
-'''
