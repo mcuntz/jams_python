@@ -8,7 +8,7 @@ import os
 import warnings
 from collections import OrderedDict
 
-from ritenetcdf import writenetcdf
+from writenetcdf import writenetcdf
 from readnetcdf  import readnetcdf
 
 def mat2nc(fname, overwrite=False, fname_out=None, verbose=True, squeeze=True,
