@@ -92,6 +92,7 @@ from __future__ import absolute_import, division, print_function
                                        - Removed bug that x-axis in scatter plots is only correct if line2 is chosen.
               Matthias Cuntz, Jul 2019 - Added example to filter panel
               Matthias Cuntz, Aug 2019 - Added checkbox for linking the two y-axes in scatter plots
+              Matthias Cuntz, Sep 2020 - Added checkbox to invert second axis
 '''
 # --------------------------------------------------------------------
 # import
@@ -705,6 +706,7 @@ class ScatterPlot(wx.Panel):
         # second line
         self.combo_box3 = wx.ComboBox(self, choices=columns_with_neutral_selection, style=wx.CB_READONLY)
         self.checkbox1 = wx.CheckBox(self, label="Same y-axis")
+        self.checkbox2 = wx.CheckBox(self, label="Invert y-axis")
 
         self.linestyle_label2 = wx.StaticText(self, wx.ID_ANY, label="linestyle", size=wx.Size(60, 20))
         self.linestyle2 = wx.TextCtrl(self, wx.ID_ANY, value="--", size=wx.Size(40, 20))
@@ -728,6 +730,7 @@ class ScatterPlot(wx.Panel):
         # row_sizer4.Add(self.checkbox1, 0, wx.ALL | wx.ALIGN_CENTER, 5)
         row_sizer4.Add(self.combo_box3, 0, wx.ALL, 5)
         row_sizer4.Add(self.checkbox1, 0, wx.ALL, 5)
+        row_sizer4.Add(self.checkbox2, 0, wx.ALL, 5)
 
         row_sizer5 = wx.BoxSizer(wx.HORIZONTAL)
         # row_sizer5.Add(self.linestyle_label2, 0, wx.ALL | wx.ALIGN_CENTER, 1)
@@ -810,7 +813,8 @@ class ScatterPlot(wx.Panel):
         markerfacecolor2 = self.markerfacecolor2.GetLineText(0)
         markeredgecolor2 = self.markeredgecolor2.GetLineText(0)
         markeredgewidth2 = float(self.markeredgewidth2.GetLineText(0))
-        sameyaxes = self.checkbox1.GetValue()
+        sameyaxes   = self.checkbox1.GetValue()
+        invertyaxis = self.checkbox2.GetValue()
         if ((column_index1 != wx.NOT_FOUND and column_index2 != wx.NOT_FOUND and
              column_index1 != 0 and column_index2 != 0) or
             (column_index1 != wx.NOT_FOUND and column_index3 != wx.NOT_FOUND and
@@ -872,7 +876,11 @@ class ScatterPlot(wx.Panel):
                             ymax = ylim2[1]
                     if (ymin is not None) and (ymax is not None):
                         self.axes.set_ylim([ymin,ymax])
-                        self.axes2.set_ylim([ymin,ymax])                        
+                        self.axes2.set_ylim([ymin,ymax])
+                elif invertyaxis:
+                    if (ylim2[0] is not None):
+                        ylim2 = ylim2[::-1]
+                        self.axes2.set_ylim(ylim2)
                 self.canvas.draw()
 
 
