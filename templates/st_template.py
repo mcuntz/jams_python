@@ -20,10 +20,10 @@ import os
 from os.path import isfile
 import xarray as xr
 import numpy as np
-from ufz import position, get_brewer
+from jams import position, get_brewer
 import argparse
 import textwrap
-import ufz
+import jams
 import matplotlib.pyplot as plt
 """ 
 License
@@ -154,11 +154,11 @@ class plotObject(object):
         alwidth     = 1.0         # axis line width
         msize       = 1.0         # marker size
         mwidth      = 1.0         # marker edge width
-        mcol1       = ufz.color.colours('red')        # primary marker colour
+        mcol1       = jams.color.colours('red')        # primary marker colour
         mcol2       = '0.0'                     # secondary
         mcol3       = (202/255.,0/255.,32/255.) # third
-        mcols       = ufz.color.colours(['blue','red','darkgray','orange','darkblue','black'])
-        lcol1       = ufz.color.colours('blue')   # primary line colour
+        mcols       = jams.color.colours(['blue','red','darkgray','orange','darkblue','black'])
+        lcol1       = jams.color.colours('blue')   # primary line colour
         lcol2       = '0.0'
         lcol3       = '0.0'
         lcols       = mcols

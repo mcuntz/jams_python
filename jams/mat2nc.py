@@ -8,8 +8,8 @@ import os
 import warnings
 from collections import OrderedDict
 
-from jams.writenetcdf import writenetcdf
-from jams.readnetcdf  import readnetcdf
+from .writenetcdf import writenetcdf
+from .readnetcdf  import readnetcdf
 
 def mat2nc(fname, overwrite=False, fname_out=None, verbose=True, squeeze=True,
            varname=None,
@@ -95,7 +95,7 @@ def mat2nc(fname, overwrite=False, fname_out=None, verbose=True, squeeze=True,
         writes  'vv'                  shape =  (6,)                  to *.nc
         wrote file  test.nc
 
-        >>> from jams.readnetcdf import readnetcdf
+        >>> from readnetcdf import readnetcdf
         >>> print(readnetcdf('test.nc',var='ss'))
         [10.]
         >>> print(readnetcdf('test.nc',var='tt'))
