@@ -43,7 +43,7 @@ Topic :: Utilities
 """
 
 MAJOR      = 5
-MINOR      = 0
+MINOR      = 1
 MICRO      = 0
 ISRELEASED = True
 VERSION    = '{:d}.{:d}.{:d}'.format(MAJOR, MINOR, MICRO)
@@ -67,7 +67,7 @@ metadata = dict(
     platforms = ["Windows", "Linux", "Solaris", "Mac OS-X", "Unix"],
     packages = find_packages(exclude=['templates', 'tests*']),
     include_package_data = True,
-    scripts = ['bin/delta_isogsm2.py', 'bin/get_era_interim.py', 'bin/get_era5.py', 'bin/get_isogsm2.py', 'bin/makehtml'],
+    scripts = ['bin/delta_isogsm2.py', 'bin/dfgui.py', 'bin/get_era5.py', 'bin/get_era_interim.py', 'bin/get_isogsm2.py', 'bin/makehtml'],
     # install_requires=['numpy>=1.11.0', 'scipy>=0.9.0', 'netCDF4>=1.1.4', 'matplotlib>=1.4.3']
     install_requires = ['numpy', 'scipy','netcdf4','matplotlib'],
     )
