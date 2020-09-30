@@ -27,7 +27,8 @@ Modified Stephan Thober, Mar 2020 - added era5-land capability
 
 
 --------------------------------------------------------
-usage: get_era5.py [-h] [-a area] [-o] [-p path] [-r reanalysis_model] [-v variables] [-y years]
+usage: get_era5.py [-h] [-a area] [-o] [-p path] [-r reanalysis_model]
+                   [-v variables] [-y years]
 
         Download ERA5 or ERA5-Land data from Copernicus Climate Data Store
         https://climate.copernicus.eu/climate-data-store.

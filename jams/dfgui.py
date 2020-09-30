@@ -90,9 +90,10 @@ from __future__ import absolute_import, division, print_function
                                        - label x-axis on histograms
               Matthias Cuntz, Jun 2019 - make application
                                        - Removed bug that x-axis in scatter plots is only correct if line2 is chosen.
-              Matthias Cuntz, Jul 2019 - Added example to filter panel
-              Matthias Cuntz, Aug 2019 - Added checkbox for linking the two y-axes in scatter plots
-              Matthias Cuntz, Sep 2020 - Added checkbox to invert second axis
+              Matthias Cuntz, Jul 2019 - added example to filter panel
+              Matthias Cuntz, Aug 2019 - added checkbox for linking the two y-axes in scatter plots
+              Matthias Cuntz, Sep 2020 - added checkbox to invert second axis
+              Matthias Cuntz, Sep 2020 - changed wx.ListItemAttr() to wx.ItemAttr()
 '''
 # --------------------------------------------------------------------
 # import
@@ -155,7 +156,8 @@ class ListCtrlDataFrame(wx.ListCtrl):
         self._reset_mask()
 
         # prepare attribute for alternating colors of rows
-        self.attr_light_blue = wx.ListItemAttr()
+        # self.attr_light_blue = wx.ListItemAttr()
+        self.attr_light_blue = wx.ItemAttr()
         self.attr_light_blue.SetBackgroundColour("#D6EBFF")
 
         self.Bind(wx.EVT_LIST_COL_CLICK, self._on_col_click)
