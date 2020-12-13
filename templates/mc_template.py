@@ -1,396 +1,201 @@
 #!/usr/bin/env python
-from __future__ import division, absolute_import, print_function
 """
-usage: mc_template.py [-h] [-u] [-p plotname] [-s] [-t outtype] [-w] [infile]
+usage: mc_template.py [-h] [-p plotname] [-s] [-t outtype] [-u] [-w] [args [args ...]]
 
 This is the Python template for any new program of Matthias Cuntz.
 
 positional arguments:
-  infile                Mandatory input file.
+  args                  No positional arguments.
 
 optional arguments:
   -h, --help            show this help message and exit
   -p plotname, --plotname plotname
-                        Name of plot output file for types pdf, html, d3, bokeh, or plotly,
-                        and name basis for type png (default: mc_template).
+                        Name of plot output file for types pdf, html, d3, or
+                        plotly, and name basis for type png (default:
+                        /Users/cuntz/prog/github/jams_python/jams/mcplot).
   -s, --serif           Use serif font; default sans serif.
   -t outtype, --type outtype
-                        Output type is pdf, png, html, d3, bokeh, or plotly (default: open
-                        screen windows).
+                        Output type is pdf, png, html, d3, or plotly
+                        (default: open screen windows).
   -u, --usetex          Use LaTeX to render text in pdf, png and html.
-  -w, --white           White lines on transparent or black background; default: black lines on transparent or white background.
-
-
-License
--------
-This file is part of the JAMS Python package, distributed under the MIT License.
-
-Copyright (c) 2012-2019 Matthias Cuntz - mc (at) macu (dot) de
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+  -w, --white           White lines on transparent or black background;
+                        default: black lines on transparent or white background.
 
 
 History
 -------
-Written,  MC, Jul 2012
-Modified, MC, Jul 2013 - optparse->argparse
-          MC, Jul 2013 - extended to be lookup and gallery
-          MC, Dec 2013 - add png support
-          MC, Mar 2014 - split into individual templates
-          MC, Nov 2014 - script -> function
+Written,  Matthias Cuntz, Jul 2012
+Modified, Matthias Cuntz, Jul 2013 - optparse->argparse
+          Matthias Cuntz, Jul 2013 - extended to be lookup and gallery
+          Matthias Cuntz, Dec 2013 - add png support
+          Matthias Cuntz, Mar 2014 - split into individual templates
+          Matthias Cuntz, Nov 2014 - script -> function
                        - pdf, png, html, or d3
-          MC, Sep 2015 - Serif and sans serif fonts
-          MC, Dec 2015 - white lines on black or transparent background
-          MC, Mar 2017 - bokeh, plotly
-          MC, Aug 2018 - use jams.plot snippets
-          MC, Nov 2018 - label=str(iplot) to each add_axes to suppress warning about future changes
-          MC, Apr 2019 - llcspace missing in calls to legend
+          Matthias Cuntz, Sep 2015 - Serif and sans serif fonts
+          Matthias Cuntz, Dec 2015 - white lines on black or
+                                     transparent background
+          Matthias Cuntz, Mar 2017 - bokeh, plotly
+          Matthias Cuntz, Aug 2018 - use jams.plot snippets
+          Matthias Cuntz, Nov 2018 - label=str(iplot) to each add_axes
+                                     to suppress warning about future changes
+          Matthias Cuntz, Apr 2019 - llcspace missing in calls to legend
+          Matthias Cuntz, Dec 2020 - use class mcPlot
 """
+from __future__ import division, absolute_import, print_function
+import numpy as np
+from jams import mcPlot
+
 
 # -------------------------------------------------------------------------
-# Command line arguments - if script
+# Class PlotIt based on Matthias' standard plotting class
 #
 
-def filebase(f):
-    f1 = f
-    if f.startswith('..'):
-        f1 = f[2:]
-    elif f.startswith('.'):
-        f1 = f[1:]
-    else:
-        f1 = f
-    if '.' in f1:
-        return f[0:f.rfind(".")]
-    else:
-        return f
+class PlotIt(mcPlot):
 
-# Comment|Uncomment - Begin
+    # -------------------------------------------------------------------------
+    # init
+    #
+    def __init__(self, *args, **kwargs):
+        """ initialisation """
+        super().__init__(*args, **kwargs)
+        # nrow, ncol, colours, etc.
+        self.set_extra_layout()
+
+    # -------------------------------------------------------------------------
+    # special plot layout
+    #
+    def set_extra_layout(self):
+        from jams.color import colours
+        # layout and spaces
+        self.nrow     = 3     # # of rows of subplots per figure
+        self.ncol     = 2     # # of columns of subplots per figure
+        self.hspace   = 0.09  # x-space between subplots
+        self.vspace   = 0.04  # y-space between subplots
+        self.right    = 0.9   # right space on page
+        self.textsize = 11    # standard text size
+        self.dxabc    = 0.02  # % of (max-min) shift to the right
+                              # of left y-axis for a,b,c,... labels
+        self.dyabc    = 0.90  # % of (max-min) shift up from lower x-axis
+                                 # for a,b,c,... labels
+        self.mcol1 = self.fgcolor     # obs line, obs 2000
+        self.mcol2 = self.mcols[-3]   # model line
+        self.mcol3 = colours('gray')  # obs 1970
+        self.mcol4 = self.mcols[0]    # model 2000
+        self.mcol5 = self.mcols[2]    # model 1970
+        self.lcol1 = self.mcol1
+        self.lcol2 = self.mcol2
+        self.lcol3 = self.mcol3
+        self.lcol4 = self.mcol4
+        self.lcol5 = self.mcol5
+        # legend
+        self.llxbbox    = 1.0   # x-anchor legend bounding box
+        self.llybbox    = 1.0   # y-anchor legend bounding box
+        self.llhlength  = 1.5   # length of the legend handles
+        # legend
+        self.dxabc = 0.02  # % of (max-min) shift to the right
+                           # of left y-axis for a,b,c,... labels
+        self.dyabc = 0.02  # % of (max-min) shift up from lower x-axis
+                           # for a,b,c,... labels
+
+    # -------------------------------------------------------------------------
+    # read data
+    #
+    def read_data(self):
+        # do something
+        nn = 100
+        self.dat = np.arange(nn) / float(nn) * 4.*np.pi
+
+    # -------------------------------------------------------------------------
+    # plot fig
+    #
+    def plot_fig_sin(self):
+        import matplotlib.pyplot as plt
+        from jams import str2tex, position, abc2plot
+
+        self.ifig += 1
+        iplot  = 0
+        print('    Plot - Fig ', self.ifig)
+        fig = plt.figure(self.ifig)
+
+        xlab = str2tex(r'4 $\pi$', usetex=self.usetex)
+        ylab = str2tex('sine and cosine function', usetex=self.usetex)
+        xlim = None
+        ylim = None
+
+        xx  = self.dat
+        yy1 = np.sin(xx)
+        yy2 = np.cos(xx)
+
+        iplot += 1
+
+        pos = position(self.nrow, self.ncol, iplot,
+                       hspace=self.hspace, vspace=self.vspace)
+        sub = fig.add_axes(pos, label=str(iplot))
+
+        larr = []
+        tarr = []
+
+        tarr = ['sin']
+        larr = sub.plot(xx, yy1)
+        plt.setp(larr[-1], linestyle='-', linewidth=self.lwidth, marker=None,
+                 color=self.lcols[0])
+
+        tarr += ['cos']
+        larr += sub.plot(xx, yy2)
+        plt.setp(larr[-1], linestyle='-', linewidth=self.lwidth, marker=None,
+                 color=self.lcols[-3])
+
+        if xlab != '':
+            plt.setp(sub, xlabel=xlab)
+        if ylab != '':
+            plt.setp(sub, ylabel=ylab)
+        sub.grid(False)
+
+        sub.spines['right'].set_color('none')
+        sub.spines['top'].set_color('none')
+
+        if xlim is not None:
+            plt.setp(sub, xlim=xlim)
+        if ylim is not None:
+            plt.setp(sub, ylim=ylim)
+
+        ll = sub.legend(larr, tarr, frameon=self.frameon, ncol=1,
+                        labelspacing=self.llrspace,
+                        handletextpad=self.llhtextpad,
+                        handlelength=self.llhlength,
+                        loc='upper left',
+                        bbox_to_anchor=(self.llxbbox, self.llybbox),
+                        scatterpoints=1, numpoints=1)
+        plt.setp(ll.get_texts(), fontsize='small')
+
+        abc2plot(sub, self.dxabc, self.dyabc, iplot, lower=True,
+                 bold=True, usetex=self.usetex, mathrm=True)
+
+        # import pdb
+        # pdb.set_trace()
+
+        self.plot_save(fig)
+
+
 if __name__ == '__main__':
 
-    import argparse
-
-    plotname = ''
-    outtype  = ''
-    usetex   = False
-    serif    = False
-    dowhite  = False
-    parser   = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter,
-                                       description='''This is the Python template for any new program of Matthias Cuntz.''')
-    parser.add_argument('-p', '--plotname', action='store',
-                        default=plotname, dest='plotname', metavar='plotname',
-                        help='Name of plot output file for types pdf, html, d3, bokeh, or plotly, '
-                        'and name basis for type png (default: '+filebase(__file__)+').')
-    parser.add_argument('-s', '--serif', action='store_true', default=serif, dest='serif',
-                        help='Use serif font; default sans serif.')
-    parser.add_argument('-t', '--type', action='store',
-                        default=outtype, dest='outtype', metavar='outtype',
-                        help='Output type is pdf, png, html, d3, bokeh, or plotly (default: open screen windows).')
-    parser.add_argument('-u', '--usetex', action='store_true', default=usetex, dest='usetex',
-                        help='Use LaTeX to render text in pdf, png and html.')
-    parser.add_argument('-w', '--white', action='store_true', default=dowhite, dest='dowhite',
-                        help='White lines on transparent or black background; '
-                        'default: black lines on transparent or white background.')
-    parser.add_argument('file', nargs='?', default=None, metavar='infile',
-                        help='Mandatory input file.')
-
-    args     = parser.parse_args()
-    infile   = args.file
-    plotname = args.plotname
-    outtype  = args.outtype
-    serif    = args.serif
-    usetex   = args.usetex
-    dowhite  = args.dowhite
-
-    del parser, args
-# Comment|Uncomment - End
-
-# -------------------------------------------------------------------------
-# Function definition - if function
-#
-
-# Comment|Uncomment - Begin
-# def mc_template(infile=None, plotname='', outtype='', serif=False, usetex=False, dowhite=False):
-#     """
-#     This is the Python template for any new program of Matthias Cuntz.
-
-#     positional arguments:
-#       infile                Mandatory input file.
-
-#     optional arguments:
-#       -h, --help            show this help message and exit
-#       -p plotname, --plotname plotname
-#                             Name of plot output file for types pdf, html, d3, bokeh, or plotly,
-#                             and name basis for type png (default: mc_template).
-#       -s, --serif           Use serif font; default sans serif.
-#       -t outtype, --type outtype
-#                             Output type is pdf, png, html, d3, bokeh, or plotly (default: open
-#                             screen windows).
-#       -u, --usetex          Use LaTeX to render text in pdf, png and html.
-#       -w, --white           White lines on transparent or black background; default: black lines on transparent or white background.
-#     """
-# Comment|Uncomment - End
-
-    # Check input
-    if (infile is None):
-        raise IOError('\nInput file must be given.\n')
-
-    import numpy as np
-    import jams
     import time as ptime
     t1 = ptime.time()
 
-    exec(jams.plot.mc_set_outtype)
+    desc   = "This is the Python template for any new program"
+    desc  += " of Matthias Cuntz."
+    argstr = "No positional arguments."
+    iplot = PlotIt(desc=desc, argstr=argstr)
 
-    
-    # -------------------------------------------------------------------------
-    # Customize plots
-    #
-
-    # Main plot
-    nrow        = 3           # # of rows of subplots per figure
-    ncol        = 2           # # of columns of subplots per figure
-    hspace      = 0.10        # x-space between subplots
-    vspace      = 0.05        # y-space between subplots
-    right       = 0.9         # right space on page
-    textsize    = 13          # standard text size
-    dxabc       = 0.90        # % of (max-min) shift to the right from left y-axis for a,b,c,... labels
-    dyabc       = 0.05        # % of (max-min) shift up from lower x-axis for a,b,c,... labels
-
-    lwidth      = 1.5         # linewidth
-    elwidth     = 1.0         # errorbar line width
-    alwidth     = 1.0         # axis line width
-    msize       = 1.0         # marker size
-    mwidth      = 1.0         # marker edge width
-    mcol1       = jams.color.colours('red')  # primary marker colour
-    mcol2       = fgcolor                   # secondary
-    mcol3       = jams.color.rgb2rgb01(202,0,32) # third
-    if dowhite:
-        mcols   = jams.color.colours(['blue','red','lightgray','orange','lightblue',fgcolor])
-    else:
-        mcols   = jams.color.colours(['blue','red','darkgray','orange','darkblue','black'])
-    lcol1       = jams.color.colours('blue')   # primary line colour
-    lcol2       = fgcolor
-    lcol3       = fgcolor
-    lcols       = mcols
-
-    # Legend
-    llxbbox     = 0           # x-anchor legend bounding box
-    llybbox     = 1           # y-anchor legend bounding box
-    llrspace    = 0.          # spacing between rows in legend
-    llcspace    = 1.0         # spacing between columns in legend
-    llhtextpad  = 0.4         # the pad between the legend handle and text
-    llhlength   = 1.5         # the length of the legend handles
-    frameon     = False       # if True, draw a frame around the legend. If None, use rc
-
-    # PNG
-    dpi         = 300
-    transparent = False
-    bbox_inches = 'tight'
-    pad_inches  = 0.035
-
-    exec(jams.plot.mc_set_matplotlib)
-
-
-    # -------------------------------------------------------------------------
-    # Data
-    #
-
-    pass
-
-
-    # -------------------------------------------------------------------------
-    # Plot
-    #
-
-    exec(jams.plot.mc_plot_begin)
-
-    # Uncomment for xkcd-style
+    # # Uncomment for xkcd-style
+    # import matplotlib.pyplot as plt
     # plt.xkcd()
-
-    
-    # -------------------------------------------------------------------------
-    # Fig 1
-    #
-
-    ifig += 1
-    iplot = 0
-    print('Plot - Fig ', ifig)
-    fig = plt.figure(ifig)
-
-    # Set to None for free scaling at first, then set limits
-    xlim = None
-    ylim = None
-    # xlim = [0.,1.]
-    # ylim = [-0.4,0.4]
-
-    iplot += 1
-    if outtype in ['d3', 'bokeh', 'plotly']:
-        xlab   = 'f(x) (0,100)'
-        ylab   = 'delta Delta sin(x)'
-    else:
-        xlab   = jams.str2tex('f(x) (0,100)', usetex=usetex)
-        ylab   = jams.str2tex(r'$\delta \Delta \sin(x)$', usetex=usetex)
-    # if (iplot == 0) | (outtype == 'pdf') | (outtype == 'png') | (outtype == 'html'):
-    #     sub  = fig.add_axes(jams.position(nrow,ncol,iplot,hspace=hspace,vspace=vspace), label=str(iplot))
-    #     sub1 = sub
-    # else:
-    #     # special if windows or d3: zoom one panel zooms all panels
-    #     sub = fig.add_axes(jams.position(nrow,ncol,iplot,hspace=hspace,vspace=vspace), sharex=sub1, label=str(iplot))
-    sub    = fig.add_axes(jams.position(nrow,ncol,iplot,hspace=hspace,vspace=vspace), label=str(iplot))
-
-    mark1  = sub.plot(np.sin(np.arange(100)))
-    plt.setp(mark1, linestyle='None', marker='o', markeredgecolor=mcol1, markerfacecolor='None',
-             markersize=msize, markeredgewidth=mwidth)
-
-    plt.setp(sub, xlabel=xlab)
-    plt.setp(sub, ylabel=ylab)
-    sub.grid(False)
-
-    if xlim != None: plt.setp(sub, xlim=xlim)
-    if ylim != None: plt.setp(sub, ylim=ylim)
-
-    larr = mark1
-    if outtype in ['d3', 'bokeh', 'plotly']:
-        tarr = ['sin(x) sin Nothing 100']
-    else:
-        tarr = [jams.str2tex(r'$\sin(x)$ sin Nothing 100', usetex=usetex)]
-    ll = sub.legend(larr, tarr, frameon=frameon, ncol=1,
-                    labelspacing=llrspace, columnspacing=llcspace,
-                    handletextpad=llhtextpad, handlelength=llhlength,
-                    loc='upper left', bbox_to_anchor=(llxbbox,llybbox), scatterpoints=1, numpoints=1)
-    plt.setp(ll.get_texts(), fontsize='small')
-
-    if outtype in ['d3', 'bokeh', 'plotly']:
-        jams.abc2plot(sub, dxabc, dyabc, iplot, lower=True, bold=True, usetex=False, mathrm=True, parenthesis='close')
-    else:
-        jams.abc2plot(sub, dxabc, dyabc, iplot, lower=True, bold=True, usetex=usetex, mathrm=True, parenthesis='close')
-
-    exec(jams.plot.mc_plot_save)
-
-    
-    # -------------------------------------------------------------------------
-    # Fig 2
-    #
-
-    ifig += 1
-    iplot = 0
-    print('Plot - Fig ', ifig)
-    fig = plt.figure(ifig)
-
-    # Set to None for free scaling at first, then set limits
-    xlim = None
-    ylim = None
-    # xlim = [0.,1.]
-    # ylim = [-0.4,0.4]
-
-    iplot += 1
-    if outtype in ['d3', 'bokeh', 'plotly']:
-        xlab   = '(0,10)'
-        ylab   = '2sin(x)'
-    else:
-        xlab   = jams.str2tex('(0,10)', usetex=usetex)
-        ylab   = jams.str2tex(r'2$\sin(x)$', usetex=usetex)
-    sub    = fig.add_axes(jams.position(nrow,ncol,iplot,hspace=hspace,vspace=vspace), label=str(iplot))
-
-    line1 = sub.plot(2.*np.sin(np.arange(100)))
-    plt.setp(line1, linestyle='-', linewidth=lwidth, marker=None, color=lcol1)
-
-    plt.setp(sub, xlabel=xlab)
-    plt.setp(sub, ylabel=ylab)
-    sub.grid(False)
-
-    if xlim != None: plt.setp(sub, xlim=xlim) # set axis limit if wanted
-    if ylim != None: plt.setp(sub, ylim=ylim)
-
-    larr = line1
-    if outtype in ['d3', 'bokeh', 'plotly']:
-        tarr = ['sin Nothing']
-    else:
-        tarr = [jams.str2tex(r'$\sin$ Nothing', usetex=usetex)]
-    ll = sub.legend(larr, tarr, frameon=frameon, ncol=1,
-                    labelspacing=llrspace, columnspacing=llcspace,
-                    handletextpad=llhtextpad, handlelength=llhlength,
-                    loc='upper left', bbox_to_anchor=(llxbbox,llybbox), scatterpoints=1, numpoints=1)
-    plt.setp(ll.get_texts(), fontsize='small')
-
-    if outtype in ['d3', 'bokeh', 'plotly']:
-        jams.abc2plot(sub, dxabc, dyabc, iplot, lower=True, bold=True, usetex=False, mathrm=True, parenthesis='close')
-    else:
-        jams.abc2plot(sub, dxabc, dyabc, iplot, lower=True, bold=True, usetex=usetex, mathrm=True, parenthesis='close')
-
-    import re
-    exec(re.sub("pngfile = .*", "pngfile = pngfile.replace('0','_')+'.png'", jams.plot.mc_plot_save))
-
-    
-    # -------------------------------------------------------------------------
-    # Finished
-    #
-
-    exec(jams.plot.mc_plot_end)
+    iplot.read_data()
+    iplot.plot_fig_sin()
+    iplot.close()
 
     t2    = ptime.time()
-    strin = '[m]: {:.1f}'.format((t2-t1)/60.) if (t2-t1)>60. else '[s]: {:d}'.format(int(t2-t1))
-    print('Time elapsed', strin)
-
-# -------------------------------------------------------------------------
-# Command line usage if function
-#
-
-# Comment|Uncomment - Begin
-# if __name__ == '__main__':
-
-#     import argparse
-
-#     plotname = ''
-#     outtype  = ''
-#     usetex   = False
-#     serif    = False
-#     dowhite  = False
-#     parser   = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter,
-#                                        description='''This is the Python template for any new program of Matthias Cuntz.''')
-#     parser.add_argument('-p', '--plotname', action='store',
-#                         default=plotname, dest='plotname', metavar='plotname',
-#                         help='Name of plot output file for types pdf, html, d3, bokeh, or plotly, '
-#                         'and name basis for type png (default: '+filebase(__file__)+').')
-#     parser.add_argument('-s', '--serif', action='store_true', default=serif, dest="serif",
-#                         help="Use serif font; default sans serif.")
-#     parser.add_argument('-t', '--type', action='store',
-#                         default=outtype, dest='outtype', metavar='outtype',
-#                         help='Output type is pdf, png, html, d3, bokeh, or plotly (default: open screen windows).')
-#     parser.add_argument('-u', '--usetex', action='store_true', default=usetex, dest="usetex",
-#                         help="Use LaTeX to render text in pdf, png and html.")
-#     parser.add_argument('-w', '--white', action='store_true', default=dowhite, dest="dowhite",
-#                         help="White lines on transparent or black background; default: black lines on transparent or white background.")
-#     parser.add_argument('file', nargs='?', default=None, metavar='infile',
-#                         help='Mandatory input file.')
-
-#     args     = parser.parse_args()
-#     infile   = args.file
-#     plotname = args.plotname
-#     outtype  = args.outtype
-#     serif    = args.serif
-#     usetex   = args.usetex
-#     dowhite  = args.dowhite
-
-#     del parser, args
-    
-#     # Call function
-#     mc_template(infile, plotname=plotname, outtype=outtype, serif=serif, usetex=usetex, dowhite=dowhite)
-
-# Comment|Uncomment - End
+    strin = ( '[m]: {:.1f}'.format((t2 - t1) / 60.)
+              if (t2 - t1) > 60.
+              else '[s]: {:d}'.format(int(t2 - t1)) )
+    print('    Time elapsed', strin)
