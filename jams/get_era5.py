@@ -24,6 +24,7 @@ Modified Stephan Thober, Mar 2020 - added era5-land capability
                                   - input variable list with MuSICA variables
                                     as default
                                   - finalised era5-land capability
+         Matthias Cuntz, Feb 2021 - bug in single point -> lat1 > lat2
 
 
 --------------------------------------------------------
@@ -278,6 +279,7 @@ def get_era5(vars=['10m_u_component_of_wind', '10m_v_component_of_wind',
                                         variables as default
                                       - finalised era5-land capability
                                       - use numpydoc format
+             Matthias Cuntz, Feb 2021 - bug in single point -> lat1 > lat2
     """
     # Check parameters
     # reanalysis model
@@ -314,9 +316,9 @@ def get_era5(vars=['10m_u_component_of_wind', '10m_v_component_of_wind',
         assert len(sarea) == 2, estr
         lat, lon = sarea
         # single point does not work. Needs to encompass an actual grid point.
-        area = (str(float(lat)-resolution/2.) + '/'
+        area = (str(float(lat)+resolution/2.) + '/'
                 + str(float(lon)-resolution/2.) + '/'
-                + str(float(lat)+resolution/2.) + '/'
+                + str(float(lat)-resolution/2.) + '/'
                 + str(float(lon)+resolution/2.))
 
     # years
@@ -324,7 +326,7 @@ def get_era5(vars=['10m_u_component_of_wind', '10m_v_component_of_wind',
         estr = 'years must be scaler or iterable with two elements.'
         assert len(years) <= 2, estr
         if len(years) == 1:
-            yearstart, yearend = years, years
+            yearstart = yearend = years
         else:
             yearstart, yearend = [ int(i) for i in years ]
         estr = 'Start year must be greater'
