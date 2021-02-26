@@ -114,7 +114,7 @@ class PlotIt(mcPlot):
 
         self.ifig += 1
         iplot  = 0
-        print('    Plot - Fig ', self.ifig)
+        print('    Plot - Fig', self.ifig, '- plot_fig_sin')
         fig = plt.figure(self.ifig)
 
         xlab = str2tex(r'4 $\pi$', usetex=self.usetex)

@@ -25,45 +25,52 @@ Modified Stephan Thober, Mar 2020 - added era5-land capability
                                     as default
                                   - finalised era5-land capability
          Matthias Cuntz, Feb 2021 - bug in single point -> lat1 > lat2
+         Matthias Cuntz, Feb 2021 - added grib format
+                                  - default download era5-land in grib format
 
 
 --------------------------------------------------------
-usage: get_era5.py [-h] [-a area] [-o] [-p path] [-r reanalysis_model]
-                   [-v variables] [-y years]
+usage: get_era5.py [-h] [-a area] [-f format] [-o] [-p path]
+                   [-r reanalysis_model] [-v variables] [-y years]
 
         Download ERA5 or ERA5-Land data from Copernicus Climate Data Store
         https://climate.copernicus.eu/climate-data-store.
+
 
 optional arguments:
   -h, --help            show this help message and exit
   -a area, --area area  area format as either lat,lon or
                         NorthLat/WestLon/SouthLat/EastLon
                         (default: global 90/-180/-90/180).
-  -o, --override        Do not check that output file already exists
-                        that includes request. Override existing output file
+  -f format, --format format
+                        Output format netcdf or grib.
+                        (default: netcdf if era5, grib if era5-land).
+  -o, --override        Do not check that output file already exists that
+                        includes request. Override existing output file
                         (default: False).
   -p path, --path path  Output directory (default: current directory ".").
   -r reanalysis_model, --reanalyis-model reanalysis_model
-                        Reanalyis model to download, either: era5, era5-land
-                        or era5land (default: era5)
+                        Reanalyis model to download, either: era5, era5-land or
+                        era5land (default: era5)
   -v variables, --variables variables
                         Comma-separated variable list var1,var2,...
                         (default: forcing variables of ecosystem model MuSICA:
                         10m_u_component_of_wind,10m_v_component_of_wind,
-                        2m_temperature,2m_dewpoint_temperature,
-                        total_precipitation,snowfall,surface_pressure,
+                        2m_temperature,2m_dewpoint_temperature,total_precipitation,
+                        snowfall,surface_pressure,
                         surface_solar_radiation_downwards,
                         surface_thermal_radiation_downwards).
   -y years, --years years
                         years format is startyear,endyear
-                        (default: 1979,current-1 for ERA5
-                        and 1981,current-1 for ERA5-Land.)
+                        (default: 1979,current-1 for ERA5 and
+                        1981,current-1 for ERA5-Land.)
 
 
 Examples
 --------
     # Hesse
-    python get_era5.py -r ERA5-Land -v 2m_temperature,2m_dewpoint_temperature -a 48.6742166667,7.06461666667 -y 1995,2017 -p era
+    python get_era5.py -r ERA5-Land -v 2m_temperature,2m_dewpoint_temperature \
+                       -a 48.6742166667,7.06461666667 -y 1995,2017 -p era
     # Tumbarumba
     python get_era5.py -r ERA5-Land -v 10m_u_component_of_wind,10m_v_component_of_wind,2m_temperature,2m_dewpoint_temperature,total_precipitation,snowfall,surface_pressure,surface_solar_radiation_downwards,surface_thermal_radiation_downwards --area=-35.7833302,148.0166666 -y 2016,2018 -p era
 
@@ -88,7 +95,8 @@ __all__ = ['get_era5']
 #
 
 def _get_era5_single_level5(variables, date, time, area, target,
-                            grid=None, reanalysis_model='era5'):
+                            grid=None, reanalysis_model='era5',
+                            output_format='netcdf'):
     """
     ToDo
     """
@@ -116,14 +124,13 @@ def _get_era5_single_level5(variables, date, time, area, target,
 
     server = cdsapi.Client()
 
-    form = 'netcdf'
     request = {
-        'format':   form,       # grib or netcdf
-        'variable': variables,  # ['10m_v_component_of_wind', ...]
-        'date':     date,       # "2010-01-01", "2010-01-01/2015-12-31"
-        'time':     time,       # "[00:00, 01:00, 02:00, ..., 23:00]
-        'area':     area,       # North, West, South, East within
-                                # "90/-180/-90/180" or [90, -180, -90, 180]
+        'format':   output_format,  # grib or netcdf
+        'variable': variables,      # ['10m_v_component_of_wind', ...]
+        'date':     date,           # "2010-01-01", "2010-01-01/2015-12-31"
+        'time':     time,           # "[00:00, 01:00, 02:00, ..., 23:00]
+        'area':     area,           # North, West, South, East within
+                                    # "90/-180/-90/180" or [90, -180, -90, 180]
     }
 
     if reanalysis_model == 'era5':
@@ -142,14 +149,16 @@ def _get_era5_single_level5(variables, date, time, area, target,
 
 
 def _get_era5_single_level5_datestarget(variables, time, area, datestarget,
-                                        grid=None, reanalysis_model='era5'):
+                                        grid=None, reanalysis_model='era5',
+                                        output_format='netcdf'):
     """
     Wrapper function for `_get_era5_single_level5` to parallelise with
     Python's `multiprocessing.Pool`.
     """
     date, target = datestarget
     return _get_era5_single_level5(variables, date, time, area, target,
-                                   grid, reanalysis_model=reanalysis_model)
+                                   grid, reanalysis_model=reanalysis_model,
+                                   output_format=output_format)
 
 
 # --------------------------------------------------------------------
@@ -162,7 +171,8 @@ def get_era5(vars=['10m_u_component_of_wind', '10m_v_component_of_wind',
                    'surface_solar_radiation_downwards',
                    'surface_thermal_radiation_downwards'],
              area='90/-180/-90/180', years=None, path='.',
-             override=False, reanalysis_model='era5'):
+             override=False, reanalysis_model='era5',
+             output_format=''):
     """
     Download ERA5 or ERA5-Land data from Copernicus Climate Data Store.
 
@@ -228,14 +238,42 @@ def get_era5(vars=['10m_u_component_of_wind', '10m_v_component_of_wind',
         checking ONLY filenames.
     reanalysis_model : string, optional
         Reanalyis model to download. Can be era5, era5-land or era5land
-        (default: 'ear5').
+        (default: 'era5').
         Output filenames will be adapted accordingly.
+    output_format : string, optional
+        File format of output file. Default is 'netcdf'
+        if `reanalysis_model=='era5'` and 'grib' if `reanalysis_model=='era5'`.
+        Output filenames will be suffixed by '.nc' or '.grb', respectively.
+
+        Model output at ECMWF is stored in grib format. There are limitation on
+        the conversion to netCDF using the current ECMWF infrastructure. One
+        gets errors like 'One or more variable sizes violate format
+        constraints.':
+        https://confluence.ecmwf.int/display/CKB/Common+Error+Messages+for+CDS+Requests
+        Download in grib format in this case and use the climate data operators
+        'cdo' to convert to netCDF format:
+
+        Check the file content to know latitude, longitude and year:
+
+            `cdo -t ecmwf sinfov gribfile`
+
+        Construct the netcdf name, e.g. era5-land_lat1_lon1_lat2_lon2_year.nc
+        Convert to compressed netCDF4 format:
+
+            `cdo -f nc4 -z zip -t ecmwf copy gribfile netcdffile`
+
+        If you want to have lowercase variable names, this is in bash:
+
+            `cdo -t ecmwf sinfov gribfile`
+            `vars=$(cdo -s -t ecmwf showname gribfile)`
+            `copt="" ; for i in ${vars} ; do copt="${copt} -chname,${i},$(echo ${i} | tr A-Z a-z)" ; done`
+            `cdo -L -f nc4 -z zip -t ecmwf ${copt} gribfile netcdffile`
 
     Returns
     -------
     list
         Returns filenames of the output files in path, either the newly written
-        files or the files that contain the output requested:
+        files or the files that contain the output requested (netcdf example):
 
             [ path + '/' + 'era5<land>_' + area.replace('/','_')
             + '_{:04d}.nc'.format(yy) for yy in years ]
@@ -280,6 +318,8 @@ def get_era5(vars=['10m_u_component_of_wind', '10m_v_component_of_wind',
                                       - finalised era5-land capability
                                       - use numpydoc format
              Matthias Cuntz, Feb 2021 - bug in single point -> lat1 > lat2
+             Matthias Cuntz, Feb 2021 - added grib format
+                                      - download era5-land in grib format
     """
     # Check parameters
     # reanalysis model
@@ -289,10 +329,23 @@ def get_era5(vars=['10m_u_component_of_wind', '10m_v_component_of_wind',
     if rmodel == 'era5':
         resolution = 0.25
         minyear    = 1979
+        if not output_format:
+            output_format = 'netcdf'
     else:
         rmodel     = 'era5land'
         resolution = 0.1
         minyear    = 1981
+        if not output_format:
+            output_format = 'grib'
+    output_format = output_format.lower()
+    if output_format == 'netcdf':
+        suffix = '.nc'
+    elif output_format == 'grib':
+        suffix = '.grb'
+    else:
+        estr  = 'Output format must be netcdf or grib. Given: '
+        estr += output_format
+        raise ValueError(estr)
 
     # area
     if '/' in area:
@@ -346,11 +399,11 @@ def get_era5(vars=['10m_u_component_of_wind', '10m_v_component_of_wind',
     # Single year output files
     hasyrs     = list(range(yearstart, yearend+1))
     targetera5 = [ path + '/' + rmodel + '_' + area.replace('/', '_')
-                   + '_{:04d}.nc'.format(yy) for yy in hasyrs ]
+                   + '_{:04d}'.format(yy) + suffix for yy in hasyrs ]
     targetyrs  = targetera5[:]
 
     # Check existing files
-    files = glob.glob(path+'/*.nc*')
+    files = glob.glob(path+'/*.nc*') + glob.glob(path+'/*.gr*b*')
     files = [ ff for ff in files
               if os.path.basename(ff).startswith(rmodel+'_') ]
     if (len(files) > 0) and (not override):
@@ -401,9 +454,9 @@ def get_era5(vars=['10m_u_component_of_wind', '10m_v_component_of_wind',
             lastdate  = '{:04d}-{:02d}-{:02d}'.format(hasyrs[yy], 12, 31)
             dates = (startdate+"/"+lastdate)
             print('Retrieve ', dates, target)
-            data_file_era5 = _get_era5_single_level5(vars, dates, times, area,
-                                                     target,
-                                                     reanalysis_model=rmodel)
+            data_file_era5 = _get_era5_single_level5(
+                vars, dates, times, area, target, reanalysis_model=rmodel,
+                output_format=output_format)
         else:
             # Do one by year because CDS allows only download of 100000 items
             # at a time.
@@ -422,7 +475,8 @@ def get_era5(vars=['10m_u_component_of_wind', '10m_v_component_of_wind',
                 print('Pool ', dates, target)
             from functools import partial
             getit = partial(_get_era5_single_level5_datestarget, vars, times,
-                            area, reanalysis_model=rmodel)
+                            area, reanalysis_model=rmodel,
+                            output_format=output_format)
             from multiprocessing import Pool
             pool = Pool(processes=len(hasyrs))
             pool.map(getit, datestarget, None)
@@ -439,6 +493,7 @@ if __name__ == "__main__":
     import argparse
 
     area             = '90/-180/-90/180'
+    oformat          = ''
     override         = False
     path             = '.'
     reanalysis_model = 'era5'
@@ -461,6 +516,10 @@ if __name__ == "__main__":
     hstr = hstr + ' (default: global '+area+').'
     parser.add_argument('-a', '--area', action='store', default=area,
                         dest='area', metavar='area', help=hstr)
+    hstr  = 'Output format netcdf or grib. (default: netcdf if era5,'
+    hstr += ' grib if era5-land).'
+    parser.add_argument('-f', '--format', action='store', default=oformat,
+                        dest='oformat', metavar='format', help=hstr)
     hstr = 'Do not check that output file already exists that includes'
     hstr = hstr + ' request. Override existing output file (default: False).'
     parser.add_argument('-o', '--override', action='store_true',
@@ -485,6 +544,7 @@ if __name__ == "__main__":
 
     args             = parser.parse_args()
     area             = args.area
+    oformat          = args.oformat
     override         = args.override
     path             = args.path
     reanalysis_model = args.reanalyis_model
@@ -515,7 +575,8 @@ if __name__ == "__main__":
     t1 = ptime.time()
 
     era5files = get_era5(vars=svars, area=area, years=lyears, path=path,
-                         override=override, reanalysis_model=reanalysis_model)
+                         override=override, reanalysis_model=reanalysis_model,
+                         output_format=oformat)
     print('Files: ', era5files)
 
     t2    = ptime.time()
