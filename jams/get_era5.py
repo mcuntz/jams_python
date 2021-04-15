@@ -264,10 +264,13 @@ def get_era5(vars=['10m_u_component_of_wind', '10m_v_component_of_wind',
 
         If you want to have lowercase variable names, this is in bash:
 
-            `cdo -t ecmwf sinfov gribfile`
-            `vars=$(cdo -s -t ecmwf showname gribfile)`
+            `gribfile=ecmwf_output.grb`
+            `# cdo -t ecmwf sinfov ${gribfile}`
+            `year=$(echo $(cdo -s showyear ${gribfile}))`
+            `netcdffile=era5-land_75_-15_28_45_${year}.nc`
+            `vars=$(cdo -s -t ecmwf showname ${gribfile})`
             `copt="" ; for i in ${vars} ; do copt="${copt} -chname,${i},$(echo ${i} | tr A-Z a-z)" ; done`
-            `cdo -L -f nc4 -z zip -t ecmwf ${copt} gribfile netcdffile`
+            `cdo -L -f nc4 -z zip -t ecmwf ${copt} ${gribfile} ${netcdffile}`
 
     Returns
     -------
