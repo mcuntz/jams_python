@@ -1146,7 +1146,7 @@ command line, otherwise assumed %Y-%m-%d %H:%M:%S.''')
         for infile in infiles[1:]:
             df1 = pd.read_csv(infile, sep, parse_dates=[0], date_parser=parser,
                               index_col=0, header=0)
-            df = df.append(df1, sort=False)
+            df = df.append(df1, sort=True)
 
     if undef is not None:
         df.replace(undef, np.nan, inplace=True)
