@@ -107,6 +107,7 @@ Modified, Matthias Cuntz, Jan 2019 - exclude NaN in histograms
           Matthias Cuntz, Sep 2020 - changed wx.ListItemAttr() to wx.ItemAttr()
           Matthias Cuntz, Apr 2021 - undef on command line
                                    - flake8 compatible
+          Matthias Cuntz, May 2021 - sort columns with command line option -c
 '''
 # --------------------------------------------------------------------
 # import
@@ -1081,6 +1082,7 @@ if __name__ == "__main__":
 
     import argparse
 
+    csort = False
     form  = '%Y-%m-%d %H:%M:%S'
     sep   = None
     undef = None
@@ -1090,6 +1092,9 @@ if __name__ == "__main__":
 A minimalistic GUI for analyzing text files.
 Date/Time must be in the first data column. Its format can be given on the
 command line, otherwise assumed %Y-%m-%d %H:%M:%S.''')
+    hstr = 'Sort columns by name.'
+    parser.add_argument('-c', '--columnsort', action='store_true',
+                        default=csort, dest='csort', help=hstr)
     hstr  = "Format codes of the platform's C library strftime(),"
     hstr += " used by Python."
     parser.add_argument('-f', '--format', action='store', default=form,
@@ -1107,6 +1112,7 @@ command line, otherwise assumed %Y-%m-%d %H:%M:%S.''')
                         help=hstr)
 
     args    = parser.parse_args()
+    csort   = args.csort
     form    = args.form
     sep     = args.sep
     undef   = args.undef
@@ -1148,8 +1154,14 @@ command line, otherwise assumed %Y-%m-%d %H:%M:%S.''')
                               index_col=0, header=0)
             df = df.append(df1, sort=True)
 
+    # # to concatenate files
+    # df.to_csv('all.csv', na_rep=-9999., line_terminator='\r\n')
+
     if undef is not None:
         df.replace(undef, np.nan, inplace=True)
+
+    if csort:
+        df = df.reindex(sorted(df.columns), axis=1)
 
     # This must be before any other call to matplotlib
     # because it use the wxAgg backend.

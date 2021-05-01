@@ -241,13 +241,14 @@ def get_era5(vars=['10m_u_component_of_wind', '10m_v_component_of_wind',
         (default: 'era5').
         Output filenames will be adapted accordingly.
     output_format : string, optional
-        File format of output file. Default is 'netcdf'
-        if `reanalysis_model=='era5'` and 'grib' if `reanalysis_model=='era5'`.
+        File format of output file.
+        Default is 'netcdf' if `reanalysis_model=='era5'` and
+        'grib' if `reanalysis_model=='era5-land'.
         Output filenames will be suffixed by '.nc' or '.grb', respectively.
 
-        Model output at ECMWF is stored in grib format. There are limitation on
-        the conversion to netCDF using the current ECMWF infrastructure. One
-        gets errors like 'One or more variable sizes violate format
+        Model output at ECMWF is stored in grib format. There are limitations
+        on the conversion to netCDF using the current ECMWF infrastructure.
+        One gets errors like 'One or more variable sizes violate format
         constraints.':
         https://confluence.ecmwf.int/display/CKB/Common+Error+Messages+for+CDS+Requests
         Download in grib format in this case and use the climate data operators
