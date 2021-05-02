@@ -8,12 +8,13 @@ A minimalistic GUI for analyzing Pandas DataFrames based on wxPython.
 
 Usage
 -----
+import datetime as dt
 import numpy as np
 import pandas as pd
 filename = 'Hesse_DB2_1997-2011.csv'
 # filename = '1.csv'
 # not needed for US format
-parser = lambda date: pd.datetime.strptime(date, '%Y-%m-%d %H:%M')
+parser = lambda date: dt.datetime.strptime(date, '%Y-%m-%d %H:%M')
 names = ['Date', 'FCO2 H1 (umol/m2.s)', 'FCO2_cor H1 (umol/m2.s)',
          'FH2O H1 (mmol/m2.s)', 'H H1 (W/m2)',
          'Rg_Kipp H1 (W/m2)', 'alb H1 (-)', 'Rnet_CNR1 H1 (W/m2)',
@@ -108,6 +109,8 @@ Modified, Matthias Cuntz, Jan 2019 - exclude NaN in histograms
           Matthias Cuntz, Apr 2021 - undef on command line
                                    - flake8 compatible
           Matthias Cuntz, May 2021 - sort columns with command line option -c
+          Matthias Cuntz, May 2021 - write coordinates and values on bottom of
+                                     plot
 '''
 # --------------------------------------------------------------------
 # import
@@ -117,7 +120,7 @@ Modified, Matthias Cuntz, Jan 2019 - exclude NaN in histograms
 import numpy as np
 import pandas as pd
 # unused import required to allow 'eval' of date filters
-import datetime
+import datetime as dt
 from bisect import bisect
 
 try:
@@ -133,6 +136,7 @@ matplotlib.use('WXAgg')
 from matplotlib.backends.backend_wxagg import FigureCanvasWxAgg as FigureCanvas
 from matplotlib.backends.backend_wx import NavigationToolbar2Wx
 from matplotlib.figure import Figure
+import matplotlib.dates as mpld
 
 # try to get nicer plotting styles
 try:
@@ -144,6 +148,60 @@ except ImportError:
         plt.style.use('ggplot')
     except AttributeError:
         pass
+
+
+def format_coord_scatter(x, y, ax, ax2, xdtype, ydtype, y2dtype):
+    """
+    Formatter function for scatter plot with left and right axis
+    having the same x-axis.
+
+    Parameters
+    ----------
+    x, y : float
+        Data coordinates of `ax2`.
+    ax, ax2: matplotlib.axes._subplots.AxesSubplot
+        Matplotlib axes object for left-hand and right-hand y-axis, resp.
+    xdtype, ydtype, y2dtype: numpy.dtype
+        Numpy dtype of data of x-values (xdtype), left-hand side y-values
+        (ydtype), and right-hand side y-values (y2dtype)
+
+    Returns
+    -------
+    String with left-hand side and right hand-side coordinates.
+
+    Examples
+    --------
+    >>> ax = plt.subplot(111)
+    >>> ax2 = ax.twinx()
+    >>> ax.plot(xx, yy)
+    >>> ax2.plot(xx, yy2)
+    >>> ax2.format_coord = lambda x, y: format_coord_scatter(
+    ...     x, y, ax, ax2, xx.dtype, yy.dtype, yy2.dtype)
+    """
+    # convert to display coords
+    # https://stackoverflow.com/questions/21583965/matplotlib-cursor-value-with-two-axes
+    display_coord = ax2.transData.transform((x, y))
+    # convert back to data coords with respect to ax
+    inv      = ax.transData.inverted()
+    ax_coord = inv.transform(display_coord)
+
+    # Special treatment for datetime
+    # https://stackoverflow.com/questions/49267011/matplotlib-datetime-from-event-coordinates
+    if xdtype == 'datetime64[ns]':
+        xstr = mpld.num2date(x).strftime('%Y-%m-%d %H:%M')
+    else:
+        xstr  = '{:.3g}'.format(x)
+    if ydtype == 'datetime64[ns]':
+        ystr = mpld.num2date(ax_coord[1]).strftime('%Y-%m-%d %H:%M')
+    else:
+        ystr  = '{:.3g}'.format(ax_coord[1])
+    if y2dtype == 'datetime64[ns]':
+        y2str = mpld.num2date(y).strftime('%Y-%m-%d %H:%M')
+    else:
+        y2str = '{:.3g}'.format(y)
+    out  = 'L: (' + xstr + ', ' + ystr + ')'
+    out += ' R: (' + xstr + ', ' + y2str + ')'
+    return out
 
 
 # --------------------------------------------------------------------
@@ -964,6 +1022,8 @@ class ScatterPlot(wx.Panel):
                     self.axes2.yaxis.set_label_text(
                         self.columns[column_index3])
                     ylim2 = self.axes2.get_ylim()
+                self.axes2.format_coord = lambda xx, yy: format_coord_scatter(
+                    xx, yy, self.axes, self.axes2, x.dtype, y.dtype, y2.dtype)
                 if sameyaxes:
                     if (ylim1[0] is not None) and (ylim2[0] is not None):
                         ymin = min(ylim1[0], ylim2[0])
@@ -1120,10 +1180,11 @@ command line, otherwise assumed %Y-%m-%d %H:%M:%S.''')
 
     del parser, args
 
+    import datetime as dt
     import numpy as np
     import pandas as pd
 
-    parser = lambda date: pd.datetime.strptime(date, form)
+    parser = lambda date: dt.datetime.strptime(date, form)
 
     infile = infiles[0]
     if sep is not None:
