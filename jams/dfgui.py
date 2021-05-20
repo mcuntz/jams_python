@@ -137,17 +137,8 @@ from matplotlib.backends.backend_wxagg import FigureCanvasWxAgg as FigureCanvas
 from matplotlib.backends.backend_wx import NavigationToolbar2Wx
 from matplotlib.figure import Figure
 import matplotlib.dates as mpld
-
-# try to get nicer plotting styles
-try:
-    import seaborn
-    seaborn.set()
-except ImportError:
-    try:
-        from matplotlib import pyplot as plt
-        plt.style.use('ggplot')
-    except AttributeError:
-        pass
+from matplotlib import pyplot as plt
+plt.style.use('seaborn-dark')
 
 
 def format_coord_scatter(x, y, ax, ax2, xdtype, ydtype, y2dtype):
@@ -729,6 +720,7 @@ class ScatterPlot(wx.Panel):
         self.axes  = self.figure.add_subplot(111)
         self.axes2 = self.axes.twinx()
         self.canvas = FigureCanvas(self, -1, self.figure)
+        # self.canvas.mpl_connect('pick_event', self.onpick)
 
         chart_toolbar = NavigationToolbar2Wx(self.canvas)
 
@@ -946,6 +938,17 @@ class ScatterPlot(wx.Panel):
     def on_checkbox(self, event):
         self.redraw()
 
+    # def onpick(self, event):
+    #     print('in pick')
+    #     if self.canvas.HasCapture():
+    #         self.canvas.ReleaseMouse()
+    #     thisline = event.artist
+    #     xdata = thisline.get_xdata()
+    #     ydata = thisline.get_ydata()
+    #     ind = event.ind
+    #     points = tuple(zip(xdata[ind], ydata[ind]))
+    #     print('onpick points:', points)
+
     def redraw(self, event=None):
         column_index1 = self.combo_box1.GetSelection()
         column_index2 = self.combo_box2.GetSelection()
@@ -1000,7 +1003,8 @@ class ScatterPlot(wx.Panel):
                                    marker=marker, markersize=markersize,
                                    markerfacecolor=markerfacecolor,
                                    markeredgecolor=markeredgecolor,
-                                   markeredgewidth=markeredgewidth)
+                                   markeredgewidth=markeredgewidth)  # ,
+                                   # picker=True, pickradius=15)
                     self.axes.spines['left'].set_color(linecolor)
                     self.axes.tick_params(axis='y', colors=linecolor)
                     self.axes.xaxis.set_label_text(self.columns[column_index1])
@@ -1013,7 +1017,8 @@ class ScatterPlot(wx.Panel):
                                     marker=marker2, markersize=markersize2,
                                     markerfacecolor=markerfacecolor2,
                                     markeredgecolor=markeredgecolor2,
-                                    markeredgewidth=markeredgewidth2)
+                                    markeredgewidth=markeredgewidth2)  # ,
+                                    # picker=True, pickradius=15)
                     self.axes2.spines['right'].set_color(linecolor2)
                     self.axes2.tick_params(axis='y', colors=linecolor2)
                     self.axes2.xaxis.set_label_text(
@@ -1022,6 +1027,8 @@ class ScatterPlot(wx.Panel):
                     self.axes2.yaxis.set_label_text(
                         self.columns[column_index3])
                     ylim2 = self.axes2.get_ylim()
+                self.axes2.yaxis.set_label_position("right")
+                self.axes2.yaxis.tick_right()
                 self.axes2.format_coord = lambda xx, yy: format_coord_scatter(
                     xx, yy, self.axes, self.axes2, x.dtype, y.dtype, y2.dtype)
                 if sameyaxes:
