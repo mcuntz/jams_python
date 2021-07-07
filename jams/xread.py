@@ -274,7 +274,7 @@ def xread(infile, sheet=None, nc=0, cname=None, snc=0, sname=None,
     except (ModuleNotFoundError, xlrd.biffh.XLRDError):
         try:
             import openpyxl
-            wb = openpyxl.open(infile, read_only=True)
+            wb = openpyxl.open(infile, read_only=True, data_only=True)
         except ModuleNotFoundError:
             raise IOError('Cannot open file (1) '+infile)
     except IOError:
