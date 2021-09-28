@@ -5,6 +5,7 @@ include *.txt
 include setupegg.py
 include bin/*.py
 include bin/makehtml
+include jams/brewer.cmaps
 include jams/Humor-Sans.ttf
 include jams/test_*
 include jams/color/brewer.tiff
