@@ -23,6 +23,8 @@ class PlotIt(mcPlot):
         super().__init__(*args, **kwargs)
         # change e.g. colors
         self.lcol1 = 'cyan'
+        # reset global values after colour changes, etc.
+        self.set_matplotlib_rcparams()
 
     def read_data(self):
         # do something
