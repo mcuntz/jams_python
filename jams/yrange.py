@@ -113,7 +113,6 @@ def yrange(*args, **kwargs):
               Matthias Cuntz, Apr 2014 - assert
               Matthias Cuntz, Nov 2016 - const.tiny -> const.eps
               Matthias Cuntz, Nov 2019 - mask NaN values, e.g. from Pandas
-              Matthias Cuntz, Sep 2021 - code refactoring
     """
     # Check input
     assert len(args) > 0, 'no input argument given.'

@@ -30,8 +30,8 @@ import numpy as np
 # global variables for calculating upstream cells
 # yy_offset, xx_offset = np.meshgrid(np.arange(-1, 2), np.arange(-1, 2))
 yy_offset, xx_offset = np.meshgrid(np.arange(1, -2, -1), np.arange(-1, 2))
-yy_offset = yy_offset.ravel() # yy_offset for neighboring cells
-xx_offset = xx_offset.ravel() # xx_offset for neighboring cells
+yy_offset = yy_offset.ravel()  # yy_offset for neighboring cells
+xx_offset = xx_offset.ravel()  # xx_offset for neighboring cells
 # local flow direction sorted in the order of yy_offset and xx_offset
 local_flow_direction = np.array([8, 16, 32, 4, -1, 64, 2, 1, 128])
 # same as local_flow_direction but reverted. This means these are the
@@ -80,128 +80,149 @@ def cal_fdir(locs, fdir, factor):
     return fds
 
 
-def upscale_fdir(sn, factor, print_info=False, return_maxlocs=False, do_co=False, redo_fa=True, missing_value=-9999.):
+def upscale_fdir(sn, factor, print_info=False, return_maxlocs=False,
+                 do_co=False, redo_fa=True, missing_value=-9999.):
     """
-        Upscales a river network by a factor (integer > 1), that has to be a divisible of the
-        resolution of the flow direction. Direction is given by the cell with the largest flow
-        accumulation. If multiple of these exist, then one is chosen randomly.
+    Upscales a river network by a factor (integer > 1), that has to be a
+    divisible of the resolution of the flow direction. Direction is given by
+    the cell with the largest flow accumulation. If multiple of these exist,
+    then one is chosen randomly.
 
-        Definition
-        ----------
-        upscale_fdir(sn, factor, print_info=False, return_maxlocs=False, do_co=False, redo_fa=True)
-
-
-        Input
-        -----
-        sn            river_network object containing flow direction, flow accumulation and sinks
-        factor        integer indicating by which factor the flow direction should be upscaled
-
-        Optional Input Parameters
-        -------------------------
-        print_info     flag for printing additional information
-        return_maxlocs flag for return locations of cell determining flow directions at given river_network object
-        do_co          flag for calculating channel order
-        redo_fa        flow recalculating flow accumulation at coarser river_network
-
-        Options
-        -------
-
-        Output
-        ------
-        river_network object at coarser resolution with upscaled flow direction
-
-        Restrictions
-        ------------
-            Given river_network object sn has to contain flow direction, accumulation and location of
-            sink following the convention below.
-
-            The origin of the flow direction field is assumed to be located in the upper left corner.
-            Then flow directions are following this convention:
-
-            Flow direction is assumed like this meaning that the ORIGIN IS THE UPPER LEFT CORNER
-                      64             y-axis
-                  32      128          |
-              16      -1       1       |
-                   8       2          \|/
-                       4               V
-                 x-axis ------>
-
-            Sinks are marked by -1.
-
-        Examples
-        --------
-        >>> # Create some data
-        >>> fd = np.ma.array([[  2,   1,   1,   2,   4,   4,   8,  8,  8],
-        ...                   [  1,   2,   1,   1,   2,   4,   4,  4,  8],
-        ...                   [128,   1, 128,   1,   1,   2,   4,  4,  4],
-        ...                   [  1, 128,  64, 128, 128,   2,   4,  4,  8],
-        ...                   [128,  64,  64,  64,   1,   2,   4,  4,  4],
-        ...                   [ 64, 128,  64,  32,   1,   1,   2,  2,  4],
-        ...                   [128,  64,  64,  64,   1,   1,   1,  1,  1],
-        ...                   [128,  64, 128,  64,  32,   1, 128, 64, 64],
-        ...                   [ 64, 128,  64,  64,  64, 128,  64, 64, 32]])
-        >>> sinks = np.array([[6], [8]])
-        >>> sn = river_network(fdir=fd, do_fa=True, do_co=False, sinks=sinks)
-        >>> print(upscale_fdir(sn, 3).fdir)
-        [[1.0 2.0 4.0]
-         [64.0 16.0 4.0]
-         [64.0 64.0 1.0]]
+    Definition
+    ----------
+    upscale_fdir(sn, factor, print_info=False, return_maxlocs=False,
+                 do_co=False, redo_fa=True)
 
 
-        License
-        -------
-        This file is part of the JAMS Python package, distributed under the MIT
-        License. The JAMS Python package originates from the former UFZ Python library,
-        Department of Computational Hydrosystems, Helmholtz Centre for Environmental
-        Research - UFZ, Leipzig, Germany.
+    Input
+    -----
+    sn
+        river_network object containing flow direction, flow accumulation and
+        sinks
+    factor
+        integer indicating by which factor the flow direction should be
+        upscaled
 
-        Copyright (c) 2016 Stephan Thober
+    Optional Input Parameters
+    -------------------------
+    print_info
+        flag for printing additional information
+    return_maxlocs
+        flag for return locations of cell determining flow directions at given
+        river_network object
+    do_co
+        flag for calculating channel order
+    redo_fa
+        flow recalculating flow accumulation at coarser river_network
 
-        Permission is hereby granted, free of charge, to any person obtaining a copy
-        of this software and associated documentation files (the "Software"), to deal
-        in the Software without restriction, including without limitation the rights
-        to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-        copies of the Software, and to permit persons to whom the Software is
-        furnished to do so, subject to the following conditions:
+    Options
+    -------
 
-        The above copyright notice and this permission notice shall be included in all
-        copies or substantial portions of the Software.
+    Output
+    ------
+    river_network object at coarser resolution with upscaled flow direction
 
-        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-        IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-        FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-        AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-        LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-        OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-        SOFTWARE.
+    Restrictions
+    ------------
+    Given river_network object sn has to contain flow direction, accumulation
+    and location of sink following the convention below.
+
+    The origin of the flow direction field is assumed to be located in the
+    upper left corner.
+    Then flow directions are following this convention:
+
+    Flow direction is assumed like this meaning that the ORIGIN IS THE UPPER
+    LEFT CORNER
+              64             y-axis
+          32      128          |
+      16      -1       1       |
+           8       2          \|/
+               4               V
+         x-axis ------>
+
+    Sinks are marked by -1.
+
+    Examples
+    --------
+    >>> # Create some data
+    >>> fd = np.ma.array([[  2,   1,   1,   2,   4,   4,   8,  8,  8],
+    ...                   [  1,   2,   1,   1,   2,   4,   4,  4,  8],
+    ...                   [128,   1, 128,   1,   1,   2,   4,  4,  4],
+    ...                   [  1, 128,  64, 128, 128,   2,   4,  4,  8],
+    ...                   [128,  64,  64,  64,   1,   2,   4,  4,  4],
+    ...                   [ 64, 128,  64,  32,   1,   1,   2,  2,  4],
+    ...                   [128,  64,  64,  64,   1,   1,   1,  1,  1],
+    ...                   [128,  64, 128,  64,  32,   1, 128, 64, 64],
+    ...                   [ 64, 128,  64,  64,  64, 128,  64, 64, 32]])
+    >>> sinks = np.array([[6], [8]])
+    >>> sn = river_network(fdir=fd, do_fa=True, do_co=False, sinks=sinks)
+    >>> print(upscale_fdir(sn, 3).fdir)
+    [[1.0 2.0 4.0]
+     [64.0 16.0 4.0]
+     [64.0 64.0 1.0]]
 
 
-        History
-        -------
-        Written,  ST, Feb 2016
-        Modified, MC, Nov 2016 - ported to Python 3
+    License
+    -------
+    This file is part of the JAMS Python package, distributed under the MIT
+    License. The JAMS Python package originates from the former UFZ Python
+    library, Department of Computational Hydrosystems, Helmholtz Centre for
+    Environmental Research - UFZ, Leipzig, Germany.
+
+    Copyright (c) 2016-2021 Stephan Thober
+
+    Permission is hereby granted, free of charge, to any person obtaining a
+    copy of this software and associated documentation files (the "Software"),
+    to deal in the Software without restriction, including without limitation
+    the rights to use, copy, modify, merge, publish, distribute, sublicense,
+    and/or sell copies of the Software, and to permit persons to whom the
+    Software is furnished to do so, subject to the following conditions:
+
+    The above copyright notice and this permission notice shall be included in
+    all copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+    FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+    DEALINGS IN THE SOFTWARE.
+
+
+    History
+    -------
+    Written,  Stephan Thober, Feb 2016
+    Modified, Matthias Cuntz, Nov 2016 - ported to Python 3
+              Matthias Cuntz, Sep 2021 - code refactoring
     """
     # consistency checks
     if not np.ma.isMaskedArray(sn.fa):
         raise ValueError('***ERROR: upscale_fdir requires flow accumulation as masked array in river_network')
     if any(np.array(sn.fdir.shape) % factor != 0):
-        raise ValueError('***ERROR: factor: ' + str(factor) + ' is not a divisible of flow direction shape')
+        raise ValueError('***ERROR: factor: ' + str(factor) +
+                         ' is not a divisible of flow direction shape')
     # create upscaled arrays
     new_shape = np.array(sn.fdir.shape) // factor
     new_fd = np.ma.masked_array(np.zeros(new_shape) + missing_value,
-                                mask=np.ones(new_shape), fill_value=missing_value)
+                                mask=np.ones(new_shape),
+                                fill_value=missing_value)
     new_fa = np.ma.masked_array(np.zeros(new_shape) + missing_value,
-                                mask=np.ones(new_shape), fill_value=missing_value)
+                                mask=np.ones(new_shape),
+                                fill_value=missing_value)
 
     # create maxlocs list
     maxlocs = []
     for ii in range(new_fd.shape[0]):
         for jj in range(new_fd.shape[1]):
             # extract part of map evaluated
-            tmp_fa = sn.fa[ii * factor: (ii + 1) * factor, jj * factor: (jj + 1) * factor]
-            tmp_fd = sn.fdir[ii * factor: (ii + 1) * factor, jj * factor: (jj + 1) * factor]
+            tmp_fa = sn.fa[ii * factor: (ii + 1) * factor,
+                           jj * factor: (jj + 1) * factor]
+            tmp_fd = sn.fdir[ii * factor: (ii + 1) * factor,
+                             jj * factor: (jj + 1) * factor]
             if np.all(tmp_fa.mask):
-                if print_info: print('cell is masked ', ii, jj)
+                if print_info:
+                    print('cell is masked ', ii, jj)
                 # cell is masked
                 new_fd[ii, jj] = -9999.
                 new_fa[ii, jj] = -9999.
@@ -211,10 +232,12 @@ def upscale_fdir(sn, factor, print_info=False, return_maxlocs=False, do_co=False
                 # calculate coarse scale flow direction
                 coarse_fd = cal_fdir(maxloc, tmp_fd, factor)
                 if maxloc[0].shape[0] > 1:
-                    # if there is more than one outflow cell, check whether flow directions are different
+                    # if there is more than one outflow cell,
+                    # check whether flow directions are different
                     if print_info:
                         print(coarse_fd, ' flow directions of same cells')
-                    # evaluate when there are more than one cell if maximum flow directions are different
+                    # evaluate when there are more than one cell
+                    # if maximum flow directions are different
                     if np.any(np.diff(coarse_fd) > 0):
                         print('***Warning: multiple cells with same flow accumulation but different flow directions found, arbitrarily choose first one')
                 # store flow direction and flow accumulation
@@ -229,143 +252,158 @@ def upscale_fdir(sn, factor, print_info=False, return_maxlocs=False, do_co=False
                     print('new_fa = ', new_fa[ii, jj])
                     print('================')
                 # add to store maximum locations
-                maxlocs.append([maxloc[0] + ii * factor, maxloc[1] + jj * factor])
+                maxlocs.append([maxloc[0] + ii * factor,
+                                maxloc[1] + jj * factor])
     # upscale sinks
     upscale_sinks = tuple(np.array(sn.sinks)/int(factor))
     # return
     if return_maxlocs:
         if redo_fa:
-            return maxlocs, river_network(fdir=new_fd, do_co=do_co, do_fa=True, sinks=upscale_sinks)
+            return maxlocs, river_network(fdir=new_fd, do_co=do_co, do_fa=True,
+                                          sinks=upscale_sinks)
         else:
             return maxlocs, river_network(fdir=new_fd, do_co=do_co, fa=new_fa)
     else:
         if redo_fa:
-            return river_network(fdir=new_fd, do_co=do_co, do_fa=True, sinks=upscale_sinks)
+            return river_network(fdir=new_fd, do_co=do_co, do_fa=True,
+                                 sinks=upscale_sinks)
         else:
             return river_network(fdir=new_fd, do_co=do_co, fa=new_fa)
 
 
 class river_network(object):
-    def __init__(self, dem=None, fdir=None, co=None, do_co=False, fa=None, do_fa=False, print_info=False, missing_value=-9999., sinks=None):
+    def __init__(self, dem=None, fdir=None, co=None, do_co=False,
+                 fa=None, do_fa=False, print_info=False, missing_value=-9999.,
+                 sinks=None):
         """
-            Initializes a river_network object describing the flow path of a river through the landscape.
+        Initializes a river_network object describing the flow path of a river
+        through the landscape.
 
-            Definition
-            ----------
-            river_network(dem=None, fdir=None, co=None, do_co=False, fa=None, do_fa=False, missing_value=-9999., sinks=None):
+        Definition
+        ----------
+        river_network(dem=None, fdir=None, co=None, do_co=False, fa=None,
+                      do_fa=False, missing_value=-9999., sinks=None):
 
 
-            Input
-            -----
-            dem           digital elevation model (dem), basis for calculating flow direction fdir
-            fdir          flow direction following convention below.
+        Input
+        -----
+        dem
+            digital elevation model (dem), basis for calculating flow
+            direction fdir
+        fdir
+            flow direction following convention below.
 
-            Optional Input Parameters
-            -------------------------
-            co            channel order following Strahler 1952
-            do_co         flag for calculating channel order
-            fa            flow accumulation
-            do_fa         flag for calculating flow accumulation
-            print_info    flag for printing additional information
-            missing_value default: -9999.
-            sinks         location of sinks as two arrays (first/second for y/x coordinate)
+        Optional Input Parameters
+        -------------------------
+        co
+            channel order following Strahler 1952
+        do_co
+            flag for calculating channel order
+        fa
+            flow accumulation
+        do_fa
+            flag for calculating flow accumulation
+        print_info
+            flag for printing additional information
+        missing_value
+            default: -9999.
+        sinks
+            location of sinks as two arrays (first/second for y/x coordinate)
 
-            Options
-            -------
+        Restrictions
+        ------------
+        Either dem or fdir has to be provided, both cannot be omitted.
 
-            Output
-            ------
+        The origin of the flow direction field is assumed to be located in the
+        upper left corner.
+        Then flow directions are following this convention:
 
-            Restrictions
-            ------------
-                Either dem or fdir has to be provided, both cannot be omitted.
+        Flow direction is assumed like this meaning that the ORIGIN IS THE
+        UPPER LEFT CORNER
+                  64             y-axis
+              32      128          |
+          16      -1       1       |
+               8       2          \|/
+                   4               V
+             x-axis ------>
 
-                The origin of the flow direction field is assumed to be located in the upper left corner.
-                Then flow directions are following this convention:
+        Sinks are marked by -1.
 
-                Flow direction is assumed like this meaning that the ORIGIN IS THE UPPER LEFT CORNER
-                          64             y-axis
-                      32      128          |
-                  16      -1       1       |
-                       8       2          \|/
-                           4               V
-                     x-axis ------>
-
-                Sinks are marked by -1.
-
-            Examples
-            --------
-            >>> # Create some data
-            >>> fd = np.ma.array([[  2,   1,   1,   2,   4,   4,   8,  8,  8],
-            ...                   [  1,   2,   1,   1,   2,   4,   4,  4,  8],
-            ...                   [128,   1, 128,   1,   1,   2,   4,  4,  4],
-            ...                   [  1, 128,  64, 128, 128,   2,   4,  4,  8],
-            ...                   [128,  64,  64,  64,   1,   2,   4,  4,  4],
-            ...                   [ 64, 128,  64,  32,   1,   1,   2,  2,  4],
-            ...                   [128,  64,  64,  64,   1,   1,   1,  1,  1],
-            ...                   [128,  64, 128,  64,  32,   1, 128, 64, 64],
-            ...                   [ 64, 128,  64,  64,  64, 128,  64, 64, 32]])
-            >>> sinks = np.array([[6], [8]])
-            >>> print(river_network(fdir=fd, do_fa=True, do_co=False, sinks=sinks).fa)
-            [[1.0 1.0 2.0 3.0 1.0 1.0 1.0 1.0 1.0]
-             [1.0 4.0 1.0 32.0 37.0 3.0 2.0 2.0 1.0]
-             [1.0 1.0 30.0 1.0 4.0 46.0 3.0 4.0 1.0]
-             [1.0 5.0 19.0 2.0 1.0 1.0 50.0 5.0 2.0]
-             [2.0 1.0 18.0 1.0 1.0 2.0 52.0 8.0 1.0]
-             [1.0 6.0 2.0 9.0 1.0 2.0 57.0 9.0 2.0]
-             [1.0 4.0 1.0 8.0 1.0 2.0 3.0 68.0 81.0]
-             [2.0 1.0 3.0 2.0 2.0 1.0 4.0 3.0 1.0]
-             [1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0]]
-            >>> print(river_network(fdir=fd, do_fa=False, do_co=True, sinks=sinks).co)
-            [[1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0]
-             [1.0 2.0 1.0 3.0 3.0 2.0 1.0 1.0 1.0]
-             [1.0 1.0 3.0 1.0 2.0 3.0 1.0 2.0 1.0]
-             [1.0 2.0 3.0 1.0 1.0 1.0 3.0 2.0 1.0]
-             [1.0 1.0 3.0 1.0 1.0 1.0 3.0 2.0 1.0]
-             [1.0 2.0 1.0 2.0 1.0 1.0 3.0 2.0 1.0]
-             [1.0 2.0 1.0 2.0 1.0 1.0 1.0 3.0 3.0]
-             [1.0 1.0 2.0 1.0 1.0 1.0 2.0 2.0 1.0]
-             [1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0]]
+        Examples
+        --------
+        >>> # Create some data
+        >>> fd = np.ma.array([[  2,   1,   1,   2,   4,   4,   8,  8,  8],
+        ...                   [  1,   2,   1,   1,   2,   4,   4,  4,  8],
+        ...                   [128,   1, 128,   1,   1,   2,   4,  4,  4],
+        ...                   [  1, 128,  64, 128, 128,   2,   4,  4,  8],
+        ...                   [128,  64,  64,  64,   1,   2,   4,  4,  4],
+        ...                   [ 64, 128,  64,  32,   1,   1,   2,  2,  4],
+        ...                   [128,  64,  64,  64,   1,   1,   1,  1,  1],
+        ...                   [128,  64, 128,  64,  32,   1, 128, 64, 64],
+        ...                   [ 64, 128,  64,  64,  64, 128,  64, 64, 32]])
+        >>> sinks = np.array([[6], [8]])
+        >>> print(river_network(fdir=fd, do_fa=True, do_co=False, sinks=sinks).fa)
+        [[1.0 1.0 2.0 3.0 1.0 1.0 1.0 1.0 1.0]
+         [1.0 4.0 1.0 32.0 37.0 3.0 2.0 2.0 1.0]
+         [1.0 1.0 30.0 1.0 4.0 46.0 3.0 4.0 1.0]
+         [1.0 5.0 19.0 2.0 1.0 1.0 50.0 5.0 2.0]
+         [2.0 1.0 18.0 1.0 1.0 2.0 52.0 8.0 1.0]
+         [1.0 6.0 2.0 9.0 1.0 2.0 57.0 9.0 2.0]
+         [1.0 4.0 1.0 8.0 1.0 2.0 3.0 68.0 81.0]
+         [2.0 1.0 3.0 2.0 2.0 1.0 4.0 3.0 1.0]
+         [1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0]]
+        >>> print(river_network(fdir=fd, do_fa=False, do_co=True, sinks=sinks).co)
+        [[1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0]
+         [1.0 2.0 1.0 3.0 3.0 2.0 1.0 1.0 1.0]
+         [1.0 1.0 3.0 1.0 2.0 3.0 1.0 2.0 1.0]
+         [1.0 2.0 3.0 1.0 1.0 1.0 3.0 2.0 1.0]
+         [1.0 1.0 3.0 1.0 1.0 1.0 3.0 2.0 1.0]
+         [1.0 2.0 1.0 2.0 1.0 1.0 3.0 2.0 1.0]
+         [1.0 2.0 1.0 2.0 1.0 1.0 1.0 3.0 3.0]
+         [1.0 1.0 2.0 1.0 1.0 1.0 2.0 2.0 1.0]
+         [1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0]]
 
 
         License
         -------
         This file is part of the JAMS Python package, distributed under the MIT
-        License. The JAMS Python package originates from the former UFZ Python library,
-        Department of Computational Hydrosystems, Helmholtz Centre for Environmental
-        Research - UFZ, Leipzig, Germany.
+        License. The JAMS Python package originates from the former UFZ Python
+        library, Department of Computational Hydrosystems, Helmholtz Centre for
+        Environmental Research - UFZ, Leipzig, Germany.
 
-        Copyright (c) 2016 Stephan Thober
+        Copyright (c) 2016-2021 Stephan Thober
 
-        Permission is hereby granted, free of charge, to any person obtaining a copy
-        of this software and associated documentation files (the "Software"), to deal
-        in the Software without restriction, including without limitation the rights
-        to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-        copies of the Software, and to permit persons to whom the Software is
-        furnished to do so, subject to the following conditions:
+        Permission is hereby granted, free of charge, to any person obtaining a
+        copy of this software and associated documentation files (the
+        "Software"), to deal in the Software without restriction, including
+        without limitation the rights to use, copy, modify, merge, publish,
+        distribute, sublicense, and/or sell copies of the Software, and to
+        permit persons to whom the Software is furnished to do so, subject to
+        the following conditions:
 
-        The above copyright notice and this permission notice shall be included in all
-        copies or substantial portions of the Software.
+        The above copyright notice and this permission notice shall be included
+        in all copies or substantial portions of the Software.
 
-        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-        IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-        FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-        AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-        LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-        OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-        SOFTWARE.
+        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+        OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+        MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+        IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+        CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+        TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+        SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
         History
         -------
-        Written,  ST, Dec 2015
+        Written,  Stephan Thober, Dec 2015
+        Modified, Matthias Cuntz, Sep 2021 - code refactoring
         """
         # initialize all arrays
-        self.dem = None # digital elevation model
-        self.fdir = None # flow direction
-        self.sinks = None # sinks
-        self.co = None # channel order
-        self.fa = None # flow accumulation
+        self.dem = None    # digital elevation model
+        self.fdir = None   # flow direction
+        self.sinks = None  # sinks
+        self.co = None  # channel order
+        self.fa = None  # flow accumulation
         # consistency check
         if fdir is None  and dem is None:
             raise ValueError('***ERROR: specify either dem or fdir to create a river_network object')
@@ -384,133 +422,111 @@ class river_network(object):
             self.fdir = np.ma.array(self.fdir)
             self.fdir.mask = False
         # assign flow accumulation
-        if not fa is None:
+        if fa is not None:
             self.fa = fa
         # assign channel order
-        if not co is None:
+        if co is not None:
             self.co = co
         # assign sinks
         if sinks is None and fa is None:
             raise ValueError('***ERROR: for initializing river network either the location of the sinks or flow accumulation has to be given')
-        elif sinks is None and not fa is None:
+        elif sinks is None and fa is not None:
             self.sinks = self._get_sinks()
-        elif not sinks is None and fa is None:
+        elif sinks is not None and fa is None:
             self.sinks = sinks
         # get channel order and flow accumulation
         if do_co and do_fa:
-            self.co = np.ma.masked_array(np.zeros(self.fdir.shape) + missing_value,
-                                         mask=np.ones(self.fdir.shape), fill_value=missing_value)
-            self.fa = np.ma.masked_array(np.zeros(self.fdir.shape) + missing_value,
-                                         mask=np.ones(self.fdir.shape), fill_value=missing_value)
+            self.co = np.ma.masked_array(np.zeros(self.fdir.shape) +
+                                         missing_value,
+                                         mask=np.ones(self.fdir.shape),
+                                         fill_value=missing_value)
+            self.fa = np.ma.masked_array(np.zeros(self.fdir.shape) +
+                                         missing_value,
+                                         mask=np.ones(self.fdir.shape),
+                                         fill_value=missing_value)
             for ii in range(self.sinks[0].shape[0]):
-                self.co, self.fa = self.network_properties(self.fdir, self.sinks[0][ii], self.sinks[1][ii],
-                                                           do_co=do_co, co=self.co,
-                                                           do_fa=do_fa, fa=self.fa,
-                                                           missing_value=missing_value,
-                                                           print_info=print_info)
+                self.co, self.fa = self.network_properties(
+                    self.fdir, self.sinks[0][ii], self.sinks[1][ii],
+                    do_co=do_co, co=self.co, do_fa=do_fa, fa=self.fa,
+                    missing_value=missing_value, print_info=print_info)
         elif do_co and not do_fa:
-            self.co = np.ma.masked_array(np.zeros(self.fdir.shape) + missing_value,
-                                         mask=np.ones(self.fdir.shape), fill_value=missing_value)
+            self.co = np.ma.masked_array(
+                np.zeros(self.fdir.shape) + missing_value,
+                mask=np.ones(self.fdir.shape), fill_value=missing_value)
             for ii in range(self.sinks[0].shape[0]):
-                self.co = self.network_properties(self.fdir, self.sinks[0][ii], self.sinks[1][ii],
-                                                  do_co=do_co, co=self.co,
-                                                  do_fa=do_fa,
-                                                  missing_value=missing_value,
-                                                  print_info=print_info)
+                self.co = self.network_properties(
+                    self.fdir, self.sinks[0][ii], self.sinks[1][ii],
+                    do_co=do_co, co=self.co, do_fa=do_fa,
+                    missing_value=missing_value, print_info=print_info)
         elif not do_co and do_fa:
-            self.fa = np.ma.masked_array(np.zeros(self.fdir.shape) + missing_value,
-                                         mask=np.ones(self.fdir.shape), fill_value=missing_value)
+            self.fa = np.ma.masked_array(
+                np.zeros(self.fdir.shape) + missing_value,
+                mask=np.ones(self.fdir.shape), fill_value=missing_value)
             for ii in range(self.sinks[0].shape[0]):
-                self.fa = self.network_properties(self.fdir, self.sinks[0][ii], self.sinks[1][ii],
-                                                  do_co=do_co,
-                                                  do_fa=do_fa, fa=self.fa,
-                                                  missing_value=missing_value,
-                                                  print_info=print_info)
-
+                self.fa = self.network_properties(
+                    self.fdir, self.sinks[0][ii], self.sinks[1][ii],
+                    do_co=do_co, do_fa=do_fa, fa=self.fa,
+                    missing_value=missing_value, print_info=print_info)
 
     def flow_direction(self, print_info=False):
         """
-            Calculates flow direction from a DEM.
+        Calculates flow direction from a DEM.
 
-            Definition
-            ----------
-            def flow_direction(self, print_info=False)
-
-
-            Input
-            -----
-            self         self - river_network object containing a dem array
-
-            Optional Input Parameters
-            -------------------------
-            print_info - flag for printing additional information
-
-            Options
-            -------
-
-            Output
-            ------
-            fd           array containing flow direction with the following convention
-
-            Restrictions
-            ------------
-                The origin of the flow direction field is assumed to be located in the upper left corner.
-                Then flow directions are following this convention:
-
-                flow direction is assumed like this meaning that the ORIGIN IS THE UPPER LEFT CORNER
-                          64             y-axis
-                      32      128          |
-                  16      -1       1       |
-                       8       2          \|/
-                           4               V
-                     x-axis ------>
-
-                Sinks are marked by -1.
-
-            Examples
-            --------
-            >>> # Create some data
-            >>> dem = np.ma.array([[ 30,   2,   1],
-            ...                    [  5,  10,  25],
-            ...                    [ 15,  23,  24]])
-            >>> dem.mask = np.zeros(dem.shape, dtype='bool')
-            >>> print(river_network(dem=dem, do_fa=False, do_co=False, sinks=np.array([[0], [2]])).fdir)
-            [[1.0 1.0 -1.0]
-             [128.0 128.0 64.0]
-             [64.0 32.0 32.0]]
+        Definition
+        ----------
+        def flow_direction(self, print_info=False)
 
 
-            License
-            -------
-            This file is part of the JAMS Python package, distributed under the MIT
-            License. The JAMS Python package originates from the former UFZ Python library,
-            Department of Computational Hydrosystems, Helmholtz Centre for Environmental
-            Research - UFZ, Leipzig, Germany.
+        Input
+        -----
+        self         self - river_network object containing a dem array
 
-            Copyright (c) 2015 Stephan Thober, David Schaefer
+        Optional Input Parameters
+        -------------------------
+        print_info - flag for printing additional information
 
-            Permission is hereby granted, free of charge, to any person obtaining a copy
-            of this software and associated documentation files (the "Software"), to deal
-            in the Software without restriction, including without limitation the rights
-            to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-            copies of the Software, and to permit persons to whom the Software is
-            furnished to do so, subject to the following conditions:
+        Options
+        -------
 
-            The above copyright notice and this permission notice shall be included in all
-            copies or substantial portions of the Software.
+        Output
+        ------
+        fd
+            array containing flow direction with the following convention
 
-            THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-            IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-            FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-            AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-            LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-            OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-            SOFTWARE.
+        Restrictions
+        ------------
+        The origin of the flow direction field is assumed to be located in the
+        upper left corner.
+        Then flow directions are following this convention:
+
+        flow direction is assumed like this meaning that the ORIGIN IS THE
+        UPPER LEFT CORNER
+                  64             y-axis
+              32      128          |
+          16      -1       1       |
+               8       2          \|/
+                   4               V
+             x-axis ------>
+
+        Sinks are marked by -1.
+
+        Examples
+        --------
+        >>> # Create some data
+        >>> dem = np.ma.array([[ 30,   2,   1],
+        ...                    [  5,  10,  25],
+        ...                    [ 15,  23,  24]])
+        >>> dem.mask = np.zeros(dem.shape, dtype='bool')
+        >>> print(river_network(dem=dem, do_fa=False, do_co=False, sinks=np.array([[0], [2]])).fdir)
+        [[1.0 1.0 -1.0]
+         [128.0 128.0 64.0]
+         [64.0 32.0 32.0]]
 
 
-            History
-            -------
-            Written,  ST & DS, Dec 2015
+        History
+        -------
+        Written,  Stephan Thober & David Schaefer, Dec 2015
+        Modified, Matthias Cuntz, Sep 2021 - code refactoring
         """
         # global variable used: correct_direction
         fd = np.zeros(self.dem.shape)
@@ -528,120 +544,101 @@ class river_network(object):
                 fd[ii, jj] = local_flow_direction[neighbors][pos_min]
         return fd
 
-
-    def network_properties(self, fd, yy, xx, print_info=False, do_co=True, co=None, do_fa=True, fa=None,
+    def network_properties(self, fd, yy, xx, print_info=False, do_co=True,
+                           co=None, do_fa=True, fa=None,
                            missing_value=-9999.):
         """
-            Calculates channel order number and flow accumulation starting from one sink in a flow direction map
+        Calculates channel order number and flow accumulation starting from one
+        sink in a flow direction map
 
-            channel order is calculated following Strahler 1952. It is ONE for headwater. If channels join, the
-            channel order of the resulting stream is the highest one of the inflowing streams, if two or more than
-            two inflowing streams have the highest channel order, the channel order of the resulting stream is one
-            higher than the highest channel order of the inflowing streams.
+        channel order is calculated following Strahler 1952. It is ONE for
+        headwater. If channels join, the channel order of the resulting stream
+        is the highest one of the inflowing streams, if two or more than two
+        inflowing streams have the highest channel order, the channel order of
+        the resulting stream is one higher than the highest channel order of
+        the inflowing streams.
 
-            Definition
-            ----------
-            def network_properties(self, fd, yy, xx, print_info=False, do_co=True, co=None, do_fa=True, fa=None, missing_value=-9999.):
-
-
-            Input
-            -----
-            self          self - river_network object
-            fd            flow direction field, basically river_network.fd
-            yy            row coordinate of sink
-            xx            column coordinate of sink
+        Definition
+        ----------
+        def network_properties(self, fd, yy, xx, print_info=False, do_co=True,
+        co=None, do_fa=True, fa=None, missing_value=-9999.):
 
 
-            Optional Input Parameters
-            -------------------------
-            print_info    write additional info on std_out
-            do_co         calculate channel order
-            co            given channel order field
-            do_fa         calculate flow accumulation
-            fa            given flow accumulation
-            missing_value floating point value for masking
-
-            Options
-            -------
-            print_info   True: write additional information
-                         False: do not write additional information (default)
-            do_co        True: calculate channel order (default)
-                         False: do not channel order
-            co           None: no channel order field specified, will be created (default)
-            do_fa        True: calculate flow accumulation (default)
-                         False: do not flow accumulation
-            fa           None: no flow accumulation field specified, will be created (default)
-
-            Output
-            ------
-            Depending on options:
-                co, fa if do_co=True and do_fa=True
-                co if do_co=True and not do_fa=True
-                fa if not do_co=True and do_fa=True
+        Input
+        -----
+        self          self - river_network object
+        fd            flow direction field, basically river_network.fd
+        yy            row coordinate of sink
+        xx            column coordinate of sink
 
 
-            Restrictions
-            ------------
-                The origin of the flow direction field is assumed to be located in the upper left corner.
-                Then flow directions are following this convention:
+        Optional Input Parameters
+        -------------------------
+        print_info    write additional info on std_out
+        do_co         calculate channel order
+        co            given channel order field
+        do_fa         calculate flow accumulation
+        fa            given flow accumulation
+        missing_value floating point value for masking
 
-                flow direction is assumed like this meaning that the ORIGIN IS THE UPPER LEFT CORNER
-                          64             y-axis
-                      32      128          |
-                  16      -1       1       |
-                       8       2          \|/
-                           4               V
-                     x-axis ------>
+        Options
+        -------
+        print_info   True:  write additional information
+                     False: do not write additional information (default)
+        do_co        True:  calculate channel order (default)
+                     False: do not channel order
+        co           None:  no channel order field specified,
+                            will be created (default)
+        do_fa        True:  calculate flow accumulation (default)
+                     False: do not flow accumulation
+        fa           None:  no flow accumulation field specified,
+                            will be created (default)
 
-                Sinks are marked by -1.
-
-            Examples
-            --------
-
-            License
-            -------
-            This file is part of the JAMS Python package, distributed under the MIT
-            License. The JAMS Python package originates from the former UFZ Python library,
-            Department of Computational Hydrosystems, Helmholtz Centre for Environmental
-            Research - UFZ, Leipzig, Germany.
-
-            Copyright (c) 2015-2018 Stephan Thober, David Schaefer, Matthias Cuntz
-
-            Permission is hereby granted, free of charge, to any person obtaining a copy
-            of this software and associated documentation files (the "Software"), to deal
-            in the Software without restriction, including without limitation the rights
-            to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-            copies of the Software, and to permit persons to whom the Software is
-            furnished to do so, subject to the following conditions:
-
-            The above copyright notice and this permission notice shall be included in all
-            copies or substantial portions of the Software.
-
-            THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-            IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-            FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-            AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-            LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-            OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-            SOFTWARE.
+        Output
+        ------
+        Depending on options:
+            co, fa if do_co=True and do_fa=True
+            co if do_co=True and not do_fa=True
+            fa if not do_co=True and do_fa=True
 
 
-            History
-            -------
-            Written,  ST & DS, Dec 2015
-            Modified, MC, Nov 2016 - ported to Python 3
-                      MC, Oct 2018 - int indices in fa[]
+        Restrictions
+        ------------
+        The origin of the flow direction field is assumed to be located in the
+        upper left corner.
+        Then flow directions are following this convention:
+
+        flow direction is assumed like this meaning that the ORIGIN IS THE
+        UPPER LEFT CORNER
+                  64             y-axis
+              32      128          |
+          16      -1       1       |
+               8       2          \|/
+                   4               V
+             x-axis ------>
+
+        Sinks are marked by -1.
+
+
+        History
+        -------
+        Written,  Stephan Thober & David Sschaefer, Dec 2015
+        Modified, Matthias Cuntz, Nov 2016 - ported to Python 3
+                  Matthias Cuntz, Oct 2018 - int indices in fa[]
+                  Matthias Cuntz, Sep 2021 - code refactoring
         """
         if co is None and do_co:
-            co = np.ma.masked_array(np.zeros(fd.shape) + missing_value,
-                                    mask=np.ones(fd.shape), fill_value=missing_value)
+            co = np.ma.masked_array(
+                np.zeros(fd.shape) + missing_value, mask=np.ones(fd.shape),
+                fill_value=missing_value)
         if fa is None and do_fa:
-            fa = np.ma.masked_array(np.zeros(fd.shape) + missing_value,
-                                    mask=np.ones(fd.shape), fill_value=missing_value)
+            fa = np.ma.masked_array(
+                np.zeros(fd.shape) + missing_value, mask=np.ones(fd.shape),
+                fill_value=missing_value)
         # flow direction stack to emulate recursion
         if not do_co and not do_fa:
-            raise ValueERROR('***ERROR: neither fa nor co calculated')
-        fd_stack = [[yy, xx]] # start at initial sink
+            raise ValueError('***ERROR: neither fa nor co calculated')
+        fd_stack = [[yy, xx]]  # start at initial sink
         while fd_stack:
             if print_info:
                 print('current flow accumulation stack: ', fd_stack)
@@ -650,16 +647,18 @@ class river_network(object):
                 print('upstream locations: ', upstream)
             if do_co:
                 # use co for identifying upstream cells
-                ext = [l for l in upstream if co.data[int(l[0]),int(l[1])] == missing_value]
+                ext = [l for l in upstream
+                       if co.data[int(l[0]), int(l[1])] == missing_value]
             else:
                 # use fa for identifying upstream cells
-                ext = [l for l in upstream if fa.data[int(l[0]),int(l[1])] == missing_value]
+                ext = [l for l in upstream
+                       if fa.data[int(l[0]), int(l[1])] == missing_value]
             if ext:
                 fd_stack.extend(ext)
                 continue
             # all upstream cells are available
             # note that headwaters dont have an upstream cell
-            cell = fd_stack.pop() # save cell
+            cell = fd_stack.pop()  # save cell
             if do_co:
                 co_upstream = [co[loc[0], loc[1]] for loc in upstream]
                 co_max = np.amax(co_upstream + [1])
@@ -671,7 +670,8 @@ class river_network(object):
                 if print_info:
                     print('co (channel order) of upstream: ', co_upstream)
             if do_fa:
-                fa_upstream = [ fa[int(loc[0]), int(loc[1])] for loc in upstream ]
+                fa_upstream = [ fa[int(loc[0]), int(loc[1])]
+                                for loc in upstream ]
                 fa.data[int(cell[0]), int(cell[1])] = np.sum(fa_upstream) + 1
                 fa.mask[int(cell[0]), int(cell[1])] = False
                 if print_info:
@@ -683,11 +683,9 @@ class river_network(object):
         elif not do_co and do_fa:
             return fa
 
-
     def _get_sinks(self):
         # set sinks to maximum flow accumulation
         return np.ma.where(self.fa == np.amax(self.fa))
-
 
     def _get_neighbors(self, arr, yy_loc, xx_loc):
         # global variables used: yy_offset, xx_offset
@@ -701,17 +699,18 @@ class river_network(object):
                      (xx_ind < arr.shape[1]))
         return neighbors, yy_ind[neighbors], xx_ind[neighbors]
 
-
     def _get_upstream(self, fd, loc):
         # global variable used: inflow_direction
         #
         # get mask of neighbors and y and x locations
         neighbors, yy, xx = self._get_neighbors(fd, loc[0], loc[1])
         # mask inflowing cells
-        upstream_mask = (fd.data[yy.astype(np.int), xx.astype(np.int)] == inflow_direction[neighbors])
+        upstream_mask = (fd.data[yy.astype(int), xx.astype(int)] ==
+                         inflow_direction[neighbors])
         yy_upstream = yy[upstream_mask]
         xx_upstream = xx[upstream_mask]
-        return [ [yy_upstream[ii], xx_upstream[ii]] for ii in range(np.sum(upstream_mask)) ]
+        return [ [yy_upstream[ii], xx_upstream[ii]]
+                 for ii in range(np.sum(upstream_mask)) ]
 
 
 if __name__ == '__main__':

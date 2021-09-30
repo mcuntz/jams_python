@@ -129,7 +129,7 @@ def writenetcdf(fhandle, vhandle=None, var=None, time=None, isdim=False,
     ...                       attributes=varAtt, comp=True, vartype=typ)
     >>> for i in range(2):
     ...     handle = writenetcdf(fhandle, vhand, time=i,
-    ...                          var=np.array(dat, dtype=np.int)*(i+1))
+    ...                          var=np.array(dat, dtype=int)*(i+1))
 
     # close file
     >>> fhandle.close()
@@ -144,7 +144,7 @@ def writenetcdf(fhandle, vhandle=None, var=None, time=None, isdim=False,
     >>> print(np.any((readdata[0,:,:] - dat) != 0.))
     False
     >>> readdata2 = readnetcdf('writenetcdf_test.nc', var='TESTING2')
-    >>> print(np.any((readdata2[0,:,:] - np.array(dat,dtype=np.int)) != 0.))
+    >>> print(np.any((readdata2[0,:,:] - np.array(dat,dtype=int)) != 0.))
     False
     >>> if readdata.dtype == np.dtype('float32'): print('Toll')
     Toll

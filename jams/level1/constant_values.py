@@ -24,7 +24,7 @@ def constant_values(juldate,series, length, eps):
         eps     difference of minimal and maximal data point in window of length <length> has to
                 be above 2*eps otherwise all datapoints in window are regarded to be constant
 
-        
+
         Output
         ------
         1D-array of boolean values indicating if value is in a constant period (.true.) or not (.false.)
@@ -105,8 +105,8 @@ def constant_values(juldate,series, length, eps):
         raise ValueError('constant_values: size of dates and data points are not matching')
 
     nseries = np.size(series,0)
-    
-    out = np.zeros(nseries, dtype=np.bool)
+
+    out = np.zeros(nseries, dtype=bool)
 
     # indexes of entries where difference is too small
     diff_idx = np.where(np.abs(np.diff(series))<2.0*eps)[0]
@@ -114,7 +114,7 @@ def constant_values(juldate,series, length, eps):
     for idx in diff_idx:
 
         wind_idx = np.where((juldate>=juldate[idx]) & (juldate<juldate[idx]+length))[0]
-        
+
         min_val = np.amin(series[wind_idx])
         max_val = np.amax(series[wind_idx])
 
@@ -135,7 +135,7 @@ def constant_values(juldate,series, length, eps):
         # shorten the idexes which still have to be checked
         # e.g. [2,3,4,5,6,10,11,12] --> [10,11,12]
         diff_idx = diff_idx[np.where(diff_idx>wind_idx[-1]-1)[0]]
-    
+
     return out
 
 # --------------------------------------------------------------------

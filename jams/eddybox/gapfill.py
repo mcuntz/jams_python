@@ -100,7 +100,7 @@ def gapfill(date, data, rg, tair, vpd,
         >>> ihead = dict(list(zip(head1, list(range(len(head1))))))
         >>> for ii in range(len(head1)): exec(head1[ii].lower() + ' = ' + 'dat[ihead["'+head1[ii]+'"],:]')
         >>> year  = np.ones(day.shape, dtype=day.dtype) * 1998.
-        >>> hh    = hour.astype(np.int)
+        >>> hh    = hour.astype(int)
         >>> mn    = np.round((hour-hh)*60.)
         >>> y0    = date2dec(yr=year[0], mo=1, dy=1, hr=hh, mi=mn)
         >>> jdate = y0 + day
@@ -117,12 +117,12 @@ def gapfill(date, data, rg, tair, vpd,
         >>> print(astr(nee_std[11006:11012],3,pp=True))
         ['    5.372' '   13.118' '    6.477' '-9999.000' '-9999.000' '-9999.000']
 
-        >>> nee_err     = np.ones(nee_std.shape, dtype=np.int)*(-1)
+        >>> nee_err     = np.ones(nee_std.shape, dtype=int)*(-1)
         >>> kk          = np.where((nee_std!=undef) & (nee_f!=0.))[0]
-        >>> nee_err[kk] = np.abs(nee_std[kk]/nee_f[kk]*100.).astype(np.int)
+        >>> nee_err[kk] = np.abs(nee_std[kk]/nee_f[kk]*100.).astype(int)
         >>> print(astr(nee_err[11006:11012],pp=True))
         [' 28' ' 83' ' 33' ' -1' ' -1' ' -1']
-    
+
         # 2D fill
         >>> nee2 = np.dstack([nee,nee,nee])
         >>> print(nee2.shape)
@@ -206,7 +206,7 @@ def gapfill(date, data, rg, tair, vpd,
     assert tair.ndim == 1, 'squeezed tair must be 1D array.'
     assert vpd.ndim  == 1, 'squeezed vpd must be 1D array.'
     assert data.ndim <= 2, 'squeezed data must be 1D or 2D array.'
-    
+
     # make 2D array
     if data.ndim == 1:
         is2d = False
@@ -247,15 +247,15 @@ def gapfill(date, data, rg, tair, vpd,
     ddate    = np.diff(date)
     if np.any((ddate-ddate[0]) > 1e-4): # 1e-4 are ca 2.secs
         raise ValueError('dates must be equally spaced.')
-    week    = np.int(np.around(7./ddate[0]))
+    week    = int(np.around(7./ddate[0]))
     nperday = week // 7
-    # hour = (np.array(np.floor((date-np.trunc(date))*24.), dtype=np.int) + 12) % 24
+    # hour = (np.array(np.floor((date-np.trunc(date))*24.), dtype=int) + 12) % 24
     # hour, mi = dec2date(date, hr=True, mi=True)
     tobj = nc.num2date(date-1721424., 'days since 0001-01-01 12:00:00', calendar='gregorian')
-    hour = np.array([ i.hour for i in tobj ], dtype=np.int)
-    mi   = np.array([ i.minute for i in tobj ], dtype=np.int)
+    hour = np.array([ i.hour for i in tobj ], dtype=int)
+    mi   = np.array([ i.minute for i in tobj ], dtype=int)
     hour = hour + mi/60.
-    day  = np.floor(date-0.5).astype(np.int)
+    day  = np.floor(date-0.5).astype(int)
 
     if err:
         # error estimate
@@ -278,10 +278,10 @@ def gapfill(date, data, rg, tair, vpd,
     # Large margins
 
     # Check for large margins at beginning
-    largegap    = np.zeros(ndata, dtype=np.bool)
+    largegap    = np.zeros(ndata, dtype=bool)
     firstvalid  = np.amin(np.where(~data_flg)[0])
     lastvalid   = np.amax(np.where(~data_flg)[0])
-    nn          = np.int(nperday*longgap)
+    nn          = int(nperday*longgap)
     if firstvalid > nn:
         if verbose > 1: print('    Large margin at beginning: ', firstvalid)
         largegap[0:(firstvalid-nn)] = True
@@ -604,7 +604,7 @@ if __name__ == '__main__':
     # ihead = dict(list(zip(head1, list(range(len(head1))))))
     # for ii in range(len(head1)): exec(head1[ii].lower() + ' = ' + 'dat[ihead["'+head1[ii]+'"],:]')
     # year  = np.ones(day.shape, dtype=day.dtype) * 1998.
-    # hh    = hour.astype(np.int)
+    # hh    = hour.astype(int)
     # mn    = np.round((hour-hh)*60.)
     # y0    = date2dec(yr=year[0], mo=1, dy=1, hr=hh, mi=mn)
     # jdate = y0 + day
@@ -621,12 +621,12 @@ if __name__ == '__main__':
     # print(astr(nee_std[11006:11012],3,pp=True))
     # # ['    5.372' '   13.118' '    6.477' '-9999.000' '-9999.000' '-9999.000']
 
-    # nee_err     = np.ones(nee_std.shape, dtype=np.int)*(-1)
+    # nee_err     = np.ones(nee_std.shape, dtype=int)*(-1)
     # kk          = np.where((nee_std!=undef) & (nee_f!=0.))[0]
-    # nee_err[kk] = np.abs(nee_std[kk]/nee_f[kk]*100.).astype(np.int)
+    # nee_err[kk] = np.abs(nee_std[kk]/nee_f[kk]*100.).astype(int)
     # print(astr(nee_err[11006:11012],pp=True))
     # # [' 28' ' 83' ' 33' ' -1' ' -1' ' -1']
-    
+
     # # 2D fill
     # nee2 = np.dstack([nee,nee,nee])
     # print(nee2.shape)

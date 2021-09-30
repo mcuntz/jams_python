@@ -89,8 +89,8 @@ SOFTWARE.
 
 History
 -------
-Written, Fabian Keller (fabian.keller@blue-yonder.com), 2014,
-         http://github.com/bluenote10/PandasDataFrameGUI
+Written,  Fabian Keller (fabian.keller@blue-yonder.com), 2014,
+              http://github.com/bluenote10/PandasDataFrameGUI
 Modified, Matthias Cuntz, Jan 2019 - exclude NaN in histograms
                                    - add index as 'Date' column automatically
                                    - plot controls
@@ -111,6 +111,7 @@ Modified, Matthias Cuntz, Jan 2019 - exclude NaN in histograms
           Matthias Cuntz, May 2021 - sort columns with command line option -c
           Matthias Cuntz, May 2021 - write coordinates and values on bottom of
                                      plot
+          Matthias Cuntz, Sep 2021 - catch if no infile given
 '''
 # --------------------------------------------------------------------
 # import
@@ -162,12 +163,12 @@ def format_coord_scatter(x, y, ax, ax2, xdtype, ydtype, y2dtype):
 
     Examples
     --------
-    >>> ax = plt.subplot(111)
-    >>> ax2 = ax.twinx()
-    >>> ax.plot(xx, yy)
-    >>> ax2.plot(xx, yy2)
-    >>> ax2.format_coord = lambda x, y: format_coord_scatter(
-    ...     x, y, ax, ax2, xx.dtype, yy.dtype, yy2.dtype)
+    ax = plt.subplot(111)
+    ax2 = ax.twinx()
+    ax.plot(xx, yy)
+    ax2.plot(xx, yy2)
+    ax2.format_coord = lambda x, y: format_coord_scatter(
+        x, y, ax, ax2, xx.dtype, yy.dtype, yy2.dtype)
     """
     # convert to display coords
     # https://stackoverflow.com/questions/21583965/matplotlib-cursor-value-with-two-axes
@@ -1184,6 +1185,11 @@ command line, otherwise assumed %Y-%m-%d %H:%M:%S.''')
     sep     = args.sep
     undef   = args.undef
     infiles = args.files
+
+    if len(infiles) == 0:
+        print('No input file given.')
+        import sys
+        sys.exit()
 
     del parser, args
 

@@ -8,8 +8,8 @@ import os
 import warnings
 from collections import OrderedDict
 
-from .writenetcdf import writenetcdf
-from .readnetcdf  import readnetcdf
+from jams.writenetcdf import writenetcdf
+from jams.readnetcdf  import readnetcdf
 
 def mat2nc(fname, overwrite=False, fname_out=None, verbose=True, squeeze=True,
            varname=None,
@@ -78,6 +78,7 @@ def mat2nc(fname, overwrite=False, fname_out=None, verbose=True, squeeze=True,
         Examples
         --------
         >>> import scipy.io as sio
+        >>> import os, jams
         >>> ss = np.array([[10.0]])
         >>> tt = np.array([[10.0, 1.0, 1.0],[20.0, 2.0, 2.0]])
         >>> uu = np.array([[[10.0], [1.0], [1.0]],[[20.0], [2.0], [2.0]]])
@@ -469,7 +470,7 @@ def mat2nc(fname, overwrite=False, fname_out=None, verbose=True, squeeze=True,
                     writenetcdf(fh, name=key, dims=dim_name[idx], var=tmp,
                                 comp=True,
                                 attributes=attributes,
-                                vartype=key_content.dtype )
+                                vartype=key_content.dtype)
                 vv += 1
 
     fh.close()

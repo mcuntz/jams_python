@@ -27,6 +27,7 @@ Modified Stephan Thober, Mar 2020 - added era5-land capability
          Matthias Cuntz, Feb 2021 - bug in single point -> lat1 > lat2
          Matthias Cuntz, Feb 2021 - added grib format
                                   - default download era5-land in grib format
+         Matthias Cuntz, Sep 2021 - no default area: -a must be given.
 
 
 --------------------------------------------------------
@@ -288,15 +289,15 @@ def get_era5(vars=['10m_u_component_of_wind', '10m_v_component_of_wind',
 
     Examples
     --------
-    >>> area  = '48/7/47/8'
-    >>> years = (1995,2017)
-    >>> ofile = get_era5(area=area, years=years, path='.')
-    >>> file1 = 'era5_'+area.replace('/','_')+'_{:04d}.nc'.format(years[0])
-    >>> if file1 != ofile[0]: print(
-    ...     'Returned filename not recognised: ', ofile, ' Expected: ', file1)
-    >>> import os
-    >>> if not os.path.exists(ofile): print('No ofile: ', ofile)
-    >>> if not os.path.exists(file1): print('No file1: ', file1)
+    area  = '48/7/47/8'
+    years = (1995,2017)
+    ofile = get_era5(area=area, years=years, path='.')
+    file1 = 'era5_'+area.replace('/','_')+'_{:04d}.nc'.format(years[0])
+    if file1 != ofile[0]: print(
+        'Returned filename not recognised: ', ofile, ' Expected: ', file1)
+    import os
+    if not os.path.exists(ofile): print('No ofile: ', ofile)
+    if not os.path.exists(file1): print('No file1: ', file1)
 
     License
     -------
@@ -496,7 +497,7 @@ if __name__ == "__main__":
 
     import argparse
 
-    area             = '90/-180/-90/180'
+    area             = ''
     oformat          = ''
     override         = False
     path             = '.'
@@ -517,7 +518,7 @@ if __name__ == "__main__":
         https://climate.copernicus.eu/climate-data-store.
         ''')
     hstr = 'area format as either lat,lon or NorthLat/WestLon/SouthLat/EastLon'
-    hstr = hstr + ' (default: global '+area+').'
+    hstr = hstr + ', e.g. global 90/-180/-90/180, mandatory.'
     parser.add_argument('-a', '--area', action='store', default=area,
                         dest='area', metavar='area', help=hstr)
     hstr  = 'Output format netcdf or grib. (default: netcdf if era5,'
@@ -556,6 +557,13 @@ if __name__ == "__main__":
     years            = args.years
 
     del parser, args
+
+    if not area:
+        print('area as either lat,lon or NorthLat/WestLon/SouthLat/EastLon')
+        print('must be given with -a option, e.g. --area="90/-180/-90/180"')
+        print('or a specific location like FR-Hes: -a 48.6742167,7.0646167.')
+        import sys
+        sys.exit()
 
     # years
     if years:

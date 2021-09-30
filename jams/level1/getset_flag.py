@@ -88,7 +88,7 @@ def get_flag(flags, n):
         Written,  MC, Mar 2015
     """
 
-    out = np.ones(flags.shape, dtype=np.int)*(-1)   # if not enough digits -> -1
+    out = np.ones(flags.shape, dtype=int)*(-1)   # if not enough digits -> -1
 
     # deal with -9999
     jj = np.where(flags <= 0)
@@ -98,7 +98,7 @@ def get_flag(flags, n):
     jj = np.where(flags > 0)
     if jj[0].size>0:
         oo = out[jj]
-        ilog10 = np.log10(flags[jj]).astype(np.int) # how many digits
+        ilog10 = np.log10(flags[jj]).astype(int) # how many digits
         ii = np.where((ilog10-n) >= 0)              # otherwise extract n-th digit
         if ii[0].size > 0:
             oo[ii] = (flags[jj][ii] // 10**(ilog10[ii]-n)) % 10
@@ -190,14 +190,15 @@ AL        def set_flag(flags, n, iflag, ii=None):
         Modified, MC, Jan 2016 - ND arrays possible
     """
     fflags = flags.copy()
-    uu = np.where(fflags < 0)                        # if undef, set to treated that mean 9
-    if uu[0].size > 0: fflags[uu] = 9
+    uu = np.where(fflags < 0)  # if undef, set to treated that mean 9
+    if uu[0].size > 0:
+        fflags[uu] = 9
     # extend flag vector if needed
-    ilog10 = np.log10(fflags).astype(np.int)         # are there enough flag positions (i)
+    ilog10 = np.log10(fflags).astype(int)  # are there enough flag positions (i)
     jj = np.where(ilog10 < n)
-    if jj[0].size > 0:                               # increase number of entries (filled with 0)
+    if jj[0].size > 0:  # increase number of entries (filled with 0)
         fflags[jj] *= 10**(n-ilog10[jj])
-        ilog10      = np.log10(fflags).astype(np.int)
+        ilog10      = np.log10(fflags).astype(int)
 
     # get entries in flag vector
     isflags = get_flag(fflags, n)
@@ -317,13 +318,13 @@ def get_maxflag(flags, no=0):
     fmax = np.amax(flags)
     if fmax == -9999:
         # return -2 if no flags set yet
-        return np.ones(np.shape(flags), dtype=np.int)*(-2)
+        return np.ones(np.shape(flags), dtype=int)*(-2)
     elif fmax == 9:
         # return -1 if no flags set yet but flags were already initialised
-        return np.ones(np.shape(flags), dtype=np.int)*(-1)
+        return np.ones(np.shape(flags), dtype=int)*(-1)
     else:
-        maxflag = np.ones(np.shape(flags), dtype=np.int)*(-2)
-        n_flags = np.log10(fmax).astype(np.int)
+        maxflag = np.ones(np.shape(flags), dtype=int)*(-2)
+        n_flags = np.log10(fmax).astype(int)
         for ii in range(n_flags):
             iii = ii+1
             if iii not in no:

@@ -2,7 +2,7 @@
 from __future__ import division, absolute_import, print_function
 '''
     Download ERA-Interim data suitable to produce MuSICA input data.
-    
+
     If override=False (default), the script checks if the data is already available
     in the local download directory (path).
     It expects files with the same naming convention than its own, i.e.
@@ -16,6 +16,7 @@ from __future__ import division, absolute_import, print_function
     Modified Jerome Ogee,    May 2018 - figured out precip download, with the help of Sebastian Lafont
              Matthias Cuntz, Nov 2018 - retrieve all years at once because of long wait times per request
              Matthias Cuntz, Nov 2018 - make it callable function as well as script.
+             Matthias Cuntz, Sep 2021 - no default area: -a must be given.
 
 
     --------------------------------------------------------
@@ -97,7 +98,7 @@ def get_sfc_data(typ, date, time, step, param, area, target):
 
     from ecmwfapi import ECMWFDataServer
     server = ECMWFDataServer()
-    
+
     rdict = {
         "class":   "ei",
         "expver":  "1",
@@ -130,7 +131,7 @@ def get_sfc_data(typ, date, time, step, param, area, target):
 def get_era_interim(area=None, years=None, path='.', override=False):
     '''
         Download ERA-Interim data suitable to produce MuSICA input data.
-    
+
         If override=False, checks if the data is already available in the download directory.
         It expects files with the same naming convention than its own, i.e.
              path+'/'+'era-interim_an_'+area.replace('/','_')+'_{:04d}-{:04d}.nc'.format(*years)
@@ -255,7 +256,7 @@ def get_era_interim(area=None, years=None, path='.', override=False):
     startdate = '{:04d}-{:02d}-{:02d}'.format(yearstart, 1, 1)
     lastdate  = '{:04d}-{:02d}-{:02d}'.format(yearend, 12, 31)
     dates = (startdate+"/to/"+lastdate)
-    
+
     # make output directory
     if not os.path.exists(path): os.makedirs(path)
 
@@ -361,7 +362,7 @@ def get_era_interim(area=None, years=None, path='.', override=False):
 
     return targetan, targetfc
 
-            
+
 # --------------------------------------------------------------------
 # Script
 #
@@ -377,8 +378,8 @@ if __name__ == "__main__":
     parser   = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter,
                                        description='''Download ERA-Interim data suitable to produce MuSICA input data.''')
     parser.add_argument('-a', '--area', action='store', default=area, dest='area', metavar='area',
-                        help='area format as either lat,lon or NorthLat/WestLon/SouthLat/EastLon '
-                        '(default: global 90/-180/-90/180.')
+                        help='area format as either lat,lon or NorthLat/WestLon/SouthLat/EastLon, '
+                        'e.g. global 90/-180/-90/180.')
     parser.add_argument('-y', '--years', action='store', default=years, dest='years', metavar='years',
                         help='years format is startyear,endyear (default: 1979,current-1).')
     parser.add_argument('-p', '--path', action='store', default=path, dest='path', metavar='path',
@@ -394,6 +395,13 @@ if __name__ == "__main__":
     override = args.override
 
     del parser, args
+
+    if area is None:
+        print('area as either lat,lon or NorthLat/WestLon/SouthLat/EastLon')
+        print('must be given with -a option, e.g. --area="90/-180/-90/180"')
+        print('or a specific location like FR-Hes: -a 48.6742167,7.0646167.')
+        import sys
+        sys.exit()
 
     if years is not None:
         if ',' in years:

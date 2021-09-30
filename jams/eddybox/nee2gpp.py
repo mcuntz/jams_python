@@ -181,7 +181,7 @@ def nee2gpp(dates, nee, t, isday, rg=False, vpd=False, undef=np.nan,
                  MC, Feb 2013 - ported to Python 3
                  MC, May 2013 - replaced cost functions by generel cost function cost_abs if possible
                  AP, Aug 2014 - replaced fmin with fmin_tnc to permit params<0,
-                                permit gpp<0 at any time if nogppnight=True 
+                                permit gpp<0 at any time if nogppnight=True
     """
 
     # Global relationship in Reichstein et al. (2005)
@@ -550,8 +550,8 @@ def nee2gpp_reichstein(dates, nee, t, isday, rg=False, vpd=False, undef=np.nan,
     if (ii.size==0):
         print('Warning nee2gpp_reichstein: no valid nighttime data.')
         if masked:
-            GPP  = np.ma.array(np.reshape(nee,inshape), mask=np.ones(inshape, dtype=np.bool))
-            Reco = np.ma.array(np.reshape(nee,inshape), mask=np.ones(inshape, dtype=np.bool))
+            GPP  = np.ma.array(np.reshape(nee,inshape), mask=np.ones(inshape, dtype=bool))
+            Reco = np.ma.array(np.reshape(nee,inshape), mask=np.ones(inshape, dtype=bool))
         else:
             GPP  = np.ones(np.reshape(nee,inshape))*undef
             Reco = np.ones(np.reshape(nee,inshape))*undef
@@ -562,8 +562,8 @@ def nee2gpp_reichstein(dates, nee, t, isday, rg=False, vpd=False, undef=np.nan,
     # 1. each 5 days, in 15 day period, fit if range of T > 5
     locp = [] # local param
     locs = [] # local err
-    dmin = np.floor(np.amin(jul)).astype(np.int) # be aware that julian days starts at noon, i.e. 1.0 is 12h
-    dmax = np.ceil(np.amax(jul)).astype(np.int)  # so the search will be from noon to noon and thus includes all nights
+    dmin = np.floor(np.amin(jul)).astype(int) # be aware that julian days starts at noon, i.e. 1.0 is 12h
+    dmax = np.ceil(np.amax(jul)).astype(int)  # so the search will be from noon to noon and thus includes all nights
     for i in range(dmin,dmax,5):
         iii  = np.where((jul>=i) & (jul<(i+14)))[0]
         niii = iii.size
@@ -574,11 +574,11 @@ def nee2gpp_reichstein(dates, nee, t, isday, rg=False, vpd=False, undef=np.nan,
             if (np.ptp(tt[iii]) >= 5.) & (np.sum(mm) > 6):
                 # print(i)
                 #p     = opt.fmin(functions.cost_lloyd_fix, [2.,200.], args=(tt1[mm], net1[mm]), disp=False) # robust params
-                
+
                 p, temp1, temp2 = opt.fmin_tnc(functions.cost_lloyd_fix, [2.,200.], bounds=[[0.,None],[0.,None]],
                                               args=(tt1[mm], net1[mm]),
                                               approx_grad=True, disp=False)
-                
+
                 try:
                     p1, c = opt.curve_fit(functions.lloyd_fix, tt1[mm], net1[mm], p0=p, maxfev=10000) # params, covariance
                     if np.all(np.isfinite(c)): # possible return of curvefit: c=inf
@@ -594,14 +594,14 @@ def nee2gpp_reichstein(dates, nee, t, isday, rg=False, vpd=False, undef=np.nan,
         raise ValueError('Error nee2gpp_reichstein: No local relationship found.')
         print('Warning nee2gpp_reichstein: No local relationship found.')
         if masked:
-            GPP  = np.ma.array(np.reshape(nee,inshape), mask=np.ones(inshape, dtype=np.bool))
-            Reco = np.ma.array(np.reshape(nee,inshape), mask=np.ones(inshape, dtype=np.bool))
+            GPP  = np.ma.array(np.reshape(nee,inshape), mask=np.ones(inshape, dtype=bool))
+            Reco = np.ma.array(np.reshape(nee,inshape), mask=np.ones(inshape, dtype=bool))
         else:
             GPP  = np.ones(np.reshape(nee,inshape))*undef
             Reco = np.ones(np.reshape(nee,inshape))*undef
         return GPP, Reco
-    locp   = np.squeeze(np.array(locp).astype(np.float))
-    locs   = np.squeeze(np.array(locs).astype(np.float))
+    locp   = np.squeeze(np.array(locp).astype(float))
+    locs   = np.squeeze(np.array(locs).astype(float))
     # 2. E0 = avg of best 3
     # Reichstein et al. (2005), p. 1430, 1st paragraph.
     with warnings.catch_warnings():
@@ -617,8 +617,8 @@ def nee2gpp_reichstein(dates, nee, t, isday, rg=False, vpd=False, undef=np.nan,
             raise ValueError('Error nee2gpp_reichstein: No E0>0 found.')
             print('Warning nee2gpp_reichstein: No E0>0 found.')
             if masked:
-                GPP  = np.ma.array(np.reshape(nee,inshape), mask=np.ones(inshape, dtype=np.bool))
-                Reco = np.ma.array(np.reshape(nee,inshape), mask=np.ones(inshape, dtype=np.bool))
+                GPP  = np.ma.array(np.reshape(nee,inshape), mask=np.ones(inshape, dtype=bool))
+                Reco = np.ma.array(np.reshape(nee,inshape), mask=np.ones(inshape, dtype=bool))
             else:
                 GPP  = np.ones(np.reshape(nee,inshape))*undef
                 Reco = np.ones(np.reshape(nee,inshape))*undef
@@ -657,19 +657,19 @@ def nee2gpp_reichstein(dates, nee, t, isday, rg=False, vpd=False, undef=np.nan,
             # p, c = opt.curve_fit(functions.lloyd_only_rref, et[iii], net[iii], p0=[2.])
             #p      = opt.fmin(functions.cost_lloyd_only_rref, [2.], args=(et[iii], net[iii]), disp=False)
             #p = opt.fmin(functions.cost_abs, [2.], args=(functions.lloyd_only_rref_p, et[iii], net[iii]), disp=False)
-            
+
             p, temp1, temp2 = opt.fmin_tnc(functions.cost_abs, [2.], bounds=[[0.,None]],
                                               args=(functions.lloyd_only_rref_p, et[iii], net[iii]),
                                               approx_grad=True, disp=False)
-                
+
             refp  += [p]
-            refii += [np.int((iii[0]+iii[-1])//2)]
+            refii += [int((iii[0]+iii[-1])//2)]
     if len(refp) == 0:
         raise ValueError('Error nee2gpp_reichstein: No ref relationship found.')
         print('Warning nee2gpp_reichstein: No ref relationship found.')
         if masked:
-            GPP  = np.ma.array(np.reshape(nee,inshape), mask=np.ones(inshape, dtype=np.bool))
-            Reco = np.ma.array(np.reshape(nee,inshape), mask=np.ones(inshape, dtype=np.bool))
+            GPP  = np.ma.array(np.reshape(nee,inshape), mask=np.ones(inshape, dtype=bool))
+            Reco = np.ma.array(np.reshape(nee,inshape), mask=np.ones(inshape, dtype=bool))
         else:
             GPP  = np.ones(np.reshape(nee,inshape))*undef
             Reco = np.ones(np.reshape(nee,inshape))*undef
@@ -892,7 +892,7 @@ def nee2gpp_lasslop(dates, nee, t, isday, rg, vpd, undef=np.nan,
     aalpha = 0.01
     qnet   = np.sort(dnet)
     nqnet  = qnet.size
-    abeta0 = np.abs(qnet[np.floor(0.97*nqnet).astype(np.int)]-qnet[np.ceil(0.03*nqnet).astype(np.int)])
+    abeta0 = np.abs(qnet[np.floor(0.97*nqnet).astype(int)]-qnet[np.ceil(0.03*nqnet).astype(int)])
     ak     = 0.
     # out
     lE0    = []
@@ -902,8 +902,8 @@ def nee2gpp_lasslop(dates, nee, t, isday, rg, vpd, undef=np.nan,
         lk     = []
     lRref  = []
     lii    = []
-    dmin = np.floor(np.amin(dates)).astype(np.int)
-    dmax = np.ceil(np.amax(dates)).astype(np.int)
+    dmin = np.floor(np.amin(dates)).astype(int)
+    dmax = np.ceil(np.amax(dates)).astype(int)
     zaehl = -1
     for i in range(dmin,dmax,2):
         good = True
@@ -917,7 +917,7 @@ def nee2gpp_lasslop(dates, nee, t, isday, rg, vpd, undef=np.nan,
             p, temp1, temp2 = opt.fmin_tnc(functions.cost_abs, [aRref,100.], bounds=[[0.,None],[0.,None]],
                                               args=(functions.lloyd_fix_p, ntt[iii], nnet[iii]),
                                               approx_grad=True, disp=False)
-            
+
             E0 = np.maximum(p[1], 50.)
         else:
             if zaehl >= 0:
@@ -942,7 +942,7 @@ def nee2gpp_lasslop(dates, nee, t, isday, rg, vpd, undef=np.nan,
                 p, nfeval, rc  = opt.fmin_tnc(functions.cost_lasslop, [ialpha,ibeta0,ik,iRref], bounds=bounds,
                                               args=(drg[iii], et, dvpd[iii], dnet[iii]),
                                               approx_grad=True, disp=False)
-                
+
                 # if parameters beyond some bounds, set params and redo the optim or skip
                 if ((p[0] < 0.) | (p[0] > 0.22)): # alpha
                     again = True
@@ -972,7 +972,7 @@ def nee2gpp_lasslop(dates, nee, t, isday, rg, vpd, undef=np.nan,
                     lbeta0 = lbeta0 + [p[1]]
                     lk     = lk     + [p[2]]
                 lRref  = lRref  + [p[3]]
-                lii    = lii    + [np.int((iii[0]+iii[-1])/2)]
+                lii    = lii    + [int((iii[0]+iii[-1])/2)]
             else:
                 continue
         else:

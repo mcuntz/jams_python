@@ -33,10 +33,13 @@ History
 -------
 Written,  Matthias Cuntz, Oct 2018
 Modified, Matthias Cuntz, Nov 2018
-    - make it callable function as well as script.
-Modified Matthias Cuntz, Nov 2018
-    - flak8 compatible
-    - missing value of IsoGSM2 is 9.999e20 -> precip, shm > 1e+15 = -1000
+              - make it callable function as well as script.
+          Matthias Cuntz, Nov 2018
+              - flak8 compatible
+              - missing value of IsoGSM2 is 9.999e20
+                -> precip, shm > 1e+15 = -1000
+         Matthias Cuntz, Sep 2021
+              - no error but only message when called without IsoGSM2 output
 """
 from __future__ import division, absolute_import, print_function
 
@@ -83,12 +86,12 @@ def delta_isogsm2(ifile, output=None):
 
     Examples
     --------
-    >>> latlon = '48.6742166667,7.06461666667'
-    >>> ff = get_isogsm2(latlon)
-    >>> df = [ delta_isogsm2(ifile) for ifile in ff ]
-    >>> import os
-    >>> file1 = 'lat48.571lon7.500_isogsm2_6hrly_1979-2017-delta.csv'
-    >>> if not os.path.exists(file1): print('No file: ', file1)
+    latlon = '48.6742166667,7.06461666667'
+    ff = get_isogsm2(latlon)
+    df = [ delta_isogsm2(ifile) for ifile in ff ]
+    import os
+    file1 = 'lat48.571lon7.500_isogsm2_6hrly_1979-2017-delta.csv'
+    if not os.path.exists(file1): print('No file: ', file1)
 
 
     License
@@ -254,7 +257,9 @@ if __name__ == '__main__':
 
     # Check input
     if (ifile is None):
-        raise IOError('\nIsoGSM2 output file has to be given.\n')
+        print('No IsoGSM2 output file given.')
+        import sys
+        sys.exit()
 
     import time as ptime
     t1 = ptime.time()

@@ -3,7 +3,7 @@ from __future__ import division, absolute_import, print_function
 
 import numpy as np
 import numpy.random as rand
-import sys
+# import sys
 
 
 """Note: The different classes are published under different licenses."""
@@ -70,8 +70,11 @@ class RNG(object):
     def seed(self, new_seed=None):
         self._seed = new_seed
         self._master_RNG_fct = rand.RandomState(new_seed)
+        # random_integers is deprecated
+        # self._master_RNG = \
+        #     lambda: self._master_RNG_fct.random_integers(2**32-1)
         self._master_RNG = \
-            lambda: self._master_RNG_fct.random_integers(2**32-1)
+            lambda: self._master_RNG_fct.randint(1, 4294967295 + 1)
 
     def gau(self, corr_len, size=None):
         r1 = rand.RandomState(self._master_RNG())
@@ -164,8 +167,11 @@ class RandMeth(object):
         # MC - seed with maximum 4294967295 instead of sys.maxsize for Mac OS X
         # self.master_RNG = \
         #     lambda: self.__master_RNG.random_integers(sys.maxsize-1)
-        self.master_RNG = \
-            lambda: self.__master_RNG.random_integers(4294967295)
+        # random_integers is deprecated
+        # self.master_RNG = \
+        #     lambda: self.__master_RNG.random_integers(4294967295)
+        self._master_RNG = \
+            lambda: self._master_RNG_fct.randint(1, 4294967295 + 1)
         r1 = r.RandomState(self.master_RNG())
         r2 = r.RandomState(self.master_RNG())
         r3 = r.RandomState(self.master_RNG())

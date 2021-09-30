@@ -5,7 +5,7 @@ Standard plotting class of Matthias Cuntz.
 It has the same functionality as the old mc_template.py by Matthias Cuntz but
 uses the object-oriented approach of st_template.py of Stephan Thober.
 
-It allows to plotting on screen, into PDF and PNG files, as well as in HTML
+It allows plotting on screen, into PDF and PNG files, as well as in HTML
 files as a wrapper for PNG images or in D3 format (and plotly currently only
 with older Matplotlib versions).
 
@@ -59,7 +59,8 @@ class PlotIt(mcPlot):
         self.plot_save(fig)
 
 if __name__ == '__main__':
-    iplot = PlotIt(desc='Test mcPlot')
+    iplot = PlotIt(desc='Test mcPlot',
+                   argstr='No argument wanted')
     iplot.read_data()
     iplot.plot_fig_1()
     iplot.plot_fig_2()
@@ -75,6 +76,7 @@ Copyright (c) 2020 Matthias Cuntz - mc (at) macu (dot) de
 Released under the MIT License; see LICENSE file for details.
 
 * Written Dec 2020 by Matthias Cuntz (mc (at) macu (dot) de)
+* No plot_test() if __main__, Sep 2021, Matthias Cuntz
 
 .. moduleauthor:: Matthias Cuntz
 """
@@ -289,8 +291,8 @@ class mcPlot(object):
 
         Examples
         --------
-        >>> iplot = mcPlot(desc="Test Matthias' plotting class.",
-        ...                argstr="directory file")
+        iplot = mcPlot(desc="Test Matthias' plotting class.",
+                       argstr="directory file")
         """
         if desc is None:
             idesc = "Matthias Cuntz' standard plotting class."
@@ -861,20 +863,5 @@ class mcPlot(object):
 
 
 if __name__ == '__main__':
-
-    import time as ptime
-    t1 = ptime.time()
-
-    iplot = mcPlot(desc="Test Matthias' plotting class.",
-                   argstr="No argument wanted")
-    # # Uncomment for xkcd-style
-    # import matplotlib.pyplot as plt
-    # plt.xkcd()
-    iplot.plot_test()
-    iplot.close()
-
-    t2    = ptime.time()
-    strin = ( '[m]: {:.1f}'.format((t2 - t1) / 60.)
-              if (t2 - t1) > 60.
-              else '[s]: {:d}'.format(int(t2 - t1)) )
-    print('    Time elapsed', strin)
+    import doctest
+    doctest.testmod(optionflags=doctest.NORMALIZE_WHITESPACE)
