@@ -310,7 +310,7 @@ division               Divide two arrays, return 'otherwise' if division by 0.
 elementary_effects     Morris measures mu, stddev and mu*
 ellipse_area           Area of ellipse (or circle)
 errormeasures          Definition of different error measures.
-fftngo                 Fast fourier transformation for dummies (like me)    
+fftngo                 Fast fourier transformation for dummies (like me)
 functions              Module with common functions that are used in curve_fit or fmin parameter estimations.
 heaviside              Heaviside (or unit step) operator.
 intersection           Intersection of two curves from x,y coordinates.
@@ -426,7 +426,7 @@ License. The JAMS Python package originates from the former UFZ Python library,
 Department of Computational Hydrosystems, Helmholtz Centre for Environmental
 Research - UFZ, Leipzig, Germany.
 
-Copyright (c) 2012-2019 Matthias Cuntz, Juliane Mai, Stephan Thober, Arndt
+Copyright (c) 2009-2021 Matthias Cuntz, Juliane Mai, Stephan Thober, Arndt
 Piayda
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
