@@ -25,6 +25,8 @@ The following functions are provided
    argsort
 """
 from __future__ import division, absolute_import, print_function
+from warnings import warn, filterwarnings
+filterwarnings("default", category=DeprecationWarning)
 import numpy as np
 
 
@@ -125,7 +127,10 @@ def argmax(a, *args, **kwargs):
     -------
     Written,  Matthias Cuntz, Jul 2019
     Modified, Matthias Cuntz, May 2020 - numpy docstring, more examples from numpy docs
+
     """
+    warn('The function argmax is deprecated from JAMS. Use module pyjams.',
+         category=DeprecationWarning)
     if isinstance(a, np.ma.MaskedArray):
         return np.ma.argmax(a, *args, **kwargs)
     elif isinstance(a, np.ndarray):
@@ -227,7 +232,10 @@ def argmin(a, *args, **kwargs):
     -------
     Written,  Matthias Cuntz, Jul 2019
     Modified, Matthias Cuntz, May 2020 - numpy docstring, more examples from numpy docs
+
     """
+    warn('The function argmin is deprecated from JAMS. Use module pyjams.',
+         category=DeprecationWarning)
     if isinstance(a, np.ma.MaskedArray):
         return np.ma.argmin(a, *args, **kwargs)
     elif isinstance(a, np.ndarray):
@@ -354,7 +362,10 @@ def argsort(a, *args, **kwargs):
     -------
     Written,  Matthias Cuntz, Dec 2014
     Modified, Matthias Cuntz, May 2020 - numpy docstring, more examples from numpy docs
+
     """
+    warn('The function argsort is deprecated from JAMS. Use module pyjams.',
+         category=DeprecationWarning)
     if isinstance(a, np.ma.MaskedArray):
         return np.ma.argsort(a, *args, **kwargs)
     elif isinstance(a, np.ndarray):

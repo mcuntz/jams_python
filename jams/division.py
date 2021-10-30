@@ -28,6 +28,8 @@ The following functions are provided
    div
 """
 from __future__ import division, absolute_import, print_function
+from warnings import warn, filterwarnings
+filterwarnings("default", category=DeprecationWarning)
 import numpy as np
 
 
@@ -102,7 +104,10 @@ def division(a, b, otherwise=np.nan, prec=0.):
               Matthias Cuntz, Oct 2014 - do not return masked array if no masked array given
               Matthias Cuntz, Sep 2015 - bug: returned non-masked array in case of masked array input
               Matthias Cuntz, May 2020 - numpy docstring format
+
     """
+    warn('The function division is deprecated from JAMS. Use module pyjams.',
+         category=DeprecationWarning)
     oldsettings = np.geterr()
     np.seterr(divide='ignore')
 
@@ -138,6 +143,8 @@ def div(*args, **kwargs):
     >>> print('{:.1f} {:.1f} {:.1f}'.format(*div(a, b, prec=1.)))
     0.5 nan nan
     """
+    warn('The function div is deprecated from JAMS. Use module pyjams.',
+         category=DeprecationWarning)
     return division(*args, **kwargs)
 
 

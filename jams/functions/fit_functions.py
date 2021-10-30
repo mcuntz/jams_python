@@ -163,6 +163,8 @@ The following functions are provided:
    cost2_see
 """
 from __future__ import division, absolute_import, print_function
+from warnings import warn, filterwarnings
+filterwarnings("default", category=DeprecationWarning)
 import numpy as np
 import scipy.special as sp
 try:        # import package
@@ -219,6 +221,8 @@ def cost_abs(p, func, x, y):
     float
         sum of absolute deviations
     """
+    warn('The module functions is deprecated from JAMS. Use module pyjams.',
+         category=DeprecationWarning)
     return np.sum(np.abs(y-func(x,p)))
 
 
@@ -263,6 +267,8 @@ def arrhenius(T, E):
     float
         function value(s)
     """
+    warn('The module functions is deprecated from JAMS. Use module pyjams.',
+         category=DeprecationWarning)
     return np.exp((T-(T25-T0))*E/(T25*R*(T+T0)))
 
 
@@ -303,6 +309,8 @@ def cost_arrhenius(p, T, rate):
     float
         sum of absolute deviations
     """
+    warn('The module functions is deprecated from JAMS. Use module pyjams.',
+         category=DeprecationWarning)
     return np.sum(np.abs(rate-arrhenius_p(T,p)))
 
 
@@ -324,6 +332,8 @@ def cost2_arrhenius(p, T, rate):
     float
         sum of squared deviations
     """
+    warn('The module functions is deprecated from JAMS. Use module pyjams.',
+         category=DeprecationWarning)
     return np.sum((rate-arrhenius_p(T,p))**2)
 
 
@@ -347,6 +357,8 @@ def f1x(x,a,b):
     float
         function value(s)
     """
+    warn('The module functions is deprecated from JAMS. Use module pyjams.',
+         category=DeprecationWarning)
     return a+b/x
 
 
@@ -370,6 +382,8 @@ def f1x_p(x,p):
     float
         function value(s)
     """
+    warn('The module functions is deprecated from JAMS. Use module pyjams.',
+         category=DeprecationWarning)
     return p[0]+p[1]/x
 
 
@@ -395,6 +409,8 @@ def cost_f1x(p,x,y):
     float
         sum of absolute deviations
     """
+    warn('The module functions is deprecated from JAMS. Use module pyjams.',
+         category=DeprecationWarning)
     return np.sum(np.abs(y-f1x_p(x,p)))
 
 
@@ -420,6 +436,8 @@ def cost2_f1x(p,x,y):
     float
         sum of squared deviations
     """
+    warn('The module functions is deprecated from JAMS. Use module pyjams.',
+         category=DeprecationWarning)
     return np.sum((y-f1x_p(x,p))**2)
 
 
@@ -445,6 +463,8 @@ def fexp(x,a,b,c):
     float
         function value(s)
     """
+    warn('The module functions is deprecated from JAMS. Use module pyjams.',
+         category=DeprecationWarning)
     return a+b*np.exp(c*x)
 
 
@@ -470,6 +490,8 @@ def fexp_p(x,p):
     float
         function value(s)
     """
+    warn('The module functions is deprecated from JAMS. Use module pyjams.',
+         category=DeprecationWarning)
     return p[0]+p[1]*np.exp(p[2]*x)
 
 
@@ -497,6 +519,8 @@ def cost_fexp(p,x,y):
     float
         sum of absolute deviations
     """
+    warn('The module functions is deprecated from JAMS. Use module pyjams.',
+         category=DeprecationWarning)
     return np.sum(np.abs(y-fexp_p(x,p)))
 
 
@@ -524,6 +548,8 @@ def cost2_fexp(p,x,y):
     float
         sum of squared deviations
     """
+    warn('The module functions is deprecated from JAMS. Use module pyjams.',
+         category=DeprecationWarning)
     return np.sum((y-fexp_p(x,p))**2)
 
 
@@ -547,6 +573,8 @@ def gauss(x,mu,sig):
     float
         function value(s)
     """
+    warn('The module functions is deprecated from JAMS. Use module pyjams.',
+         category=DeprecationWarning)
     return np.exp(-(x-mu)**2/(2.*sig**2))/(sig*np.sqrt(2.*np.pi))
 
 
@@ -570,6 +598,8 @@ def gauss_p(x,p):
     float
         function value(s)
     """
+    warn('The module functions is deprecated from JAMS. Use module pyjams.',
+         category=DeprecationWarning)
     return np.exp(-(x-p[0])**2/(2.*p[1]**2))/(p[1]*np.sqrt(2.*np.pi))
 
 
@@ -595,6 +625,8 @@ def cost_gauss(p,x,y):
     float
         sum of absolute deviations
     """
+    warn('The module functions is deprecated from JAMS. Use module pyjams.',
+         category=DeprecationWarning)
     return np.sum(np.abs(y-gauss_p(x,p)))
 
 
@@ -620,6 +652,8 @@ def cost2_gauss(p,x,y):
     float
         sum of squared deviations
     """
+    warn('The module functions is deprecated from JAMS. Use module pyjams.',
+         category=DeprecationWarning)
     return np.sum((y-gauss_p(x,p))**2)
 
 
@@ -654,6 +688,8 @@ def lasslop(Rg, et, VPD, alpha, beta0, k, Rref):
     float
         net ecosystem exchange [umol(CO2) m-2 s-1]
     """
+    warn('The module functions is deprecated from JAMS. Use module pyjams.',
+         category=DeprecationWarning)
     # Lloyd & Taylor (1994)
     gamma = Rref*et
     # Koerner (1995)
@@ -694,6 +730,8 @@ def lasslop_p(Rg, et, VPD, p):
     float
         net ecosystem exchange [umol(CO2) m-2 s-1]
     """
+    warn('The module functions is deprecated from JAMS. Use module pyjams.',
+         category=DeprecationWarning)
     # Lloyd & Taylor (1994)
     gamma = p[3]*et
     # Koerner (1995)
@@ -733,6 +771,8 @@ def cost_lasslop(p, Rg, et, VPD, NEE):
     float
         sum of absolute deviations
     """
+    warn('The module functions is deprecated from JAMS. Use module pyjams.',
+         category=DeprecationWarning)
     return np.sum(np.abs(NEE-lasslop(Rg, et, VPD, p[0], p[1], p[2], p[3])))
 
 
@@ -766,6 +806,8 @@ def cost2_lasslop(p, Rg, et, VPD, NEE):
     float
         sum of squared deviations
     """
+    warn('The module functions is deprecated from JAMS. Use module pyjams.',
+         category=DeprecationWarning)
     return np.sum((NEE-lasslop(Rg, et, VPD, p[0], p[1], p[2], p[3]))**2)
 
 
@@ -789,6 +831,8 @@ def line(x,a,b):
     float
         function value(s)
     """
+    warn('The module functions is deprecated from JAMS. Use module pyjams.',
+         category=DeprecationWarning)
     return a+b*x
 
 
@@ -812,6 +856,8 @@ def line_p(x,p):
     float
         function value(s)
     """
+    warn('The module functions is deprecated from JAMS. Use module pyjams.',
+         category=DeprecationWarning)
     return p[0]+p[1]*x
 
 
@@ -837,6 +883,8 @@ def cost_line(p,x,y):
     float
         sum of absolute deviations
     """
+    warn('The module functions is deprecated from JAMS. Use module pyjams.',
+         category=DeprecationWarning)
     return np.sum(np.abs(y-line_p(x,p)))
 
 
@@ -862,6 +910,8 @@ def cost2_line(p,x,y):
     float
         sum of squared deviations
     """
+    warn('The module functions is deprecated from JAMS. Use module pyjams.',
+         category=DeprecationWarning)
     return np.sum((y-line_p(x,p))**2)
 
 
@@ -883,6 +933,8 @@ def line0(x,a):
     float
         function value(s)
     """
+    warn('The module functions is deprecated from JAMS. Use module pyjams.',
+         category=DeprecationWarning)
     return a*x
 
 
@@ -902,6 +954,8 @@ def line0_p(x,p):
     float
         function value(s)
     """
+    warn('The module functions is deprecated from JAMS. Use module pyjams.',
+         category=DeprecationWarning)
     return p*x
 
   
@@ -923,6 +977,8 @@ def cost_line0(p,x,y):
     float
         sum of absolute deviations
     """
+    warn('The module functions is deprecated from JAMS. Use module pyjams.',
+         category=DeprecationWarning)
     return np.sum(np.abs(y-line0_p(x,p)))
 
   
@@ -944,6 +1000,8 @@ def cost2_line0(p,x,y):
     float
         sum of squared deviations
     """
+    warn('The module functions is deprecated from JAMS. Use module pyjams.',
+         category=DeprecationWarning)
     return np.sum((y-line0_p(x,p))**2)
 
 
@@ -967,6 +1025,8 @@ def lloyd_fix(T, Rref, E0):
     float
         Respiration [umol(C) m-2 s-1]
     """
+    warn('The module functions is deprecated from JAMS. Use module pyjams.',
+         category=DeprecationWarning)
     Tref = 283.15 #  10    [degC]
     T0   = 227.13 # -46.02 [degC]
     return Rref*np.exp(E0*(1./(Tref-T0)-1./(T-T0)))
@@ -992,6 +1052,8 @@ def lloyd_fix_p(T, p):
     float
         Respiration [umol(C) m-2 s-1]
     """
+    warn('The module functions is deprecated from JAMS. Use module pyjams.',
+         category=DeprecationWarning)
     Tref = 283.15 #  10    [degC]
     T0   = 227.13 # -46.02 [degC]
     return p[0]*np.exp(p[1]*(1./(Tref-T0)-1./(T-T0)))
@@ -1019,6 +1081,8 @@ def cost_lloyd_fix(p, T, resp):
     float
         sum of absolute deviations
     """
+    warn('The module functions is deprecated from JAMS. Use module pyjams.',
+         category=DeprecationWarning)
     return np.sum(np.abs(resp-lloyd_fix_p(T,p)))
 
 
@@ -1044,6 +1108,8 @@ def cost2_lloyd_fix(p, T, resp):
     float
         sum of squared deviations
     """
+    warn('The module functions is deprecated from JAMS. Use module pyjams.',
+         category=DeprecationWarning)
     return np.sum((resp-lloyd_fix_p(T,p))**2)
 
 
@@ -1067,6 +1133,8 @@ def lloyd_only_rref(et, Rref):
     float
         Respiration [umol(C) m-2 s-1]
     """
+    warn('The module functions is deprecated from JAMS. Use module pyjams.',
+         category=DeprecationWarning)
     return Rref*et
 
 
@@ -1088,6 +1156,8 @@ def lloyd_only_rref_p(et, p):
     float
         Respiration [umol(C) m-2 s-1]
     """
+    warn('The module functions is deprecated from JAMS. Use module pyjams.',
+         category=DeprecationWarning)
     return p[0]*et
 
 
@@ -1109,6 +1179,8 @@ def cost_lloyd_only_rref(p, et, resp):
     float
         sum of absolute deviations
     """
+    warn('The module functions is deprecated from JAMS. Use module pyjams.',
+         category=DeprecationWarning)
     return np.sum(np.abs(resp-lloyd_only_rref_p(et,p)))
 
 
@@ -1130,6 +1202,8 @@ def cost2_lloyd_only_rref(p, et, resp):
     float
         sum of squared deviations
     """
+    warn('The module functions is deprecated from JAMS. Use module pyjams.',
+         category=DeprecationWarning)
     return np.sum((resp-lloyd_only_rref_p(et,p))**2)
 
 
@@ -1154,6 +1228,8 @@ def sabx(x, a, b):
     float
         function value(s)
     """
+    warn('The module functions is deprecated from JAMS. Use module pyjams.',
+         category=DeprecationWarning)
     return np.sqrt(a+b/x)
 
 
@@ -1177,6 +1253,8 @@ def sabx_p(x, p):
     float
         function value(s)
     """
+    warn('The module functions is deprecated from JAMS. Use module pyjams.',
+         category=DeprecationWarning)
     return np.sqrt(p[0]+p[1]/x)
 
   
@@ -1202,6 +1280,8 @@ def cost_sabx(p,x,y):
     float
         sum of absolute deviations
     """
+    warn('The module functions is deprecated from JAMS. Use module pyjams.',
+         category=DeprecationWarning)
     return np.sum(np.abs(y-sabx_p(x,p)))
 
 def cost2_sabx(p,x,y):
@@ -1226,6 +1306,8 @@ def cost2_sabx(p,x,y):
     float
         sum of squared deviations
     """
+    warn('The module functions is deprecated from JAMS. Use module pyjams.',
+         category=DeprecationWarning)
     return np.sum((y-sabx_p(x,p))**2)
 
 
@@ -1247,6 +1329,8 @@ def poly(x,*args):
     float
         function value(s)
     """
+    warn('The module functions is deprecated from JAMS. Use module pyjams.',
+         category=DeprecationWarning)
     return np.polynomial.polynomial.polyval(x, list(args))
 
   
@@ -1266,6 +1350,8 @@ def poly_p(x,p):
     float
         function value(s)
     """
+    warn('The module functions is deprecated from JAMS. Use module pyjams.',
+         category=DeprecationWarning)
     return np.polynomial.polynomial.polyval(x, p)
 
   
@@ -1287,6 +1373,8 @@ def cost_poly(p,x,y):
     float
         sum of absolute deviations
     """
+    warn('The module functions is deprecated from JAMS. Use module pyjams.',
+         category=DeprecationWarning)
     return np.sum(np.abs(y-poly_p(x,p)))
 
 
@@ -1308,6 +1396,8 @@ def cost2_poly(p,x,y):
     float
         sum of squared deviations
     """
+    warn('The module functions is deprecated from JAMS. Use module pyjams.',
+         category=DeprecationWarning)
     return np.sum((y-poly_p(x,p))**2)
 
 
@@ -1337,6 +1427,8 @@ def cost_logistic(p, x, y):
     float
         sum of absolute deviations
     """
+    warn('The module functions is deprecated from JAMS. Use module pyjams.',
+         category=DeprecationWarning)
     return np.sum(np.abs(y-logistic_p(x,p)))
 
 
@@ -1364,6 +1456,8 @@ def cost2_logistic(p,x,y):
     float
         sum of squared deviations
     """
+    warn('The module functions is deprecated from JAMS. Use module pyjams.',
+         category=DeprecationWarning)
     return np.sum((y-logistic_p(x,p))**2)
 
 
@@ -1395,6 +1489,8 @@ def cost_logistic_offset(p, x, y):
     float
         sum of absolute deviations
     """
+    warn('The module functions is deprecated from JAMS. Use module pyjams.',
+         category=DeprecationWarning)
     return np.sum(np.abs(y-logistic_offset_p(x,p)))
 
 
@@ -1424,6 +1520,8 @@ def cost2_logistic_offset(p,x,y):
     float
         sum of squared deviations
     """
+    warn('The module functions is deprecated from JAMS. Use module pyjams.',
+         category=DeprecationWarning)
     return np.sum((y-logistic_offset_p(x,p))**2)
 
 
@@ -1462,6 +1560,8 @@ def cost_logistic2_offset(p, x, y):
     float
         sum of absolute deviations
     """
+    warn('The module functions is deprecated from JAMS. Use module pyjams.',
+         category=DeprecationWarning)
     return np.sum(np.abs(y-logistic2_offset_p(x,p)))
 
 
@@ -1498,6 +1598,8 @@ def cost2_logistic2_offset(p,x,y):
     float
         sum of squared deviations
     """
+    warn('The module functions is deprecated from JAMS. Use module pyjams.',
+         category=DeprecationWarning)
     return np.sum((y-logistic2_offset_p(x,p))**2)
 
 
@@ -1523,6 +1625,8 @@ def see(x, a, b, c):
     float
         function value(s)
     """
+    warn('The module functions is deprecated from JAMS. Use module pyjams.',
+         category=DeprecationWarning)
     return np.where((x-b)<0., 0., a*(x-b)**c)
 
 
@@ -1548,6 +1652,8 @@ def see_p(x, p):
     float
         function value(s)
     """
+    warn('The module functions is deprecated from JAMS. Use module pyjams.',
+         category=DeprecationWarning)
     return np.where((x-p[1]) < 0., 0., p[0] * (x-p[1])**p[2])
 
   
@@ -1575,6 +1681,8 @@ def cost_see(p, x, y):
     float
         sum of absolute deviations
     """
+    warn('The module functions is deprecated from JAMS. Use module pyjams.',
+         category=DeprecationWarning)
     return np.sum(np.abs(y-see_p(x,p)))
 
 
@@ -1602,6 +1710,8 @@ def cost2_see(p,x,y):
     float
         sum of squared deviations
     """
+    warn('The module functions is deprecated from JAMS. Use module pyjams.',
+         category=DeprecationWarning)
     return np.sum((y-see_p(x,p))**2)
 
 

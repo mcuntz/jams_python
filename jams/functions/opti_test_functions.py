@@ -44,6 +44,8 @@ The following functions are provided:
    six_hump_camelback
 """
 from __future__ import division, absolute_import, print_function
+from warnings import warn, filterwarnings
+filterwarnings("default", category=DeprecationWarning)
 import numpy as np
 
 
@@ -68,6 +70,8 @@ def ackley(x):
     float
        Value of Ackley function.
     """
+    warn('The module functions is deprecated from JAMS. Use module pyjams.',
+         category=DeprecationWarning)
     a = 20.0
     b = 0.2
     c = 2.0*np.pi
@@ -93,7 +97,7 @@ def griewank(x):
         multi-dimensional x-values.
 
         `len(x)=2` or `len(x)=10`.
-        
+
         `x[i]` bound to [-600,600] for all i.
 
     Returns
@@ -101,6 +105,8 @@ def griewank(x):
     float
        Value of Griewank function.
     """
+    warn('The module functions is deprecated from JAMS. Use module pyjams.',
+         category=DeprecationWarning)
     nopt = np.size(x)
     #if (nopt == 2) | (nopt == 10):
     xx = x
@@ -130,7 +136,7 @@ def goldstein_price(x):
     ----------
     x : array
         2 x-values. `len(x)=2`.
-        
+
         `x[i]` bound to [-2,2] for i=1 and 2.
 
     Returns
@@ -138,6 +144,8 @@ def goldstein_price(x):
     float
        Value of Goldstein-Price function.
     """
+    warn('The module functions is deprecated from JAMS. Use module pyjams.',
+         category=DeprecationWarning)
     x1 = x[0]
     x2 = x[1]
     u1 = (x1 + x2 + 1.0)**2
@@ -161,7 +169,7 @@ def rastrigin(x):
     ----------
     x : array
         2 x-values. `len(x)=2`.
-        
+
         `x[i]` bound to [-1,1] for i=1 and 2.
 
     Returns
@@ -169,6 +177,8 @@ def rastrigin(x):
     float
        Value of Rastrigin function.
     """
+    warn('The module functions is deprecated from JAMS. Use module pyjams.',
+         category=DeprecationWarning)
     x1 = x[0]
     x2 = x[1]
     f = x1**2 + x2**2 - np.cos(18.0*x1) - np.cos(18.0*x2)
@@ -186,7 +196,7 @@ def rosenbrock(x):
     ----------
     x : array
         2 x-values. `len(x)=2`.
-        
+
         `x[1]` bound to [-5,5].
 
         `x[2]` bound to [-2,8].
@@ -196,6 +206,8 @@ def rosenbrock(x):
     float
        Value of Rosenbrock function.
     """
+    warn('The module functions is deprecated from JAMS. Use module pyjams.',
+         category=DeprecationWarning)
 
     x1 = x[0]
     x2 = x[1]
@@ -215,7 +227,7 @@ def six_hump_camelback(x):
     ----------
     x : array
         2 x-values. `len(x)=2`.
-        
+
         `x[i]` bound to [-5,5] for i=1 and 2.
 
     Returns
@@ -223,6 +235,8 @@ def six_hump_camelback(x):
     float
        Value of Six-hump Camelback function.
     """
+    warn('The module functions is deprecated from JAMS. Use module pyjams.',
+         category=DeprecationWarning)
     x1 = x[0]
     x2 = x[1]
     f = (4 - 2.1*x1**2 + x1**4/3)*x1**2 + x1*x2 + (-4 + 4*x2**2)*x2**2

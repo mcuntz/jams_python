@@ -23,7 +23,12 @@ The following functions are provided:
    closest
 """
 from __future__ import division, absolute_import, print_function
+from warnings import warn, filterwarnings
+filterwarnings("default", category=DeprecationWarning)
 import numpy as np
+
+__all__ = ['closest']
+
 
 def closest(arr, num, value=False):
     """
@@ -71,7 +76,10 @@ def closest(arr, num, value=False):
     Written,  Matthias Cuntz, Jan 2012
     Modified, Matthias Cuntz, Feb 2013 - ported to Python 3
               Matthias Cuntz, Apr 2020 - numpy docstring format
+
     """
+    warn('The function closets is deprecated from JAMS. Use module pyjams.',
+         category=DeprecationWarning)
     out = np.ma.argmin(np.ma.abs(np.ma.array(arr)-num))
     if value:
       return arr.flat[out]

@@ -23,6 +23,8 @@ The following functions are provided:
    tee
 """
 from __future__ import division, absolute_import, print_function
+from warnings import warn, filterwarnings
+filterwarnings("default", category=DeprecationWarning)
 
 
 __all__ = ['tee']
@@ -95,6 +97,8 @@ def tee(*args, **kwargs):
               Matthias Cuntz, Dec 2019 - numpy docstring format
               Matthias Cuntz, Sep 2021 - code refactoring
     """
+    warn('The function tee is deprecated from JAMS. Use module pyjams.',
+         category=DeprecationWarning)
     if 'file' in kwargs:
         if kwargs['file'] is not None:
             print(*args, **kwargs)  # file

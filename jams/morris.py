@@ -116,6 +116,8 @@ from __future__ import division, absolute_import, print_function
               MC & FG, Aug 2018 - Distance matrix not done for all trajectories at once because of very
                                   large memory requirement.
 """
+from warnings import warn, filterwarnings
+filterwarnings("default", category=DeprecationWarning)
 import numpy as np
 
 
@@ -790,6 +792,8 @@ def morris_sampling(NumFact, LB, UB, N=500, p=4, r=10, GroupMat=np.array([]), Di
         Wrapper function for Optimized_Groups.
         def Optimized_Groups(NumFact, LB, UB, N=500, p=4, r=10, GroupMat=np.array([]), Diagnostic=0):
     """
+    warn('The function morris_sampling is deprecated from JAMS. Use module pyjams.',
+         category=DeprecationWarning)
     return Optimized_Groups(NumFact, LB, UB, N, p, r, GroupMat, Diagnostic)
 
 
@@ -798,6 +802,8 @@ def elementary_effects(NumFact, Sample, OutFact, Output, p=4, Group=[], Diagnost
         Wrapper function for Morris_Measure_Groups.
         def Morris_Measure_Groups(NumFact, Sample, OutFact, Output, p=4, Group=[], Diagnostic=False):
     """
+    warn('The function elementary_effects is deprecated from JAMS. Use module pyjams.',
+         category=DeprecationWarning)
     return Morris_Measure_Groups(NumFact, Sample, OutFact, Output, p, Group, Diagnostic)
 
 

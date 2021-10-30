@@ -80,6 +80,8 @@ The following functions are provided:
     d2logistic2_offset_p
 """
 from __future__ import division, absolute_import, print_function
+from warnings import warn, filterwarnings
+filterwarnings("default", category=DeprecationWarning)
 import numpy as np
 import scipy.special as sp
 
@@ -119,6 +121,8 @@ def logistic(x, L, k, x0):
     float or ndarray
         Logistic function at `x` with maximum `L`, steepness `k` and inflection point `x0`
     """
+    warn('The module functions is deprecated from JAMS. Use module pyjams.',
+         category=DeprecationWarning)
     return L * sp.expit(k * (x - x0))
 
 
@@ -126,6 +130,8 @@ def logistic_p(x, p):
     """
     Wrapper function for :func:`logistic`: `logistic(x, *p)`.
     """
+    warn('The module functions is deprecated from JAMS. Use module pyjams.',
+         category=DeprecationWarning)
     return logistic(x, *p)
 
 
@@ -157,6 +163,8 @@ def dlogistic(x, L, k, x0):
     float or ndarray
         First derivative of logistic function at `x` with maximum `L`, steepness `k` and inflection point `x0`
     """
+    warn('The module functions is deprecated from JAMS. Use module pyjams.',
+         category=DeprecationWarning)
     return k * L / (2. * (np.cosh(k * (x - x0)) + 1.))
 
 
@@ -164,6 +172,8 @@ def dlogistic_p(x, p):
     """
     Wrapper function for :func:`dlogistic`: `dlogistic(x, *p)`.
     """
+    warn('The module functions is deprecated from JAMS. Use module pyjams.',
+         category=DeprecationWarning)
     return dlogistic(x, *p)
 
 
@@ -195,6 +205,8 @@ def d2logistic(x, L, k, x0):
     float or ndarray
         Second derivative of logistic function at `x` with maximum `L`, steepness `k` and inflection point `x0`
     """
+    warn('The module functions is deprecated from JAMS. Use module pyjams.',
+         category=DeprecationWarning)
     return ( -k**2 * L * np.sinh(k * (x - x0)) /
                  (2. * (np.cosh(k * (x - x0)) + 1.)**2) )
 
@@ -203,6 +215,8 @@ def d2logistic_p(x, p):
     """
     Wrapper function for :func:`d2logistic`: `d2logistic(x, *p)`.
     """
+    warn('The module functions is deprecated from JAMS. Use module pyjams.',
+         category=DeprecationWarning)
     return d2logistic(x, *p)
 
 
@@ -232,6 +246,8 @@ def logistic_offset(x, L, k, x0, a):
     float or ndarray
         Logistic function at `x` with maximum `L`, steepness `k`, inflection point `x0` and offset `a`
     """
+    warn('The module functions is deprecated from JAMS. Use module pyjams.',
+         category=DeprecationWarning)
     return L * sp.expit(k * (x - x0)) + a
 
 
@@ -239,6 +255,8 @@ def logistic_offset_p(x, p):
     """
     Wrapper function for :func:`logistic_offset`: `logistic_offset(x, *p)`.
     """
+    warn('The module functions is deprecated from JAMS. Use module pyjams.',
+         category=DeprecationWarning)
     return logistic_offset(x, *p)
 
 
@@ -273,6 +291,8 @@ def dlogistic_offset(x, L, k, x0, a):
         First derivative of logistic function with offset at `x` with maximum `L`, steepness `k`,
         inflection point `x0`, and offset `a`
     """
+    warn('The module functions is deprecated from JAMS. Use module pyjams.',
+         category=DeprecationWarning)
     return k * L / (2. * (np.cosh(k * (x - x0)) + 1.))
 
 
@@ -280,6 +300,8 @@ def dlogistic_offset_p(x, p):
     """
     Wrapper function for :func:`dlogistic_offset`: `dlogistic_offset(x, *p)`.
     """
+    warn('The module functions is deprecated from JAMS. Use module pyjams.',
+         category=DeprecationWarning)
     return dlogistic_offset(x, *p)
 
 
@@ -314,6 +336,8 @@ def d2logistic_offset(x, L, k, x0, a):
         Second derivative of logistic function at `x` with maximum `L`, steepness `k`,
         inflection point `x0`, and offset `a`
     """
+    warn('The module functions is deprecated from JAMS. Use module pyjams.',
+         category=DeprecationWarning)
     return ( -k**2 * L * np.sinh(k * (x - x0)) /
                  (2. * (np.cosh(k * (x - x0)) + 1.)**2) )
 
@@ -322,6 +346,8 @@ def d2logistic_offset_p(x, p):
     """
     Wrapper function for :func:`d2logistic_offset`: `d2logistic_offset(x, *p)`.
     """
+    warn('The module functions is deprecated from JAMS. Use module pyjams.',
+         category=DeprecationWarning)
     return d2logistic_offset(x, *p)
 
 
@@ -357,6 +383,8 @@ def logistic2_offset(x, L1, k1, x01, L2, k2, x02, a):
     float or ndarray
         Double Logistic function at `x`
     """
+    warn('The module functions is deprecated from JAMS. Use module pyjams.',
+         category=DeprecationWarning)
     return L1 * sp.expit(k1 * (x - x01)) - L2 * sp.expit(k2 * (x - x02)) + a
 
 
@@ -364,6 +392,8 @@ def logistic2_offset_p(x, p):
     """
     Wrapper function for :func:`logistic2_offset`: `logistic2_offset(x, *p)`.
     """
+    warn('The module functions is deprecated from JAMS. Use module pyjams.',
+         category=DeprecationWarning)
     return logistic2_offset(x, *p)
 
 
@@ -403,6 +433,8 @@ def dlogistic2_offset(x, L1, k1, x01, L2, k2, x02, a):
     float or ndarray
         First derivative of double logistic function with offset at `x`
     """
+    warn('The module functions is deprecated from JAMS. Use module pyjams.',
+         category=DeprecationWarning)
     return ( k1 * L1 / (2. * (np.cosh(k1 * (x - x01)) + 1.)) -
              k2 * L2 / (2. * (np.cosh(k2 * (x - x02)) + 1.)) )
 
@@ -411,6 +443,8 @@ def dlogistic2_offset_p(x, p):
     """
     Wrapper function for :func:`dlogistic2_offset`: `dlogistic2_offset(x, *p)`.
     """
+    warn('The module functions is deprecated from JAMS. Use module pyjams.',
+         category=DeprecationWarning)
     return dlogistic2_offset(x, *p)
 
 
@@ -450,6 +484,8 @@ def d2logistic2_offset(x, L1, k1, x01, L2, k2, x02, a):
     float or ndarray
         Second derivative of double logistic function with offset at `x`
     """
+    warn('The module functions is deprecated from JAMS. Use module pyjams.',
+         category=DeprecationWarning)
     return ( -k1**2 * L1 * np.sinh(k1 * (x - x01)) /
                  (2. * (np.cosh(k1 * (x - x01)) + 1.)**2) +
              k2**2 * L2 * np.sinh(k2 * (x - x02)) /
@@ -460,6 +496,8 @@ def d2logistic2_offset_p(x, p):
     """
     Wrapper function for :func:`d2logistic2_offset`: `d2logistic2_offset(x, *p)`.
     """
+    warn('The module functions is deprecated from JAMS. Use module pyjams.',
+         category=DeprecationWarning)
     return d2logistic2_offset(x, *p)
 
 

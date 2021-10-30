@@ -76,6 +76,8 @@ The following functions are provided:
     ishigami_homma_easy
 """
 from __future__ import division, absolute_import, print_function
+from warnings import warn, filterwarnings
+filterwarnings("default", category=DeprecationWarning)
 import numpy as np
 
 
@@ -99,6 +101,8 @@ def B(X):
     B : float or ndarray
         float or (npoints,) floats of B function values at `X`
     """
+    warn('The module functions is deprecated from JAMS. Use module pyjams.',
+         category=DeprecationWarning)
     # Parameter sets are assumed to be in following ordering: (x_1, x_2, ..., X_m, w_1, w_2, ..., w_m)
     X = np.array(X)
     if X.ndim == 1:
@@ -142,6 +146,8 @@ def g(X, a):
     G : float or ndarray
         float or (npoints,) floats of G function values at `X` with parameters `a`
     """
+    warn('The module functions is deprecated from JAMS. Use module pyjams.',
+         category=DeprecationWarning)
     return Gstar(X, np.ones(len(a)), np.zeros(len(a)), a)
 
 
@@ -168,6 +174,8 @@ def G(X, a):
     g : float or ndarray
         float or (npoints,) floats of G function values at `X` with parameters `a`
     """
+    warn('The module functions is deprecated from JAMS. Use module pyjams.',
+         category=DeprecationWarning)
     return Gstar(X, np.ones(len(a)), np.zeros(len(a)), a)
 
 
@@ -194,6 +202,8 @@ def Gstar(X, alpha, delta, a):
     G* : float or ndarray
         float or (npoints,) floats of G* function values at `X` with parameters `alpha`, `delta` and `a`
     """
+    warn('The module functions is deprecated from JAMS. Use module pyjams.',
+         category=DeprecationWarning)
     # Model output for given parameter set(s) is returned
     # X: dim1 = # of parameters = 10
     #       dim2 = # of parameter sets
@@ -247,6 +257,8 @@ def linear(X, a, b):
     linear : float or ndarray
         float or (npoints,) floats of linear function values at `X` with parameters `a` and `b`
     """
+    warn('The module functions is deprecated from JAMS. Use module pyjams.',
+         category=DeprecationWarning)
     # Model output for given parameter set(s) is returned
     # X:    dim1 = # of parameters = 1
     #       dim2 = # of parameter sets
@@ -287,6 +299,8 @@ def product(X):
     product : float or ndarray
         float or (npoints,) floats of product function values at `X`
     """
+    warn('The module functions is deprecated from JAMS. Use module pyjams.',
+         category=DeprecationWarning)
     # Model output for given parameter set(s) is returned
     # X:    dim1 = # of parameters = 2
     #       dim2 = # of parameter sets
@@ -339,6 +353,8 @@ def ratio(X):
     ratio : float or ndarray
         float or (npoints,) floats of ratio function values at `X`
     """
+    warn('The module functions is deprecated from JAMS. Use module pyjams.',
+         category=DeprecationWarning)
     # Model output for given parameter set(s) is returned
     # X:    dim1 = # of parameters = 2
     #       dim2 = # of parameter sets
@@ -381,6 +397,8 @@ def ishigami_homma_easy(X):
     ishigami_homma_easy : float or ndarray
         float or (npoints,) floats of simplified Ishigami and Homma function values at `X`
     """
+    warn('The module functions is deprecated from JAMS. Use module pyjams.',
+         category=DeprecationWarning)
     # Model output for given parameter set(s) is returned
     # X:    dim1 = # of parameters = 2
     #       dim2 = # of parameter sets
@@ -423,6 +441,8 @@ def ishigami_homma(X, a, b):
     ishigami_homma : float or ndarray
         float or (npoints,) floats of Ishigami and Homma function values at `X` with parameters `a` and `b`
     """
+    warn('The module functions is deprecated from JAMS. Use module pyjams.',
+         category=DeprecationWarning)
     # Model output for given parameter set(s) is returned
     # X: dim1 = # of parameters = 3
     #       dim2 = # of parameter sets
@@ -461,6 +481,8 @@ def K(X):
     K : float or ndarray
         float or (npoints,) floats of K function values at `X`
     """
+    warn('The module functions is deprecated from JAMS. Use module pyjams.',
+         category=DeprecationWarning)
     # Model output for given parameter set(s) is returned
     # X: dim1 = # of parameters = 10
     #    dim2 = # of parameter sets
@@ -501,6 +523,8 @@ def bratley(*args):
     bratley : float or ndarray
         float or (npoints,) floats of K function values at `X`
     """
+    warn('The module functions is deprecated from JAMS. Use module pyjams.',
+         category=DeprecationWarning)
     return K(*args)
 
 
@@ -531,6 +555,8 @@ def fmorris(X, beta0, beta1, beta2, beta3, beta4):
     fmorris : float or ndarray
         float or (npoints,) floats of Morris function values at `X` with parameters `beta0-beta4`
     """
+    warn('The module functions is deprecated from JAMS. Use module pyjams.',
+         category=DeprecationWarning)
     X = np.array(X)
     if X.ndim == 1:
         isone = True
@@ -592,6 +618,8 @@ def morris(*args):
     morris : float or ndarray
         float or (npoints,) floats of Morris function values at `X` with parameters `beta0-beta4`
     """
+    warn('The module functions is deprecated from JAMS. Use module pyjams.',
+         category=DeprecationWarning)
     return fmorris(*args)
 
 
@@ -612,6 +640,8 @@ def oakley_ohagan(X):
     oakley_ohagan : float or ndarray
         float or (npoints,) floats of Oakley and O'Hagan function values at `X`
     """
+    warn('The module functions is deprecated from JAMS. Use module pyjams.',
+         category=DeprecationWarning)
     X = np.array(X)
     if X.ndim == 1:
         isone = True

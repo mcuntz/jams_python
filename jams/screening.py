@@ -3,6 +3,8 @@ from __future__ import division, absolute_import, print_function
 from functools import partial
 import os
 import subprocess
+from warnings import warn, filterwarnings
+filterwarnings("default", category=DeprecationWarning)
 import numpy as np
 from jams.morris import morris_sampling, elementary_effects
 
@@ -209,6 +211,8 @@ def screening(func, x0, lb, ub, mask=None,
         Modified, Matthias Cuntz, Dec 2017 - output for nt=1 also (npara,3)
                   Matthias Cuntz, Dec 2019 - bug: default ntotal was not set if ntotal<0 (but nt instead)
     """
+    warn('The function screening is deprecated from JAMS. Use module pyjams.',
+         category=DeprecationWarning)
     # Get MPI communicator
     try:
         from mpi4py import MPI

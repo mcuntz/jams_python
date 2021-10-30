@@ -27,6 +27,8 @@ The following functions are provided:
     curvature
 """
 from __future__ import division, absolute_import, print_function
+from warnings import warn, filterwarnings
+filterwarnings("default", category=DeprecationWarning)
 import numpy as np
 import scipy.special as sp
 
@@ -60,6 +62,8 @@ def curvature(x, dfunc, d2func, *args, **kwargs):
     float or ndarray
         Curvature of function f at `x`
     """
+    warn('The module functions is deprecated from JAMS. Use module pyjams.',
+         category=DeprecationWarning)
     return ( d2func(x, *args, **kwargs) /
                  (1. + dfunc(x, *args, **kwargs)**2)**1.5 )
 
