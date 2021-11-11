@@ -19,7 +19,6 @@ Subpackages
 
 """
 from warnings import warn, filterwarnings
-filterwarnings("default", category=DeprecationWarning)
 warn('The module const is deprecated from JAMS. Use module pyjams.',
      category=DeprecationWarning)
 

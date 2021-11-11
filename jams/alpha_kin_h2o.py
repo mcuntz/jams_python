@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 from __future__ import division, absolute_import, print_function
-import numpy as np
+from warnings import warn, filterwarnings
+filterwarnings("default", category=DeprecationWarning)
 
 def alpha_kin_h2o(isotope=None, eps=False, greater1=True, boundary=False, cappa=False):
     """
@@ -50,7 +51,7 @@ def alpha_kin_h2o(isotope=None, eps=False, greater1=True, boundary=False, cappa=
         >>> from autostring import astr
         >>> print(astr(alpha_kin_h2o(isotope=0), 4))
         1.0000
-    
+
         >>> print(astr(alpha_kin_h2o(isotope=1, eps=True)*1000., 4))
         25.1153
 
@@ -96,6 +97,8 @@ def alpha_kin_h2o(isotope=None, eps=False, greater1=True, boundary=False, cappa=
         -------
         Written,  MC, Sep 2014
     """
+    warn('The function alpha_kin_h2o is deprecated from JAMS. Use module pyjams.',
+         category=DeprecationWarning)
     # Fractionation factors
     if (isotope==1): # HDO
         if cappa:

@@ -12,13 +12,8 @@ Get help on each function by typing
 Provided functions and modules (alphabetic w/o obsolete functions)
 ------------------------------------------------------------------
 abc2plot               Write a, b, c, ... on plots.
-alpha_equ_h2o          Equilibrium fractionation between liquid water and vapour.
-alpha_kin_h2o          Kinetic fractionation of molecular diffusion of water vapour.
 apply_undef            Use a function on masked arguments.
 area_poly              Area of a polygon.
-argmax                 Wrapper for numpy.argmax, numpy.ma.argmax, and using max for Python iterables.
-argmin                 Wrapper for numpy.argmin, numpy.ma.argmin, and using min for Python iterables.
-argsort                Wrapper for numpy.argsort, numpy.ma.argsort, and using sorted for Python iterables.
 around                 Round to the passed power of ten.
 ascii2ascii            Convert date notations between to ascii date format DD.MM.YYYY hh:mm:ss.
 ascii2en               Convert date notations to English date format YYYY-MM-DD hh:mm:ss.
@@ -30,9 +25,7 @@ baseflow               Calculate baseflow from discharge timeseries
 cellarea               Calc areas of grid cells in m^2.
 climate_index_knoben   Determines continuous climate indexes based on Knoben et al. (2018).
 clockplot              The clockplot of mHM.
-closest                Index in array which entry is closest to a given number.
 color                  Module with color functions for plotting.
-const                  Provides physical, mathematical, computational, and isotope constants.
 convex_hull            Calculate subset of points that make a convex hull around a set of 2D points.
 correlate              Computes the cross-correlation function of two series x and y.
 cuntz_gleixner         Cuntz-Gleixner model of 13C discrimination.
@@ -46,12 +39,9 @@ date2dec               Converts arrays with calendar date to decimal date.
 dec2date               Converts arrays with decimal date to calendar date.
 dfgui                  A minimalistic GUI for analyzing Pandas DataFrames based on wxPython.
 distributions          Module for pdfs of additional distributions.
-div                    Wrapper for division.
-division               Divide two arrays, return 'otherwise' if division by 0.
 dumpnetcdf             Convenience function for writenetcdf
 eddybox                Module containing Eddy Covaraince utilities, see eddysuite.py for details
 eddysuite              Example file for processing Eddy data with eddybox and EddySoft
-elementary_effects     Morris measures mu, stddev and mu*
 ellipse_area           Area of ellipse (or circle)
 encrypt                Module to encrypt and decrypt text using a key system as well as a cipher.
 en2ascii               Convert date notations from English YYYY-MM-DD to ascii date format DD.MM.YYYY hh:mm:ss.
@@ -69,7 +59,6 @@ fr2ascii               Convert date notations from French DD/MM/YYYT to ascii da
 fread                  Reads in float array from ascii file.
 fsread                 Simultaneous read of float and string array from ascii file.
 ftp                    Module with functions for interacting with an open FTP connection.
-functions              Module with common functions that are used in curve_fit or fmin parameter estimations.
 fwrite                 Writes an array to ascii file
 gap2lai                Calculation of leaf area index from gap probability observations.
 geoarray               Pythonic gdal wrapper
@@ -111,8 +100,6 @@ lowess                 Locally linear regression in n dimensions.
 mad                    Median absolute deviation test.
 mat2nc                 Converts Matlab file *.mat into NetCDF *.nc.
 means                  Calculate daily, monthly, yearly, etc. means of data depending on date stamp.
-mcPlot                 Matthias Cuntz' standard plotting class.
-morris_sampling        Sampling of optimised trajectories for Morris measures / elementary effects
 nc2nc                  Copy netcdf file deleting, renaming, replacing variables and attribues.
 ncread                 Wrapper for readnetcdf.
 netcdfread             Wrapper for readnetcdf.
@@ -145,14 +132,12 @@ savitzky_golay         Smooth (and optionally differentiate) 1D data with a Savi
 savitzky_golay2d       Smooth (and optionally differentiate) 2D data with a Savitzky-Golay filter.
 saltelli               Parameter sampling for Sobol indices calculation.
 sce                    Shuffle-Complex-Evolution algorithm for function min(max)imisation
-screening              Samples trajectories, runs model and returns measures of Morris Elemenary Effects
 semivariogram          Calculates semivariogram from spatial data.
 sendmail               Send an e-mail.
 sg                     Wrapper savitzky_golay.
 sg2d                   Wrapper savitzky_golay2d.
 sigma_filter           Mask values deviating more than z standard deviations from a given function.
 signature2plot         Write a copyright notice on a plot.
-str2tex                Convert strings to LaTeX strings in math environement used by matplotlib's usetex
 us2ascii               Convert date notations from American MM/DD/YYYY to ascii format DD.MM.YYYY hh:mm:ss.
 tail                   Return list with last n lines of file.
 maskgroup              Masks elements in a 1d array gathered in small groups.
@@ -166,7 +151,6 @@ sread                  Reads in string array from ascii file.
 srrasa                 Generates stratified random 2D points within a given rectangular area.
 srrasa_trans           Generates stratified random 2D transects within a given rectangular area.
 tcherkez               Calculates the Tcherkez model of 13C-discrimiantion in the Calvin cycle.
-tee                    Prints arguments on screen and in file.
 timestepcheck          Fills missing time steps in ascii data files
 tsym                   Raw unicodes for common symbols.
 unpack                 Similar to Fortran unpack function with mask.
@@ -179,6 +163,26 @@ xread                  Simultaneous read of float and string array from Excel fi
 yrange                 Calculates plot range from input array.
 zacharias              Soil water content with van Genuchten and Zacharias et al. (2007).
 zacharias_check        Checks validity of parameter set for Zacharias et al. (2007).
+
+
+Deprecated
+----------
+alpha_equ_h2o          Equilibrium fractionation between liquid water and vapour.
+alpha_kin_h2o          Kinetic fractionation of molecular diffusion of water vapour.
+argmax                 Wrapper for numpy.argmax, numpy.ma.argmax, and using max for Python iterables.
+argmin                 Wrapper for numpy.argmin, numpy.ma.argmin, and using min for Python iterables.
+argsort                Wrapper for numpy.argsort, numpy.ma.argsort, and using sorted for Python iterables.
+closest                Index in array which entry is closest to a given number.
+const                  Provides physical, mathematical, computational, and isotope constants.
+div                    Wrapper for division.
+division               Divide two arrays, return 'otherwise' if division by 0.
+elementary_effects     Morris measures mu, stddev and mu*
+functions              Module with common functions that are used in curve_fit or fmin parameter estimations.
+mcPlot                 Matthias Cuntz' standard plotting class.
+morris_sampling        Sampling of optimised trajectories for Morris measures / elementary effects
+screening              Samples trajectories, runs model and returns measures of Morris Elemenary Effects
+str2tex                Convert strings to LaTeX strings in math environement used by matplotlib's usetex
+tee                    Prints arguments on screen and in file.
 
 
 Provided functions and modules per category
@@ -200,10 +204,6 @@ Provided functions and modules per category
 
 Array manipulation
 ------------------
-argmax                 Wrapper for numpy.argmax, numpy.ma.argmax, and using max for Python iterables.
-argmin                 Wrapper for numpy.argmin, numpy.ma.argmin, and using min for Python iterables.
-argsort                Wrapper for numpy.argsort, numpy.ma.argsort, and using sorted for Python iterables.
-closest                Index in array which entry is closest to a given number.
 pack                   Similar to Fortran pack function with mask.
 samevalue              Checks if abs. differences of array values within a certain window are smaller than threshold.
 maskgroup              Masks elements in a 1d array gathered in small groups.
@@ -291,8 +291,6 @@ river_network          a class for creating a river network from a DEM including
 
 Isotopes
 --------
-alpha_equ_h2o          Equilibrium fractionation between liquid water and vapour
-alpha_kin_h2o          Kinetic fractionation of molecular diffusion of water vapour
 cuntz_gleixner         Cuntz-Gleixner model of 13C discrimination.
 delta_isogsm2          Calculate delta values from downloaded IsoGSM2 data.
 get_isogsm2            Get IsoGSM2 output.
@@ -305,26 +303,20 @@ around                 Round to the passed power of ten.
 correlate              Computes the cross-correlation function of two series x and y.
 dag                    Generation and plotting of (connected) directed acyclic graphs with one source node.
 distributions          Module for pdfs of additional distributions.
-div                    Wrapper for division.
-division               Divide two arrays, return 'otherwise' if division by 0.
-elementary_effects     Morris measures mu, stddev and mu*
 ellipse_area           Area of ellipse (or circle)
 errormeasures          Definition of different error measures.
 fftngo                 Fast fourier transformation for dummies (like me)
-functions              Module with common functions that are used in curve_fit or fmin parameter estimations.
 heaviside              Heaviside (or unit step) operator.
 intersection           Intersection of two curves from x,y coordinates.
 jab                    Jackknife-after-Bootstrap error.
 lagcorr                Calculate time lag of maximum or minimum correlation of two arrays.
 lhs                    Latin Hypercube Sampling of any distribution without correlations.
-morris_sampling        Sampling of optimised trajectories for Morris measures / elementary effects
 pareto_metrics         Performance metrics to compare Pareto fronts.
 pi                     Parameter importance index PI or alternatively B index calculation.
 pso                    Particle swarm optimization
 qa                     Module of quality assessment (error) measures.
 saltelli               Parameter sampling for Sobol indices calculation.
 sce                    Shuffle-Complex-Evolution algorithm for function min(max)imisation
-screening              Samples trajectories, runs model and returns measures of Morris Elemenary Effects
 sobol                  Generates Sobol sequences
 sobol_index            Calculates the first-order and total variance-based sensitivity indices.
 
@@ -346,7 +338,6 @@ Miscellaneous
 apply_undef            Use a function on masked arguments.
 astr                   Wrapper for autostring.
 autostring             Format number (array) with given decimal precision.
-const                  Provides physical, mathematical, computational, and isotope constants.
 directories_from_gui   Open directory selection dialogs, returns consecutiveley selected directories
 directory_from_gui     Open directory selection dialog, returns selected directory
 encrypt                Module to encrypt and decrypt text using a key system as well as a cipher.
@@ -358,7 +349,6 @@ ftp                    Module with functions for interacting with an open FTP co
 int2roman              Integer to roman numeral conversion.
 roman2int              Roman numeral to integer conversion.
 sendmail               Send an e-mail.
-tee                    Prints arguments on screen and in file.
 zacharias              Soil water content with van Genuchten and Zacharias et al. (2007).
 zacharias_check        Checks validity of parameter set for Zacharias et al. (2007).
 
@@ -380,14 +370,12 @@ dfgui                  A minimalistic GUI for analyzing Pandas DataFrames based 
 get_brewer             Registers and returns Brewer colormap.
 lat_fmt                Set lat label string (called by Basemap.drawparallels) if LaTeX package clash.
 lon_fmt                Set lon label string (called by Basemap.drawmeridians) if LaTeX package clash.
-mcPlot                 Matthias Cuntz' standard plotting class.
 plot                   Module with code snippets for plotting.
 plot_brewer            Plots available Brewer color maps in pdf file.
 position               Position arrays of subplots to be used with add_axes.
 print_brewer           Prints available Brewer colormap names.
 register_brewer        Registers and registers Brewer colormap.
 signature2plot         Write a copyright notice on a plot.
-str2tex                Convert strings to LaTeX strings in math environement used by matplotlib's usetex
 tsym                   Raw unicodes for common symbols.
 xkcd                   Make plot look handdrawn.
 yrange                 Calculates plot range from input array.
@@ -596,6 +584,8 @@ Modified, Matthias Cuntz, Jul 2009
           Juliane Mai, Feb 2020    - pet_oudin
           Juliane Mai, Feb 2020    - climate_index_knoben
           Matthias Cuntz, Dec 2020 - mcPlot
+          Matthias Cuntz, Oct 2021 - started deprecation
+
 """
 
 # sub-packages without dependencies to rest of jams

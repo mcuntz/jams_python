@@ -177,6 +177,7 @@ from __future__ import division, absolute_import, print_function
               JM, Sep 2014 - color maps of Mathematica
               MC, Oct 2016 - print_brewers outputs sorted lists
               MC, Nov 2016 - ported to Python 3, mostly dict.keys() into list(dict.keys())
+              MC, Nov 2021 - corrected some erroneous names in print routine
 """
 from jams.color import brewer_sequential, brewer_diverging, brewer_qualitative
 from jams.color import oregon_sequential, oregon_diverging, oregon_qualitative
@@ -311,17 +312,17 @@ def print_brewer(names='all'):
         print(pp)
     else:
         print('Sequential color maps')
-        pp = list(brewer_sequential_maps.keys())
+        pp = list(brewer_sequential.keys())
         pp.sort()
         print(pp)
         print('')
         print('Diverging color maps')
-        pp = list(brewer_diverging_maps.keys())
+        pp = list(brewer_diverging.keys())
         pp.sort()
         print(pp)
         print('')
         print('Qualitative color maps')
-        pp = list(brewer_qualitative_maps.keys())
+        pp = list(brewer_qualitative.keys())
         pp.sort()
         print(pp)
         print('')

@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 from __future__ import division, absolute_import, print_function
+from warnings import warn, filterwarnings
+filterwarnings("default", category=DeprecationWarning)
 import numpy as np
 
 
@@ -110,6 +112,8 @@ def alpha_equ_h2o(temp, isotope=None, undef=-9999., eps=False, greater1=True):
     Written,  Matthias Cuntz, Sep 2014
     Modified, Matthias Cuntz, Sep 2021 - code refactoring
     """
+    warn('The function alpha_equ_h2o is deprecated from JAMS. Use module pyjams.',
+         category=DeprecationWarning)
     # Check scalar, list or array
     islist = False
     if isinstance(temp, list):
