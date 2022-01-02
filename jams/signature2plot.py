@@ -2,6 +2,8 @@
 from __future__ import division, absolute_import, print_function
 import numpy as np
 import time
+from warnings import warn, filterwarnings
+filterwarnings("default", category=DeprecationWarning)
 
 def signature2plot(handle, dx=None, dy=None, name=None,
                    small=False, medium=None, large=False,
@@ -24,7 +26,7 @@ def signature2plot(handle, dx=None, dy=None, name=None,
                            usetex=False, mathrm=False,
                            **kwargs):
 
-                     
+
         Input
         -----
         None
@@ -44,7 +46,7 @@ def signature2plot(handle, dx=None, dy=None, name=None,
                     False:   fontstyle='normal' (default)
         usetex      True:    Embed into LaTeX math environment
                     False:   No LaTeX math mode
-        mathrm      True:    If usetex=True, surround by \mathrm{}, \mathit{} it italic=true or \mathbf{} if bold=True
+        mathrm      True:    If usetex=True, surround by \\mathrm{}, \\mathit{} it italic=true or \\mathbf{} if bold=True
                     False:   If usetex=True, standard math font.
         **kwargs             All additional parameters passed to axes.text()
 
@@ -99,7 +101,9 @@ def signature2plot(handle, dx=None, dy=None, name=None,
         -------
         Written,  MC, May 2014 - from abc2plot
     """
-    
+    warn('The function signature2plot is deprecated from JAMS. Use module pyjams.',
+         category=DeprecationWarning)
+
     # Check input
     if medium is None:
         if (small+large) > 1:
@@ -124,7 +128,7 @@ def signature2plot(handle, dx=None, dy=None, name=None,
         dy = None
     else:
         iname = name
-    
+
     # default dx/dy
     xmin, xmax = handle.get_xlim()
     ymin, ymax = handle.get_ylim()
@@ -151,9 +155,9 @@ def signature2plot(handle, dx=None, dy=None, name=None,
         if usetex:
             s1 = r'$\mathrm{\copyright\,'+iname.strip()+'}$'
             if ' ' in s1:
-                s1 = s1.replace(' ', '\,')
+                s1 = s1.replace(' ', r'\,')
             if '&' in s1:
-                s1 = s1.replace('&', '\&')
+                s1 = s1.replace('&', r'\&')
             s2 = r'$\mathrm{CHS/JAMS\, Leipzig,\, '+year+'}$'
         else:
             s1 = r'$\copyright$ '+iname.strip()

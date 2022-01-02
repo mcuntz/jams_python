@@ -40,6 +40,8 @@ The following functions are provided
    fread
 """
 from __future__ import division, absolute_import, print_function
+from warnings import warn, filterwarnings
+filterwarnings("default", category=DeprecationWarning)
 import numpy as np
 
 
@@ -392,6 +394,8 @@ def fread(infile, nc=0, cname=None, skip=0, cskip=0, hskip=0, hstrip=True,
                   - flake8 compatible
                   - preserve trailing whitespace if separated by whitespace
     """
+    warn('The function fread is deprecated from JAMS. Use module pyjams.',
+         category=DeprecationWarning)
     #
     # Open file
     import codecs

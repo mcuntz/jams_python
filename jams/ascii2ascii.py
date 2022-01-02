@@ -37,6 +37,8 @@ The following functions are provided
    eng2ascii
 """
 from __future__ import division, absolute_import, print_function
+from warnings import warn, filterwarnings
+filterwarnings("default", category=DeprecationWarning)
 import numpy as np
 
 
@@ -142,6 +144,8 @@ def ascii2ascii(edate, full=False, en=False, fr=False, us=False, eng=False, YY=F
               Matthias Cuntz, Jun 2019 - eng->en working again
               Matthias Cuntz, May 2020 - numpy docstring format
     """
+    warn('The function ascii2ascii is deprecated from JAMS and superseded by date2date of pyjams.',
+         category=DeprecationWarning)
     if eng: en = True
     assert (en+fr+us <= 1), 'en, fr and us keywords mutually exclusive.'
 

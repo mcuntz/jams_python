@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 from __future__ import division, absolute_import, print_function
 import numpy as np
+from warnings import warn, filterwarnings
+filterwarnings("default", category=DeprecationWarning)
 
 __all__ = ['position']
 
@@ -150,6 +152,8 @@ def position(row=1, col=1, num=1,
                   MC, Apr 2014 - assert
                   ST, Feb 2016 - added height and width
     """
+    warn('The function position is deprecated from JAMS. Use module pyjams.',
+         category=DeprecationWarning)
     #
     # Check
     nplots = row*col

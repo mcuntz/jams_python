@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-from __future__ import division, absolute_import, print_function
 """
     Functions working with colours and producing colour tables.
 
@@ -298,6 +297,10 @@ from __future__ import division, absolute_import, print_function
     -------
     Written,  MC, Mar 2015
 """
+from __future__ import division, absolute_import, print_function
+# from warnings import warn, filterwarnings
+# warn('The module color is deprecated from JAMS. Use module pyjams.',
+#      category=DeprecationWarning)
 
 # UFZ colours
 from .ufz_colours       import ufzdarkblue, ufzblue, ufzlightblue

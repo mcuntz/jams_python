@@ -11,21 +11,15 @@ Get help on each function by typing
 
 Provided functions and modules (alphabetic w/o obsolete functions)
 ------------------------------------------------------------------
-abc2plot               Write a, b, c, ... on plots.
 apply_undef            Use a function on masked arguments.
 area_poly              Area of a polygon.
 around                 Round to the passed power of ten.
-ascii2ascii            Convert date notations between to ascii date format DD.MM.YYYY hh:mm:ss.
-ascii2en               Convert date notations to English date format YYYY-MM-DD hh:mm:ss.
-ascii2fr               Convert date notations to French date format DD/MM/YYYY hh:mm:ss.
-ascii2us               Convert date notations to American date format MM/DD/YYYY hh:mm:ss.
 astr                   Wrapper for autostring.
 autostring             Format number (array) with given decimal precision.
 baseflow               Calculate baseflow from discharge timeseries
 cellarea               Calc areas of grid cells in m^2.
 climate_index_knoben   Determines continuous climate indexes based on Knoben et al. (2018).
 clockplot              The clockplot of mHM.
-color                  Module with color functions for plotting.
 convex_hull            Calculate subset of points that make a convex hull around a set of 2D points.
 correlate              Computes the cross-correlation function of two series x and y.
 cuntz_gleixner         Cuntz-Gleixner model of 13C discrimination.
@@ -44,7 +38,6 @@ eddybox                Module containing Eddy Covaraince utilities, see eddysuit
 eddysuite              Example file for processing Eddy data with eddybox and EddySoft
 ellipse_area           Area of ellipse (or circle)
 encrypt                Module to encrypt and decrypt text using a key system as well as a cipher.
-en2ascii               Convert date notations from English YYYY-MM-DD to ascii date format DD.MM.YYYY hh:mm:ss.
 errormeasures          Definition of different error measures.
 esat                   Calculates the saturation vapour pressure of water/ice.
 fftngo                 Fast fourier transformation for dummies (like me)
@@ -55,15 +48,11 @@ files_from_gui         Open file selection dialog, returns selected files
 fill_nonfinite         Fill missing values by interpolation.
 find_in_path           Look for file in system path.
 Filtered_Incompr_Field Generates random filtered velocity fields.
-fr2ascii               Convert date notations from French DD/MM/YYYT to ascii date format DD.MM.YYYY hh:mm:ss.
-fread                  Reads in float array from ascii file.
-fsread                 Simultaneous read of float and string array from ascii file.
 ftp                    Module with functions for interacting with an open FTP connection.
 fwrite                 Writes an array to ascii file
 gap2lai                Calculation of leaf area index from gap probability observations.
 geoarray               Pythonic gdal wrapper
 get_angle              Returns the angle in radiant from each point in xy1 to each point in xy2.
-get_brewer             Registers and returns Brewer colormap.
 get_era_interim        Download ERA-Interim data suitable to produce MuSICA input data.
 get_era5               Download ERA5 data suitable to produce MuSICA input data.
 get_isogsm2            Get IsoGSM2 output.
@@ -78,7 +67,6 @@ homo_sampling          Generation of homogeneous, randomly distributed points in
 Incompr_Field          Generates random velocity fields.
 in_poly                Determines whether a 2D point falls in a polygon.
 inpoly                 Wrapper for in_poly.
-int2roman              Integer to roman numeral conversion.
 interpol               One-dimensional linear interpolation on first dimension.
 intersection           Intersection of two curves from x,y coordinates.
 jab                    Jackknife-after-Bootstrap error.
@@ -111,9 +99,6 @@ pca                    Principal component analysis (PCA) upon the first dimensi
 pet_oudin              Daily potential evapotranspiration following the Oudin formula.
 pi                     Parameter importance index PI or alternatively B index calculation.
 plot                   Module with code snippets for plotting.
-plot_brewer            Plots available Brewer color maps in pdf file.
-position               Position arrays of subplots to be used with add_axes.
-print_brewer           Prints available Brewer colormap names.
 pritay                 Daily reference evapotranspiration after Priestley & Taylor.
 pso                    Particle swarm optimization
 qa                     Module of quality (error) measures.
@@ -122,10 +107,8 @@ readhdf4               Reads variables or information from hdf4 files.
 readhdf5               Reads variables or information from hdf5 file.
 readnc                 Wrapper for readnetcdf.
 readnetcdf             Reads variables or information from netcdf file.
-register_brewer        Registers and registers Brewer colormap.
 river_network          a class for creating a river network from a DEM including flow direction, flow accumulation and channel order
 rolling                Reshape an array in a "rolling window" style.
-roman2int              Roman numeral to integer conversion.
 rossner                Wrapper for outlier.
 t2sap                  Conversion of temperature difference to sap flux density.
 savitzky_golay         Smooth (and optionally differentiate) 1D data with a Savitzky-Golay filter.
@@ -137,8 +120,6 @@ sendmail               Send an e-mail.
 sg                     Wrapper savitzky_golay.
 sg2d                   Wrapper savitzky_golay2d.
 sigma_filter           Mask values deviating more than z standard deviations from a given function.
-signature2plot         Write a copyright notice on a plot.
-us2ascii               Convert date notations from American MM/DD/YYYY to ascii format DD.MM.YYYY hh:mm:ss.
 tail                   Return list with last n lines of file.
 maskgroup              Masks elements in a 1d array gathered in small groups.
 samevalue              Checks if abs. differences of array values within a certain window are smaller than threshold.
@@ -147,7 +128,6 @@ savez_compressed       Save several arrays into a single file in compressed ``.n
 smax                   Calculating smooth maximum of two numbers
 smin                   Calculating smooth minimum of two numbers
 sobol_index            Calculates the first-order and total variance-based sensitivity indices.
-sread                  Reads in string array from ascii file.
 srrasa                 Generates stratified random 2D points within a given rectangular area.
 srrasa_trans           Generates stratified random 2D transects within a given rectangular area.
 tcherkez               Calculates the Tcherkez model of 13C-discrimiantion in the Calvin cycle.
@@ -167,22 +147,42 @@ zacharias_check        Checks validity of parameter set for Zacharias et al. (20
 
 Deprecated
 ----------
+abc2plot               Write a, b, c, ... on plots.
 alpha_equ_h2o          Equilibrium fractionation between liquid water and vapour.
 alpha_kin_h2o          Kinetic fractionation of molecular diffusion of water vapour.
 argmax                 Wrapper for numpy.argmax, numpy.ma.argmax, and using max for Python iterables.
 argmin                 Wrapper for numpy.argmin, numpy.ma.argmin, and using min for Python iterables.
 argsort                Wrapper for numpy.argsort, numpy.ma.argsort, and using sorted for Python iterables.
+ascii2ascii            Convert date notations between to ascii date format DD.MM.YYYY hh:mm:ss.
+ascii2en               Convert date notations to English date format YYYY-MM-DD hh:mm:ss.
+ascii2fr               Convert date notations to French date format DD/MM/YYYY hh:mm:ss.
+ascii2us               Convert date notations to American date format MM/DD/YYYY hh:mm:ss.
 closest                Index in array which entry is closest to a given number.
+color                  Module with color functions for plotting.
 const                  Provides physical, mathematical, computational, and isotope constants.
 div                    Wrapper for division.
 division               Divide two arrays, return 'otherwise' if division by 0.
 elementary_effects     Morris measures mu, stddev and mu*
+en2ascii               Convert date notations from English YYYY-MM-DD to ascii date format DD.MM.YYYY hh:mm:ss.
+fr2ascii               Convert date notations from French DD/MM/YYYT to ascii date format DD.MM.YYYY hh:mm:ss.
+fread                  Reads in float array from ascii file.
+fsread                 Simultaneous read of float and string array from ascii file.
 functions              Module with common functions that are used in curve_fit or fmin parameter estimations.
+get_brewer             Registers and returns Brewer colormap.
+int2roman              Integer to roman numeral conversion.
 mcPlot                 Matthias Cuntz' standard plotting class.
 morris_sampling        Sampling of optimised trajectories for Morris measures / elementary effects
+plot_brewer            Plots available Brewer color maps in pdf file.
+position               Position arrays of subplots to be used with add_axes.
+print_brewer           Prints available Brewer colormap names.
+register_brewer        Registers and registers Brewer colormap.
+roman2int              Roman numeral to integer conversion.
 screening              Samples trajectories, runs model and returns measures of Morris Elemenary Effects
+signature2plot         Write a copyright notice on a plot.
+sread                  Reads in string array from ascii file.
 str2tex                Convert strings to LaTeX strings in math environement used by matplotlib's usetex
 tee                    Prints arguments on screen and in file.
+us2ascii               Convert date notations from American MM/DD/YYYY to ascii format DD.MM.YYYY hh:mm:ss.
 
 
 Provided functions and modules per category
@@ -215,12 +215,9 @@ unpack                 Similar to Fortran unpack function with mask.
 
 Ascii files
 -----------
-fread                  Reads in float array from ascii file.
-fsread                 Simultaneous read of float and string array from ascii file.
 fwrite                 Writes an array to ascii file
 head                   Return list with first n lines of file.
 lif                    Count number of lines in file.
-sread                  Reads in string array from ascii file.
 tail                   Return list with last n lines of file.
 
 
@@ -259,15 +256,8 @@ timestepcheck          Fills missing time steps in ascii data files
 
 Date & Time
 -----------
-ascii2ascii            Convert date notations to ascii date format DD.MM.YYYY hh:mm:ss
-ascii2en               Convert date notations to English date format YYYY-MM-DD hh:mm:ss.
-ascii2fr               Convert date notations to French date format DD/MM/YYYY hh:mm:ss.
-ascii2us               Convert date notations to American date format MM/DD/YYYY hh:mm:ss.
 date2dec               Converts arrays with calendar date to decimal date.
 dec2date               Converts arrays with decimal date to calendar date.
-en2ascii               Convert date notations from English YYYY-MM-DD to ascii date format DD.MM.YYYY hh:mm:ss.
-fr2ascii               Convert date notations from French DD/MM/YYYY to ascii date format DD.MM.YYYY hh:mm:ss.
-us2ascii               Convert date notations from American MM/DD/YYYY to ascii format DD.MM.YYYY hh:mm:ss.
 
 
 Grids / Polygons
@@ -346,8 +336,6 @@ file_from_gui          Open file selection dialog for one single file, returns s
 files_from_gui         Open file selection dialog, returns selected files
 find_in_path           Look for file in system path.
 ftp                    Module with functions for interacting with an open FTP connection.
-int2roman              Integer to roman numeral conversion.
-roman2int              Roman numeral to integer conversion.
 sendmail               Send an e-mail.
 zacharias              Soil water content with van Genuchten and Zacharias et al. (2007).
 zacharias_check        Checks validity of parameter set for Zacharias et al. (2007).
@@ -363,19 +351,11 @@ leafmodel              Model to compute photosynthesis and stomatal conductance 
 
 Plotting
 --------
-abc2plot               Write a, b, c, ... on plots.
 clockplot              The clockplot of mHM.
-color                  Module with color functions for plotting.
 dfgui                  A minimalistic GUI for analyzing Pandas DataFrames based on wxPython.
-get_brewer             Registers and returns Brewer colormap.
 lat_fmt                Set lat label string (called by Basemap.drawparallels) if LaTeX package clash.
 lon_fmt                Set lon label string (called by Basemap.drawmeridians) if LaTeX package clash.
 plot                   Module with code snippets for plotting.
-plot_brewer            Plots available Brewer color maps in pdf file.
-position               Position arrays of subplots to be used with add_axes.
-print_brewer           Prints available Brewer colormap names.
-register_brewer        Registers and registers Brewer colormap.
-signature2plot         Write a copyright notice on a plot.
 tsym                   Raw unicodes for common symbols.
 xkcd                   Make plot look handdrawn.
 yrange                 Calculates plot range from input array.

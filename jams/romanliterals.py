@@ -1,6 +1,4 @@
 #!/usr/bin/env python
-from __future__ import division, absolute_import, print_function
-import numpy as np
 """
         Convert integer to and from roman numerals.
 
@@ -50,8 +48,14 @@ import numpy as np
         Modified, MC, Feb 2013 - ported to Python 3
                   MC, Apr 2014 - assert
 """
+from __future__ import division, absolute_import, print_function
+import numpy as np
+from warnings import warn, filterwarnings
+filterwarnings("default", category=DeprecationWarning)
+
 
 __all__ = ['int2roman', 'roman2int']
+
 
 numeral_map = list(zip((1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1),
                   ('M', 'CM', 'D', 'CD', 'C', 'XC', 'L', 'XL', 'X', 'IX', 'V', 'IV', 'I')))
@@ -142,6 +146,8 @@ def int2roman(i, lower=False):
                   MC, Feb 2013 - ported to Python 3
                   MC, Apr 2014 - assert
     """
+    warn('The function int2roman is deprecated from JAMS. Use module pyjams.',
+         category=DeprecationWarning)
     assert i >= 1, 'integer must be > 0.'
     result = []
     for integer, numeral in numeral_map:
@@ -227,6 +233,8 @@ def roman2int(n):
                                  http://code.activestate.com/recipes/81611-roman-numerals
         Modified, MC, Feb 2013 - ported to Python 3
     """
+    warn('The function roman2int is deprecated from JAMS. Use module pyjams.',
+         category=DeprecationWarning)
     n = str(n).upper()
     i = result = 0
     for integer, numeral in numeral_map:

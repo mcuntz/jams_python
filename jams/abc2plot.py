@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 from __future__ import division, absolute_import, print_function
 from jams.romanliterals import int2roman
+from warnings import warn, filterwarnings
+filterwarnings("default", category=DeprecationWarning)
 
 
 __all__ = ['abc2plot']
@@ -73,7 +75,7 @@ def abc2plot(handle, dx, dy, iplot,
                     False:   fontstyle='normal' (default)
         usetex      True:    Embed into LaTeX math environment
                     False:   No LaTeX math mode
-        mathrm      True:    If usetex=True, surround by \mathrm{}, \mathit{} it italic=true or \mathbf{} if bold=True
+        mathrm      True:    If usetex=True, surround by \\mathrm{}, \\mathit{} it italic=true or \\mathbf{} if bold=True
                     False:   If usetex=True, standard math font.
         string      True:    Treat iplot as literal string and not as number. integer, roman and lower are disabled.
                     False:   iplot is integer (default)
@@ -130,7 +132,7 @@ def abc2plot(handle, dx, dy, iplot,
                   MC, Feb 2013 - ported to Python 3
                   MC, Feb 2013 - opening and closing parenthesis, brackets and braces
                   MC, Feb 2013 - usetex, mathrm
-                  MC, Oct 2013 - \mathbf, large, default medium
+                  MC, Oct 2013 - \\mathbf, large, default medium
                   MC, Nov 2013 - string, corrected medium default
                                - usetex works with fontsize keyword of axis.text() now (matplotlib v1.1.0)
                   MC, Feb 2014 - if medium is not None then small or large must be set
@@ -139,6 +141,8 @@ def abc2plot(handle, dx, dy, iplot,
                                - italic
                   MC, Oct 2015 - xlarge, xxlarge, xsmall, xxsmall
     """
+    warn('The function abc2plot is deprecated from JAMS. Use module pyjams.',
+         category=DeprecationWarning)
     # Check input
     assert (roman+integer) < 2, 'either roman literals or integers can be chosen.'
     if medium is None:
@@ -223,17 +227,17 @@ def abc2plot(handle, dx, dy, iplot,
     if braces:
         if braces.lower() == 'open':
             if usetex:
-                t = '\{' + t
+                t = r'\{' + t
             else:
                 t = '{' + t
         elif braces.lower() == 'close':
             if usetex:
-                t = t + '\}'
+                t = t + r'\}'
             else:
                 t = t + '}'
         elif braces.lower() == 'both':
             if usetex:
-                t = '\{' + t + '\}'
+                t = r'\{' + t + r'\}'
             else:
                 t = '{' + t + '}'
         elif braces.lower() == 'none':
@@ -244,11 +248,11 @@ def abc2plot(handle, dx, dy, iplot,
     if usetex:
         if mathrm:
             if bold:
-                t = '\mathbf{' + t + '}'
+                t = r'\mathbf{' + t + '}'
             elif italic:
-                t = '\mathit{' + t + '}'
+                t = r'\mathit{' + t + '}'
             else:
-                t = '\mathrm{' + t + '}'
+                t = r'\mathrm{' + t + '}'
         # Works with fontsize keyword now (matplotlib v1.1.0)
         # if small:  t = '\small ' + t
         # if large:  t = '\large ' + t

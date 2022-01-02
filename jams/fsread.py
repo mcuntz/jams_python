@@ -34,6 +34,8 @@ The following functions are provided
    fsread
 """
 from __future__ import division, absolute_import, print_function
+from warnings import warn, filterwarnings
+filterwarnings("default", category=DeprecationWarning)
 import numpy as np
 
 
@@ -76,19 +78,20 @@ def fsread(infile, nc=0, cname=None, snc=0, sname=None, skip=0, cskip=0,
         string columns can be chosen by the values in the first header line;
         must be iterable with strings.
     skip : int, optional
-        number of lines to skip at the beginning of file (default: 0)
+        Number of lines to skip at the beginning of file (default: 0)
     cskip : int, optional
         number of columns to skip at the beginning of each line (default: 0)
     hskip : int, optional
-        number of lines in skip that do not belong to header (default: 0)
+        Number of lines in skip that do not belong to header (default: 0)
     hstrip : bool, optional
         True: strip header cells to match with cname (default: True)
     separator : str, optional
-        column separator. If not given, columns separator are (in order):
+        Column separator. If not given, columns separators are (in order):
         comma (','), semicolon (';'), whitespace.
     comment : iterable, optional
-         line gets excluded if first character of line is in comment sequence.
-         Sequence must be iterable such as string, list and tuple.
+         Line gets excluded if the first non-white character is in comment
+         sequence. Sequence must be iterable such as string, list and tuple,
+         such as '#' or ['#', '!'].
     fill_value : float, optional
          value to fill in float array in empty cells or if not enough columns
          in line and `fill==True` (default: 0).
@@ -120,9 +123,8 @@ def fsread(infile, nc=0, cname=None, snc=0, sname=None, skip=0, cskip=0,
     reform : bool, optional
         Same as squeeze.
     skip_blank : bool, optional
-        True:  continues reading after blank line.
-
-        False: stops reading at first blank line (default).
+        Continues reading after a blank line if True, otherwise stops reading
+        at the first blank line (default).
     fill : bool, optional
         True:  fills in `fill_value` if not enough columns in line.
 
@@ -319,6 +321,8 @@ def fsread(infile, nc=0, cname=None, snc=0, sname=None, skip=0, cskip=0,
                   - flake8 compatible
                   - preserve trailing whitespace if separated by whitespace
     """
+    warn('The function fsread is deprecated from JAMS. Use module pyjams.',
+         category=DeprecationWarning)
 
     # Input error
     if (nc == -1) and (snc == -1):
