@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 from __future__ import division, absolute_import, print_function
+from warnings import warn, filterwarnings
+filterwarnings("default", category=DeprecationWarning)
 import numpy as np
 
 def readnetcdf(file, var='', code=-1, reform=False, squeeze=False,
@@ -169,6 +171,9 @@ def readnetcdf(file, var='', code=-1, reform=False, squeeze=False,
                   ST, Aug 2016 - restricted overwrite to files with only one variable
                   MC, Oct 2016 - do not count dimension variables in variable count for overwrite
     """
+    warn('The function readnetcdf is deprecated from JAMS.'
+         'Use infonetcdf and readnetcdf from the module pyjams.',
+         category=DeprecationWarning)
     try:
         import netCDF4 as nc
     except:

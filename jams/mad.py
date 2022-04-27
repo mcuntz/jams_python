@@ -34,6 +34,8 @@ The following functions are provided
    mad
 """
 from __future__ import division, absolute_import, print_function
+from warnings import warn, filterwarnings
+filterwarnings("default", category=DeprecationWarning)
 import numpy as np
 
 
@@ -193,6 +195,8 @@ def mad(datin, z=7, deriv=0, nozero=False):
                   - nozero, bug in NaN treatment with dim=1
               Matthias Cuntz, May 2020 - numpy docstring format
     """
+    warn('The function mad is deprecated from JAMS. Use module pyjams.',
+         category=DeprecationWarning)
     if nozero:
         idatin = datin.copy()
         ii = np.where(idatin == 0.)[0]

@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 from __future__ import division, absolute_import, print_function
+from warnings import warn, filterwarnings
+filterwarnings("default", category=DeprecationWarning)
 import numpy as np
 import scipy.optimize as opt  # fmin_tnc
 from jams.division import division
@@ -121,6 +123,8 @@ def kernel_regression(x, y, h=None, silverman=False, xout=None):
               Matthias Cuntz, Apr 2014 - assert
               Matthias Cuntz, Sep 2021 - code refactoring
     """
+    warn('The function kernel_regression is deprecated from JAMS.'
+         ' Use module pyjams.', category=DeprecationWarning)
     #
     # Check input
     ss = np.shape(x)
@@ -257,6 +261,8 @@ def kernel_regression_h(x, y, silverman=False):
               Matthias Cuntz, Jan 2018 - bug in _boot_h: x.size->x.shape[0]
               Matthias Cuntz, Sep 2021 - code refactoring
     """
+    warn('The function kernel_regression_h is deprecated from JAMS.'
+         ' Use module pyjams.', category=DeprecationWarning)
     #
     # Check input
     ss = np.shape(x)

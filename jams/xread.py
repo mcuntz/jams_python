@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 from __future__ import division, absolute_import, print_function
+from warnings import warn, filterwarnings
+filterwarnings("default", category=DeprecationWarning)
 import numpy as np
 
 
@@ -255,6 +257,8 @@ def xread(infile, sheet=None, nc=0, cname=None, snc=0, sname=None,
               Matthias Cuntz, Jul 2020 - use openpyxl for xlsx
                                        - flake8
     """
+    warn('The function xread is deprecated from JAMS. Use module pyjams.',
+         category=DeprecationWarning)
     # Input error
     if (nc == -1) and (snc == -1):
         estr  = 'nc and snc must be numbers or list of indices;'

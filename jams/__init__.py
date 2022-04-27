@@ -17,7 +17,6 @@ around                 Round to the passed power of ten.
 astr                   Wrapper for autostring.
 autostring             Format number (array) with given decimal precision.
 baseflow               Calculate baseflow from discharge timeseries
-cellarea               Calc areas of grid cells in m^2.
 climate_index_knoben   Determines continuous climate indexes based on Knoben et al. (2018).
 clockplot              The clockplot of mHM.
 convex_hull            Calculate subset of points that make a convex hull around a set of 2D points.
@@ -39,7 +38,6 @@ eddysuite              Example file for processing Eddy data with eddybox and Ed
 ellipse_area           Area of ellipse (or circle)
 encrypt                Module to encrypt and decrypt text using a key system as well as a cipher.
 errormeasures          Definition of different error measures.
-esat                   Calculates the saturation vapour pressure of water/ice.
 fftngo                 Fast fourier transformation for dummies (like me)
 Field                  Generates random hydraulic conductivity fields.
 files                  Module with file list function.
@@ -71,8 +69,6 @@ interpol               One-dimensional linear interpolation on first dimension.
 intersection           Intersection of two curves from x,y coordinates.
 jab                    Jackknife-after-Bootstrap error.
 jConfigParser          Extended Python ConfigParser.
-kernel_regression      Multi-dimensional non-parametric regression.
-kernel_regression_h    Optimal bandwidth for kernel regression.
 kriging                Krig a surface from a set of 2D points.
 lagcorr                Calculate time lag of maximum or minimum correlation of two arrays.
 lat_fmt                Set lat label string (called by Basemap.drawparallels) if LaTeX package clash.
@@ -85,12 +81,9 @@ line_dev_mask          Maskes elements of an array deviating from a line fit.
 logtools               Module with control file functions of Logtools, the Logger Tools Software of Olaf Kolle.
 lon_fmt                Set lon label string (called by Basemap.drawmeridians) if LaTeX package clash.
 lowess                 Locally linear regression in n dimensions.
-mad                    Median absolute deviation test.
 mat2nc                 Converts Matlab file *.mat into NetCDF *.nc.
 means                  Calculate daily, monthly, yearly, etc. means of data depending on date stamp.
 nc2nc                  Copy netcdf file deleting, renaming, replacing variables and attribues.
-ncread                 Wrapper for readnetcdf.
-netcdfread             Wrapper for readnetcdf.
 netcdf4                Convenience layer around netCDF4
 outlier                Rossner''s extreme standardized deviate outlier test.
 pack                   Similar to Fortran pack function with mask.
@@ -105,8 +98,6 @@ qa                     Module of quality (error) measures.
 readhdf                Reads variables or information from hdf4 and hdf5 files.
 readhdf4               Reads variables or information from hdf4 files.
 readhdf5               Reads variables or information from hdf5 file.
-readnc                 Wrapper for readnetcdf.
-readnetcdf             Reads variables or information from netcdf file.
 river_network          a class for creating a river network from a DEM including flow direction, flow accumulation and channel order
 rolling                Reshape an array in a "rolling window" style.
 rossner                Wrapper for outlier.
@@ -137,9 +128,6 @@ unpack                 Similar to Fortran unpack function with mask.
 volume_poly            Volume of function above a polygon
 writenetcdf            Write netCDF4 file.
 xkcd                   Make plot look handdrawn.
-xlsread                Wrapper for xread.
-xlsxread               Wrapper for xread.
-xread                  Simultaneous read of float and string array from Excel file.
 yrange                 Calculates plot range from input array.
 zacharias              Soil water content with van Genuchten and Zacharias et al. (2007).
 zacharias_check        Checks validity of parameter set for Zacharias et al. (2007).
@@ -157,6 +145,7 @@ ascii2ascii            Convert date notations between to ascii date format DD.MM
 ascii2en               Convert date notations to English date format YYYY-MM-DD hh:mm:ss.
 ascii2fr               Convert date notations to French date format DD/MM/YYYY hh:mm:ss.
 ascii2us               Convert date notations to American date format MM/DD/YYYY hh:mm:ss.
+cellarea               Calc areas of grid cells in m^2.
 closest                Index in array which entry is closest to a given number.
 color                  Module with color functions for plotting.
 const                  Provides physical, mathematical, computational, and isotope constants.
@@ -164,17 +153,25 @@ div                    Wrapper for division.
 division               Divide two arrays, return 'otherwise' if division by 0.
 elementary_effects     Morris measures mu, stddev and mu*
 en2ascii               Convert date notations from English YYYY-MM-DD to ascii date format DD.MM.YYYY hh:mm:ss.
+esat                   Calculates the saturation vapour pressure of water/ice.
 fr2ascii               Convert date notations from French DD/MM/YYYT to ascii date format DD.MM.YYYY hh:mm:ss.
 fread                  Reads in float array from ascii file.
 fsread                 Simultaneous read of float and string array from ascii file.
 functions              Module with common functions that are used in curve_fit or fmin parameter estimations.
 get_brewer             Registers and returns Brewer colormap.
 int2roman              Integer to roman numeral conversion.
+kernel_regression      Multi-dimensional non-parametric regression.
+kernel_regression_h    Optimal bandwidth for kernel regression.
+mad                    Median absolute deviation test.
 mcPlot                 Matthias Cuntz' standard plotting class.
 morris_sampling        Sampling of optimised trajectories for Morris measures / elementary effects
+ncread                 Wrapper for readnetcdf.
+netcdfread             Wrapper for readnetcdf.
 plot_brewer            Plots available Brewer color maps in pdf file.
 position               Position arrays of subplots to be used with add_axes.
 print_brewer           Prints available Brewer colormap names.
+readnc                 Wrapper for readnetcdf.
+readnetcdf             Reads variables or information from netcdf file.
 register_brewer        Registers and registers Brewer colormap.
 roman2int              Roman numeral to integer conversion.
 screening              Samples trajectories, runs model and returns measures of Morris Elemenary Effects
@@ -183,6 +180,9 @@ sread                  Reads in string array from ascii file.
 str2tex                Convert strings to LaTeX strings in math environement used by matplotlib's usetex
 tee                    Prints arguments on screen and in file.
 us2ascii               Convert date notations from American MM/DD/YYYY to ascii format DD.MM.YYYY hh:mm:ss.
+xlsread                Wrapper for xread.
+xlsxread               Wrapper for xread.
+xread                  Simultaneous read of float and string array from Excel file.
 
 
 Provided functions and modules per category
@@ -230,14 +230,11 @@ fill_nonfinite         Fill missing values by interpolation.
 gap2lai                Calculation of leaf projection and leaf area index from gap probability observations.
 interpol               One-dimensional linear interpolation on first dimension.
 kriging                Krig a surface from a set of 2D points.
-kernel_regression      Multi-dimensional non-parametric regression.
-kernel_regression_h    Optimal bandwidth for kernel regression.
 leafprojection         Calculation of leaf projection from leaf angle observations.
 level1                 Module with functions dealing with CHS level1 data files, data and flags.
 line_dev_mask          Mask elements of an array deviating from a line fit.
 logtools               Module with control file functions of Logtools, the Logger Tools Software of Olaf Kolle.
 lowess                 Locally linear regression in n dimensions.
-mad                    Median absolute deviation test.
 means                  Calculate daily, monthly, yearly, etc. means of data depending on date stamp.
 outlier                Rossner''s extreme standardized deviate outlier test.
 pca                    Principal component analysis (PCA) upon the first dimension of an 2D-array.
@@ -263,7 +260,6 @@ dec2date               Converts arrays with decimal date to calendar date.
 Grids / Polygons
 ----------------
 area_poly              Area of a polygon
-cellarea               Calc areas of grid cells in m^2.
 grid_mid2edge          Longitude and latitude grid edges from grid midpoints.
 homo_sampling          Generation of homogeneous, randomly distributed points in a given rectangular area.
 in_poly                Determines whether a 2D point falls in a polygon.
@@ -316,7 +312,6 @@ Meteorology
 climate_index_knoben   Determines continuous climate indexes based on Knoben et al. (2018).
 dewpoint               Calculates the dew point from ambient humidity.
 dielectric_water       Dielectric constant of liquid water.
-esat                   Calculates the saturation vapour pressure of water/ice.
 get_era_interim        Download ERA-Interim data suitable to produce MuSICA input data.
 get_era5               Download ERA5 data suitable to produce MuSICA input data.
 pet_oudin              Daily potential evapotranspiration following the Oudin formula.
@@ -371,20 +366,13 @@ hdf5read               Wrapper for readhdf5.
 jConfigParser          Extended Python ConfigParser.
 mat2nc                 Converts Matlab file *.mat into NetCDF *.nc.
 nc2nc                  Copy netcdf file deleting, renaming, replacing variables and attribues.
-ncread                 Wrapper for readnetcdf.
-netcdfread             Wrapper for readnetcdf.
 netcdf4                Convenience layer around netCDF4
 readhdf                Reads variables or information from hdf4 and hdf5 files.
 readhdf4               Reads variables or information from hdf4 files.
 readhdf5               Reads variables or information from hdf5 file.
-readnc                 Wrapper for readnetcdf.
-readnetcdf             Reads variables or information from netcdf file.
 savez                  Save several numpy arrays into a single file in uncompressed ``.npz`` format.
 savez_compressed       Save several arrays into a single file in compressed ``.npz`` format.
 writenetcdf            Write netCDF4 file.
-xlsread                Wrapper for xread.
-xlsxread               Wrapper for xread.
-xread                  Simultaneous read of float and string array from Excel file.
 
 
 License

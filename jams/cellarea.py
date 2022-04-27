@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 from __future__ import division, absolute_import, print_function
+from warnings import warn, filterwarnings
+filterwarnings("default", category=DeprecationWarning)
 import numpy as np
 
 def cellarea(lat, lon, globe=False):
@@ -83,6 +85,8 @@ def cellarea(lat, lon, globe=False):
                   MC, Apr 2014 - assert
                   MC, Oct 2018 - clip lat because -90,90 give negative area
     """
+    warn('The function cellarea is deprecated from JAMS. Use module pyjams.',
+         category=DeprecationWarning)
     nlat = len(lat)
     assert nlat >= 2, 'at least 2 latitudes must be given'
     nlon = len(lon)

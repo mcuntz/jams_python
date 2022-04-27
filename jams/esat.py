@@ -25,6 +25,8 @@ The following functions are provided
    esat
 """
 from __future__ import division, absolute_import, print_function
+from warnings import warn, filterwarnings
+filterwarnings("default", category=DeprecationWarning)
 import numpy as np
 
 
@@ -152,6 +154,8 @@ def esat(T, liquid=False, formula='GoffGratch'):
               Matthias Cuntz, Apr 2014 - assert
               Matthias Cuntz, May 2020 - numpy docstring format
     """
+    warn('The function esat is deprecated from JAMS. Use module pyjams.',
+         category=DeprecationWarning)
     #
     # Constants
     T0 = 273.15 # Celcius <-> Kelvin [K]
