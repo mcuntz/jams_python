@@ -50,6 +50,8 @@ Released under the MIT License.
 * Removed exec command to make restart work with Python 3,
   May 2020, Matthias Cuntz
 * Code refactoring, Sep 2021, Matthias Cuntz
+* Added keywords args and kwargs to pass to function,
+  Apr 2022, Matthias Cuntz
 
 .. moduleauthor:: Matthias Cuntz
 
@@ -126,7 +128,8 @@ def _SampleInputMatrix(nrows, bl, bu, distname='randomUniform'):
     return x
 
 
-def _cce(func, s, sf, bl, bu, mask, icall, maxn, alpha, beta, maxit, printit):
+def _cce(func, s, sf, bl, bu, mask, icall, maxn, alpha, beta, maxit, printit,
+         args=(), kwargs={}):
     """
     Generate a new point in a simplex
 
@@ -157,7 +160,10 @@ def _cce(func, s, sf, bl, bu, mask, icall, maxn, alpha, beta, maxit, printit):
         if True: maximise instead of minimize func
     printit
         if 1: print each function evaluation
-
+    args : tuple, optional
+        Extra arguments passed to the function *func*
+    kwargs : dict, optional
+        Extra keyword arguments passed to the function *func*
 
     Optional Input
     --------------
@@ -188,6 +194,7 @@ def _cce(func, s, sf, bl, bu, mask, icall, maxn, alpha, beta, maxit, printit):
             - changed indentation of random point last resort
             - fixed masked values that were always out of bounds
         Matthias Cuntz, May 2020 - underscore before function name
+        Matthias Cuntz, Apr 2022 - args and kwargs passed to function
     """
 
     """
@@ -234,7 +241,7 @@ def _cce(func, s, sf, bl, bu, mask, icall, maxn, alpha, beta, maxit, printit):
         snew = _SampleInputMatrix(1, bl, bu, distname='randomUniform')[0]
         snew = np.where(mask, snew, sb)
 
-    fuc = func(snew)
+    fuc = func(snew, *args, **kwargs)
     fnew = -fuc if maxit else fuc
     icall += 1
     if printit == 1:
@@ -244,7 +251,7 @@ def _cce(func, s, sf, bl, bu, mask, icall, maxn, alpha, beta, maxit, printit):
     if fnew > fw:
         snew = sw + beta * (ce - sw)
         snew = np.where(mask, snew, sb)
-        fuc = func(snew)
+        fuc = func(snew, *args, **kwargs)
         fnew = -fuc if maxit else fuc
         icall += 1
         if printit == 1:
@@ -254,7 +261,7 @@ def _cce(func, s, sf, bl, bu, mask, icall, maxn, alpha, beta, maxit, printit):
     if fnew > fw:
         snew = _SampleInputMatrix(1, bl, bu, distname='randomUniform')[0]
         snew = np.where(mask, snew, sb)
-        fuc = func(snew)
+        fuc = func(snew, *args, **kwargs)
         fnew = -fuc if maxit else fuc
         icall += 1
         if printit == 1:
@@ -272,7 +279,8 @@ def sce(func, x0, bl, bu,
         alpha=0.8, beta=0.45, maxit=False, printit=2,
         outf=False, outhist=False, outcall=False,
         restart=False, restartfile1='sce.restart.npz',
-        restartfile2='sce.restart.txt'):
+        restartfile2='sce.restart.txt',
+        args=(), kwargs={}):
     """
     Shuffled-Complex-Evolution algorithm for function minimization
 
@@ -352,6 +360,10 @@ def sce(func, x0, bl, bu,
     restartfile2 : int, optional
         Filename for saving state of SCE, non-array variables
         (default: `sce.restart.txt`)
+    args : tuple, optional
+        Extra arguments passed to the function *func*
+    kwargs : dict, optional
+        Extra keyword arguments passed to the function *func*
 
     Returns
     -------
@@ -443,6 +455,7 @@ def sce(func, x0, bl, bu,
               Matthias Cuntz, May 2020
                   - removed exec commands for read/write of restart files
                   - use numpy.savez_compressed to be independent of JAMS
+              Matthias Cuntz, Apr 2022 - args and kwargs passed to function
     """
 
     """
@@ -514,7 +527,7 @@ def sce(func, x0, bl, bu,
         icall = 0
         xf = np.zeros(npt)
         for i in range(npt):
-            fuc = func(x[i, :])
+            fuc = func(x[i, :], *args, **kwargs)
             xf[i] = -fuc if maxit else fuc
             icall += 1
             if printit == 1:
@@ -669,7 +682,8 @@ def sce(func, x0, bl, bu,
                 large = 1.1 * large if large > 0. else 0.9 * large
 
                 snew, fnew, icall = _cce(func, s, sf, bl, bu, mask, icall,
-                                         maxn, alpha, beta, maxit, printit)
+                                         maxn, alpha, beta, maxit, printit,
+                                         args=args, kwargs=kwargs)
                 # Replace the worst point in Simplex with the new point:
                 s[-1, :] = snew
                 sf[-1]   = fnew
@@ -792,7 +806,7 @@ if __name__ == '__main__':
     doctest.testmod(optionflags=doctest.NORMALIZE_WHITESPACE)
 
     # maxn = 10000
-    # from jams.functions import ackley, griewank, goldstein_price, rastrigin, rosenbrock, six_hump_camelback
+    # from pyjams.functions import ackley, griewank, goldstein_price, rastrigin, rosenbrock, six_hump_camelback
     # np.random.seed(1023)
     # """
     # This is the Ackley Function
@@ -861,7 +875,7 @@ if __name__ == '__main__':
     # print('Six_hump_camelback ', bestx, bestf)
 
     # # Restart
-    # from jams.functions import rosenbrock
+    # from pyjams.functions import rosenbrock
     # maxn = 500
     # npara = 2
     # lb = -2*np.ones(npara)
