@@ -39,6 +39,9 @@ The following functions are provided
    dec2date
 """
 from __future__ import division, absolute_import, print_function
+from __future__ import division, absolute_import, print_function
+from warnings import warn, filterwarnings
+filterwarnings("default", category=DeprecationWarning)
 import numpy as np
 
 
@@ -360,6 +363,8 @@ def dec2date(indata, calendar='standard', refdate=None, units=None,
              Matthias Cuntz, May 2021 - rm np.int and np.float
                                       - (almost) flake8 compatible
     """
+    warn('The function dec2date is deprecated from JAMS and superseded by'
+         ' num2date/dec2date of pyjams.', category=DeprecationWarning)
     #
     # Constants
     calendars = ['standard', 'gregorian', 'julian', 'proleptic_gregorian',

@@ -28,8 +28,6 @@ directories_from_gui   Open directory selection dialogs, returns consecutiveley 
 directory_from_gui     Open directory selection dialog, returns selected directory.
 delta_isogsm2          Calculate delta values from downloaded IsoGSM2 data.
 dewpoint               Calculates the dew point from ambient humidity.
-date2dec               Converts arrays with calendar date to decimal date.
-dec2date               Converts arrays with decimal date to calendar date.
 dfgui                  A minimalistic GUI for analyzing Pandas DataFrames based on wxPython.
 distributions          Module for pdfs of additional distributions.
 dumpnetcdf             Convenience function for writenetcdf
@@ -149,6 +147,8 @@ cellarea               Calc areas of grid cells in m^2.
 closest                Index in array which entry is closest to a given number.
 color                  Module with color functions for plotting.
 const                  Provides physical, mathematical, computational, and isotope constants.
+date2dec               Converts arrays with calendar date to decimal date.
+dec2date               Converts arrays with decimal date to calendar date.
 div                    Wrapper for division.
 division               Divide two arrays, return 'otherwise' if division by 0.
 elementary_effects     Morris measures mu, stddev and mu*
@@ -190,7 +190,6 @@ Provided functions and modules per category
     Array manipulation
     Ascii files
     Data processing
-    Date & Time
     Grids / Polygons
     Hydrology
     Isotopes
@@ -249,12 +248,6 @@ sigma_filter           Mask values deviating more than z standard deviations fro
 srrasa                 Generates stratified random 2D points within a given rectangular area.
 srrasa_trans           Generates stratified random 2D transects within a given rectangular area.
 timestepcheck          Fills missing time steps in ascii data files
-
-
-Date & Time
------------
-date2dec               Converts arrays with calendar date to decimal date.
-dec2date               Converts arrays with decimal date to calendar date.
 
 
 Grids / Polygons
