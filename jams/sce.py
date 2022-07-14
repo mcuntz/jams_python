@@ -52,6 +52,7 @@ Released under the MIT License.
 * Code refactoring, Sep 2021, Matthias Cuntz
 * Added keywords args and kwargs to pass to function,
   Apr 2022, Matthias Cuntz
+* Different sampling of input parameters, Jul 2022, Matthias Cuntz
 
 .. moduleauthor:: Matthias Cuntz
 
@@ -68,7 +69,7 @@ import numpy as np
 __all__ = ['sce']
 
 
-def _SampleInputMatrix(nrows, bl, bu, distname='randomUniform'):
+def _SampleInputMatrix(nrows, bl, bu, rnd, sampling='half-open'):
     """
     Create input parameter matrix (nrows,npars) for
     nrows simulations and npars parameters with bounds bl and bu
@@ -82,13 +83,22 @@ def _SampleInputMatrix(nrows, bl, bu, distname='randomUniform'):
         (npars) lower bounds of parameters
     bu
         (npars) upper bounds of parameters
+    rnd
+        RandomState instance
 
 
     Optional Input
     --------------
-    distname
-        initial sampling distribution (not implemented yet,
-        takes uniform distribution)
+    sampling
+        string or (npars) list of strings of options for sampling
+        random numbers. Options can be
+        'half-open': same as 'right-half-open' (default)
+        'left-half-open': sample random floats in half-open interval (bl, bu]
+        'right-half-open': sample random floats in half-open interval [bl, bu)
+        'open': sample random floats in open interval (bl, bu)
+        'log': sample half-open interval [log(bl), log(bu)),
+               which samples better intervals spanning orders or magnitude
+               such as bl=10^-9 and bu=10^-4
 
 
     Output
@@ -108,28 +118,78 @@ def _SampleInputMatrix(nrows, bl, bu, distname='randomUniform'):
     -------
     Written, Q. Duan, Sep 2004
     Modified,
-        S. Van Hoey 2011
-            - ported to Python
+        S. Van Hoey 2011 - ported to Python
         Matthias Cuntz, Oct 2013
             - adapted to JAMS package and sync with JAMS Fortran version
         Matthias Cuntz, Mar 2018
             - removed npars from call, get it from lower boundary
-        Matthias Cuntz, May 2020
-            - underscore before function name
+        Matthias Cuntz, May 2020 - underscore before function name
+        Matthias Cuntz, Jul 2022 - pass RandomState
+        Matthias Cuntz, Jul 2022 - sampling
+
     """
     npars = len(bl)
+    if isinstance(sampling, str):
+        isampling = [sampling] * npars
+    else:
+        isampling = sampling
+    assert len(isampling) == npars, (
+        f'sampling must be string or list of strings'
+        f' with {npars} entries')
     x = np.zeros((nrows, npars))
     bound = bu - bl
     for i in range(nrows):
-        # only used in full Vhoeys-framework
-        # x[i, :]= bl + DistSelector([0.0, 1.0, npars],
-        #                            distname='randomUniform') * bound
-        x[i, :] = bl + np.random.rand(1, npars) * bound
+        irnd = rnd.random_sample(npars)
+        for j in range(npars):
+            opt = isampling[j].lower()
+            if opt == 'half-open':
+                x[i, j] = bl[j] + irnd[j] * bound[j]
+            elif opt == 'left-half-open':
+                irnd[j] = 1. - irnd[j]
+                x[i, j] = bl[j] + irnd[j] * bound[j]
+            elif opt == 'right-half-open':
+                x[i, j] = bl[j] + irnd[j] * bound[j]
+            elif opt == 'open':
+                iirnd = irnd[j]
+                while not (iirnd > 0.):
+                    iirnd = rnd.random_sample(1)
+                x[i, j] = bl[j] + iirnd * bound[j]
+            elif opt == 'log':
+                # x must be > 0. for ln(x)
+                xshift = 0.
+                xmul = 1.
+                if (bl[j] * bu[j]) < 0.:
+                    # bl < 0, bu > 0 -> shift to > 0
+                    xshift = np.maximum(np.abs(bl[j]), np.abs(bu[j]))
+                elif (bl[j] < 0.) or (bu[j] < 0.):
+                    # (bl =< 0 and bu =< 0) -> shift to > 0
+                    xmul = -1.
+                if (bl[j] * bu[j]) == 0.:
+                    if bl[j] == 0.:
+                        # (bl == 0 and bu > 0) -> shift to [bu, 2*bu)
+                        xshift = bu[j]
+                    if bu[j] == 0.:
+                        # (bl < 0 and bu == 0) -> shift to [2*bl, bl) < 0.
+                        # but xmul==-1
+                        xshift = bl[j]  # < 0
+                        assert xmul == -1., (
+                            'wrong logic in sampling option log')
+                lnbl = np.log((bl[j] + xshift) * xmul)
+                lnbu = np.log((bu[j] + xshift) * xmul)
+                x[i, j] = (np.exp(lnbl +
+                                  irnd[j] * (lnbu - lnbl)) -
+                           xshift) * xmul
+            else:
+                raise ValueError(f'unknown sampling option {isampling[j]}.\n'
+                                 f'Known samplings are: half-open,'
+                                 f' left-half-open, right-half-open, open,'
+                                 f' log')
+
     return x
 
 
-def _cce(func, s, sf, bl, bu, mask, icall, maxn, alpha, beta, maxit, printit,
-         args=(), kwargs={}):
+def _cce(func, s, sf, bl, bu, mask, sampling, icall, maxn, alpha, beta,
+         maxit, printit, rnd, args=(), kwargs={}):
     """
     Generate a new point in a simplex
 
@@ -148,6 +208,16 @@ def _cce(func, s, sf, bl, bu, mask, icall, maxn, alpha, beta, maxit, printit,
         upper bounds of parameters
     mask              (npars)
         mask to include (1) or exclude (0) parameter from optimisation
+    sampling
+        string or (npars) list of strings of options for sampling
+        random numbers. Options can be
+        'half-open': same as 'right-half-open' (default)
+        'left-half-open': sample random floats in half-open interval (bl, bu]
+        'right-half-open': sample random floats in half-open interval [bl, bu)
+        'open': sample random floats in open interval (bl, bu)
+        'log': sample half-open interval [log(bl), log(bu)),
+               which samples better intervals spanning orders or magnitude
+               such as bl=10^-9 and bu=10^-4
     icall
         counter of function calls
     maxn
@@ -160,14 +230,16 @@ def _cce(func, s, sf, bl, bu, mask, icall, maxn, alpha, beta, maxit, printit,
         if True: maximise instead of minimize func
     printit
         if 1: print each function evaluation
+    rnd
+        RandomState instance
+
+
+    Optional Input
+    --------------
     args : tuple, optional
         Extra arguments passed to the function *func*
     kwargs : dict, optional
         Extra keyword arguments passed to the function *func*
-
-    Optional Input
-    --------------
-    None
 
 
     Output
@@ -195,6 +267,9 @@ def _cce(func, s, sf, bl, bu, mask, icall, maxn, alpha, beta, maxit, printit,
             - fixed masked values that were always out of bounds
         Matthias Cuntz, May 2020 - underscore before function name
         Matthias Cuntz, Apr 2022 - args and kwargs passed to function
+        Matthias Cuntz, Jul 2022 - pass RandomState
+        Matthias Cuntz, Jul 2022 - sampling
+
     """
 
     """
@@ -211,7 +286,7 @@ def _cce(func, s, sf, bl, bu, mask, icall, maxn, alpha, beta, maxit, printit,
     """
     # Assign the best and worst points:
     sb = s[0, :]
-    fb = sf[0]
+    # fb = sf[0]
     sw = s[-1, :]
     fw = sf[-1]
 
@@ -238,7 +313,7 @@ def _cce(func, s, sf, bl, bu, mask, icall, maxn, alpha, beta, maxit, printit,
         ibound = 2
 
     if ibound >= 1:
-        snew = _SampleInputMatrix(1, bl, bu, distname='randomUniform')[0]
+        snew = _SampleInputMatrix(1, bl, bu, rnd, sampling=sampling)[0]
         snew = np.where(mask, snew, sb)
 
     fuc = func(snew, *args, **kwargs)
@@ -259,7 +334,7 @@ def _cce(func, s, sf, bl, bu, mask, icall, maxn, alpha, beta, maxit, printit,
 
     # Both reflection and contraction have failed, attempt a random point;
     if fnew > fw:
-        snew = _SampleInputMatrix(1, bl, bu, distname='randomUniform')[0]
+        snew = _SampleInputMatrix(1, bl, bu, rnd, sampling=sampling)[0]
         snew = np.where(mask, snew, sb)
         fuc = func(snew, *args, **kwargs)
         fnew = -fuc if maxit else fuc
@@ -273,6 +348,7 @@ def _cce(func, s, sf, bl, bu, mask, icall, maxn, alpha, beta, maxit, printit,
 
 def sce(func, x0, bl, bu,
         mask=None,
+        sampling='half-open',
         maxn=1000, kstop=10, pcento=0.0001,
         ngs=2, npg=None, nps=None, nspl=None, mings=None,
         peps=0.001, seed=None, iniflg=True,
@@ -300,6 +376,19 @@ def sce(func, x0, bl, bu,
         (default: include all parameters).
 
         'nopt = sum(mask)`
+    sampling : string or array_like of strings, optional
+        Options for sampling random numbers. Options can be:
+        'half-open': same as 'right-half-open' (default)
+
+        'left-half-open': sample random floats in half-open interval (bl, bu]
+
+        'right-half-open': sample random floats in half-open interval [bl, bu)
+
+        'open': sample random floats in open interval (bl, bu)
+
+        'log': sample half-open interval [log(bl), log(bu)), which samples
+        better intervals spanning orders or magnitude such as
+        bl=10^-9 and bu=10^-4
     maxn : int, optional
         Maximum number of function evaluations allowed during minimization
         (default: 1000).
@@ -405,7 +494,9 @@ def sce(func, x0, bl, bu,
     >>> bl = np.array([-5.,-2.])
     >>> bu = np.array([5.,8.])
     >>> x0 = np.array([-2.,7.])
-    >>> bestx, bestf, icall = sce(rosen, x0, bl, bu, seed=1, maxn=1000, outf=True, outcall=True, printit=2, restartfile1=None)
+    >>> bestx, bestf, icall = sce(
+    ...     rosen, x0, bl, bu, seed=1, maxn=1000, outf=True, outcall=True,
+    ...     printit=2, restartfile1=None)
     >>> print(icall)
     298
     >>> print('{:.3f}'.format(bestf))
@@ -415,11 +506,11 @@ def sce(func, x0, bl, bu,
     >>> bl = np.ones((10))*(-5.)
     >>> bu = np.ones((10))*(5.)
     >>> x0 = np.ones((10))*(0.5)
-    >>> bestx, bestf, icall = sce(rosen, x0, bl, bu,
-    ...                           maxn=30000, kstop=10, pcento=0.0001, seed=12358,
-    ...                           ngs=5, npg=5*nopt+1, nps=nopt+1, nspl=5*nopt+1, mings=2,
-    ...                           iniflg=True, printit=2, alpha=0.8, beta=0.45,
-    ...                           outf=True, outcall=True, restartfile1=None)
+    >>> bestx, bestf, icall = sce(
+    ...     rosen, x0, bl, bu, maxn=30000, kstop=10, pcento=0.0001, seed=12358,
+    ...     ngs=5, npg=5*nopt+1, nps=nopt+1, nspl=5*nopt+1, mings=2,
+    ...     iniflg=True, printit=2, alpha=0.8, beta=0.45,
+    ...     outf=True, outcall=True, restartfile1=None)
     >>> print(icall)
     30228
     >>> print('{:.3g}'.format(bestf))
@@ -456,6 +547,9 @@ def sce(func, x0, bl, bu,
                   - removed exec commands for read/write of restart files
                   - use numpy.savez_compressed to be independent of JAMS
               Matthias Cuntz, Apr 2022 - args and kwargs passed to function
+              Matthias Cuntz, Jul 2022 - pass RandomState between routines
+              Matthias Cuntz, Jul 2022 - sampling
+
     """
 
     """
@@ -487,11 +581,11 @@ def sce(func, x0, bl, bu,
         if mask is None:
             mask = np.ones(nn, dtype=bool)
         nopt = np.sum(mask)
-        if npg   is None:
+        if npg is None:
             npg   = 2 * nopt + 1
-        if nps   is None:
+        if nps is None:
             nps   = nopt + 1
-        if nspl  is None:
+        if nspl is None:
             nspl  = 2 * nopt + 1
         if mings is None:
             mings = ngs
@@ -509,7 +603,7 @@ def sce(func, x0, bl, bu,
         bound = bu - bl
 
         # Seed random number generator
-        np.random.seed(seed=seed)
+        rnd = np.random.RandomState(seed=seed)
 
         # degenerated bounds
         if np.any(bound <= 0.):
@@ -518,7 +612,7 @@ def sce(func, x0, bl, bu,
         large = 0.5 * np.finfo(float).max
 
         # Create an initial population to fill array x(npt,nn):
-        x = _SampleInputMatrix(npt, bl, bu, distname='randomUniform')
+        x = _SampleInputMatrix(npt, bl, bu, rnd, sampling=sampling)
         for i in range(npt):
             x[i, :] = np.where(mask, x[i, :], x0)
         if iniflg == 1:
@@ -552,11 +646,12 @@ def sce(func, x0, bl, bu,
         allbestf = bestf
         allbestx = bestx
 
-        # Compute the standard deviation for each parameter
-        xnstd = np.std(x, axis=0)
+        # # Compute the standard deviation for each parameter
+        # xnstd = np.std(x, axis=0)
 
         # Computes the normalized geometric range of the parameters
-        # gnrng = np.exp(np.mean(np.log((np.max(x,axis=0)-np.min(x,axis=0))/bound)))
+        # gnrng = np.exp(
+        #     np.mean(np.log((np.max(x,axis=0)-np.min(x,axis=0))/bound)))
         rrange = (np.ma.array(x.max(axis=0) - x.min(axis=0), mask=~mask) /
                   np.ma.array(bound, mask=~mask))
         gnrng  = np.ma.exp(np.ma.mean(np.ma.log(rrange)))
@@ -572,12 +667,14 @@ def sce(func, x0, bl, bu,
         # Check for convergence
         if icall >= maxn:
             if printit < 2:
-                print('Optimisation terminated because trial number {:d} '
-                      'reached maximum number of trials {:d} at the initial loop.'.format(maxn,icall))
+                print('Optimisation terminated because trial number {:d}'
+                      ' reached maximum number of trials {:d} at the'
+                      ' initial loop.'.format(maxn, icall))
 
         if gnrng < peps:
             if printit < 2:
-                print('The population has converged to a small parameter space {:f} (<{:f}).'.format(gnrng, peps))
+                print('The population has converged to a small parameter'
+                      ' space {:f} (<{:f}).'.format(gnrng, peps))
 
         # Begin evolution loops:
         nloop  = 0
@@ -586,7 +683,7 @@ def sce(func, x0, bl, bu,
 
         # save restart
         if restartfile1 is not None:
-            rs1, rs2, rs3, rs4, rs5 = np.random.get_state()
+            rs1, rs2, rs3, rs4, rs5 = rnd.get_state()
             # Only arrays with savez_compressed - restartfile1
             savez_compressed(restartfile1,
                              bl=bl, bu=bu, bound=bound, mask=mask,
@@ -633,7 +730,8 @@ def sce(func, x0, bl, bu,
         maxit = bool(strtobool(p2.readline().rstrip()))
         rs1 = p2.readline().rstrip()
         p2.close()
-        np.random.set_state((rs1, rs2, rs3, rs4, rs5))
+        rnd = np.random.RandomState(seed=seed)
+        rnd.set_state((rs1, rs2, rs3, rs4, rs5))
 
     # Outer Loop
     while icall < maxn and gnrng > peps and criter_change > pcento:
@@ -659,11 +757,13 @@ def sce(func, x0, bl, bu,
                 lcs[0] = 1
                 for k3 in range(1, nps):
                     for i in range(1000):
-                        # lpos = 1 + int(np.floor(npg+0.5-np.sqrt((npg+0.5)**2 - npg*(npg+1)*np.random.random())))
+                        # lpos = 1 + int(np.floor(
+                        #    npg + 0.5 -
+                        # np.sqrt((npg+0.5)**2 - npg*(npg+1)*rnd.random())))
                         lpos = int(np.floor(npg + 0.5 -
                                             np.sqrt((npg + 0.5)**2 -
                                                     npg * (npg + 1) *
-                                                    np.random.rand())))
+                                                    rnd.rand())))
                         # check of element al eens gekozen
                         # idx=find(lcs(1:k3-1)==lpos)
                         idx = (lcs[0:k3] == lpos).nonzero()
@@ -681,8 +781,9 @@ def sce(func, x0, bl, bu,
                 large = cf[np.isfinite(cf)].max()
                 large = 1.1 * large if large > 0. else 0.9 * large
 
-                snew, fnew, icall = _cce(func, s, sf, bl, bu, mask, icall,
-                                         maxn, alpha, beta, maxit, printit,
+                snew, fnew, icall = _cce(func, s, sf, bl, bu, mask,
+                                         sampling, icall, maxn, alpha,
+                                         beta, maxit, printit, rnd,
                                          args=args, kwargs=kwargs)
                 # Replace the worst point in Simplex with the new point:
                 s[-1, :] = snew
@@ -721,8 +822,8 @@ def sce(func, x0, bl, bu,
         allbestx = np.append(allbestx, bestx, axis=0)
         allbestf = np.append(allbestf, bestf)
 
-        # Compute the standard deviation for each parameter
-        xnstd = np.std(x, axis=0)
+        # # Compute the standard deviation for each parameter
+        # xnstd = np.std(x, axis=0)
 
         # Computes the normalized geometric range of the parameters
         # gnrng=np.exp(np.mean(np.log((np.max(x,axis=0)-np.min(x,axis=0))/bound)))
@@ -732,7 +833,8 @@ def sce(func, x0, bl, bu,
 
         if printit < 2:
             print('')
-            print('Evolution loop {0:d}, trials {1:d}. Best f: {2:f}, worst f {3:f}'.format(nloop, icall, bestf, worstf))
+            print('Evolution loop {0:d}, trials {1:d}. Best f: {2:f},'
+                  ' worst f {3:f}'.format(nloop, icall, bestf, worstf))
             print('  best X:')
             print(bestx)
             print('')
@@ -741,11 +843,13 @@ def sce(func, x0, bl, bu,
         if icall >= maxn:
             if printit < 2:
                 print('Optimisation terminated because trial number {:d} '
-                      'reached maximum number of trials {:d}.'.format(maxn, icall))
+                      'reached maximum number of trials'
+                      ' {:d}.'.format(maxn, icall))
 
         if gnrng < peps:
             if printit < 2:
-                print('The population has converged to a small parameter space {:f} (<{:f}).'.format(gnrng, peps))
+                print('The population has converged to a small parameter '
+                      ' space {:f} (<{:f}).'.format(gnrng, peps))
 
         criter = np.append(criter, bestf)
 
@@ -755,17 +859,18 @@ def sce(func, x0, bl, bu,
                 np.mean(np.abs(criter[nloop - kstop:nloop])), 1e-15)
             if criter_change < pcento:
                 if printit < 2:
-                    print('The best point has improved by less then {:f} in the last {:d} loops.'.format(pcento, kstop))
+                    print('The best point has improved by less then {:f} in'
+                          ' the last {:d} loops.'.format(pcento, kstop))
 
         # save restart
         if restartfile1 is not None:
-            rs1, rs2, rs3, rs4, rs5 = np.random.get_state()
+            rs1, rs2, rs3, rs4, rs5 = rnd.get_state()
             savez_compressed(restartfile1,
                              bl=bl, bu=bu, bound=bound, mask=mask,
                              criter=criter,
                              x=x, xf=xf,
-                             bestx=bestx, worstx=worstx, allbestf=allbestf, allbestx=allbestx,
-                             rs2=rs2)
+                             bestx=bestx, worstx=worstx, allbestf=allbestf,
+                             allbestx=allbestx, rs2=rs2)
             p = open(restartfile2, 'w')
             iout  = [nopt, npg, nps, nspl, mings, npt, nloop, icall, rs3, rs4]
             fform = '{:d},' * (len(iout) - 1) + '{:d}'
@@ -780,8 +885,10 @@ def sce(func, x0, bl, bu,
     # and criter_change>pcento
 
     if printit < 2:
-        print('Search stopped at trial number {0:d} with normalized geometric range {1:f}. '.format(icall, gnrng))
-        print('The best point has improved by {:f} in the last {:d} loops.'.format(criter_change, kstop))
+        print('Search stopped at trial number {0:d} with normalized'
+              ' geometric range {1:f}. '.format(icall, gnrng))
+        print('The best point has improved by {:f} in the last'
+              ' {:d} loops.'.format(criter_change, kstop))
 
     # reshape allbestx
     allbestx = allbestx.reshape(allbestx.size // nn, nn)
@@ -806,95 +913,139 @@ if __name__ == '__main__':
     doctest.testmod(optionflags=doctest.NORMALIZE_WHITESPACE)
 
     # maxn = 10000
-    # from pyjams.functions import ackley, griewank, goldstein_price, rastrigin, rosenbrock, six_hump_camelback
-    # np.random.seed(1023)
+    # from pyjams.functions import ackley, griewank, goldstein_price
+    # from pyjams.functions import rastrigin, rosenbrock, six_hump_camelback
+    # seed = 12345
+
     # """
     # This is the Ackley Function
     # Global Optimum (n>=2): 0.0 at origin
     # """
     # npara = 10
-    # bl = -10*np.ones(npara)
-    # bu = 10*np.ones(npara)
-    # x0 = np.random.rand(npara)*10.
-    # bestx, bestf = sce(ackley, x0, bl, bu, maxn=maxn, outf=True, restartfile1=None)
+    # bl = -10 * np.ones(npara)
+    # bu = 10 * np.ones(npara)
+    # x0 = np.random.rand(npara) * 10.
+    # bestx, bestf = sce(ackley, x0, bl, bu, maxn=maxn, outf=True,
+    #                    restartfile1=None, seed=seed)
     # print('Ackley ', bestx, bestf)
+
     # """
     # This is the Griewank Function (2-D or 10-D)
     # Bound: X(i)=[-600,600], for i=1,2,...,10  !for visualization only 2!
     #    Global Optimum: 0, at origin
     # """
     # npara = 10
-    # bl = -600*np.ones(npara)
-    # bu = 600*np.ones(npara)
-    # x0 = np.random.rand(npara)*600.
-    # bestx, bestf = sce(griewank, x0, bl, bu, maxn=maxn, outf=True, restartfile1=None)
+    # bl = -600 * np.ones(npara)
+    # bu = 600 * np.ones(npara)
+    # x0 = np.random.rand(npara) * 600.
+    # bestx, bestf = sce(griewank, x0, bl, bu, maxn=maxn, outf=True,
+    #                    restartfile1=None, seed=seed)
     # print('Griewank ', bestx, bestf)
+
     # """
     # This is the Goldstein-Price Function
     # Bound X1=[-2,2], X2=[-2,2]
     # Global Optimum: 3.0,(0.0,-1.0)
     # """
     # npara = 2
-    # bl = -2*np.ones(npara)
-    # bu = 2*np.ones(npara)
-    # x0 = np.random.rand(npara)*2.
-    # bestx, bestf = sce(goldstein_price, x0, bl, bu, maxn=maxn, outf=True, restartfile1=None)
+    # bl = -2 * np.ones(npara)
+    # bu = 2 * np.ones(npara)
+    # x0 = np.random.rand(npara) * 2.
+    # bestx, bestf = sce(goldstein_price, x0, bl, bu, maxn=maxn,
+    #                    outf=True, restartfile1=None, seed=seed)
     # print('Goldstein ', bestx, bestf)
+
     # """
     # This is the Rastrigin Function
     # Bound: X1=[-1,1], X2=[-1,1]
     # Global Optimum: -2, (0,0)
     # """
     # npara = 2
-    # bl = -1*np.ones(npara)
-    # bu = 1*np.ones(npara)
-    # x0 = np.random.rand(npara)*1.
-    # bestx, bestf = sce(rastrigin, x0, bl, bu, maxn=maxn, outf=True, restartfile1=None)
+    # bl = -1 * np.ones(npara)
+    # bu = 1 * np.ones(npara)
+    # x0 = np.random.rand(npara) * 1.
+    # bestx, bestf = sce(rastrigin, x0, bl, bu, maxn=maxn,
+    #                    outf=True, restartfile1=None, seed=seed)
     # print('Rastrigin ', bestx, bestf)
+
     # """
     # This is the Rosenbrock Function
     # Bound: X1=[-5,5], X2=[-2,8]; Global Optimum: 0,(1,1)
     #        bl=[-5 -5]; bu=[5 5]; x0=[1 1];
     # """
     # npara = 2
-    # bl = -2*np.ones(npara)
-    # bu = 5*np.ones(npara)
-    # x0 = np.random.rand(npara)*2.
-    # bestx, bestf = sce(rosenbrock, x0, bl, bu, maxn=maxn, outf=True, restartfile1=None)
+    # bl = -2 * np.ones(npara)
+    # bu = 5 * np.ones(npara)
+    # x0 = np.random.rand(npara) * 2.
+    # bestx, bestf = sce(rosenbrock, x0, bl, bu, maxn=maxn,
+    #                    outf=True, restartfile1=None, seed=seed)
     # print('Rosenbrock ', bestx, bestf)
+
     # """
     # This is the Six-hump Camelback Function.
     # Bound: X1=[-5,5], X2=[-5,5]
     # True Optima: -1.031628453489877, (-0.08983,0.7126), (0.08983,-0.7126)
     # """
     # npara = 2
-    # bl = -5*np.ones(npara)
-    # bu = 5*np.ones(npara)
-    # x0 = np.random.rand(npara)*5.
-    # bestx, bestf = sce(six_hump_camelback, x0, bl, bu, maxn=maxn, outf=True, restartfile1=None)
+    # bl = -5 * np.ones(npara)
+    # bu = 5 * np.ones(npara)
+    # x0 = np.random.rand(npara) * 5.
+    # bestx, bestf = sce(six_hump_camelback, x0, bl, bu, maxn=maxn,
+    #                    outf=True, restartfile1=None, seed=seed)
     # print('Six_hump_camelback ', bestx, bestf)
 
     # # Restart
-    # from pyjams.functions import rosenbrock
     # maxn = 500
     # npara = 2
-    # lb = -2*np.ones(npara)
-    # ub = 5*np.ones(npara)
+    # lb = -2 * np.ones(npara)
+    # ub = 5 * np.ones(npara)
     # x0 = np.zeros(npara)
-    # seed = 1234
-    # bestx, bestf = sce(rosenbrock, x0, lb, ub, maxn=maxn, outf=True, restartfile1=None,
+    # bestx, bestf = sce(rosenbrock, x0, lb, ub, maxn=maxn,
+    #                    outf=True, restartfile1=None,
     #                    seed=seed, restart=False)
     # print('Rosenbrock Reference - ', bestx, bestf)
-    # bestx, bestf = sce(rosenbrock, x0, lb, ub, maxn=maxn//2, outf=True,
+    # bestx, bestf = sce(rosenbrock, x0, lb, ub, maxn=maxn // 2, outf=True,
     #                    seed=seed, restart=False)
     # print('Rosenbrock Restart 1 - ', bestx, bestf)
     # bestx, bestf = sce(rosenbrock, x0, lb, ub, maxn=maxn, outf=True,
     #                    seed=seed, restart=True)
     # print('Rosenbrock Restart 2 - ', bestx, bestf)
-
     # # Clean restart
     # import os
-    # restartfile1='sce.restart.npz'
-    # restartfile2='sce.restart.txt'
-    # os.remove(restartfile1)
-    # os.remove(restartfile2)
+    # os.remove('sce.restart.npz')
+    # os.remove('sce.restart.txt')
+
+    # # different sampling
+    # npara = 2
+    # bl = -2 * np.ones(npara)
+    # bu = 5 * np.ones(npara)
+    # x0 = np.random.rand(npara) * 2.
+    # # sampling is str
+    # for sampling in ['half-open', 'left-half-open',
+    #                  'right-half-open', 'open', 'log']:
+    #     bestx, bestf = sce(rosenbrock, x0, bl, bu, sampling=sampling,
+    #                        maxn=maxn, outf=True, restartfile1=None, seed=seed)
+    #     print('Rosenbrock0 ', sampling, bestx, bestf)
+    # # sampling is list
+    # sampling = ['half-open', 'log']
+    # bestx, bestf = sce(rosenbrock, x0, bl, bu, sampling=sampling,
+    #                    maxn=maxn, outf=True, restartfile1=None, seed=seed)
+    # print('Rosenbrock1 ', sampling, bestx, bestf)
+    # # bounds include 0
+    # bl = [0., -2.]
+    # bu = [5., 8.]
+    # x0 = np.random.rand(npara) * 2.
+    # for sampling in ['half-open', 'left-half-open',
+    #                  'right-half-open', 'open', 'log']:
+    #     bestx, bestf = sce(rosenbrock, x0, bl, bu, sampling=sampling,
+    #                        maxn=maxn, outf=True, restartfile1=None, seed=seed)
+    #     print('Rosenbrock2 ', sampling, bestx, bestf)
+    # # bounds all > 0
+    # bl = [0.1, 0.1]
+    # bu = [5., 8.]
+    # x0 = np.random.rand(npara) * 2.
+    # for sampling in ['half-open', 'left-half-open',
+    #                  'right-half-open', 'Open', 'log']:
+    #     bestx, bestf = sce(rosenbrock, x0, bl, bu, sampling=sampling,
+    #                        maxn=maxn, outf=True, restartfile1=None, seed=seed)
+    #     print('Rosenbrock3 ', sampling, bestx, bestf)
