@@ -155,30 +155,24 @@ def _SampleInputMatrix(nrows, bl, bu, rnd, sampling='half-open'):
                     iirnd = rnd.random_sample(1)
                 x[i, j] = bl[j] + iirnd * bound[j]
             elif opt == 'log':
-                # x must be > 0. for ln(x)
-                xshift = 0.
-                xmul = 1.
-                if (bl[j] * bu[j]) < 0.:
-                    # bl < 0, bu > 0 -> shift to > 0
-                    xshift = np.maximum(np.abs(bl[j]), np.abs(bu[j]))
-                elif (bl[j] < 0.) or (bu[j] < 0.):
-                    # (bl =< 0 and bu =< 0) -> shift to > 0
-                    xmul = -1.
-                if (bl[j] * bu[j]) == 0.:
-                    if bl[j] == 0.:
-                        # (bl == 0 and bu > 0) -> shift to [bu, 2*bu)
-                        xshift = bu[j]
-                    if bu[j] == 0.:
-                        # (bl < 0 and bu == 0) -> shift to [2*bl, bl) < 0.
-                        # but xmul==-1
-                        xshift = bl[j]  # < 0
-                        assert xmul == -1., (
-                            'wrong logic in sampling option log')
-                lnbl = np.log((bl[j] + xshift) * xmul)
-                lnbu = np.log((bu[j] + xshift) * xmul)
-                x[i, j] = (np.exp(lnbl +
-                                  irnd[j] * (lnbu - lnbl)) -
-                           xshift) * xmul
+                 # x must be &gt; 0. for ln(x)
+                 xshift = 0.
+                 if (bl[j] * bu[j]) &lt; 0.:
+                     # bl &lt; 0, bu &gt; 0 -&gt; shift to &gt; 0
+                     xshift = 2. * np.maximum(np.abs(bl[j]), np.abs(bu[j]))
+                 elif (bl[j] * bu[j]) == 0.:
+                     if bl[j] == 0.:
+                         # (bl == 0 and bu &gt; 0) -&gt; shift to [bu, 2*bu)
+                         xshift = bu[j]
+                     if bu[j] == 0.:
+                         # (bl &lt; 0 and bu == 0) -&gt; shift to [|bl|, 2*|bl|) &lt; 0.
+                         xshift = -2. * bl[j]
+                 elif (bl[j] &lt; 0.) and (bu[j] &lt; 0.):
+                     # bl &lt; 0 and bu &lt; 0 -&gt; shift to &gt; 0
+                     xshift = 2. * np.maximum(np.abs(bl[j]), np.abs(bu[j]))
+                 lnbl = np.log(bl[j] + xshift)
+                 lnbu = np.log(bu[j] + xshift)
+                 x[i, j] = np.exp(lnbl + irnd[j] * (lnbu - lnbl)) - xshift
             else:
                 raise ValueError(f'unknown sampling option {isampling[j]}.\n'
                                  f'Known samplings are: half-open,'
