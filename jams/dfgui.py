@@ -112,6 +112,7 @@ Modified, Matthias Cuntz, Jan 2019 - exclude NaN in histograms
           Matthias Cuntz, May 2021 - write coordinates and values on bottom of
                                      plot
           Matthias Cuntz, Sep 2021 - catch if no infile given
+          Matthias Cuntz, Jul 2022 - add header argument
 '''
 # --------------------------------------------------------------------
 # import
@@ -283,8 +284,8 @@ class ListCtrlDataFrame(wx.ListCtrl):
                 print("Evaluating condition:", condition)
                 try:
                     tmp_mask = eval(condition)
-                    if (isinstance(tmp_mask, pd.Series) and
-                        (tmp_mask.dtype == np.bool)):
+                    if ( isinstance(tmp_mask, pd.Series) and
+                         (tmp_mask.dtype == np.bool)):
                         self.mask &= tmp_mask
                 except Exception as e:
                     print("Failed with:", e)
@@ -516,10 +517,12 @@ class ListBoxDraggable(wx.ListBox):
                     self.drag_start_index = index
 
     def swap(self, i, j):
-        self.index_mapping[i], self.index_mapping[j] = self.index_mapping[j], self.index_mapping[i]
+        self.index_mapping[i], self.index_mapping[j] = (
+            self.index_mapping[j], self.index_mapping[i])
         self.SetString(i, self.data[self.index_mapping[i]])
         self.SetString(j, self.data[self.index_mapping[j]])
-        self.selected_items[i], self.selected_items[j] = self.selected_items[j], self.selected_items[i]
+        self.selected_items[i], self.selected_items[j] = (
+            self.selected_items[j], self.selected_items[i])
         # self.update_selection()
         # print("Updated mapping:", self.index_mapping)
         new_event = wx.PyCommandEvent(wx.EVT_LISTBOX.typeId, self.GetId())
@@ -582,9 +585,11 @@ class FilterPanel(wx.Panel):
 
         self.main_sizer = wx.BoxSizer(wx.VERTICAL)
 
-        self.example = wx.StaticText(self, wx.ID_ANY,
-                                     label="Select column. Use filter like:   _ > 0.   or   _ > datetime.datetime(1998,1,1)",
-                                     size=wx.Size(560, 20))
+        self.example = wx.StaticText(
+            self, wx.ID_ANY,
+            label=("Select column. Use filter like:   _ > 0.   or   _ >"
+                   " datetime.datetime(1998,1,1)"),
+            size=wx.Size(560, 20))
         row_sizer = wx.BoxSizer(wx.HORIZONTAL)
         # row_sizer.Add(self.example, 0, wx.ALL | wx.ALIGN_CENTER, 1)
         row_sizer.Add(self.example, 0, wx.ALL, 1)
@@ -1152,6 +1157,7 @@ if __name__ == "__main__":
 
     csort = False
     form  = '%Y-%m-%d %H:%M:%S'
+    header = '0'
     sep   = None
     undef = None
     parser = argparse.ArgumentParser(
@@ -1167,11 +1173,16 @@ command line, otherwise assumed %Y-%m-%d %H:%M:%S.''')
     hstr += " used by Python."
     parser.add_argument('-f', '--format', action='store', default=form,
                         dest='form', metavar='C-format', help=hstr)
+    hstr  = ("header keyword of read_csv of pandas. --header='[0,1]' reads two"
+             " line of headers. dfgui uses the first line for its column"
+             " names")
+    parser.add_argument('--header', action='store', default=header,
+                        dest='header', metavar='read_csv_header', help=hstr)
     hstr = "Field delimiter (Default: try , ; None)"
     parser.add_argument('-s', '--sep', action='store', default=sep, dest='sep',
                         metavar='field_delimiter', help=hstr)
-    hstr  = 'Missing value. Will be set to NaN for plotting.'
-    hstr += ' Use long version if negative number, e.g. --undef="-9999".'
+    hstr  = "Missing value. Will be set to NaN for plotting."
+    hstr += " Use long version if negative number, e.g. --undef='-9999.'"
     parser.add_argument('-u', '--undef', action='store', type=float,
                         default=undef, dest='undef',
                         metavar='undef', help=hstr)
@@ -1182,6 +1193,7 @@ command line, otherwise assumed %Y-%m-%d %H:%M:%S.''')
     args    = parser.parse_args()
     csort   = args.csort
     form    = args.form
+    header  = eval(args.header)
     sep     = args.sep
     undef   = args.undef
     infiles = args.files
@@ -1197,36 +1209,43 @@ command line, otherwise assumed %Y-%m-%d %H:%M:%S.''')
     import numpy as np
     import pandas as pd
 
-    parser = lambda date: dt.datetime.strptime(date, form)
+    parser = lambda date: pd.to_datetime(date, format=form)
 
     infile = infiles[0]
     if sep is not None:
-        df = pd.read_csv(infile, sep, parse_dates=[0], date_parser=parser,
-                         index_col=0, header=0)
+        df = pd.read_csv(infile, sep=sep, parse_dates=[0], date_parser=parser,
+                         index_col=0, header=header)
     else:
         try:
             sep = ','
-            df = pd.read_csv(infile, sep, parse_dates=[0], date_parser=parser,
-                             index_col=0, header=0)
+            df = pd.read_csv(infile, sep=sep, parse_dates=[0],
+                             date_parser=parser, index_col=0, header=header)
         except:
             try:
                 sep = ';'
-                df = pd.read_csv(infile, sep, parse_dates=[0],
-                                 date_parser=parser, index_col=0, header=0)
+                df = pd.read_csv(infile, sep=sep, parse_dates=[0],
+                                 date_parser=parser, index_col=0,
+                                 header=header)
             except:
                 try:
                     # Pandas try to detect delimiter by using csv.Sniffer.
                     sep = None
-                    df = pd.read_csv(infile, sep, parse_dates=[0],
-                                     date_parser=parser, index_col=0, header=0)
+                    df = pd.read_csv(infile, sep=sep, parse_dates=[0],
+                                     date_parser=parser, index_col=0,
+                                     header=header)
                 except:
-                    raise IOError('Pandas could not read input file: '+infile)
+                    raise IOError('Pandas could not read input file: ' +
+                                  infile)
 
     if len(infiles) > 1:
         for infile in infiles[1:]:
-            df1 = pd.read_csv(infile, sep, parse_dates=[0], date_parser=parser,
-                              index_col=0, header=0)
+            df1 = pd.read_csv(infile, sep=sep, parse_dates=[0],
+                              date_parser=parser, index_col=0, header=header)
             df = df.append(df1, sort=True)
+
+    # no MultiIndex column names
+    head = [ i[0] if not isinstance(i, str) else i for i in df.columns ]
+    df.columns = head
 
     # # to concatenate files
     # df.to_csv('all.csv', na_rep=-9999., line_terminator='\r\n')
