@@ -346,14 +346,18 @@ def get_era5(vars=['10m_u_component_of_wind', '10m_v_component_of_wind',
         minyear    = 1979
         if not output_format:
             output_format = 'netcdf'
-        latency = 10  # days before today for product update
+        # era5 needs days that are already present in the product.
+        # It has a latency of about 5 days.
+        latency = 10
     else:
         rmodel     = 'era5land'
         resolution = 0.1
         minyear    = 1981
         if not output_format:
             output_format = 'grib'
-        latency = 100
+        # era5-land has a latency of about 2-3 months.
+        # But it seems to accept days that do not exist in the product yet.
+        latency = 0
     output_format = output_format.lower()
     if output_format == 'netcdf':
         suffix = '.nc'
