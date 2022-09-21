@@ -425,10 +425,13 @@ def get_isogsm2(latlon, baseurl=isogsm2base, path='.', override=False):
             for yy in yrs:
                 iifile = 'x{:03d}y{:03d}_isogsm2_6hrly_{:s}.dat'.format(
                     x, y, str(yy))
-                llfiles.append(path+'/'+iifile)
                 url = baseurl+'/'+str(yy)+'/'+iifile
                 print('    ', url)
-                url2file(url)
+                try:
+                    url2file(url)
+                    llfiles.append(path+'/'+iifile)
+                except:
+                    print('Could not find URL: ', url)
 
             # concatenate files
             isofiles[ll] = path + '/' + 'lat{:.3f}lon{:.3f}_isogsm2_6hrly_{:s}-{:s}.dat'.format(
