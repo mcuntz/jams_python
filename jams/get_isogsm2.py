@@ -137,7 +137,7 @@ def url2file(url, **kwargs):
     if url[-1] == '/':
         raise ValueError('url does not end with valid filename.')
 
-    ifile = url[url.rfind('/')+1:]
+    ifile = url[url.rfind('/') + 1:]
     url2filename(url, ifile, **kwargs)
 
     return
@@ -184,7 +184,7 @@ def get_filenames(url, **kwargs):
 # Get lat lon in IsoGSM2 grid
 def closest(vec, num, value=False):
     ''' Index in array at which the entry is closest to a given number. '''
-    out = np.argmin(np.abs(np.array(vec)-num))
+    out = np.argmin(np.abs(np.array(vec) - num))
     if value:
         return vec.flat[out]
     else:
@@ -251,9 +251,10 @@ def get_isogsm2(latlon, baseurl=isogsm2base, path='.', override=False):
                 Expect files with the naming convention
                 x, y = lonlat2xy(lon, lat)
                 ofile = 'lat{:.3f}lon{:.3f}_isogsm2_6hrly_{:s}-{:s}.dat'.format(
-                    isogsm2lats[y-1], isogsm2lons[x-1], str(yrs[0]), str(yrs[-1]))
-                Check if lat/lon was already downloaded in path by checking ONLY
-                filenames.
+                    isogsm2lats[y-1], isogsm2lons[x-1],
+                    str(yrs[0]), str(yrs[-1]))
+                Check if lat/lon was already downloaded in path by checking
+                ONLY filenames.
 
 
     Ouput
@@ -315,9 +316,8 @@ def get_isogsm2(latlon, baseurl=isogsm2base, path='.', override=False):
             lons = [ilon]
         else:
             if not os.path.exists(latlon):
-                raise IOError(
-                    'Did not find latlon: ' + latlon +
-                    '  latlon must be either a file name or a string "lat,lon".')
+                raise IOError(f'Did not find latlon: {latlon}. latlon must'
+                              f' be either a file name or a string "lat,lon".')
             lats = []
             lons = []
             ff = open(latlon, 'r')
@@ -329,22 +329,21 @@ def get_isogsm2(latlon, baseurl=isogsm2base, path='.', override=False):
                     break
             if nhead == 1:
                 ff.close()
-                raise IOError('Cannot detect delimter in latlon file: '+latlon)
+                raise IOError(f'Cannot detect delimter in latlon file:'
+                              f' {latlon}')
             ii = [ i for i in range(nhead)
                    if head[i].lower().startswith('lat') ]
             if len(ii) != 1:
                 ff.close()
-                raise IOError(
-                    'Found no or more than one column starting with "lat" in latlon file: ' +
-                    latlon)
+                raise IOError(f'Found no or more than one column starting'
+                              f' with "lat" in latlon file: {latlon}')
             iilat = ii[0]
             ii = [ i for i in range(nhead)
                    if head[i].lower().startswith('lon') ]
             if len(ii) != 1:
                 ff.close()
-                raise IOError(
-                    'Found no or more than one column starting with "lon" in latlon file: ' +
-                    latlon)
+                raise IOError(f'Found no or more than one column starting'
+                              f' with "lon" in latlon file: {latlon}')
             iilon = ii[0]
             for line in ff:
                 s  = line.rstrip()
@@ -364,7 +363,8 @@ def get_isogsm2(latlon, baseurl=isogsm2base, path='.', override=False):
             lats = latlon[0, :]
             lons = latlon[1, :]
     else:
-        raise IOError('latlon must be either a string "lat,lon", a filename, or an iterable with lats and lons.')
+        raise IOError('latlon must be either a string "lat,lon", a filename,'
+                      ' or an iterable with lats and lons.')
     nlat = len(lats)
 
     # make output directory
@@ -372,14 +372,14 @@ def get_isogsm2(latlon, baseurl=isogsm2base, path='.', override=False):
         os.makedirs(path)
 
     # Check existing files
-    hasfile  = [False]*nlat
-    isofiles = ['']*nlat
-    files = glob.glob(path+'/lat*.dat')
+    hasfile  = [False] * nlat
+    isofiles = [''] * nlat
+    files = glob.glob(path + '/lat*.dat')
     if (len(files) > 0) and (not override):
         for ll in range(nlat):
             x, y = lonlat2xy(float(lons[ll]), float(lats[ll]))
-            ilat = '{:.3f}'.format(isogsm2lats[y-1])
-            ilon = '{:.3f}'.format(isogsm2lons[x-1])
+            ilat = '{:.3f}'.format(isogsm2lats[y - 1])
+            ilon = '{:.3f}'.format(isogsm2lons[x - 1])
             for ff in files:
                 fs = os.path.basename(ff).split('_')[0][3:]
                 lat, lon = fs.split('lon')
@@ -395,7 +395,8 @@ def get_isogsm2(latlon, baseurl=isogsm2base, path='.', override=False):
         yrs = get_years(baseurl)
     except Exception as e:
         if str(e) == 'HTTP Error 407: Proxy Authentication Required':
-            print('Enter your http proxy details: http://user:password@proxy_server:port')
+            print('Enter your http proxy details:'
+                  ' http://user:password@proxy_server:port')
             print('For example: http://mcuntz:password@revelec.inra.fr:3128')
             user = input('User (mcuntz):')
             if user == '':
@@ -425,17 +426,20 @@ def get_isogsm2(latlon, baseurl=isogsm2base, path='.', override=False):
             for yy in yrs:
                 iifile = 'x{:03d}y{:03d}_isogsm2_6hrly_{:s}.dat'.format(
                     x, y, str(yy))
-                url = baseurl+'/'+str(yy)+'/'+iifile
+                url = baseurl + '/' + str(yy) + '/' + iifile
                 print('    ', url)
                 try:
                     url2file(url)
-                    llfiles.append(path+'/'+iifile)
+                    llfiles.append(path + '/' + iifile)
                 except:
                     print('Could not find URL: ', url)
 
             # concatenate files
-            isofiles[ll] = path + '/' + 'lat{:.3f}lon{:.3f}_isogsm2_6hrly_{:s}-{:s}.dat'.format(
-                isogsm2lats[y-1], isogsm2lons[x-1], str(yrs[0]), str(yrs[-1]))
+            isofiles[ll] = (
+                path + '/' +
+                'lat{:.3f}lon{:.3f}_isogsm2_6hrly_{:s}-{:s}.dat'.format(
+                    isogsm2lats[y - 1], isogsm2lons[x - 1], str(yrs[0]),
+                    str(yrs[-1])))
             print('  Write ', isofiles[ll])
             with open(isofiles[ll], 'w') as fout:
                 fin = fileinput.input(llfiles)
@@ -473,12 +477,14 @@ if __name__ == '__main__':
     parser.add_argument(
         '-l', '--latlon', action='store',
         default=latlon, dest='latlon', metavar='lat,lon',
-        help='latitude,longitude to extract from IsoGSM2 (default: read from input file). If latitude or longitude is negative, use the notation -l=lat,lon instead of -l lat,lon.')
+        help=('latitude,longitude to extract from IsoGSM2 (default: read'
+              ' from input file). If latitude or longitude is negative,'
+              ' use the notation -l=lat,lon instead of -l lat,lon.'))
     parser.add_argument(
         '-o', '--override', action='store_true', default=override,
         dest='override',
-        help='Do not check that output file already exists. '
-        'Override existing output file (default: False).')
+        help=('Do not check that output file already exists. '
+              'Override existing output file (default: False).'))
     parser.add_argument(
         '-p', '--path', action='store', default=path, dest='path',
         metavar='path',
@@ -486,10 +492,12 @@ if __name__ == '__main__':
     parser.add_argument(
         '-u', '--url', action='store',
         default=baseurl, dest='baseurl', metavar='url',
-        help='URL of IsoGSM2 base directory (default: '+baseurl+').')
+        help='URL of IsoGSM2 base directory (default: ' + baseurl + ').')
     parser.add_argument(
         'ifile', nargs='?', default=None, metavar='latlon_file',
-        help='File with lat lon info (only these two header columns must begin with lat and lon (case-insensitive). File only used if no -l lat,lon given.')
+        help=('File with lat lon info (only these two header columns must'
+              ' begin with lat and lon (case-insensitive). File only used'
+              ' if no -l lat,lon given.'))
 
     args     = parser.parse_args()
     latlon   = args.latlon
@@ -502,7 +510,7 @@ if __name__ == '__main__':
 
     # Check input
     if (latlon is None) and (ifile is None):
-        raise IOError('\n-l lat,lon or input file must be given.\n')
+        raise IOError('-l lat,lon or input file must be given.')
 
     if (latlon is not None):
         ilatlon = latlon
@@ -517,6 +525,6 @@ if __name__ == '__main__':
     print('Files: ', ofiles)
 
     t2    = ptime.time()
-    strin = ('[m]: {:.1f}'.format((t2-t1)/60.) if (t2-t1) > 60. else
-             '[s]: {:d}'.format(int(t2-t1)))
+    strin = ('[m]: {:.1f}'.format((t2 - t1) / 60.) if (t2 - t1) > 60. else
+             '[s]: {:d}'.format(int(t2 - t1)))
     print('Time elapsed', strin)
