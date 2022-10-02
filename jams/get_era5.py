@@ -31,6 +31,9 @@ Modified Stephan Thober, Mar 2020 - added era5-land capability
          Matthias Cuntz & Jerome Ogee, Sep 2022
              - respect latency of provision of ERA5 and ERA5-Land for
                current year
+         Matthias Cuntz, Oct 2022
+             - shift area by 0.01 so account for sites on grid borders of ERA
+             - allow filenames starting with era5-land and era5land
 
 
 --------------------------------------------------------
@@ -334,6 +337,10 @@ def get_era5(vars=['10m_u_component_of_wind', '10m_v_component_of_wind',
              Matthias Cuntz & Jerome Ogee, Sep 2022
                  - respect latency of provision of ERA5 and ERA5-Land for
                    current year
+             Matthias Cuntz, Oct 2022
+                 - shift area by 0.01 so account for sites on grid borders of
+                   ERA
+                 - allow filenames starting with era5-land and era5land
 
     """
     # Check parameters
@@ -350,7 +357,7 @@ def get_era5(vars=['10m_u_component_of_wind', '10m_v_component_of_wind',
         # It has a latency of about 5 days.
         latency = 10
     else:
-        rmodel     = 'era5land'
+        # rmodel     = 'era5land'
         resolution = 0.1
         minyear    = 1981
         if not output_format:
@@ -390,10 +397,12 @@ def get_era5(vars=['10m_u_component_of_wind', '10m_v_component_of_wind',
         assert len(sarea) == 2, estr
         lat, lon = sarea
         # single point does not work. Needs to encompass an actual grid point.
-        area = (str(float(lat) + resolution / 2.) + '/'
-                + str(float(lon) - resolution / 2.) + '/'
-                + str(float(lat) - resolution / 2.) + '/'
-                + str(float(lon) + resolution / 2.))
+        # take slightly more to the left and bottom to take lower value when
+        # exactly on grid border
+        area = (str(float(lat) + resolution / 2 - 0.01) + '/'
+                + str(float(lon) - resolution / 2 + 0.01) + '/'
+                + str(float(lat) - resolution / 2 + 0.01) + '/'
+                + str(float(lon) + resolution / 2 - 0.01))
 
     # years
     if years:
@@ -430,28 +439,29 @@ def get_era5(vars=['10m_u_component_of_wind', '10m_v_component_of_wind',
     if (len(files) > 0) and (not override):
         ilat1, ilon1, ilat2, ilon2 = [ float(i) for i in area.split('/') ]
         for ff in files:
-            fs = ff.split('_')
-            lat1 = float(fs[-5])
-            lon1 = float(fs[-4])
-            lat2 = float(fs[-3])
-            lon2 = float(fs[-2])
-            if ( (ilat1 <= lat1) and (ilat2 >= lat2) and
-                 (ilon1 >= lon1) and (ilon2 <= lon2) ):
-                fs  = fs[-1]
-                yrs = fs[:fs.rfind('.')]
-                if '-' in yrs:
-                    # check merged file
-                    yr1, yr2 = [ int(i) for i in yrs.split('-') ]
-                else:
-                    # check single year file
-                    yr2 = yr1 = int(yrs)
-                for yr in range(yr1, yr2 + 1):
-                    if (yr >= yearstart) and (yr <= yearend):
-                        if yr in hasyrs:
-                            ii = hasyrs.index(yr)
-                            hasyrs.remove(yr)
-                            fyr = targetyrs.pop(ii)
-                            targetera5[targetera5.index(fyr)] = ff
+            if len(hasyrs) > 0:
+                fs = ff.split('_')
+                lat1 = float(fs[-5])
+                lon1 = float(fs[-4])
+                lat2 = float(fs[-3])
+                lon2 = float(fs[-2])
+                if ( (ilat1 <= lat1) and (ilat2 >= lat2) and
+                     (ilon1 >= lon1) and (ilon2 <= lon2) ):
+                    fs  = fs[-1]
+                    yrs = fs[:fs.rfind('.')]
+                    if '-' in yrs:
+                        # check merged file
+                        yr1, yr2 = [ int(i) for i in yrs.split('-') ]
+                    else:
+                        # check single year file
+                        yr2 = yr1 = int(yrs)
+                    for yr in range(yr1, yr2 + 1):
+                        if (yr >= yearstart) and (yr <= yearend):
+                            if yr in hasyrs:
+                                ii = hasyrs.index(yr)
+                                hasyrs.remove(yr)
+                                fyr = targetyrs.pop(ii)
+                                targetera5[targetera5.index(fyr)] = ff
 
     # Select all times
     times = ['00:00', '01:00', '02:00',
