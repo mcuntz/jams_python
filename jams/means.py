@@ -3,6 +3,8 @@ from __future__ import division, absolute_import, print_function
 import numpy as np
 from jams.date2dec import date2dec
 from jams.dec2date import dec2date
+from warnings import warn, filterwarnings
+filterwarnings("default", category=DeprecationWarning)
 
 
 __all__ = ['means']
@@ -260,6 +262,8 @@ def means(date, dat, year=False, month=False, day=False, hour=False,
                   - did not take keyword 'retrospective' from Robin Leucht but
                     added a Note above for this case
     """
+    warn('The function means is deprecated from JAMS and superseded by'
+         ' means of pyjams.', category=DeprecationWarning)
     # Constants
     myundef  = 9e33
     ismasked = type(dat) == np.ma.core.MaskedArray

@@ -4,6 +4,8 @@ import numpy as np
 import numpy.lib.format as format
 from numpy.compat import basestring
 import os
+from warnings import warn, filterwarnings
+filterwarnings("default", category=DeprecationWarning)
 
 __all__ = ['savez', 'savez_compressed']
 
@@ -254,6 +256,10 @@ def _savez(file, args, kwds, compress):
     import zipfile
     import tempfile
     import shutil
+
+    warn('The functions savez and savez_compressed are deprecated from JAMS.'
+         ' Use updatez/updatez_compressed of pyjams together with'
+         ' numpy.savez/numpy.savez_compressed.', category=DeprecationWarning)
 
     if isinstance(file, basestring):
         if not file.endswith('.npz'):

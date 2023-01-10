@@ -26,6 +26,8 @@ The following functions are provided
    files_from_gui
 """
 from __future__ import division, absolute_import, print_function
+from warnings import warn, filterwarnings
+filterwarnings("default", category=DeprecationWarning)
 
 
 __all__ = ['directory_from_gui', 'directories_from_gui', 'file_from_gui', 'files_from_gui']
@@ -70,6 +72,11 @@ def directories_from_gui(initialdir='.', title='Choose one or several directorie
         import tkinter.filedialog as tkFileDialog
     except ImportError: # Python 2
         import Tkinter, tkFileDialog
+
+    warn('The function directories_from_gui is deprecated from JAMS and'
+         ' superseded by directories_from_gui of pyjams.',
+         category=DeprecationWarning)
+
     root = Tkinter.Tk()
     root.withdraw()                                      # hide root window, i.e. white square
 
@@ -138,6 +145,11 @@ def directory_from_gui(initialdir='.', title='Choose directory.'):
         import tkinter.filedialog as tkFileDialog
     except ImportError: # Python 2
         import Tkinter, tkFileDialog
+
+    warn('The function directory_from_gui is deprecated from JAMS and'
+         ' superseded by directory_from_gui of pyjams.',
+         category=DeprecationWarning)
+
     root = Tkinter.Tk()
     root.withdraw()                                      # hide root window, i.e. white square
 
@@ -185,7 +197,11 @@ def file_from_gui(initialdir='.', title='Choose file', multiple=False):
     Written,  Matthias Cuntz, Jun 2014
     Modified, Matthias Cuntz, May 2020 - numpy docstring format
     """
-    return files_from_gui(initialdir=initialdir, title=title, multiple=multiple)
+    warn('The function file_from_gui is deprecated from JAMS and'
+         ' superseded by file_from_gui of pyjams.',
+         category=DeprecationWarning)
+    return files_from_gui(initialdir=initialdir, title=title,
+                          multiple=multiple)
 
 
 # -------------------------------------------------------------------------
@@ -234,6 +250,11 @@ def files_from_gui(initialdir='.', title='Choose file(s).', multiple=True):
         import tkinter.filedialog as tkFileDialog
     except ImportError: # Python 2
         import Tkinter, tkFileDialog
+
+    warn('The function files_from_gui is deprecated from JAMS and'
+         ' superseded by files_from_gui of pyjams.',
+         category=DeprecationWarning)
+
     root = Tkinter.Tk()
     root.withdraw()                                      # hide root window, i.e. white square
 

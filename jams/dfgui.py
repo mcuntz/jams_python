@@ -140,7 +140,7 @@ from matplotlib.backends.backend_wx import NavigationToolbar2Wx
 from matplotlib.figure import Figure
 import matplotlib.dates as mpld
 from matplotlib import pyplot as plt
-plt.style.use('seaborn-dark')
+plt.style.use('seaborn-v0_8-dark')
 
 
 def format_coord_scatter(x, y, ax, ax2, xdtype, ydtype, y2dtype):

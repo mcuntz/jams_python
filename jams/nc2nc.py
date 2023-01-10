@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 from __future__ import division, absolute_import, print_function
+from warnings import warn, filterwarnings
+filterwarnings("default", category=DeprecationWarning)
 
 __all__ = ['nc2nc']
 
@@ -89,12 +91,14 @@ def nc2nc(ifile, ofile, dvar=[], rvar={}, rname={}, ratt={}, hist=None):
     '''
     import numpy as np
     import netCDF4 as nc
+    warn('The function nc2nc is deprecated from JAMS and superseded by'
+         ' ncio.copy_file of pyjams.', category=DeprecationWarning)
 
     if not isinstance(dvar, (list, tuple, np.ndarray)): dvar = [dvar]
     rvlist = list(rvar.keys())
     rnlist = list(rname.keys())
     ralist = list(ratt.keys())
-    
+
     with nc.Dataset(ifile) as src, nc.Dataset(ofile, 'w', format='NETCDF4') as dst:
         # copy file attributes
         for name in src.ncattrs():

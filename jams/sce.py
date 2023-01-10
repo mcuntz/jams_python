@@ -60,6 +60,8 @@ Released under the MIT License.
     sce
 """
 from __future__ import division, absolute_import, print_function
+from warnings import warn, filterwarnings
+filterwarnings("default", category=DeprecationWarning)
 from distutils.util import strtobool
 from numpy import savez_compressed
 import numpy as np
@@ -569,6 +571,8 @@ def sce(func, x0, bl, bu,
        criter(.) = vector containing the best criterion values of the last
                    10 shuffling loops
     """
+    warn('The function sce is deprecated from JAMS. Use module pyjams.',
+         category=DeprecationWarning)
     if not restart:
         # Initialize SCE parameters:
         nn = len(x0)

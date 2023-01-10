@@ -24,8 +24,6 @@ correlate              Computes the cross-correlation function of two series x a
 cuntz_gleixner         Cuntz-Gleixner model of 13C discrimination.
 dag                    Generation and plotting of (connected) directed acyclic graphs with one source node.
 dielectric_water       Dielectric constant of liquid water.
-directories_from_gui   Open directory selection dialogs, returns consecutiveley selected directories.
-directory_from_gui     Open directory selection dialog, returns selected directory.
 delta_isogsm2          Calculate delta values from downloaded IsoGSM2 data.
 dewpoint               Calculates the dew point from ambient humidity.
 dfgui                  A minimalistic GUI for analyzing Pandas DataFrames based on wxPython.
@@ -39,8 +37,6 @@ errormeasures          Definition of different error measures.
 fftngo                 Fast fourier transformation for dummies (like me)
 Field                  Generates random hydraulic conductivity fields.
 files                  Module with file list function.
-file_from_gui          Open file selection dialog for one single file, returns selected files
-files_from_gui         Open file selection dialog, returns selected files
 fill_nonfinite         Fill missing values by interpolation.
 find_in_path           Look for file in system path.
 Filtered_Incompr_Field Generates random filtered velocity fields.
@@ -76,12 +72,9 @@ level1                 Module with functions dealing with CHS level1 data files,
 lhs                    Latin Hypercube Sampling of any distribution without correlations.
 lif                    Count number of lines in file.
 line_dev_mask          Maskes elements of an array deviating from a line fit.
-logtools               Module with control file functions of Logtools, the Logger Tools Software of Olaf Kolle.
 lon_fmt                Set lon label string (called by Basemap.drawmeridians) if LaTeX package clash.
 lowess                 Locally linear regression in n dimensions.
 mat2nc                 Converts Matlab file *.mat into NetCDF *.nc.
-means                  Calculate daily, monthly, yearly, etc. means of data depending on date stamp.
-nc2nc                  Copy netcdf file deleting, renaming, replacing variables and attribues.
 netcdf4                Convenience layer around netCDF4
 outlier                Rossner''s extreme standardized deviate outlier test.
 pack                   Similar to Fortran pack function with mask.
@@ -103,7 +96,6 @@ t2sap                  Conversion of temperature difference to sap flux density.
 savitzky_golay         Smooth (and optionally differentiate) 1D data with a Savitzky-Golay filter.
 savitzky_golay2d       Smooth (and optionally differentiate) 2D data with a Savitzky-Golay filter.
 saltelli               Parameter sampling for Sobol indices calculation.
-sce                    Shuffle-Complex-Evolution algorithm for function min(max)imisation
 semivariogram          Calculates semivariogram from spatial data.
 sendmail               Send an e-mail.
 sg                     Wrapper savitzky_golay.
@@ -112,8 +104,6 @@ sigma_filter           Mask values deviating more than z standard deviations fro
 tail                   Return list with last n lines of file.
 maskgroup              Masks elements in a 1d array gathered in small groups.
 samevalue              Checks if abs. differences of array values within a certain window are smaller than threshold.
-savez                  Save several numpy arrays into a single file in uncompressed ``.npz`` format.
-savez_compressed       Save several arrays into a single file in compressed ``.npz`` format.
 smax                   Calculating smooth maximum of two numbers
 smin                   Calculating smooth minimum of two numbers
 sobol_index            Calculates the first-order and total variance-based sensitivity indices.
@@ -149,11 +139,15 @@ color                  Module with color functions for plotting.
 const                  Provides physical, mathematical, computational, and isotope constants.
 date2dec               Converts arrays with calendar date to decimal date.
 dec2date               Converts arrays with decimal date to calendar date.
+directories_from_gui   Open directory selection dialogs, returns consecutiveley selected directories.
+directory_from_gui     Open directory selection dialog, returns selected directory.
 div                    Wrapper for division.
 division               Divide two arrays, return 'otherwise' if division by 0.
 elementary_effects     Morris measures mu, stddev and mu*
 en2ascii               Convert date notations from English YYYY-MM-DD to ascii date format DD.MM.YYYY hh:mm:ss.
 esat                   Calculates the saturation vapour pressure of water/ice.
+file_from_gui          Open file selection dialog for one single file, returns selected files
+files_from_gui         Open file selection dialog, returns selected files
 fr2ascii               Convert date notations from French DD/MM/YYYT to ascii date format DD.MM.YYYY hh:mm:ss.
 fread                  Reads in float array from ascii file.
 fsread                 Simultaneous read of float and string array from ascii file.
@@ -162,9 +156,12 @@ get_brewer             Registers and returns Brewer colormap.
 int2roman              Integer to roman numeral conversion.
 kernel_regression      Multi-dimensional non-parametric regression.
 kernel_regression_h    Optimal bandwidth for kernel regression.
+logtools               Module with control file functions of Logtools, the Logger Tools Software of Olaf Kolle.
 mad                    Median absolute deviation test.
 mcPlot                 Matthias Cuntz' standard plotting class.
+means                  Calculate daily, monthly, yearly, etc. means of data depending on date stamp.
 morris_sampling        Sampling of optimised trajectories for Morris measures / elementary effects
+nc2nc                  Copy netcdf file deleting, renaming, replacing variables and attribues.
 ncread                 Wrapper for readnetcdf.
 netcdfread             Wrapper for readnetcdf.
 plot_brewer            Plots available Brewer color maps in pdf file.
@@ -174,6 +171,9 @@ readnc                 Wrapper for readnetcdf.
 readnetcdf             Reads variables or information from netcdf file.
 register_brewer        Registers and registers Brewer colormap.
 roman2int              Roman numeral to integer conversion.
+savez                  Save several numpy arrays into a single file in uncompressed ``.npz`` format.
+savez_compressed       Save several arrays into a single file in compressed ``.npz`` format.
+sce                    Shuffle-Complex-Evolution algorithm for function min(max)imisation
 screening              Samples trajectories, runs model and returns measures of Morris Elemenary Effects
 signature2plot         Write a copyright notice on a plot.
 sread                  Reads in string array from ascii file.
@@ -232,9 +232,7 @@ kriging                Krig a surface from a set of 2D points.
 leafprojection         Calculation of leaf projection from leaf angle observations.
 level1                 Module with functions dealing with CHS level1 data files, data and flags.
 line_dev_mask          Mask elements of an array deviating from a line fit.
-logtools               Module with control file functions of Logtools, the Logger Tools Software of Olaf Kolle.
 lowess                 Locally linear regression in n dimensions.
-means                  Calculate daily, monthly, yearly, etc. means of data depending on date stamp.
 outlier                Rossner''s extreme standardized deviate outlier test.
 pca                    Principal component analysis (PCA) upon the first dimension of an 2D-array.
 rossner                Wrapper for outlier.
@@ -295,7 +293,6 @@ pi                     Parameter importance index PI or alternatively B index ca
 pso                    Particle swarm optimization
 qa                     Module of quality assessment (error) measures.
 saltelli               Parameter sampling for Sobol indices calculation.
-sce                    Shuffle-Complex-Evolution algorithm for function min(max)imisation
 sobol                  Generates Sobol sequences
 sobol_index            Calculates the first-order and total variance-based sensitivity indices.
 
@@ -316,12 +313,8 @@ Miscellaneous
 apply_undef            Use a function on masked arguments.
 astr                   Wrapper for autostring.
 autostring             Format number (array) with given decimal precision.
-directories_from_gui   Open directory selection dialogs, returns consecutiveley selected directories
-directory_from_gui     Open directory selection dialog, returns selected directory
 encrypt                Module to encrypt and decrypt text using a key system as well as a cipher.
 files                  Module with file list function.
-file_from_gui          Open file selection dialog for one single file, returns selected files
-files_from_gui         Open file selection dialog, returns selected files
 find_in_path           Look for file in system path.
 ftp                    Module with functions for interacting with an open FTP connection.
 sendmail               Send an e-mail.
@@ -358,13 +351,10 @@ hdf4read               Wrapper for readhdf4.
 hdf5read               Wrapper for readhdf5.
 jConfigParser          Extended Python ConfigParser.
 mat2nc                 Converts Matlab file *.mat into NetCDF *.nc.
-nc2nc                  Copy netcdf file deleting, renaming, replacing variables and attribues.
 netcdf4                Convenience layer around netCDF4
 readhdf                Reads variables or information from hdf4 and hdf5 files.
 readhdf4               Reads variables or information from hdf4 files.
 readhdf5               Reads variables or information from hdf5 file.
-savez                  Save several numpy arrays into a single file in uncompressed ``.npz`` format.
-savez_compressed       Save several arrays into a single file in compressed ``.npz`` format.
 writenetcdf            Write netCDF4 file.
 
 
